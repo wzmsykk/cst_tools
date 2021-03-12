@@ -1,0 +1,40 @@
+{
+    "parameters": [
+        {
+            "expr": "229",
+            "name": "R",
+            "value": "229"
+        },
+        {
+            "expr": "259",
+            "name": "L",
+            "value": "259"
+        },
+        {
+            "expr": "50",
+            "name": "Rtube",
+            "value": "50"
+        },
+        {
+            "expr": "400",
+            "name": "Ltube",
+            "value": "400"
+        },
+        {
+            "expr": "400",
+            "name": "fmin",
+            "value": "400"
+        },
+        {
+            "expr": "1200",
+            "name": "fmax",
+            "value": "1200"
+        },
+        {
+            "expr": "1",
+            "name": "nmodes",
+            "value": "1"
+        }
+    ],
+    "version": 1
+}

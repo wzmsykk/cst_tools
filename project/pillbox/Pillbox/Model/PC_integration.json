@@ -1,0 +1,81 @@
+{
+   "execution": {
+      "classname": "SMAPowerByEmagHPCFrame",
+      "libname": "SMAPowerByEmagUI"
+   },
+   "inputVariables": [
+      {
+         "name": "R",
+         "type": "float",
+         "value": 229.0
+      },
+      {
+         "name": "L",
+         "type": "float",
+         "value": 259.0
+      },
+      {
+         "name": "Rtube",
+         "type": "float",
+         "value": 50.0
+      },
+      {
+         "name": "Ltube",
+         "type": "float",
+         "value": 400.0
+      },
+      {
+         "name": "fmin",
+         "type": "float",
+         "value": 400.0
+      },
+      {
+         "name": "fmax",
+         "type": "float",
+         "value": 1200.0
+      },
+      {
+         "name": "nmodes",
+         "type": "float",
+         "value": 1.0
+      }
+   ],
+   "outputVariables": [
+      {
+         "len": 1,
+         "name": "3D\\Frequency (Multiple Modes)\\Mode 1",
+         "type": "float",
+         "value": 503.787486075
+      },
+      {
+         "len": 1,
+         "name": "3D\\Q-Factor (Perturbation) (Multiple Modes)\\Mode 1",
+         "type": "float",
+         "value": 41255.9220140901
+      },
+      {
+         "len": 1,
+         "name": "3D\\R over Q beta=1 (Multiple Modes)\\Mode 1",
+         "type": "float",
+         "value": 181.49829842131
+      },
+      {
+         "len": 1,
+         "name": "3D\\Shunt Impedance (Pertubation) beta=1 (Multiple Modes)\\Mode 1",
+         "type": "float",
+         "value": 7487879.64535961
+      },
+      {
+         "len": 1,
+         "name": "3D\\Voltage beta=1 (Multiple Modes)\\Mode 1",
+         "type": "float",
+         "value": 757637.685582881
+      },
+      {
+         "len": 1,
+         "name": "3D\\Total Loss (Pert., Aver.) (Multiple Modes)\\Mode 1",
+         "type": "float",
+         "value": 76659.1999072945
+      }
+   ]
+}

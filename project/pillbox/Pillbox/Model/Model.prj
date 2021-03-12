@@ -1,0 +1,19 @@
+[Version]
+2
+[ProjectVersion]
+'# MWS Version: Version 2020.0 - Sep 25 2019 - ACIS 29.0.1 -
+[Author]
+dzzvi
+[Mesh Cells]
+
+[Mesh Type]
+Tetrahedral
+[Last Problem Type]
+High Frequency
+[Last Solver Type]
+HF Eigenmode
+[Last Solver Type Abb]
+e
+[Results]
+Unavailable
+[Comment]

@@ -1,0 +1,227 @@
+
+
+'"Ver 20200123"
+Sub Start	
+	outFullDir=resultDir & currentResultName &"\"
+	defineCurvesNFaces()
+	compute()	
+	postProcess()
+	SaveAs (outFullDir & cstType &".cst", False)
+End Sub
+Sub defineCurvesNFaces
+	'径向0-R直线
+	With Line
+     .Reset
+     .Name "line_R"
+     .Curve "curve_R"
+     .X1 "0.0"
+     .Y1 "0.0"
+     .X2 "R"
+     .Y2 "0.0"
+     .Create
+	End With
+
+	'沿z轴X=0.5R Y=0的直线
+	With AnalyticalCurve
+     .Reset
+     .Name "line_xp"
+     .Curve "curv_line_xp"
+     .LawX "0.5*R"
+     .LawY "0"
+     .LawZ "t"
+     .ParameterRange "-L/2", "L/2"
+     .Create
+	End With
+	'沿z轴X=-0.5R Y=0的直线
+	With AnalyticalCurve
+     .Reset
+     .Name "line_xm"
+     .Curve "curv_line_xm"
+     .LawX "-0.5*R"
+     .LawY "0"
+     .LawZ "t"
+     .ParameterRange "-L/2", "L/2"
+     .Create
+	End With
+	'沿z=0.25L平面r=0.5R 的圆
+	With Circle
+     .Reset
+     .Name "circle_p1"
+     .Curve "curve_cp1"
+     .Radius "R/2"
+     .Xcenter "0.0"
+     .Ycenter "0.0"
+     .Segments "0"
+     .Create
+	End With
+	With Transform
+     .Reset
+     .Name "curve_cp1:circle_p1"
+     .Vector "0", "0", "0.25*L"
+     .UsePickedPoints "False"
+     .InvertPickedPoints "False"
+     .MultipleObjects "False"
+     .GroupObjects "False"
+     .Repetitions "1"
+     .MultipleSelection "False"
+     .Transform "Curve", "Translate"
+	End With
+	'沿z=-0.25L平面r=0.5R 的圆
+	With Circle
+     .Reset
+     .Name "circle_m1"
+     .Curve "curve_cm1"
+     .Radius "R/2"
+     .Xcenter "0.0"
+     .Ycenter "0.0"
+     .Segments "0"
+     .Create
+	End With
+	With Transform
+     .Reset
+     .Name "curve_cm1:circle_m1"
+     .Vector "0", "0", "-0.25*L"
+     .UsePickedPoints "False"
+     .InvertPickedPoints "False"
+     .MultipleObjects "False"
+     .GroupObjects "False"
+     .Repetitions "1"
+     .MultipleSelection "False"
+     .Transform "Curve", "Translate"
+	End With
+	'沿z=0.25L平面r=0.5R 的圆面
+	With Face
+     .Reset
+     .Name "facep"
+     .Type "CoverCurve"
+     .Curve "curve_cm1:circle_m1"
+     .DeleteCurve "False"
+     .Create
+	End With
+	'沿z=-0.25L平面r=0.5R 的圆面
+	With Face
+     .Reset
+     .Name "facem"
+     .Type "CoverCurve"
+     .Curve "curve_cp1:circle_p1"
+     .DeleteCurve "False"
+     .Create
+	End With
+	'沿z=0平面r=0.5R 的圆
+	With Circle
+     .Reset
+     .Name "circle_0"
+     .Curve "curve_0"
+     .Radius "R/2"
+     .Xcenter "0.0"
+     .Ycenter "0.0"
+     .Segments "0"
+     .Create
+	End With
+	'沿z=0平面r=0.5R 的圆面
+	With Face
+     .Reset
+     .Name "face0"
+     .Type "CoverCurve"
+     .Curve "curve_0:circle_0"
+     .DeleteCurve "False"
+     .Create
+	End With
+
+End Sub
+
+Sub compute
+	EigenmodeSolver.Start
+End Sub
+Sub postProcess
+	Dim fullPath As String
+	fullPath = outFullDir
+	basePath=""
+	fullPath = "C:/Users/ykk48/Documents/speedtest/"
+	'fullPath = "C:\\Users\\ykk48\\Documents\\speedtest\\speedtest\\cst_new\\model\\Pillbox_test\\"
+	Dim outmode,i As Integer
+	Dim st,ed As Double
+	Dim fieldResultPath As String
+	Dim OBJ As Object
+	Dim dIntReal As Double, dIntImag As Double
+	Dim dArea As Double, dMax_abs As Double, dMax_z As Double
+	Dim eps_tm As Double, eps_te As Double
+	Dim m,n,p As Integer
+	Dim IS_TM,IS_TE As Boolean
+	eps_tm=0.01
+	eps_te=0.01
+	Dim result As Object
+
+	Set result = Result0D("")
+	outmode = RestoreDoubleParameter("nmodes")
+
+
+
+	For i=1 To outmode
+		'电场
+		SelectTreeItem("2D/3D Results\Modes\Mode "& i &"\e")
+		EvaluateFieldOnFace.CalculateIntegral ("facep","abs","re",dIntReal, dIntImag, dArea)
+		dMax_abs=EvaluateFieldOnFace.GetValue("max")
+		EvaluateFieldOnFace.CalculateIntegral("facep","abs","re",dIntReal, dIntImag, dArea)
+		dMax_z=EvaluateFieldOnFace.GetValue("max")
+		fieldResultPath=fullPath & "Mode" & i &"_TYP_TE.sig"
+		If (dMax_z/dMax_abs)<eps_tm Then
+			IS_TE=True
+			With result
+				.SetDataComplex(dMax_z,dMax_abs)
+				.Title("TYP_TE_ZMAX_ABSMAX")
+				.SetFileName(fieldResultPath)
+				.Save()
+			End With
+		End If
+		'TM
+		'For M
+		Set OBJ = EvaluateFieldAlongCurve.GetField1D ("curve_cp1", "abs", "real")
+		fieldResultPath= basePath & "Mode" & i & "_EF_M.sig"
+		OBJ.Save(fieldResultPath)
+		OBJ.AddToTree("1D Results\Data\Mode_" & i & "_EF_M")
+		'For N
+		Set OBJ = EvaluateFieldAlongCurve.GetField1D ("curve_R", "z", "real")
+		fieldResultPath= basePath & "Mode" & i & "_EF_N.sig"
+		OBJ.Save(fieldResultPath)
+		OBJ.AddToTree("1D Results\Data\Mode_" & i & "_EF_N")
+		'For P
+		Set OBJ = EvaluateFieldAlongCurve.GetField1D ("curv_line_xp", "z", "real")
+		fieldResultPath= basePath & "Mode" & i & "_EF_P.sig"
+		OBJ.Save(fieldResultPath)
+		OBJ.AddToTree("1D Results\Data\Mode_" & i & "_EF_P")
+		'磁场
+		SelectTreeItem("2D/3D Results\Modes\Mode "& i &"\h")
+		EvaluateFieldOnFace.CalculateIntegral("facep","abs","imaginary",dIntReal, dIntImag, dArea)
+		dMax_abs=EvaluateFieldOnFace.GetValue("max")
+		EvaluateFieldOnFace.CalculateIntegral("facep","abs","imaginary",dIntReal, dIntImag, dArea)
+		dMax_z=EvaluateFieldOnFace.GetValue("max")
+		fieldResultPath= fullPath & "Mode" & i & "_TYP_TM.sig"
+		If (dMax_z/dMax_abs)<eps_te Then
+			IS_TM=True
+			With result
+				.SetDataComplex(dMax_z,dMax_abs)
+				.Title("TYP_TM_ZMAX_ABSMAX")
+				.SetFileName(fieldResultPath)
+				.Save()
+			End With
+		End If
+		'TE
+		'For M
+		Set OBJ = EvaluateFieldAlongCurve.GetField1D ("curve_cp1", "abs", "imaginary")
+		fieldResultPath=basePath & "Mode"& i &"_HF_M.sig"
+		OBJ.Save(fieldResultPath)
+		OBJ.AddToTree("1D Results\Data\Mode_" & i & "_HF_M")
+		'For N
+		Set OBJ = EvaluateFieldAlongCurve.GetField1D ("curve_R", "z", "imaginary")
+		fieldResultPath=basePath &"Mode"& i &"_HF_N.sig"
+		OBJ.Save(fieldResultPath)
+		OBJ.AddToTree("1D Results\Data\Mode_" & i & "_HF_N")
+		'For P
+		Set OBJ = EvaluateFieldAlongCurve.GetField1D ("curv_line_xp", "z", "imaginary")
+		fieldResultPath=basePath &"Mode"& i &"_HF_P.sig"
+		OBJ.Save(fieldResultPath)
+		OBJ.AddToTree("1D Results\Data\Mode_" & i & "_HF_P")
+
+	Next i
+End Sub

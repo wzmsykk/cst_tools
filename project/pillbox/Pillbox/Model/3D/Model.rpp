@@ -1,0 +1,77 @@
+9
+0
+0
+8
+Frequency (Multiple Modes)
+3D Eigenmode Result
+1
+M0D
+2D and 3D Field Results
+P
+ED10
+1
+Frequency (Multiple Modes)\Mode 1
+Q-Factor (Perturbation) (Multiple Modes)
+3D Eigenmode Result
+1
+M0D
+2D and 3D Field Results
+P
+ED10
+1
+Q-Factor (Perturbation) (Multiple Modes)\Mode 1
+R over Q beta=1 (Multiple Modes)
+3D Eigenmode Result
+1
+M0D
+2D and 3D Field Results
+P
+ED10
+1
+R over Q beta=1 (Multiple Modes)\Mode 1
+Shunt Impedance (Pertubation) beta=1 (Multiple Modes)
+3D Eigenmode Result
+1
+M0D
+2D and 3D Field Results
+P
+ED10
+1
+Shunt Impedance (Pertubation) beta=1 (Multiple Modes)\Mode 1
+Voltage beta=1 (Multiple Modes)
+3D Eigenmode Result
+1
+M0D
+2D and 3D Field Results
+P
+ED10
+1
+Voltage beta=1 (Multiple Modes)\Mode 1
+Total Loss (Pert., Aver.) (Multiple Modes)
+3D Eigenmode Result
+1
+M0D
+2D and 3D Field Results
+P
+ED10
+1
+Total Loss (Pert., Aver.) (Multiple Modes)\Mode 1
+e_Abs (Z)
+Evaluate Field in arbitrary Coordinates
+1
+1D
+2D and 3D Field Results
+P
+ED10
+1
+e_Abs (Z)
+TotalQ_Eigenmode_All
+Loss and Q Value from H-Field
+1
+1D
+2D and 3D Field Results
+P
+ED10
+1
+TotalQ_Eigenmode_All
+0

@@ -1,0 +1,118 @@
+2021-02-18 09:16:11,742 - WARNING: 找到curr_global_cfg:.\config\current.ini
+2021-02-18 09:16:11,749 - INFO: 检查全局配置开始.
+2021-02-18 09:16:11,750 - DEBUG: CST ENV PATH为C:\Program Files (x86)\CST Studio Suite 2020\CST DESIGN ENVIRONMENT.exe
+2021-02-18 09:16:11,750 - DEBUG: CST 版本为2020
+2021-02-18 09:16:11,752 - INFO: 已建立tempdir于./temp。
+2021-02-18 09:16:11,753 - INFO: 已建立resultdir于./result。
+2021-02-18 09:16:11,754 - INFO: 检查全局配置结束.
+2021-02-18 09:16:11,754 - INFO: 使用命令行定义的project目录:.\project\POP
+2021-02-18 09:16:11,754 - INFO: 检查project开始
+2021-02-18 09:16:11,755 - INFO: 找到project目录:.\project\POP
+2021-02-18 09:16:11,755 - INFO: 检查project结束
+2021-02-18 09:16:11,756 - INFO: 已保存全局配置文件于.\config\current.ini。
+2021-02-18 09:16:11,756 - INFO: 开始使用project目录:.\project\POP
+2021-02-18 09:16:11,757 - INFO: 尝试打开project目录.\project\POP。
+2021-02-18 09:16:11,757 - INFO: 未找到配置文件project.ini，尝试重新创建。
+2021-02-18 09:16:11,757 - INFO: 创建配置文件project.ini。
+2021-02-18 09:16:11,758 - INFO: 未指定project名,使用为默认目录名POP
+2021-02-18 09:16:11,759 - INFO: 找到CST项目文件POP.cst
+2021-02-18 09:16:11,769 - INFO: 正在从CST文件中读取参数列表。
+2021-02-18 09:16:29,681 - INFO: b'This is CST DESIGN ENVIRONMENT 2020.0 Release from 2019-09-25 (change 724524)\r\r\n'
+2021-02-18 09:16:29,681 - INFO: b'Using install path: C:\\Program Files (x86)\\CST Studio Suite 2020\\\r\r\n'
+2021-02-18 09:16:29,682 - INFO: b'Using Qt 5.12.3 (compiled with 5.12.3)\r\r\n'
+2021-02-18 09:16:29,682 - INFO: b'\r\r\n'
+2021-02-18 09:16:29,683 - INFO: b'Checking license servers...\r\r\n'
+2021-02-18 09:16:29,683 - INFO: b'No license search path found in CST registry.\r\r\n'
+2021-02-18 09:16:29,683 - INFO: b'Checking license at startup successfully passed.\r\r\n'
+2021-02-18 09:16:29,692 - INFO: b'Connected to license server: 11605@LAPTOP-1M7HQML5\r\r\n'
+2021-02-18 09:16:29,695 - INFO: b'[modeler_AMD64.exe] This is the modeler 2020.0 Release from 2019-09-25 (change 724524)\r\r\n'
+2021-02-18 09:16:29,702 - INFO: b'[modeler_AMD64.exe] Startup: 18.02.2021 09:16:16\r\r\n'
+2021-02-18 09:16:29,703 - INFO: b'[modeler_AMD64.exe] \r\r\n'
+2021-02-18 09:16:29,704 - INFO: b'[modeler_AMD64.exe] Modeler affinity of main thread: 1111 1111 \r\r\n'
+2021-02-18 09:16:29,704 - INFO: b'[modeler_AMD64.exe] \r\r\n'
+2021-02-18 09:16:29,705 - INFO: b'[modeler_AMD64.exe] thread setup 1: 4, 8\r\r\n'
+2021-02-18 09:16:29,706 - INFO: b'[modeler_AMD64.exe]   sockets         : 1\r\r\n'
+2021-02-18 09:16:29,725 - INFO: b'[modeler_AMD64.exe]   cores per socket: 4\r\r\n'
+2021-02-18 09:16:29,730 - INFO: b'[modeler_AMD64.exe]   ht units        : 2\r\r\n'
+2021-02-18 09:16:29,736 - INFO: b'[modeler_AMD64.exe]   acc. hw         : 8\r\r\n'
+2021-02-18 09:16:29,738 - INFO: b'[modeler_AMD64.exe]   acc. OSI        : 8\r\r\n'
+2021-02-18 09:16:29,741 - INFO: b'[modeler_AMD64.exe]   aff. available  : yes\r\r\n'
+2021-02-18 09:16:29,750 - INFO: b"[modeler_AMD64.exe]   OSI log         : CPUID: selected engine is 'Leaf 0xB detection'\r\r\n"
+2021-02-18 09:16:29,752 - INFO: b'[modeler_AMD64.exe] Logical  0: socket  0 core  0\r\r\n'
+2021-02-18 09:16:29,752 - INFO: b'[modeler_AMD64.exe] Logical  1: socket  0 core  1\r\r\n'
+2021-02-18 09:16:29,753 - INFO: b'[modeler_AMD64.exe] Logical  2: socket  0 core  2\r\r\n'
+2021-02-18 09:16:29,756 - INFO: b'[modeler_AMD64.exe] Logical  3: socket  0 core  3\r\r\n'
+2021-02-18 09:16:29,764 - INFO: b'[modeler_AMD64.exe] Logical  4: socket  0 core  4\r\r\n'
+2021-02-18 09:16:29,766 - INFO: b'[modeler_AMD64.exe] Logical  5: socket  0 core  5\r\r\n'
+2021-02-18 09:16:29,766 - INFO: b'[modeler_AMD64.exe] Logical  6: socket  0 core  6\r\r\n'
+2021-02-18 09:16:29,767 - INFO: b'[modeler_AMD64.exe] Logical  7: socket  0 core  7\r\r\n'
+2021-02-18 09:16:29,767 - INFO: b'[modeler_AMD64.exe] packages: 1\r\r\n'
+2021-02-18 09:16:29,768 - INFO: b'[modeler_AMD64.exe] cores   : 4\r\r\n'
+2021-02-18 09:16:29,786 - INFO: b'[modeler_AMD64.exe] ht units: 2\r\r\n'
+2021-02-18 09:16:29,787 - INFO: b'[modeler_AMD64.exe] \r\r\n'
+2021-02-18 09:16:29,789 - INFO: b'[modeler_AMD64.exe] \r\r\n'
+2021-02-18 09:16:29,789 - INFO: b'[modeler_AMD64.exe] thread setup 2: 4\r\r\n'
+2021-02-18 09:16:29,790 - INFO: b'[modeler_AMD64.exe] thread setup 3: 128 --> 4\r\r\n'
+2021-02-18 09:16:29,791 - INFO: b'[modeler_AMD64.exe] Modeler openmp threads: 4\r\r\n'
+2021-02-18 09:16:29,791 - INFO: b'[modeler_AMD64.exe] Parallel ACIS is active. Starting 8 worker threads for ACIS.\r\r\n'
+2021-02-18 09:16:29,792 - INFO: b'[schematic_AMD64.exe] This is the schematic 2020.0 Release from 2019-09-25 (change 724524)\r\r\n'
+2021-02-18 09:16:29,793 - INFO: b'[schematic_AMD64.exe] \r\r\n'
+2021-02-18 09:16:29,794 - INFO: b'[schematic_AMD64.exe] \r\r\n'
+2021-02-18 09:16:29,795 - INFO: b'[schematic_AMD64.exe] project name: c:\\users\\ykk48\\appdata\\local\\temp\\cstde1\\temp\\de94\\untitled_0.cst\r\r\n'
+2021-02-18 09:16:29,795 - INFO: b'[schematic_AMD64.exe] \r\r\n'
+2021-02-18 09:16:29,796 - INFO: b'[schematic_AMD64.exe] \r\r\n'
+2021-02-18 09:16:29,796 - INFO: b'[schematic_AMD64.exe] myname: C:\\Program Files (x86)\\CST Studio Suite 2020\\AMD64\\schematic_AMD64.exe\r\r\n'
+2021-02-18 09:16:29,797 - INFO: b'[schematic_AMD64.exe] \r\r\n'
+2021-02-18 09:16:29,797 - INFO: b'[modeler_AMD64.exe] Skipping template 3D\\Frequency (Multiple Modes):: Template needs to be evaluated first.\r\r\n'
+2021-02-18 09:16:29,798 - INFO: b'[modeler_AMD64.exe] Skipping template 3D\\Q-Factor (Perturbation) (Multiple Modes):: Template needs to be evaluated first.\r\r\n'
+2021-02-18 09:16:29,799 - INFO: b'[modeler_AMD64.exe] Skipping template 3D\\R over Q beta=1 (Multiple Modes):: Template needs to be evaluated first.\r\r\n'
+2021-02-18 09:16:29,805 - INFO: b'[modeler_AMD64.exe] Skipping template 3D\\Shunt Impedance (Pertubation) beta=1 (Multiple Modes):: Template needs to be evaluated first.\r\r\n'
+2021-02-18 09:16:29,805 - INFO: b'[modeler_AMD64.exe] Skipping template 3D\\Voltage beta=1 (Multiple Modes):: Template needs to be evaluated first.\r\r\n'
+2021-02-18 09:16:29,808 - INFO: b'[modeler_AMD64.exe] Skipping template 3D\\Total Loss (Pert., Aver.) (Multiple Modes):: Template needs to be evaluated first.\r\r\n'
+2021-02-18 09:16:29,809 - INFO: b'Batch run finished successfully\r\r\n'
+2021-02-18 09:16:29,810 - INFO: b'[modeler_AMD64.exe] Modeler finished successfully\r\r\n'
+2021-02-18 09:16:29,811 - INFO: b'Exiting with exit code 0. Exit code info: (EXITCODE_SUCCESS)\r\r\n'
+2021-02-18 09:16:29,818 - INFO: 创建配置文件结束。
+2021-02-18 09:16:29,838 - INFO: project.ini测试结束
+
+2021-02-18 09:16:29,842 - INFO: 全局信息:
+2021-02-18 09:16:29,857 - INFO: data目录:./data
+2021-02-18 09:16:29,858 - INFO: temp目录:./temp
+2021-02-18 09:16:29,859 - INFO: log目录:./log
+2021-02-18 09:16:29,862 - INFO: result目录:./result
+2021-02-18 09:16:29,873 - INFO: CST版本:2020
+2021-02-18 09:16:29,874 - INFO: CSTEXE路径:C:\Program Files (x86)\CST Studio Suite 2020\CST DESIGN ENVIRONMENT.exe
+2021-02-18 09:16:29,875 - INFO: project目录:.\project\POP
+2021-02-18 09:16:29,876 - INFO: 项目信息:
+2021-02-18 09:16:29,876 - INFO: ProjectName:POP
+2021-02-18 09:16:29,878 - INFO: ProjectType:POP
+2021-02-18 09:16:29,889 - INFO: ProjectDescription:
+2021-02-18 09:16:29,889 - INFO: 项目result目录:..\..\result
+2021-02-18 09:16:29,890 - INFO: 项目temp目录:..\..\temp
+2021-02-18 09:16:29,890 - INFO: CST文件名:POP.cst
+2021-02-18 09:16:29,891 - INFO: CSTFileMD5:8de0434bc8ad7b590a300da6e5c789f5
+2021-02-18 09:16:29,892 - INFO: 使用MPI:False
+2021-02-18 09:16:29,892 - INFO: MPI节点文件:
+2021-02-18 09:16:29,894 - INFO: UseRemoteCalculaton:False
+2021-02-18 09:16:29,911 - INFO: DCMainControlAddress:
+2021-02-18 09:16:29,912 - INFO: 参数列表文件:params.json
+2021-02-18 09:16:29,922 - INFO: created worker type local id:0
+2021-02-18 09:16:29,925 - INFO: TempDir:C:\Users\ykk48\Documents\cst_new\temp\worker_0
+2021-02-18 09:16:29,950 - INFO: TaskFileDir:C:\Users\ykk48\Documents\cst_new\temp\worker_0
+2021-02-18 09:16:29,987 - INFO: "C:\Program Files (x86)\CST Studio Suite 2020\CST DESIGN ENVIRONMENT.exe" -m "C:\Users\ykk48\Documents\cst_new\temp\worker_0\main.bas"
+2021-02-18 09:16:29,994 - INFO: <subprocess.Popen object at 0x00000223DBE2B9D0>
+2021-02-18 09:16:30,007 - INFO: created worker type local id:1
+2021-02-18 09:16:30,015 - INFO: TempDir:C:\Users\ykk48\Documents\cst_new\temp\worker_1
+2021-02-18 09:16:30,016 - INFO: TaskFileDir:C:\Users\ykk48\Documents\cst_new\temp\worker_1
+2021-02-18 09:16:30,027 - INFO: "C:\Program Files (x86)\CST Studio Suite 2020\CST DESIGN ENVIRONMENT.exe" -m "C:\Users\ykk48\Documents\cst_new\temp\worker_1\main.bas"
+2021-02-18 09:16:30,033 - INFO: <subprocess.Popen object at 0x00000223DBE2BA90>
+2021-02-18 09:16:30,053 - INFO: WorkerID:'0' Run:0 Name:'normal_result' started.
+2021-02-18 09:16:30,070 - INFO: Start Time:'Thu Feb 18 09:16:30 2021'
+2021-02-18 09:17:32,629 - INFO: WorkerID:'0' Run:0 Name:'normal_result' success.
+2021-02-18 09:17:32,629 - INFO: ElapsedTime:62.57562804222107
+2021-02-18 09:17:32,630 - INFO: End Time:'Thu Feb 18 09:17:32 2021'
+2021-02-18 09:17:32,672 - INFO: WorkerID:'0' Run:1 Name:'NEW000000_0' started.
+2021-02-18 09:17:32,672 - INFO: Start Time:'Thu Feb 18 09:17:32 2021'
+2021-02-18 09:17:32,673 - INFO: WorkerID:'1' Run:0 Name:'NEW000000_1' started.
+2021-02-18 09:17:32,674 - INFO: Start Time:'Thu Feb 18 09:17:32 2021'
+2021-02-18 09:17:42,760 - ERROR: CST ENV stopped

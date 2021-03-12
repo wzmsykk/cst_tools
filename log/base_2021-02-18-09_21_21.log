@@ -1,0 +1,52 @@
+2021-02-18 09:21:21,585 - WARNING: 找到curr_global_cfg:.\config\current.ini
+2021-02-18 09:21:21,593 - INFO: 检查全局配置开始.
+2021-02-18 09:21:21,594 - DEBUG: CST ENV PATH为C:\Program Files (x86)\CST Studio Suite 2020\CST DESIGN ENVIRONMENT.exe
+2021-02-18 09:21:21,595 - DEBUG: CST 版本为2020
+2021-02-18 09:21:21,597 - INFO: 检查全局配置结束.
+2021-02-18 09:21:21,597 - INFO: 使用命令行定义的project目录:.\project\copper
+2021-02-18 09:21:21,600 - INFO: 检查project开始
+2021-02-18 09:21:21,601 - INFO: 找到project目录:.\project\copper
+2021-02-18 09:21:21,609 - INFO: 检查project结束
+2021-02-18 09:21:21,611 - INFO: 已保存全局配置文件于.\config\current.ini。
+2021-02-18 09:21:21,611 - INFO: 开始使用project目录:.\project\copper
+2021-02-18 09:21:21,612 - INFO: 尝试打开project目录.\project\copper。
+2021-02-18 09:21:21,622 - INFO: project.ini测试结束
+
+2021-02-18 09:21:21,623 - INFO: 全局信息:
+2021-02-18 09:21:21,626 - INFO: data目录:./data
+2021-02-18 09:21:21,627 - INFO: temp目录:./temp
+2021-02-18 09:21:21,628 - INFO: log目录:./log
+2021-02-18 09:21:21,629 - INFO: result目录:./result
+2021-02-18 09:21:21,629 - INFO: CST版本:2020
+2021-02-18 09:21:21,639 - INFO: CSTEXE路径:C:\Program Files (x86)\CST Studio Suite 2020\CST DESIGN ENVIRONMENT.exe
+2021-02-18 09:21:21,647 - INFO: project目录:.\project\copper
+2021-02-18 09:21:21,648 - INFO: 项目信息:
+2021-02-18 09:21:21,649 - INFO: ProjectName:copper
+2021-02-18 09:21:21,649 - INFO: ProjectType:pillbox
+2021-02-18 09:21:21,651 - INFO: ProjectDescription:
+2021-02-18 09:21:21,652 - INFO: 项目result目录:..\..\result
+2021-02-18 09:21:21,653 - INFO: 项目temp目录:..\..\temp
+2021-02-18 09:21:21,654 - INFO: CST文件名:copper_cavity_new.cst
+2021-02-18 09:21:21,655 - INFO: CSTFileMD5:679ab7289ee38f722f32700d8c2033f6
+2021-02-18 09:21:21,655 - INFO: 使用MPI:False
+2021-02-18 09:21:21,656 - INFO: MPI节点文件:
+2021-02-18 09:21:21,657 - INFO: UseRemoteCalculaton:False
+2021-02-18 09:21:21,657 - INFO: DCMainControlAddress:
+2021-02-18 09:21:21,658 - INFO: 参数列表文件:params.json
+2021-02-18 09:21:21,668 - INFO: created worker type local id:0
+2021-02-18 09:21:21,669 - INFO: TempDir:C:\Users\ykk48\Documents\cst_new\temp\worker_0
+2021-02-18 09:21:21,672 - INFO: TaskFileDir:C:\Users\ykk48\Documents\cst_new\temp\worker_0
+2021-02-18 09:21:21,680 - WARNING: CstProjectFile is not consistent with the one in temp.
+2021-02-18 09:21:21,928 - INFO: Worker_(0):old runfile removed
+2021-02-18 09:21:21,954 - INFO: "C:\Program Files (x86)\CST Studio Suite 2020\CST DESIGN ENVIRONMENT.exe" -m "C:\Users\ykk48\Documents\cst_new\temp\worker_0\main.bas"
+2021-02-18 09:21:21,961 - INFO: <subprocess.Popen object at 0x000001CF1A3944C0>
+2021-02-18 09:21:21,974 - INFO: created worker type local id:1
+2021-02-18 09:21:21,977 - INFO: TempDir:C:\Users\ykk48\Documents\cst_new\temp\worker_1
+2021-02-18 09:21:21,980 - INFO: TaskFileDir:C:\Users\ykk48\Documents\cst_new\temp\worker_1
+2021-02-18 09:21:21,986 - WARNING: CstProjectFile is not consistent with the one in temp.
+2021-02-18 09:21:22,082 - INFO: Worker_(1):old runfile removed
+2021-02-18 09:21:22,097 - INFO: "C:\Program Files (x86)\CST Studio Suite 2020\CST DESIGN ENVIRONMENT.exe" -m "C:\Users\ykk48\Documents\cst_new\temp\worker_1\main.bas"
+2021-02-18 09:21:22,103 - INFO: <subprocess.Popen object at 0x000001CF1A394A60>
+2021-02-18 09:21:22,132 - INFO: WorkerID:'0' Run:0 Name:'normal_result' started.
+2021-02-18 09:21:22,134 - INFO: Start Time:'Thu Feb 18 09:21:22 2021'
+2021-02-18 09:22:47,788 - ERROR: CST ENV stopped
