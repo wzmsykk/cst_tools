@@ -15,23 +15,43 @@ class ProjectConfmanager(object):
 
         self.maincwd=os.getcwd()
         self.currProjectDir=None #外部 ref->oldcwd
+        self.CFGfilename="project.ini"
 
 
+    def openProjectDirReadOnly(self,newProjectDir,slient=False):
+        self.log.logger.info("尝试打开project目录%s。"% newProjectDir)
+        if (self.currProjectDir!=None):
+            self.savecfg(slient=slient)
+        self.currProjectDir=os.path.abspath(newProjectDir)
+        cfgfilename=self.CFGfilename
+        cfgpath=os.path.join(self.currProjectDir,cfgfilename)
+        if(not os.path.exists(cfgpath)):
+            self.log.logger.error("未找到配置文件%s。"% cfgfilename)
+            raise FileNotFoundError
+
+        self.checkProjectStatus()
 
     def openProjectDir(self,newProjectDir,slient=False):
         self.log.logger.info("尝试打开project目录%s。"% newProjectDir)
         if (self.currProjectDir!=None):
             self.savecfg(slient=slient)
         self.currProjectDir=os.path.abspath(newProjectDir)
-        cfgfilename="project.ini"
+        cfgfilename=self.CFGfilename
         cfgpath=os.path.join(self.currProjectDir,cfgfilename)
         if(not os.path.exists(cfgpath)):
-            self.log.logger.info("未找到配置文件%s，尝试重新创建。"% cfgfilename)
-            self.createProjectConf(cfgfilename=cfgfilename)
+            self.log.logger.error("未找到配置文件%s。"% cfgfilename)
+            self.createProjectFromDir(newProjectDir,slient)
 
         self.checkProjectStatus()
 
-
+    def createProjectFromDir(self,newProjectDir,slient=False):
+        self.log.logger.info("尝试从project目录%s创建配置文件。"% newProjectDir)
+        if (self.currProjectDir!=None):
+            self.savecfg(slient=slient)
+        self.currProjectDir=os.path.abspath(newProjectDir)
+        cfgfilename=self.CFGfilename
+        self.createProjectConf(cfgfilename=cfgfilename)
+        self.checkProjectStatus()
 
     def savecfg(self,cfgfilename="project.ini",slient=False):
         oldcwd=os.getcwd()
@@ -134,6 +154,17 @@ class ProjectConfmanager(object):
         os.chdir(oldcwd)
 
     def getParamsList(self, jsonpath=""):
+        """从生成的json读取Model结构参数列表 read model parameters from json filepath
+            
+        Parameters
+        ----------
+        jsonpath : string
+
+        Returns
+        -------
+        pamlist : a list of json dict contains the param names and values
+
+        """
         oldcwd=os.getcwd()
         os.chdir(self.currProjectDir)
         if (jsonpath==""):
@@ -239,11 +270,13 @@ class ProjectConfmanager(object):
             self.log.logger.warning("记录的CST文件MD5%s与实际的%s不一致，已被修改"%(savedCSTMD5,currCSTMD5))            
             nex=False
             while(nex!=True):
-                self.log.logger.warning("是否重新生成参数列表n/y")
+                self.log.logger.warning("是否重新生成参数列表并保存MD5n/y")
                 a=input() 
                 if(a=='y' or a=='Y'):
                     self.log.logger.info("正在重新生成参数列表")
                     self.readParametersFromCST()
+                    self.conf['CST']['CSTFileMD5']=currCSTMD5
+                    self.log.logger.warning("已更新保存的MD5")
                     self.savecfg()
                     self.log.logger.warning("生成结束，请重新运行程序")
                     os._exit(1)
@@ -251,31 +284,17 @@ class ProjectConfmanager(object):
                     nex=True
             nex=False
             while(nex!=True):
-                self.log.logger.warning("是否更新MD5n/y")
+                self.log.logger.warning("是否仅更新MD5n/y")
                 a=input() 
                 if(a=='y' or a=='Y'):
                     nex=True
-                elif(a=='n' or a=='N'):                    
+                elif(a=='n' or a=='N'):  
+                    self.log.logger.warning("退出程序n/y")                  
                     os._exit(1)
             self.conf['CST']['CSTFileMD5']=currCSTMD5
             self.savecfg()
             self.log.logger.warning("已更新保存的MD5")
-        paramjsonpath=self.conf['PARAMETERS']['paramfile']
-        if(not os.path.exists(paramjsonpath)):
-            self.log.logger.warning("未找到参数列表文件%s"%paramjsonpath)            
-            nex=False
-            while(nex!=True):
-                self.log.logger.warning("是否重新生成参数列表n/y")
-                a=input() 
-                if(a=='y' or a=='Y'):
-                    self.log.logger.info("正在重新生成参数列表")
-                    self.readParametersFromCST()
-                    self.savecfg()
-                    self.log.logger.warning("生成结束，请重新运行程序")
-                    os._exit(1)
-                elif(a=='n' or a=='N'):
-                    nex=True
-            nex=False
+        
         self.log.logger.info("%s测试结束\n"% cfgfilename)
         os.chdir(oldcwd)
 

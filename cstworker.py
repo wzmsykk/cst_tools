@@ -166,8 +166,8 @@ class local_cstworker(worker.worker):
         file_c.close()
 
         ###
-        file_1 = open(hFilePath,'r')
-        file_2 = open(mFilePath,'r')
+        file_1 = open(hFilePath,'r', encoding='utf-8')
+        file_2 = open(mFilePath,'r', encoding='utf-8')
         list1 = []
         for line in file_1.readlines():
             ssd=line
@@ -192,8 +192,8 @@ class local_cstworker(worker.worker):
         self.u_param_list=u_param_list
         self.u_value_list=u_value_list
 
-    def start(self):
-        run(self)
+    
+
     def run(self):
         if self.cstStatus=='off':
             raise BaseException
@@ -260,6 +260,9 @@ class local_cstworker(worker.worker):
             self.cstlog.close()
         if self.cstProcess is None:
             self.cstProcess.kill()
-        
+    
+    def start(self):
+        self.run()
+
 
 

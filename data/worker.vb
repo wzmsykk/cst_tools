@@ -24,7 +24,15 @@ Sub Main
 	count=0
 	OpenFile(cstProjectPath)
 	'EXTERN'prepareEnv()
-	'WORKING LOOP
+	'This Function is used to prepare environment before computing.
+	'Dont Affects project files (For VB MACRO ITSELF ONLY)
+	'which means you won't change the history list during this.
+	'Once ParamsChanged(), this function will lose effect.
+	'only run once
+	'Should be implemented in patterns
+
+
+	'NEXT WORKING LOOP
 	Dim startTime,endTime As Double
 	Dim status As String
 	Do While count < maxAttempt
@@ -36,6 +44,9 @@ Sub Main
 				startTime=Timer
 				ChangeParams()
 				'EXTERN'Start()
+				'This Function is used to do the actual job of computing.
+				'runs everytime when parameter changes
+				'Should be implemented in patterns
 				endTime=Timer
 				totalElaspedTime=endTime-startTime
 				Success()

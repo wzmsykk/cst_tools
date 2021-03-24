@@ -111,6 +111,26 @@ class manager(object):
 
     
     def runWithParam(self,name_list,value_list,job_name):
+        """提供参数列表运行CST  (阻塞)
+            run with user provided parameters (Synchronized)
+
+        Paramaters
+        ----------
+        name_list : list 
+            A list of Parameter names.
+
+        value_list : list
+            A list of Parameter values.
+
+        job_name : string 
+            User defined job name for this run.
+
+        Returns
+        -------
+        result : list
+            A list of Run results.
+
+        """
         self.addTask(param_name_list=name_list, value_list=value_list,job_name=job_name)
         self.start()
         self.synchronize()

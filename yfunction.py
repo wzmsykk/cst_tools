@@ -1,6 +1,6 @@
 import numpy as np
 
-
+# trash code
 # deltaY=Y2-Y1=dYFreq-0.3*deltaR_Q+0.15*deltaZL+0.05*deltaV>1e-7
 # Y=YF-0.3*R_Q+0.15ZL-0.05V YMIN
 # dYFreq/dx=0 in [FREQ-toleF,FREQ+toleF],-1e11 in (,FREQ-toleF],+1e11 in [FREQ+tolef,)
