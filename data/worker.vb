@@ -78,7 +78,7 @@ Sub Main
 		Wait 1
 	Loop
 
-	SaveAs (taskFileDir &"temp.cst", False)
+	Backup (taskFileDir &"temp.cst")
 	Quit
 
 End Sub

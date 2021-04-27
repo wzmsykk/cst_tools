@@ -1,11 +1,11 @@
 
 
-'"Ver 20201026"
+'"Ver 20210427"
 Sub Start	
 	outFullDir=resultDir & currentResultName &"\"
 	compute()	
 	postProcess()
-	SaveAs (outFullDir & cstType &".cst", False)
+	Backup (outFullDir & cstType &".cst")
 End Sub
 Sub prepareEnv
 End Sub

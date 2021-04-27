@@ -1,12 +1,12 @@
 
 
-'"Ver 20200123"
+'"Ver 20210427"
 Sub Start	
 	outFullDir=resultDir & currentResultName &"\"
 	defineCurvesNFaces()
 	compute()	
 	postProcess()
-	SaveAs (outFullDir & cstType &".cst", False)
+	Backup (outFullDir & cstType &".cst")
 End Sub
 Sub defineCurvesNFaces
 	'径向0-R直线
