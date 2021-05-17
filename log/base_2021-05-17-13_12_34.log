@@ -1,0 +1,74 @@
+2021-05-17 13:12:34,137 - WARNING: 找到curr_global_cfg:.\config\current.ini
+2021-05-17 13:12:34,143 - INFO: 检查全局配置开始.
+2021-05-17 13:12:34,143 - DEBUG: CST ENV PATH为C:\Program Files (x86)\CST Studio Suite 2020\CST DESIGN ENVIRONMENT.exe
+2021-05-17 13:12:34,143 - DEBUG: CST 版本为2020
+2021-05-17 13:12:34,143 - INFO: 已建立tempdir于./temp。
+2021-05-17 13:12:34,144 - INFO: 已建立resultdir于./result。
+2021-05-17 13:12:34,144 - INFO: 检查全局配置结束.
+2021-05-17 13:12:34,144 - INFO: 使用命令行定义的project目录:.\project\Enlarged
+2021-05-17 13:12:34,144 - INFO: 检查project开始
+2021-05-17 13:12:34,144 - INFO: 找到project目录:.\project\Enlarged
+2021-05-17 13:12:34,145 - INFO: 检查project结束
+2021-05-17 13:12:34,145 - INFO: 已保存全局配置文件于.\config\current.ini。
+2021-05-17 13:12:34,145 - INFO: 开始使用project目录:.\project\Enlarged
+2021-05-17 13:12:34,145 - INFO: 尝试打开project目录.\project\Enlarged。
+2021-05-17 13:12:34,175 - INFO: project.ini测试结束
+
+2021-05-17 13:12:34,175 - INFO: 全局信息:
+2021-05-17 13:12:34,175 - INFO: data目录:./data
+2021-05-17 13:12:34,175 - INFO: temp目录:./temp
+2021-05-17 13:12:34,175 - INFO: log目录:./log
+2021-05-17 13:12:34,175 - INFO: result目录:./result
+2021-05-17 13:12:34,176 - INFO: CST版本:2020
+2021-05-17 13:12:34,176 - INFO: CSTEXE路径:C:\Program Files (x86)\CST Studio Suite 2020\CST DESIGN ENVIRONMENT.exe
+2021-05-17 13:12:34,176 - INFO: project目录:.\project\Enlarged
+2021-05-17 13:12:34,176 - INFO: 项目信息:
+2021-05-17 13:12:34,176 - INFO: ProjectName:Enlarged
+2021-05-17 13:12:34,176 - INFO: ProjectType:Enlarged
+2021-05-17 13:12:34,176 - INFO: ProjectDescription:
+2021-05-17 13:12:34,176 - INFO: 项目result目录:..\..\result
+2021-05-17 13:12:34,176 - INFO: 项目temp目录:..\..\temp
+2021-05-17 13:12:34,176 - INFO: CST文件名:Enlarged.cst
+2021-05-17 13:12:34,176 - INFO: CSTFileMD5:5aa59bc518437fa34dd7d0251b5be815
+2021-05-17 13:12:34,176 - INFO: 使用MPI:False
+2021-05-17 13:12:34,176 - INFO: MPI节点文件:
+2021-05-17 13:12:34,177 - INFO: UseRemoteCalculaton:False
+2021-05-17 13:12:34,177 - INFO: DCMainControlAddress:
+2021-05-17 13:12:34,177 - INFO: 参数列表文件:params.json
+2021-05-17 13:12:34,178 - INFO: created worker type local id:0
+2021-05-17 13:12:34,179 - INFO: TempDir:C:\Users\ykk\Desktop\cst_tools\temp\worker_0
+2021-05-17 13:12:34,179 - INFO: TaskFileDir:C:\Users\ykk\Desktop\cst_tools\temp\worker_0
+2021-05-17 13:12:34,201 - INFO: "C:\Program Files (x86)\CST Studio Suite 2020\CST DESIGN ENVIRONMENT.exe" -m "C:\Users\ykk\Desktop\cst_tools\temp\worker_0\main.bas"
+2021-05-17 13:12:34,204 - INFO: <subprocess.Popen object at 0x000001A6622432B0>
+2021-05-17 13:12:34,209 - INFO: created worker type local id:1
+2021-05-17 13:12:34,209 - INFO: TempDir:C:\Users\ykk\Desktop\cst_tools\temp\worker_1
+2021-05-17 13:12:34,215 - INFO: TaskFileDir:C:\Users\ykk\Desktop\cst_tools\temp\worker_1
+2021-05-17 13:12:34,229 - INFO: "C:\Program Files (x86)\CST Studio Suite 2020\CST DESIGN ENVIRONMENT.exe" -m "C:\Users\ykk\Desktop\cst_tools\temp\worker_1\main.bas"
+2021-05-17 13:12:34,231 - INFO: <subprocess.Popen object at 0x000001A6622435E0>
+2021-05-17 13:12:34,238 - INFO: WorkerID:'0' Run:0 Name:'R_230.000000_L_260.000000' started.
+2021-05-17 13:12:34,244 - INFO: Start Time:'Mon May 17 13:12:34 2021'
+2021-05-17 13:13:33,291 - INFO: WorkerID:'0' Run:0 Name:'R_230.000000_L_260.000000' success.
+2021-05-17 13:13:33,291 - INFO: ElapsedTime:59.05247211456299
+2021-05-17 13:13:33,291 - INFO: End Time:'Mon May 17 13:13:33 2021'
+2021-05-17 13:13:33,292 - INFO: RUN:0
+2021-05-17 13:13:33,292 - INFO: Stopping CST, Please Wait
+2021-05-17 13:13:33,292 - INFO: Stopping CST, Please Wait
+2021-05-17 13:13:34,293 - INFO: 1 secs
+2021-05-17 13:13:34,294 - INFO: 1 secs
+2021-05-17 13:13:35,295 - INFO: 2 secs
+2021-05-17 13:13:35,297 - INFO: 2 secs
+2021-05-17 13:13:36,295 - INFO: 3 secs
+2021-05-17 13:13:36,297 - INFO: 3 secs
+2021-05-17 13:13:37,296 - INFO: 4 secs
+2021-05-17 13:13:37,298 - INFO: 4 secs
+2021-05-17 13:13:38,297 - INFO: 5 secs
+2021-05-17 13:13:38,300 - INFO: 5 secs
+2021-05-17 13:13:39,297 - INFO: 6 secs
+2021-05-17 13:13:39,300 - INFO: 6 secs
+2021-05-17 13:13:40,298 - INFO: 7 secs
+2021-05-17 13:13:40,301 - INFO: 7 secs
+2021-05-17 13:13:40,301 - INFO: Stop success
+2021-05-17 13:13:41,299 - INFO: 8 secs
+2021-05-17 13:13:42,301 - INFO: 9 secs
+2021-05-17 13:13:43,302 - INFO: 10 secs
+2021-05-17 13:13:43,302 - INFO: Stop success

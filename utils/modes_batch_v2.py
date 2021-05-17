@@ -9,7 +9,7 @@ import glob
 import pathlib
 import numpy as np
 import json
-def read_file(filename):
+def read_field1D(filename):
     xl=[]
     yl=[]
     fp=open(filename,"r")
@@ -23,10 +23,39 @@ def read_file(filename):
             xl.append(float(words[0]))
             yl.append(float(words[1]))
 
-    x=np.array(xl)
-    y=np.array(yl)
+    xpos=np.array(xl)
+    value=np.array(yl)
     fp.close()
-    return x,y
+    return xpos,value
+
+def xycoord_xycomp_to_rfcoord_rfcomp(xlist,ylist,xcomplist,ycomplist):
+
+    rlist=np.sqrt(np.square(xlist)+np.square(ylist))
+    flist=np.arctan2(ylist,xlist)
+
+    rcomplist=xcomplist*np.cos(flist)+ycomplist*np.sin(flist)
+    fcomplist=xcomplist*np.sin(flist)+ycomplist*np.cos(flist)
+
+    return rlist,flist,rcomplist,fcomplist
+
+def read_maxcoords(filename):
+    fp=open(filename,"r")
+    lines=fp.readlines()
+    er=lines[0].split()[1]
+    ef=lines[1].split()[1]
+    ez=lines[2].split()[1]
+    hr=lines[3].split()[1]
+    hf=lines[4].split()[1]
+    hz=lines[5].split()[1]
+    return er,ef,ez,hr,hf,hz
+
+def rfcoord_xycomp_to_rfcoord_rfcomp(rlist,flist,xcomplist,ycomplist):
+    
+    rcomplist=xcomplist*np.cos(flist)+ycomplist*np.sin(flist)
+    fcomplist=xcomplist*np.sin(flist)+ycomplist*np.cos(flist)
+
+    return rlist,flist,rcomplist,fcomplist
+
 def read_mode_batch(resultdir):
 
 
@@ -117,7 +146,7 @@ def convert_field_to_nparray(result_dir="",export_name="Export"):
         mode_name=mode_index+1
         epath=os.path.join(result_dir,"Mode%dEField.txt"%mode_name)
         hpath=os.path.join(result_dir,"Mode%dHField.txt"%mode_name)
-        efield,eheader=read_field(epath)
+        efield,eheader=read_field3D(epath)
         eheader["fieldtype"]="EField"
         eheader["ModeIndex"]=mode_index
         eheader["ModeName"]="Mode_"+str(mode_name)
@@ -126,7 +155,7 @@ def convert_field_to_nparray(result_dir="",export_name="Export"):
         eheader["M"]=Mcount
         eheader["N"]=Ncount
         eheader["P"]=Pcount
-        hfield,hheader=read_field(hpath)
+        hfield,hheader=read_field3D(hpath)
         hheader["fieldtype"]="HField"
         hheader["ModeIndex"]=mode_index
         hheader["ModeName"]="Mode_"+str(mode_name)
@@ -142,7 +171,7 @@ def convert_field_to_nparray(result_dir="",export_name="Export"):
             json.dump(hheader,fh)
 
     pass
-def read_field(filepath):
+def read_field3D(filepath):
     fp=open(filepath,"r")
     xdim=128
     ydim=128
@@ -221,9 +250,9 @@ def mode_recog(result_dir="",dst_path="res.txt"):
         #判断MNP
         if (result[mode_index][0]==0):
             #print("MODE %d IS TM" % (mode_index))
-            mx,my=read_file("Mode_%d_EF_M.txt" % mode_name)
-            nx,ny=read_file("Mode_%d_EF_N.txt" % mode_name)
-            px,py=read_file("Mode_%d_EF_P.txt" % mode_name)
+            mx,my=read_field1D("Mode_%d_EF_M.txt" % mode_name)
+            nx,ny=read_field1D("Mode_%d_EF_N.txt" % mode_name)
+            px,py=read_field1D("Mode_%d_EF_P.txt" % mode_name)
 
 
             #FIND M
@@ -243,9 +272,9 @@ def mode_recog(result_dir="",dst_path="res.txt"):
 
 
         elif (result[mode_index][0]==1):
-            mx,my=read_file("Mode_%d_HF_M.txt" % mode_name)
-            nx,ny=read_file("Mode_%d_HF_N.txt" % mode_name)
-            px,py=read_file("Mode_%d_HF_P.txt" % mode_name)
+            mx,my=read_field1D("Mode_%d_HF_M.txt" % mode_name)
+            nx,ny=read_field1D("Mode_%d_HF_N.txt" % mode_name)
+            px,py=read_field1D("Mode_%d_HF_P.txt" % mode_name)
 
             #FIND M
             rpc=1
@@ -264,6 +293,7 @@ def mode_recog(result_dir="",dst_path="res.txt"):
     return result
 
 
+
 def result_stats(result_dir=""):
     curdir=pathlib.Path(result_dir)
     freqs=curdir.glob("MODE_*_Freq.txt")
@@ -272,6 +302,10 @@ def result_stats(result_dir=""):
         flist.append(tx)
     statlist=list()
     totalmodes=len(flist)
+
+    
+    
+
     for i in range(1,totalmodes):
         pt="MODE_"+str(i)+"_Freq.txt"
         pt=curdir.joinpath(pt)
@@ -287,10 +321,34 @@ def result_stats(result_dir=""):
         line=lines[0]
         tp=line.split()[1]
         fp.close()
-        statlist.append((i,tp,fq))
-    uformat="MODE:%s Type:%s Freq:%s"
+
+
+        pt="MODE_"+str(i)+"_Coffs.txt"
+        pt=curdir.joinpath(pt)
+        fp=open(pt,"r")
+        lines=fp.readlines()
+        line=lines[0]
+        cof=line.split()[1]
+        fp.close()
+
+        #custom result
+        alpha=2.5
+        coff=float(cof)
+        if coff<alpha and coff>1/alpha:
+            mc="HX"
+        elif coff<1/alpha:
+            mc="TE"
+        else:
+            mc="TM"
+
+
+        statlist.append((i,tp,fq,coff,mc))
+
+    
+
+    uformat="MODE:{}\tType:{}\tFreq:{}\tTEMCoff:{:5f}\tcustType:{}"
     for element in statlist:
-        print(uformat % element)
+        print(uformat.format(*element))
         
 
     return totalmodes
@@ -299,4 +357,5 @@ if __name__ =='__main__':
     ##convert_field_to_nparray(r"D:\cst_tools\result\R_230.000000_L_160.000000")
     #read_field_data_batch(r"D:\cst_tools\result")
 
-    result_stats()
+    result_stats(result_dir=r"\\172.1.10.232\pillbox_modes")
+    

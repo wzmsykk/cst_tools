@@ -1,0 +1,48 @@
+2021-04-30 12:15:18,102 - WARNING: 找到curr_global_cfg:.\config\current.ini
+2021-04-30 12:15:18,113 - INFO: 检查全局配置开始.
+2021-04-30 12:15:18,114 - DEBUG: CST ENV PATH为C:\Program Files (x86)\CST Studio Suite 2020\CST DESIGN ENVIRONMENT.exe
+2021-04-30 12:15:18,115 - DEBUG: CST 版本为2020
+2021-04-30 12:15:18,116 - INFO: 检查全局配置结束.
+2021-04-30 12:15:18,117 - INFO: 使用命令行定义的project目录:.\project\Enlarged
+2021-04-30 12:15:18,117 - INFO: 检查project开始
+2021-04-30 12:15:18,118 - INFO: 找到project目录:.\project\Enlarged
+2021-04-30 12:15:18,119 - INFO: 检查project结束
+2021-04-30 12:15:18,119 - INFO: 已保存全局配置文件于.\config\current.ini。
+2021-04-30 12:15:18,120 - INFO: 开始使用project目录:.\project\Enlarged
+2021-04-30 12:15:18,120 - INFO: 尝试打开project目录.\project\Enlarged。
+2021-04-30 12:15:18,168 - INFO: project.ini测试结束
+
+2021-04-30 12:15:18,169 - INFO: 全局信息:
+2021-04-30 12:15:18,171 - INFO: data目录:./data
+2021-04-30 12:15:18,171 - INFO: temp目录:./temp
+2021-04-30 12:15:18,172 - INFO: log目录:./log
+2021-04-30 12:15:18,173 - INFO: result目录:./result
+2021-04-30 12:15:18,173 - INFO: CST版本:2020
+2021-04-30 12:15:18,174 - INFO: CSTEXE路径:C:\Program Files (x86)\CST Studio Suite 2020\CST DESIGN ENVIRONMENT.exe
+2021-04-30 12:15:18,175 - INFO: project目录:.\project\Enlarged
+2021-04-30 12:15:18,175 - INFO: 项目信息:
+2021-04-30 12:15:18,176 - INFO: ProjectName:Enlarged
+2021-04-30 12:15:18,177 - INFO: ProjectType:Enlarged
+2021-04-30 12:15:18,177 - INFO: ProjectDescription:
+2021-04-30 12:15:18,178 - INFO: 项目result目录:..\..\result
+2021-04-30 12:15:18,178 - INFO: 项目temp目录:..\..\temp
+2021-04-30 12:15:18,179 - INFO: CST文件名:Enlarged.cst
+2021-04-30 12:15:18,188 - INFO: CSTFileMD5:340a54ff82ef16c99958a6f38bd733af
+2021-04-30 12:15:18,188 - INFO: 使用MPI:False
+2021-04-30 12:15:18,189 - INFO: MPI节点文件:
+2021-04-30 12:15:18,189 - INFO: UseRemoteCalculaton:False
+2021-04-30 12:15:18,190 - INFO: DCMainControlAddress:
+2021-04-30 12:15:18,191 - INFO: 参数列表文件:params.json
+2021-04-30 12:15:18,210 - INFO: created worker type local id:0
+2021-04-30 12:15:18,211 - INFO: TempDir:C:\Users\ykk\Desktop\cst_tools\temp\worker_0
+2021-04-30 12:15:18,212 - INFO: TaskFileDir:C:\Users\ykk\Desktop\cst_tools\temp\worker_0
+2021-04-30 12:15:18,236 - INFO: "C:\Program Files (x86)\CST Studio Suite 2020\CST DESIGN ENVIRONMENT.exe" -m "C:\Users\ykk\Desktop\cst_tools\temp\worker_0\main.bas"
+2021-04-30 12:15:18,241 - INFO: <subprocess.Popen object at 0x000001D0E6A532B0>
+2021-04-30 12:15:18,245 - INFO: created worker type local id:1
+2021-04-30 12:15:18,246 - INFO: TempDir:C:\Users\ykk\Desktop\cst_tools\temp\worker_1
+2021-04-30 12:15:18,247 - INFO: TaskFileDir:C:\Users\ykk\Desktop\cst_tools\temp\worker_1
+2021-04-30 12:15:18,261 - INFO: "C:\Program Files (x86)\CST Studio Suite 2020\CST DESIGN ENVIRONMENT.exe" -m "C:\Users\ykk\Desktop\cst_tools\temp\worker_1\main.bas"
+2021-04-30 12:15:18,265 - INFO: <subprocess.Popen object at 0x000001D0E6A535E0>
+2021-04-30 12:15:18,290 - INFO: WorkerID:'0' Run:0 Name:'R_230.000000_L_260.000000' started.
+2021-04-30 12:15:18,291 - INFO: Start Time:'Fri Apr 30 12:15:18 2021'
+2021-04-30 12:18:26,486 - ERROR: CST ENV stopped

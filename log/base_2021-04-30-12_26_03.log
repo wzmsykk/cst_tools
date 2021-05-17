@@ -1,0 +1,80 @@
+2021-04-30 12:26:03,248 - WARNING: 找到curr_global_cfg:.\config\current.ini
+2021-04-30 12:26:03,261 - INFO: 检查全局配置开始.
+2021-04-30 12:26:03,262 - DEBUG: CST ENV PATH为C:\Program Files (x86)\CST Studio Suite 2020\CST DESIGN ENVIRONMENT.exe
+2021-04-30 12:26:03,264 - DEBUG: CST 版本为2020
+2021-04-30 12:26:03,264 - INFO: 检查全局配置结束.
+2021-04-30 12:26:03,265 - INFO: 使用命令行定义的project目录:.\project\Enlarged
+2021-04-30 12:26:03,266 - INFO: 检查project开始
+2021-04-30 12:26:03,266 - INFO: 找到project目录:.\project\Enlarged
+2021-04-30 12:26:03,267 - INFO: 检查project结束
+2021-04-30 12:26:03,268 - INFO: 已保存全局配置文件于.\config\current.ini。
+2021-04-30 12:26:03,272 - INFO: 开始使用project目录:.\project\Enlarged
+2021-04-30 12:26:03,273 - INFO: 尝试打开project目录.\project\Enlarged。
+2021-04-30 12:26:03,309 - INFO: project.ini测试结束
+
+2021-04-30 12:26:03,309 - INFO: 全局信息:
+2021-04-30 12:26:03,310 - INFO: data目录:./data
+2021-04-30 12:26:03,311 - INFO: temp目录:./temp
+2021-04-30 12:26:03,311 - INFO: log目录:./log
+2021-04-30 12:26:03,311 - INFO: result目录:./result
+2021-04-30 12:26:03,311 - INFO: CST版本:2020
+2021-04-30 12:26:03,312 - INFO: CSTEXE路径:C:\Program Files (x86)\CST Studio Suite 2020\CST DESIGN ENVIRONMENT.exe
+2021-04-30 12:26:03,312 - INFO: project目录:.\project\Enlarged
+2021-04-30 12:26:03,313 - INFO: 项目信息:
+2021-04-30 12:26:03,313 - INFO: ProjectName:Enlarged
+2021-04-30 12:26:03,313 - INFO: ProjectType:Enlarged
+2021-04-30 12:26:03,314 - INFO: ProjectDescription:
+2021-04-30 12:26:03,314 - INFO: 项目result目录:..\..\result
+2021-04-30 12:26:03,314 - INFO: 项目temp目录:..\..\temp
+2021-04-30 12:26:03,314 - INFO: CST文件名:Enlarged.cst
+2021-04-30 12:26:03,315 - INFO: CSTFileMD5:5aa59bc518437fa34dd7d0251b5be815
+2021-04-30 12:26:03,315 - INFO: 使用MPI:False
+2021-04-30 12:26:03,316 - INFO: MPI节点文件:
+2021-04-30 12:26:03,316 - INFO: UseRemoteCalculaton:False
+2021-04-30 12:26:03,316 - INFO: DCMainControlAddress:
+2021-04-30 12:26:03,316 - INFO: 参数列表文件:params.json
+2021-04-30 12:26:03,335 - INFO: created worker type local id:0
+2021-04-30 12:26:03,336 - INFO: TempDir:C:\Users\ykk\Desktop\cst_tools\temp\worker_0
+2021-04-30 12:26:03,338 - INFO: TaskFileDir:C:\Users\ykk\Desktop\cst_tools\temp\worker_0
+2021-04-30 12:26:03,352 - INFO: "C:\Program Files (x86)\CST Studio Suite 2020\CST DESIGN ENVIRONMENT.exe" -m "C:\Users\ykk\Desktop\cst_tools\temp\worker_0\main.bas"
+2021-04-30 12:26:03,358 - INFO: <subprocess.Popen object at 0x00000222DE7D32B0>
+2021-04-30 12:26:03,362 - INFO: created worker type local id:1
+2021-04-30 12:26:03,363 - INFO: TempDir:C:\Users\ykk\Desktop\cst_tools\temp\worker_1
+2021-04-30 12:26:03,364 - INFO: TaskFileDir:C:\Users\ykk\Desktop\cst_tools\temp\worker_1
+2021-04-30 12:26:03,378 - INFO: "C:\Program Files (x86)\CST Studio Suite 2020\CST DESIGN ENVIRONMENT.exe" -m "C:\Users\ykk\Desktop\cst_tools\temp\worker_1\main.bas"
+2021-04-30 12:26:03,383 - INFO: <subprocess.Popen object at 0x00000222DE7D35E0>
+2021-04-30 12:26:03,420 - INFO: WorkerID:'0' Run:0 Name:'R_230.000000_L_260.000000' started.
+2021-04-30 12:26:03,421 - INFO: Start Time:'Fri Apr 30 12:26:03 2021'
+2021-04-30 12:27:22,585 - INFO: WorkerID:'0' Run:0 Name:'R_230.000000_L_260.000000' success.
+2021-04-30 12:27:22,586 - INFO: ElapsedTime:79.1648519039154
+2021-04-30 12:27:22,592 - INFO: End Time:'Fri Apr 30 12:27:22 2021'
+2021-04-30 12:27:22,595 - INFO: RUN:0
+2021-04-30 12:27:22,597 - INFO: Stopping CST, Please Wait
+2021-04-30 12:27:22,602 - INFO: Stopping CST, Please Wait
+2021-04-30 12:27:23,599 - INFO: 1 secs
+2021-04-30 12:27:23,606 - INFO: 1 secs
+2021-04-30 12:27:24,600 - INFO: 2 secs
+2021-04-30 12:27:24,607 - INFO: 2 secs
+2021-04-30 12:27:25,601 - INFO: 3 secs
+2021-04-30 12:27:25,610 - INFO: 3 secs
+2021-04-30 12:27:26,603 - INFO: 4 secs
+2021-04-30 12:27:26,613 - INFO: 4 secs
+2021-04-30 12:27:27,604 - INFO: 5 secs
+2021-04-30 12:27:27,614 - INFO: 5 secs
+2021-04-30 12:27:28,605 - INFO: 6 secs
+2021-04-30 12:27:28,617 - INFO: 6 secs
+2021-04-30 12:27:29,609 - INFO: 7 secs
+2021-04-30 12:27:29,634 - INFO: 7 secs
+2021-04-30 12:27:30,610 - INFO: 8 secs
+2021-04-30 12:27:30,636 - INFO: 8 secs
+2021-04-30 12:27:31,612 - INFO: 9 secs
+2021-04-30 12:27:31,638 - INFO: 9 secs
+2021-04-30 12:27:32,613 - INFO: 10 secs
+2021-04-30 12:27:32,639 - INFO: 10 secs
+2021-04-30 12:27:33,615 - INFO: 11 secs
+2021-04-30 12:27:33,640 - INFO: 11 secs
+2021-04-30 12:27:34,616 - INFO: 12 secs
+2021-04-30 12:27:34,642 - INFO: 12 secs
+2021-04-30 12:27:34,643 - INFO: Stop success
+2021-04-30 12:27:35,618 - INFO: 13 secs
+2021-04-30 12:27:35,619 - INFO: Stop success

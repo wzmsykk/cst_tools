@@ -61,8 +61,8 @@ class MyCuts_Pillbox(object):
     def do(self):
         ###Y=Y(R(X))####
         r=230
-        nmodes=10
-        for l in range(260,262):
+        nmodes=4
+        for l in range(260,261):
             r0=self.manager.runWithParam(name_list=self.struct_params_namelist,value_list=[r,l,nmodes],job_name="R_%f_L_%f" % (r,l))
 
         self.log.logger.info("RUN:%d" %(self.runcount))
