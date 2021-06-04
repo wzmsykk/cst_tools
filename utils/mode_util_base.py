@@ -11,6 +11,106 @@ import pathlib
 import numpy as np
 import json
 
+def read_coffs(filename):
+    resultlist=[]
+    fp=open(filename,"r")
+    lines=fp.readlines()
+    totallines=len(lines)
+    pnum=math.floor(totallines/3)
+    namelist=[]
+    rvlist=[]
+    rnlist=[]
+    dlist=[]
+    expect="Name"
+
+    for line in lines:
+        
+        if(expect=="Name"):
+            namelist.append(line.split()[0])
+            expect="Comp_Name"
+        elif(expect=="Comp_Name"):
+            words=line.split()
+            rnlist.clear()
+            for word in words:
+                
+                rnlist.append(word)
+            expect="Comp_Value"
+        elif(expect=="Comp_Value"):
+            words=line.split()
+            rvlist.clear()
+            for word in words:
+                
+                rvlist.append(word)
+            nvs=zip(rnlist,rvlist)
+            mydict=dict( (name,value) for name,value in nvs)
+            dlist.append(mydict)
+            expect="Name"
+
+    nvs=zip(namelist,dlist)
+    mydict=dict( (name,value) for name,value in nvs)
+
+    return mydict
+
+
+
+def result_stats(result_dir=""):
+    curdir=pathlib.Path(result_dir)
+    freqs=curdir.glob("MODE_*_Freq.txt")
+    flist=list()
+    for tx in freqs:
+        flist.append(tx)
+    statlist=list()
+    totalmodes=len(flist)
+
+    
+    
+
+    for i in range(1,totalmodes):
+        pt="MODE_"+str(i)+"_Freq.txt"
+        pt=curdir.joinpath(pt)
+        fp=open(pt,"r")
+        lines=fp.readlines()
+        line=lines[2]
+        fq=line.split()[1]
+        fp.close()
+        pt="MODE_"+str(i)+"_Type.txt"
+        pt=curdir.joinpath(pt)
+        fp=open(pt,"r")
+        lines=fp.readlines()
+        line=lines[0]
+        tp=line.split()[1]
+        fp.close()
+
+
+        pt="MODE_"+str(i)+"_Coffs.txt"
+        pt=curdir.joinpath(pt)
+        mycoffdict=read_coffs(pt)
+        cof=mycoffdict['TEM_Coffs']['value']
+        
+        
+
+        #custom result
+        alpha=2.5
+        coff=float(cof)
+        if coff<alpha and coff>1/alpha:
+            mc="HX"
+        elif coff<1/alpha:
+            mc="TE"
+        else:
+            mc="TM"
+
+
+        statlist.append((i,tp,fq,coff,mc))
+
+    
+
+    uformat="MODE:{}\tType:{}\tFreq:{}\tTEMCoff:{:5f}\tcustType:{}"
+    for element in statlist:
+        print(uformat.format(*element))
+        
+
+    return totalmodes
+
 def read_field1D(filename):
     xl=[]
     yl=[]
@@ -30,8 +130,76 @@ def read_field1D(filename):
     fp.close()
     return xpos,value
 
+def read_field1D_Complex(filename):
+    
+    fp=open(filename,"r")
+    lines=fp.readlines()
+    names=[]
+    values=[]
+    words=lines[0].split()
+    for word in words:
+        names.append(word)
+    lines=lines[1:]
+    mydd=[]
+    length=len(names)
+    for line in lines:
+        words=line.split()
+        mydd.clear()
+        for word in words:                
+            mydd.append(float(word))
+        values.append(mydd[:length])
 
 
+    npvalue=np.array(values)
+    fp.close()
+    return names,npvalue
+
+def read_field3D(filepath):
+    fp=open(filepath,"r")
+    #推测XYZDIMS
+    lines=fp.readlines()
+    xdim=128
+    ydim=128
+    zdim=8
+    narray=np.zeros((128,128,8,6))   
+    dumpcount=5
+    print("Total lines:%d" % len(lines))
+    size=128*128*8
+    print("EXPECTED SIZE:%d"% (size+2))
+    line=lines[2]
+    words=line.split()
+    x0=float(words[0])
+    xspace=abs(x0)*2/(xdim-1)
+    y0=float(words[1])
+    yspace=abs(y0)*2/(ydim-1)
+    z0=float(words[2])
+    zspace=abs(z0)*2/(zdim-1)
+    header=dict()
+    header["x0"]=x0
+    header["y0"]=y0
+    header["z0"]=z0
+    header["xspace"]=xspace
+    header["yspace"]=yspace
+    header["zspace"]=zspace
+    header["xdim"]=xdim
+    header["ydim"]=ydim
+    header["zdim"]=zdim
+    for index in range (128*128*8):
+        line=lines[index+2]
+        words=line.split()
+        if (index<dumpcount):
+            print(words)
+        i=round((float(words[0])-x0)/xspace)
+        j=round((float(words[1])-y0)/yspace)
+        k=round((float(words[2])-z0)/zspace)
+        
+        u=np.array(words[3:])
+        u=u.astype(np.float)
+        narray[i][j][k]=u
+        if (index<dumpcount):
+            print("i=%d,j=%d,k=%d,u="%(i,j,k),u)
+            
+    return narray,header
 def read_maxcoords(filename):
     fp=open(filename,"r")
     lines=fp.readlines()
@@ -60,6 +228,7 @@ def rfcoord_xycomp_to_rfcoord_rfcomp(rlist,flist,xcomplist,ycomplist):
     fcomplist=-xcomplist*np.sin(flist)+ycomplist*np.cos(flist)
 
     return rlist,flist,rcomplist,fcomplist
+
 
 
 def rcomp_fcomp_alone_zaxis_line(resultdir,modeindex):
@@ -149,6 +318,57 @@ def rcomp_fcomp_alone_xyplane_radius(resultdir,modeindex):
 
 
     
+def mode_wavenumber_m(flist,fcomp):
+    #FIND M
+    rpc=1
+    my=fcomp
+    nmy=np.reshape(np.repeat(np.reshape(my,(1,len(my))),rpc,axis=0),rpc*len(my))
+    #print("MY_LEN=%d,NMY_LEN=%d"%(len(my),len(nmy)))
+    N=len(nmy)
+    fft_y=fft.rfft(my,n=my.size)
+    abs_y=np.abs(fft_y)
+    freqs = fft.rfftfreq(my.size, d=1./len(my))
+    M_NUM = freqs[np.argmax(abs_y)]
+    return M_NUM
+def mode_wavenumber_n(rlist,fcomp):
+    #find N
+    nzeros=0
+    
+    YFR=fcomp
+    #FROM MIDDLE TO START
+    while YFR[-1]==0:
+        YFR=YFR[:-1]#去除末尾的0元素
+    
+    
+
+    #排除波动测试
+    YSMD=np.zeros_like(YFR)
+    for i in range(len(YFR)-1):
+        YSMD[i]=(YFR[i]+YFR[i+1])/2
+    YFR=YSMD
+
+    ntps=len(YFR) #total points
+
+    for i in range (math.floor(ntps/2-1),ntps-1):
+        if YFR[i]*YFR[i+1]<0:
+            nzeros+=1
+        elif YFR[i]==0:
+            nzeros+=1    
+    if nzeros==0:
+        nzeros=nzeros+1
+    return nzeros
+def mode_wavenumber_p(zlist,fcomp):
+    #FIND P
+    rpc=1
+    my=fcomp
+    nmy=np.reshape(np.repeat(np.reshape(my,(1,len(my))),rpc,axis=0),rpc*len(my))
+    #print("MY_LEN=%d,NMY_LEN=%d"%(len(my),len(nmy)))
+    N=len(nmy)
+    fft_y=fft.rfft(my,n=my.size)
+    abs_y=np.abs(fft_y)
+    freqs = fft.rfftfreq(my.size, d=1./len(my))
+    P_NUM = freqs[np.argmax(abs_y)]
+    return P_NUM
 
 def mode_wavenumber_mnp(XC,YFC,XR,YFR,XZ,YFZ):
     '''
@@ -212,11 +432,8 @@ def main_mode_type(resultdir,modeindex,threshold=10):
 
     pt="MODE_"+str(modeindex)+"_Coffs.txt"
     pt=curdir.joinpath(pt)
-    fp=open(pt,"r")
-    lines=fp.readlines()
-    line=lines[0]
-    cof=line.split()[1]
-    fp.close()
+    coffsDict=read_coffs(pt)
+    cof=coffsDict['TEM_Coffs']['value']
 
     #custom result
     alpha=threshold
