@@ -9,6 +9,12 @@ class result(object):
     
 def readModeResult(resultPath,modecount):
     #readFREQ
+    freq=None
+    R_Q=None
+    zl=None
+    Q=None
+    vot=None
+    tl=None
     filename='Mode'+str(modecount)+'Frequency.txt'
     fullpath=os.path.join(resultPath,filename)    
     with open(fullpath,'r') as f:

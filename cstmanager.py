@@ -3,7 +3,7 @@ import time,os
 import threading
 import queue
 import copy
-
+import pathlib
 
 class manager(object):
     def __init__(self,gconfm,pconfm,params,log_obj,maxTask=2):
@@ -12,16 +12,30 @@ class manager(object):
         self.log=log_obj
         self.gconf=gconfm.conf
         self.pconf=pconfm.conf
-        self.curcwd=os.getcwd()
-        self.cstPatternDir=self.gconf['BASE']['datadir']
-        os.chdir(pconfm.currProjectDir)
-        self.tempPath=os.path.abspath(self.pconf['DIRS']['tempdir'])
-        self.taskFileDir=os.path.abspath(self.pconf['DIRS']['tempdir'])
-        self.resultDir=os.path.abspath(self.pconf['DIRS']['resultdir'])
-        self.cstProjPath=os.path.abspath(self.pconf['CST']['CSTFilename'])
+        self.cstPatternDir=pathlib.Path(self.gconf['BASE']['datadir']).absolute()
+        self.currProjectDir=pathlib.Path(pconfm.currProjectDir).absolute()
+
+        tp=pathlib.Path(self.pconf['DIRS']['tempdir'])
+        if tp.is_absolute():
+            self.tempPath=tp
+        else:
+            self.tempPath=self.currProjectDir / tp
+
+        self.taskFileDir=self.tempPath
+        if not self.tempPath.exists():
+            self.tempPath.mkdir()
+        rd=pathlib.Path(self.pconf['DIRS']['resultdir'])
+        if rd.is_absolute():
+            self.resultDir=rd
+        else:
+            self.resultDir=self.currProjectDir / rd
+
+        if not self.resultDir.exists():
+            self.resultDir.mkdir()
+        self.cstProjPath=self.currProjectDir / self.pconf['CST']['CSTFilename']
         self.cstType=self.pconf['PROJECT']['ProjectType']
         self.paramList=params
-        os.chdir(self.curcwd)
+
         
         #PARALLEL
         self.maxParallelTasks=maxTask
@@ -56,16 +70,16 @@ class manager(object):
 
     def createLocalWorker(self,workerID):
         mconf={}
-        mconf['tempPath']=os.path.join(self.tempPath,"worker_"+workerID)
+        mconf['tempPath']=str(self.tempPath / ("worker_"+workerID))
         mconf['CSTENVPATH']=self.gconf['CST']['cstexepath']
         mconf['ProjectType']=self.cstType
-        mconf['cstPatternDir']=self.cstPatternDir
-        mconf['resultDir']=self.resultDir
-        mconf['cstPath']=self.cstProjPath
+        mconf['cstPatternDir']=str(self.cstPatternDir)
+        mconf['resultDir']=str(self.resultDir)
+        mconf['cstPath']=str(self.cstProjPath)
         mconf['paramList']=self.paramList
         os.makedirs(mconf['tempPath'],exist_ok=True)
         print(mconf['tempPath'])
-        mconf['taskFileDir']=os.path.join(self.taskFileDir,"worker_"+workerID)
+        mconf['taskFileDir']=str(self.taskFileDir/("worker_"+workerID))
         mcstworker_local=cstworker.local_cstworker(id=workerID, type="local",config=mconf,log_obj=self.log)
         return mcstworker_local
 

@@ -100,7 +100,155 @@ Function FindMaximumAbs3D_epllipse(comp As String, rxy As Double,rz As Double, B
 
 	FindMaximumAbs3D_epllipse=cst_value
 End Function
+Function SumFieldAbsCylindrical_epllipse(comp As String, rxy As Double,rz As Double) As Double
+	Dim x_cst As Double,y_cst As Double,z_cst As Double
+	Dim r_cst As Double,f_cst As Double
+	Dim r_step As Double,f_step As Double,z_step As Double
+	Dim take_this As Boolean
+	Dim i As Long
+	Dim cst_value As Double
+	'Restrict Volumes
+	r_step=4.0
+	f_step=4.0
+	z_step=4.0
+	VectorPlot3D.Reset
+	Dim x_cst_list() As Double
+	Dim y_cst_list() As Double
+	Dim z_cst_list() As Double
+	Dim r_cst_list() As Double
+	Dim f_cst_list() As Double
+	Dim MaxLength As Long
+	MaxLength =(Int(rxy/r_step)+1)*(Int(360/f_step)+1)*(Int(2*rz/z_step)+1)
+	ReDim x_cst_list(MaxLength)
+	ReDim y_cst_list(MaxLength)
+	ReDim z_cst_list(MaxLength)
+	ReDim r_cst_list(MaxLength)
+	ReDim f_cst_list(MaxLength)
+	Dim totalPoints As Long
+	totalPoints=0
+	i=0
+	For r_cst=0 To rxy STEP r_step
+		For f_cst=0 To 360 STEP f_step
+			For z_cst=-rz To rz STEP z_step
 
+				If (r_cst/rxy)^2+(z_cst/rz)^2<1 Then
+					take_this=True
+					totalPoints = totalPoints+1
+					i=i+1
+				End If
+
+
+				If take_this Then
+					x_cst_list(i) =r_cst*Cos(f_cst/180*Pi)
+					y_cst_list(i) =r_cst*Sin(f_cst/180*Pi)
+					z_cst_list(i) =z_cst
+					f_cst_list(i) =f_cst/180*Pi
+					r_cst_list(i) =r_cst
+				End If
+
+			Next z_cst
+		Next f_cst
+	Next r_cst
+	ReportInformation("STEP1 Done")
+	ReDim Preserve x_cst_list(totalPoints)
+	ReDim Preserve y_cst_list(totalPoints)
+	ReDim Preserve z_cst_list(totalPoints)
+	'No Need To Redim RF
+	VectorPlot3D.SetPoints(x_cst_list,y_cst_list,z_cst_list)
+
+
+	VectorPlot3D.CalculateList
+	ReportInformation("STEP2 Done")
+
+	Dim i_CST_GetListItem As Long
+	i_CST_GetListItem =0
+	Dim tr_coord As Double,tf_coord As Double,tz_coord As Double
+	Dim ur_coord As Double,uf_coord As Double,uz_coord As Double
+	Dim xre_list As Variant, yre_list As Variant, zre_list As Variant, xim_list As Variant, yim_list As Variant, zim_list As Variant
+	Dim tv As Double
+	Dim uv As Double
+
+
+	'CONVERT cartensian to cylindrical
+	Dim sum As Double
+	sum=0
+	Select Case comp
+		Case "Ez"
+			zre_list=VectorPlot3D.GetList("zre")
+			For i_CST_GetListItem=0 To totalPoints
+				tv=zre_list(i_CST_GetListItem)
+				sum=sum+Abs(tv)
+			Next i_CST_GetListItem
+
+		Case "Hz"
+			zim_list=VectorPlot3D.GetList("zim")
+			For i_CST_GetListItem=0 To totalPoints
+				tv=zim_list(i_CST_GetListItem)
+				sum=sum+Abs(tv)
+			Next i_CST_GetListItem
+
+		Case "Er"
+			xre_list=VectorPlot3D.GetList("xre")
+			yre_list=VectorPlot3D.GetList("yre")
+			ReDim vr_list(totalPoints)
+			ReDim vf_list(totalPoints)
+
+			For i_CST_GetListItem=0 To totalPoints
+				ur_coord=r_cst_list(i_CST_GetListItem)
+				uf_coord=f_cst_list(i_CST_GetListItem)
+				uv=xre_list(i)*Cos(uf_coord)+yre_list(i)*Sin(uf_coord)
+				sum=sum+Abs(uv)
+			Next i_CST_GetListItem
+		Case "Ef"
+			xre_list=VectorPlot3D.GetList("xre")
+			yre_list=VectorPlot3D.GetList("yre")
+			ReDim vr_list(totalPoints)
+			ReDim vf_list(totalPoints)
+		
+			For i_CST_GetListItem=0 To totalPoints
+				ur_coord=r_cst_list(i_CST_GetListItem)
+				uf_coord=f_cst_list(i_CST_GetListItem)
+				uv=xre_list(i)*-Sin(uf_coord)+yre_list(i)*Cos(uf_coord)
+
+				sum=sum+Abs(uv)
+			Next i_CST_GetListItem
+		Case "Hr"
+			xim_list=VectorPlot3D.GetList("xim")
+			yim_list=VectorPlot3D.GetList("yim")
+			ReDim vr_list(totalPoints)
+			ReDim vf_list(totalPoints)
+			tr_coord=r_cst_list(0)
+			tf_coord=f_cst_list(0)
+			tv=xim_list(i)*-Sin(tf_coord)+yim_list(i)*Cos(tf_coord)
+			For i_CST_GetListItem=0 To totalPoints
+				ur_coord=r_cst_list(i_CST_GetListItem)
+				uf_coord=f_cst_list(i_CST_GetListItem)
+				uv=xim_list(i)*Cos(uf_coord)+yim_list(i)*Sin(uf_coord)
+				sum=sum+Abs(uv)
+			Next i_CST_GetListItem
+		Case "Hf"
+			xim_list=VectorPlot3D.GetList("xim")
+			yim_list=VectorPlot3D.GetList("yim")
+			ReDim vr_list(totalPoints)
+			ReDim vf_list(totalPoints)
+			tr_coord=r_cst_list(0)
+			tf_coord=f_cst_list(0)
+			tv=xim_list(i)*-Sin(tf_coord)+yim_list(i)*Cos(tf_coord)
+			For i_CST_GetListItem=0 To totalPoints
+				ur_coord=r_cst_list(i_CST_GetListItem)
+				uf_coord=f_cst_list(i_CST_GetListItem)
+				uv=xim_list(i)*-Sin(uf_coord)+yim_list(i)*Cos(uf_coord)
+				sum=sum+Abs(uv)
+				
+			Next i_CST_GetListItem
+	End Select
+
+
+
+	cst_value=sum
+
+	SumFieldAbsCylindrical_epllipse=cst_value
+End Function
 Function FindMaximumAbsCylindrical_epllipse(comp As String, rxy As Double,rz As Double, ByRef rcoord As Double,ByRef fcoord As Double,ByRef zcoord As Double) As Double
 	Dim x_cst As Double,y_cst As Double,z_cst As Double
 	Dim r_cst As Double,f_cst As Double
@@ -699,7 +847,7 @@ Sub postProcess(saveDir As String,id As Variant)
 	Dim xcoord As Double, ycoord As Double, zcoord As Double
 	Dim i As Double,r As Double
 	Dim ezabsmax As Double,hzabsmax As Double
-	Dim coffd As Double
+	Dim coffd As Double, coffd2 As Double
 	Dim etabsmax As Double,htabsmax As Double
 
 	Const basepath As String=""
@@ -709,6 +857,7 @@ Sub postProcess(saveDir As String,id As Variant)
 	Dim resultArray As Variant
 	Dim rxy As Double,rz As Double
 	Dim radius As Double,z_0 As Double,z_t As Double
+	Dim ezabssum As Double, hzabdsum As Double
 	radius = RestoreDoubleParameter("R")
 	z_0=-RestoreDoubleParameter("L")*0.5
 	z_t=RestoreDoubleParameter("L")*0.5
@@ -728,6 +877,10 @@ Sub postProcess(saveDir As String,id As Variant)
 	Print #99,"xcoord";vbTab;"ycoord";vbTab;"zcoord";vbTab;"value"
 	Print #99,xcoord;vbTab;ycoord;vbTab;zcoord;vbTab;ezabsmax
 
+	ezabssum=SumFieldAbsCylindrical_epllipse("Ez",rxy,rz)
+	Print #99,"Sum_Abs_Ez"
+	Print #99,"value"
+	Print #99,ezabssum
 
 	SelectTreeItem("2D/3D Results\Modes\Mode "& i &"\h\Z")
 	hzabsmax=FindMaximumAbs3D_epllipse("Hz",rxy,rz,xcoord, ycoord, zcoord)
@@ -736,8 +889,17 @@ Sub postProcess(saveDir As String,id As Variant)
 	Print #99,"xcoord";vbTab;"ycoord";vbTab;"zcoord";vbTab;"value"
 	Print #99,xcoord;vbTab;ycoord;vbTab;zcoord;vbTab;hzabsmax
 
+	hzabssum=SumFieldAbsCylindrical_epllipse("Hz",rxy,rz)
+	Print #99,"Sum_Abs_Hz"
+	Print #99,"value"
+	Print #99,hzabssum
+
 	coffd=ezabsmax/hzabsmax/Z0
 	ReportInformation("TEMcoff:"& coffd)
+
+	coffd2=ezabssum/hzabssum/Z0
+	ReportInformation("TEMcoff_method2:"& coffd2)
+
 	'coffd>alpha TM
 	'coffd<alpha TE
 	If coffd>alpha Then
@@ -754,6 +916,10 @@ Sub postProcess(saveDir As String,id As Variant)
 	Print #99,"TEM_Coffs"
 	Print #99,"value"
 	Print #99,coffd
+
+	Print #99,"TEM_Coffs_method2"
+	Print #99,"value"
+	Print #99,coffd2
 
 
 	Dim rcoord As Double,fcoord As Double

@@ -1,18 +1,20 @@
 import configparser
 import os,shutil
 import logger,json
+import pathlib
 class GlobalConfmanager(object):
     
     def __init__(self,Logger=None):
         self.projlist=[]
         self.log=Logger
         self.conf = configparser.ConfigParser()
-        if (not os.path.exists(r'.\config')):
-            os.makedirs(r'.\config')
-        self.def_global_cfg_path=r'.\config\default.ini'
-        self.curr_global_cfg_path=r'.\config\current.ini'
+        self.confdir=pathlib.Path(r'.\config')
+        if (not self.confdir.exists()):
+            self.confdir.mkdir()
+        self.def_global_cfg_path=self.confdir / 'default.ini'
+        self.curr_global_cfg_path=self.confdir / 'current.ini'
         ##Generate new default conf file
-        if (not os.path.exists(self.def_global_cfg_path)):
+        if (not self.def_global_cfg_path.exists()):
             self.conf.add_section("BASE")
             self.conf.set('BASE','datadir','./data')
             self.conf.set('BASE','tempdir','./temp')
@@ -24,7 +26,7 @@ class GlobalConfmanager(object):
             self.conf.add_section("PROJECT")
             self.conf.set('PROJECT','currprojdir','')
 
-        if (not os.path.exists(self.curr_global_cfg_path)):
+        if (not self.curr_global_cfg_path.exists()):
 
             self.log.logger.warning("未找到curr_global_cfg.")
             self.log.logger.warning("使用default.")
@@ -34,14 +36,16 @@ class GlobalConfmanager(object):
 
     def printconf(self):
         self.log.logger.info("全局信息:")
-        self.log.logger.info("data目录:%s"% self.conf['BASE']['datadir'])
-        self.log.logger.info("temp目录:%s"% self.conf['BASE']['tempdir'])
-        self.log.logger.info("log目录:%s"% self.conf['BASE']['logdir'])
-        self.log.logger.info("result目录:%s"% self.conf['BASE']['resultdir'])
+        self.log.logger.info("data目录:%s"% self._rstr2astr(self.conf['BASE']['datadir']))
+        self.log.logger.info("temp目录:%s"% self._rstr2astr(self.conf['BASE']['tempdir']))
+        self.log.logger.info("log目录:%s"% self._rstr2astr(self.conf['BASE']['logdir']))
+        self.log.logger.info("result目录:%s"% self._rstr2astr(self.conf['BASE']['resultdir']))
         self.log.logger.info("CST版本:%s"% self.conf['CST']['cstver'])
         self.log.logger.info("CSTEXE路径:%s"% self.conf['CST']['cstexepath'])
-        self.log.logger.info("project目录:%s"% self.conf['PROJECT']['currprojdir'])
-
+        self.log.logger.info("project目录:%s"% self._rstr2astr(self.conf['PROJECT']['currprojdir']))
+    def _rstr2astr(self,instr): #_relative_path_str_to_abspath_str function
+        ostr=str(pathlib.Path(instr).absolute())
+        return ostr
     def saveconf(self):
         f=open(self.curr_global_cfg_path,'w')
         self.conf.write(f)
@@ -52,44 +56,58 @@ class GlobalConfmanager(object):
 
     def checkConfig(self):
         #测试CST环境位置
-        post_exit=False
+        result=True 
         self.log.logger.info("检查全局配置开始.")
         cfg=self.conf
-        if (not os.path.exists(cfg['CST']['cstexepath'])):
+        self.log.logger.info("检查CST PATH.")
+        cstenvexepath=pathlib.Path(cfg['CST']['cstexepath'])
+        if (not cstenvexepath.exists()):
             self.log.logger.warning("定义的cstexepath:%s不存在。" %cfg['CST']['cstexepath'] )
             self.log.logger.warning("尝试寻找cstexepath。")
             try:
                 cfg['CST']['cstexepath'],cfg['CST']['cstver']=self.findCSTenv()
             except FileNotFoundError:
                 self.log.logger.error("未找到CST ENV PATH,请从config指定PATH")
-                post_exit=True
-
+                self.log.logger.info("检查CST PATH 失败.")
+                result=False
+            else:
+                self.log.logger.info("检查CST PATH 失败, 已使用自动寻找到的有效cst path作为代替.")
+            
+        else:
+            self.log.logger.info("检查CST PATH 成功.")
+            
         #测试CST版本
+        self.log.logger.info("检查CST 版本.")
         if (int(cfg['CST']['cstver'])<2015 or int(cfg['CST']['cstver'])>2020):
             self.log.logger.warning("定义的cstver不正确(req:cstver>2015&&<2021)。")
             self.log.logger.warning("尝试从cstexepath寻找cstver。")
             self.log.logger.error("功能未实现，请手动指定。")
             
-            post_exit=True
+            result=False
         self.log.logger.debug("CST ENV PATH为%s" % cfg['CST']['cstexepath'])
         self.log.logger.debug("CST 版本为%s" % cfg['CST']['cstver'])
+        self.log.logger.info("检查CST 版本 结束.")
         #测试各个路径是否存在，若否则创建目录
+        self.log.logger.info("检查各个路径是否存在.")
         for names,dirs in cfg['BASE'].items():
-            if(not os.path.exists(dirs)):                
-                os.makedirs(dirs)
+            pathobj=pathlib.Path(dirs)
+            if(not pathobj.exists()):                
+                pathobj.mkdir()
                 self.log.logger.info("已建立%s于%s。" %(names,dirs))
 
         self.log.logger.info("检查全局配置结束.")
-        if (post_exit==True):
-            self.log.logger.error("退出程序")
-            os._exit(1)
+        if (result==False):
+            self.log.logger.info("未通过全局配置检测")
+        else:
+            self.log.logger.info("通过全局配置检测")
+        return result
     def findCSTenv(self):
         self.log.logger.info("寻找CSTenv开始")
         ed1=":\\Program Files (x86)\\CST Studio Suite "
         ed2="\\CST DESIGN ENVIRONMENT.exe"
         for j in range(2015,2025):        
             for i in range(ord('C'),ord('Z')):            
-                if os.path.exists(chr(i)+ed1+str(j)+ed2):
+                if pathlib.Path(chr(i)+ed1+str(j)+ed2).exists():
                     success=True
                     CSTexepath=chr(i)+ed1+str(j)+ed2
                     CSTver=str(j)
@@ -102,13 +120,13 @@ class GlobalConfmanager(object):
     ###检查project
     def checkCurrProject(self):
         self.log.logger.info("检查project开始")
-        curprojdirpath=self.conf['PROJECT']['currprojdir']
+        curprojdirpath=pathlib.Path(self.conf['PROJECT']['currprojdir'])
         if os.path.exists(curprojdirpath):
-            self.log.logger.info("找到project目录:%s"% curprojdirpath)
+            self.log.logger.info("找到project目录:%s"% str(curprojdirpath))
         else:
-            self.log.logger.info("未找到project目录:%s"% curprojdirpath)
+            self.log.logger.info("未找到project目录:%s"% str(curprojdirpath))
             os.makedirs(curprojdirpath,exist_ok=True)
-            self.log.logger.info("已创建project目录:%s"% curprojdirpath)
+            self.log.logger.info("已创建project目录:%s"% str(curprojdirpath))
         self.log.logger.info("检查project结束")
 
 

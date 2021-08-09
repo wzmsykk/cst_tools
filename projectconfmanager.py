@@ -5,110 +5,109 @@ import subprocess
 import hashlib
 import tempfile
 import projectutil
-
+import pathlib
 ###读取或生成ProjConf.ini文件
+
+class ProjectStatusError(Exception):
+    def __init__(self,message):
+        self.meg=message
 class ProjectConfmanager(object):
     def __init__(self,GlobalConfigManager=None,Logger=None):
         self.conf= configparser.ConfigParser()
         self.log=Logger
         self.gconf=GlobalConfigManager.conf
-
-        self.maincwd=os.getcwd()
-        self.currProjectDir=None #外部 ref->oldcwd
+        self.currProjectDir=None 
         self.CFGfilename="project.ini"
+        self.paramsfilename='params.json'
 
-
-    def openProjectDirReadOnly(self,newProjectDir,slient=False):
-        self.log.logger.info("尝试打开project目录%s。"% newProjectDir)
-        if (self.currProjectDir!=None):
-            self.savecfg(slient=slient)
-        self.currProjectDir=os.path.abspath(newProjectDir)
+    def _rap2apo(self,inpath): #relative or abs path to abspath object related to project dir as base dir
+        if self.currProjectDir == None:
+            raise AttributeError
+        op=pathlib.Path(inpath)
+        if not op.is_absolute():
+            op = self.currProjectDir / op
+        return op
+    def openProjectDirReadOnly(self,projectDir):
+        self.currProjectDir=pathlib.Path(projectDir).absolute()
+        self.log.logger.info("尝试打开project目录%s。"% str(self.currProjectDir))
         cfgfilename=self.CFGfilename
-        cfgpath=os.path.join(self.currProjectDir,cfgfilename)
-        if(not os.path.exists(cfgpath)):
+        cfgpath=self.currProjectDir / cfgfilename
+        if(not cfgpath.exists()):
             self.log.logger.error("未找到配置文件%s。"% cfgfilename)
             raise FileNotFoundError
 
-        self.checkProjectStatus()
+        result=self.checkProjectStatus()
+        if result==False:
+            raise ProjectStatusError
 
-    def openProjectDir(self,newProjectDir,slient=False):
-        self.log.logger.info("尝试打开project目录%s。"% newProjectDir)
-        if (self.currProjectDir!=None):
-            self.savecfg(slient=slient)
-        self.currProjectDir=os.path.abspath(newProjectDir)
+
+    def openProjectDir(self,projectDir):
+        self.currProjectDir=pathlib.Path(projectDir).absolute()
+        self.log.logger.info("尝试打开project目录%s。"% str(self.currProjectDir))
         cfgfilename=self.CFGfilename
-        cfgpath=os.path.join(self.currProjectDir,cfgfilename)
-        if(not os.path.exists(cfgpath)):
-            self.log.logger.error("未找到配置文件%s。"% cfgfilename)
-            self.createProjectFromDir(newProjectDir,slient)
+        cfgpath=self.currProjectDir/ cfgfilename
+        if(not cfgpath.exists()):
+            self.log.logger.info("未找到配置文件%s。"% cfgfilename)
+            self.createProjectFromDir(self.currProjectDir)
 
-        self.checkProjectStatus()
+        result=self.checkAndRepairProject()
+        if result==False:
+            raise ProjectStatusError
 
-    def createProjectFromDir(self,newProjectDir,slient=False):
-        self.log.logger.info("尝试从project目录%s创建配置文件。"% newProjectDir)
-        if (self.currProjectDir!=None):
-            self.savecfg(slient=slient)
-        self.currProjectDir=os.path.abspath(newProjectDir)
+    def createProjectFromDir(self,newProjectDir=None,slient=False):
+        self.log.logger.info("尝试从project目录%s创建配置文件。"% str(newProjectDir))
+        if newProjectDir!=None:
+            self.currProjectDir=pathlib.Path(newProjectDir).absolute()
         cfgfilename=self.CFGfilename
         self.createProjectConf(cfgfilename=cfgfilename)
-        self.checkProjectStatus()
+        #self.checkProjectStatus()
 
     def savecfg(self,cfgfilename="project.ini",slient=False):
-        oldcwd=os.getcwd()
-        os.chdir(self.currProjectDir)
-        cfgfilePath=os.path.join(self.currProjectDir,"project.ini")
+        cfgfilePath=self.currProjectDir / "project.ini"
         f=open(cfgfilePath,"w")
         self.conf.write(f)
         f.close()
-        os.chdir(oldcwd)
 
-    def createProjectConf(self,cfgfilename="project.ini",projectname=""):
-        #所有路径都是相对于.\project\myproject这一文件夹   
-        self.log.logger.info("创建配置文件%s。"% cfgfilename)
+    def createProjectConf(self,cfgfilename="project.ini",projectname=None):
+        #所有路径都是相对于.\project\myproject这一文件夹 
+        cfgfilepath=pathlib.Path(self.currProjectDir)/ cfgfilename
+        self.log.logger.info("开始创建配置文件%s于%s。"% (cfgfilename,str(cfgfilepath)))
         self.conf.clear()
         cstfile=None
-        currprojdir=self.currProjectDir        
-        avilprojname=os.path.basename(os.path.realpath(currprojdir))
-        os.chdir(currprojdir)
+        currprojdir=pathlib.Path(self.currProjectDir)        
+        avilprojname=currprojdir.name
 
         currprojname=None
-        if(projectname!=""):
+        if(projectname!=None):
+            self.log.logger.info("使用指定的project名%s" % projectname)
             currprojname=projectname
+
         else:
             self.log.logger.info("未指定project名,使用为默认目录名%s" % avilprojname)
             currprojname=avilprojname
 
-        found =False
-        for root,dirs,files in os.walk("."):
-            if(found ==True) :
-                break
-            for file in files:
-                if file.endswith('.cst'):
-                    cstfile=file
-                    self.log.logger.info("找到CST项目文件%s"% file)
-                    found=True
-                    break
-                else:
-                    self.log.logger.error("未找到CST项目文件于%s目录"%currprojdir)
-                    self.log.logger.error("退出程序")
-                    os._exit(1)
-
+        cstfilelist=list(currprojdir.glob("*.cst"))
+        if (len(cstfilelist)==0):
+            self.log.logger.error("未找到CST项目文件于%s目录"%str(currprojdir))
+            raise FileNotFoundError
+        else:
+            file=cstfilelist[0]
+            self.log.logger.info("找到CST项目文件%s"% file)
+            cstfile=file
         self.conf.add_section("PROJECT")
         self.conf.set('PROJECT','ProjectName',currprojname)
         self.conf.set('PROJECT','ProjectType',currprojname)
         self.conf.set('PROJECT','ProjectDescription',"")
         self.conf.add_section("DIRS")   
         #保存为相对路径
-        os.chdir(self.maincwd) 
-        projresultdirabspath=os.path.abspath(self.gconf['BASE']['resultdir'])
-        projresulttempabspath=os.path.abspath(self.gconf['BASE']['tempdir'])
-        os.chdir(self.currProjectDir)
-        projresultrelpath=os.path.relpath(projresultdirabspath)
-        projtemprelpath=os.path.relpath(projresulttempabspath)
-        self.conf.set('DIRS','resultdir',projresultrelpath)
-        self.conf.set('DIRS','tempdir',projtemprelpath)
+
+        #############TO DO #####################
+
+
+        self.conf.set('DIRS','resultdir','result')
+        self.conf.set('DIRS','tempdir','temp')
         self.conf.add_section("CST")      
-        self.conf.set('CST','CSTFilename',os.path.basename(cstfile))  
+        self.conf.set('CST','CSTFilename',str(cstfile.name))  
 
         file_md5=self.genMD5FromCST(cstfile)
         self.conf.set('CST','CSTFileMD5',file_md5.hexdigest())
@@ -118,13 +117,11 @@ class ProjectConfmanager(object):
         self.conf.set('CST','UseRemoteCalculaton',"False")  
         self.conf.set('CST','DCMainControlAddress',"")  
         self.conf.add_section("PARAMETERS")
-        self.conf.set('PARAMETERS','paramfile',"params.json")  
+        self.conf.set('PARAMETERS','paramfile',self.paramsfilename)  
         self.readParametersFromCST()
 
         #保存配置文件
         self.savecfg()
-
-        os.chdir(self.maincwd)#切回工作目录
         self.log.logger.info("创建配置文件结束。")
 
     def printconf(self):
@@ -144,16 +141,13 @@ class ProjectConfmanager(object):
         self.printparams()
 
     def printparams(self):
-        oldcwd=os.getcwd()
-        os.chdir(self.currProjectDir)
-        paramfile=self.conf['PARAMETERS']['paramfile']
+        paramfile=self.currProjectDir / self.conf['PARAMETERS']['paramfile']
         f=open(paramfile,"r")
         pamlist=json.load(f)
         print(pamlist)
         f.close()
-        os.chdir(oldcwd)
 
-    def getParamsList(self, jsonpath=""):
+    def getParamsList(self, jsonpath=None):
         """从生成的json读取Model结构参数列表 read model parameters from json filepath
             
         Parameters
@@ -165,16 +159,13 @@ class ProjectConfmanager(object):
         pamlist : a list of json dict contains the param names and values
 
         """
-        oldcwd=os.getcwd()
-        os.chdir(self.currProjectDir)
-        if (jsonpath==""):
-            paramfile=self.conf['PARAMETERS']['paramfile']
+        if (jsonpath==None):
+            paramfile=self.currProjectDir / self.conf['PARAMETERS']['paramfile']
         else:
             paramfile=jsonpath
         f=open(paramfile,"r")
         pamlist=json.load(f)
         f.close()
-        os.chdir(oldcwd)
         return pamlist
 
 
@@ -187,27 +178,39 @@ class ProjectConfmanager(object):
         return file_md5
         
 
-    def readParametersFromCST(self,savejsonname="params.json"):        
+    def readParametersFromCST(self,savejsonpath=None):    
+        if savejsonpath==None:
+            jsonpath=self.currProjectDir / self.paramsfilename 
+        else:
+            jsonpath=pathlib.Path(savejsonpath)
+            if not jsonpath.is_absolute():
+                jsonpath = self.currProjectDir / jsonpath
+        self.log.logger.info("正在从CST文件中读取参数列表。")    
         projectname=self.conf['PROJECT']['ProjectName']
-        oldcwd=os.getcwd()
-        os.chdir(self.currProjectDir)
-        self.log.logger.info("正在从CST文件中读取参数列表。")
-        tempfile.tempdir=self.conf['DIRS']['tempdir']
+        td=pathlib.Path(self.conf['DIRS']['tempdir'])
+        
+        if td.is_absolute():
+            td=self.conf['DIRS']['tempdir']
+        else:
+            td=self.currProjectDir / td
+        if not td.exists():
+            td.mkdir()
+        tempfile.tempdir=str(td)
+        self.log.logger.info("tempdir为%s。" %tempfile.gettempdir())  
         tmp_bas=tempfile.NamedTemporaryFile(mode="w",suffix='.bas',delete =False)
         tmp_txt=tempfile.NamedTemporaryFile(mode="w",suffix='.txt',delete =False)
         tmp_cst=tempfile.NamedTemporaryFile(mode="wb",suffix='.cst',delete =False)
         tmp_bas_name = tmp_bas.name
         tmp_cst_name = tmp_cst.name
         tmp_txt_name = tmp_txt.name
-        os.chdir(self.maincwd)
-        vbasrcpath=os.path.abspath(os.path.join(self.gconf['BASE']['datadir'],"readParamsT.vb"))
-        os.chdir(self.currProjectDir)
-        vbadstpath=os.path.join(tempfile.gettempdir(),tmp_bas_name)
-        midfilepath=os.path.abspath(os.path.join(tempfile.gettempdir(),tmp_txt_name))
+        self.log.logger.info("临时文件生成成功。")
+        vbasrcpath=pathlib.Path(self.gconf['BASE']['datadir']).absolute() / "readParamsT.vb"
+        vbadstpath=pathlib.Path(tempfile.gettempdir()) / tmp_bas_name
+        midfilepath=pathlib.Path(tempfile.gettempdir()) / tmp_txt_name
         
         
-        cstfilepath=os.path.abspath(os.path.join(self.currProjectDir,self.conf['CST']['CSTFilename']))
-        tmpcstpath=os.path.abspath(os.path.join(tempfile.gettempdir(),tmp_cst_name))
+        cstfilepath=pathlib.Path(self.currProjectDir).absolute() / self.conf['CST']['CSTFilename']
+        tmpcstpath=pathlib.Path(tempfile.gettempdir()).absolute() / tmp_cst_name
         #tmpcstfile
         fcst=open(cstfilepath,"rb")
         content=fcst.read()
@@ -221,8 +224,8 @@ class ProjectConfmanager(object):
         list1=[]
         for line in file_1.readlines():
             ssd=line
-            ssd=re.sub('%PARAMDSTPATH%',midfilepath.replace('\\','\\\\'),ssd)
-            ssd=re.sub('%CSTPROJFILE%',tmpcstpath.replace('\\','\\\\'),ssd)
+            ssd=re.sub('%PARAMDSTPATH%',str(midfilepath).replace('\\','\\\\'),ssd)
+            ssd=re.sub('%CSTPROJFILE%',str(tmpcstpath).replace('\\','\\\\'),ssd)
             list1.append(ssd)
         file_1.close()
         for i in range(len(list1)):
@@ -231,74 +234,109 @@ class ProjectConfmanager(object):
 
         #command=
 
-        command = "\""+self.gconf['CST']['cstexepath'] + "\"" +" -m " + "\"" + vbadstpath + "\""
+        command = "\""+self.gconf['CST']['cstexepath'] + "\"" +" -m " + "\"" + str(vbadstpath) + "\""
         with subprocess.Popen(command, stdout=subprocess.PIPE,shell=True) as self.cstProcess:
             for line in self.cstProcess.stdout:
                 self.log.logger.info(line)
-        os.chdir(self.currProjectDir)
-        projectutil.custom_ascii_2_json(midfilepath,savejsonname)
-        os.chdir(oldcwd)
+        
+        projectutil.custom_ascii_2_json(midfilepath,jsonpath)
         pass
 
-
-    
-    def checkProjectStatus(self,cfgfilename="project.ini",slient=False,force=False):
-        oldcwd=os.getcwd()
-        os.chdir(self.currProjectDir)
-        cfgpath=cfgfilename
+    def checkAndRepairProject(self,cfgfilename="project.ini",slient=False,force=True):
+        result=True
+        cfgpath=self.currProjectDir / cfgfilename
         cstfileflag=False
         cfgfileflag=False
-        if(os.path.exists(cfgpath)):
+        self.log.logger.info("检测并更新项目配置文件")
+        self.log.logger.info("测试项目配置文件是否存在")
+        self.log.logger.debug("推测项目配置文件位于%s",str(cfgpath))
+        if(cfgpath.exists()):
+            self.log.logger.info("测试项目配置文件存在 通过")
             cfgfileflag=True
         else:
-            self.log.logger.error("未找到配置文件%s\n"% cfgfilename)
-            self.log.logger.error("退出程序")
-            os._exit(1)
-
+            self.log.logger.error("未找到配置文件%s\n"% str(cfgpath))
+            self.log.logger.info("测试项目配置文件存在 失败")
+            result=False
         self.conf.clear()
-        self.conf.read(cfgfilename)
-        cstfilepath=self.conf['CST']['CSTFilename']
-        if(os.path.exists(cstfilepath)):
+        self.conf.read(cfgpath)
+        self.log.logger.info("测试CST模型文件是否存在")
+        cstfilepath=self.currProjectDir / self.conf['CST']['CSTFilename']
+        self.log.logger.debug("推测模型文件位于%s",str(cstfilepath))
+        if(cstfilepath.exists()):
+            self.log.logger.info("测试CST模型文件存在 通过")
             cstfileflag=True
         else:
-            self.log.logger.error("未找到cst文件%s\n"% cstfilepath)
-            self.log.logger.error("退出程序")
-            os._exit(1)
+            self.log.logger.error("未找到cst文件%s\n"% str(cstfilepath))
+            self.log.logger.info("测试CST模型文件存在 失败")
+            result=False
         currCSTMD5=self.genMD5FromCST(cstfilepath).hexdigest()
         savedCSTMD5=self.conf['CST']['CSTFileMD5']
+        self.log.logger.info("测试保存的参数列表与MD5是否与CST模型文件匹配")
+        paramjsonpath=self._rap2apo(self.conf['PARAMETERS']['paramfile'])
+        
         if(currCSTMD5!=savedCSTMD5):
-            self.log.logger.warning("记录的CST文件MD5%s与实际的%s不一致，已被修改"%(savedCSTMD5,currCSTMD5))            
-            nex=False
-            while(nex!=True):
-                self.log.logger.warning("是否重新生成参数列表并保存MD5n/y")
-                a=input() 
-                if(a=='y' or a=='Y'):
-                    self.log.logger.info("正在重新生成参数列表")
-                    self.readParametersFromCST()
-                    self.conf['CST']['CSTFileMD5']=currCSTMD5
-                    self.log.logger.warning("已更新保存的MD5")
-                    self.savecfg()
-                    self.log.logger.warning("生成结束，请重新运行程序")
-                    os._exit(1)
-                elif(a=='n' or a=='N'):
-                    nex=True
-            nex=False
-            while(nex!=True):
-                self.log.logger.warning("是否仅更新MD5n/y")
-                a=input() 
-                if(a=='y' or a=='Y'):
-                    nex=True
-                elif(a=='n' or a=='N'):  
-                    self.log.logger.warning("退出程序n/y")                  
-                    os._exit(1)
+            self.log.logger.warning("记录的CST文件MD5_%s与实际的MD5_%s不一致，已被修改"%(savedCSTMD5,currCSTMD5))           
+            
+            self.log.logger.warning("重新生成参数列表并保存MD5n/y")
+            self.log.logger.info("正在重新生成参数列表")
+            self.readParametersFromCST()
             self.conf['CST']['CSTFileMD5']=currCSTMD5
             self.savecfg()
             self.log.logger.warning("已更新保存的MD5")
+            self.log.logger.info("测试MD5 通过")
+        elif(not paramjsonpath.exists()):
+            self.log.logger.warning("参数列表文件_%s不存在"%str(paramjsonpath))       
+            
+            self.log.logger.warning("重新生成并保存参数列表")
+            self.readParametersFromCST(paramjsonpath)
+        self.log.logger.info("%s检测并更新项目配置文件结束\n"% cfgfilename)
+        return result
+
+    def checkProjectStatus(self,cfgfilename="project.ini",slient=False,force=False):
+        result=True
+        cfgpath=self.currProjectDir / cfgfilename
+        cstfileflag=False
+        cfgfileflag=False
+        self.log.logger.info("检测项目配置文件正确性")
+        self.log.logger.info("测试项目配置文件是否存在")
+        self.log.logger.debug("推测项目配置文件位于%s",str(cfgpath))
+        if(cfgpath.exists()):
+            cfgfileflag=True
+            self.log.logger.info("测试项目配置文件 通过")
+        else:
+            self.log.logger.error("未找到项目配置文件%s\n"% str(cfgpath))
+            self.log.logger.info("测试项目配置文件 失败")
+            result=False
+
+        self.conf.clear()
+        self.conf.read(cfgpath)
+        cstfilepath=self.currProjectDir / self.conf['CST']['CSTFilename']
+        self.log.logger.info("测试CST模型文件是否存在")
+        self.log.logger.debug("推测模型文件位于%s",str(cstfilepath))
+        if(cstfilepath.exists()):
+            cstfileflag=True
+            self.log.logger.info("测试CST模型文件 通过")
+        else:
+            self.log.logger.error("未找到cst模型文件%s\n"% str(cstfilepath))
+            self.log.logger.info("测试CST模型文件 失败")
+            result=False
+        currCSTMD5=self.genMD5FromCST(cstfilepath).hexdigest()
+        savedCSTMD5=self.conf['CST']['CSTFileMD5']
+        self.log.logger.info("测试保存的MD5是否与CST模型文件匹配")
+        paramjsonpath=self._rap2apo(self.conf['PARAMETERS']['paramfile'])
+        if(currCSTMD5!=savedCSTMD5):
+            self.log.logger.warning("记录的CST文件MD5%s与实际的%s不一致，已被修改"%(savedCSTMD5,currCSTMD5))       
+            self.log.logger.info("测试MD5 失败")     
+            result=False
+        elif(not paramjsonpath.exists()):
+            self.log.logger.warning("参数列表文件_%s不存在"%str(paramjsonpath))       
+            result=False
+        else:
+            self.log.logger.info("测试MD5 通过")
         
-        self.log.logger.info("%s测试结束\n"% cfgfilename)
-        os.chdir(oldcwd)
+        self.log.logger.info("%s检测项目配置文件结束\n"% cfgfilename)
 
-
+        return result
 
 
 

@@ -427,7 +427,7 @@ def mode_wavenumber_mnp(XC,YFC,XR,YFR,XZ,YFZ):
 
     return M_NUM,N_NUM,P_NUM
 
-def main_mode_type(resultdir,modeindex,threshold=10):
+def main_mode_type(resultdir,modeindex,th_upper=10,th_below=0.1):
     curdir=pathlib.Path(resultdir)
 
     pt="MODE_"+str(modeindex)+"_Coffs.txt"
@@ -436,11 +436,11 @@ def main_mode_type(resultdir,modeindex,threshold=10):
     cof=coffsDict['TEM_Coffs']['value']
 
     #custom result
-    alpha=threshold
+
     coff=float(cof)
-    if coff<alpha and coff>1/alpha:
+    if coff<th_upper and coff>th_below:
         mc="HX"
-    elif coff<1/alpha:
+    elif coff<th_below:
         mc="TE"
     else:
         mc="TM"

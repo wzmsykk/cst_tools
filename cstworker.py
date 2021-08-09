@@ -5,6 +5,7 @@ import time
 import subprocess
 import logging
 import hashlib
+import pathlib
 import worker
 
 class local_cstworker(worker.worker):
@@ -12,13 +13,13 @@ class local_cstworker(worker.worker):
         super().__init__(id,type,config,log_obj)
         
         #configs
-        #cstType,cstPatternDir,tempPath,taskFileDir,resultDir,cstPath
+        #cstType,cstPatternDir,tempDir,taskFileDir,resultDir,cstPath
         self.cstType=config['ProjectType']
-        self.cstPatternDir=config['cstPatternDir']
-        self.tempPath=config['tempPath']
-        self.taskFileDir=config['taskFileDir']
-        self.resultDir=config['resultDir']
-        self.cstProjPath=config['cstPath']
+        self.cstPatternDir=pathlib.Path(config['cstPatternDir'])
+        self.tempDir=pathlib.Path(config['tempPath'])
+        self.taskFileDir=pathlib.Path(config['taskFileDir'])
+        self.resultDir=pathlib.Path(config['resultDir'])
+        self.cstProjPath=pathlib.Path(config['cstPath'])
         
         self.paramList=copy.deepcopy(config['paramList'])
         self.taskIndex=0
@@ -32,8 +33,8 @@ class local_cstworker(worker.worker):
         
         #LOGGING#
 
-        self.log.logger.info("TempDir:"+self.tempPath)
-        self.log.logger.info("TaskFileDir:"+self.taskFileDir)
+        self.log.logger.info("TempDir:%s"%str(self.tempDir))
+        self.log.logger.info("TaskFileDir:%s"%str(self.taskFileDir))
 
         #FINDCST
         self.currentCSTENVPATH=config['CSTENVPATH']
@@ -41,57 +42,34 @@ class local_cstworker(worker.worker):
         ##INIT##
 
         cstPatternName=self.cstType+".pattern"
-        cstPatternPath=os.path.join(self.cstPatternDir,cstPatternName)
-        if not os.path.exists(cstPatternPath):
-            self.log.logger.error("pattern not found for "+self.cstType)
-            os._exit(0)
-        headerFilePath=os.path.join(self.cstPatternDir,"worker.vb")
+        cstPatternPath=self.cstPatternDir / cstPatternName
+        if not cstPatternPath.exists():
+            
+            self.log.logger.error("pattern not found for %s"%self.cstType)
+            self.log.logger.error("pattern should be in %s "% str(cstPatternPath))
+            raise FileNotFoundError
+        headerFilePath=self.cstPatternDir / "worker.vb"
         
 
         ##COPY cstProj TO TEMP
-        if (os.path.exists(os.path.splitext(self.cstProjPath)[0])):
-            self.log.logger.info("Found useless cstProject related files." )
-            shutil.rmtree(os.path.splitext(self.cstProjPath)[0])
-            self.log.logger.info(os.path.splitext(self.cstProjPath)[0])
-            self.log.logger.info("files removed.")
-        self.tmpCstFilePath=os.path.join(self.tempPath,"cstproj.cst")
+
+        self.tmpCstFilePath=self.tempDir / "cstproj.cst"
 
             ##IF tmpCstFile EXISTS, CHECK FILE MD5
-        if os.path.exists(self.tmpCstFilePath):
+        if self.tmpCstFilePath.exists():
             md5srcfile=self.getFileMD5(self.cstProjPath)
             md5dstfile=self.getFileMD5(self.tmpCstFilePath)
             if not (md5srcfile==md5dstfile):
                 self.log.logger.warning("CstProjectFile is not consistent with the one in temp.")
-                self.clearall3()                
+                self.clearall3()    
+                shutil.copyfile(src=self.cstProjPath,dst=self.tmpCstFilePath)            
         else:
             shutil.copyfile(src=self.cstProjPath,dst=self.tmpCstFilePath)
         
         mainBatchFilePath=self.createMainCSTbatch(headerFilePath,cstPatternPath)
         self.startCSTenv(mainBatchFilePath)
 
-    def genAvilTempPath(self,currTempDir):
-        mid=0
-        tmpdir=os.path.normpath(currTempDir)
-        parentdir=os.path.dirname(tmpdir)
-        name=os.path.basename(currTempDir)
-        while (os.path.exists(tmpdir)):
-            newname=name+"_"+str(mid).zfill(4)
-            mid+=1
-            tmpdir=os.path.join(parentdir,newname)
-        os.mkdir(tmpdir)        
-        return tmpdir
-    def genAviltaskFileDir(self,currtaskFileDir):
-        mid=0
-        tmpdir=os.path.normpath(currtaskFileDir)
-        parentdir=os.path.dirname(tmpdir)
-        name=os.path.basename(currtaskFileDir)
-        while (os.path.exists(tmpdir)):
-            newname=name+"_"+str(mid).zfill(4)
-            mid+=1
-            tmpdir=os.path.join(parentdir,newname)
-        os.mkdir(tmpdir)
-        
-        return tmpdir
+
 
     def getFileMD5(self,filePath):
         with open(filePath, "rb") as fp:
@@ -101,24 +79,24 @@ class local_cstworker(worker.worker):
             return file_md5
 
     def clearall3(self):
-        if (os.path.exists(self.taskFileDir)):
+        if (self.taskFileDir.exists()):
             shutil.rmtree(self.taskFileDir)
-            os.mkdir(self.taskFileDir)
-        if (os.path.exists(self.resultDir)):
+            self.taskFileDir.mkdir()
+        if (self.resultDir.exists()):
             shutil.rmtree(self.resultDir)
-            os.mkdir(self.resultDir)
-        if (os.path.exists(self.tempPath)):
-            shutil.rmtree(self.tempPath)
-            os.mkdir(self.tempPath)
+            self.resultDir.mkdir()
+        if (self.tempDir.exists()):
+            shutil.rmtree(self.tempDir)
+            self.tempDir.mkdir()
         self.log.logger.info("Worker_(%s):old runfile removed"% self.ID)
 
 
 
     def startCSTenv(self,mainbatchpath):
-        cstlogPath=os.path.join(self.tempPath,"cst.log")
+        cstlogPath=self.tempDir / "cst.log"
         self.cstlog=open(cstlogPath,"wb",buffering=0)
-        command ="start cmd /k "+"\""+self.currentCSTENVPATH + "\"" +" -m "+ mainbatchpath
-        command2 = "\""+self.currentCSTENVPATH + "\"" +" -m " + "\"" + mainbatchpath + "\""
+        command ="start cmd /k "+"\""+self.currentCSTENVPATH + "\"" +" -m "+ str(mainbatchpath)
+        command2 = "\""+self.currentCSTENVPATH + "\"" +" -m " + "\"" + str(mainbatchpath) + "\""
         if self.cstStatus=='off':
             #command2="start cmd /k "+"\""+batFilePath+"\""
             self.log.logger.info(command2)
@@ -127,14 +105,14 @@ class local_cstworker(worker.worker):
             self.cstStatus ='on'
 
     def stopWork(self):
-        oFilePath=os.path.join(self.taskFileDir,"terminate.txt")
+        oFilePath=self.taskFileDir / "terminate.txt"
         file=open(oFilePath,"w")
         file.close()
         self.cstStatus=='off'
         self.taskIndex=0
 
     def sendTaskFile(self,paramname_list,value_list,run_name):
-        tf=os.path.join(self.taskFileDir,str(self.taskIndex)+'.txt')
+        tf=self.taskFileDir / (str(self.taskIndex)+'.txt')
         f1=open(tf,"w")
         f1.write(run_name+'\n')
         full_param_list=copy.deepcopy(self.paramList)
@@ -154,15 +132,15 @@ class local_cstworker(worker.worker):
     
 
     def createMainCSTbatch(self,hFilePath,mFilePath):
-        oFilePath=os.path.join(self.tempPath,"main.bas")
+        oFilePath=self.tempDir/"main.bas"
         
         ###saveVBConfigs
-        cFilePath=os.path.join(self.tempPath,"configs.txt")
+        cFilePath=self.tempDir/"configs.txt"
         file_c=open(cFilePath,'w')
         file_c.write(self.cstType+'\n')
-        file_c.write(os.path.abspath(self.resultDir)+'\n')
-        file_c.write(os.path.abspath(self.tmpCstFilePath)+'\n')
-        file_c.write(os.path.abspath(self.taskFileDir)+'\n')
+        file_c.write(str(self.resultDir.absolute())+'\n')
+        file_c.write(str(self.tmpCstFilePath.absolute())+'\n')
+        file_c.write(str(self.taskFileDir.absolute())+'\n')
         file_c.close()
 
         ###
@@ -172,7 +150,7 @@ class local_cstworker(worker.worker):
         for line in file_1.readlines():
             ssd=line
             ssd=re.sub('\'EXTERN\'','',ssd)
-            ssd=re.sub('%CONFIGFILEPATH%',os.path.abspath(cFilePath).replace('\\','\\\\'),ssd)
+            ssd=re.sub('%CONFIGFILEPATH%',str(cFilePath.absolute()).replace('\\','\\\\'),ssd)
             list1.append(ssd)
         file_1.close()
         list2 = []
@@ -186,7 +164,7 @@ class local_cstworker(worker.worker):
         for i in range(len(list2)):
             file_new.write(list2[i])
         file_new.close()
-        return os.path.abspath(oFilePath)
+        return oFilePath
 
     def change_uvalue(self,u_param_list,u_value_list):
         self.u_param_list=u_param_list
@@ -198,14 +176,14 @@ class local_cstworker(worker.worker):
         if self.cstStatus=='off':
             raise BaseException
         self.sendTaskFile(self.u_param_list,self.u_value_list,self.resultName)
-        pathc = os.path.join(self.resultDir, self.resultName)
+        pathc = self.resultDir / self.resultName
         #WAIT RESULTS
-        flagPath=os.path.join(self.taskFileDir,str(self.taskIndex)+".success")
+        flagPath=self.taskFileDir / (str(self.taskIndex)+".success")
         waitTime=0
         startTime=time.time()
         self.log.logger.info("WorkerID:%r Run:%r Name:%r started."%(self.ID,self.taskIndex,self.resultName))
         self.log.logger.info("Start Time:%r"% time.ctime())
-        while not os.path.exists(flagPath):
+        while not flagPath.exists():
             #ADD process check HERE
             rcode =self.cstProcess.poll()
             if rcode is None:

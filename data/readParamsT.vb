@@ -25,5 +25,7 @@ Sub Main
         Print #1,N;vbTab;parname;vbTab;svalue;vbTab;description
     Next
 	Close #1
+    Save()
+    Wait 1
     Quit
 End Sub
