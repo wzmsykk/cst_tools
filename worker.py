@@ -1,6 +1,6 @@
 
 import result
-import logger
+import logging
 #200
 #worker 输入X得到result的工具
 
@@ -29,12 +29,12 @@ class peuCSTworker(object):#伪CSTworker，返回查找表
         return self.x
         
 class worker(object):
-    def __init__(self, id, type='test',config=None,log_obj=None):
+    def __init__(self, id, type='test',config=None,logger=None):
         super().__init__()
-        if (log_obj==None):
-            self.log=logger.P_Logger()
+        if (logger==None):
+            self.logger=logging.getLogger('main.'+'worker_'+str(id))
         else:
-            self.log=log_obj
+            self.logger=logger
         
 
         self.config=config
@@ -44,10 +44,10 @@ class worker(object):
         self.resultName='Default'
         self.ID=id
         if type=='test':
-            self.log.logger.info("(DEBUG) test worker:%s" % str(self.ID))
+            self.logger.info("(DEBUG) test worker:%s" % str(self.ID))
         else:
             self.type=type
-            self.log.logger.info("created worker type %s id:%s" %(str(self.type),str(self.ID)))
+            self.logger.info("created worker type %s id:%s" %(str(self.type),str(self.ID)))
 
     def setID(self,id):
         self.ID=id

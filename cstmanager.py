@@ -6,10 +6,10 @@ import copy
 import pathlib
 
 class manager(object):
-    def __init__(self,gconfm,pconfm,params,log_obj,maxTask=2):
+    def __init__(self,gconfm,pconfm,params,logger,maxTask=2):
         super().__init__()
         
-        self.log=log_obj
+        self.logger=logger
         self.gconf=gconfm.conf
         self.pconf=pconfm.conf
         self.cstPatternDir=pathlib.Path(self.gconf['BASE']['datadir']).absolute()
@@ -65,6 +65,7 @@ class manager(object):
                 self.resultQueue.put(result)
             else:
                 break
+            
 
 
 
@@ -80,7 +81,7 @@ class manager(object):
         os.makedirs(mconf['tempPath'],exist_ok=True)
         print(mconf['tempPath'])
         mconf['taskFileDir']=str(self.taskFileDir/("worker_"+workerID))
-        mcstworker_local=cstworker.local_cstworker(id=workerID, type="local",config=mconf,log_obj=self.log)
+        mcstworker_local=cstworker.local_cstworker(id=workerID, type="local",config=mconf,logger=self.logger)
         return mcstworker_local
 
     def start(self):

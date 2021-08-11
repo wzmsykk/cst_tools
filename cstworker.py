@@ -9,8 +9,8 @@ import pathlib
 import worker
 
 class local_cstworker(worker.worker):
-    def __init__(self,id,type,config,log_obj):
-        super().__init__(id,type,config,log_obj)
+    def __init__(self,id,type,config,logger):
+        super().__init__(id,type,config,logger)
         
         #configs
         #cstType,cstPatternDir,tempDir,taskFileDir,resultDir,cstPath
@@ -33,8 +33,8 @@ class local_cstworker(worker.worker):
         
         #LOGGING#
 
-        self.log.logger.info("TempDir:%s"%str(self.tempDir))
-        self.log.logger.info("TaskFileDir:%s"%str(self.taskFileDir))
+        self.logger.info("TempDir:%s"%str(self.tempDir))
+        self.logger.info("TaskFileDir:%s"%str(self.taskFileDir))
 
         #FINDCST
         self.currentCSTENVPATH=config['CSTENVPATH']
@@ -45,8 +45,8 @@ class local_cstworker(worker.worker):
         cstPatternPath=self.cstPatternDir / cstPatternName
         if not cstPatternPath.exists():
             
-            self.log.logger.error("pattern not found for %s"%self.cstType)
-            self.log.logger.error("pattern should be in %s "% str(cstPatternPath))
+            self.logger.error("pattern not found for %s"%self.cstType)
+            self.logger.error("pattern should be in %s "% str(cstPatternPath))
             raise FileNotFoundError
         headerFilePath=self.cstPatternDir / "worker.vb"
         
@@ -60,7 +60,7 @@ class local_cstworker(worker.worker):
             md5srcfile=self.getFileMD5(self.cstProjPath)
             md5dstfile=self.getFileMD5(self.tmpCstFilePath)
             if not (md5srcfile==md5dstfile):
-                self.log.logger.warning("CstProjectFile is not consistent with the one in temp.")
+                self.logger.warning("CstProjectFile is not consistent with the one in temp.")
                 self.clearall3()    
                 shutil.copyfile(src=self.cstProjPath,dst=self.tmpCstFilePath)            
         else:
@@ -88,7 +88,7 @@ class local_cstworker(worker.worker):
         if (self.tempDir.exists()):
             shutil.rmtree(self.tempDir)
             self.tempDir.mkdir()
-        self.log.logger.info("Worker_(%s):old runfile removed"% self.ID)
+        self.logger.info("Worker_(%s):old runfile removed"% self.ID)
 
 
 
@@ -99,9 +99,9 @@ class local_cstworker(worker.worker):
         command2 = "\""+self.currentCSTENVPATH + "\"" +" -m " + "\"" + str(mainbatchpath) + "\""
         if self.cstStatus=='off':
             #command2="start cmd /k "+"\""+batFilePath+"\""
-            self.log.logger.info(command2)
+            self.logger.info(command2)
             self.cstProcess=subprocess.Popen(command2, stdout=self.cstlog, stderr=self.cstlog,shell=True)
-            self.log.logger.info(self.cstProcess)
+            self.logger.info(self.cstProcess)
             self.cstStatus ='on'
 
     def stopWork(self):
@@ -181,8 +181,8 @@ class local_cstworker(worker.worker):
         flagPath=self.taskFileDir / (str(self.taskIndex)+".success")
         waitTime=0
         startTime=time.time()
-        self.log.logger.info("WorkerID:%r Run:%r Name:%r started."%(self.ID,self.taskIndex,self.resultName))
-        self.log.logger.info("Start Time:%r"% time.ctime())
+        self.logger.info("WorkerID:%r Run:%r Name:%r started."%(self.ID,self.taskIndex,self.resultName))
+        self.logger.info("Start Time:%r"% time.ctime())
         while not flagPath.exists():
             #ADD process check HERE
             rcode =self.cstProcess.poll()
@@ -190,7 +190,7 @@ class local_cstworker(worker.worker):
                 pass
                 
             else:
-                self.log.logger.error("CST ENV stopped")
+                self.logger.error("CST ENV stopped")
                 os._exit(0)
             time.sleep(1)
             currentTime=time.time()
@@ -199,15 +199,15 @@ class local_cstworker(worker.worker):
                 raise TimeoutError
             
           
-        self.log.logger.info("WorkerID:%r Run:%r Name:%r success."%(self.ID,self.taskIndex,self.resultName))
-        self.log.logger.info("ElapsedTime:%r"%escapedTime)
-        self.log.logger.info("End Time:%r"%time.ctime())
+        self.logger.info("WorkerID:%r Run:%r Name:%r success."%(self.ID,self.taskIndex,self.resultName))
+        self.logger.info("ElapsedTime:%r"%escapedTime)
+        self.logger.info("End Time:%r"%time.ctime())
         self.taskIndex+=1
         runResult=result.readModeResult(pathc,1)
         return runResult
 
     def stop(self):
-        self.log.logger.info("Stopping CST, Please Wait")
+        self.logger.info("Stopping CST, Please Wait")
         secs=0
         if not self.cstlog is None:
             self.cstlog.close()
@@ -219,18 +219,18 @@ class local_cstworker(worker.worker):
             if rcode is None:
                 time.sleep(1)
                 secs+=1
-                self.log.logger.info("%r secs"%(secs))
+                self.logger.info("%r secs"%(secs))
             else:
-                self.log.logger.info("Stop success")
+                self.logger.info("Stop success")
                 return True
-        self.log.logger.error("failed to stop cst, try killing the process.")
+        self.logger.error("failed to stop cst, try killing the process.")
         self.kill()
         time.sleep(10)
         if not self.cstProcess is None:
-            self.log.logger.warning("cst killed.")
+            self.logger.warning("cst killed.")
             return True
         else:
-            self.log.logger.error("killing failed")
+            self.logger.error("killing failed")
             return False
 
     def kill(self):

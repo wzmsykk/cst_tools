@@ -27,7 +27,7 @@ class Logger(object):
     }#日志级别关系映射
     #%(pathname)s[line:%(lineno)d]
     def __init__(self,filename,level='info',when='D',backCount=3,fmt='%(asctime)s - %(levelname)s: %(message)s'):
-        self.logger = logging.getLogger(filename)
+        self.logger = logging.getLogger('main')
         format_str = logging.Formatter(fmt)#设置日志格式
         self.logger.setLevel(self.level_relations.get(level))#设置日志级别
         sh = logging.StreamHandler()#往屏幕上输出W
@@ -44,3 +44,6 @@ class Logger(object):
         th.setFormatter(format_str)#设置文件里写入的格式
         self.logger.addHandler(sh) #把对象加到logger里
         self.logger.addHandler(th)
+
+    def getLogger(self):
+        return self.logger

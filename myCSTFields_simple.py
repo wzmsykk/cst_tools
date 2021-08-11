@@ -46,8 +46,8 @@ class MyCuts_Pillbox(object):
         self.struct_params_valuelist = [230,260,10]
         assert isinstance(manager, cstmanager.manager)
         self.manager = manager
-        assert isinstance(manager.log, logger.Logger)
-        self.log=manager.log
+        #assert isinstance(manager.logger, logging.logger)
+        self.logger=manager.logger
         
 
         ###OTHERS
@@ -65,7 +65,7 @@ class MyCuts_Pillbox(object):
         for l in range(260,261):
             r0=self.manager.runWithParam(name_list=self.struct_params_namelist,value_list=[r,l,nmodes],job_name="R_%f_L_%f" % (r,l))
 
-        self.log.logger.info("RUN:%d" %(self.runcount))
+        self.logger.info("RUN:%d" %(self.runcount))
         return self.runcount
 
 
