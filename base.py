@@ -160,18 +160,21 @@ class cst_tools_main:
         self.status=ToolsStatus.RUNNING
         if  self.taskType==TaskType.DoNothing:
             self.glogger.logger.info("未指定任何任务。退出。")
-            self._success_and_exit()
+            self.status=ToolsStatus.COMPLETED
+            return self.status
         if self.taskType==TaskType.RunFromExistingProject:
             try:
                 self.pconfman.openProjectDirReadOnly(self.currprojdir)
             except:
-                self._fail_and_exit()
+                self.status=ToolsStatus.FIZZLED
+                return self.status
 
         elif self.taskType==TaskType.GenerateProjectFromCST or self.taskType==TaskType.GenerateAndRunProject:
             try:
                 self.pconfman.openProjectDir(self.currprojdir)
             except:
-                self._fail_and_exit()
+                self.status=ToolsStatus.FIZZLED
+                return self.status
 
 
         if self.taskType==TaskType.RunFromExistingProject or self.taskType==TaskType.GenerateAndRunProject:
@@ -190,13 +193,14 @@ class cst_tools_main:
                 x0 = projectutil.convert_json_params_to_list(params)
                 mym=cstmanager.manager(params=params,pconfm=self.pconfman,gconfm=self.gconfman,logger=self.logger,maxTask=2)
                 import myCSTFields_simple
-                gw=myCSTFields_simple.MyCuts_Pillbox(manager=mym,params=params) 
-                #gw=myAlgorithm_pop.myAlg01(manager=mym,params=params) 
+                #gw=myCSTFields_simple.MyCuts_Pillbox(manager=mym,params=params) 
+                gw=myAlgorithm_pop.myAlg01(manager=mym,params=params) 
                 #gw=myAlgorithm.myAlg01_pillbox(manager=mym,x0=x0) 
                 gw.start()
                 mym.stop()
 
         self.status=ToolsStatus.COMPLETED
+        return self.status
         
        
 

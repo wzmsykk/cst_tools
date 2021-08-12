@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import QApplication, QWidget,QMainWindow
 from GUI.ui_main import Ui_MainWindow
 from PyQt5.QtWidgets import QFileDialog,QPlainTextEdit
 from base import TaskType,cst_tools_main
-from PyQt5.QtCore import QThread
+from PyQt5.QtCore import QThread,pyqtSignal
 import logging
 import os,pathlib
 class QPlainTextEditLogger(logging.Handler):
@@ -15,10 +15,15 @@ class QPlainTextEditLogger(logging.Handler):
         msg = self.format(record)
         self.widget.appendPlainText(msg) 
 class cst_tools_main_qt(QThread,cst_tools_main):
+    _signal_start =pyqtSignal()
+    _signal_end =pyqtSignal()
     def __init__(self) -> None:
         super(cst_tools_main_qt,self).__init__()
     def run(self):
+        self._signal_start.emit()
         self.starttask()
+        self._signal_end.emit()
+        
     
 class mywindow(QMainWindow, Ui_MainWindow):
     def  __init__ (self):
@@ -40,6 +45,12 @@ class mywindow(QMainWindow, Ui_MainWindow):
         self.logger.info("使用PyQt5图形窗口运行模式")
         self.maintool.startGlobalConfig()
 
+        self.setSignalNSlots()
+
+    def setSignalNSlots(self):
+        self.maintool._signal_start.connect(self.freezeAllButtons)
+        self.maintool._signal_end.connect(self.unFreezeAllButtons)
+
     def read_dir(self):
         #选取文件
         if self.uiProjectDir==None:
@@ -56,6 +67,7 @@ class mywindow(QMainWindow, Ui_MainWindow):
         self.GenerateAndRunButton.setEnabled(False)  
 
     def unfreezeStartButtons(self):
+
         self.RunOnlyButton.setEnabled(True)
         self.GenerateOnlyButton.setEnabled(True)
         self.GenerateAndRunButton.setEnabled(True) 
@@ -73,6 +85,7 @@ class mywindow(QMainWindow, Ui_MainWindow):
         self.GenerateAndRunButton.setEnabled(True)
 
     def uiStartWork(self):
+        
         self.maintool.initAfterDirAndTaskTypeSet()
         self.freezeAllButtons()
         self.maintool.start()

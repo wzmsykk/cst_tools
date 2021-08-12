@@ -74,7 +74,7 @@ Sub postProcess
 	Dim outmode,i As Integer
 	Dim st,ed As Double
 	st=Timer
-	outmode = RestoreDoubleParameter("nmodes")
+	outmode = RestoreDoubleParameter("Nmodes")
 	For i=1 to outmode
 		SelectTreeItem("2D/3D Results\Modes\Mode "& i &"\e")
 		With ASCIIExport
@@ -115,7 +115,7 @@ Sub postProcess
 			.FileName (fullPath & "Mode"& i &"R_Q.txt")
 			.Execute
 		End With
-		SelectTreeItem("R over Q beta=1 (Multiple Modes)offset1=5mm (Multiple Modes)\Mode " & i)
+		SelectTreeItem("Tables\0D Results\R over Q beta=1 (Multiple Modes)_offset1=5mm (Multiple Modes)\Mode " & i)
 		With ASCIIExport
 			.Reset
 			.FileName (fullPath & "Mode"& i &"R_Q_5mm.txt")
@@ -133,7 +133,7 @@ Sub postProcess
 			.FileName (fullPath & "Mode"& i &"TotalLoss.txt")
 			.Execute
 		End With
-		SelectTreeItem("R over Q beta=1 (Multiple Modes)offset2=10mm (Multiple Modes)\Mode " & i)
+		SelectTreeItem("Tables\0D Results\R over Q beta=1 (Multiple Modes)_offset2=10mm (Multiple Modes)\Mode " & i)
 		With ASCIIExport
 			.Reset
 			.FileName (fullPath & "Mode"& i & "R_Q_10mm.txt")

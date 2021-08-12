@@ -1,0 +1,57 @@
+2021-08-11 21:42:30,179 - INFO: 日志已输出到log\base_2021-08-11-21_42_30.log
+2021-08-11 21:42:30,179 - INFO: 使用PyQt5图形窗口运行模式
+2021-08-11 21:42:31,075 - WARNING: 找到curr_global_cfg:config\current.ini
+2021-08-11 21:42:39,667 - INFO: 项目目录已设为C:\Users\ykk\Desktop\cst_tools\project\HOM analysis
+2021-08-11 21:42:42,404 - INFO: 检查全局配置开始.
+2021-08-11 21:42:42,406 - INFO: 检查CST PATH.
+2021-08-11 21:42:42,409 - INFO: 检查CST PATH 成功.
+2021-08-11 21:42:42,410 - INFO: 检查CST 版本.
+2021-08-11 21:42:42,411 - DEBUG: CST ENV PATH为C:\Program Files (x86)\CST Studio Suite 2020\CST DESIGN ENVIRONMENT.exe
+2021-08-11 21:42:42,412 - DEBUG: CST 版本为2020
+2021-08-11 21:42:42,412 - INFO: 检查CST 版本 结束.
+2021-08-11 21:42:42,413 - INFO: 检查各个路径是否存在.
+2021-08-11 21:42:42,414 - INFO: 检查全局配置结束.
+2021-08-11 21:42:42,415 - INFO: 通过全局配置检测
+2021-08-11 21:42:42,415 - INFO: 使用命令行定义的project目录:C:/Users/ykk/Desktop/cst_tools/project/HOM analysis
+2021-08-11 21:42:42,416 - INFO: 检查project开始
+2021-08-11 21:42:42,417 - INFO: 找到project目录:C:\Users\ykk\Desktop\cst_tools\project\HOM analysis
+2021-08-11 21:42:42,427 - INFO: 检查project结束
+2021-08-11 21:42:42,428 - INFO: 已保存全局配置文件于config\current.ini。
+2021-08-11 21:42:42,429 - INFO: 开始使用project目录:C:/Users/ykk/Desktop/cst_tools/project/HOM analysis
+2021-08-11 21:42:42,430 - INFO: 全局信息:
+2021-08-11 21:42:42,431 - INFO: data目录:C:\Users\ykk\Desktop\cst_tools\data
+2021-08-11 21:42:42,432 - INFO: temp目录:C:\Users\ykk\Desktop\cst_tools\temp
+2021-08-11 21:42:42,433 - INFO: log目录:C:\Users\ykk\Desktop\cst_tools\log
+2021-08-11 21:42:42,433 - INFO: result目录:C:\Users\ykk\Desktop\cst_tools\result
+2021-08-11 21:42:42,434 - INFO: CST版本:2020
+2021-08-11 21:42:42,435 - INFO: CSTEXE路径:C:\Program Files (x86)\CST Studio Suite 2020\CST DESIGN ENVIRONMENT.exe
+2021-08-11 21:42:42,440 - INFO: project目录:C:\Users\ykk\Desktop\cst_tools\project\HOM analysis
+2021-08-11 21:42:42,444 - INFO: 尝试打开project目录C:\Users\ykk\Desktop\cst_tools\project\HOM analysis。
+2021-08-11 21:42:42,454 - INFO: 检测项目配置文件正确性
+2021-08-11 21:42:42,457 - INFO: 测试项目配置文件是否存在
+2021-08-11 21:42:42,458 - DEBUG: 推测项目配置文件位于C:\Users\ykk\Desktop\cst_tools\project\HOM analysis\project.ini
+2021-08-11 21:42:42,460 - INFO: 测试项目配置文件 通过
+2021-08-11 21:42:42,462 - INFO: 测试CST模型文件是否存在
+2021-08-11 21:42:42,468 - DEBUG: 推测模型文件位于C:\Users\ykk\Desktop\cst_tools\project\HOM analysis\HOM analysis.cst
+2021-08-11 21:42:42,470 - INFO: 测试CST模型文件 通过
+2021-08-11 21:42:42,578 - INFO: 测试保存的MD5是否与CST模型文件匹配
+2021-08-11 21:42:42,579 - INFO: 测试MD5 通过
+2021-08-11 21:42:42,580 - INFO: project.ini检测项目配置文件结束
+
+2021-08-11 21:42:42,582 - INFO: created worker type local id:0
+2021-08-11 21:42:42,583 - INFO: TempDir:C:\Users\ykk\Desktop\cst_tools\project\HOM analysis\temp\worker_0
+2021-08-11 21:42:42,583 - INFO: TaskFileDir:C:\Users\ykk\Desktop\cst_tools\project\HOM analysis\temp\worker_0
+2021-08-11 21:42:42,768 - WARNING: CstProjectFile is not consistent with the one in temp.
+2021-08-11 21:42:43,106 - INFO: Worker_(0):old runfile removed
+2021-08-11 21:42:43,169 - INFO: "C:\Program Files (x86)\CST Studio Suite 2020\CST DESIGN ENVIRONMENT.exe" -m "C:\Users\ykk\Desktop\cst_tools\project\HOM analysis\temp\worker_0\main.bas"
+2021-08-11 21:42:43,173 - INFO: <subprocess.Popen object at 0x00000138A7136E50>
+2021-08-11 21:42:43,174 - INFO: created worker type local id:1
+2021-08-11 21:42:43,175 - INFO: TempDir:C:\Users\ykk\Desktop\cst_tools\project\HOM analysis\temp\worker_1
+2021-08-11 21:42:43,176 - INFO: TaskFileDir:C:\Users\ykk\Desktop\cst_tools\project\HOM analysis\temp\worker_1
+2021-08-11 21:42:43,368 - INFO: "C:\Program Files (x86)\CST Studio Suite 2020\CST DESIGN ENVIRONMENT.exe" -m "C:\Users\ykk\Desktop\cst_tools\project\HOM analysis\temp\worker_1\main.bas"
+2021-08-11 21:42:43,373 - INFO: <subprocess.Popen object at 0x00000138A7136E80>
+2021-08-11 21:42:43,409 - INFO: WorkerID:'0' Run:0 Name:'frequency000000_700_800' started.
+2021-08-11 21:42:43,413 - INFO: Start Time:'Wed Aug 11 21:42:43 2021'
+2021-08-11 21:45:00,564 - INFO: WorkerID:'0' Run:0 Name:'frequency000000_700_800' success.
+2021-08-11 21:45:00,565 - INFO: ElapsedTime:137.15458250045776
+2021-08-11 21:45:00,566 - INFO: End Time:'Wed Aug 11 21:45:00 2021'

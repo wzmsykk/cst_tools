@@ -19,7 +19,11 @@ class ProjectConfmanager(object):
         self.currProjectDir=None 
         self.CFGfilename="project.ini"
         self.paramsfilename='params.json'
-
+    def isCFGfileexist(self):
+        if self.currProjectDir!=None:
+            if (self.currProjectDir / self.CFGfilename).exists():
+                return True
+        return False
     def _rap2apo(self,inpath): #relative or abs path to abspath object related to project dir as base dir
         if self.currProjectDir == None:
             raise AttributeError

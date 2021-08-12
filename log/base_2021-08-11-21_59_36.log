@@ -1,0 +1,32 @@
+2021-08-11 21:59:36,715 - INFO: 日志已输出到log\base_2021-08-11-21_59_36.log
+2021-08-11 21:59:36,716 - INFO: 使用PyQt5图形窗口运行模式
+2021-08-11 21:59:37,181 - WARNING: 找到curr_global_cfg:config\current.ini
+2021-08-11 21:59:41,009 - INFO: 项目目录已设为C:\Users\ykk\Desktop\cst_tools\project\HOM analysis
+2021-08-11 21:59:42,559 - INFO: 检查全局配置开始.
+2021-08-11 21:59:42,560 - INFO: 检查CST PATH.
+2021-08-11 21:59:42,562 - INFO: 检查CST PATH 成功.
+2021-08-11 21:59:42,562 - INFO: 检查CST 版本.
+2021-08-11 21:59:42,563 - DEBUG: CST ENV PATH为C:\Program Files (x86)\CST Studio Suite 2020\CST DESIGN ENVIRONMENT.exe
+2021-08-11 21:59:42,564 - DEBUG: CST 版本为2020
+2021-08-11 21:59:42,565 - INFO: 检查CST 版本 结束.
+2021-08-11 21:59:42,565 - INFO: 检查各个路径是否存在.
+2021-08-11 21:59:42,566 - INFO: 已建立tempdir于./temp。
+2021-08-11 21:59:42,567 - INFO: 已建立resultdir于./result。
+2021-08-11 21:59:42,568 - INFO: 检查全局配置结束.
+2021-08-11 21:59:42,568 - INFO: 通过全局配置检测
+2021-08-11 21:59:42,569 - INFO: 使用命令行定义的project目录:C:/Users/ykk/Desktop/cst_tools/project/HOM analysis
+2021-08-11 21:59:42,569 - INFO: 检查project开始
+2021-08-11 21:59:42,570 - INFO: 找到project目录:C:\Users\ykk\Desktop\cst_tools\project\HOM analysis
+2021-08-11 21:59:42,570 - INFO: 检查project结束
+2021-08-11 21:59:42,571 - INFO: 已保存全局配置文件于config\current.ini。
+2021-08-11 21:59:42,572 - INFO: 开始使用project目录:C:/Users/ykk/Desktop/cst_tools/project/HOM analysis
+2021-08-11 21:59:42,573 - INFO: 全局信息:
+2021-08-11 21:59:42,573 - INFO: data目录:C:\Users\ykk\Desktop\cst_tools\data
+2021-08-11 21:59:42,574 - INFO: temp目录:C:\Users\ykk\Desktop\cst_tools\temp
+2021-08-11 21:59:42,574 - INFO: log目录:C:\Users\ykk\Desktop\cst_tools\log
+2021-08-11 21:59:42,575 - INFO: result目录:C:\Users\ykk\Desktop\cst_tools\result
+2021-08-11 21:59:42,576 - INFO: CST版本:2020
+2021-08-11 21:59:42,576 - INFO: CSTEXE路径:C:\Program Files (x86)\CST Studio Suite 2020\CST DESIGN ENVIRONMENT.exe
+2021-08-11 21:59:42,577 - INFO: project目录:C:\Users\ykk\Desktop\cst_tools\project\HOM analysis
+2021-08-11 21:59:42,578 - INFO: 尝试打开project目录C:\Users\ykk\Desktop\cst_tools\project\HOM analysis。
+2021-08-11 21:59:42,589 - ERROR: 未找到配置文件project.ini。

@@ -115,7 +115,7 @@ Sub postProcess
 			.FileName (fullPath & "Mode"& i &"R_Q.txt")
 			.Execute
 		End With
-		SelectTreeItem("R over Q beta=1 (Multiple Modes)offset1=5mm (Multiple Modes)\Mode " & i)
+		SelectTreeItem("Tables\0D Results\R over Q beta=1 (Multiple Modes)offset=5mm\Mode " & i)
 		With ASCIIExport
 			.Reset
 			.FileName (fullPath & "Mode"& i &"R_Q_5mm.txt")
@@ -133,7 +133,7 @@ Sub postProcess
 			.FileName (fullPath & "Mode"& i &"TotalLoss.txt")
 			.Execute
 		End With
-		SelectTreeItem("R over Q beta=1 (Multiple Modes)offset2=10mm (Multiple Modes)\Mode " & i)
+		SelectTreeItem("Tables\0D Results\R over Q beta=1 (Multiple Modes)offset=10mm\Mode " & i)
 		With ASCIIExport
 			.Reset
 			.FileName (fullPath & "Mode"& i & "R_Q_10mm.txt")
