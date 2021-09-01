@@ -5,9 +5,16 @@ import subprocess
 import hashlib
 import tempfile
 import projectutil
-import pathlib
+import pathlib,shutil
+from enum import Enum
 ###读取或生成ProjConf.ini文件
 
+
+class TaskStatus(Enum):
+    UNKNOWN=0
+    READY=1
+    RUNNING=2
+    DONE=3
 class ProjectStatusError(Exception):
     def __init__(self,message):
         self.meg=message
@@ -16,10 +23,18 @@ class ProjectConfmanager(object):
         self.conf= configparser.ConfigParser()
         self.logger=Logger
         self.gconf=GlobalConfigManager.conf
+        self.inputCSTFilePath=None
         self.currProjectDir=None 
+        self.currCSTFilePath=None
         self.CFGfilename="project.ini"
         self.paramsfilename='params.json'
-    def isCFGfileexist(self):
+        self.ready=False
+    def isReady(self):
+        return self.ready
+    def setNotReady(self):
+        self.ready=False
+        return self.ready
+    def __isCFGfileexist(self):
         if self.currProjectDir!=None:
             if (self.currProjectDir / self.CFGfilename).exists():
                 return True
@@ -31,54 +46,126 @@ class ProjectConfmanager(object):
         if not op.is_absolute():
             op = self.currProjectDir / op
         return op
-    def openProjectDirReadOnly(self,projectDir):
-        self.currProjectDir=pathlib.Path(projectDir).absolute()
-        self.logger.info("尝试打开project目录%s。"% str(self.currProjectDir))
+    def __isDirClean(self,projectDir):
+        # new clean project output dir or existed int mid file
+        # dir must exist
+        iDir=pathlib.Path(projectDir)
+        self.logger.info("尝试打开project目录%s。"% str(iDir))
         cfgfilename=self.CFGfilename
-        cfgpath=self.currProjectDir / cfgfilename
+        cfgpath=iDir / cfgfilename
+        if not iDir.exists():
+            raise FileNotFoundError # dir must exist
+        if not any(iDir.iterdir()):
+            self.logger.info("目录%s为空。"% str(iDir))
+            return True
         if(not cfgpath.exists()):
-            self.logger.error("未找到配置文件%s。"% cfgfilename)
+            self.logger.info("目录%s无旧config文件。"% str(iDir))
+            return True
+        self.logger.info("目录%s存在已有文件。"% str(iDir))
+        return False
+    def __getTaskStatus(self,projectDir):
+        # 任务完成情况
+        iDir=pathlib.Path(projectDir)
+        cfgfilename=self.CFGfilename
+        cfgpath=iDir / cfgfilename
+        if(not cfgpath.exists()):
+            self.logger.info("目录%s无旧config文件,无未完成任务。"% str(iDir))
             raise FileNotFoundError
-
-        result=self.checkProjectStatus()
-        if result==False:
-            raise ProjectStatusError
-
-
-    def openProjectDir(self,projectDir):
+        tempconf=configparser.ConfigParser()
+        tempconf.read(cfgpath)
+        status=tempconf.get('TASK','status')
+        if status==None:
+            raise ValueError 
+        else:
+            return status
+    def assignProjectDir(self,projectDir):
+        self.setNotReady()#changed Path so Not Ready
         self.currProjectDir=pathlib.Path(projectDir).absolute()
-        self.logger.info("尝试打开project目录%s。"% str(self.currProjectDir))
-        cfgfilename=self.CFGfilename
-        cfgpath=self.currProjectDir/ cfgfilename
-        if(not cfgpath.exists()):
-            self.logger.info("未找到配置文件%s。"% cfgfilename)
-            self.createProjectFromDir(self.currProjectDir)
+    def assignInputCSTFilePath(self,CSTfilePath):
+        self.setNotReady()
+        self.inputCSTFilePath=pathlib.Path(CSTfilePath).absolute()
+    def __ready(self):
+        self.ready=True
+        return self.ready
+    def prepareProject(self,startFromExisted=False,Safe=True):
+        #startFromExisted=True 从已有开始 不需要CST文件 
+        self.logger.info('准备项目文件')
+        iProjectDir=self.currProjectDir
+        iInputCSTFilePath=self.inputCSTFilePath
+        if iProjectDir==None or not iProjectDir.exists():
+            self.logger.error("未找到project目录%s。"% str(iProjectDir))
+            raise FileNotFoundError
+        if not startFromExisted:
+            if iInputCSTFilePath==None or not iInputCSTFilePath.exists():
+                self.logger.error("未找到输入CST文件%s。"% str(iInputCSTFilePath))
+                raise FileNotFoundError
+        dirClean=self.__isDirClean(iProjectDir)
+        iConf=None
+        
+        if dirClean:
+            if startFromExisted:
+                self.logger.info("尝试从空白目录继续")
+                raise ProjectStatusError
+            self.logger.info("目录%s无旧文件"% str(iProjectDir))
+            self.logger.info("尝试从project目录%s创建空白配置文件。"% str(iProjectDir))
+            iConf=self.createNewEmptyProjectConfFile(iProjectDir)
 
-        result=self.checkAndRepairProject()
-        if result==False:
-            raise ProjectStatusError
+            #复制输入CST文件到输出文件夹
+            
+            dstPath=iProjectDir / iInputCSTFilePath.name    
+            if dstPath.exists():
+                self.logger.info("目的%s已存在同名文件。"%str(dstPath))
+                dstPath=iProjectDir/ (iInputCSTFilePath.stem +'_dst.'+iInputCSTFilePath.suffix)
+            dstStrPath=shutil.copy2(src=str(iInputCSTFilePath),dst=str(dstPath)) 
+            self.logger.info("已将输入CST文件%s复制到project目录%s。"%(str(iInputCSTFilePath),dstStrPath))
+            iConf=self.__updateCSTFileInfoInConfObj(iConf,dstPath)
+            self.__savecfgobj(iConf)
+            self.conf=iConf            
+            return self.__ready()
+        else:
+            self.logger.info("目录%s有旧文件"% str(iProjectDir))
+            status=self.__getTaskStatus(iProjectDir) #[READY RUNNING DONE]
+            if status=='READY':
+                result=self.__checkProjectStatus()
+                if result==False:
+                    raise ProjectStatusError
+                return self.__ready()
+            elif status=='RUNNING':
+                if Safe:
+                    self.logger.warning("发现异常结束,尝试修复并继续")
+                    result=self.__checkAndRepairProject()
+                    if result==False:
+                        raise ProjectStatusError
+                    return self.__ready()
+                else:
+                    self.logger.warning("发现异常结束,安全模式设置为ON,不会尝试修改")
+                    self.logger.warning("结束")
+                    raise ProjectStatusError
+            elif status=='DONE':
+                # SAME AS READY
+                result=self.__checkAndRepairProject()
+                if result==False:
+                    raise ProjectStatusError
+                return self.__ready()
 
-    def createProjectFromDir(self,newProjectDir=None,slient=False):
-        self.logger.info("尝试从project目录%s创建配置文件。"% str(newProjectDir))
-        if newProjectDir!=None:
-            self.currProjectDir=pathlib.Path(newProjectDir).absolute()
-        cfgfilename=self.CFGfilename
-        self.createProjectConf(cfgfilename=cfgfilename)
-        #self.checkProjectStatus()
 
-    def savecfg(self,cfgfilename="project.ini",slient=False):
+
+    def __savecfgobj(self,confobj,cfgfilename="project.ini",slient=False):
         cfgfilePath=self.currProjectDir / "project.ini"
         f=open(cfgfilePath,"w")
-        self.conf.write(f)
+        confobj.write(f)
         f.close()
-
-    def createProjectConf(self,cfgfilename="project.ini",projectname=None):
-        #所有路径都是相对于.\project\myproject这一文件夹 
-        cfgfilepath=pathlib.Path(self.currProjectDir)/ cfgfilename
+    def savecfg(self,cfgfilename="project.ini"):
+        self.__savecfgobj(self.conf,cfgfilename)
+    def createNewEmptyProjectConfFile(self,projectDir='',cfgfilename="project.ini",projectname=None):
+        #Config内所有路径都是相对于projectDir这一文件夹 
+        iProjectDir=pathlib.Path(projectDir)
+        cfgfilepath=iProjectDir/ cfgfilename
         self.logger.info("开始创建配置文件%s于%s。"% (cfgfilename,str(cfgfilepath)))
-        self.conf.clear()
+        newconf=configparser.ConfigParser()
+        newconf.clear()
         cstfile=None
-        currprojdir=pathlib.Path(self.currProjectDir)        
+        currprojdir=iProjectDir  
         avilprojname=currprojdir.name
 
         currprojname=None
@@ -90,68 +177,82 @@ class ProjectConfmanager(object):
             self.logger.info("未指定project名,使用为默认目录名%s" % avilprojname)
             currprojname=avilprojname
 
-        cstfilelist=list(currprojdir.glob("*.cst"))
-        if (len(cstfilelist)==0):
-            self.logger.error("未找到CST项目文件于%s目录"%str(currprojdir))
-            raise FileNotFoundError
-        else:
-            file=cstfilelist[0]
-            self.logger.info("找到CST项目文件%s"% file)
-            cstfile=file
-        self.conf.add_section("PROJECT")
-        self.conf.set('PROJECT','ProjectName',currprojname)
-        self.conf.set('PROJECT','ProjectType',currprojname)
-        self.conf.set('PROJECT','ProjectDescription',"")
-        self.conf.add_section("DIRS")   
+        newconf.add_section("PROJECT")
+        newconf.set('PROJECT','ProjectName',currprojname)
+        newconf.set('PROJECT','ProjectType',currprojname)
+        newconf.set('PROJECT','ProjectDescription',"")
+        newconf.add_section("DIRS")   
         #保存为相对路径
 
         #############TO DO #####################
 
 
-        self.conf.set('DIRS','resultdir','result')
-        self.conf.set('DIRS','tempdir','temp')
-        self.conf.add_section("CST")      
-        self.conf.set('CST','CSTFilename',str(cstfile.name))  
+        newconf.set('DIRS','resultdir','result')
+        newconf.set('DIRS','tempdir','temp')
+        newconf.add_section("CST")      
+        newconf.set('CST','CSTFilename','') #NEED TO BE FILLED IN LATER
 
-        file_md5=self.genMD5FromCST(cstfile)
-        self.conf.set('CST','CSTFileMD5',file_md5.hexdigest())
+        #file_md5=self.genMD5FromCST(cstfile)
+        #newconf.set('CST','CSTFileMD5',file_md5.hexdigest()) 
+        newconf.set('CST','CSTFileMD5','') #NEED BE FILLED IN 
 
-        self.conf.set('CST','UseMpi',"False")  
-        self.conf.set('CST','MpiNodeList',"")  
-        self.conf.set('CST','UseRemoteCalculaton',"False")  
-        self.conf.set('CST','DCMainControlAddress',"")  
-        self.conf.add_section("PARAMETERS")
-        self.conf.set('PARAMETERS','paramfile',self.paramsfilename)  
-        self.readParametersFromCST()
-
-        #保存配置文件
-        self.savecfg()
+        newconf.set('CST','UseMpi',"False")  
+        newconf.set('CST','MpiNodeList',"")  
+        newconf.set('CST','UseRemoteCalculaton',"False")  
+        newconf.set('CST','DCMainControlAddress',"")  
+        newconf.add_section("PARAMETERS")
+        newconf.set('PARAMETERS','paramfile',self.paramsfilename)  
+        #newconf.set('PARAMETERS','paramfile','')
+        newconf.add_section("TASK")
+        newconf.set('TASK','status','READY') # READY RUNNING DONE 
+        
         self.logger.info("创建配置文件结束。")
-
-    def printconf(self):
+        self.__savecfgobj(newconf,cfgfilename)
+        return newconf
+        #保存配置文件
+        
+    def __updateCSTFileInfoInConfObj(self,confobj,cstFilePath):
+        self.logger.info('根据输入的CST文件更新Config内容')
+        savejsonname=confobj.get('PARAMETERS','paramfile')
+        confobj.set('CST','CSTFilename',str(cstFilePath))
+        file_md5=self.genMD5FromCST(cstFilePath)
+        confobj.set('CST','CSTFileMD5',file_md5.hexdigest()) 
+        self.readParametersFromCST(confobj,projectDir=self.currProjectDir,savejsonpath=savejsonname)
+        self.logger.info('Config内容更新完成')
+        return confobj
+    def __updateTaskStatusInConfObj(self,confobj,taskstatus):
+        confobj.set('TASK','status',taskstatus.name)
+        return confobj
+    def updateTaskStatus(self,taskstatus):
+        self.conf.set('TASK','status',taskstatus.name)
+        self.__savecfgobj(self.conf)
+        return taskstatus
+    def printConfInfo(self,confobj,projectDir):
         self.logger.info("项目信息:")
-        self.logger.info("ProjectName:%s"% self.conf['PROJECT']['ProjectName'])
-        self.logger.info("ProjectType:%s"% self.conf['PROJECT']['ProjectType'])
-        self.logger.info("ProjectDescription:%s"% self.conf['PROJECT']['ProjectDescription'])
-        self.logger.info("项目result目录:%s"% self.conf['DIRS']['resultdir'])
-        self.logger.info("项目temp目录:%s"% self.conf['DIRS']['tempdir'])
-        self.logger.info("CST文件名:%s"% self.conf['CST']['CSTFilename'])
-        self.logger.info("CSTFileMD5:%s"% self.conf['CST']['CSTFileMD5'])
-        self.logger.info("使用MPI:%s"% self.conf['CST']['UseMpi'])
-        self.logger.info("MPI节点文件:%s"% self.conf['CST']['MpiNodeList'])
-        self.logger.info("UseRemoteCalculaton:%s"% self.conf['CST']['UseRemoteCalculaton'])
-        self.logger.info("DCMainControlAddress:%s"% self.conf['CST']['DCMainControlAddress'])
-        self.logger.info("参数列表文件:%s"% self.conf['PARAMETERS']['paramfile'])
-        self.printparams()
+        self.logger.info("ProjectName:%s"% confobj['PROJECT']['ProjectName'])
+        self.logger.info("ProjectType:%s"% confobj['PROJECT']['ProjectType'])
+        self.logger.info("ProjectDescription:%s"% confobj['PROJECT']['ProjectDescription'])
+        self.logger.info("项目result目录:%s"% confobj['DIRS']['resultdir'])
+        self.logger.info("项目temp目录:%s"% confobj['DIRS']['tempdir'])
+        self.logger.info("CST文件名:%s"% confobj['CST']['CSTFilename'])
+        self.logger.info("CSTFileMD5:%s"% confobj['CST']['CSTFileMD5'])
+        self.logger.info("使用MPI:%s"% confobj['CST']['UseMpi'])
+        self.logger.info("MPI节点文件:%s"% confobj['CST']['MpiNodeList'])
+        self.logger.info("UseRemoteCalculaton:%s"% confobj['CST']['UseRemoteCalculaton'])
+        self.logger.info("DCMainControlAddress:%s"% confobj['CST']['DCMainControlAddress'])
+        self.logger.info("参数列表文件:%s"% confobj['PARAMETERS']['paramfile'])
+        self.printparams(confobj,projectDir)
 
-    def printparams(self):
-        paramfile=self.currProjectDir / self.conf['PARAMETERS']['paramfile']
+    def printParamsInfo(self,confobj,projectDir):
+
+        paramfile=projectDir / confobj['PARAMETERS']['paramfile']
         f=open(paramfile,"r")
         pamlist=json.load(f)
         print(pamlist)
         f.close()
-
-    def getParamsList(self, jsonpath=None):
+    def getParamsList(self):
+        return self.__getParamsList(self.conf,self.currProjectDir)
+    def __getParamsList(self, confobj, projectDir, jsonpath=None):
         """从生成的json读取Model结构参数列表 read model parameters from json filepath
             
         Parameters
@@ -164,7 +265,7 @@ class ProjectConfmanager(object):
 
         """
         if (jsonpath==None):
-            paramfile=self.currProjectDir / self.conf['PARAMETERS']['paramfile']
+            paramfile=projectDir / confobj['PARAMETERS']['paramfile']
         else:
             paramfile=jsonpath
         f=open(paramfile,"r")
@@ -180,23 +281,27 @@ class ProjectConfmanager(object):
         file_md5 = hashlib.md5(dat)
         fp.close()
         return file_md5
+    
+    def CSTfilePreProcess(self,cstFilePath):#预处理
         
+        processedCSTFilePath=cstFilePath
+        return processedCSTFilePath
 
-    def readParametersFromCST(self,savejsonpath=None):    
+    def readParametersFromCST(self,confobj,projectDir,savejsonpath=None):    
         if savejsonpath==None:
-            jsonpath=self.currProjectDir / self.paramsfilename 
+            jsonpath=projectDir / self.paramsfilename 
         else:
             jsonpath=pathlib.Path(savejsonpath)
             if not jsonpath.is_absolute():
-                jsonpath = self.currProjectDir / jsonpath
+                jsonpath = projectDir / jsonpath
         self.logger.info("正在从CST文件中读取参数列表。")    
-        projectname=self.conf['PROJECT']['ProjectName']
-        td=pathlib.Path(self.conf['DIRS']['tempdir'])
+        projectname=confobj['PROJECT']['ProjectName']
+        td=pathlib.Path(confobj['DIRS']['tempdir'])
         
         if td.is_absolute():
-            td=self.conf['DIRS']['tempdir']
+            td=confobj['DIRS']['tempdir']
         else:
-            td=self.currProjectDir / td
+            td=projectDir / td
         if not td.exists():
             td.mkdir()
         tempfile.tempdir=str(td)
@@ -213,7 +318,7 @@ class ProjectConfmanager(object):
         midfilepath=pathlib.Path(tempfile.gettempdir()) / tmp_txt_name
         
         
-        cstfilepath=pathlib.Path(self.currProjectDir).absolute() / self.conf['CST']['CSTFilename']
+        cstfilepath=pathlib.Path(projectDir).absolute() / confobj['CST']['CSTFilename']
         tmpcstpath=pathlib.Path(tempfile.gettempdir()).absolute() / tmp_cst_name
         #tmpcstfile
         fcst=open(cstfilepath,"rb")
@@ -246,7 +351,7 @@ class ProjectConfmanager(object):
         projectutil.custom_ascii_2_json(midfilepath,jsonpath)
         pass
 
-    def checkAndRepairProject(self,cfgfilename="project.ini",slient=False,force=True):
+    def __checkAndRepairProject(self,cfgfilename="project.ini",slient=False,force=True):
         result=True
         cfgpath=self.currProjectDir / cfgfilename
         cstfileflag=False
@@ -285,7 +390,7 @@ class ProjectConfmanager(object):
             self.logger.info("正在重新生成参数列表")
             self.readParametersFromCST()
             self.conf['CST']['CSTFileMD5']=currCSTMD5
-            self.savecfg()
+            self.__savecfgobj()
             self.logger.warning("已更新保存的MD5")
             self.logger.info("测试MD5 通过")
         elif(not paramjsonpath.exists()):
@@ -296,7 +401,7 @@ class ProjectConfmanager(object):
         self.logger.info("%s检测并更新项目配置文件结束\n"% cfgfilename)
         return result
 
-    def checkProjectStatus(self,cfgfilename="project.ini",slient=False,force=False):
+    def __checkProjectStatus(self,cfgfilename="project.ini",slient=False,force=False):
         result=True
         cfgpath=self.currProjectDir / cfgfilename
         cstfileflag=False

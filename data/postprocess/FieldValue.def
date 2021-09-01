@@ -1,0 +1,13 @@
+#DoubleList FieldValue(xList,yList,zList,iModeNumber,fieldComp)
+# 查询点位置处的场值
+#DoubleList xList 存储查询点位置x分量的列表
+#DoubleList yList 存储查询点位置x分量的列表
+#DoubleList zList 存储查询点位置x分量的列表
+#Integer iModeNumber 代表当前计算的模式,第一个模式设为1
+#String fieldComp ["e","h"]
+
+
+# Usage
+# 
+# 输出结果到文件outputPath
+# 推荐输出结果到文件Mode_${iModeNumber}_FieldValues_${user_defination}.txt

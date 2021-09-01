@@ -95,6 +95,9 @@ class manager(object):
         for iworker in self.cstWorkerList:
             ithread=threading.Thread(target=iworker.stop)
             ithread.start()
+        for iworker in self.cstWorkerList:
+            ithread.join()
+        self.logger.info('MANAGER 终止结束')
 
     def synchronize(self):
         #WAIT UNTIL ALL TASK FINISHED

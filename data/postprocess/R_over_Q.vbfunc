@@ -1,61 +1,3 @@
-'#Language "WWB-COM"
-
-Option Explicit
-Const lib_rundef = -1.2345678e27
-Function bScalarField (sField As String) As Boolean
-
-	If (InStr(sField,"Dens.")>0 And InStr(sField,"Current")=0)  Or (InStr(sField,"Electron")>0) Or (InStr(sField,"Potential")>0) Or (InStr(sField,"Temperature")>0) Or (sField="Pressure") Or (InStr(sField,"Material")>0) Or (InStr(sField,"Space Charge")>0) Or (InStr(sField,"SAR")>0) Then
-		bScalarField = True
-	Else
-		bScalarField = False
-	End If
-
-	' special handling for mech stress solver
-	If (InStr(sField,"Force Dens.")>0) Then
-		bScalarField = False
-	End If
-	If (InStr(sField,"Strain\")=1 Or InStr(sField,"Stress\")=1) Then
-		bScalarField = True
-	End If
-
-	' special handling for nonlinear material monitors
-	If (InStr(sField,"Materials\")>0 And InStr(sField,"Nonlinear\")>0) Then
-		bScalarField = False
-	End If
-
-End Function
-Function CST_Print(variant_cst As Variant, ncharlen_cst As Integer) As String
-
-	' this function prints the variant with ncharlen characters, and tries to make this as flexible as possible
-	' there are short functions PP4, PP6, ...., PP30 (also PP15L, ) to have nice tabulated formats in txt-files
-
-	Dim stmp_cst1 As String, stmp_cst2 As String, islen_cst As Integer
-
-	stmp_cst1 = CStr(variant_cst)
-	islen_cst = Len(stmp_cst1)
-
-	If (islen_cst > ncharlen_cst-1) Then
-		If (IsNumeric(variant_cst)) Then
-			If (ncharlen_cst<9) Then
-				' number cannot be displayed completely
-				stmp_cst2 = " " + Left(stmp_cst1,ncharlen_cst-2) + "x"
-			Else
-				stmp_cst2 = " " + IIf(variant_cst < 0,""," ") + Replace(Format(variant_cst,"0.0"+Left("0000000000000000000",ncharlen_cst-9)+"E+00"),",",".")
-			End If
-		Else
-			stmp_cst2= " " + Left(stmp_cst1,ncharlen_cst-1)
-		End If
-	Else
-		stmp_cst2 = Left("                                     ", ncharlen_cst-islen_cst) + stmp_cst1
-	End If
-
-	CST_Print = stmp_cst2
-
-End Function
-Function PP12(variant_cst As Variant) As String
-	PP12 = CST_Print(variant_cst, 12)
-End Function
-
 Function R_over_Q(iModeNumber As Integer,axis As Integer,ByRef iUVWvalue() As Double) As Double
     If (iModeNumber > EigenmodeSolver.GetNumberOfModesCalculated) Then
             ReportWarningToWindow("3D Eigenmode result template execution: Cannot find result for mode #"+CStr(iModeNumber)+".")
@@ -454,15 +396,11 @@ Function R_over_Q(iModeNumber As Integer,axis As Integer,ByRef iUVWvalue() As Do
     ReportInformation(cst_value)
     R_over_Q=cst_value
 End Function
-Function ModeRecog(iModeNumber)
-	Dim offset0,offset1,offset2 As Double
-    Dim offset1fordipole,offset2fordipole As Double
-	Dim uvw(3,3) As Double
-    Dim coff As Double
-    ReportInformation("---------------------------")
-    ReportInformation("Eigenmode "+Str(iModeNumber))
-    coff=CLight/(EigenmodeSolver.GetModeFrequencyInHz(iModeNumber)*2*Pi)
-	uvw(1,1)=0
+
+Function R_over_Q_output(iModeNumber As Integer,axis As Integer,xoffset As Double,yoffset As Double,zoffset As Double, outputPath As String)
+    Dim roq As Double
+    Dim uvw(3,3) As Double
+    uvw(1,1)=0
 	uvw(1,2)=0
 	uvw(1,3)=0
 	uvw(2,1)=0
@@ -471,36 +409,23 @@ Function ModeRecog(iModeNumber)
     uvw(3,1)=0
 	uvw(3,2)=0
 	uvw(3,3)=0
-    ' R_over_Q(iModeNumber,axis,uvw)
-    ' axis=1,2,3 分别代表x,y,z
-    ' 例 axis取2 (z轴), uvw(2,1)=5, uvw(2,2)=0, uvw(2,3)=0 代表沿z方向 xoffset=5, yoffset=0, stepsize=0(auto) 积分
-	offset0=R_over_Q(iModeNumber,3,uvw)
-	ReportInformation("center ROQ is "+Str(offset0))
-	uvw(2,1)=5
-    offset1=R_over_Q(iModeNumber,3,uvw)
-    offset1fordipole=offset1/25E-6*coff
-    ReportInformation("offset1 ROQ is "+Str(offset1))
-    ReportInformation("offset1 ROQ2 is "+Str(offset1fordipole))
-    uvw(2,1)=10
-    offset2=R_over_Q(iModeNumber,3,uvw)
-    offset2fordipole=offset2/1E-4*coff
-    ReportInformation("offset2 ROQ is "+Str(offset2))
-    ReportInformation("offset2 ROQ2 is "+Str(offset2fordipole))
-    If (offset0>1 And offset1>10 And Abs(offset0/offset1)<2 And Abs(offset0/offset1)>0.5) Then
-        ReportInformation(Str(iModeNumber)+" is TM-Mono")
-        Exit Function
-    End If
-    If (offset1fordipole>10 And offset2fordipole>10 And Abs(offset1fordipole/offset2fordipole)<2 And Abs(offset1fordipole/offset2fordipole)>0.5) Then
-        ReportInformation(Str(iModeNumber)+" is TM-Dipole")
-        Exit Function
-    Else
-        ReportInformation(Str(iModeNumber)+" is Others")
-        Exit Function
-    End If
+    uvw(axis,1)=xoffset
+    uvw(axis,2)=yoffset
+    uvw(axis,3)=zoffset
+    uvw(axis,axis)=0 'RECOVER
+    
+    roq=R_over_Q(iModeNumber,axis,uvw)
+    Open(outputPath) For Output As #1
+    Print #1,"R_over_Q_result"
+    Print #1,"ModeNumber"
+    Print #1,iModeNumber
+    Print #1,"axisNumber"
+    Print #1,axis
+    Print #1,"xoffset"
+    Print #1,iUVWvalue(axis,1)
+    Print #1,"yoffset"
+    Print #1,iUVWvalue(axis,2)
+    Print #1,"zoffset"
+    Print #1,iUVWvalue(axis,3)
+    Close #1
 End Function
-Sub Main
-    Dim i As Integer
-    For i=1 To 10
-        ModeRecog(i)
-    Next i
-End Sub
