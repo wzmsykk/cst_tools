@@ -1,14 +1,40 @@
 import os
-import sys
-import shutil
-import re
-import result
-import copy
 import numpy as np
-import cstmanager
 import yfunction
 import projectutil
 
+from abc import ABCMeta, abstractmethod
+
+
+class myAlg(object):
+    #BASE CLASS FOR ALL ALGS
+    def __init__(self,manager=None,params=None) -> None:
+        super().__init__()
+        self.ready=False
+        self.CSTparams=None
+        self.manager=None
+    @abstractmethod
+    def checkAndSetReady(self):
+        self.ready=True
+        pass
+    @abstractmethod
+    def setCSTParams(self,params):
+        self.CSTparams=params
+        pass
+    @abstractmethod
+    def setJobManager(self,manager):
+        self.manager=manager
+        pass
+    @abstractmethod
+    def setEditableAttrs(self,dict):
+        pass
+    @abstractmethod
+    def getEditableAttrs(self):
+        return None
+        pass
+    @abstractmethod
+    def start(self):
+        pass
 class myAlg02_POP(object):
     def __init__(self, manager, params, log_obj):
         super().__init__()

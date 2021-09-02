@@ -42,7 +42,7 @@ class GlobalConfmanager(object):
         self.logger.info("result目录:%s"% self._rstr2astr(self.conf['BASE']['resultdir']))
         self.logger.info("CST版本:%s"% self.conf['CST']['cstver'])
         self.logger.info("CSTEXE路径:%s"% self.conf['CST']['cstexepath'])
-        self.logger.info("project目录:%s"% self._rstr2astr(self.conf['PROJECT']['currprojdir']))
+
     def _rstr2astr(self,instr): #_relative_path_str_to_abspath_str function
         ostr=str(pathlib.Path(instr).absolute())
         return ostr
@@ -117,16 +117,6 @@ class GlobalConfmanager(object):
         raise FileNotFoundError
         return None,None
 
-    ###检查project
-    def checkCurrProject(self):
-        self.logger.info("检查project开始")
-        curprojdirpath=pathlib.Path(self.conf['PROJECT']['currprojdir'])
-        if os.path.exists(curprojdirpath):
-            self.logger.info("找到project目录:%s"% str(curprojdirpath))
-        else:
-            self.logger.info("未找到project目录:%s"% str(curprojdirpath))
-            os.makedirs(curprojdirpath,exist_ok=True)
-            self.logger.info("已创建project目录:%s"% str(curprojdirpath))
-        self.logger.info("检查project结束")
+
 
 

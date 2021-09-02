@@ -6,9 +6,8 @@
 ###初值需要自己写，留空[]则为默认
 ###
 import os
-import sys
-import shutil
-import re
+from myAlgorithm import myAlg
+from _pytest.monkeypatch import V
 import result
 import copy
 import math
@@ -21,28 +20,30 @@ from decimal import Decimal
 import csv
 import pandas as pd
 
-class myAlg01(object):
+class myAlg01(myAlg):
     def __init__(self, manager, params):
+        super().__init__(manager, params)
         self.parameter_range = 0
-        self.params=params
+        self.CSTparams=params
         
         self.state_x0=[]
         self.state_y0 = 0
         
         #读写
         #self.mode_location = 'result\\'
-        self.mode_location = str(manager.currProjectDir) + '\\result\\'
-        self.relative_location = str(manager.currProjectDir) +"\\save\\csv\\"
-        if not os.path.exists(self.relative_location):
-            os.makedirs(self.relative_location)
+        self.log=None
+        self.mode_location = None
+        self.relative_location = None #在setManager后实现
+        self.ready=False 
         #y函数,
         self.yFunc=yfunction.yfunc(yfunction.myYFunc01)
 
         ##OTHERS
-        self.w = manager
-        self.results=result.result
-        logpath=os.path.join(self.w.getResultDir(),"result.log")
-        self.log = open(logpath, "w")
+        self.manager=None
+        if manager is not None:
+            self.setJobManager(manager)
+        #self.results=result.result
+        
 
         self.input_name = ['Nmodes','fmin','fmax','accuracy','cell']
         self.input_min = [1,700,800,1e-5,20]##初始值
@@ -64,6 +65,37 @@ class myAlg01(object):
         self.end_frequency =2500
         self.continue_flag = [0, 3738.9532]#[是否继续，上次做完的最后一次频率]
     
+    def checkAndSetReady(self):
+        if self.CSTparams is not None and self.manager is not None:
+            self.ready=True
+        else:
+            self.ready=False
+    def setCSTParams(self,params):
+        self.CSTparams=params
+        self.checkAndSetReady()
+    def setJobManager(self,manager):
+        self.manager=manager
+        self.mode_location = str(manager.currProjectDir) + '\\result\\'
+        self.relative_location = str(manager.currProjectDir) +"\\save\\csv\\"
+        if not os.path.exists(self.relative_location):
+            os.makedirs(self.relative_location)
+        logpath=os.path.join(manager.getResultDir(),"result.log")
+        self.log = open(logpath, "w")
+        self.checkAndSetReady()
+
+    def setEditableAttrs(self,dict):
+        d={"fmin":self.input_min[1],"fmax":self.input_min[2],"cflag":self.continue_flag[0],"cfreq":self.continue_flag[1]}
+        d.update(dict)
+        self.input_name[1]=d["fmin"]
+        self.input_name[2]=d["fmax"]
+        self.continue_flag[0]=int(d["cflag"])
+        self.continue_flag[1]=d["cfreq"]
+    def getEditableAttrs(self):
+        d={"fmin":self.input_min[1],"fmax":self.input_min[2],"cflag":self.continue_flag[0],"cfreq":self.continue_flag[1]}
+        return d
+    def logCalcSettings(self):
+        print(self.getEditableAttrs())
+        pass
     def get_y_trans_r_aprallel(self, xs, run_count):
         
         nor = self.state_y0
@@ -72,11 +104,11 @@ class myAlg01(object):
         y = []
         
         for j,x in enumerate(xs):
-            self.w.addTask(self.input_name,x,str(run_count)+str(x[1]))
+            self.manager.addTask(self.input_name,x,str(run_count)+str(x[1]))
         
-        self.w.start()
-        self.w.synchronize()#同步 很重要
-        rg=self.w.getFullResults()
+        self.manager.start()
+        self.manager.synchronize()#同步 很重要
+        rg=self.manager.getFullResults()
         ###SORT RESULTS
         
         rg=sorted(rg,key=lambda x: int(x['name'][16:]))
@@ -150,6 +182,11 @@ class myAlg01(object):
         return float(text[140:])
         
     def start(self):
+        if self.ready==False:
+            print('CALCATION NOT READY, PLEASE CHECK SETTINGS.')
+            print('IS THE JOBMANAGER SET?')
+            return -1
+        self.logCalcSettings()
         fmin = self.input_min[1]
         fmax = self.input_min[2]
         start_time = time.time()
@@ -157,7 +194,7 @@ class myAlg01(object):
         samples = pd.DataFrame()
         
         if self.continue_flag[0]==0:
-            self.state_y0 = np.array(self.w.runWithParam(self.input_name, self.input_min,  "frequency"+str(1000000)[1:]+"_"+str(fmin).replace(".", "-")+"_"+str(fmax)))
+            self.state_y0 = np.array(self.manager.runWithParam(self.input_name, self.input_min,  "frequency"+str(1000000)[1:]+"_"+str(fmin).replace(".", "-")+"_"+str(fmax)))
             sample = self.get_3_modes("frequency"+str(1000000)[1:]+"_"+str(fmin).replace(".", "-")+"_"+str(fmax)).iloc[0]
             samples = samples.append(sample)
             self.write_many("all_value_"+str(fmin).replace(".", "-"), samples)
@@ -189,7 +226,7 @@ class myAlg01(object):
                 self.input_min[4] = float(self.cell_list.loc[(self.cell_list["f_down"]<=fmin) & (self.cell_list["f_up"]>=fmin),"cell"])
                 print("input is:",self.input_min)
                 
-                self.state_y0 = np.array(self.w.runWithParam(self.input_name, self.input_min, "frequency"+str(1000000)[1:]+"_"+str(fmin).replace(".", "-")+"_"+str(fmax)))
+                self.state_y0 = np.array(self.manager.runWithParam(self.input_name, self.input_min, "frequency"+str(1000000)[1:]+"_"+str(fmin).replace(".", "-")+"_"+str(fmax)))
                 sample = self.get_3_modes("frequency"+str(1000000)[1:]+"_"+str(fmin).replace(".", "-")+"_"+str(fmax)).iloc[0]
 
                 print("--------\nfmin_define:",fmin,"\nfmax_define:",fmax,"\nf_get:",sample["frequent"])
@@ -207,7 +244,7 @@ class myAlg01(object):
 #                        self.input_min[0] = 1
 #                    except:
                     self.input_min[1] = float(math.ceil(sample["frequent"]*100))/100
-                    self.state_y0 = np.array(self.w.runWithParam(self.input_name, self.input_min, "frequency"+str(1000000)[1:]+"_"+str(self.input_min[1]).replace(".", "-")+"_"+str(fmax)+"_variate"))
+                    self.state_y0 = np.array(self.manager.runWithParam(self.input_name, self.input_min, "frequency"+str(1000000)[1:]+"_"+str(self.input_min[1]).replace(".", "-")+"_"+str(fmax)+"_variate"))
                     sample = self.get_3_modes("frequency"+str(1000000)[1:]+"_"+str(self.input_min[1]).replace(".", "-")+"_"+str(fmax)+"_variate").iloc[0]
 
                 if float(sample["frequent"])<fmax:
@@ -225,3 +262,4 @@ class myAlg01(object):
         
         end_time = time.time()
         print(start_time-end_time)
+        return 0

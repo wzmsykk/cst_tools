@@ -43,16 +43,14 @@ class manager(object):
         self.mthreadList=[]
         self.taskQueue=queue.Queue()
         self.resultQueue=queue.Queue()
-        workerID=0
-        for i in range(self.maxParallelTasks):            
-            self.cstWorkerList.append(self.createLocalWorker(str(workerID)))
-            print("created cstworker. ID=",workerID)
-            workerID+=1
-
+        self.startWorkers()
+        self.ready=True
+    
     def getResultDir(self):
         return self.resultDir
 
     def mthread(self,idx):
+        #Listener For Each Worker
         while True:
             if (self.taskQueue.qsize()!=0):
 
@@ -83,8 +81,15 @@ class manager(object):
         mconf['taskFileDir']=str(self.taskFileDir/("worker_"+workerID))
         mcstworker_local=cstworker.local_cstworker(id=workerID, type="local",config=mconf,logger=self.logger)
         return mcstworker_local
-
-    def start(self):
+    def startWorkers(self):
+        workerID=0
+        for i in range(self.maxParallelTasks):            
+            self.cstWorkerList.append(self.createLocalWorker(str(workerID)))
+            print("created cstworker. ID=",workerID)
+            workerID+=1
+    def startListening(self):
+        if self.ready==False:
+            self.startWorkers()
         for i in range(self.maxParallelTasks):
             ithread=threading.Thread(target=manager.mthread,args=(self,i,))
             self.mthreadList.append(ithread)
@@ -97,7 +102,15 @@ class manager(object):
             ithread.start()
         for iworker in self.cstWorkerList:
             ithread.join()
+        with self.taskQueue.mutex:
+            self.taskQueue.queue.clear()
+        with self.resultQueue.mutex:
+            self.resultQueue.queue.clear()
+        self.cstWorkerList.clear()
+        self.mthreadList.clear()
+        self.ready=False
         self.logger.info('MANAGER 终止结束')
+        
 
     def synchronize(self):
         #WAIT UNTIL ALL TASK FINISHED
@@ -122,7 +135,7 @@ class manager(object):
 
     def runWithx(self,x,job_name):
         self.addTask(value_list=x,job_name=job_name)
-        self.start()
+        self.startListening()
         self.synchronize()
         result=self.getFirstResult()
         return result['value']
@@ -150,7 +163,7 @@ class manager(object):
 
         """
         self.addTask(param_name_list=name_list, value_list=value_list,job_name=job_name)
-        self.start()
+        self.startListening()
         self.synchronize()
         result=self.getFirstResult()
         return result['value']

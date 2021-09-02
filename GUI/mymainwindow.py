@@ -40,52 +40,25 @@ class mywindow(QMainWindow, Ui_MainWindow):
 
         self.uiProjectDir=None
         self.uiCSTFilePath=None
-        self.defaultAlgParamDict=None
+
 
         self.freezeStartButtons()
         self.maintool=cst_tools_main_qt()
         self.maintool.glogger.logger.addHandler(self.logTextBox)
         self.logger=self.maintool.glogger.getLogger()
         self.logger.info("使用PyQt5图形窗口运行模式")
-        self.maintool.startGlobalConfig()
-
         
         self.setSignalNSlots()
 
-    def translate_algdict_to_uidict(self,algdict):
-        uidict={'fmin':500,'fmax':1000,'cfreq':500,'cflag':False}
-        vcfreq=algdict.get('continue_flag')[1]
-        vcflag=algdict.get('continue_flag')[0]
-        vfmin=algdict.get('input_min')[1]
-        vfmax=algdict.get('input_min')[2]
 
-        if vcfreq:uidict.update({'cfreq':vcfreq})
-        if vcflag:uidict.update({'cflag':vcflag})
-        if vfmin:uidict.update({'fmin':vfmin})
-        if vfmax:uidict.update({'fmax':vfmax})
-        return uidict
-    
-    def translate_uidict_to_algdict(self,uidict):
-        vcflag=uidict.get('cflag')
-        vcfreq=uidict.get('cfreq')        
-        vfmin=uidict.get('fmin')
-        vfmax=uidict.get('fmax')
-        algdict=self.defaultAlgParamDict.copy()
-        continue_flag_list=algdict.get('continue_flag')
-        continue_flag_list[0]=vcflag
-        continue_flag_list[1]=vcfreq
-        input_min_list=algdict.get('input_min')
-        input_min_list[1]=vfmin
-        input_min_list[2]=vfmax
-        algdict.update({'continue_flag':continue_flag_list})
-        algdict.update({'input_min':input_min_list})
-        return algdict
+        #DATA 
+        self.CalcDialogBox.setDefaultValues(self.maintool.getAlgAttrs())    
+
 
     def setSignalNSlots(self):
         self.selectProjectDirButton.clicked.connect(self.read_dir)
+        self.selectCSTPathButton.clicked.connect(self.read_cst)
         self.StartButton.clicked.connect(self.run)
-        self.GenerateOnlyButton.clicked.connect(self.genonly)
-        self.GenerateAndRunButton.clicked.connect(self.rungen)
         self.AlgSettingButton.clicked.connect(self.showCalcDialogBox)
 
 
@@ -97,21 +70,17 @@ class mywindow(QMainWindow, Ui_MainWindow):
     def showCalcDialogBox(self):
         self.CalcDialogBox.show()
     def updateAlgSetting(self):
-        self.maintool.changeAlgSetting(self.translate_uidict_to_algdict(self.CalcDialogBox.createUDict()))
+        self.maintool.setAlgAttrs(self.CalcDialogBox.getValues())
 
     def read_dir(self):
         #选取输出目录
-        if self.uiProjectDir==None:
-            curcwd=str(pathlib.Path(os.getcwd()))
-            self.uiProjectDir=curcwd
         self.uiProjectDir = QFileDialog.getExistingDirectory(self, "选取文件夹", self.uiProjectDir)
+
+        if self.uiProjectDir==None or self.uiProjectDir=='':
+            curcwd=str(pathlib.Path(os.getcwd()).absolute())
+            self.uiProjectDir=curcwd        
         self.dirNameLineEdit.setText(self.uiProjectDir)
         self.maintool.setProjectDir(self.uiProjectDir)
-        self.maintool.wininit()
-        self.defaultAlgParamDict=self.maintool.prepareAlgorithmAndParams_Win()    
-        dfd=self.translate_algdict_to_uidict(self.defaultAlgParamDict)
-        print(dfd)
-        self.CalcDialogBox.setDefaultValues(dfd)
         self.unfreezeStartButtons()
 
     def read_cst(self):
@@ -119,8 +88,9 @@ class mywindow(QMainWindow, Ui_MainWindow):
         if self.uiProjectDir==None:
             curcwd=str(pathlib.Path(os.getcwd()))
             self.uiProjectDir=curcwd
-        self.uiCSTFilePath =QFileDialog.getOpenFileName(self,"选取CST文件",self.uiProjectDir)
+        self.uiCSTFilePath,ok =QFileDialog.getOpenFileName(self,"选取CST文件",self.uiProjectDir)
         self.cstFilePathLineEdit.setText(self.uiCSTFilePath)
+        self.maintool.setCSTFilePath(self.uiCSTFilePath)
 
 
 
@@ -134,22 +104,30 @@ class mywindow(QMainWindow, Ui_MainWindow):
     def freezeAllButtons(self):
         self.selectProjectDirButton.setEnabled(False)
         self.StartButton.setEnabled(False)
+        self.selectCSTPathButton.setEnabled(False)
+        self.AlgSettingButton.setEnabled(False)
 
 
     def unFreezeAllButtons(self):
         self.selectProjectDirButton.setEnabled(True)
         self.StartButton.setEnabled(True)
+        self.selectCSTPathButton.setEnabled(True)
+        self.AlgSettingButton.setEnabled(True)
 
 
-    def uiStartWork(self):                     
-        self.freezeAllButtons()
-        self.maintool.createJobManager()        
-        self.maintool.pretask_win()
+
+    def uiStartWork(self):       
+        self.logger.info('UI:STARTING WORK')              
+        self.freezeAllButtons()          
         self.maintool.start()
         self.unFreezeAllButtons()
 
     def run(self):
-        self.maintool.taskType=TaskType.RunFromExistingProject
+        ctn=self.checkBox_CTN.isChecked()
+        safe=self.checkBox_SAFE.isChecked()
+        self.maintool.setFlags(ctn,safe)
+        self.maintool.wininit()
+        self.maintool.setRunInfos() 
         self.uiStartWork()
 
 

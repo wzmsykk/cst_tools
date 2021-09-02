@@ -8,7 +8,7 @@ import json
 import numpy as np
 import worker,cstmanager
 import projectutil
-import adam,myAlgorithm_pop,myAlgo_pop_win
+import adam,myAlgorithm_pop
 import globalconfmanager,logger,time
 import projectconfmanager
 import argparse
@@ -39,25 +39,28 @@ class cst_tools_main:
         self.gconfman=globalconfmanager.GlobalConfmanager(Logger=self.logger)
         self.pconfman=projectconfmanager.ProjectConfmanager(GlobalConfigManager=self.gconfman,Logger=self.logger)
         self.ReadyForActualTask=False
-        self.projectDir=None
-        self.cstFilePath=None
         #WORKER MANAGER
         self.jm=None
 
         #算法/参数
-        self.algparams=None
-        self.alg=None
+        self.alg=myAlgorithm_pop.myAlg01(manager=None,params=None)
+
 
 
       
     def setProjectDir(self,dirpath):
-        self.projectDir=dirpath
-
+        self.pconfman.assignProjectDir(dirpath)
+    def getProjectDir(self):
+        return self.pconfman.currProjectDir
     def setCSTFilePath(self,filepath):
-        self.cstFilePath=filepath
+        self.pconfman.assignInputCSTFilePath(filepath)
+    def getCSTFilePath(self):
+        return self.pconfman.currCSTFilePath
     def setFlags(self,startFromExisted,safe):
         self.ctn=startFromExisted
         self.safe=safe
+        self.logger.info('BASE:SET CTN=%s,SAFE=%s'%(str(self.ctn),str(self.safe)))
+
     def __batch_fail_and_exit(self):
         os._exit(1)
     def _success_and_exit(self):
@@ -65,34 +68,19 @@ class cst_tools_main:
     
 
     def wininit(self):
+        ##认为setProjectDir/setCSTFilePath
+
         result=self.gconfman.checkConfig()
         if result==False:
             return False
 
-        if (self.projectDir!=None):
-            self.logger.error("未指定project目录")
-            return False
-
-
-        ###检查并取得当前project
-        self.gconfman.checkCurrProject()
+        ###保存全局配置
         self.gconfman.saveconf()
 
-        ###使用找到的project
-        self.currprojdir=self.gconfman.conf['PROJECT']['currprojdir']
-        self.logger.info("开始使用project目录:%s" % self.currprojdir)
-
-        ###准备项目配置
-        self.pconfman=projectconfmanager.ProjectConfmanager(GlobalConfigManager=self.gconfman,Logger=self.logger)
-        self.pconfman.prepareProject(self.ctn,self.safe)
-        #self.pconfman.setProjectDir(self.currprojdir)
-        # if self.taskType==TaskType.GenerateAndRunProject or self.taskType==TaskType.GenerateProjectFromCST:    
-        #     self.pconfman.openProjectDir(self.currprojdir)
-        # elif self.taskType==TaskType.RunFromExistingProject:
-        #     self.pconfman.openProjectDirReadOnly(self.currprojdir)
-
-        ###读取完毕，显示当前全局设置
-        self.gconfman.printconf()
+        ###使用找到的projectTrue
+        self.logger.info("开始使用project目录:%s" % str(self.getProjectDir()))
+        return True
+        
     def batchinit(self):
         #self.params=sys.argv
         ###设定命令行参数PARSER
@@ -119,35 +107,34 @@ class cst_tools_main:
         if result==False:
             self.__batch_fail_and_exit()
 
-        if (self.projectDir!=None):
-            self.logger.info("使用命令行定义的project目录:%s" % self.projectDir)
-            self.gconfman.conf['PROJECT']['currprojdir']=self.projectDir
-        else:
-            self.logger.error("未指定project目录")
-            self.__batch_fail_and_exit()
-
-
-        ###检查并取得当前project
-        self.gconfman.checkCurrProject()
+        ###保存全局配置
         self.gconfman.saveconf()
 
         ###使用找到的project
-        self.currprojdir=self.gconfman.conf['PROJECT']['currprojdir']
-        self.logger.info("开始使用project目录:%s" % self.currprojdir)
-
+        self.logger.info("开始使用project目录:%s" % str(self.getProjectDir()))
+        return 1
+        
+    def setRunInfos(self):
         ###开始项目配置
-        self.pconfman.assignProjectDir(self.currprojdir)
-        self.pconfman.assignInputCSTFilePath(self.cstFilePath)
-        self.pconfman.prepareProject(self.ctn,self.safe)
-        #self.pconfman.setProjectDir(self.currprojdir)
-        # if self.taskType==TaskType.GenerateAndRunProject or self.taskType==TaskType.GenerateProjectFromCST:    
-        #     self.pconfman.openProjectDir(self.currprojdir)
-        # elif self.taskType==TaskType.RunFromExistingProject:
-        #     self.pconfman.openProjectDirReadOnly(self.currprojdir)
+        try:
+            self.pconfman.prepareProject(self.ctn,self.safe)
+        except RuntimeError:
+            self.logger.error('项目配置出错')
+            return 0
+
+            
 
         ###读取完毕，显示当前全局设置
         self.gconfman.printconf()
         self.logger.info("-----------------------------------")
+        ### 创建JM
+        self.createJobManager()
+        ### 准备计算信息
+        self.algparams=self.pconfman.getParamsList()
+        self.alg.setJobManager(self.jm)
+        self.alg.setCSTParams(self.algparams)
+        ### READY
+        self.taskType=TaskType.Run #准备运行
 
     def createJobManager(self): 
         #depends on a ready Pconfman 
@@ -160,33 +147,17 @@ class cst_tools_main:
             self.logger.info("JOB MANAGER 创建完成")
         else:
             self.logger.warning("JOB MANAGER 已存在")
-    def prepareAlgorithmAndParams_Batch(self):
-        if not self.pconfman.isReady():
-            self.logger.error('pconfman 未准备完成')
-            raise RuntimeError
-        self.algparams=self.pconfman.getParamsList()
-        self.alg=myAlgorithm_pop.myAlg01(manager=self.jm,params=self.algparams) 
+        
 
-    def prepareAlgorithmAndParams_Win(self):  
-        if self.alg==None:      
-            self.alg=myAlgo_pop_win.myAlg01_win_wrapper(Logger=self.logger)         
         
-        return self.alg.getAttrsDict()
-        
-    def changeAlgSetting(self,paramdict):
-        methodnameList=['changeCalcParams']
-        for methodname in methodnameList:
-            method=getattr(self.alg,methodname)
-            if method:
-                break
-        method(paramdict)
-    def pretask_win(self,manager):
-        if not self.pconfman.isReady():
-            self.logger.error('pconfman 未准备完成')
-            raise RuntimeError
-        self.alg.assignCSTWorkManager(manager)
-        self.algparams=self.pconfman.getParamsList()
-        self.alg.assignCSTVariable(self.algparams)
+
+
+    def getAlgAttrs(self):
+        return self.alg.getEditableAttrs()
+    def setAlgAttrs(self,dict):
+        self.alg.setEditableAttrs(dict)
+        self.logger.info('ALG参数设置完毕')
+
 
     def starttask(self):
         self.status=projectconfmanager.TaskStatus.RUNNING
@@ -194,12 +165,16 @@ class cst_tools_main:
         if  self.taskType==TaskType.DoNothing:
             self.logger.info("未指定任何任务。退出。")
             self.status=projectconfmanager.TaskStatus.DONE
+            self.jm.stop()
             return self.status
         
 
-
+        print()
         if self.taskType==TaskType.Run:
-
+            if self.alg is None:
+                self.logger.info("未指定计算方法。退出。")
+                self.status=projectconfmanager.TaskStatus.DONE
+                return self.status
             method="GD_PARALLEL_LOCAL"
             #if method=="GD":
             #    worker=worker.worker(type='loacl',config=cstconf)
@@ -209,13 +184,7 @@ class cst_tools_main:
             #    worker.stop()
 
 
-            if method=="GD_PARALLEL_LOCAL":
-                
-                import myCSTFields_simple
-                #gw=myCSTFields_simple.MyCuts_Pillbox(manager=mym,params=params) 
-                #assign manager
-
-                #gw=myAlgorithm.myAlg01_pillbox(manager=mym,x0=x0) 
+            if method=="GD_PARALLEL_LOCAL":                
                 self.alg.start()
         self.jm.stop()
         self.status=projectconfmanager.TaskStatus.DONE
@@ -227,22 +196,16 @@ class cst_tools_main:
 if __name__ =='__main__':
     # BATCH FLOW
     myapp=cst_tools_main()
-
-    myapp.batchinit()
-    myapp.createJobManager()
-    myapp.prepareAlgorithmAndParams_Batch()   
+    myapp.batchinit()   
+    myapp.setRunInfos()   
     myapp.starttask()
     # UI PROGRAM FLOW SAMPLE
     # myapp=cst_tools_main()
     # myapp.setProjectDir()
     # myapp.setCSTFilePath()
     # myapp.setFlags()
+    # attrs=myapp.getAlgAttrs()
+    # OPTIONAL myapp.setAlgAttrs(attrs)
     # result=myapp.wininit()
-    # 
-    # alg default=myapp.prepareAlgorithmAndParams_Win()    
-    #   CHANGE ALG SETTINGS OPTIONAL
-    #   (OPTIONAL)myapp.changeAlgSetting()
-    #
-    # myapp.createJobManager()
-    # myapp.pretask_win()
+    # myapp.setRunInfos()   
     # myapp.starttask()

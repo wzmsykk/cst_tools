@@ -81,9 +81,11 @@ class ProjectConfmanager(object):
     def assignProjectDir(self,projectDir):
         self.setNotReady()#changed Path so Not Ready
         self.currProjectDir=pathlib.Path(projectDir).absolute()
+        self.logger.info('PCM:currProjectDir 已设为%s'%self.currProjectDir)
     def assignInputCSTFilePath(self,CSTfilePath):
         self.setNotReady()
         self.inputCSTFilePath=pathlib.Path(CSTfilePath).absolute()
+        self.logger.info('PCM:inputCSTFilePath 已设为%s'%self.inputCSTFilePath)
     def __ready(self):
         self.ready=True
         return self.ready
@@ -105,7 +107,7 @@ class ProjectConfmanager(object):
         if dirClean:
             if startFromExisted:
                 self.logger.info("尝试从空白目录继续")
-                raise ProjectStatusError
+                raise ProjectStatusError("尝试从空白目录继续")
             self.logger.info("目录%s无旧文件"% str(iProjectDir))
             self.logger.info("尝试从project目录%s创建空白配置文件。"% str(iProjectDir))
             iConf=self.createNewEmptyProjectConfFile(iProjectDir)
@@ -115,7 +117,7 @@ class ProjectConfmanager(object):
             dstPath=iProjectDir / iInputCSTFilePath.name    
             if dstPath.exists():
                 self.logger.info("目的%s已存在同名文件。"%str(dstPath))
-                dstPath=iProjectDir/ (iInputCSTFilePath.stem +'_dst.'+iInputCSTFilePath.suffix)
+                dstPath=iProjectDir/ (iInputCSTFilePath.stem +'_dst'+iInputCSTFilePath.suffix)
             dstStrPath=shutil.copy2(src=str(iInputCSTFilePath),dst=str(dstPath)) 
             self.logger.info("已将输入CST文件%s复制到project目录%s。"%(str(iInputCSTFilePath),dstStrPath))
             iConf=self.__updateCSTFileInfoInConfObj(iConf,dstPath)
@@ -131,16 +133,16 @@ class ProjectConfmanager(object):
                     raise ProjectStatusError
                 return self.__ready()
             elif status=='RUNNING':
-                if Safe:
+                if not Safe:
                     self.logger.warning("发现异常结束,尝试修复并继续")
                     result=self.__checkAndRepairProject()
                     if result==False:
-                        raise ProjectStatusError
+                        raise ProjectStatusError('FLAG_SAFE=OFF but REPAIR FAILED')
                     return self.__ready()
                 else:
                     self.logger.warning("发现异常结束,安全模式设置为ON,不会尝试修改")
                     self.logger.warning("结束")
-                    raise ProjectStatusError
+                    raise ProjectStatusError('FLAG_SAFE=ON and status=RUNNING')
             elif status=='DONE':
                 # SAME AS READY
                 result=self.__checkAndRepairProject()
@@ -226,6 +228,7 @@ class ProjectConfmanager(object):
     def updateTaskStatus(self,taskstatus):
         self.conf.set('TASK','status',taskstatus.name)
         self.__savecfgobj(self.conf)
+        self.logger.info('PCM:项目状态已设为%s'% taskstatus.name)
         return taskstatus
     def printConfInfo(self,confobj,projectDir):
         self.logger.info("项目信息:")
