@@ -181,7 +181,7 @@ class ProjectConfmanager(object):
 
         newconf.add_section("PROJECT")
         newconf.set('PROJECT','ProjectName',currprojname)
-        newconf.set('PROJECT','ProjectType',currprojname)
+        newconf.set('PROJECT','ProjectType','HOM analysis')
         newconf.set('PROJECT','ProjectDescription',"")
         newconf.add_section("DIRS")   
         #保存为相对路径

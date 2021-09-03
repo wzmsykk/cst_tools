@@ -1,0 +1,128 @@
+2021-09-02 20:16:49,638 - INFO: 日志已输出到log\base_2021-09-02-20_16_49.log
+2021-09-02 20:16:49,639 - WARNING: 找到curr_global_cfg:config\current.ini
+2021-09-02 20:16:49,641 - INFO: 使用PyQt5图形窗口运行模式
+2021-09-02 20:16:54,978 - INFO: PCM:currProjectDir 已设为C:\Users\ykk\Desktop\cst_tools\project\pillbox_ay
+2021-09-02 20:16:56,897 - INFO: PCM:inputCSTFilePath 已设为C:\Users\ykk\Desktop\cst_tools\project\pillbox_ay\Pillbox_ay.cst
+2021-09-02 20:17:10,010 - INFO: ALG参数设置完毕
+2021-09-02 20:17:17,214 - INFO: BASE:SET CTN=False,SAFE=False
+2021-09-02 20:17:17,214 - INFO: 检查全局配置开始.
+2021-09-02 20:17:17,215 - INFO: 检查CST PATH.
+2021-09-02 20:17:17,215 - INFO: 检查CST PATH 成功.
+2021-09-02 20:17:17,216 - INFO: 检查CST 版本.
+2021-09-02 20:17:17,216 - DEBUG: CST ENV PATH为C:\Program Files (x86)\CST Studio Suite 2020\CST DESIGN ENVIRONMENT.exe
+2021-09-02 20:17:17,216 - DEBUG: CST 版本为2020
+2021-09-02 20:17:17,217 - INFO: 检查CST 版本 结束.
+2021-09-02 20:17:17,217 - INFO: 检查各个路径是否存在.
+2021-09-02 20:17:17,217 - INFO: 检查全局配置结束.
+2021-09-02 20:17:17,218 - INFO: 通过全局配置检测
+2021-09-02 20:17:17,219 - INFO: 已保存全局配置文件于config\current.ini。
+2021-09-02 20:17:17,219 - INFO: 开始使用project目录:C:\Users\ykk\Desktop\cst_tools\project\pillbox_ay
+2021-09-02 20:17:17,220 - INFO: 准备项目文件
+2021-09-02 20:17:17,221 - INFO: 尝试打开project目录C:\Users\ykk\Desktop\cst_tools\project\pillbox_ay。
+2021-09-02 20:17:17,221 - INFO: 目录C:\Users\ykk\Desktop\cst_tools\project\pillbox_ay无旧config文件。
+2021-09-02 20:17:17,222 - INFO: 目录C:\Users\ykk\Desktop\cst_tools\project\pillbox_ay无旧文件
+2021-09-02 20:17:17,222 - INFO: 尝试从project目录C:\Users\ykk\Desktop\cst_tools\project\pillbox_ay创建空白配置文件。
+2021-09-02 20:17:17,223 - INFO: 开始创建配置文件project.ini于C:\Users\ykk\Desktop\cst_tools\project\pillbox_ay\project.ini。
+2021-09-02 20:17:17,223 - INFO: 未指定project名,使用为默认目录名pillbox_ay
+2021-09-02 20:17:17,224 - INFO: 创建配置文件结束。
+2021-09-02 20:17:17,225 - INFO: 目的C:\Users\ykk\Desktop\cst_tools\project\pillbox_ay\Pillbox_ay.cst已存在同名文件。
+2021-09-02 20:17:17,227 - INFO: 已将输入CST文件C:\Users\ykk\Desktop\cst_tools\project\pillbox_ay\Pillbox_ay.cst复制到project目录C:\Users\ykk\Desktop\cst_tools\project\pillbox_ay\Pillbox_ay_dst.cst。
+2021-09-02 20:17:17,228 - INFO: 根据输入的CST文件更新Config内容
+2021-09-02 20:17:17,237 - INFO: 正在从CST文件中读取参数列表。
+2021-09-02 20:17:17,238 - INFO: tempdir为C:\Users\ykk\Desktop\cst_tools\project\pillbox_ay\temp。
+2021-09-02 20:17:17,239 - INFO: 临时文件生成成功。
+2021-09-02 20:17:26,128 - INFO: b'This is CST DESIGN ENVIRONMENT 2020.0 Release from 2019-09-25 (change 724524)\r\r\n'
+2021-09-02 20:17:26,128 - INFO: b'Using install path: C:\\Program Files (x86)\\CST Studio Suite 2020\\\r\r\n'
+2021-09-02 20:17:26,129 - INFO: b'Using Qt 5.12.3 (compiled with 5.12.3)\r\r\n'
+2021-09-02 20:17:26,130 - INFO: b'\r\r\n'
+2021-09-02 20:17:26,130 - INFO: b'Checking license servers...\r\r\n'
+2021-09-02 20:17:26,130 - INFO: b'License search path found in CST registry: 11605@whpsgroup.test\r\r\n'
+2021-09-02 20:17:26,131 - INFO: b'Checking license at startup successfully passed.\r\r\n'
+2021-09-02 20:17:26,131 - INFO: b'Connected to license server: 11605@whpsgroup.test\r\r\n'
+2021-09-02 20:17:26,131 - INFO: b'[modeler_AMD64.exe] This is the modeler 2020.0 Release from 2019-09-25 (change 724524)\r\r\n'
+2021-09-02 20:17:26,132 - INFO: b'[modeler_AMD64.exe] Startup: 02.09.2021 20:17:19\r\r\n'
+2021-09-02 20:17:26,132 - INFO: b'[modeler_AMD64.exe] \r\r\n'
+2021-09-02 20:17:26,133 - INFO: b'[modeler_AMD64.exe] Modeler affinity of main thread: 111111111111 111111111111 \r\r\n'
+2021-09-02 20:17:26,133 - INFO: b'[modeler_AMD64.exe] \r\r\n'
+2021-09-02 20:17:26,133 - INFO: b'[modeler_AMD64.exe] thread setup 1: 12, 24\r\r\n'
+2021-09-02 20:17:26,134 - INFO: b'[modeler_AMD64.exe]   sockets         : 1\r\r\n'
+2021-09-02 20:17:26,134 - INFO: b'[modeler_AMD64.exe]   cores per socket: 12\r\r\n'
+2021-09-02 20:17:26,135 - INFO: b'[modeler_AMD64.exe]   ht units        : 2\r\r\n'
+2021-09-02 20:17:26,135 - INFO: b'[modeler_AMD64.exe]   acc. hw         : 24\r\r\n'
+2021-09-02 20:17:26,136 - INFO: b'[modeler_AMD64.exe]   acc. OSI        : 24\r\r\n'
+2021-09-02 20:17:26,136 - INFO: b'[modeler_AMD64.exe]   aff. available  : yes\r\r\n'
+2021-09-02 20:17:26,137 - INFO: b"[modeler_AMD64.exe]   OSI log         : CPUID: selected engine is 'Leaf 0xB detection'\r\r\n"
+2021-09-02 20:17:26,137 - INFO: b'[modeler_AMD64.exe] Logical  0: socket  0 core  0\r\r\n'
+2021-09-02 20:17:26,138 - INFO: b'[modeler_AMD64.exe] Logical  1: socket  0 core  1\r\r\n'
+2021-09-02 20:17:26,138 - INFO: b'[modeler_AMD64.exe] Logical  2: socket  0 core  2\r\r\n'
+2021-09-02 20:17:26,139 - INFO: b'[modeler_AMD64.exe] Logical  3: socket  0 core  3\r\r\n'
+2021-09-02 20:17:26,139 - INFO: b'[modeler_AMD64.exe] Logical  4: socket  0 core  4\r\r\n'
+2021-09-02 20:17:26,140 - INFO: b'[modeler_AMD64.exe] Logical  5: socket  0 core  5\r\r\n'
+2021-09-02 20:17:26,140 - INFO: b'[modeler_AMD64.exe] Logical  6: socket  0 core  6\r\r\n'
+2021-09-02 20:17:26,141 - INFO: b'[modeler_AMD64.exe] Logical  7: socket  0 core  7\r\r\n'
+2021-09-02 20:17:26,141 - INFO: b'[modeler_AMD64.exe] Logical  8: socket  0 core  8\r\r\n'
+2021-09-02 20:17:26,142 - INFO: b'[modeler_AMD64.exe] Logical  9: socket  0 core  9\r\r\n'
+2021-09-02 20:17:26,142 - INFO: b'[modeler_AMD64.exe] Logical 10: socket  0 core 10\r\r\n'
+2021-09-02 20:17:26,142 - INFO: b'[modeler_AMD64.exe] Logical 11: socket  0 core 11\r\r\n'
+2021-09-02 20:17:26,143 - INFO: b'[modeler_AMD64.exe] Logical 12: socket  0 core 12\r\r\n'
+2021-09-02 20:17:26,143 - INFO: b'[modeler_AMD64.exe] Logical 13: socket  0 core 13\r\r\n'
+2021-09-02 20:17:26,144 - INFO: b'[modeler_AMD64.exe] Logical 14: socket  0 core 14\r\r\n'
+2021-09-02 20:17:26,144 - INFO: b'[modeler_AMD64.exe] Logical 15: socket  0 core 15\r\r\n'
+2021-09-02 20:17:26,145 - INFO: b'[modeler_AMD64.exe] Logical 16: socket  0 core 16\r\r\n'
+2021-09-02 20:17:26,145 - INFO: b'[modeler_AMD64.exe] Logical 17: socket  0 core 17\r\r\n'
+2021-09-02 20:17:26,146 - INFO: b'[modeler_AMD64.exe] Logical 18: socket  0 core 18\r\r\n'
+2021-09-02 20:17:26,146 - INFO: b'[modeler_AMD64.exe] Logical 19: socket  0 core 19\r\r\n'
+2021-09-02 20:17:26,147 - INFO: b'[modeler_AMD64.exe] Logical 20: socket  0 core 20\r\r\n'
+2021-09-02 20:17:26,147 - INFO: b'[modeler_AMD64.exe] Logical 21: socket  0 core 21\r\r\n'
+2021-09-02 20:17:26,148 - INFO: b'[modeler_AMD64.exe] Logical 22: socket  0 core 22\r\r\n'
+2021-09-02 20:17:26,148 - INFO: b'[modeler_AMD64.exe] Logical 23: socket  0 core 23\r\r\n'
+2021-09-02 20:17:26,149 - INFO: b'[modeler_AMD64.exe] packages: 1\r\r\n'
+2021-09-02 20:17:26,149 - INFO: b'[modeler_AMD64.exe] cores   : 12\r\r\n'
+2021-09-02 20:17:26,149 - INFO: b'[modeler_AMD64.exe] ht units: 2\r\r\n'
+2021-09-02 20:17:26,150 - INFO: b'[modeler_AMD64.exe] \r\r\n'
+2021-09-02 20:17:26,150 - INFO: b'[modeler_AMD64.exe] \r\r\n'
+2021-09-02 20:17:26,151 - INFO: b'[modeler_AMD64.exe] thread setup 2: 12\r\r\n'
+2021-09-02 20:17:26,151 - INFO: b'[modeler_AMD64.exe] thread setup 3: 128 --> 12\r\r\n'
+2021-09-02 20:17:26,151 - INFO: b'[modeler_AMD64.exe] Modeler openmp threads: 12\r\r\n'
+2021-09-02 20:17:26,152 - INFO: b'[modeler_AMD64.exe] Parallel ACIS is active. Starting 24 worker threads for ACIS.\r\r\n'
+2021-09-02 20:17:26,152 - INFO: b'[schematic_AMD64.exe] This is the schematic 2020.0 Release from 2019-09-25 (change 724524)\r\r\n'
+2021-09-02 20:17:26,153 - INFO: b'[schematic_AMD64.exe] \r\r\n'
+2021-09-02 20:17:26,153 - INFO: b'[schematic_AMD64.exe] \r\r\n'
+2021-09-02 20:17:26,154 - INFO: b'[schematic_AMD64.exe] project name: c:\\users\\ykk\\appdata\\local\\temp\\1\\cstde1\\temp\\de5\\untitled_0.cst\r\r\n'
+2021-09-02 20:17:26,154 - INFO: b'[schematic_AMD64.exe] \r\r\n'
+2021-09-02 20:17:26,155 - INFO: b'[schematic_AMD64.exe] \r\r\n'
+2021-09-02 20:17:26,155 - INFO: b'[schematic_AMD64.exe] myname: C:\\Program Files (x86)\\CST Studio Suite 2020\\AMD64\\schematic_AMD64.exe\r\r\n'
+2021-09-02 20:17:26,156 - INFO: b'[schematic_AMD64.exe] \r\r\n'
+2021-09-02 20:17:26,156 - INFO: b'[modeler_AMD64.exe] Skipping template 3D\\Frequency (Multiple Modes):: Template needs to be evaluated first.\r\r\n'
+2021-09-02 20:17:26,157 - INFO: b'[modeler_AMD64.exe] Skipping template 3D\\Q-Factor (Perturbation) (Multiple Modes):: Template needs to be evaluated first.\r\r\n'
+2021-09-02 20:17:26,157 - INFO: b'[modeler_AMD64.exe] Skipping template 3D\\R over Q beta=1 (Multiple Modes):: Template needs to be evaluated first.\r\r\n'
+2021-09-02 20:17:26,158 - INFO: b'[modeler_AMD64.exe] Skipping template 3D\\Shunt Impedance (Pertubation) beta=1 (Multiple Modes):: Template needs to be evaluated first.\r\r\n'
+2021-09-02 20:17:26,158 - INFO: b'[modeler_AMD64.exe] Skipping template 3D\\Voltage beta=1 (Multiple Modes):: Template needs to be evaluated first.\r\r\n'
+2021-09-02 20:17:26,159 - INFO: b'[modeler_AMD64.exe] Skipping template 3D\\Total Loss (Pert., Aver.) (Multiple Modes):: Template needs to be evaluated first.\r\r\n'
+2021-09-02 20:17:26,159 - INFO: b'[modeler_AMD64.exe] Skipping template 3D\\e_F_3D:: Template needs to be evaluated first.\r\r\n'
+2021-09-02 20:17:26,160 - INFO: b'[modeler_AMD64.exe] Skipping template 3D\\h_F_3D:: Template needs to be evaluated first.\r\r\n'
+2021-09-02 20:17:26,160 - INFO: b'[modeler_AMD64.exe] Skipping template 3D\\Frequency (Multiple Modes):: Template needs to be evaluated first.\r\r\n'
+2021-09-02 20:17:30,292 - INFO: b'[modeler_AMD64.exe] Skipping template 3D\\Q-Factor (Perturbation) (Multiple Modes):: Template needs to be evaluated first.\r\r\n'
+2021-09-02 20:17:30,293 - INFO: b'[modeler_AMD64.exe] Skipping template 3D\\R over Q beta=1 (Multiple Modes):: Template needs to be evaluated first.\r\r\n'
+2021-09-02 20:17:30,294 - INFO: b'[modeler_AMD64.exe] Skipping template 3D\\Shunt Impedance (Pertubation) beta=1 (Multiple Modes):: Template needs to be evaluated first.\r\r\n'
+2021-09-02 20:17:30,295 - INFO: b'[modeler_AMD64.exe] Skipping template 3D\\Voltage beta=1 (Multiple Modes):: Template needs to be evaluated first.\r\r\n'
+2021-09-02 20:17:30,295 - INFO: b'[modeler_AMD64.exe] Skipping template 3D\\Total Loss (Pert., Aver.) (Multiple Modes):: Template needs to be evaluated first.\r\r\n'
+2021-09-02 20:17:30,296 - INFO: b'[modeler_AMD64.exe] Skipping template 3D\\e_F_3D:: Template needs to be evaluated first.\r\r\n'
+2021-09-02 20:17:30,297 - INFO: b'[modeler_AMD64.exe] Skipping template 3D\\h_F_3D:: Template needs to be evaluated first.\r\r\n'
+2021-09-02 20:17:30,297 - INFO: b'Batch run finished successfully\r\r\n'
+2021-09-02 20:17:30,298 - INFO: b'[modeler_AMD64.exe] Modeler finished successfully\r\r\n'
+2021-09-02 20:17:30,298 - INFO: b'Exiting with exit code 0. Exit code info: (EXITCODE_SUCCESS)\r\r\n'
+2021-09-02 20:17:30,300 - INFO: Config内容更新完成
+2021-09-02 20:17:30,303 - INFO: 全局信息:
+2021-09-02 20:17:30,304 - INFO: data目录:C:\Users\ykk\Desktop\cst_tools\data
+2021-09-02 20:17:30,304 - INFO: temp目录:C:\Users\ykk\Desktop\cst_tools\temp
+2021-09-02 20:17:30,305 - INFO: log目录:C:\Users\ykk\Desktop\cst_tools\log
+2021-09-02 20:17:30,306 - INFO: result目录:C:\Users\ykk\Desktop\cst_tools\result
+2021-09-02 20:17:30,306 - INFO: CST版本:2020
+2021-09-02 20:17:30,307 - INFO: CSTEXE路径:C:\Program Files (x86)\CST Studio Suite 2020\CST DESIGN ENVIRONMENT.exe
+2021-09-02 20:17:30,308 - INFO: -----------------------------------
+2021-09-02 20:17:30,318 - INFO: created worker type local id:0
+2021-09-02 20:17:30,319 - INFO: TempDir:C:\Users\ykk\Desktop\cst_tools\project\pillbox_ay\temp\worker_0
+2021-09-02 20:17:30,319 - INFO: TaskFileDir:C:\Users\ykk\Desktop\cst_tools\project\pillbox_ay\temp\worker_0
+2021-09-02 20:17:30,320 - ERROR: pattern not found for pillbox_ay
+2021-09-02 20:17:30,321 - ERROR: pattern should be in C:\Users\ykk\Desktop\cst_tools\data\pillbox_ay.pattern 

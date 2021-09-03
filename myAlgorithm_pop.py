@@ -86,8 +86,8 @@ class myAlg01(myAlg):
     def setEditableAttrs(self,dict):
         d={"fmin":self.input_min[1],"fmax":self.input_min[2],"cflag":self.continue_flag[0],"cfreq":self.continue_flag[1]}
         d.update(dict)
-        self.input_name[1]=d["fmin"]
-        self.input_name[2]=d["fmax"]
+        self.input_min[1]=d["fmin"]
+        self.input_min[2]=d["fmax"]
         self.continue_flag[0]=int(d["cflag"])
         self.continue_flag[1]=d["cfreq"]
     def getEditableAttrs(self):
