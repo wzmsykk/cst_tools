@@ -1,5 +1,0 @@
-2021-09-02 20:19:39,685 - INFO: 日志已输出到log\base_2021-09-02-20_19_39.log
-2021-09-02 20:19:39,686 - WARNING: 找到curr_global_cfg:config\current.ini
-2021-09-02 20:19:39,690 - INFO: 使用PyQt5图形窗口运行模式
-2021-09-02 20:19:45,103 - INFO: PCM:currProjectDir 已设为C:\Users\ykk\Desktop\cst_tools\project\HOM analysis
-2021-09-02 20:19:47,368 - INFO: PCM:inputCSTFilePath 已设为C:\Users\ykk\Desktop\cst_tools\project\HOM analysis\HOM analysis.cst

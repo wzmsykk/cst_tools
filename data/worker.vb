@@ -47,6 +47,7 @@ Sub Main
 				'This Function is used to do the actual job of computing.
 				'runs everytime when parameter changes
 				'Should be implemented in patterns
+				'EXTERN'CustomPostProcess()
 				endTime=Timer
 				totalElaspedTime=endTime-startTime
 				Success()

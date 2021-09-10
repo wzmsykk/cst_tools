@@ -11,7 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(987, 709)
+        MainWindow.resize(987, 713)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.selectProjectDirButton = QtWidgets.QPushButton(self.centralwidget)
@@ -44,6 +44,9 @@ class Ui_MainWindow(object):
         self.checkBox_SAFE = QtWidgets.QCheckBox(self.centralwidget)
         self.checkBox_SAFE.setGeometry(QtCore.QRect(70, 290, 101, 21))
         self.checkBox_SAFE.setObjectName("checkBox_SAFE")
+        self.postProcessButton = QtWidgets.QPushButton(self.centralwidget)
+        self.postProcessButton.setGeometry(QtCore.QRect(470, 280, 151, 61))
+        self.postProcessButton.setObjectName("postProcessButton")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 987, 22))
@@ -65,4 +68,5 @@ class Ui_MainWindow(object):
         self.selectCSTPathButton.setText(_translate("MainWindow", "选择cst文件"))
         self.checkBox_CTN.setText(_translate("MainWindow", "继续运行"))
         self.checkBox_SAFE.setText(_translate("MainWindow", "安全模式"))
+        self.postProcessButton.setText(_translate("MainWindow", "后处理设置"))
 

@@ -1,6 +1,0 @@
-2021-09-03 14:48:51,755 - INFO: 日志已输出到log\base_2021-09-03-14_48_51.log
-2021-09-03 14:48:51,756 - WARNING: 找到curr_global_cfg:config\current.ini
-2021-09-03 14:48:51,765 - INFO: 使用PyQt5图形窗口运行模式
-2021-09-03 14:48:56,845 - INFO: PCM:currProjectDir 已设为C:\Users\ykk\Desktop\cst_tools\project\pillbox_ay
-2021-09-03 14:49:00,217 - INFO: PCM:inputCSTFilePath 已设为C:\Users\ykk\Desktop\cst_tools\project\pillbox_ay\Pillbox_ay_dst.cst
-2021-09-03 14:49:13,446 - INFO: PCM:inputCSTFilePath 已设为C:\Users\ykk\Desktop\cst_tools

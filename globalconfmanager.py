@@ -1,5 +1,6 @@
 import configparser
 import os,shutil
+from re import S
 import logger,json
 import pathlib
 class GlobalConfmanager(object):
@@ -15,26 +16,21 @@ class GlobalConfmanager(object):
         self.curr_global_cfg_path=self.confdir / 'current.ini'
         ##Generate new default conf file
         if (not self.def_global_cfg_path.exists()):
-            self.conf.add_section("BASE")
-            self.conf.set('BASE','datadir','./data')
-            self.conf.set('BASE','tempdir','./temp')
-            self.conf.set('BASE','logdir','./log')  
-            self.conf.set('BASE','resultdir','./result')        
-            self.conf.add_section("CST")
-            self.conf.set('CST','cstver','')
-            self.conf.set('CST','cstexepath','')
-            self.conf.add_section("PROJECT")
-            self.conf.set('PROJECT','currprojdir','')
-
+            self.createEmptyGlobalConfigFile(self.def_global_cfg_path)
+            
         if (not self.curr_global_cfg_path.exists()):
-
             self.logger.warning("未找到curr_global_cfg.")
             self.logger.warning("使用default.")
+            self.conf.read(self.def_global_cfg_path)
+            self.saveconf()
         else:
-            self.logger.warning("找到curr_global_cfg:%s" % self.curr_global_cfg_path)
-            self.conf.read(self.curr_global_cfg_path)            
+            self.logger.info("找到curr_global_cfg:%s" % str(self.curr_global_cfg_path))
+            self.conf.read(self.curr_global_cfg_path)      
+        
+
 
     def printconf(self):
+        self.logger.info("----------------------------------------------------------")
         self.logger.info("全局信息:")
         self.logger.info("data目录:%s"% self._rstr2astr(self.conf['BASE']['datadir']))
         self.logger.info("temp目录:%s"% self._rstr2astr(self.conf['BASE']['tempdir']))
@@ -42,26 +38,51 @@ class GlobalConfmanager(object):
         self.logger.info("result目录:%s"% self._rstr2astr(self.conf['BASE']['resultdir']))
         self.logger.info("CST版本:%s"% self.conf['CST']['cstver'])
         self.logger.info("CSTEXE路径:%s"% self.conf['CST']['cstexepath'])
+        self.logger.info("superfish版本:%s"% self.conf['superfish']['version'])
+        self.logger.info("superfish路径:%s"% self.conf['superfish']['dirpath'])
+        self.logger.info("----------------------------------------------------------")
+    def createEmptyGlobalConfigFile(self,savepath):
+        newconf=configparser.ConfigParser()
+        newconf.add_section("BASE")
+        newconf.set('BASE','datadir','./data')
+        newconf.set('BASE','tempdir','./temp')
+        newconf.set('BASE','logdir','./log')  
+        newconf.set('BASE','resultdir','./result')        
+        newconf.add_section("CST")
+        newconf.set('CST','cstver','')
+        newconf.set('CST','cstexepath','')
+        newconf.add_section("PROJECT")
+        newconf.set('PROJECT','currprojdir','')
+        newconf.add_section("superfish")
+        newconf.set('superfish','dirpath','')
+        newconf.set('superfish','version','')
+        self.__saveconf(newconf,savepath)
+        return savepath
 
     def _rstr2astr(self,instr): #_relative_path_str_to_abspath_str function
         ostr=str(pathlib.Path(instr).absolute())
         return ostr
-    def saveconf(self):
-        f=open(self.curr_global_cfg_path,'w')
-        self.conf.write(f)
-        self.logger.info("已保存全局配置文件于%s。" %self.curr_global_cfg_path)
+    def __saveconf(self,confobj,path):
+        f=open(path,'w')
+        confobj.write(f)
+        self.logger.info("已保存全局配置文件于%s。" %str(path))
         f.close()
+    def saveconf(self):
+        '''
+        save current config into self.curr_global_cfg_path
+        '''
+        self.__saveconf(self.conf,self.curr_global_cfg_path)
 
 
 
-    def checkConfig(self):
+    def checkCSTENVConfig(self):
         #测试CST环境位置
         result=True 
         self.logger.info("检查全局配置开始.")
         cfg=self.conf
         self.logger.info("检查CST PATH.")
         cstenvexepath=pathlib.Path(cfg['CST']['cstexepath'])
-        if (not cstenvexepath.exists()):
+        if ((not cstenvexepath.exists()) or (cstenvexepath.suffix.lower()!='.exe')):
             self.logger.warning("定义的cstexepath:%s不存在。" %cfg['CST']['cstexepath'] )
             self.logger.warning("尝试寻找cstexepath。")
             try:
@@ -101,21 +122,39 @@ class GlobalConfmanager(object):
         else:
             self.logger.info("通过全局配置检测")
         return result
-    def findCSTenv(self):
+    def findCSTenv(self=None):
         self.logger.info("寻找CSTenv开始")
-        ed1=":\\Program Files (x86)\\CST Studio Suite "
-        ed2="\\CST DESIGN ENVIRONMENT.exe"
-        for j in range(2015,2025):        
-            for i in range(ord('C'),ord('Z')):            
-                if pathlib.Path(chr(i)+ed1+str(j)+ed2).exists():
-                    success=True
-                    CSTexepath=chr(i)+ed1+str(j)+ed2
-                    CSTver=str(j)
-                    self.logger.info("FOUND CST VERSION %s at %s"% (str(j),CSTexepath))
-                    self.logger.info("寻找CSTenv结束")
-                    return CSTexepath,CSTver
+        ed1=r":\Program Files (x86)\CST Studio Suite "
+        ed2=r"\CST DESIGN ENVIRONMENT.exe"
+        for i in range(ord('C'),ord('Z')):        
+            for j in range(2015,2025):    
+                path=pathlib.Path(chr(i)+ed1+str(j)+ed2)
+                print(path)
+                try:
+                    result=path.exists()
+                    if result:
+                        success=True
+                        CSTexepath=chr(i)+ed1+str(j)+ed2
+                        CSTver=str(j)
+                        self.logger.info("FOUND CST VERSION %s at %s"% (str(j),CSTexepath))
+                        self.logger.info("寻找CSTenv结束")
+                        return CSTexepath,CSTver
+                except OSError:
+                    continue
+        self.logger.info("CST ENV NOT FOUND")
         raise FileNotFoundError
-        return None,None
+        return False
+
+    def findSuperfishENV(self):
+        sfdir=os.getenv('SFDir')
+        if sfdir is None:
+            self.logger.info("Poisson Superfish ENV NOT FOUND")
+            return False
+        else:
+            self.logger.info("FOUND Poisson Superfish ENV at %s"% (sfdir))
+            self.conf.set('superfish','dirpath',sfdir)
+            return True
+
 
 
 

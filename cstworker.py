@@ -7,6 +7,8 @@ import logging
 import hashlib
 import pathlib
 import worker
+import postprocess_cst
+
 
 class local_cstworker(worker.worker):
     def __init__(self,id,type,config,logger):
@@ -22,6 +24,8 @@ class local_cstworker(worker.worker):
         self.cstProjPath=pathlib.Path(config['cstPath'])
         
         self.paramList=copy.deepcopy(config['paramList'])
+        self.postProcessSetList=config['postProcess']
+        self.postProcessHelper=postprocess_cst.vbpostprocess()
         self.taskIndex=0
         self.cstStatus='off'
         self.maxWaitTime=999999
@@ -144,8 +148,8 @@ class local_cstworker(worker.worker):
         file_c.close()
 
         ###
-        file_1 = open(hFilePath,'r', encoding='utf-8')
-        file_2 = open(mFilePath,'r', encoding='utf-8')
+        file_1 = open(hFilePath,'r', encoding='utf-8') #worker.vb
+        file_2 = open(mFilePath,'r', encoding='utf-8') #PROJECT TYPE SPECIFIC.vb
         list1 = []
         for line in file_1.readlines():
             ssd=line
@@ -163,6 +167,13 @@ class local_cstworker(worker.worker):
             file_new.write(list1[i])
         for i in range(len(list2)):
             file_new.write(list2[i])
+        
+        ##POST PROCESS        
+        self.postProcessHelper.appendPostProcessSteps(self.postProcessSetList)
+        list3=self.postProcessHelper.createPostProcessVBCodeLines() #POSTPROCESS.vb.
+        for i in range(len(list3)):
+            file_new.write(list3[i])
+        ##POST PROCESS ENDS
         file_new.close()
         return oFilePath
 
@@ -175,35 +186,42 @@ class local_cstworker(worker.worker):
     def run(self):
         if self.cstStatus=='off':
             raise BaseException
-        self.sendTaskFile(self.u_param_list,self.u_value_list,self.resultName)
-        pathc = self.resultDir / self.resultName
+        pathc = self.resultDir / self.runName
+        self.postProcessHelper.setResultDir(pathc.absolute())
         #WAIT RESULTS
         flagPath=self.taskFileDir / (str(self.taskIndex)+".success")
-        waitTime=0
-        startTime=time.time()
-        self.logger.info("WorkerID:%r Run:%r Name:%r started."%(self.ID,self.taskIndex,self.resultName))
-        self.logger.info("Start Time:%r"% time.ctime())
-        while not flagPath.exists():
-            #ADD process check HERE
-            rcode =self.cstProcess.poll()
-            if rcode is None:
-                pass
-                
-            else:
-                self.logger.error("CST ENV stopped")
-                os._exit(0)
-            time.sleep(1)
-            currentTime=time.time()
-            escapedTime=currentTime-startTime
-            if (escapedTime>self.maxWaitTime):
-                raise TimeoutError
+        if flagPath.exists():
+            self.logger.info("WorkerID:%r Run:%r Name:%r Already Finished."%(self.ID,self.taskIndex,self.runName))
+        else:
+            self.sendTaskFile(self.u_param_list,self.u_value_list,self.runName)
             
-          
-        self.logger.info("WorkerID:%r Run:%r Name:%r success."%(self.ID,self.taskIndex,self.resultName))
-        self.logger.info("ElapsedTime:%r"%escapedTime)
-        self.logger.info("End Time:%r"%time.ctime())
+            
+            waitTime=0
+            startTime=time.time()
+            self.logger.info("WorkerID:%r Run:%r Name:%r started."%(self.ID,self.taskIndex,self.runName))
+            self.logger.info("Start Time:%r"% time.ctime())
+            while not flagPath.exists():
+                #ADD process check HERE
+                rcode =self.cstProcess.poll()
+                if rcode is None:
+                    pass
+                    
+                else:
+                    self.logger.error("CST ENV stopped")
+                    os._exit(0)
+                time.sleep(1)
+                currentTime=time.time()
+                escapedTime=currentTime-startTime
+                if (escapedTime>self.maxWaitTime):
+                    raise TimeoutError
+                
+            
+            self.logger.info("WorkerID:%r Run:%r Name:%r success."%(self.ID,self.taskIndex,self.runName))
+            self.logger.info("ElapsedTime:%r"%escapedTime)
+            self.logger.info("End Time:%r"%time.ctime())
         self.taskIndex+=1
-        runResult=result.readModeResult(pathc,1)
+        runResult=self.postProcessHelper.readAllResults()
+        #runResult=result.readModeResult(pathc,1)
         return runResult
 
     def stop(self):

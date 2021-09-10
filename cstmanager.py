@@ -10,6 +10,7 @@ class manager(object):
         super().__init__()
         
         self.logger=logger
+        self.pconfm=pconfm
         self.gconf=gconfm.conf
         self.pconf=pconfm.conf
         self.cstPatternDir=pathlib.Path(self.gconf['BASE']['datadir']).absolute()
@@ -79,6 +80,7 @@ class manager(object):
         os.makedirs(mconf['tempPath'],exist_ok=True)
         print(mconf['tempPath'])
         mconf['taskFileDir']=str(self.taskFileDir/("worker_"+workerID))
+        mconf['postProcess']=self.pconfm.getPPSSettings()
         mcstworker_local=cstworker.local_cstworker(id=workerID, type="local",config=mconf,logger=self.logger)
         return mcstworker_local
     def startWorkers(self):

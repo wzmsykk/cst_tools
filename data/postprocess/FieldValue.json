@@ -1,0 +1,26 @@
+{
+    "VBfunc_file": "FieldValue.vb",
+    "Method": [
+        "FieldValue"
+    ],
+    "VBfuncs": [
+        {
+            "FuncName": "FieldValue",
+            "Parameters": {
+                "iModeNumber": "Integer",
+                "queryType": "String"
+            },
+            "Type":"Sub"
+        },
+        {
+            "FuncName": "EigenResult_Simple_output",
+            "Parameters": {
+                "iModeNumber": "Integer",
+                "queryType": "String",
+                "outputDir": "String",
+                "outputName": "String"
+            },
+            "Type":"Output"
+        }
+    ]
+}

@@ -1,6 +1,7 @@
 import configparser
 import os,shutil,re,json
 import logger
+import json
 import subprocess
 import hashlib
 import tempfile
@@ -28,6 +29,8 @@ class ProjectConfmanager(object):
         self.currCSTFilePath=None
         self.CFGfilename="project.ini"
         self.paramsfilename='params.json'
+        self.ppsfilename='pps.json' #后处理设定文件
+        self.currPPSList=[]
         self.ready=False
     def isReady(self):
         return self.ready
@@ -78,6 +81,9 @@ class ProjectConfmanager(object):
             raise ValueError 
         else:
             return status
+    def setCurrPPSList(self,ilist):
+        self.currPPSList=ilist  
+        return ilist      
     def assignProjectDir(self,projectDir):
         self.setNotReady()#changed Path so Not Ready
         self.currProjectDir=pathlib.Path(projectDir).absolute()
@@ -123,6 +129,7 @@ class ProjectConfmanager(object):
             iConf=self.__updateCSTFileInfoInConfObj(iConf,dstPath)
             self.__savecfgobj(iConf)
             self.conf=iConf            
+            self.savePPSSettings(self.currPPSList)
             return self.__ready()
         else:
             self.logger.info("目录%s有旧文件"% str(iProjectDir))
@@ -131,6 +138,10 @@ class ProjectConfmanager(object):
                 result=self.__checkProjectStatus()
                 if result==False:
                     raise ProjectStatusError
+                if startFromExisted:
+                    self.currPPSList=self.loadPPSSettings()
+                else:
+                    self.savePPSSettings(self.currPPSList)
                 return self.__ready()
             elif status=='RUNNING':
                 if not Safe:
@@ -138,6 +149,10 @@ class ProjectConfmanager(object):
                     result=self.__checkAndRepairProject()
                     if result==False:
                         raise ProjectStatusError('FLAG_SAFE=OFF but REPAIR FAILED')
+                    if startFromExisted:                    
+                        self.currPPSList=self.loadPPSSettings()
+                    else:
+                        self.savePPSSettings(self.currPPSList)
                     return self.__ready()
                 else:
                     self.logger.warning("发现异常结束,安全模式设置为ON,不会尝试修改")
@@ -148,6 +163,10 @@ class ProjectConfmanager(object):
                 result=self.__checkAndRepairProject()
                 if result==False:
                     raise ProjectStatusError
+                if startFromExisted:
+                    self.currPPSList=self.loadPPSSettings()
+                else:
+                    self.savePPSSettings(self.currPPSList)
                 return self.__ready()
 
 
@@ -204,6 +223,7 @@ class ProjectConfmanager(object):
         newconf.set('CST','DCMainControlAddress',"")  
         newconf.add_section("PARAMETERS")
         newconf.set('PARAMETERS','paramfile',self.paramsfilename)  
+        newconf.set('PARAMETERS','ppsfile',self.ppsfilename)  
         #newconf.set('PARAMETERS','paramfile','')
         newconf.add_section("TASK")
         newconf.set('TASK','status','READY') # READY RUNNING DONE 
@@ -385,7 +405,7 @@ class ProjectConfmanager(object):
         savedCSTMD5=self.conf['CST']['CSTFileMD5']
         self.logger.info("测试保存的参数列表与MD5是否与CST模型文件匹配")
         paramjsonpath=self._rap2apo(self.conf['PARAMETERS']['paramfile'])
-        
+        ppsjsonpath=self._rap2apo(self.conf['PARAMETERS']['ppsfile'])
         if(currCSTMD5!=savedCSTMD5):
             self.logger.warning("记录的CST文件MD5_%s与实际的MD5_%s不一致，已被修改"%(savedCSTMD5,currCSTMD5))           
             
@@ -401,6 +421,10 @@ class ProjectConfmanager(object):
             
             self.logger.warning("重新生成并保存参数列表")
             self.readParametersFromCST(paramjsonpath)
+        if (not ppsjsonpath.exists()):
+            self.logger.warning("后处理设置文件_%s不存在"%str(paramjsonpath))       
+            self.logger.warning("重新生成并保存参数列表")
+            self.savePPSSettings(self.currPPSList)
         self.logger.info("%s检测并更新项目配置文件结束\n"% cfgfilename)
         return result
 
@@ -445,11 +469,41 @@ class ProjectConfmanager(object):
             result=False
         else:
             self.logger.info("测试MD5 通过")
-        
+        ppsjsonpath=self._rap2apo(self.conf['PARAMETERS']['ppsfile'])
+        if (not ppsjsonpath.exists()):
+            self.logger.warning("后处理设置文件_%s不存在"%str(ppsjsonpath))       
+            result=False
         self.logger.info("%s检测项目配置文件结束\n"% cfgfilename)
 
         return result
 
+    def getPPSSettings(self):
+        return self.currPPSList
+    def loadPPSSettings(self):
+        ppspath=self.currProjectDir /self.conf.get('PARAMETERS','ppsfile')
+        return self.loadPPSSettingsFromFile(ppspath)
 
+    def loadPPSSettingsFromFile(self,ppspath):
+        lst=[]
+        
+        try:
+            fp=open(ppspath,"r")
+            lst=json.load(fp)
+            fp.close()
+            return lst
+        except:
+            self.logger.info("后处理设定读取失败")
+            return lst
+    def savePPSSettings(self,ppslist):
+        ppspath=self.currProjectDir /self.conf.get('PARAMETERS','ppsfile')
+        try:
+            fp=open(ppspath,"w")
+            json.dump(ppslist,fp)
+            fp.close()
+            self.logger.info("后处理设定已保存至%s"%str(ppspath))
+            return True
+        except:
+            self.logger.info("后处理设定保存失败")
+            return False
 
 

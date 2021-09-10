@@ -1,0 +1,33 @@
+{
+    "VBfunc_file": "EigenResult_Complex.vb",
+    "Method": [
+        "R over Q",
+        "Shunt Inpedence"
+    ],
+    "VBfuncs": [
+        {
+            "FuncName": "EigenResult_Complex",
+            "Parameters": {
+                "iModeNumber": "Integer",
+                "queryKey": "String",
+                "axis": "Integer",
+                "uvw": "Array"
+            },
+            "Type":"Sub"
+        },
+        {
+            "FuncName": "EigenResult_Complex_output",
+            "Parameters": {
+                "iModeNumber": "Integer",
+                "queryKey": "String",
+                "axis": "Integer",
+                "xoffset": "Double",
+                "yoffset": "Double",
+                "zoffset": "Double",
+                "outputDir": "String",
+                "outputName": "String"
+            },
+            "Type":"Output"
+        }
+    ]
+}

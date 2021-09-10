@@ -21,7 +21,7 @@ import csv
 import pandas as pd
 
 class myAlg01(myAlg):
-    def __init__(self, manager, params):
+    def __init__(self, manager=None, params=None):
         super().__init__(manager, params)
         self.parameter_range = 0
         self.CSTparams=params
@@ -49,7 +49,8 @@ class myAlg01(myAlg):
         self.input_min = [1,700,800,1e-5,20]##初始值
         
         self.csv_input_name = self.input_name+['mode']
-        self.output_name = ['frequent','R_divide_Q','R_divide_Q_5mm','Q-factor','R_divide_Q_10mm']
+        
+        self.output_name = ['frequency','R_divide_Q','R_divide_Q_5mm','R_divide_Q_10mm','Q-factor','Shunt_Inpedence','Total_Loss']
         self.text_name = ["Frequency", "R_Q", "R_Q_5mm", "Q-Factor", "R_Q_10mm"]
         self.accu_list = pd.DataFrame([[700,1500,1e-5],
                                        [1500,4100,1e-4]],columns=["f_down","f_up","accuracy"])
@@ -138,7 +139,45 @@ class myAlg01(myAlg):
                     #print("False because str")
                     return False
             return True
+    def get_3_modes_custom(self,resultList):
+        return self.__get_3_modes_custom(resultList,self.output_name)
+    def __get_3_modes_custom(self,resultList,customResultNameList=None):
+        
+        
+        resultNameList=[]
+        for dict in resultList:
+            resultNameList.append(dict['resultName'])
+        if customResultNameList is None:
+            columnNameSet=set(resultNameList)
+            columnNameList=list(columnNameSet)
+            columnNameList.sort()
+        else:
+            columnNameList=customResultNameList
+        
+        samples = pd.DataFrame(columns=self.csv_input_name+columnNameList)
+        mode1 = np.zeros(len(self.csv_input_name)+len(columnNameList))
+        mode2 = np.zeros(len(self.csv_input_name)+len(columnNameList))
+        for i in range(len(self.csv_input_name)):
+            if i<len(self.csv_input_name)-1:
+                mode1[i] = mode2[i] = self.input_min[i]
+            else:
+                mode1[i] = 1
+                mode2[i] = 2
+        columns=self.csv_input_name+resultNameList
 
+        for i in range(len(columnNameList)):
+            target=columnNameList[i]
+            u=[item['value'] for item  in resultList if (item['params']['iModeNumber']==1 and item['resultName']==target)]
+            if len(u)>0:
+                mode1[len(self.csv_input_name)+i] = u[0]
+            v=[item['value']  for item  in resultList if (item['params']['iModeNumber']==2 and item['resultName']==target)]
+            if len(v)>0:
+                mode2[len(self.csv_input_name)+i] = v[0]
+
+        samples = samples.append(pd.DataFrame([list(mode1)], columns=self.csv_input_name+columnNameList))
+        samples = samples.append(pd.DataFrame([list(mode2)], columns=self.csv_input_name+columnNameList))
+        print("samples\n",samples)
+        return samples.reset_index(drop = True)
     def get_3_modes(self,title):
         samples = pd.DataFrame(columns=self.csv_input_name+self.output_name)
         location = self.mode_location + title + '\\'
@@ -195,11 +234,12 @@ class myAlg01(myAlg):
         
         if self.continue_flag[0]==0:
             self.state_y0 = np.array(self.manager.runWithParam(self.input_name, self.input_min,  "frequency"+str(1000000)[1:]+"_"+str(fmin).replace(".", "-")+"_"+str(fmax)))
-            sample = self.get_3_modes("frequency"+str(1000000)[1:]+"_"+str(fmin).replace(".", "-")+"_"+str(fmax)).iloc[0]
+            #sample = self.get_3_modes("frequency"+str(1000000)[1:]+"_"+str(fmin).replace(".", "-")+"_"+str(fmax)).iloc[0]
+            sample=self.get_3_modes_custom(self.state_y0).iloc[0]
             samples = samples.append(sample)
             self.write_many("all_value_"+str(fmin).replace(".", "-"), samples)
-            fmin = np.float(sample["frequent"])
-            fmax = math.floor(sample["frequent"])+self.delta_frequency
+            fmin = np.float(sample["frequency"])
+            fmax = math.floor(sample["frequency"])+self.delta_frequency
             
         else:
             self.continue_flag[0] = 0
@@ -209,8 +249,8 @@ class myAlg01(myAlg):
             
             sample = samples.iloc[-1]
             print("sample is:\n",sample)
-            fmin = np.float(sample["frequent"])
-            fmax = math.floor(sample["frequent"])+self.delta_frequency
+            fmin = np.float(sample["frequency"])
+            fmax = math.floor(sample["frequency"])+self.delta_frequency
 
         
         while fmin<self.end_frequency:
@@ -227,39 +267,72 @@ class myAlg01(myAlg):
                 print("input is:",self.input_min)
                 
                 self.state_y0 = np.array(self.manager.runWithParam(self.input_name, self.input_min, "frequency"+str(1000000)[1:]+"_"+str(fmin).replace(".", "-")+"_"+str(fmax)))
-                sample = self.get_3_modes("frequency"+str(1000000)[1:]+"_"+str(fmin).replace(".", "-")+"_"+str(fmax)).iloc[0]
-
-                print("--------\nfmin_define:",fmin,"\nfmax_define:",fmax,"\nf_get:",sample["frequent"])
+                #sample = self.get_3_modes("frequency"+str(1000000)[1:]+"_"+str(fmin).replace(".", "-")+"_"+str(fmax)).iloc[0]
+                sample=self.get_3_modes_custom(self.state_y0).iloc[0]
+                print("--------\nfmin_define:",fmin,"\nfmax_define:",fmax,"\nf_get:",sample["frequency"])
                 
-                if sample["frequent"]==fmin:
+                if sample["frequency"]==fmin:
 #                    try:
 #                        self.input_min[0] = 2
 #                        print("input is:",self.input_min)
 #                        self.state_y0 = np.array(self.w.runWithParam(self.input_name, self.input_min, "frequency"+str(1000000)[1:]+"_"+str(fmin).replace(".", "-")+"_"+str(fmax)+"_2mode"))
 #                        sample = self.get_3_modes("frequency"+str(1000000)[1:]+"_"+str(fmin).replace(".", "-")+"_"+str(fmax)+"_2mode")
-#                        if sample.loc[0,"frequent"] == fmin:
+#                        if sample.loc[0,"frequency"] == fmin:
 #                            sample = sample.iloc[1]
 #                        else:
 #                            sample = sample.iloc[0]
 #                        self.input_min[0] = 1
 #                    except:
-                    self.input_min[1] = float(math.ceil(sample["frequent"]*100))/100
+                    self.input_min[1] = float(math.ceil(sample["frequency"]*100))/100
                     self.state_y0 = np.array(self.manager.runWithParam(self.input_name, self.input_min, "frequency"+str(1000000)[1:]+"_"+str(self.input_min[1]).replace(".", "-")+"_"+str(fmax)+"_variate"))
-                    sample = self.get_3_modes("frequency"+str(1000000)[1:]+"_"+str(self.input_min[1]).replace(".", "-")+"_"+str(fmax)+"_variate").iloc[0]
+                    sample=self.get_3_modes_custom(self.state_y0).iloc[0]
+                    #sample = self.get_3_modes("frequency"+str(1000000)[1:]+"_"+str(self.input_min[1]).replace(".", "-")+"_"+str(fmax)+"_variate").iloc[0]
 
-                if float(sample["frequent"])<fmax:
+                if float(sample["frequency"])<fmax:
                     satisfy_flag = True
                     print("judge:True")
                 else:
-                    fmax = math.floor(sample["frequent"])+20
+                    fmax = math.floor(sample["frequency"])+20
                     print("judge:False")
             samples = samples.append(sample)
             samples = samples.reset_index(drop = True)
             self.write_many("all_value_"+str(fmin).replace(".", "-"), samples)
-            fmin = np.float(sample["frequent"])
-            fmax = math.floor(sample["frequent"])+self.delta_frequency
+            fmin = np.float(sample["frequency"])
+            fmax = math.floor(sample["frequency"])+self.delta_frequency
            
         
         end_time = time.time()
         print(start_time-end_time)
         return 0
+
+
+if __name__=='__main__':
+    from postprocess_cst import vbpostprocess
+    from pathlib import Path
+    vbp=vbpostprocess()
+    import json
+    fp=open("template/defaultPPS.json","r")
+    r=json.load(fp)
+    
+    vbp.appendPostProcessSteps(r)
+    fp=open("temp/a.txt","w")
+    ilist=vbp.createPostProcessVBCodeLines()
+    for line in ilist:
+        fp.write(line)
+    fp.close()
+    dir=Path(r"project\HOM analysis\result\frequency000000_700_800")
+    vbp.setResultDir(dir)
+
+    cc=vbp.readAllResults()
+    print(cc)
+    alg=myAlg01()
+    sample=alg.get_3_modes_custom(cc).iloc[0]
+    print(sample)
+    fmin = float(sample["frequency"])
+    fmax = math.floor(sample["frequency"])+alg.delta_frequency
+    alg.input_min[1] = fmin
+    alg.input_min[2] = fmax
+    print(alg.accu_list)
+    print((alg.accu_list["f_down"]<=fmin) & (alg.accu_list["f_up"]>=fmin))
+    alg.input_min[3] = float(alg.accu_list.loc[(alg.accu_list["f_down"]<=fmin) & (alg.accu_list["f_up"]>=fmin),"accuracy"])
+    alg.input_min[4] = float(alg.cell_list.loc[(alg.cell_list["f_down"]<=fmin) & (alg.cell_list["f_up"]>=fmin),"cell"])

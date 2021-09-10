@@ -41,7 +41,7 @@ class worker(object):
         self.resultDir="./"
         self.u_param_list=[]
         self.u_value_list=[]
-        self.resultName='Default'
+        self.runName='Default'
         self.ID=id
         if type=='test':
             self.logger.info("(DEBUG) test worker:%s" % str(self.ID))
@@ -54,7 +54,7 @@ class worker(object):
     def stop(self):
         pass
     def run(self,resultname):
-        self.resultName=resultname #这次结果的名称，用于回溯
+        self.runName=resultname #这次结果的名称，用于回溯
         re=resultname
         return re
     def change_uvalue(self,u_param_list,u_value_list):
@@ -62,12 +62,12 @@ class worker(object):
         self.u_value_list=u_value_list
 
     def runWithx(self,x,resultname):
-        self.resultName=resultname #这次结果的名称，用于回溯
+        self.runName=resultname #这次结果的名称，用于回溯
         self.change_uvalue(u_param_list=[],u_value_list=x)
         re=self.run()        
         return re
     def runWithParam(self,param_name_list,value_list,resultname):
-        self.resultName=resultname #这次结果的名称，用于回溯
+        self.runName=resultname #这次结果的名称，用于回溯
         self.change_uvalue(u_param_list=param_name_list,u_value_list=value_list)
         re=self.run()        
         return re

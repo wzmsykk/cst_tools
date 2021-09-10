@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>987</width>
-    <height>709</height>
+    <height>713</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -121,6 +121,19 @@
     </property>
     <property name="text">
      <string>安全模式</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="postProcessButton">
+    <property name="geometry">
+     <rect>
+      <x>470</x>
+      <y>280</y>
+      <width>151</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>后处理设置</string>
     </property>
    </widget>
   </widget>

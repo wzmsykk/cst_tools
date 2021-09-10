@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QApplication, QWidget,QMainWindow
 from GUI.algo_pop_window import myAlgDialog
 from GUI.ui_main import Ui_MainWindow
+from GUI.postprocess_dialog import myPPSDialog
 from PyQt5.QtWidgets import QFileDialog,QPlainTextEdit
 from base import TaskType,cst_tools_main
 from PyQt5.QtCore import QThread,pyqtSignal
@@ -30,7 +31,7 @@ class mywindow(QMainWindow, Ui_MainWindow):
     def  __init__ (self):
         super(mywindow, self).__init__()
         self.setupUi(self)
-        self.CalcDialogBox=myAlgDialog()
+        
 
         self.logTextBox = QPlainTextEditLogger(self)
         self.LogBoxLayout.addWidget(self.logTextBox.widget)        
@@ -48,6 +49,12 @@ class mywindow(QMainWindow, Ui_MainWindow):
         self.logger=self.maintool.glogger.getLogger()
         self.logger.info("使用PyQt5图形窗口运行模式")
         
+        self.CalcDialogBox=myAlgDialog()
+        self.PPSDialogBox=myPPSDialog(Logger=self.logger)
+        
+        defaultPath="data\defaultPPS.json"
+        ppslist=self.maintool.setPostProcessFromFile(defaultPath)
+        self.PPSDialogBox.setPPSList(ppslist)
         self.setSignalNSlots()
 
 
@@ -60,18 +67,21 @@ class mywindow(QMainWindow, Ui_MainWindow):
         self.selectCSTPathButton.clicked.connect(self.read_cst)
         self.StartButton.clicked.connect(self.run)
         self.AlgSettingButton.clicked.connect(self.showCalcDialogBox)
-
+        self.postProcessButton.clicked.connect(self.showPPSDialogBox)
 
         self.maintool._signal_start.connect(self.freezeAllButtons)
         self.maintool._signal_end.connect(self.unFreezeAllButtons)
 
         self.CalcDialogBox._signal_done.connect(self.updateAlgSetting)
-
+        self.PPSDialogBox._signal_done.connect(self.updatePPSSetting)
     def showCalcDialogBox(self):
         self.CalcDialogBox.show()
+    def showPPSDialogBox(self):
+        self.PPSDialogBox.show()
     def updateAlgSetting(self):
         self.maintool.setAlgAttrs(self.CalcDialogBox.getValues())
-
+    def updatePPSSetting(self):
+        self.maintool.setPostProcess(self.PPSDialogBox.getPPSList())
     def read_dir(self):
         #选取输出目录
         self.uiProjectDir = QFileDialog.getExistingDirectory(self, "选取文件夹", self.uiProjectDir)
@@ -106,13 +116,14 @@ class mywindow(QMainWindow, Ui_MainWindow):
         self.StartButton.setEnabled(False)
         self.selectCSTPathButton.setEnabled(False)
         self.AlgSettingButton.setEnabled(False)
-
+        self.PPSDialogBox.setEnabled(False)
 
     def unFreezeAllButtons(self):
         self.selectProjectDirButton.setEnabled(True)
         self.StartButton.setEnabled(True)
         self.selectCSTPathButton.setEnabled(True)
         self.AlgSettingButton.setEnabled(True)
+        self.PPSDialogBox.setEnabled(True)
 
 
 

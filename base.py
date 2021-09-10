@@ -60,7 +60,11 @@ class cst_tools_main:
         self.ctn=startFromExisted
         self.safe=safe
         self.logger.info('BASE:SET CTN=%s,SAFE=%s'%(str(self.ctn),str(self.safe)))
-
+    def setPostProcess(self,ppslist):
+        return  self.pconfman.setCurrPPSList(ppslist)
+        
+    def setPostProcessFromFile(self,path):
+        return self.pconfman.loadPPSSettingsFromFile(path)
     def __batch_fail_and_exit(self):
         os._exit(1)
     def _success_and_exit(self):
@@ -70,7 +74,7 @@ class cst_tools_main:
     def wininit(self):
         ##认为setProjectDir/setCSTFilePath
 
-        result=self.gconfman.checkConfig()
+        result=self.gconfman.checkCSTENVConfig()
         if result==False:
             return False
 
@@ -103,7 +107,7 @@ class cst_tools_main:
         
         ###验证全局配置是否有效
         
-        result=self.gconfman.checkConfig()
+        result=self.gconfman.checkCSTENVConfig()
         if result==False:
             self.__batch_fail_and_exit()
 
@@ -204,6 +208,7 @@ if __name__ =='__main__':
     # myapp.setProjectDir()
     # myapp.setCSTFilePath()
     # myapp.setFlags()
+    # myapp.setPostProcess()
     # attrs=myapp.getAlgAttrs()
     # OPTIONAL myapp.setAlgAttrs(attrs)
     # result=myapp.wininit()

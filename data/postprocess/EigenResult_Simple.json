@@ -1,0 +1,28 @@
+{
+    "VBfunc_file": "EigenResult_Simple.vb",
+    "Method": [
+        "Frequency",
+        "Q-Factor",
+        "Total Loss",
+        "Total Energy"
+    ],
+    "VBfuncs": [
+        {
+            "FuncName": "EigenResult_Simple",
+            "Parameters": {
+                "iModeNumber": "Integer",
+                "queryKey": "String"
+            },
+            "Type":"Sub"
+        },
+        {
+            "FuncName": "EigenResult_Simple_output",
+            "Parameters": {
+                "iModeNumber": "Integer",
+                "queryKey": "String",
+                "outputPath": "String"
+            },
+            "Type":"Output"
+        }
+    ]
+}

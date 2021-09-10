@@ -5,6 +5,7 @@ Sub Start
 	outFullDir=resultDir & currentResultName &"\"
 	compute()	
 	postProcess()
+	
 	Backup (outFullDir & cstType &".cst")
 End Sub
 Sub prepareEnv
@@ -150,3 +151,4 @@ Sub postProcess
 	ed=Timer
 	postProcessTime=ed-st
 End Sub
+
