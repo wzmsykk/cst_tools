@@ -81,9 +81,7 @@ class ProjectConfmanager(object):
             raise ValueError 
         else:
             return status
-    def setCurrPPSList(self,ilist):
-        self.currPPSList=ilist  
-        return ilist      
+         
     def assignProjectDir(self,projectDir):
         self.setNotReady()#changed Path so Not Ready
         self.currProjectDir=pathlib.Path(projectDir).absolute()
@@ -139,7 +137,7 @@ class ProjectConfmanager(object):
                 if result==False:
                     raise ProjectStatusError
                 if startFromExisted:
-                    self.currPPSList=self.loadPPSSettings()
+                    self.setCurrPPSList(self.readPPSList())
                 else:
                     self.savePPSSettings(self.currPPSList)
                 return self.__ready()
@@ -150,7 +148,7 @@ class ProjectConfmanager(object):
                     if result==False:
                         raise ProjectStatusError('FLAG_SAFE=OFF but REPAIR FAILED')
                     if startFromExisted:                    
-                        self.currPPSList=self.loadPPSSettings()
+                        self.setCurrPPSList(self.readPPSList())
                     else:
                         self.savePPSSettings(self.currPPSList)
                     return self.__ready()
@@ -164,7 +162,7 @@ class ProjectConfmanager(object):
                 if result==False:
                     raise ProjectStatusError
                 if startFromExisted:
-                    self.currPPSList=self.loadPPSSettings()
+                    self.setCurrPPSList(self.readPPSList())
                 else:
                     self.savePPSSettings(self.currPPSList)
                 return self.__ready()
@@ -477,13 +475,16 @@ class ProjectConfmanager(object):
 
         return result
 
-    def getPPSSettings(self):
+    def getCurrPPSList(self):
         return self.currPPSList
-    def loadPPSSettings(self):
+    def setCurrPPSList(self,ilist):
+        self.currPPSList=ilist  
+        return ilist 
+    def readPPSList(self):
         ppspath=self.currProjectDir /self.conf.get('PARAMETERS','ppsfile')
-        return self.loadPPSSettingsFromFile(ppspath)
+        return self.readPPSListFromFile(ppspath)
 
-    def loadPPSSettingsFromFile(self,ppspath):
+    def readPPSListFromFile(self,ppspath):
         lst=[]
         
         try:

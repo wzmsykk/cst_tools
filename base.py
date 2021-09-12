@@ -45,7 +45,10 @@ class cst_tools_main:
         #算法/参数
         self.alg=myAlgorithm_pop.myAlg01(manager=None,params=None)
 
-
+        #设置默认后处理
+        defaultPPSListPath=pathlib.Path("data/defaultPPS.json")
+        lst=self.readPostProcessListFromFile(defaultPPSListPath)
+        self.setCurrPostProcessList(lst)
 
       
     def setProjectDir(self,dirpath):
@@ -60,11 +63,12 @@ class cst_tools_main:
         self.ctn=startFromExisted
         self.safe=safe
         self.logger.info('BASE:SET CTN=%s,SAFE=%s'%(str(self.ctn),str(self.safe)))
-    def setPostProcess(self,ppslist):
+    def setCurrPostProcessList(self,ppslist):
         return  self.pconfman.setCurrPPSList(ppslist)
-        
-    def setPostProcessFromFile(self,path):
-        return self.pconfman.loadPPSSettingsFromFile(path)
+    def getCurrPostProcessList(self):
+        return self.pconfman.getCurrPPSList()
+    def readPostProcessListFromFile(self,path):
+        return self.pconfman.readPPSListFromFile(path)
     def __batch_fail_and_exit(self):
         os._exit(1)
     def _success_and_exit(self):
@@ -83,6 +87,7 @@ class cst_tools_main:
 
         ###使用找到的projectTrue
         self.logger.info("开始使用project目录:%s" % str(self.getProjectDir()))
+        
         return True
         
     def batchinit(self):

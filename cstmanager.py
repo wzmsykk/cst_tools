@@ -80,7 +80,7 @@ class manager(object):
         os.makedirs(mconf['tempPath'],exist_ok=True)
         print(mconf['tempPath'])
         mconf['taskFileDir']=str(self.taskFileDir/("worker_"+workerID))
-        mconf['postProcess']=self.pconfm.getPPSSettings()
+        mconf['postProcess']=self.pconfm.getCurrPPSList()
         mcstworker_local=cstworker.local_cstworker(id=workerID, type="local",config=mconf,logger=self.logger)
         return mcstworker_local
     def startWorkers(self):

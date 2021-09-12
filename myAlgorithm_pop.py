@@ -51,6 +51,7 @@ class myAlg01(myAlg):
         self.csv_input_name = self.input_name+['mode']
         
         self.output_name = ['frequency','R_divide_Q','R_divide_Q_5mm','R_divide_Q_10mm','Q-factor','Shunt_Inpedence','Total_Loss']
+        self.output_name =None
         self.text_name = ["Frequency", "R_Q", "R_Q_5mm", "Q-Factor", "R_Q_10mm"]
         self.accu_list = pd.DataFrame([[700,1500,1e-5],
                                        [1500,4100,1e-4]],columns=["f_down","f_up","accuracy"])
@@ -58,8 +59,8 @@ class myAlg01(myAlg):
                                        [1300,2000,15],
                                        [2000,4100,10]],columns=["f_down","f_up","cell"])
      
-        self.dimension_input = len(self.input_name)
-        self.dimension_output = len(self.output_name)
+        #self.dimension_input = len(self.input_name)
+        #self.dimension_output = len(self.output_name)
         
         self.delta_frequency = 50
         
