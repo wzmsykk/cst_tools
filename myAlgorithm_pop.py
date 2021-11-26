@@ -53,9 +53,9 @@ class myAlg01(myAlg):
         self.output_name = ['frequency','R_divide_Q','R_divide_Q_5mm','R_divide_Q_10mm','Q-factor','Shunt_Inpedence','Total_Loss']
         self.output_name =None
         self.text_name = ["Frequency", "R_Q", "R_Q_5mm", "Q-Factor", "R_Q_10mm"]
-        self.accu_list = pd.DataFrame([[700,1500,1e-5],
+        self.accu_list = pd.DataFrame([[0,1500,1e-5],
                                        [1500,4100,1e-4]],columns=["f_down","f_up","accuracy"])
-        self.cell_list =  pd.DataFrame([[400,1300,20],
+        self.cell_list =  pd.DataFrame([[0,1300,20],
                                        [1300,2000,15],
                                        [2000,4100,10]],columns=["f_down","f_up","cell"])
      
@@ -239,7 +239,8 @@ class myAlg01(myAlg):
             sample=self.get_3_modes_custom(self.state_y0).iloc[0]
             samples = samples.append(sample)
             self.write_many("all_value_"+str(fmin).replace(".", "-"), samples)
-            fmin = np.float(sample["frequency"])
+            #fmin = np.float(sample["frequency"])
+            fmin = math.ceil(np.float(sample["frequency"])*100)/100  ## round up float to 2 decimals
             fmax = math.floor(sample["frequency"])+self.delta_frequency
             
         else:
@@ -250,7 +251,8 @@ class myAlg01(myAlg):
             
             sample = samples.iloc[-1]
             print("sample is:\n",sample)
-            fmin = np.float(sample["frequency"])
+            #fmin = np.float(sample["frequency"])
+            fmin = math.ceil(np.float(sample["frequency"])*100)/100  ## round up float to 2 decimals
             fmax = math.floor(sample["frequency"])+self.delta_frequency
 
         
@@ -298,7 +300,8 @@ class myAlg01(myAlg):
             samples = samples.append(sample)
             samples = samples.reset_index(drop = True)
             self.write_many("all_value_"+str(fmin).replace(".", "-"), samples)
-            fmin = np.float(sample["frequency"])
+            #fmin = np.float(sample["frequency"])
+            fmin = math.ceil(np.float(sample["frequency"])*100)/100  ## round up float to 2 decimals
             fmax = math.floor(sample["frequency"])+self.delta_frequency
            
         

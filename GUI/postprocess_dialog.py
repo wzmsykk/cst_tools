@@ -110,6 +110,7 @@ class myPPSDialog(QDialog,Ui_PostProcessSettingDialog):
         self.DeleteButton.clicked.connect(self.deleteItem)
         self.AddROQButton.clicked.connect(self.addROQ)
         self.AddQButton.clicked.connect(self.addQ)
+        self.AddQExtButton.clicked.connect(self.addQ_Ext)
         self.AddLossButton.clicked.connect(self.addTL)
         self.AddSIButton.clicked.connect(self.addSI)
         self.AddFreqButton.clicked.connect(self.addFQ)
@@ -126,6 +127,8 @@ class myPPSDialog(QDialog,Ui_PostProcessSettingDialog):
         self.showAddDialog('Shunt_Inpedence',True)
     def addQ(self):
         self.showAddDialog('Q_Factor',False)
+    def addQ_Ext(self):
+        self.showAddDialog('Q_Ext',False)
     def addTL(self):
         self.showAddDialog('Total_Loss',False)
     def addTE(self):

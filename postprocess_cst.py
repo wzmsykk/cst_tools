@@ -1,7 +1,7 @@
 from pathlib import Path
 import json
 from collections import OrderedDict, defaultdict
-from typing_extensions import ParamSpec
+
 from result import result
 
 class vbpostprocess():
@@ -12,6 +12,7 @@ class vbpostprocess():
         self.postProcessDataDir=Path("data/postprocess").absolute()
         self.postProcessDocList=list()
         self.postProcessID=0
+        self.ml_tools=None
         pass
     def setResultDir(self,rDir):
         self.resultDir=Path(rDir)
@@ -35,6 +36,9 @@ class vbpostprocess():
             elif doc['method']=='Q_Factor':
                 iModeNumber=doc['params']['iModeNumber']
                 self.Q_Factor(iModeNumber,doc['resultName'])
+            elif doc['method']=='Q_Ext':
+                iModeNumber=doc['params']['iModeNumber']
+                self.Q_Ext(iModeNumber,doc['resultName'])
             elif doc['method']=='Total_Loss':
                 iModeNumber=doc['params']['iModeNumber']
                 self.Total_Loss(iModeNumber,doc['resultName'])
@@ -44,6 +48,9 @@ class vbpostprocess():
             elif doc['method']=='Frequency':
                 iModeNumber=doc['params']['iModeNumber']
                 self.Frequency(iModeNumber,doc['resultName'])
+            elif doc['method']=='Mode_Recog':
+                iModeNumber=doc['params']['iModeNumber']
+                self.mode_rec(iModeNumber,doc['resultName'])
     def getUsedFileNameList(self):
         namelist=list()
         for doc in self.postProcessDocList:
@@ -189,6 +196,31 @@ class vbpostprocess():
         rpath=self.resultDir / resultFilename
         d=self.readFile(rpath)
         return float(d['value'])
+    def Q_Ext(self,iModeNumber,resultName):
+        resultFilename="Mode_%d_Q_Ext_%s.txt" % (iModeNumber,str(resultName))
+        i=0
+        while resultFilename in self.getUsedFileNameList():  
+            resultFilename="Mode_%d_Q_Ext_%s_%d.txt" % (iModeNumber,str(resultName),i)
+        funcString="EigenResult_Simple_output({iMode},\"Q_Ext\",outFullDir,\"{rFilename}\")\n".format(iMode=str(iModeNumber),rFilename=str(resultFilename))
+        paramdoc={}
+        paramdoc.update({
+            "iModeNumber":iModeNumber,
+        })
+        doc=dict()
+        doc.update({"id":self.postProcessID})
+        doc.update({"import":"EigenResult_Simple.vb"})
+        doc.update({"resultName":resultName})
+        doc.update({"resultFilename":resultFilename})
+        doc.update({"funcString":funcString})
+        doc.update({"readoutmethod":self.Q_Ext_readout})
+        doc.update({"params":paramdoc})
+        self.postProcessDocList.append(doc)
+        self.postProcessID+=1
+
+    def Q_Ext_readout(self,resultFilename):
+        rpath=self.resultDir / resultFilename
+        d=self.readFile(rpath)
+        return float(d['value'])
     def Frequency(self,iModeNumber,resultName):
         resultFilename="Mode_%d_Frequency_%s.txt" % (iModeNumber,str(resultName))
         i=0
@@ -265,7 +297,33 @@ class vbpostprocess():
         rpath=self.resultDir / resultFilename
         d=self.readFile(rpath)
         return float(d['value'])
-
+    def mode_rec(self,iModeNumber,resultName):
+        resultFilename="Mode_%d_Mode_Info_%s.txt" % (iModeNumber,str(resultName))
+        i=0
+        while resultFilename in self.getUsedFileNameList():  
+            resultFilename="Mode_%d_Mode_Info_%s_%d.txt" % (iModeNumber,str(resultName),i)
+        #TODO
+        funcString="EigenResult_Simple_output({iMode},\"Total Energy\",outFullDir,\"{rFilename}\")\n".format(iMode=str(iModeNumber),rFilename=str(resultFilename))
+        
+        paramdoc={}
+        paramdoc.update({
+            "iModeNumber":iModeNumber,
+        })
+        doc=dict()
+        doc.update({"id":self.postProcessID})
+        doc.update({"import":"EigenResult_Simple.vb"})
+        doc.update({"resultName":resultName})
+        doc.update({"resultFilename":resultFilename})
+        doc.update({"funcString":funcString})
+        doc.update({"readoutmethod":self.mode_rec_readout})
+        doc.update({"params":paramdoc})
+        self.postProcessDocList.append(doc)
+        self.postProcessID+=1
+    def mode_rec_readout(self,resultFilename):
+        rpath=self.resultDir / resultFilename
+        #d=self.readFile(rpath)
+        #init torch
+        return float(d['value'])
 
 if __name__=='__main__':
     vbp=vbpostprocess()

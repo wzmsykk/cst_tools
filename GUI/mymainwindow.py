@@ -60,7 +60,9 @@ class mywindow(QMainWindow, Ui_MainWindow):
 
         #DATA 
         self.CalcDialogBox.setDefaultValues(self.maintool.getAlgAttrs())    
-
+    def closeEvent(self, event):
+        self.logger.info('主窗口被用户关闭')
+        event.accept()
 
     def setSignalNSlots(self):
         self.selectProjectDirButton.clicked.connect(self.read_dir)

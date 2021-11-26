@@ -1,0 +1,62 @@
+2021-11-24 16:51:55,524 - INFO: 日志已输出到log\base_2021-11-24-16_51_55.log
+2021-11-24 16:51:55,525 - INFO: 找到curr_global_cfg:config\current.ini
+2021-11-24 16:51:55,528 - INFO: 使用PyQt5图形窗口运行模式
+2021-11-24 16:52:13,922 - INFO: PCM:currProjectDir 已设为C:\Users\ykk\Desktop\QEXT
+2021-11-24 16:52:16,119 - INFO: PCM:inputCSTFilePath 已设为C:\Users\ykk\Desktop\QEXT\Enlarged.cst
+2021-11-24 16:52:28,937 - INFO: BASE:SET CTN=False,SAFE=False
+2021-11-24 16:52:28,938 - INFO: 检查全局配置开始.
+2021-11-24 16:52:28,938 - INFO: 检查CST PATH.
+2021-11-24 16:52:28,939 - INFO: 检查CST PATH 成功.
+2021-11-24 16:52:28,940 - INFO: 检查CST 版本.
+2021-11-24 16:52:28,940 - DEBUG: CST ENV PATH为C:\Program Files (x86)\CST Studio Suite 2020\CST DESIGN ENVIRONMENT.exe
+2021-11-24 16:52:28,940 - DEBUG: CST 版本为2020
+2021-11-24 16:52:28,941 - INFO: 检查CST 版本 结束.
+2021-11-24 16:52:28,941 - INFO: 检查各个路径是否存在.
+2021-11-24 16:52:28,942 - INFO: 检查全局配置结束.
+2021-11-24 16:52:28,942 - INFO: 通过全局配置检测
+2021-11-24 16:52:28,943 - INFO: 已保存全局配置文件于config\current.ini。
+2021-11-24 16:52:28,943 - INFO: 开始使用project目录:C:\Users\ykk\Desktop\QEXT
+2021-11-24 16:52:28,944 - INFO: 准备项目文件
+2021-11-24 16:52:28,945 - INFO: 尝试打开project目录C:\Users\ykk\Desktop\QEXT。
+2021-11-24 16:52:28,946 - INFO: 目录C:\Users\ykk\Desktop\QEXT存在已有文件。
+2021-11-24 16:52:28,946 - INFO: 目录C:\Users\ykk\Desktop\QEXT有旧文件
+2021-11-24 16:52:28,949 - WARNING: 发现异常结束,尝试修复并继续
+2021-11-24 16:52:28,950 - INFO: 检测并更新项目配置文件
+2021-11-24 16:52:28,950 - INFO: 测试项目配置文件是否存在
+2021-11-24 16:52:28,951 - DEBUG: 推测项目配置文件位于C:\Users\ykk\Desktop\QEXT\project.ini
+2021-11-24 16:52:28,952 - INFO: 测试项目配置文件存在 通过
+2021-11-24 16:52:28,953 - INFO: 测试CST模型文件是否存在
+2021-11-24 16:52:28,954 - DEBUG: 推测模型文件位于C:\Users\ykk\Desktop\QEXT\Enlarged.cst
+2021-11-24 16:52:28,954 - INFO: 测试CST模型文件存在 通过
+2021-11-24 16:52:28,991 - INFO: 测试保存的参数列表与MD5是否与CST模型文件匹配
+2021-11-24 16:52:28,992 - INFO: project.ini检测并更新项目配置文件结束
+
+2021-11-24 16:52:28,993 - INFO: 后处理设定已保存至C:\Users\ykk\Desktop\QEXT\pps.json
+2021-11-24 16:52:28,994 - INFO: ----------------------------------------------------------
+2021-11-24 16:52:28,994 - INFO: 全局信息:
+2021-11-24 16:52:28,995 - INFO: data目录:C:\Users\ykk\Desktop\cst_tools\data
+2021-11-24 16:52:28,996 - INFO: temp目录:C:\Users\ykk\Desktop\cst_tools\temp
+2021-11-24 16:52:28,996 - INFO: log目录:C:\Users\ykk\Desktop\cst_tools\log
+2021-11-24 16:52:28,996 - INFO: result目录:C:\Users\ykk\Desktop\cst_tools\result
+2021-11-24 16:52:28,997 - INFO: CST版本:2020
+2021-11-24 16:52:28,997 - INFO: CSTEXE路径:C:\Program Files (x86)\CST Studio Suite 2020\CST DESIGN ENVIRONMENT.exe
+2021-11-24 16:52:28,998 - INFO: superfish版本:
+2021-11-24 16:52:28,998 - INFO: superfish路径:
+2021-11-24 16:52:28,999 - INFO: ----------------------------------------------------------
+2021-11-24 16:52:28,999 - INFO: -----------------------------------
+2021-11-24 16:52:29,000 - INFO: created worker type local id:0
+2021-11-24 16:52:29,004 - INFO: TempDir:C:\Users\ykk\Desktop\QEXT\temp\worker_0
+2021-11-24 16:52:29,004 - INFO: TaskFileDir:C:\Users\ykk\Desktop\QEXT\temp\worker_0
+2021-11-24 16:52:29,080 - INFO: "C:\Program Files (x86)\CST Studio Suite 2020\CST DESIGN ENVIRONMENT.exe" -m "C:\Users\ykk\Desktop\QEXT\temp\worker_0\main.bas"
+2021-11-24 16:52:29,083 - INFO: <subprocess.Popen object at 0x000001DBBBF4C190>
+2021-11-24 16:52:29,084 - INFO: created worker type local id:1
+2021-11-24 16:52:29,085 - INFO: TempDir:C:\Users\ykk\Desktop\QEXT\temp\worker_1
+2021-11-24 16:52:29,086 - INFO: TaskFileDir:C:\Users\ykk\Desktop\QEXT\temp\worker_1
+2021-11-24 16:52:29,154 - INFO: "C:\Program Files (x86)\CST Studio Suite 2020\CST DESIGN ENVIRONMENT.exe" -m "C:\Users\ykk\Desktop\QEXT\temp\worker_1\main.bas"
+2021-11-24 16:52:29,157 - INFO: <subprocess.Popen object at 0x000001DBBBF4C3A0>
+2021-11-24 16:52:29,158 - INFO: JOB MANAGER 创建完成
+2021-11-24 16:52:29,159 - INFO: UI:STARTING WORK
+2021-11-24 16:52:29,162 - INFO: PCM:项目状态已设为RUNNING
+2021-11-24 16:52:29,169 - INFO: WorkerID:'0' Run:0 Name:'frequency000000_700_800' started.
+2021-11-24 16:52:29,171 - INFO: Start Time:'Wed Nov 24 16:52:29 2021'
+2021-11-24 16:53:07,192 - ERROR: CST ENV stopped

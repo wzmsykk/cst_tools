@@ -2,6 +2,7 @@ Function EigenResult_Simple(iModeNumber As Integer,queryKey As String) As Double
     If (iModeNumber > EigenmodeSolver.GetNumberOfModesCalculated) Then
             ReportWarningToWindow("3D Eigenmode result template execution: Cannot find result for mode #"+CStr(iModeNumber)+".")
             'CalculateEigenModeResult = lib_rundef
+            EigenResult_Simple=-1
             Exit Function
     End If
     Dim frq_cst As Double
@@ -9,6 +10,7 @@ Function EigenResult_Simple(iModeNumber As Integer,queryKey As String) As Double
     If (Not SelectTreeItem("2D/3D Results\Modes\Mode " + CStr(iModeNumber) + "\e")) Then
                     ReportWarningToWindow("Error in 3D Eigenmode result template execution: Cannot find result for mode #"+CStr(iModeNumber)+".")
                     'CalculateEigenModeResult = lib_rundef
+                    EigenResult_Simple=-1
                     Exit Function
     End If
     Plot.Update
@@ -23,6 +25,7 @@ Function EigenResult_Simple(iModeNumber As Integer,queryKey As String) As Double
         pw_cst = .GetTotalLossRMS
         eng_cst = .GetTotalEnergy
     End With
+    
     Dim cst_value As Double
     if queryKey="Q-Factor" or  queryKey="Q_Factor" or  queryKey="Q Factor" or  queryKey="Q"Then
         cst_value=q_cst
@@ -32,6 +35,18 @@ Function EigenResult_Simple(iModeNumber As Integer,queryKey As String) As Double
         cst_value=eng_cst
     ElseIf queryKey="Frequency" or queryKey="frequency" or queryKey="Freq" or queryKey="freq"Then
         cst_value=frq_cst
+    
+    ElseIf queryKey="Q-Factor(External)" or queryKey="Q_Ext" Then
+
+        If (Port.StartPortNumberIteration = 0) Then
+            ReportWarning("3D Eigenmode: Cannot calculate external Q value due to missing port.")
+            cst_value = -1
+        ElseIf (Port.GetFCutOff(Port.GetNextPortNumber, 1) > frq_cst) Then
+            ReportWarning("3D Eigenmode: Cannot calculate external Q value, mode frequency is below port cutoff frequency.")
+            cst_value = -1 ' use -1 instead of lib_rundef so that a plot is created
+        Else
+            cst_value = EigenmodeSolver.GetModeExternalQFactor(iModeNumber)
+        End If
     End IF
     EigenResult_Simple=cst_value
 End Function
