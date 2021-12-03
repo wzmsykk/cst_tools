@@ -42,6 +42,15 @@ class vbpostprocess():
             elif doc['method']=='Total_Loss':
                 iModeNumber=doc['params']['iModeNumber']
                 self.Total_Loss(iModeNumber,doc['resultName'])
+            elif doc['method']=='Loss_Enclosure':
+                iModeNumber=doc['params']['iModeNumber']
+                self.Loss_Enclosure(iModeNumber,doc['resultName'])
+            elif doc['method']=='Loss_Volume':
+                iModeNumber=doc['params']['iModeNumber']
+                self.Loss_Volume(iModeNumber,doc['resultName'])
+            elif doc['method']=='Loss_Surface':
+                iModeNumber=doc['params']['iModeNumber']
+                self.Loss_Surface(iModeNumber,doc['resultName'])
             elif doc['method']=='Total_Energy':
                 iModeNumber=doc['params']['iModeNumber']
                 self.Total_Energy(iModeNumber,doc['resultName'])
@@ -271,7 +280,82 @@ class vbpostprocess():
         rpath=self.resultDir / resultFilename
         d=self.readFile(rpath)
         return float(d['value'])
+    def Loss_Enclosure(self,iModeNumber,resultName):
+        resultFilename="Mode_%d_Loss_Enclosure_%s.txt" % (iModeNumber,str(resultName))
+        i=0
+        while resultFilename in self.getUsedFileNameList():  
+            resultFilename="Mode_%d_Loss_Enclosure_%s_%d.txt" % (iModeNumber,str(resultName),i)
+        funcString="EigenResult_Simple_output({iMode},\"Loss_Enclosure\",outFullDir,\"{rFilename}\")\n".format(iMode=str(iModeNumber),rFilename=str(resultFilename))
+        paramdoc={}
+        paramdoc.update({
+            "iModeNumber":iModeNumber,
+        })
+        doc=dict()
+        doc.update({"id":self.postProcessID})
+        doc.update({"import":"EigenResult_Simple.vb"})
+        doc.update({"resultName":resultName})
+        doc.update({"resultFilename":resultFilename})
+        doc.update({"funcString":funcString})
+        doc.update({"readoutmethod":self.Loss_Enclosure_readout})
+        doc.update({"params":paramdoc})
+        self.postProcessDocList.append(doc)
+        self.postProcessID+=1
 
+    def Loss_Enclosure_readout(self,resultFilename):
+        rpath=self.resultDir / resultFilename
+        d=self.readFile(rpath)
+        return float(d['value'])
+    def Loss_Volume(self,iModeNumber,resultName):
+        resultFilename="Mode_%d_Loss_Volume_%s.txt" % (iModeNumber,str(resultName))
+        i=0
+        while resultFilename in self.getUsedFileNameList():  
+            resultFilename="Mode_%d_Loss_Volume_%s_%d.txt" % (iModeNumber,str(resultName),i)
+        funcString="EigenResult_Simple_output({iMode},\"Loss_Volume\",outFullDir,\"{rFilename}\")\n".format(iMode=str(iModeNumber),rFilename=str(resultFilename))
+        paramdoc={}
+        paramdoc.update({
+            "iModeNumber":iModeNumber,
+        })
+        doc=dict()
+        doc.update({"id":self.postProcessID})
+        doc.update({"import":"EigenResult_Simple.vb"})
+        doc.update({"resultName":resultName})
+        doc.update({"resultFilename":resultFilename})
+        doc.update({"funcString":funcString})
+        doc.update({"readoutmethod":self.Loss_Volume_readout})
+        doc.update({"params":paramdoc})
+        self.postProcessDocList.append(doc)
+        self.postProcessID+=1
+
+    def Loss_Volume_readout(self,resultFilename):
+        rpath=self.resultDir / resultFilename
+        d=self.readFile(rpath)
+        return float(d['value'])
+
+    def Loss_Surface(self,iModeNumber,resultName):
+        resultFilename="Mode_%d_Loss_Surface_%s.txt" % (iModeNumber,str(resultName))
+        i=0
+        while resultFilename in self.getUsedFileNameList():  
+            resultFilename="Mode_%d_Loss_Surface_%s_%d.txt" % (iModeNumber,str(resultName),i)
+        funcString="EigenResult_Simple_output({iMode},\"Loss_Surface\",outFullDir,\"{rFilename}\")\n".format(iMode=str(iModeNumber),rFilename=str(resultFilename))
+        paramdoc={}
+        paramdoc.update({
+            "iModeNumber":iModeNumber,
+        })
+        doc=dict()
+        doc.update({"id":self.postProcessID})
+        doc.update({"import":"EigenResult_Simple.vb"})
+        doc.update({"resultName":resultName})
+        doc.update({"resultFilename":resultFilename})
+        doc.update({"funcString":funcString})
+        doc.update({"readoutmethod":self.Loss_Surface_readout})
+        doc.update({"params":paramdoc})
+        self.postProcessDocList.append(doc)
+        self.postProcessID+=1
+
+    def Loss_Surface_readout(self,resultFilename):
+        rpath=self.resultDir / resultFilename
+        d=self.readFile(rpath)
+        return float(d['value'])
     def Total_Energy(self,iModeNumber,resultName):
         resultFilename="Mode_%d_Total_Energy_%s.txt" % (iModeNumber,str(resultName))
         i=0

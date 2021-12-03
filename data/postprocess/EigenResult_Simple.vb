@@ -35,7 +35,12 @@ Function EigenResult_Simple(iModeNumber As Integer,queryKey As String) As Double
         cst_value=eng_cst
     ElseIf queryKey="Frequency" or queryKey="frequency" or queryKey="Freq" or queryKey="freq"Then
         cst_value=frq_cst
-    
+    ElseIf queryKey="Loss Enclosure" or queryKey="Loss_Enclosure" or queryKey="**Cond. Enclosure**"Then
+        cst_value=QFactor.GetLossRMS("**Cond. Enclosure**")
+    ElseIf queryKey="Loss Volume" or queryKey="Loss_Volume" or queryKey="**Volume Losses**"Then
+        cst_value=QFactor.GetLossRMS("**Volume Losses**")
+    ElseIf queryKey="Loss Surface" or queryKey="Loss_Surface" or queryKey="**Sum of Surface Losses**"Then
+        cst_value=QFactor.GetLossRMS("**Sum of Surface Losses**")
     ElseIf queryKey="Q-Factor(External)" or queryKey="Q_Ext" Then
 
         If (Port.StartPortNumberIteration = 0) Then

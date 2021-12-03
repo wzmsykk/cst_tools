@@ -11,9 +11,9 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_PostProcessSettingDialog(object):
     def setupUi(self, PostProcessSettingDialog):
         PostProcessSettingDialog.setObjectName("PostProcessSettingDialog")
-        PostProcessSettingDialog.resize(645, 490)
+        PostProcessSettingDialog.resize(886, 490)
         self.buttonBox = QtWidgets.QDialogButtonBox(PostProcessSettingDialog)
-        self.buttonBox.setGeometry(QtCore.QRect(180, 410, 401, 61))
+        self.buttonBox.setGeometry(QtCore.QRect(220, 410, 401, 61))
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
         self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
         self.buttonBox.setObjectName("buttonBox")
@@ -47,6 +47,15 @@ class Ui_PostProcessSettingDialog(object):
         self.AddQExtButton = QtWidgets.QPushButton(PostProcessSettingDialog)
         self.AddQExtButton.setGeometry(QtCore.QRect(380, 220, 231, 41))
         self.AddQExtButton.setObjectName("AddQExtButton")
+        self.AddLossButton_Enclosure = QtWidgets.QPushButton(PostProcessSettingDialog)
+        self.AddLossButton_Enclosure.setGeometry(QtCore.QRect(620, 20, 231, 41))
+        self.AddLossButton_Enclosure.setObjectName("AddLossButton_Enclosure")
+        self.AddLossButton_Volume = QtWidgets.QPushButton(PostProcessSettingDialog)
+        self.AddLossButton_Volume.setGeometry(QtCore.QRect(620, 60, 231, 41))
+        self.AddLossButton_Volume.setObjectName("AddLossButton_Volume")
+        self.AddLossButton_Surface = QtWidgets.QPushButton(PostProcessSettingDialog)
+        self.AddLossButton_Surface.setGeometry(QtCore.QRect(620, 100, 231, 41))
+        self.AddLossButton_Surface.setObjectName("AddLossButton_Surface")
 
         self.retranslateUi(PostProcessSettingDialog)
         self.buttonBox.accepted.connect(PostProcessSettingDialog.accept)
@@ -65,4 +74,7 @@ class Ui_PostProcessSettingDialog(object):
         self.AddQButton.setText(_translate("PostProcessSettingDialog", "添加Q"))
         self.AddSIButton.setText(_translate("PostProcessSettingDialog", "添加Shunt Inpedence"))
         self.AddQExtButton.setText(_translate("PostProcessSettingDialog", "添加Q_ext"))
+        self.AddLossButton_Enclosure.setText(_translate("PostProcessSettingDialog", "添加loss of enslosure"))
+        self.AddLossButton_Volume.setText(_translate("PostProcessSettingDialog", "添加All volume losses"))
+        self.AddLossButton_Surface.setText(_translate("PostProcessSettingDialog", "添加all Surface losses"))
 

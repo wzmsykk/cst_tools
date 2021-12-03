@@ -117,8 +117,6 @@ class local_cstworker(worker.worker):
 
     def sendTaskFile(self,paramname_list,value_list,run_name):
         tf=self.taskFileDir / (str(self.taskIndex)+'.txt')
-        f1=open(tf,"w")
-        f1.write(run_name+'\n')
         full_param_list=copy.deepcopy(self.paramList)
         if (len(paramname_list)==0 and len(value_list)>0) :
             for i in range(min(len(full_param_list),len(value_list))):
@@ -128,6 +126,8 @@ class local_cstworker(worker.worker):
                 for idict in full_param_list:
                     if(idict["name"]==paramname_list[i]):
                         idict.update({"value":value_list[i]}) 
+        f1=open(tf,"w")
+        f1.write(run_name+'\n')    
 
         for i in range(len(full_param_list)):
             f1.write(str(full_param_list[i]['name'])+'\n')

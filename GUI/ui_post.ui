@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>645</width>
+    <width>886</width>
     <height>490</height>
    </rect>
   </property>
@@ -16,7 +16,7 @@
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
     <rect>
-     <x>180</x>
+     <x>220</x>
      <y>410</y>
      <width>401</width>
      <height>61</height>
@@ -154,6 +154,45 @@
    </property>
    <property name="text">
     <string>添加Q_ext</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="AddLossButton_Enclosure">
+   <property name="geometry">
+    <rect>
+     <x>620</x>
+     <y>20</y>
+     <width>231</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>添加loss of enslosure</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="AddLossButton_Volume">
+   <property name="geometry">
+    <rect>
+     <x>620</x>
+     <y>60</y>
+     <width>231</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>添加All volume losses</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="AddLossButton_Surface">
+   <property name="geometry">
+    <rect>
+     <x>620</x>
+     <y>100</y>
+     <width>231</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>添加all Surface losses</string>
    </property>
   </widget>
  </widget>

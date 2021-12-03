@@ -156,6 +156,7 @@ Function GetJobDef(index As Integer) As String
 	Dim n,i As Integer
 	n=0
 	i=0
+	Wait 0.1
 	Open(taskFileDir & index &".txt") For Input As #1
 	Line Input #1,currentResultName
 	Do While Not EOF(1)
