@@ -92,8 +92,9 @@ class myAlg01(myAlg):
         self.input_min[2]=d["fmax"]
         self.continue_flag[0]=int(d["cflag"])
         self.continue_flag[1]=d["cfreq"]
+        self.end_frequency=d.get('endfreq',2500)
     def getEditableAttrs(self):
-        d={"fmin":self.input_min[1],"fmax":self.input_min[2],"cflag":self.continue_flag[0],"cfreq":self.continue_flag[1]}
+        d={"fmin":self.input_min[1],"fmax":self.input_min[2],"cflag":self.continue_flag[0],"cfreq":self.continue_flag[1],"endfreq":self.end_frequency}
         return d
     def logCalcSettings(self):
         print(self.getEditableAttrs())

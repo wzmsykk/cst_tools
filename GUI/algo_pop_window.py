@@ -19,12 +19,14 @@ class myAlgDialog(QDialog, Ui_AlgoPopDialog):
         self.data.update(param_dict)
         self.fmaxLineEdit.setText(str(self.data.get('fmax',700)))
         self.fminLineEdit.setText(str(self.data.get('fmin',500)))
+        self.maxFreqThresholdLineEdit.setText(str(self.data.get('endfreq',2500)))
         self.continueFreqLineEdit.setText(str(self.data.get('cfreq',650)))
         self.continueCheckBox.setChecked(bool(self.data.get('cflag',0)))
 
     def setValues(self):
         self.data.update({'fmax':float(self.fmaxLineEdit.text())})
         self.data.update({'fmin':float(self.fminLineEdit.text())})
+        self.data.update({'endfreq':float(self.maxFreqThresholdLineEdit.text())})
         self.data.update({'cfreq':float(self.continueFreqLineEdit.text())})
         self.data.update({'cflag':int(self.continueCheckBox.isChecked())})
 

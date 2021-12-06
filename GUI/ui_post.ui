@@ -166,7 +166,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>添加loss of enslosure</string>
+    <string>添加Loss of enclosure表面损耗</string>
    </property>
   </widget>
   <widget class="QPushButton" name="AddLossButton_Volume">
@@ -179,7 +179,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>添加All volume losses</string>
+    <string>添加All volume losses材料损耗</string>
    </property>
   </widget>
   <widget class="QPushButton" name="AddLossButton_Surface">
@@ -192,7 +192,46 @@
     </rect>
    </property>
    <property name="text">
-    <string>添加all Surface losses</string>
+    <string>添加All surface losses全损耗</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="AddQButton_Enclosure">
+   <property name="geometry">
+    <rect>
+     <x>620</x>
+     <y>140</y>
+     <width>231</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>添加Q of enclosure 表面Q值</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="AddQButton_Volume">
+   <property name="geometry">
+    <rect>
+     <x>620</x>
+     <y>180</y>
+     <width>231</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>添加All volume Q 材料Q值</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="AddQButton_Surface">
+   <property name="geometry">
+    <rect>
+     <x>620</x>
+     <y>220</y>
+     <width>231</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>添加All surface Q 全部Q值</string>
    </property>
   </widget>
  </widget>

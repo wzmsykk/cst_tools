@@ -1,8 +1,6 @@
 from pathlib import Path
 import json
-from collections import OrderedDict, defaultdict
 
-from result import result
 
 class vbpostprocess():
     
@@ -51,6 +49,15 @@ class vbpostprocess():
             elif doc['method']=='Loss_Surface':
                 iModeNumber=doc['params']['iModeNumber']
                 self.Loss_Surface(iModeNumber,doc['resultName'])
+            elif doc['method']=='Q_Enclosure':
+                iModeNumber=doc['params']['iModeNumber']
+                self.Q_Enclosure(iModeNumber,doc['resultName'])
+            elif doc['method']=='Q_Volume':
+                iModeNumber=doc['params']['iModeNumber']
+                self.Q_Volume(iModeNumber,doc['resultName'])
+            elif doc['method']=='Q_Surface':
+                iModeNumber=doc['params']['iModeNumber']
+                self.Q_Surface(iModeNumber,doc['resultName'])
             elif doc['method']=='Total_Energy':
                 iModeNumber=doc['params']['iModeNumber']
                 self.Total_Energy(iModeNumber,doc['resultName'])
@@ -60,6 +67,7 @@ class vbpostprocess():
             elif doc['method']=='Mode_Recog':
                 iModeNumber=doc['params']['iModeNumber']
                 self.mode_rec(iModeNumber,doc['resultName'])
+            
     def getUsedFileNameList(self):
         namelist=list()
         for doc in self.postProcessDocList:
@@ -97,7 +105,10 @@ class vbpostprocess():
         return lst
     def readFile(self,path):
         d={}
-        fp=open(path,"r")
+        ipath=Path(path)
+        if not ipath.exists():
+            return None
+        fp=open(ipath,"r")
         lines=fp.readlines()
         expect="Name"
         k=""
@@ -356,6 +367,77 @@ class vbpostprocess():
         rpath=self.resultDir / resultFilename
         d=self.readFile(rpath)
         return float(d['value'])
+
+    def Q_Enclosure(self,iModeNumber,resultName):
+        resultFilename="Mode_%d_Q_Enclosure_%s.txt" % (iModeNumber,str(resultName))
+        i=0
+        while resultFilename in self.getUsedFileNameList():  
+            resultFilename="Mode_%d_Q_Enclosure_%s_%d.txt" % (iModeNumber,str(resultName),i)
+        funcString="EigenResult_Simple_output({iMode},\"Q_Enclosure\",outFullDir,\"{rFilename}\")\n".format(iMode=str(iModeNumber),rFilename=str(resultFilename))
+        paramdoc={}
+        paramdoc.update({
+            "iModeNumber":iModeNumber,
+        })
+        doc=dict()
+        doc.update({"id":self.postProcessID})
+        doc.update({"import":"EigenResult_Simple.vb"})
+        doc.update({"resultName":resultName})
+        doc.update({"resultFilename":resultFilename})
+        doc.update({"funcString":funcString})
+        doc.update({"readoutmethod":self.Q_Common_readout})
+        doc.update({"params":paramdoc})
+        self.postProcessDocList.append(doc)
+        self.postProcessID+=1
+
+    def Q_Common_readout(self,resultFilename):
+        rpath=self.resultDir / resultFilename
+        d=self.readFile(rpath)
+        return float(d['value'])
+
+    def Q_Volume(self,iModeNumber,resultName):
+        resultFilename="Mode_%d_Q_Volume_%s.txt" % (iModeNumber,str(resultName))
+        i=0
+        while resultFilename in self.getUsedFileNameList():  
+            resultFilename="Mode_%d_Q_Volume_%s_%d.txt" % (iModeNumber,str(resultName),i)
+        funcString="EigenResult_Simple_output({iMode},\"Q_Volume\",outFullDir,\"{rFilename}\")\n".format(iMode=str(iModeNumber),rFilename=str(resultFilename))
+        paramdoc={}
+        paramdoc.update({
+            "iModeNumber":iModeNumber,
+        })
+        doc=dict()
+        doc.update({"id":self.postProcessID})
+        doc.update({"import":"EigenResult_Simple.vb"})
+        doc.update({"resultName":resultName})
+        doc.update({"resultFilename":resultFilename})
+        doc.update({"funcString":funcString})
+        doc.update({"readoutmethod":self.Q_Common_readout})
+        doc.update({"params":paramdoc})
+        self.postProcessDocList.append(doc)
+        self.postProcessID+=1
+
+    def Q_Surface(self,iModeNumber,resultName):
+        resultFilename="Mode_%d_Q_Surface_%s.txt" % (iModeNumber,str(resultName))
+        i=0
+        while resultFilename in self.getUsedFileNameList():  
+            resultFilename="Mode_%d_Q_Surface_%s_%d.txt" % (iModeNumber,str(resultName),i)
+        funcString="EigenResult_Simple_output({iMode},\"Q_Surface\",outFullDir,\"{rFilename}\")\n".format(iMode=str(iModeNumber),rFilename=str(resultFilename))
+        paramdoc={}
+        paramdoc.update({
+            "iModeNumber":iModeNumber,
+        })
+        doc=dict()
+        doc.update({"id":self.postProcessID})
+        doc.update({"import":"EigenResult_Simple.vb"})
+        doc.update({"resultName":resultName})
+        doc.update({"resultFilename":resultFilename})
+        doc.update({"funcString":funcString})
+        doc.update({"readoutmethod":self.Q_Common_readout})
+        doc.update({"params":paramdoc})
+        self.postProcessDocList.append(doc)
+        self.postProcessID+=1
+
+
+
     def Total_Energy(self,iModeNumber,resultName):
         resultFilename="Mode_%d_Total_Energy_%s.txt" % (iModeNumber,str(resultName))
         i=0

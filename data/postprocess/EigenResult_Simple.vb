@@ -35,13 +35,20 @@ Function EigenResult_Simple(iModeNumber As Integer,queryKey As String) As Double
         cst_value=eng_cst
     ElseIf queryKey="Frequency" or queryKey="frequency" or queryKey="Freq" or queryKey="freq"Then
         cst_value=frq_cst
-    ElseIf queryKey="Loss Enclosure" or queryKey="Loss_Enclosure" or queryKey="**Cond. Enclosure**"Then
+    ElseIf queryKey="Loss Enclosure" or queryKey="Loss_Enclosure" or queryKey="**Cond. Enclosure Loss**"Then
         cst_value=QFactor.GetLossRMS("**Cond. Enclosure**")
-    ElseIf queryKey="Loss Volume" or queryKey="Loss_Volume" or queryKey="**Volume Losses**"Then
+    ElseIf queryKey="Loss Volume" or queryKey="Loss_Volume" Then
         cst_value=QFactor.GetLossRMS("**Volume Losses**")
-    ElseIf queryKey="Loss Surface" or queryKey="Loss_Surface" or queryKey="**Sum of Surface Losses**"Then
+    ElseIf queryKey="Loss Surface" or queryKey="Loss_Surface" Then
         cst_value=QFactor.GetLossRMS("**Sum of Surface Losses**")
+    ElseIf queryKey="Q Enclosure" or queryKey="Q_Enclosure" Then
+        cst_value=QFactor.GetQ("**Cond. Enclosure**")
+    ElseIf queryKey="Q Volume" or queryKey="Q_Volume" Then
+        cst_value=QFactor.GetQ("**Volume Losses**")
+    ElseIf queryKey="Q Surface" or queryKey="Q_Surface"  Then
+        cst_value=QFactor.GetQ("**Sum of Surface Losses**")
     ElseIf queryKey="Q-Factor(External)" or queryKey="Q_Ext" Then
+    
 
         If (Port.StartPortNumberIteration = 0) Then
             ReportWarning("3D Eigenmode: Cannot calculate external Q value due to missing port.")

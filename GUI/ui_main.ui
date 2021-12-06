@@ -98,6 +98,9 @@
     </property>
    </widget>
    <widget class="QCheckBox" name="checkBox_CTN">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>70</x>
@@ -111,6 +114,9 @@
     </property>
    </widget>
    <widget class="QCheckBox" name="checkBox_SAFE">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>70</x>

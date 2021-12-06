@@ -48,6 +48,9 @@ Sub setEigenSolver(nmodes As Integer)
     uint=RestoreParameter("nmodes")
     ReportInformation("EigenmodeSolver NumberOfModes set As " & uint)
 End Sub
+Sub SetPreprocessDone()
+    StoreParameterWithDescription preprocessdonestr 1 "PreprocessDone"
+End Sub
 Function CheckPreprocess_Ext(resultPath As String) As Boolean
     'get the preprocess result to export
     Dim result As Boolean

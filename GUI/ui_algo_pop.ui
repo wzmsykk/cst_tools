@@ -16,8 +16,8 @@
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
     <rect>
-     <x>30</x>
-     <y>240</y>
+     <x>90</x>
+     <y>280</y>
      <width>341</width>
      <height>32</height>
     </rect>
@@ -122,6 +122,42 @@
    </property>
    <property name="text">
     <string>Mhz</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="dstFreqLabel">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>230</y>
+     <width>91</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>扫描频率上限</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_3">
+   <property name="geometry">
+    <rect>
+     <x>400</x>
+     <y>230</y>
+     <width>54</width>
+     <height>12</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Mhz</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="maxFreqThresholdLineEdit">
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>220</y>
+     <width>261</width>
+     <height>31</height>
+    </rect>
    </property>
   </widget>
  </widget>

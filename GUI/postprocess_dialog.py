@@ -115,6 +115,9 @@ class myPPSDialog(QDialog,Ui_PostProcessSettingDialog):
         self.AddLossButton_Enclosure.clicked.connect(self.addLE)
         self.AddLossButton_Volume.clicked.connect(self.addLV)
         self.AddLossButton_Surface.clicked.connect(self.addLS)
+        self.AddQButton_Enclosure.clicked.connect(self.addQE)
+        self.AddQButton_Volume.clicked.connect(self.addQV)
+        self.AddQButton_Surface.clicked.connect(self.addQS)
         self.AddSIButton.clicked.connect(self.addSI)
         self.AddFreqButton.clicked.connect(self.addFQ)
         self.SaveJsonButton.clicked.connect(self.savePPSJson)
@@ -140,6 +143,12 @@ class myPPSDialog(QDialog,Ui_PostProcessSettingDialog):
         self.showAddDialog('Loss_Volume',False)
     def addLS(self):
         self.showAddDialog('Loss_Surface',False)
+    def addQE(self):
+        self.showAddDialog('Q_Enclosure',False)
+    def addQV(self):
+        self.showAddDialog('Q_Volume',False)
+    def addQS(self):
+        self.showAddDialog('Q_Surface',False)
     def addTE(self):
         self.showAddDialog('Total_Energy',False)
     def addFQ(self):
