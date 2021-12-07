@@ -1,0 +1,154 @@
+2021-12-07 13:40:34,954 - INFO: 日志已输出到log\base_2021-12-07-13_40_34.log
+2021-12-07 13:40:34,956 - INFO: 找到curr_global_cfg:config\current.ini
+2021-12-07 13:40:34,974 - INFO: 使用PyQt5图形窗口运行模式
+2021-12-07 13:40:43,329 - INFO: PCM:currProjectDir 已设为C:\Users\ykk\Desktop\cst_tools
+2021-12-07 13:40:57,523 - INFO: PCM:currProjectDir 已设为C:\Users\ykk\Desktop\QEXT
+2021-12-07 13:41:06,018 - INFO: PCM:inputCSTFilePath 已设为C:\Users\ykk\Desktop\cst_tools\project\HOM analysis\HOM analysis.cst
+2021-12-07 13:41:08,602 - INFO: BASE:SET CTN=False,SAFE=False
+2021-12-07 13:41:08,604 - INFO: 检查全局配置开始.
+2021-12-07 13:41:08,604 - INFO: 检查CST PATH.
+2021-12-07 13:41:08,605 - INFO: 检查CST PATH 成功.
+2021-12-07 13:41:08,606 - INFO: 检查CST 版本.
+2021-12-07 13:41:08,607 - DEBUG: CST ENV PATH为C:\Program Files (x86)\CST Studio Suite 2020\CST DESIGN ENVIRONMENT.exe
+2021-12-07 13:41:08,608 - DEBUG: CST 版本为2020
+2021-12-07 13:41:08,609 - INFO: 检查CST 版本 结束.
+2021-12-07 13:41:08,610 - INFO: 检查各个路径是否存在.
+2021-12-07 13:41:08,611 - INFO: 检查全局配置结束.
+2021-12-07 13:41:08,612 - INFO: 通过全局配置检测
+2021-12-07 13:41:08,616 - INFO: 已保存全局配置文件于config\current.ini。
+2021-12-07 13:41:08,618 - INFO: 开始使用project目录:C:\Users\ykk\Desktop\QEXT
+2021-12-07 13:41:08,619 - INFO: 准备项目文件
+2021-12-07 13:41:08,620 - INFO: 尝试打开project目录C:\Users\ykk\Desktop\QEXT。
+2021-12-07 13:41:08,621 - INFO: 目录C:\Users\ykk\Desktop\QEXT为空。
+2021-12-07 13:41:08,622 - INFO: 目录C:\Users\ykk\Desktop\QEXT无旧文件
+2021-12-07 13:41:08,623 - INFO: 尝试从project目录C:\Users\ykk\Desktop\QEXT创建空白配置文件。
+2021-12-07 13:41:08,626 - INFO: 开始创建配置文件project.ini于C:\Users\ykk\Desktop\QEXT\project.ini。
+2021-12-07 13:41:08,628 - INFO: 未指定project名,使用为默认目录名QEXT
+2021-12-07 13:41:08,629 - INFO: 创建配置文件结束。
+2021-12-07 13:41:08,674 - INFO: 已将输入CST文件C:\Users\ykk\Desktop\cst_tools\project\HOM analysis\HOM analysis.cst复制到project目录C:\Users\ykk\Desktop\QEXT\HOM analysis.cst。
+2021-12-07 13:41:08,674 - INFO: 根据输入的CST文件更新Config内容
+2021-12-07 13:41:08,778 - INFO: 正在从CST文件中读取参数列表。
+2021-12-07 13:41:08,779 - INFO: tempdir为C:\Users\ykk\Desktop\QEXT\temp。
+2021-12-07 13:41:08,781 - INFO: 临时文件生成成功。
+2021-12-07 13:41:22,562 - INFO: b'This is CST DESIGN ENVIRONMENT 2020.0 Release from 2019-09-25 (change 724524)\r\r\n'
+2021-12-07 13:41:22,562 - INFO: b'Using install path: C:\\Program Files (x86)\\CST Studio Suite 2020\\\r\r\n'
+2021-12-07 13:41:22,563 - INFO: b'Using Qt 5.12.3 (compiled with 5.12.3)\r\r\n'
+2021-12-07 13:41:22,563 - INFO: b'\r\r\n'
+2021-12-07 13:41:22,563 - INFO: b'Checking license servers...\r\r\n'
+2021-12-07 13:41:22,564 - INFO: b'License search path found in CST registry: 11605@whpsgroup.test\r\r\n'
+2021-12-07 13:41:22,564 - INFO: b'Checking license at startup successfully passed.\r\r\n'
+2021-12-07 13:41:22,565 - INFO: b'Connected to license server: 11605@whpsgroup.test\r\r\n'
+2021-12-07 13:41:22,565 - INFO: b'[modeler_AMD64.exe] This is the modeler 2020.0 Release from 2019-09-25 (change 724524)\r\r\n'
+2021-12-07 13:41:22,566 - INFO: b'[modeler_AMD64.exe] Startup: 07.12.2021 13:41:12\r\r\n'
+2021-12-07 13:41:22,566 - INFO: b'[modeler_AMD64.exe] \r\r\n'
+2021-12-07 13:41:22,566 - INFO: b'[modeler_AMD64.exe] Modeler affinity of main thread: 111111111111 111111111111 \r\r\n'
+2021-12-07 13:41:22,567 - INFO: b'[modeler_AMD64.exe] \r\r\n'
+2021-12-07 13:41:22,567 - INFO: b'[modeler_AMD64.exe] thread setup 1: 12, 24\r\r\n'
+2021-12-07 13:41:22,568 - INFO: b'[modeler_AMD64.exe]   sockets         : 1\r\r\n'
+2021-12-07 13:41:22,568 - INFO: b'[modeler_AMD64.exe]   cores per socket: 12\r\r\n'
+2021-12-07 13:41:22,569 - INFO: b'[modeler_AMD64.exe]   ht units        : 2\r\r\n'
+2021-12-07 13:41:22,569 - INFO: b'[modeler_AMD64.exe]   acc. hw         : 24\r\r\n'
+2021-12-07 13:41:22,570 - INFO: b'[modeler_AMD64.exe]   acc. OSI        : 24\r\r\n'
+2021-12-07 13:41:22,570 - INFO: b'[modeler_AMD64.exe]   aff. available  : yes\r\r\n'
+2021-12-07 13:41:22,570 - INFO: b"[modeler_AMD64.exe]   OSI log         : CPUID: selected engine is 'Leaf 0xB detection'\r\r\n"
+2021-12-07 13:41:22,571 - INFO: b'[modeler_AMD64.exe] Logical  0: socket  0 core  0\r\r\n'
+2021-12-07 13:41:22,574 - INFO: b'[modeler_AMD64.exe] Logical  1: socket  0 core  1\r\r\n'
+2021-12-07 13:41:22,575 - INFO: b'[modeler_AMD64.exe] Logical  2: socket  0 core  2\r\r\n'
+2021-12-07 13:41:22,575 - INFO: b'[modeler_AMD64.exe] Logical  3: socket  0 core  3\r\r\n'
+2021-12-07 13:41:22,576 - INFO: b'[modeler_AMD64.exe] Logical  4: socket  0 core  4\r\r\n'
+2021-12-07 13:41:22,576 - INFO: b'[modeler_AMD64.exe] Logical  5: socket  0 core  5\r\r\n'
+2021-12-07 13:41:22,576 - INFO: b'[modeler_AMD64.exe] Logical  6: socket  0 core  6\r\r\n'
+2021-12-07 13:41:22,577 - INFO: b'[modeler_AMD64.exe] Logical  7: socket  0 core  7\r\r\n'
+2021-12-07 13:41:22,577 - INFO: b'[modeler_AMD64.exe] Logical  8: socket  0 core  8\r\r\n'
+2021-12-07 13:41:22,578 - INFO: b'[modeler_AMD64.exe] Logical  9: socket  0 core  9\r\r\n'
+2021-12-07 13:41:22,578 - INFO: b'[modeler_AMD64.exe] Logical 10: socket  0 core 10\r\r\n'
+2021-12-07 13:41:22,579 - INFO: b'[modeler_AMD64.exe] Logical 11: socket  0 core 11\r\r\n'
+2021-12-07 13:41:22,579 - INFO: b'[modeler_AMD64.exe] Logical 12: socket  0 core 12\r\r\n'
+2021-12-07 13:41:22,579 - INFO: b'[modeler_AMD64.exe] Logical 13: socket  0 core 13\r\r\n'
+2021-12-07 13:41:22,580 - INFO: b'[modeler_AMD64.exe] Logical 14: socket  0 core 14\r\r\n'
+2021-12-07 13:41:22,580 - INFO: b'[modeler_AMD64.exe] Logical 15: socket  0 core 15\r\r\n'
+2021-12-07 13:41:22,580 - INFO: b'[modeler_AMD64.exe] Logical 16: socket  0 core 16\r\r\n'
+2021-12-07 13:41:22,581 - INFO: b'[modeler_AMD64.exe] Logical 17: socket  0 core 17\r\r\n'
+2021-12-07 13:41:22,581 - INFO: b'[modeler_AMD64.exe] Logical 18: socket  0 core 18\r\r\n'
+2021-12-07 13:41:22,581 - INFO: b'[modeler_AMD64.exe] Logical 19: socket  0 core 19\r\r\n'
+2021-12-07 13:41:22,582 - INFO: b'[modeler_AMD64.exe] Logical 20: socket  0 core 20\r\r\n'
+2021-12-07 13:41:22,582 - INFO: b'[modeler_AMD64.exe] Logical 21: socket  0 core 21\r\r\n'
+2021-12-07 13:41:22,583 - INFO: b'[modeler_AMD64.exe] Logical 22: socket  0 core 22\r\r\n'
+2021-12-07 13:41:22,586 - INFO: b'[modeler_AMD64.exe] Logical 23: socket  0 core 23\r\r\n'
+2021-12-07 13:41:22,587 - INFO: b'[modeler_AMD64.exe] packages: 1\r\r\n'
+2021-12-07 13:41:22,587 - INFO: b'[modeler_AMD64.exe] cores   : 12\r\r\n'
+2021-12-07 13:41:22,588 - INFO: b'[modeler_AMD64.exe] ht units: 2\r\r\n'
+2021-12-07 13:41:22,588 - INFO: b'[modeler_AMD64.exe] \r\r\n'
+2021-12-07 13:41:22,589 - INFO: b'[modeler_AMD64.exe] \r\r\n'
+2021-12-07 13:41:22,589 - INFO: b'[modeler_AMD64.exe] thread setup 2: 12\r\r\n'
+2021-12-07 13:41:22,589 - INFO: b'[modeler_AMD64.exe] thread setup 3: 128 --> 12\r\r\n'
+2021-12-07 13:41:22,590 - INFO: b'[modeler_AMD64.exe] Modeler openmp threads: 12\r\r\n'
+2021-12-07 13:41:22,590 - INFO: b'[modeler_AMD64.exe] Parallel ACIS is active. Starting 24 worker threads for ACIS.\r\r\n'
+2021-12-07 13:41:22,591 - INFO: b'[schematic_AMD64.exe] This is the schematic 2020.0 Release from 2019-09-25 (change 724524)\r\r\n'
+2021-12-07 13:41:22,591 - INFO: b'[schematic_AMD64.exe] \r\r\n'
+2021-12-07 13:41:22,591 - INFO: b'[schematic_AMD64.exe] \r\r\n'
+2021-12-07 13:41:22,592 - INFO: b'[schematic_AMD64.exe] project name: c:\\users\\ykk\\appdata\\local\\temp\\1\\cstde1\\temp\\de10\\untitled_0.cst\r\r\n'
+2021-12-07 13:41:22,592 - INFO: b'[schematic_AMD64.exe] \r\r\n'
+2021-12-07 13:41:22,592 - INFO: b'[schematic_AMD64.exe] \r\r\n'
+2021-12-07 13:41:22,593 - INFO: b'[schematic_AMD64.exe] myname: C:\\Program Files (x86)\\CST Studio Suite 2020\\AMD64\\schematic_AMD64.exe\r\r\n'
+2021-12-07 13:41:22,594 - INFO: b'[schematic_AMD64.exe] \r\r\n'
+2021-12-07 13:41:22,594 - INFO: b'It seems that the history list contains non ASCII characters. This may cause undesired effects if the CST project is used on computers with a different language setting or operating system.\r\r\n'
+2021-12-07 13:41:22,595 - INFO: b'History block 146 contains non ASCII characters either in its name or content.\r\r\n'
+2021-12-07 13:41:22,598 - INFO: b'[modeler_AMD64.exe] 2 blocks read in parallel from ACIS file. 2 top level entities in total.\r\r\n'
+2021-12-07 13:41:22,598 - INFO: b'Sub-Project import: External reference cannot be found: \r\r\n'
+2021-12-07 13:41:22,599 - INFO: b'  "D:\\rain\\1#WHPS2021\\model\\SS+wav\\waveguide absorb(ideal).cst"\r\r\n'
+2021-12-07 13:41:22,599 - INFO: b'Some objects were hidden when this project was last saved. These objects are still hidden.\r\r\n'
+2021-12-07 13:41:22,600 - INFO: b'Schematic window contains tasks in the navigation tree.\r\r\n'
+2021-12-07 13:41:22,600 - INFO: b'[modeler_AMD64.exe] Skipping template 3D\\Frequency (Multiple Modes):: Template needs to be evaluated first.\r\r\n'
+2021-12-07 13:41:22,601 - INFO: b'[modeler_AMD64.exe] Skipping template 3D\\Q-Factor (Perturbation) (Multiple Modes):: Template needs to be evaluated first.\r\r\n'
+2021-12-07 13:41:22,601 - INFO: b'[modeler_AMD64.exe] Skipping template 3D\\R over Q beta=1 (Multiple Modes):: Template needs to be evaluated first.\r\r\n'
+2021-12-07 13:41:31,734 - INFO: b'[modeler_AMD64.exe] Skipping template 3D\\R over Q beta=1 (Multiple Modes)_offset1=5mm (Multiple Modes):: Template needs to be evaluated first.\r\r\n'
+2021-12-07 13:41:31,735 - INFO: b'[modeler_AMD64.exe] Skipping template 3D\\R over Q beta=1 (Multiple Modes)_offset2=10mm (Multiple Modes):: Template needs to be evaluated first.\r\r\n'
+2021-12-07 13:41:31,739 - INFO: b'[modeler_AMD64.exe] Skipping template 3D\\Frequency (Multiple Modes):: Template needs to be evaluated first.\r\r\n'
+2021-12-07 13:41:31,740 - INFO: b'[modeler_AMD64.exe] Skipping template 3D\\Q-Factor (Perturbation) (Multiple Modes):: Template needs to be evaluated first.\r\r\n'
+2021-12-07 13:41:31,741 - INFO: b'[modeler_AMD64.exe] Skipping template 3D\\R over Q beta=1 (Multiple Modes):: Template needs to be evaluated first.\r\r\n'
+2021-12-07 13:41:31,741 - INFO: b'[modeler_AMD64.exe] Skipping template 3D\\R over Q beta=1 (Multiple Modes)_offset1=5mm (Multiple Modes):: Template needs to be evaluated first.\r\r\n'
+2021-12-07 13:41:31,742 - INFO: b'[modeler_AMD64.exe] Skipping template 3D\\R over Q beta=1 (Multiple Modes)_offset2=10mm (Multiple Modes):: Template needs to be evaluated first.\r\r\n'
+2021-12-07 13:41:31,742 - INFO: b'Batch run finished successfully\r\r\n'
+2021-12-07 13:41:31,742 - INFO: b'[modeler_AMD64.exe] Modeler finished successfully\r\r\n'
+2021-12-07 13:41:31,743 - INFO: b'Exiting with exit code 0. Exit code info: (EXITCODE_SUCCESS)\r\r\n'
+2021-12-07 13:41:31,747 - INFO: Config内容更新完成
+2021-12-07 13:41:31,750 - INFO: 后处理设定已保存至C:\Users\ykk\Desktop\QEXT\pps.json
+2021-12-07 13:41:31,751 - INFO: ----------------------------------------------------------
+2021-12-07 13:41:31,752 - INFO: 全局信息:
+2021-12-07 13:41:31,752 - INFO: data目录:C:\Users\ykk\Desktop\cst_tools\data
+2021-12-07 13:41:31,753 - INFO: temp目录:C:\Users\ykk\Desktop\cst_tools\temp
+2021-12-07 13:41:31,753 - INFO: log目录:C:\Users\ykk\Desktop\cst_tools\log
+2021-12-07 13:41:31,754 - INFO: result目录:C:\Users\ykk\Desktop\cst_tools\result
+2021-12-07 13:41:31,754 - INFO: CST版本:2020
+2021-12-07 13:41:31,754 - INFO: CSTEXE路径:C:\Program Files (x86)\CST Studio Suite 2020\CST DESIGN ENVIRONMENT.exe
+2021-12-07 13:41:31,755 - INFO: superfish版本:
+2021-12-07 13:41:31,755 - INFO: superfish路径:
+2021-12-07 13:41:31,755 - INFO: ----------------------------------------------------------
+2021-12-07 13:41:31,756 - INFO: -----------------------------------
+2021-12-07 13:41:31,764 - INFO: created worker type local id:0
+2021-12-07 13:41:31,765 - INFO: TempDir:C:\Users\ykk\Desktop\QEXT\temp\worker_0
+2021-12-07 13:41:31,765 - INFO: TaskFileDir:C:\Users\ykk\Desktop\QEXT\temp\worker_0
+2021-12-07 13:41:31,797 - INFO: "C:\Program Files (x86)\CST Studio Suite 2020\CST DESIGN ENVIRONMENT.exe" -m "C:\Users\ykk\Desktop\QEXT\temp\worker_0\main.bas"
+2021-12-07 13:41:31,801 - INFO: <subprocess.Popen object at 0x000001ED8AEFF160>
+2021-12-07 13:41:31,803 - INFO: created worker type local id:1
+2021-12-07 13:41:31,804 - INFO: TempDir:C:\Users\ykk\Desktop\QEXT\temp\worker_1
+2021-12-07 13:41:31,805 - INFO: TaskFileDir:C:\Users\ykk\Desktop\QEXT\temp\worker_1
+2021-12-07 13:41:31,834 - INFO: "C:\Program Files (x86)\CST Studio Suite 2020\CST DESIGN ENVIRONMENT.exe" -m "C:\Users\ykk\Desktop\QEXT\temp\worker_1\main.bas"
+2021-12-07 13:41:31,838 - INFO: <subprocess.Popen object at 0x000001ED8AEFF3A0>
+2021-12-07 13:41:31,839 - INFO: JOB MANAGER 创建完成
+2021-12-07 13:41:31,841 - INFO: UI:STARTING WORK
+2021-12-07 13:41:31,843 - INFO: PCM:项目状态已设为RUNNING
+2021-12-07 13:41:31,854 - INFO: WorkerID:'0' Run:0 Name:'frequency000000_700_800' started.
+2021-12-07 13:41:31,855 - INFO: Start Time:'Tue Dec  7 13:41:31 2021'
+2021-12-07 13:44:16,999 - INFO: WorkerID:'0' Run:0 Name:'frequency000000_700_800' success.
+2021-12-07 13:44:16,999 - INFO: ElapsedTime:165.14540314674377
+2021-12-07 13:44:17,000 - INFO: End Time:'Tue Dec  7 13:44:17 2021'
+2021-12-07 13:44:17,033 - INFO: WorkerID:'0' Run:1 Name:'frequency000000_766-0_815' started.
+2021-12-07 13:44:17,035 - INFO: Start Time:'Tue Dec  7 13:44:17 2021'
+2021-12-07 13:44:47,061 - ERROR: CST ENV stopped
+2021-12-07 13:44:47,066 - ERROR: WORKER FINISHED
+2021-12-07 13:44:47,071 - WARNING: WORKER ID:0 FAILED. RESTARTING CST ENV.
+2021-12-07 13:44:47,074 - INFO: created worker type local id:2
+2021-12-07 13:44:47,082 - INFO: TempDir:C:\Users\ykk\Desktop\QEXT\temp\worker_2
+2021-12-07 13:44:47,087 - INFO: TaskFileDir:C:\Users\ykk\Desktop\QEXT\temp\worker_2

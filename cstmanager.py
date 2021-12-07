@@ -5,6 +5,8 @@ import queue
 import copy
 import pathlib
 
+from utils.mode_util_base import result_stats
+
 class manager(object):
     def __init__(self,gconfm,pconfm,params,logger,maxTask=2):
         super().__init__()
@@ -57,15 +59,26 @@ class manager(object):
 
                 mtask=self.taskQueue.get()
                 print(mtask)
-                resultvalue=self.cstWorkerList[idx].runWithParam(mtask['pname_list'],mtask['v_list'],mtask['job_name'])
-                result={}
-                result['value']=resultvalue
-                result['name']=mtask['job_name']
+                iretry_cnt=mtask['retry_cnt']
+                if iretry_cnt<0:iretry_cnt=0
+                irun_count= iretry_cnt+1
+                while irun_count>0:
+                    result=self.cstWorkerList[idx].runWithParam(mtask['pname_list'],mtask['v_list'],mtask['job_name'])
+                    irun_count-=1
+                    if result['TaskStatus']=='Failure':
+                        self.logger.warning('WORKER ID:%s FAILED. RESTARTING CST ENV.' % str(self.cstWorkerList[idx].ID))
+                        newWorkerID=self.getMaxAvilWorkerID()
+                        nworker=self.createLocalWorker(newWorkerID)
+                        if self.cstWorkerList[idx]!=None:
+                            self.cstWorkerList[idx].__del__()
+                        self.cstWorkerList[idx]=nworker
+                    else:
+                        break                        
                 self.resultQueue.put(result)
             else:
                 break
             
-
+        
 
 
     def createLocalWorker(self,workerID):
@@ -89,6 +102,10 @@ class manager(object):
             self.cstWorkerList.append(self.createLocalWorker(str(workerID)))
             print("created cstworker. ID=",workerID)
             workerID+=1
+    def getMaxAvilWorkerID(self):
+        idlist=[int(worker.ID) for worker in self.cstWorkerList]
+        maxid=max(idlist)+1
+        return str(maxid)
     def startListening(self):
         if self.ready==False:
             self.startWorkers()
@@ -98,6 +115,7 @@ class manager(object):
 
         for thread in self.mthreadList:
             thread.start()
+    
     def stop(self):
         for iworker in self.cstWorkerList:
             ithread=threading.Thread(target=iworker.stop)
@@ -128,11 +146,12 @@ class manager(object):
 
     def getFirstResult(self):
         return self.resultQueue.get()
-    def addTask(self,param_name_list=[],value_list=[],job_name="default"):
+    def addTask(self,param_name_list=[],value_list=[],job_name="default",retry_cnt=0):
         mtask={}
         mtask['pname_list']=param_name_list
         mtask['v_list']=value_list
         mtask['job_name']=job_name
+        mtask['retry_cnt']=retry_cnt
         self.taskQueue.put(mtask)
 
     def runWithx(self,x,job_name):
@@ -140,10 +159,10 @@ class manager(object):
         self.startListening()
         self.synchronize()
         result=self.getFirstResult()
-        return result['value']
+        return result
 
     
-    def runWithParam(self,name_list,value_list,job_name):
+    def runWithParam(self,name_list,value_list,job_name,retry_cnt=0):
         """提供参数列表运行CST  (阻塞)
             run with user provided parameters (Synchronized)
 
@@ -164,9 +183,9 @@ class manager(object):
             A list of Run results.
 
         """
-        self.addTask(param_name_list=name_list, value_list=value_list,job_name=job_name)
+        self.addTask(param_name_list=name_list, value_list=value_list,job_name=job_name,retry_cnt=retry_cnt)
         self.startListening()
         self.synchronize()
         result=self.getFirstResult()
-        return result['value']
+        return result
 

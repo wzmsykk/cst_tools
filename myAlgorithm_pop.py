@@ -6,6 +6,7 @@
 ###初值需要自己写，留空[]则为默认
 ###
 import os
+from subprocess import run
 from myAlgorithm import myAlg
 from _pytest.monkeypatch import V
 import result
@@ -21,14 +22,14 @@ import csv
 import pandas as pd
 
 class myAlg01(myAlg):
-    def __init__(self, manager=None, params=None):
+    def __init__(self, manager:cstmanager.manager=None,params=None):
         super().__init__(manager, params)
         self.parameter_range = 0
         self.CSTparams=params
         
         self.state_x0=[]
         self.state_y0 = 0
-        
+
         #读写
         #self.mode_location = 'result\\'
         self.log=None
@@ -75,7 +76,7 @@ class myAlg01(myAlg):
     def setCSTParams(self,params):
         self.CSTparams=params
         self.checkAndSetReady()
-    def setJobManager(self,manager):
+    def setJobManager(self,manager:cstmanager.manager):
         self.manager=manager
         self.mode_location = str(manager.currProjectDir) + '\\result\\'
         self.relative_location = str(manager.currProjectDir) +"\\save\\csv\\"
@@ -111,9 +112,9 @@ class myAlg01(myAlg):
         
         self.manager.start()
         self.manager.synchronize()#同步 很重要
-        rg=self.manager.getFullResults()
+        rl=self.manager.getFullResults()
         ###SORT RESULTS
-        
+        rg=[i['PostProcessResult'] for i in rl]
         rg=sorted(rg,key=lambda x: int(x['name'][16:]))
         
         for irg in rg:
@@ -235,14 +236,20 @@ class myAlg01(myAlg):
         samples = pd.DataFrame()
         
         if self.continue_flag[0]==0:
-            self.state_y0 = np.array(self.manager.runWithParam(self.input_name, self.input_min,  "frequency"+str(1000000)[1:]+"_"+str(fmin).replace(".", "-")+"_"+str(fmax)))
-            #sample = self.get_3_modes("frequency"+str(1000000)[1:]+"_"+str(fmin).replace(".", "-")+"_"+str(fmax)).iloc[0]
-            sample=self.get_3_modes_custom(self.state_y0).iloc[0]
-            samples = samples.append(sample)
-            self.write_many("all_value_"+str(fmin).replace(".", "-"), samples)
-            #fmin = np.float(sample["frequency"])
-            fmin = math.ceil(np.float(sample["frequency"])*10)/10  ## round up float to 1 decimals
-            fmax = math.floor(sample["frequency"])+self.delta_frequency
+            runresult=self.manager.runWithParam(self.input_name, self.input_min,  "frequency"+str(1000000)[1:]+"_"+str(fmin).replace(".", "-")+"_"+str(fmax),retry_cnt=1)
+            if runresult['TaskStatus']=='Success':
+                self.state_y0 = np.array(runresult['PostProcessResult'])
+                #sample = self.get_3_modes("frequency"+str(1000000)[1:]+"_"+str(fmin).replace(".", "-")+"_"+str(fmax)).iloc[0]
+                sample=self.get_3_modes_custom(self.state_y0).iloc[0]
+                samples = samples.append(sample)
+                self.write_many("all_value_"+str(fmin).replace(".", "-"), samples)
+                #fmin = np.float(sample["frequency"])
+                fmin = math.ceil(np.float(sample["frequency"])*10)/10  ## round up float to 1 decimals
+                fmax = math.floor(sample["frequency"])+self.delta_frequency
+            elif runresult['TaskStatus']=='Failure':
+                print('First Loop Failure')
+                return
+                pass
             
         else:
             self.continue_flag[0] = 0
@@ -269,11 +276,24 @@ class myAlg01(myAlg):
                 self.input_min[3] = float(self.accu_list.loc[(self.accu_list["f_down"]<=fmin) & (self.accu_list["f_up"]>=fmin),"accuracy"])
                 self.input_min[4] = float(self.cell_list.loc[(self.cell_list["f_down"]<=fmin) & (self.cell_list["f_up"]>=fmin),"cell"])
                 print("input is:",self.input_min)
-                
-                self.state_y0 = np.array(self.manager.runWithParam(self.input_name, self.input_min, "frequency"+str(1000000)[1:]+"_"+str(fmin).replace(".", "-")+"_"+str(fmax)))
+                runresult=self.manager.runWithParam(self.input_name, self.input_min, "frequency"+str(1000000)[1:]+"_"+str(fmin).replace(".", "-")+"_"+str(fmax),retry_cnt=1)
+                if runresult['TaskStatus']=='Success':
+                    self.state_y0 = np.array(runresult['PostProcessResult'])
+                    sample=self.get_3_modes_custom(self.state_y0).iloc[0]
+                    print("--------\nfmin_define:",fmin,"\nfmax_define:",fmax,"\nf_get:",sample["frequency"])
+                elif runresult['TaskStatus']=='Failure':
+                    print('Main Loop Failure Met max retry count')
+                    print('Skip this run.')
+                    self.log.write('Skipped freq calc %f Mhz-%f Mhz because of failure\n' %(fmin,fmax))
+                    fmin=  fmax
+                    fmax = fmax+ self.delta_frequency*4 #200MHZ
+                    print('Adjust New Fmin to %f' % fmin)
+                    print('Adjust New Fmax to %f' % fmax)
+                    
+                    continue
+                    
                 #sample = self.get_3_modes("frequency"+str(1000000)[1:]+"_"+str(fmin).replace(".", "-")+"_"+str(fmax)).iloc[0]
-                sample=self.get_3_modes_custom(self.state_y0).iloc[0]
-                print("--------\nfmin_define:",fmin,"\nfmax_define:",fmax,"\nf_get:",sample["frequency"])
+                
                 
                 if sample["frequency"]==fmin:
 #                    try:
@@ -288,8 +308,16 @@ class myAlg01(myAlg):
 #                        self.input_min[0] = 1
 #                    except:
                     self.input_min[1] = float(math.ceil(sample["frequency"]*10))/10 ## round up float to 1 decimals
-                    self.state_y0 = np.array(self.manager.runWithParam(self.input_name, self.input_min, "frequency"+str(1000000)[1:]+"_"+str(self.input_min[1]).replace(".", "-")+"_"+str(fmax)+"_variate"))
+                    runresult=self.manager.runWithParam(self.input_name, self.input_min, "frequency"+str(1000000)[1:]+"_"+str(self.input_min[1]).replace(".", "-")+"_"+str(fmax)+"_variate_")
+                    while runresult['TaskStatus']!='Success':       
+                        print('Variate Loop Failure')
+                        fmax = math.floor(sample["frequency"])+self.delta_frequency
+                        print('Adjust New Fmax to %f' % fmax)                           
+                        runresult=self.manager.runWithParam(self.input_name, self.input_min, "frequency"+str(1000000)[1:]+"_"+str(self.input_min[1]).replace(".", "-")+"_"+str(fmax)+"_variate_")
+                        
+                    self.state_y0 = np.array(runresult['PostProcessResult'])
                     sample=self.get_3_modes_custom(self.state_y0).iloc[0]
+                    
                     #sample = self.get_3_modes("frequency"+str(1000000)[1:]+"_"+str(self.input_min[1]).replace(".", "-")+"_"+str(fmax)+"_variate").iloc[0]
 
                 if float(sample["frequency"])<fmax:
@@ -308,6 +336,7 @@ class myAlg01(myAlg):
         
         end_time = time.time()
         print(start_time-end_time)
+        self.log.close()
         return 0
 
 

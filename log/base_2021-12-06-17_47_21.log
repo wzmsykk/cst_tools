@@ -1,0 +1,424 @@
+2021-12-06 17:47:21,253 - INFO: 日志已输出到log\base_2021-12-06-17_47_21.log
+2021-12-06 17:47:21,255 - INFO: 找到curr_global_cfg:config\current.ini
+2021-12-06 17:47:21,258 - INFO: 使用PyQt5图形窗口运行模式
+2021-12-06 17:47:27,566 - INFO: PCM:inputCSTFilePath 已设为C:\Users\ykk\Desktop\cst_tools\project\HOM analysis\HOM analysis.cst
+2021-12-06 17:47:35,094 - INFO: PCM:currProjectDir 已设为C:\Users\ykk\Desktop\QEXT
+2021-12-06 17:47:40,902 - INFO: BASE:SET CTN=False,SAFE=False
+2021-12-06 17:47:40,902 - INFO: 检查全局配置开始.
+2021-12-06 17:47:40,902 - INFO: 检查CST PATH.
+2021-12-06 17:47:40,903 - INFO: 检查CST PATH 成功.
+2021-12-06 17:47:40,903 - INFO: 检查CST 版本.
+2021-12-06 17:47:40,904 - DEBUG: CST ENV PATH为C:\Program Files (x86)\CST Studio Suite 2020\CST DESIGN ENVIRONMENT.exe
+2021-12-06 17:47:40,904 - DEBUG: CST 版本为2020
+2021-12-06 17:47:40,904 - INFO: 检查CST 版本 结束.
+2021-12-06 17:47:40,904 - INFO: 检查各个路径是否存在.
+2021-12-06 17:47:40,905 - INFO: 检查全局配置结束.
+2021-12-06 17:47:40,905 - INFO: 通过全局配置检测
+2021-12-06 17:47:40,906 - INFO: 已保存全局配置文件于config\current.ini。
+2021-12-06 17:47:40,906 - INFO: 开始使用project目录:C:\Users\ykk\Desktop\QEXT
+2021-12-06 17:47:40,907 - INFO: 准备项目文件
+2021-12-06 17:47:40,907 - INFO: 尝试打开project目录C:\Users\ykk\Desktop\QEXT。
+2021-12-06 17:47:40,908 - INFO: 目录C:\Users\ykk\Desktop\QEXT存在已有文件。
+2021-12-06 17:47:40,908 - INFO: 目录C:\Users\ykk\Desktop\QEXT有旧文件
+2021-12-06 17:47:40,909 - WARNING: 发现异常结束,尝试修复并继续
+2021-12-06 17:47:40,909 - INFO: 检测并更新项目配置文件
+2021-12-06 17:47:40,910 - INFO: 测试项目配置文件是否存在
+2021-12-06 17:47:40,910 - DEBUG: 推测项目配置文件位于C:\Users\ykk\Desktop\QEXT\project.ini
+2021-12-06 17:47:40,911 - INFO: 测试项目配置文件存在 通过
+2021-12-06 17:47:40,915 - INFO: 测试CST模型文件是否存在
+2021-12-06 17:47:40,915 - DEBUG: 推测模型文件位于C:\Users\ykk\Desktop\QEXT\HOM analysis.cst
+2021-12-06 17:47:40,916 - INFO: 测试CST模型文件存在 通过
+2021-12-06 17:47:41,009 - INFO: 测试保存的参数列表与MD5是否与CST模型文件匹配
+2021-12-06 17:47:41,010 - INFO: project.ini检测并更新项目配置文件结束
+
+2021-12-06 17:47:41,011 - INFO: 后处理设定已保存至C:\Users\ykk\Desktop\QEXT\pps.json
+2021-12-06 17:47:41,011 - INFO: ----------------------------------------------------------
+2021-12-06 17:47:41,012 - INFO: 全局信息:
+2021-12-06 17:47:41,012 - INFO: data目录:C:\Users\ykk\Desktop\cst_tools\data
+2021-12-06 17:47:41,013 - INFO: temp目录:C:\Users\ykk\Desktop\cst_tools\temp
+2021-12-06 17:47:41,013 - INFO: log目录:C:\Users\ykk\Desktop\cst_tools\log
+2021-12-06 17:47:41,014 - INFO: result目录:C:\Users\ykk\Desktop\cst_tools\result
+2021-12-06 17:47:41,014 - INFO: CST版本:2020
+2021-12-06 17:47:41,014 - INFO: CSTEXE路径:C:\Program Files (x86)\CST Studio Suite 2020\CST DESIGN ENVIRONMENT.exe
+2021-12-06 17:47:41,015 - INFO: superfish版本:
+2021-12-06 17:47:41,015 - INFO: superfish路径:
+2021-12-06 17:47:41,016 - INFO: ----------------------------------------------------------
+2021-12-06 17:47:41,016 - INFO: -----------------------------------
+2021-12-06 17:47:41,017 - INFO: created worker type local id:0
+2021-12-06 17:47:41,018 - INFO: TempDir:C:\Users\ykk\Desktop\QEXT\temp\worker_0
+2021-12-06 17:47:41,018 - INFO: TaskFileDir:C:\Users\ykk\Desktop\QEXT\temp\worker_0
+2021-12-06 17:47:41,200 - WARNING: CstProjectFile is not consistent with the one in temp.
+2021-12-06 17:47:41,369 - INFO: Worker_(0):old runfile removed
+2021-12-06 17:47:41,395 - INFO: "C:\Program Files (x86)\CST Studio Suite 2020\CST DESIGN ENVIRONMENT.exe" -m "C:\Users\ykk\Desktop\QEXT\temp\worker_0\main.bas"
+2021-12-06 17:47:41,399 - INFO: <subprocess.Popen object at 0x00000143DDF5ADC0>
+2021-12-06 17:47:41,402 - INFO: created worker type local id:1
+2021-12-06 17:47:41,403 - INFO: TempDir:C:\Users\ykk\Desktop\QEXT\temp\worker_1
+2021-12-06 17:47:41,404 - INFO: TaskFileDir:C:\Users\ykk\Desktop\QEXT\temp\worker_1
+2021-12-06 17:47:41,599 - INFO: "C:\Program Files (x86)\CST Studio Suite 2020\CST DESIGN ENVIRONMENT.exe" -m "C:\Users\ykk\Desktop\QEXT\temp\worker_1\main.bas"
+2021-12-06 17:47:41,606 - INFO: <subprocess.Popen object at 0x00000143DDF5AD00>
+2021-12-06 17:47:41,608 - INFO: JOB MANAGER 创建完成
+2021-12-06 17:47:41,609 - INFO: UI:STARTING WORK
+2021-12-06 17:47:41,612 - INFO: PCM:项目状态已设为RUNNING
+2021-12-06 17:47:41,621 - INFO: WorkerID:'0' Run:0 Name:'frequency000000_700_800' started.
+2021-12-06 17:47:41,623 - INFO: Start Time:'Mon Dec  6 17:47:41 2021'
+2021-12-06 17:48:04,650 - ERROR: CST ENV stopped
+2021-12-06 17:48:04,651 - ERROR: WORKER FINISHED
+2021-12-06 17:48:04,652 - WARNING: WORKER ID:0 FAILED. RESTARTING CST ENV.
+2021-12-06 17:48:04,655 - INFO: created worker type local id:2
+2021-12-06 17:48:04,656 - INFO: TempDir:C:\Users\ykk\Desktop\QEXT\temp\worker_2
+2021-12-06 17:48:04,656 - INFO: TaskFileDir:C:\Users\ykk\Desktop\QEXT\temp\worker_2
+2021-12-06 17:48:04,686 - INFO: "C:\Program Files (x86)\CST Studio Suite 2020\CST DESIGN ENVIRONMENT.exe" -m "C:\Users\ykk\Desktop\QEXT\temp\worker_2\main.bas"
+2021-12-06 17:48:04,690 - INFO: <subprocess.Popen object at 0x00000143DDF5A700>
+2021-12-06 17:48:04,691 - INFO: WorkerID:'2' Run:0 Name:'frequency000000_700_800' started.
+2021-12-06 17:48:04,692 - INFO: Start Time:'Mon Dec  6 17:48:04 2021'
+2021-12-06 17:50:17,780 - INFO: WorkerID:'2' Run:0 Name:'frequency000000_700_800' success.
+2021-12-06 17:50:17,781 - INFO: ElapsedTime:133.08928990364075
+2021-12-06 17:50:17,783 - INFO: End Time:'Mon Dec  6 17:50:17 2021'
+2021-12-06 17:50:17,810 - INFO: WorkerID:'2' Run:1 Name:'frequency000000_766-0_815' started.
+2021-12-06 17:50:17,812 - INFO: Start Time:'Mon Dec  6 17:50:17 2021'
+2021-12-06 17:52:02,887 - INFO: WorkerID:'2' Run:1 Name:'frequency000000_766-0_815' success.
+2021-12-06 17:52:02,888 - INFO: ElapsedTime:105.07720184326172
+2021-12-06 17:52:02,889 - INFO: End Time:'Mon Dec  6 17:52:02 2021'
+2021-12-06 17:52:02,915 - INFO: WorkerID:'2' Run:2 Name:'frequency000000_771-9_821' started.
+2021-12-06 17:52:02,918 - INFO: Start Time:'Mon Dec  6 17:52:02 2021'
+2021-12-06 17:54:16,006 - INFO: WorkerID:'2' Run:2 Name:'frequency000000_771-9_821' success.
+2021-12-06 17:54:16,007 - INFO: ElapsedTime:133.0907621383667
+2021-12-06 17:54:16,013 - INFO: End Time:'Mon Dec  6 17:54:16 2021'
+2021-12-06 17:54:16,068 - INFO: WorkerID:'2' Run:3 Name:'frequency000000_786-3_836' started.
+2021-12-06 17:54:16,072 - INFO: Start Time:'Mon Dec  6 17:54:16 2021'
+2021-12-06 17:56:44,186 - INFO: WorkerID:'2' Run:3 Name:'frequency000000_786-3_836' success.
+2021-12-06 17:56:44,188 - INFO: ElapsedTime:148.1179916858673
+2021-12-06 17:56:44,190 - INFO: End Time:'Mon Dec  6 17:56:44 2021'
+2021-12-06 17:56:44,224 - INFO: WorkerID:'2' Run:4 Name:'frequency000000_786-9_836' started.
+2021-12-06 17:56:44,225 - INFO: Start Time:'Mon Dec  6 17:56:44 2021'
+2021-12-06 17:58:40,341 - INFO: WorkerID:'2' Run:4 Name:'frequency000000_786-9_836' success.
+2021-12-06 17:58:40,343 - INFO: ElapsedTime:116.11682462692261
+2021-12-06 17:58:40,344 - INFO: End Time:'Mon Dec  6 17:58:40 2021'
+2021-12-06 17:58:40,378 - INFO: WorkerID:'2' Run:5 Name:'frequency000000_826-9_876' started.
+2021-12-06 17:58:40,380 - INFO: Start Time:'Mon Dec  6 17:58:40 2021'
+2021-12-06 18:00:44,470 - INFO: WorkerID:'2' Run:5 Name:'frequency000000_826-9_876' success.
+2021-12-06 18:00:44,472 - INFO: ElapsedTime:124.09206867218018
+2021-12-06 18:00:44,473 - INFO: End Time:'Mon Dec  6 18:00:44 2021'
+2021-12-06 18:00:44,507 - INFO: WorkerID:'2' Run:6 Name:'frequency000000_844-2_894' started.
+2021-12-06 18:00:44,508 - INFO: Start Time:'Mon Dec  6 18:00:44 2021'
+2021-12-06 18:03:02,619 - INFO: WorkerID:'2' Run:6 Name:'frequency000000_844-2_894' success.
+2021-12-06 18:03:02,619 - INFO: ElapsedTime:138.11210370063782
+2021-12-06 18:03:02,621 - INFO: End Time:'Mon Dec  6 18:03:02 2021'
+2021-12-06 18:03:02,647 - INFO: WorkerID:'2' Run:7 Name:'frequency000000_844-2_919' started.
+2021-12-06 18:03:02,648 - INFO: Start Time:'Mon Dec  6 18:03:02 2021'
+2021-12-06 18:05:27,762 - INFO: WorkerID:'2' Run:7 Name:'frequency000000_844-2_919' success.
+2021-12-06 18:05:27,763 - INFO: ElapsedTime:145.11442971229553
+2021-12-06 18:05:27,766 - INFO: End Time:'Mon Dec  6 18:05:27 2021'
+2021-12-06 18:05:27,799 - INFO: WorkerID:'2' Run:8 Name:'frequency000000_899-8_949' started.
+2021-12-06 18:05:27,800 - INFO: Start Time:'Mon Dec  6 18:05:27 2021'
+2021-12-06 18:07:59,922 - INFO: WorkerID:'2' Run:8 Name:'frequency000000_899-8_949' success.
+2021-12-06 18:07:59,924 - INFO: ElapsedTime:152.12296319007874
+2021-12-06 18:07:59,925 - INFO: End Time:'Mon Dec  6 18:07:59 2021'
+2021-12-06 18:07:59,959 - INFO: WorkerID:'2' Run:9 Name:'frequency000000_946-3_996' started.
+2021-12-06 18:07:59,961 - INFO: Start Time:'Mon Dec  6 18:07:59 2021'
+2021-12-06 18:10:48,108 - INFO: WorkerID:'2' Run:9 Name:'frequency000000_946-3_996' success.
+2021-12-06 18:10:48,110 - INFO: ElapsedTime:168.14975023269653
+2021-12-06 18:10:48,112 - INFO: End Time:'Mon Dec  6 18:10:48 2021'
+2021-12-06 18:10:48,145 - INFO: WorkerID:'2' Run:10 Name:'frequency000000_973-7_1023' started.
+2021-12-06 18:10:48,147 - INFO: Start Time:'Mon Dec  6 18:10:48 2021'
+2021-12-06 18:13:51,296 - INFO: WorkerID:'2' Run:10 Name:'frequency000000_973-7_1023' success.
+2021-12-06 18:13:51,296 - INFO: ElapsedTime:183.1505787372589
+2021-12-06 18:13:51,298 - INFO: End Time:'Mon Dec  6 18:13:51 2021'
+2021-12-06 18:13:51,323 - INFO: WorkerID:'2' Run:11 Name:'frequency000000_993-7_1043' started.
+2021-12-06 18:13:51,324 - INFO: Start Time:'Mon Dec  6 18:13:51 2021'
+2021-12-06 18:19:14,626 - INFO: WorkerID:'2' Run:11 Name:'frequency000000_993-7_1043' success.
+2021-12-06 18:19:14,631 - INFO: ElapsedTime:323.3035385608673
+2021-12-06 18:19:14,633 - INFO: End Time:'Mon Dec  6 18:19:14 2021'
+2021-12-06 18:19:14,687 - INFO: WorkerID:'2' Run:12 Name:'frequency000000_993-7_1148' started.
+2021-12-06 18:19:14,690 - INFO: Start Time:'Mon Dec  6 18:19:14 2021'
+2021-12-06 18:25:55,040 - INFO: WorkerID:'2' Run:12 Name:'frequency000000_993-7_1148' success.
+2021-12-06 18:25:55,042 - INFO: ElapsedTime:400.35325503349304
+2021-12-06 18:25:55,045 - INFO: End Time:'Mon Dec  6 18:25:55 2021'
+2021-12-06 18:25:55,081 - INFO: WorkerID:'2' Run:13 Name:'frequency000000_1128-7_1178' started.
+2021-12-06 18:25:55,084 - INFO: Start Time:'Mon Dec  6 18:25:55 2021'
+2021-12-06 18:30:48,381 - INFO: WorkerID:'2' Run:13 Name:'frequency000000_1128-7_1178' success.
+2021-12-06 18:30:48,382 - INFO: ElapsedTime:293.3000965118408
+2021-12-06 18:30:48,385 - INFO: End Time:'Mon Dec  6 18:30:48 2021'
+2021-12-06 18:30:48,419 - INFO: WorkerID:'2' Run:14 Name:'frequency000000_1156-8_1206' started.
+2021-12-06 18:30:48,421 - INFO: Start Time:'Mon Dec  6 18:30:48 2021'
+2021-12-06 18:36:29,735 - INFO: WorkerID:'2' Run:14 Name:'frequency000000_1156-8_1206' success.
+2021-12-06 18:36:29,737 - INFO: ElapsedTime:341.3155071735382
+2021-12-06 18:36:29,739 - INFO: End Time:'Mon Dec  6 18:36:29 2021'
+2021-12-06 18:36:29,780 - INFO: WorkerID:'2' Run:15 Name:'frequency000000_1177-8_1227' started.
+2021-12-06 18:36:29,781 - INFO: Start Time:'Mon Dec  6 18:36:29 2021'
+2021-12-06 18:42:11,128 - INFO: WorkerID:'2' Run:15 Name:'frequency000000_1177-8_1227' success.
+2021-12-06 18:42:11,129 - INFO: ElapsedTime:341.3477430343628
+2021-12-06 18:42:11,134 - INFO: End Time:'Mon Dec  6 18:42:11 2021'
+2021-12-06 18:42:11,168 - INFO: WorkerID:'2' Run:16 Name:'frequency000000_1185-1_1235' started.
+2021-12-06 18:42:11,170 - INFO: Start Time:'Mon Dec  6 18:42:11 2021'
+2021-12-06 18:48:14,514 - INFO: WorkerID:'2' Run:16 Name:'frequency000000_1185-1_1235' success.
+2021-12-06 18:48:14,516 - INFO: ElapsedTime:363.3463649749756
+2021-12-06 18:48:14,519 - INFO: End Time:'Mon Dec  6 18:48:14 2021'
+2021-12-06 18:48:14,554 - INFO: WorkerID:'2' Run:17 Name:'frequency000000_1211-6_1261' started.
+2021-12-06 18:48:14,556 - INFO: Start Time:'Mon Dec  6 18:48:14 2021'
+2021-12-06 18:55:09,001 - INFO: WorkerID:'2' Run:17 Name:'frequency000000_1211-6_1261' success.
+2021-12-06 18:55:09,003 - INFO: ElapsedTime:414.4469892978668
+2021-12-06 18:55:09,005 - INFO: End Time:'Mon Dec  6 18:55:09 2021'
+2021-12-06 18:55:09,039 - INFO: WorkerID:'2' Run:18 Name:'frequency000000_1253-6_1303' started.
+2021-12-06 18:55:09,040 - INFO: Start Time:'Mon Dec  6 18:55:09 2021'
+2021-12-06 19:03:42,596 - INFO: WorkerID:'2' Run:18 Name:'frequency000000_1253-6_1303' success.
+2021-12-06 19:03:42,597 - INFO: ElapsedTime:513.5575470924377
+2021-12-06 19:03:42,599 - INFO: End Time:'Mon Dec  6 19:03:42 2021'
+2021-12-06 19:03:42,628 - INFO: WorkerID:'2' Run:19 Name:'frequency000000_1291-8_1341' started.
+2021-12-06 19:03:42,630 - INFO: Start Time:'Mon Dec  6 19:03:42 2021'
+2021-12-06 19:15:49,365 - INFO: WorkerID:'2' Run:19 Name:'frequency000000_1291-8_1341' success.
+2021-12-06 19:15:49,366 - INFO: ElapsedTime:726.7370433807373
+2021-12-06 19:15:49,368 - INFO: End Time:'Mon Dec  6 19:15:49 2021'
+2021-12-06 19:15:49,401 - INFO: WorkerID:'2' Run:20 Name:'frequency000000_1291-8_1402' started.
+2021-12-06 19:15:49,403 - INFO: Start Time:'Mon Dec  6 19:15:49 2021'
+2021-12-06 19:31:56,396 - INFO: WorkerID:'2' Run:20 Name:'frequency000000_1291-8_1402' success.
+2021-12-06 19:31:56,397 - INFO: ElapsedTime:966.9955997467041
+2021-12-06 19:31:56,399 - INFO: End Time:'Mon Dec  6 19:31:56 2021'
+2021-12-06 19:31:56,433 - INFO: WorkerID:'2' Run:21 Name:'frequency000000_1382-5_1432' started.
+2021-12-06 19:31:56,434 - INFO: Start Time:'Mon Dec  6 19:31:56 2021'
+2021-12-06 19:36:25,703 - INFO: WorkerID:'2' Run:21 Name:'frequency000000_1382-5_1432' success.
+2021-12-06 19:36:25,705 - INFO: ElapsedTime:269.2696442604065
+2021-12-06 19:36:25,709 - INFO: End Time:'Mon Dec  6 19:36:25 2021'
+2021-12-06 19:36:25,753 - INFO: WorkerID:'2' Run:22 Name:'frequency000000_1408-6_1458' started.
+2021-12-06 19:36:25,754 - INFO: Start Time:'Mon Dec  6 19:36:25 2021'
+2021-12-06 19:40:37,993 - INFO: WorkerID:'2' Run:22 Name:'frequency000000_1408-6_1458' success.
+2021-12-06 19:40:37,994 - INFO: ElapsedTime:252.2411003112793
+2021-12-06 19:40:37,995 - INFO: End Time:'Mon Dec  6 19:40:37 2021'
+2021-12-06 19:40:38,026 - INFO: WorkerID:'2' Run:23 Name:'frequency000000_1408-7_1458' started.
+2021-12-06 19:40:38,027 - INFO: Start Time:'Mon Dec  6 19:40:38 2021'
+2021-12-06 19:45:16,268 - INFO: WorkerID:'2' Run:23 Name:'frequency000000_1408-7_1458' success.
+2021-12-06 19:45:16,270 - INFO: ElapsedTime:278.2420291900635
+2021-12-06 19:45:16,274 - INFO: End Time:'Mon Dec  6 19:45:16 2021'
+2021-12-06 19:45:16,346 - INFO: WorkerID:'2' Run:24 Name:'frequency000000_1411-5_1461' started.
+2021-12-06 19:45:16,348 - INFO: Start Time:'Mon Dec  6 19:45:16 2021'
+2021-12-06 19:50:11,624 - INFO: WorkerID:'2' Run:24 Name:'frequency000000_1411-5_1461' success.
+2021-12-06 19:50:11,625 - INFO: ElapsedTime:295.2785234451294
+2021-12-06 19:50:11,628 - INFO: End Time:'Mon Dec  6 19:50:11 2021'
+2021-12-06 19:50:11,664 - INFO: WorkerID:'2' Run:25 Name:'frequency000000_1427-5_1477' started.
+2021-12-06 19:50:11,665 - INFO: Start Time:'Mon Dec  6 19:50:11 2021'
+2021-12-06 19:54:43,898 - INFO: WorkerID:'2' Run:25 Name:'frequency000000_1427-5_1477' success.
+2021-12-06 19:54:43,899 - INFO: ElapsedTime:272.23377442359924
+2021-12-06 19:54:43,900 - INFO: End Time:'Mon Dec  6 19:54:43 2021'
+2021-12-06 19:54:43,931 - INFO: WorkerID:'2' Run:26 Name:'frequency000000_1432-8_1482' started.
+2021-12-06 19:54:43,933 - INFO: Start Time:'Mon Dec  6 19:54:43 2021'
+2021-12-06 19:59:39,202 - INFO: WorkerID:'2' Run:26 Name:'frequency000000_1432-8_1482' success.
+2021-12-06 19:59:39,203 - INFO: ElapsedTime:295.27041006088257
+2021-12-06 19:59:39,203 - INFO: End Time:'Mon Dec  6 19:59:39 2021'
+2021-12-06 19:59:39,228 - INFO: WorkerID:'2' Run:27 Name:'frequency000000_1452-5_1502' started.
+2021-12-06 19:59:39,230 - INFO: Start Time:'Mon Dec  6 19:59:39 2021'
+2021-12-06 20:05:00,523 - INFO: WorkerID:'2' Run:27 Name:'frequency000000_1452-5_1502' success.
+2021-12-06 20:05:00,524 - INFO: ElapsedTime:321.2942078113556
+2021-12-06 20:05:00,525 - INFO: End Time:'Mon Dec  6 20:05:00 2021'
+2021-12-06 20:05:00,550 - INFO: WorkerID:'2' Run:28 Name:'frequency000000_1475-3_1525' started.
+2021-12-06 20:05:00,551 - INFO: Start Time:'Mon Dec  6 20:05:00 2021'
+2021-12-06 20:10:34,840 - INFO: WorkerID:'2' Run:28 Name:'frequency000000_1475-3_1525' success.
+2021-12-06 20:10:34,841 - INFO: ElapsedTime:334.29010581970215
+2021-12-06 20:10:34,842 - INFO: End Time:'Mon Dec  6 20:10:34 2021'
+2021-12-06 20:10:34,877 - INFO: WorkerID:'2' Run:29 Name:'frequency000000_1513-8_1563' started.
+2021-12-06 20:10:34,878 - INFO: Start Time:'Mon Dec  6 20:10:34 2021'
+2021-12-06 20:16:22,219 - INFO: WorkerID:'2' Run:29 Name:'frequency000000_1513-8_1563' success.
+2021-12-06 20:16:22,220 - INFO: ElapsedTime:347.34199810028076
+2021-12-06 20:16:22,224 - INFO: End Time:'Mon Dec  6 20:16:22 2021'
+2021-12-06 20:16:22,277 - INFO: WorkerID:'2' Run:30 Name:'frequency000000_1517-1_1567' started.
+2021-12-06 20:16:22,280 - INFO: Start Time:'Mon Dec  6 20:16:22 2021'
+2021-12-06 20:22:28,611 - INFO: WorkerID:'2' Run:30 Name:'frequency000000_1517-1_1567' success.
+2021-12-06 20:22:28,612 - INFO: ElapsedTime:366.3340334892273
+2021-12-06 20:22:28,613 - INFO: End Time:'Mon Dec  6 20:22:28 2021'
+2021-12-06 20:22:28,642 - INFO: WorkerID:'2' Run:31 Name:'frequency000000_1566-7_1616' started.
+2021-12-06 20:22:28,644 - INFO: Start Time:'Mon Dec  6 20:22:28 2021'
+2021-12-06 20:29:23,063 - INFO: WorkerID:'2' Run:31 Name:'frequency000000_1566-7_1616' success.
+2021-12-06 20:29:23,065 - INFO: ElapsedTime:414.420978307724
+2021-12-06 20:29:23,068 - INFO: End Time:'Mon Dec  6 20:29:23 2021'
+2021-12-06 20:29:23,102 - INFO: WorkerID:'2' Run:32 Name:'frequency000000_1601-7_1651' started.
+2021-12-06 20:29:23,103 - INFO: Start Time:'Mon Dec  6 20:29:23 2021'
+2021-12-06 20:36:34,557 - INFO: WorkerID:'2' Run:32 Name:'frequency000000_1601-7_1651' success.
+2021-12-06 20:36:34,559 - INFO: ElapsedTime:431.4552321434021
+2021-12-06 20:36:34,561 - INFO: End Time:'Mon Dec  6 20:36:34 2021'
+2021-12-06 20:36:34,586 - INFO: WorkerID:'2' Run:33 Name:'frequency000000_1609-4_1659' started.
+2021-12-06 20:36:34,587 - INFO: Start Time:'Mon Dec  6 20:36:34 2021'
+2021-12-06 20:45:04,187 - INFO: WorkerID:'2' Run:33 Name:'frequency000000_1609-4_1659' success.
+2021-12-06 20:45:04,189 - INFO: ElapsedTime:509.6010036468506
+2021-12-06 20:45:04,192 - INFO: End Time:'Mon Dec  6 20:45:04 2021'
+2021-12-06 20:45:04,224 - INFO: WorkerID:'2' Run:34 Name:'frequency000000_1639-9_1689' started.
+2021-12-06 20:45:04,226 - INFO: Start Time:'Mon Dec  6 20:45:04 2021'
+2021-12-06 20:52:25,655 - INFO: WorkerID:'2' Run:34 Name:'frequency000000_1639-9_1689' success.
+2021-12-06 20:52:25,656 - INFO: ElapsedTime:441.4312946796417
+2021-12-06 20:52:25,660 - INFO: End Time:'Mon Dec  6 20:52:25 2021'
+2021-12-06 20:52:25,704 - INFO: WorkerID:'2' Run:35 Name:'frequency000000_1645-3_1695' started.
+2021-12-06 20:52:25,706 - INFO: Start Time:'Mon Dec  6 20:52:25 2021'
+2021-12-06 21:00:14,222 - INFO: WorkerID:'2' Run:35 Name:'frequency000000_1645-3_1695' success.
+2021-12-06 21:00:14,223 - INFO: ElapsedTime:468.51830220222473
+2021-12-06 21:00:14,224 - INFO: End Time:'Mon Dec  6 21:00:14 2021'
+2021-12-06 21:00:14,248 - INFO: WorkerID:'2' Run:36 Name:'frequency000000_1663-3_1713' started.
+2021-12-06 21:00:14,250 - INFO: Start Time:'Mon Dec  6 21:00:14 2021'
+2021-12-06 21:08:09,749 - INFO: WorkerID:'2' Run:36 Name:'frequency000000_1663-3_1713' success.
+2021-12-06 21:08:09,751 - INFO: ElapsedTime:475.50097918510437
+2021-12-06 21:08:09,754 - INFO: End Time:'Mon Dec  6 21:08:09 2021'
+2021-12-06 21:08:09,811 - INFO: WorkerID:'2' Run:37 Name:'frequency000000_1666-8_1716' started.
+2021-12-06 21:08:09,812 - INFO: Start Time:'Mon Dec  6 21:08:09 2021'
+2021-12-06 21:15:55,279 - INFO: WorkerID:'2' Run:37 Name:'frequency000000_1666-8_1716' success.
+2021-12-06 21:15:55,280 - INFO: ElapsedTime:465.4688403606415
+2021-12-06 21:15:55,281 - INFO: End Time:'Mon Dec  6 21:15:55 2021'
+2021-12-06 21:15:55,309 - INFO: WorkerID:'2' Run:38 Name:'frequency000000_1667-6_1717' started.
+2021-12-06 21:15:55,312 - INFO: Start Time:'Mon Dec  6 21:15:55 2021'
+2021-12-06 21:25:52,910 - INFO: WorkerID:'2' Run:38 Name:'frequency000000_1667-6_1717' success.
+2021-12-06 21:25:52,912 - INFO: ElapsedTime:597.6009624004364
+2021-12-06 21:25:52,917 - INFO: End Time:'Mon Dec  6 21:25:52 2021'
+2021-12-06 21:25:52,961 - INFO: WorkerID:'2' Run:39 Name:'frequency000000_1710-2_1760' started.
+2021-12-06 21:25:52,962 - INFO: Start Time:'Mon Dec  6 21:25:52 2021'
+2021-12-06 21:34:22,489 - INFO: WorkerID:'2' Run:39 Name:'frequency000000_1710-2_1760' success.
+2021-12-06 21:34:22,491 - INFO: ElapsedTime:509.528293132782
+2021-12-06 21:34:22,492 - INFO: End Time:'Mon Dec  6 21:34:22 2021'
+2021-12-06 21:34:22,524 - INFO: WorkerID:'2' Run:40 Name:'frequency000000_1722-4_1772' started.
+2021-12-06 21:34:22,525 - INFO: Start Time:'Mon Dec  6 21:34:22 2021'
+2021-12-06 21:45:08,163 - INFO: WorkerID:'2' Run:40 Name:'frequency000000_1722-4_1772' success.
+2021-12-06 21:45:08,164 - INFO: ElapsedTime:645.6390907764435
+2021-12-06 21:45:08,167 - INFO: End Time:'Mon Dec  6 21:45:08 2021'
+2021-12-06 21:45:08,219 - INFO: WorkerID:'2' Run:41 Name:'frequency000000_1763-0_1812' started.
+2021-12-06 21:45:08,220 - INFO: Start Time:'Mon Dec  6 21:45:08 2021'
+2021-12-06 21:54:59,811 - INFO: WorkerID:'2' Run:41 Name:'frequency000000_1763-0_1812' success.
+2021-12-06 21:54:59,813 - INFO: ElapsedTime:591.5922014713287
+2021-12-06 21:54:59,814 - INFO: End Time:'Mon Dec  6 21:54:59 2021'
+2021-12-06 21:54:59,850 - INFO: WorkerID:'2' Run:42 Name:'frequency000000_1771-3_1821' started.
+2021-12-06 21:54:59,851 - INFO: Start Time:'Mon Dec  6 21:54:59 2021'
+2021-12-06 22:05:08,475 - INFO: WorkerID:'2' Run:42 Name:'frequency000000_1771-3_1821' success.
+2021-12-06 22:05:08,476 - INFO: ElapsedTime:608.6253535747528
+2021-12-06 22:05:08,477 - INFO: End Time:'Mon Dec  6 22:05:08 2021'
+2021-12-06 22:05:08,500 - INFO: WorkerID:'2' Run:43 Name:'frequency000000_1773-9_1823' started.
+2021-12-06 22:05:08,501 - INFO: Start Time:'Mon Dec  6 22:05:08 2021'
+2021-12-06 22:19:15,358 - INFO: WorkerID:'2' Run:43 Name:'frequency000000_1773-9_1823' success.
+2021-12-06 22:19:15,359 - INFO: ElapsedTime:846.8571863174438
+2021-12-06 22:19:15,360 - INFO: End Time:'Mon Dec  6 22:19:15 2021'
+2021-12-06 22:19:15,382 - INFO: WorkerID:'2' Run:44 Name:'frequency000000_1773-9_1849' started.
+2021-12-06 22:19:15,383 - INFO: Start Time:'Mon Dec  6 22:19:15 2021'
+2021-12-06 22:34:28,344 - INFO: WorkerID:'2' Run:44 Name:'frequency000000_1773-9_1849' success.
+2021-12-06 22:34:28,346 - INFO: ElapsedTime:912.9629039764404
+2021-12-06 22:34:28,349 - INFO: End Time:'Mon Dec  6 22:34:28 2021'
+2021-12-06 22:34:28,398 - INFO: WorkerID:'2' Run:45 Name:'frequency000000_1829-7_1879' started.
+2021-12-06 22:34:28,401 - INFO: Start Time:'Mon Dec  6 22:34:28 2021'
+2021-12-06 22:46:17,258 - INFO: WorkerID:'2' Run:45 Name:'frequency000000_1829-7_1879' success.
+2021-12-06 22:46:17,260 - INFO: ElapsedTime:708.8596303462982
+2021-12-06 22:46:17,261 - INFO: End Time:'Mon Dec  6 22:46:17 2021'
+2021-12-06 22:46:17,296 - INFO: WorkerID:'2' Run:46 Name:'frequency000000_1832-5_1882' started.
+2021-12-06 22:46:17,297 - INFO: Start Time:'Mon Dec  6 22:46:17 2021'
+2021-12-06 22:58:28,132 - INFO: WorkerID:'2' Run:46 Name:'frequency000000_1832-5_1882' success.
+2021-12-06 22:58:28,134 - INFO: ElapsedTime:730.8366377353668
+2021-12-06 22:58:28,136 - INFO: End Time:'Mon Dec  6 22:58:28 2021'
+2021-12-06 22:58:28,165 - INFO: WorkerID:'2' Run:47 Name:'frequency000000_1838-1_1888' started.
+2021-12-06 22:58:28,168 - INFO: Start Time:'Mon Dec  6 22:58:28 2021'
+2021-12-06 23:17:13,337 - INFO: WorkerID:'2' Run:47 Name:'frequency000000_1838-1_1888' success.
+2021-12-06 23:17:13,338 - INFO: ElapsedTime:1125.1711513996124
+2021-12-06 23:17:13,340 - INFO: End Time:'Mon Dec  6 23:17:13 2021'
+2021-12-06 23:17:13,374 - INFO: WorkerID:'2' Run:48 Name:'frequency000000_1885-1_1935' started.
+2021-12-06 23:17:13,375 - INFO: Start Time:'Mon Dec  6 23:17:13 2021'
+2021-12-06 23:31:31,310 - INFO: WorkerID:'2' Run:48 Name:'frequency000000_1885-1_1935' success.
+2021-12-06 23:31:31,312 - INFO: ElapsedTime:857.9361295700073
+2021-12-06 23:31:31,313 - INFO: End Time:'Mon Dec  6 23:31:31 2021'
+2021-12-06 23:31:31,347 - INFO: WorkerID:'2' Run:49 Name:'frequency000000_1889-5_1939' started.
+2021-12-06 23:31:31,349 - INFO: Start Time:'Mon Dec  6 23:31:31 2021'
+2021-12-06 23:47:40,481 - INFO: WorkerID:'2' Run:49 Name:'frequency000000_1889-5_1939' success.
+2021-12-06 23:47:40,482 - INFO: ElapsedTime:969.1336042881012
+2021-12-06 23:47:40,483 - INFO: End Time:'Mon Dec  6 23:47:40 2021'
+2021-12-06 23:47:40,508 - INFO: WorkerID:'2' Run:50 Name:'frequency000000_1890-5_1940' started.
+2021-12-06 23:47:40,509 - INFO: Start Time:'Mon Dec  6 23:47:40 2021'
+2021-12-07 00:01:22,401 - INFO: WorkerID:'2' Run:50 Name:'frequency000000_1890-5_1940' success.
+2021-12-07 00:01:22,402 - INFO: ElapsedTime:821.8928270339966
+2021-12-07 00:01:22,404 - INFO: End Time:'Tue Dec  7 00:01:22 2021'
+2021-12-07 00:01:22,428 - INFO: WorkerID:'2' Run:51 Name:'frequency000000_1893-7_1943' started.
+2021-12-07 00:01:22,429 - INFO: Start Time:'Tue Dec  7 00:01:22 2021'
+2021-12-07 00:15:35,432 - INFO: WorkerID:'2' Run:51 Name:'frequency000000_1893-7_1943' success.
+2021-12-07 00:15:35,434 - INFO: ElapsedTime:853.0033030509949
+2021-12-07 00:15:35,436 - INFO: End Time:'Tue Dec  7 00:15:35 2021'
+2021-12-07 00:15:35,468 - INFO: WorkerID:'2' Run:52 Name:'frequency000000_1895-7_1945' started.
+2021-12-07 00:15:35,469 - INFO: Start Time:'Tue Dec  7 00:15:35 2021'
+2021-12-07 00:31:04,481 - INFO: WorkerID:'2' Run:52 Name:'frequency000000_1895-7_1945' success.
+2021-12-07 00:31:04,483 - INFO: ElapsedTime:929.013641834259
+2021-12-07 00:31:04,484 - INFO: End Time:'Tue Dec  7 00:31:04 2021'
+2021-12-07 00:31:04,511 - INFO: WorkerID:'2' Run:53 Name:'frequency000000_1913-1_1963' started.
+2021-12-07 00:31:04,513 - INFO: Start Time:'Tue Dec  7 00:31:04 2021'
+2021-12-07 00:45:46,459 - INFO: WorkerID:'2' Run:53 Name:'frequency000000_1913-1_1963' success.
+2021-12-07 00:45:46,461 - INFO: ElapsedTime:881.9480683803558
+2021-12-07 00:45:46,462 - INFO: End Time:'Tue Dec  7 00:45:46 2021'
+2021-12-07 00:45:46,496 - INFO: WorkerID:'2' Run:54 Name:'frequency000000_1921-4_1971' started.
+2021-12-07 00:45:46,498 - INFO: Start Time:'Tue Dec  7 00:45:46 2021'
+2021-12-07 01:03:35,624 - INFO: WorkerID:'2' Run:54 Name:'frequency000000_1921-4_1971' success.
+2021-12-07 01:03:35,625 - INFO: ElapsedTime:1069.1280584335327
+2021-12-07 01:03:35,627 - INFO: End Time:'Tue Dec  7 01:03:35 2021'
+2021-12-07 01:03:35,650 - INFO: WorkerID:'2' Run:55 Name:'frequency000000_1921-4_2002' started.
+2021-12-07 01:03:35,651 - INFO: Start Time:'Tue Dec  7 01:03:35 2021'
+2021-12-07 01:23:56,940 - INFO: WorkerID:'2' Run:55 Name:'frequency000000_1921-4_2002' success.
+2021-12-07 01:23:56,941 - INFO: ElapsedTime:1221.2902209758759
+2021-12-07 01:23:56,944 - INFO: End Time:'Tue Dec  7 01:23:56 2021'
+2021-12-07 01:23:56,978 - INFO: WorkerID:'2' Run:56 Name:'frequency000000_1982-3_2032' started.
+2021-12-07 01:23:56,979 - INFO: Start Time:'Tue Dec  7 01:23:56 2021'
+2021-12-07 01:42:40,040 - INFO: WorkerID:'2' Run:56 Name:'frequency000000_1982-3_2032' success.
+2021-12-07 01:42:40,041 - INFO: ElapsedTime:1123.0627355575562
+2021-12-07 01:42:40,042 - INFO: End Time:'Tue Dec  7 01:42:40 2021'
+2021-12-07 01:42:40,069 - INFO: WorkerID:'2' Run:57 Name:'frequency000000_1993-5_2043' started.
+2021-12-07 01:42:40,071 - INFO: Start Time:'Tue Dec  7 01:42:40 2021'
+2021-12-07 01:58:24,164 - INFO: WorkerID:'2' Run:57 Name:'frequency000000_1993-5_2043' success.
+2021-12-07 01:58:24,166 - INFO: ElapsedTime:944.0953209400177
+2021-12-07 01:58:24,167 - INFO: End Time:'Tue Dec  7 01:58:24 2021'
+2021-12-07 01:58:24,202 - INFO: WorkerID:'2' Run:58 Name:'frequency000000_2001-8_2051' started.
+2021-12-07 01:58:24,204 - INFO: Start Time:'Tue Dec  7 01:58:24 2021'
+2021-12-07 02:02:13,415 - INFO: WorkerID:'2' Run:58 Name:'frequency000000_2001-8_2051' success.
+2021-12-07 02:02:13,417 - INFO: ElapsedTime:229.2131326198578
+2021-12-07 02:02:13,418 - INFO: End Time:'Tue Dec  7 02:02:13 2021'
+2021-12-07 02:02:13,453 - INFO: WorkerID:'2' Run:59 Name:'frequency000000_2005-3_2055' started.
+2021-12-07 02:02:13,454 - INFO: Start Time:'Tue Dec  7 02:02:13 2021'
+2021-12-07 02:05:50,659 - INFO: WorkerID:'2' Run:59 Name:'frequency000000_2005-3_2055' success.
+2021-12-07 02:05:50,661 - INFO: ElapsedTime:217.20553922653198
+2021-12-07 02:05:50,663 - INFO: End Time:'Tue Dec  7 02:05:50 2021'
+2021-12-07 02:05:50,696 - INFO: WorkerID:'2' Run:60 Name:'frequency000000_2022-2_2072' started.
+2021-12-07 02:05:50,697 - INFO: Start Time:'Tue Dec  7 02:05:50 2021'
+2021-12-07 02:09:15,865 - INFO: WorkerID:'2' Run:60 Name:'frequency000000_2022-2_2072' success.
+2021-12-07 02:09:15,867 - INFO: ElapsedTime:205.16963934898376
+2021-12-07 02:09:15,869 - INFO: End Time:'Tue Dec  7 02:09:15 2021'
+2021-12-07 02:09:15,909 - INFO: WorkerID:'2' Run:61 Name:'frequency000000_2044-1_2094' started.
+2021-12-07 02:09:15,910 - INFO: Start Time:'Tue Dec  7 02:09:15 2021'
+2021-12-07 02:13:23,133 - INFO: WorkerID:'2' Run:61 Name:'frequency000000_2044-1_2094' success.
+2021-12-07 02:13:23,134 - INFO: ElapsedTime:247.22378158569336
+2021-12-07 02:13:23,138 - INFO: End Time:'Tue Dec  7 02:13:23 2021'
+2021-12-07 02:13:23,172 - INFO: WorkerID:'2' Run:62 Name:'frequency000000_2058-3_2108' started.
+2021-12-07 02:13:23,174 - INFO: Start Time:'Tue Dec  7 02:13:23 2021'
+2021-12-07 02:17:39,411 - INFO: WorkerID:'2' Run:62 Name:'frequency000000_2058-3_2108' success.
+2021-12-07 02:17:39,412 - INFO: ElapsedTime:256.23971247673035
+2021-12-07 02:17:39,414 - INFO: End Time:'Tue Dec  7 02:17:39 2021'
+2021-12-07 02:17:39,448 - INFO: WorkerID:'2' Run:63 Name:'frequency000000_2085-1_2135' started.
+2021-12-07 02:17:39,450 - INFO: Start Time:'Tue Dec  7 02:17:39 2021'
+2021-12-07 02:21:55,706 - INFO: WorkerID:'2' Run:63 Name:'frequency000000_2085-1_2135' success.
+2021-12-07 02:21:55,707 - INFO: ElapsedTime:256.25783467292786
+2021-12-07 02:21:55,708 - INFO: End Time:'Tue Dec  7 02:21:55 2021'
+2021-12-07 02:21:55,733 - INFO: WorkerID:'2' Run:64 Name:'frequency000000_2102-9_2152' started.
+2021-12-07 02:21:55,735 - INFO: Start Time:'Tue Dec  7 02:21:55 2021'
+2021-12-07 02:26:03,952 - INFO: WorkerID:'2' Run:64 Name:'frequency000000_2102-9_2152' success.
+2021-12-07 02:26:03,954 - INFO: ElapsedTime:248.2187705039978
+2021-12-07 02:26:03,958 - INFO: End Time:'Tue Dec  7 02:26:03 2021'
+2021-12-07 02:26:03,999 - INFO: WorkerID:'2' Run:65 Name:'frequency000000_2106-2_2156' started.
+2021-12-07 02:26:04,001 - INFO: Start Time:'Tue Dec  7 02:26:04 2021'
+2021-12-07 02:30:51,245 - INFO: WorkerID:'2' Run:65 Name:'frequency000000_2106-2_2156' success.
+2021-12-07 02:30:51,247 - INFO: ElapsedTime:287.2454888820648
+2021-12-07 02:30:51,248 - INFO: End Time:'Tue Dec  7 02:30:51 2021'
+2021-12-07 02:30:51,282 - INFO: WorkerID:'2' Run:66 Name:'frequency000000_2132-5_2182' started.
+2021-12-07 02:30:51,284 - INFO: Start Time:'Tue Dec  7 02:30:51 2021'
+2021-12-07 02:34:52,518 - INFO: WorkerID:'2' Run:66 Name:'frequency000000_2132-5_2182' success.
+2021-12-07 02:34:52,519 - INFO: ElapsedTime:241.23688864707947
+2021-12-07 02:34:52,520 - INFO: End Time:'Tue Dec  7 02:34:52 2021'
+2021-12-07 02:34:52,552 - INFO: WorkerID:'2' Run:67 Name:'frequency000000_2132-6_2182' started.
+2021-12-07 02:34:52,553 - INFO: Start Time:'Tue Dec  7 02:34:52 2021'
+2021-12-07 02:39:14,804 - INFO: WorkerID:'2' Run:67 Name:'frequency000000_2132-6_2182' success.
+2021-12-07 02:39:14,806 - INFO: ElapsedTime:262.2519657611847
+2021-12-07 02:39:14,807 - INFO: End Time:'Tue Dec  7 02:39:14 2021'
+2021-12-07 02:39:14,841 - INFO: WorkerID:'2' Run:68 Name:'frequency000000_2139-6_2189' started.
+2021-12-07 02:39:14,843 - INFO: Start Time:'Tue Dec  7 02:39:14 2021'
+2021-12-07 02:43:31,091 - INFO: WorkerID:'2' Run:68 Name:'frequency000000_2139-6_2189' success.
+2021-12-07 02:43:31,093 - INFO: ElapsedTime:256.24978256225586
+2021-12-07 02:43:31,094 - INFO: End Time:'Tue Dec  7 02:43:31 2021'
+2021-12-07 02:43:31,139 - INFO: WorkerID:'2' Run:69 Name:'frequency000000_2146-5_2196' started.
+2021-12-07 02:43:31,152 - INFO: Start Time:'Tue Dec  7 02:43:31 2021'
+2021-12-07 02:47:46,388 - ERROR: CST ENV stopped
+2021-12-07 02:47:46,389 - ERROR: WORKER FINISHED
+2021-12-07 02:47:46,390 - WARNING: WORKER ID:2 FAILED. RESTARTING CST ENV.
+2021-12-07 02:47:46,391 - INFO: created worker type local id:3
+2021-12-07 02:47:46,393 - INFO: TempDir:C:\Users\ykk\Desktop\QEXT\temp\worker_3
+2021-12-07 02:47:46,393 - INFO: TaskFileDir:C:\Users\ykk\Desktop\QEXT\temp\worker_3

@@ -208,7 +208,10 @@ class local_cstworker(worker.worker):
                     
                 else:
                     self.logger.error("CST ENV stopped")
-                    os._exit(0)
+                    self.logger.error("WORKER FINISHED")
+                    runResult={'TaskIndex':self.taskIndex,'TaskStatus':'Failure','RunName':self.runName,'PostProcessResult':None}
+                    return runResult
+                    #os._exit(0)
                 time.sleep(1)
                 currentTime=time.time()
                 escapedTime=currentTime-startTime
@@ -220,7 +223,8 @@ class local_cstworker(worker.worker):
             self.logger.info("ElapsedTime:%r"%escapedTime)
             self.logger.info("End Time:%r"%time.ctime())
         self.taskIndex+=1
-        runResult=self.postProcessHelper.readAllResults()
+        postProcessResult=self.postProcessHelper.readAllResults()
+        runResult={'TaskIndex':self.taskIndex,'TaskStatus':'Success','RunName':self.runName,'PostProcessResult':postProcessResult}
         #runResult=result.readModeResult(pathc,1)
         return runResult
 
@@ -257,6 +261,8 @@ class local_cstworker(worker.worker):
         if self.cstProcess is None:
             self.cstProcess.kill()
     
+    def __del__(self):
+        self.kill()
     def start(self):
         self.run()
 

@@ -1,0 +1,46 @@
+2021-12-06 17:38:45,630 - INFO: 日志已输出到log\base_2021-12-06-17_38_45.log
+2021-12-06 17:38:45,630 - INFO: 找到curr_global_cfg:config\current.ini
+2021-12-06 17:38:45,637 - INFO: 使用PyQt5图形窗口运行模式
+2021-12-06 17:38:53,204 - INFO: PCM:currProjectDir 已设为C:\Users\ykk\Desktop\QEXT
+2021-12-06 17:39:03,485 - INFO: PCM:inputCSTFilePath 已设为C:\Users\ykk\Desktop\cst_tools\project\HOM analysis\HOM analysis.cst
+2021-12-06 17:39:19,541 - INFO: BASE:SET CTN=False,SAFE=False
+2021-12-06 17:39:19,542 - INFO: 检查全局配置开始.
+2021-12-06 17:39:19,543 - INFO: 检查CST PATH.
+2021-12-06 17:39:19,543 - INFO: 检查CST PATH 成功.
+2021-12-06 17:39:19,544 - INFO: 检查CST 版本.
+2021-12-06 17:39:19,544 - DEBUG: CST ENV PATH为C:\Program Files (x86)\CST Studio Suite 2020\CST DESIGN ENVIRONMENT.exe
+2021-12-06 17:39:19,545 - DEBUG: CST 版本为2020
+2021-12-06 17:39:19,545 - INFO: 检查CST 版本 结束.
+2021-12-06 17:39:19,545 - INFO: 检查各个路径是否存在.
+2021-12-06 17:39:19,546 - INFO: 检查全局配置结束.
+2021-12-06 17:39:19,546 - INFO: 通过全局配置检测
+2021-12-06 17:39:19,547 - INFO: 已保存全局配置文件于config\current.ini。
+2021-12-06 17:39:19,548 - INFO: 开始使用project目录:C:\Users\ykk\Desktop\QEXT
+2021-12-06 17:39:19,548 - INFO: 准备项目文件
+2021-12-06 17:39:19,549 - INFO: 尝试打开project目录C:\Users\ykk\Desktop\QEXT。
+2021-12-06 17:39:19,550 - INFO: 目录C:\Users\ykk\Desktop\QEXT存在已有文件。
+2021-12-06 17:39:19,550 - INFO: 目录C:\Users\ykk\Desktop\QEXT有旧文件
+2021-12-06 17:39:19,551 - WARNING: 发现异常结束,尝试修复并继续
+2021-12-06 17:39:19,554 - INFO: 检测并更新项目配置文件
+2021-12-06 17:39:19,555 - INFO: 测试项目配置文件是否存在
+2021-12-06 17:39:19,555 - DEBUG: 推测项目配置文件位于C:\Users\ykk\Desktop\QEXT\project.ini
+2021-12-06 17:39:19,556 - INFO: 测试项目配置文件存在 通过
+2021-12-06 17:39:19,557 - INFO: 测试CST模型文件是否存在
+2021-12-06 17:39:19,558 - DEBUG: 推测模型文件位于C:\Users\ykk\Desktop\QEXT\HOM analysis.cst
+2021-12-06 17:39:19,559 - INFO: 测试CST模型文件存在 通过
+2021-12-06 17:39:19,657 - INFO: 测试保存的参数列表与MD5是否与CST模型文件匹配
+2021-12-06 17:39:19,658 - INFO: project.ini检测并更新项目配置文件结束
+
+2021-12-06 17:39:19,659 - INFO: 后处理设定已保存至C:\Users\ykk\Desktop\QEXT\pps.json
+2021-12-06 17:39:19,659 - INFO: ----------------------------------------------------------
+2021-12-06 17:39:19,660 - INFO: 全局信息:
+2021-12-06 17:39:19,660 - INFO: data目录:C:\Users\ykk\Desktop\cst_tools\data
+2021-12-06 17:39:19,661 - INFO: temp目录:C:\Users\ykk\Desktop\cst_tools\temp
+2021-12-06 17:39:19,661 - INFO: log目录:C:\Users\ykk\Desktop\cst_tools\log
+2021-12-06 17:39:19,661 - INFO: result目录:C:\Users\ykk\Desktop\cst_tools\result
+2021-12-06 17:39:19,662 - INFO: CST版本:2020
+2021-12-06 17:39:19,662 - INFO: CSTEXE路径:C:\Program Files (x86)\CST Studio Suite 2020\CST DESIGN ENVIRONMENT.exe
+2021-12-06 17:39:19,663 - INFO: superfish版本:
+2021-12-06 17:39:19,663 - INFO: superfish路径:
+2021-12-06 17:39:19,663 - INFO: ----------------------------------------------------------
+2021-12-06 17:39:19,664 - INFO: -----------------------------------
