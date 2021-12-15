@@ -1,6 +1,9 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\data",
+    "\\data\\preprocess"
   ],
+  "SelectedNode": "\\result.py",
   "PreviewInSolutionExplorer": false
 }

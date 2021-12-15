@@ -19,6 +19,28 @@ Sub setFreqRange(fmin As Double,fmax As Double)
     Solver.FrequencyRange "fmin", "fmax"
     ReportInformation("FrequencyRange Set As fmin, fmax")    
 End Sub
+Sub setFreqRange_Auto()
+    'check existence
+    Dim flag As Boolean
+    Dim localfmin As Double
+    Dim localfmax As Double
+    localfmin=Solver.GetFmin()
+    localfmax=Solver.GetFmax()
+    flag=DoesParameterExist("fmin") 
+    If flag=False Then
+        StoreParameterWithDescription "fmin" localfmin "Minimum Freq For Solver"
+    ElseIf
+        ReportInformation("Fmin Already Exists")
+    End If
+    flag=DoesParameterExist("fmax") 
+    If flag=False Then
+        StoreParameterWithDescription "fmax" localfmax "Maximum Freq For Solver"
+    ElseIf
+        ReportInformation("Fmax Already Exists")
+    End If
+    Solver.FrequencyRange "fmin", "fmax"
+    ReportInformation("FrequencyRange Set As fmin, fmax")    
+End Sub
 Sub setEigenSolver(nmodes As Integer)
     Dim flag As Boolean
     Dim uint As Integer
@@ -48,12 +70,57 @@ Sub setEigenSolver(nmodes As Integer)
     uint=RestoreParameter("nmodes")
     ReportInformation("EigenmodeSolver NumberOfModes set As " & uint)
 End Sub
+Sub setEigenSolver_Auto()
+    Dim flag As Boolean
+    Dim uint As Integer
+    Dim udouble As Double
+    flag=DoesParameterExist("fmin") 
+    If flag=False Then
+        StoreParameterWithDescription "fmin" 0 "Minimum Freq For Solver"
+        ReportInformation("Fmin Not Exists Set Default Value As 0 MHZ")
+    ElseIf
+        ReportInformation("Found Existing Fmin")
+    End If    
+    flag=DoesParameterExist("nmodes") 
+    If flag=False Then
+        StoreParameterWithDescription "nmodes" 1 "Min Mode Num to Calc"        
+        ReportInformation("nmodes set As " & 1)
+    ElseIf
+        uint=RestoreParameter("nmodes") 
+        ReportInformation("Found Existing nmodes" & uint)
+    End If    
+    With EigenmodeSolver 
+        .SetFrequencyTarget "True", "fmin" 
+        .SetNumberOfModes "nmodes"
+    End With
+
+    udouble=RestoreParameter("fmin")
+    ReportInformation("EigenmodeSolver FrequencyTarget set As " & udouble)
+    uint=RestoreParameter("nmodes")
+    ReportInformation("EigenmodeSolver NumberOfModes set As " & uint)
+End Sub
 Sub SetPreprocessDone()
     StoreParameterWithDescription preprocessdonestr 1 "PreprocessDone"
 End Sub
+Function CheckPreprocessDone() As Boolean
+    'get the preprocess result
+    Dim result As Boolean
+    result=DoesParameterExist(preprocessdonestr)
+    CheckPreprocessDone=result
+End Function
 Function CheckPreprocess_Ext(resultPath As String) As Boolean
     'get the preprocess result to export
     Dim result As Boolean
     result=DoesParameterExist(preprocessdonestr)
     CheckPreprocess_Ext=result
 End Function
+
+Sub StartPreProcess
+    Dim result As Boolean
+    result=CheckPreprocessDone
+    If result=False
+        setFreqRange_Auto
+        setEigenSolver_Auto
+        SetPreprocessDone
+    End If
+End Sub
