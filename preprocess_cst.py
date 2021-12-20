@@ -13,12 +13,27 @@ class vbpreprocess:
         self.preProcessID = 0
         pass
 
-    def createPreProcessVBCodeLines(self):
+    def setResultDir(self, rDir):
+        self.resultDir = Path(rDir)
+
+    def reset(self):
+        self.resultDir = None
+        self.preProcessDocList.clear()
+        self.preProcessID = 0
+
+    def getUsedFileNameList(self):
+        namelist = list()
+        for doc in self.preProcessDocList:
+            namelist.append(doc["resultFilename"])
+        return namelist
+
+    def createPreProcessVBCodeLines(self, createMain=True):
         lst = []
         importFileList = []
         for doc in self.preProcessDocList:
-            importFile = doc["import"]
-            importFileList.append(importFile)
+            importFile = doc.get("import", None)
+            if importFile is not None:
+                importFileList.append(importFile)
         importFileSet = set(importFileList)
         for vbheaderfileName in importFileSet:
             importFilePath = self.preProcessDataDir / vbheaderfileName
@@ -30,9 +45,14 @@ class vbpreprocess:
             lst.append("\n")
         lst.append("\nSub CustomPreProcess\n")
         for doc in self.preProcessDocList:
-            funcString = "    " + doc["funcString"]
+            funcString = "    " + doc["funcString"] + "\n"
             lst.append(funcString)
         lst.append("End Sub\n")
+        if createMain:
+            lst.append("\nSub Main\n")
+            funcString = "    " + "CustomPreProcess" + "\n"
+            lst.append(funcString)
+            lst.append("End Sub\n")
         return lst
 
     def appendPreProcessSteps(self, pslist):
@@ -68,11 +88,27 @@ class vbpreprocess:
             resultList.append(d)
         return resultList
 
+    def OpenFile(self, configdict: dict):
+        cstpath = configdict.get("cstpath")
+        funcString = "OpenFile" + '"' + cstpath + '"'
+        paramdoc = {}
+        doc = dict()
+        doc.update({"id": self.preProcessID})
+        doc.update({"resultName": configdict.get("resultName", "default")})
+        doc.update(
+            {"resultFilename": configdict.get("resultFilename", "default_filename")}
+        )
+        doc.update({"funcString": funcString})
+        doc.update({"readoutmethod": self.commonReadout})
+        doc.update({"params": paramdoc})
+        self.preProcessDocList.append(doc)
+        self.preProcessID += 1
+
     def preparamize(self, configdict: dict):
         funcString = "StartPreProcess"
         paramdoc = {}
         doc = dict()
-        doc.update({"id": self.postProcessID})
+        doc.update({"id": self.preProcessID})
         doc.update({"import": "preparamize.vb"})
         doc.update({"resultName": configdict.get("resultName", "default")})
         doc.update(
@@ -85,15 +121,18 @@ class vbpreprocess:
         self.preProcessID += 1
 
     def getparamlist(self, configdict: dict):
-        funcString = "GetParamList"
+        ### dict resultName
+        resultpath = Path(configdict.get("resultpath", "./a.txt"))
+        resultFilename = resultpath.stem
+
+        funcString = "GetParamList " + '"' + str(resultpath) + '"'
         paramdoc = {}
         doc = dict()
-        doc.update({"id": self.postProcessID})
-        doc.update({"import": "readParams.vb"})
+        doc.update({"id": self.preProcessID})
+        doc.update({"import": "GetParamList.vb"})
         doc.update({"resultName": configdict.get("resultName", "default")})
-        doc.update(
-            {"resultFilename": configdict.get("resultFilename", "default_filename")}
-        )
+        doc.update({"resultFilename": resultFilename})
+        doc.update({"resultpath": resultpath})
         doc.update({"funcString": funcString})
         doc.update({"readoutmethod": self.getparamlist_readout})
         doc.update({"params": paramdoc})
@@ -139,16 +178,20 @@ class vbpreprocess:
         return paramslist
 
     def saveCSTProject(self, configdict: dict):
-        funcString = "StartPreProcess"
+        # dict cst vb path
+        outpath = configdict.get("outpath", r"./temp/a.cst")
+        outpath = str(Path(outpath).absolute())
+        funcString = "SaveCST" + " " + '"' + outpath + '"'
         paramdoc = {}
         doc = dict()
-        doc.update({"id": self.postProcessID})
+        doc.update({"id": self.preProcessID})
         doc.update({"import": "saveCST.vb"})
         doc.update({"resultName": configdict.get("resultName", "default")})
         doc.update(
-            {"resultFilename": configdict.get("resultFilename", "default_filename")}
+            {"resultFilename": configdict.get("resultFilename", "default_filename.txt")}
         )
         doc.update({"funcString": funcString})
+        doc.update({"outpath": outpath})
         doc.update({"readoutmethod": self.commonReadout})
         doc.update({"params": paramdoc})
         self.preProcessDocList.append(doc)

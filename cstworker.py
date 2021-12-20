@@ -16,8 +16,8 @@ class local_cstworker(worker.worker):
 
         # configs
         # cstType,cstPatternDir,tempDir,taskFileDir,resultDir,cstPath
-        self.cstType = config["ProjectType"]
-        self.cstPatternDir = pathlib.Path(config["cstPatternDir"])
+        self.cstType = config.get("ProjectType", "defaultCSTType")
+        self.cstPatternDir = pathlib.Path(config.get("cstPatternDir", "./data"))
         self.tempDir = pathlib.Path(config["tempPath"])
         self.taskFileDir = pathlib.Path(config["taskFileDir"])
         self.resultDir = pathlib.Path(config["resultDir"])

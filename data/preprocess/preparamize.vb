@@ -4,18 +4,10 @@ Const preprocessdonestr As String="PPSDONE"
 Sub setFreqRange(fmin As Double,fmax As Double)
     'check existence
     Dim flag As Boolean
-    flag=DoesParameterExist("fmin") 
-    If flag=False Then
-        StoreParameterWithDescription "fmin" fmin "Minimum Freq For Solver"
-    ElseIf
-        ReportInformation("Fmin Already Exists")
-    End If
-    flag=DoesParameterExist("fmax") 
-    If flag=False Then
-        StoreParameterWithDescription "fmax" fmax "Maximum Freq For Solver"
-    ElseIf
-        ReportInformation("Fmax Already Exists")
-    End If
+    MakeSureParameterExists("fmin",fmin)
+    MakeSureParameterExists("fmax",fmax)
+    SetParameterDescription   "fmin","Minimun Freq For Solver"
+    SetParameterDescription   "fmax","Maximum Freq For Solver"
     Solver.FrequencyRange "fmin", "fmax"
     ReportInformation("FrequencyRange Set As fmin, fmax")    
 End Sub
@@ -26,18 +18,11 @@ Sub setFreqRange_Auto()
     Dim localfmax As Double
     localfmin=Solver.GetFmin()
     localfmax=Solver.GetFmax()
-    flag=DoesParameterExist("fmin") 
-    If flag=False Then
-        StoreParameterWithDescription "fmin" localfmin "Minimum Freq For Solver"
-    ElseIf
-        ReportInformation("Fmin Already Exists")
-    End If
-    flag=DoesParameterExist("fmax") 
-    If flag=False Then
-        StoreParameterWithDescription "fmax" localfmax "Maximum Freq For Solver"
-    ElseIf
-        ReportInformation("Fmax Already Exists")
-    End If
+    MakeSureParameterExists("fmin",localfmin)
+    MakeSureParameterExists("fmax",localfmax)
+    SetParameterDescription   "fmin","Minimun Freq For Solver"
+    SetParameterDescription   "fmax","Maximum Freq For Solver"
+
     Solver.FrequencyRange "fmin", "fmax"
     ReportInformation("FrequencyRange Set As fmin, fmax")    
 End Sub
@@ -45,21 +30,9 @@ Sub setEigenSolver(nmodes As Integer)
     Dim flag As Boolean
     Dim uint As Integer
     Dim udouble As Double
-    flag=DoesParameterExist("fmin") 
-    If flag=False Then
-        StoreParameterWithDescription "fmin" 0 "Minimum Freq For Solver"
-        ReportInformation("Fmin Not Exists Set Default Value As 0 MHZ")
-    ElseIf
-        ReportInformation("Found Existing Fmin")
-    End If    
+    MakeSureParameterExists("fmin",0)
+    MakeSureParameterExists("nmodes",nmodes)
     flag=DoesParameterExist("nmodes") 
-    If flag=False Then
-        StoreParameterWithDescription "nmodes" nmodes "Min Mode Num to Calc"        
-        ReportInformation("nmodes set As " & nmodes)
-    ElseIf
-        uint=RestoreParameter("nmodes") 
-        ReportInformation("Found Existing nmodes" & uint)
-    End If    
     With EigenmodeSolver 
         .SetFrequencyTarget "True", "fmin" 
         .SetNumberOfModes "nmodes"
@@ -74,21 +47,9 @@ Sub setEigenSolver_Auto()
     Dim flag As Boolean
     Dim uint As Integer
     Dim udouble As Double
-    flag=DoesParameterExist("fmin") 
-    If flag=False Then
-        StoreParameterWithDescription "fmin" 0 "Minimum Freq For Solver"
-        ReportInformation("Fmin Not Exists Set Default Value As 0 MHZ")
-    ElseIf
-        ReportInformation("Found Existing Fmin")
-    End If    
-    flag=DoesParameterExist("nmodes") 
-    If flag=False Then
-        StoreParameterWithDescription "nmodes" 1 "Min Mode Num to Calc"        
-        ReportInformation("nmodes set As " & 1)
-    ElseIf
-        uint=RestoreParameter("nmodes") 
-        ReportInformation("Found Existing nmodes" & uint)
-    End If    
+    MakeSureParameterExists("fmin",0)
+    MakeSureParameterExists("nmodes",1)
+    
     With EigenmodeSolver 
         .SetFrequencyTarget "True", "fmin" 
         .SetNumberOfModes "nmodes"
@@ -100,7 +61,7 @@ Sub setEigenSolver_Auto()
     ReportInformation("EigenmodeSolver NumberOfModes set As " & uint)
 End Sub
 Sub SetPreprocessDone()
-    StoreParameterWithDescription preprocessdonestr 1 "PreprocessDone"
+    StoreParameterWithDescription preprocessdonestr,1,"PreprocessDone"
 End Sub
 Function CheckPreprocessDone() As Boolean
     'get the preprocess result
@@ -118,7 +79,7 @@ End Function
 Sub StartPreProcess
     Dim result As Boolean
     result=CheckPreprocessDone
-    If result=False
+    If result=False Then
         setFreqRange_Auto
         setEigenSolver_Auto
         SetPreprocessDone

@@ -1,6 +1,6 @@
 import configparser
 import os, shutil, re, json
-import logger
+import preprocess_cst, cstworker
 import json
 import subprocess
 import hashlib
@@ -133,7 +133,7 @@ class ProjectConfmanager(object):
             iConf = self.createNewEmptyProjectConfFile(iProjectDir)
 
             # 复制输入CST文件到输出文件夹
-
+            # 且自动预处理
             dstPath = iProjectDir / iInputCSTFilePath.name
             if dstPath.exists():
                 self.logger.info("目的%s已存在同名文件。" % str(dstPath))
@@ -144,7 +144,7 @@ class ProjectConfmanager(object):
             self.logger.info(
                 "已将输入CST文件%s复制到project目录%s。" % (str(iInputCSTFilePath), dstStrPath)
             )
-            iConf = self.__updateCSTFileInfoInConfObj(iConf, dstPath)
+            iConf = self.__autoPreProcess(iConf, dstPath)
             self.__savecfgobj(iConf)
             self.conf = iConf
             self.savePPSSettings(self.currPPSList)
@@ -252,15 +252,16 @@ class ProjectConfmanager(object):
         return newconf
         # 保存配置文件
 
-    def __updateCSTFileInfoInConfObj(self, confobj, cstFilePath):
-        self.logger.info("根据输入的CST文件更新Config内容")
+    def __autoPreProcess(self, confobj, cstFilePath):
+        self.logger.info("根据输入的CST文件进行预处理且更新Config内容")
         savejsonname = confobj.get("PARAMETERS", "paramfile")
         confobj.set("CST", "CSTFilename", str(cstFilePath))
-        file_md5 = self.genMD5FromCST(cstFilePath)
-        confobj.set("CST", "CSTFileMD5", file_md5.hexdigest())
-        self.readParametersFromCST(
+        savednewcstpath = self.__vbpreprocess_CST(
             confobj, projectDir=self.currProjectDir, savejsonpath=savejsonname
         )
+        confobj.set("CST", "CSTFilename", str(savednewcstpath))
+        file_md5 = self.genMD5FromCST(savednewcstpath)
+        confobj.set("CST", "CSTFileMD5", file_md5.hexdigest())
         self.logger.info("Config内容更新完成")
         return confobj
 
@@ -336,12 +337,52 @@ class ProjectConfmanager(object):
         fp.close()
         return file_md5
 
-    def CSTfilePreProcess(self, cstFilePath):  # 预处理
+    def __gen_vblines_cstpreprocess(self, oldcstpath, midpath):  # 预处理
+        preps = preprocess_cst.vbpreprocess()
+        preps.setResultDir(self.currProjectDir)
+        pslist = []
+        prep0 = {
+            "method": "OpenFile",
+            "config": {
+                "resultName": "openfile_result",
+                "resultFilename": "openfile.txt",
+                "cstpath": str(oldcstpath),
+            },
+        }
+        pslist.append(prep0)
+        prep1 = {
+            "method": "preparamize",
+            "config": {
+                "resultName": "preparamize_result",
+                "resultFilename": "paramr.txt",
+            },
+        }
+        pslist.append(prep1)
+        prep2 = {
+            "method": "getparamlist",
+            "config": {
+                "resultName": "getparamlist_result",
+                "resultpath": str(midpath),
+            },
+        }
+        pslist.append(prep2)
+        newcstpath = self.currProjectDir / "processed.cst"
+        opath_str = str(newcstpath)
+        prep3 = {
+            "method": "saveCSTProject",
+            "config": {
+                "resultName": "saveCSTProject_result",
+                "resultFilename": "savedcst.txt",
+                "outpath": opath_str,
+            },
+        }
+        pslist.append(prep3)
+        preps.appendPreProcessSteps(pslist)
+        vblines = preps.createPreProcessVBCodeLines()
+        # processedCSTFilePath = cstFilePath
+        return vblines, newcstpath
 
-        processedCSTFilePath = cstFilePath
-        return processedCSTFilePath
-
-    def readParametersFromCST(self, confobj, projectDir, savejsonpath=None):
+    def __vbpreprocess_CST(self, confobj, projectDir, savejsonpath=None):
         if savejsonpath == None:
             jsonpath = projectDir / self.paramsfilename
         else:
@@ -387,12 +428,16 @@ class ProjectConfmanager(object):
         file_1 = open(vbasrcpath, "r")
         file_2 = tmp_bas.file
         list1 = []
-        for line in file_1.readlines():
-            ssd = line
-            ssd = re.sub("%PARAMDSTPATH%", str(midfilepath).replace("\\", "\\\\"), ssd)
-            ssd = re.sub("%CSTPROJFILE%", str(tmpcstpath).replace("\\", "\\\\"), ssd)
-            list1.append(ssd)
-        file_1.close()
+        # for line in file_1.readlines():
+        #     ssd = line
+        #     ssd = re.sub("%PARAMDSTPATH%", str(midfilepath).replace("\\", "\\\\"), ssd)
+        #     ssd = re.sub("%CSTPROJFILE%", str(tmpcstpath).replace("\\", "\\\\"), ssd)
+        #     list1.append(ssd)
+        # file_1.close()
+        list1, newcstpath = self.__gen_vblines_cstpreprocess(
+            str(tmpcstpath), str(midfilepath)
+        )
+
         for i in range(len(list1)):
             file_2.write(list1[i])
         file_2.close()
@@ -415,6 +460,7 @@ class ProjectConfmanager(object):
                 self.logger.info(line)
 
         projectutil.custom_ascii_2_json(midfilepath, jsonpath)
+        return newcstpath
         pass
 
     def __checkAndRepairProject(
@@ -458,8 +504,9 @@ class ProjectConfmanager(object):
 
             self.logger.warning("重新生成参数列表并保存MD5n/y")
             self.logger.info("正在重新生成参数列表")
-            self.readParametersFromCST()
-            self.conf["CST"]["CSTFileMD5"] = currCSTMD5
+            self.conf = self.__autoPreProcess(self.conf, cstfilepath)
+            # self.readParametersFromCST()
+            # self.conf["CST"]["CSTFileMD5"] = currCSTMD5
             self.__savecfgobj()
             self.logger.warning("已更新保存的MD5")
             self.logger.info("测试MD5 通过")
@@ -467,7 +514,9 @@ class ProjectConfmanager(object):
             self.logger.warning("参数列表文件_%s不存在" % str(paramjsonpath))
 
             self.logger.warning("重新生成并保存参数列表")
-            self.readParametersFromCST(paramjsonpath)
+            self.conf = self.__autoPreProcess(self.conf, cstfilepath)
+            # self.readParametersFromCST(paramjsonpath)
+            self.__savecfgobj()
         if not ppsjsonpath.exists():
             self.logger.warning("后处理设置文件_%s不存在" % str(paramjsonpath))
             self.logger.warning("重新生成并保存参数列表")

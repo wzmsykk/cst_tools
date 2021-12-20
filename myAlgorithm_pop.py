@@ -45,7 +45,7 @@ class myAlg01(myAlg):
             self.setJobManager(manager)
         # self.results=result.result
 
-        self.input_name = ["Nmodes", "fmin", "fmax", "accuracy", "cell"]
+        self.input_name = ["nmodes", "fmin", "fmax", "accuracy", "cell"]
         self.input_min = [1, 700, 800, 1e-5, 20]  ##初始值
 
         self.csv_input_name = self.input_name + ["mode"]
