@@ -49,7 +49,7 @@ Sub setEigenSolver_Auto()
     Dim udouble As Double
     MakeSureParameterExists("fmin",0)
     MakeSureParameterExists("nmodes",1)
-    
+    SetParameterDescription   "nmodes","Number of modes to calculate"
     With EigenmodeSolver 
         .SetFrequencyTarget "True", "fmin" 
         .SetNumberOfModes "nmodes"

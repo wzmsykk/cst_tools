@@ -75,7 +75,7 @@ Sub postProcess
 	Dim outmode,i As Integer
 	Dim st,ed As Double
 	st=Timer
-	outmode = RestoreDoubleParameter("Nmodes")
+	outmode = RestoreDoubleParameter("nmodes")
 	For i=1 to outmode
 		SelectTreeItem("2D/3D Results\Modes\Mode "& i &"\e")
 		With ASCIIExport
