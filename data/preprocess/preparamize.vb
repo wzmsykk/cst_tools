@@ -8,7 +8,10 @@ Sub setFreqRange(fmin As Double,fmax As Double)
     MakeSureParameterExists("fmax",fmax)
     SetParameterDescription   "fmin","Minimun Freq For Solver"
     SetParameterDescription   "fmax","Maximum Freq For Solver"
-    Solver.FrequencyRange "fmin", "fmax"
+    Dim hislist As String
+    hislist="Solver.FrequencyRange ""fmin"", ""fmax""" & vbCrLf
+    AddToHistory("PRE_STEP_FREQ_CUSTOM_SET",hislist) 
+    'Solver.FrequencyRange "fmin", "fmax"
     ReportInformation("FrequencyRange Set As fmin, fmax")    
 End Sub
 Sub setFreqRange_Auto()
@@ -23,7 +26,10 @@ Sub setFreqRange_Auto()
     SetParameterDescription   "fmin","Minimun Freq For Solver"
     SetParameterDescription   "fmax","Maximum Freq For Solver"
 
-    Solver.FrequencyRange "fmin", "fmax"
+    'Solver.FrequencyRange "fmin", "fmax"
+    Dim hislist As String
+    hislist="Solver.FrequencyRange ""fmin"", ""fmax""" & vbCrLf
+    AddToHistory("PRE_STEP_FREQ_RANGE_SET",hislist) 
     ReportInformation("FrequencyRange Set As fmin, fmax")    
 End Sub
 Sub setEigenSolver(nmodes As Integer)
@@ -33,10 +39,16 @@ Sub setEigenSolver(nmodes As Integer)
     MakeSureParameterExists("fmin",0)
     MakeSureParameterExists("nmodes",nmodes)
     flag=DoesParameterExist("nmodes") 
-    With EigenmodeSolver 
-        .SetFrequencyTarget "True", "fmin" 
-        .SetNumberOfModes "nmodes"
-    End With
+    ' With EigenmodeSolver 
+    '     .SetFrequencyTarget "True", "fmin" 
+    '     .SetNumberOfModes "nmodes"
+    ' End With
+    Dim hislist As String
+    hislist="With EigenmodeSolver" & vbCrLf
+    hislist=hislist & ".SetFrequencyTarget ""True"", ""fmin""" & vbCrLf
+    hislist=hislist & ".SetNumberOfModes ""nmodes""" & vbCrLf
+    hislist=hislist & "End With" & vbCrLf
+    AddToHistory("PRE_STEP_EIGENSOLVER_CUSTOM_SET",hislist) 
 
     udouble=RestoreParameter("fmin")
     ReportInformation("EigenmodeSolver FrequencyTarget set As " & udouble)
@@ -50,11 +62,16 @@ Sub setEigenSolver_Auto()
     MakeSureParameterExists("fmin",0)
     MakeSureParameterExists("nmodes",1)
     SetParameterDescription   "nmodes","Number of modes to calculate"
-    With EigenmodeSolver 
-        .SetFrequencyTarget "True", "fmin" 
-        .SetNumberOfModes "nmodes"
-    End With
-
+    ' With EigenmodeSolver 
+    '     .SetFrequencyTarget "True", "fmin" 
+    '     .SetNumberOfModes "nmodes"
+    ' End With
+    Dim hislist As String
+    hislist="With EigenmodeSolver" & vbCrLf
+    hislist=hislist & ".SetFrequencyTarget ""True"", ""fmin""" & vbCrLf
+    hislist=hislist & ".SetNumberOfModes ""nmodes""" & vbCrLf
+    hislist=hislist & "End With" & vbCrLf
+    AddToHistory("PRE_STEP_EIGENSOLVER_SET",hislist) 
     udouble=RestoreParameter("fmin")
     ReportInformation("EigenmodeSolver FrequencyTarget set As " & udouble)
     uint=RestoreParameter("nmodes")
@@ -83,5 +100,6 @@ Sub StartPreProcess
         setFreqRange_Auto
         setEigenSolver_Auto
         SetPreprocessDone
+        Rebuild
     End If
 End Sub
