@@ -2,7 +2,7 @@ import os
 import numpy as np
 import re
 import pandas as pd
-import time
+
 
 location_up = (
     "D:\\wangpeilin\\cst_20200218\\cst_new\\my_subject_kbann\\result20210308001\\"

@@ -1,14 +1,8 @@
 import os
-import pathlib
-import sys
-import shutil
-import result
-import copy
-import json
-import numpy as np
-import worker, cstmanager
-import projectutil
-import adam, myAlgorithm_pop
+from install_compat import resource_path
+
+import cstmanager
+import myAlgorithm_pop
 import globalconfmanager, logger, time
 import projectconfmanager
 import argparse
@@ -37,6 +31,9 @@ class cst_tools_main:
         self.glogger = logger.Logger(self.glogfilepath, level="debug")
         self.logger = self.glogger.getLogger()
         self.logger.info("日志已输出到%s", self.glogfilepath)
+        ### 测试环境
+        self.logger.info("数据路径%s" % str(resource_path(".")))
+
         # 启动全局配置管理器,读取全局配置
         self.gconfman = globalconfmanager.GlobalConfmanager(Logger=self.logger)
         self.pconfman = projectconfmanager.ProjectConfmanager(
@@ -50,7 +47,7 @@ class cst_tools_main:
         self.alg = myAlgorithm_pop.myAlg01(manager=None, params=None)
 
         # 设置默认后处理
-        defaultPPSListPath = pathlib.Path("data/defaultPPS.json")
+        defaultPPSListPath = resource_path("data/defaultPPS.json")
         lst = self.readPostProcessListFromFile(defaultPPSListPath)
         self.setCurrPostProcessList(lst)
 

@@ -1,6 +1,7 @@
 import configparser
-import os, shutil, re, json
-import preprocess_cst, cstworker
+import shutil, json
+import preprocess_cst
+from install_compat import resource_path
 import json
 import subprocess
 import hashlib
@@ -409,7 +410,7 @@ class ProjectConfmanager(object):
         tmp_txt_name = tmp_txt.name
         self.logger.info("临时文件生成成功。")
         vbasrcpath = (
-            pathlib.Path(self.gconf["BASE"]["datadir"]).absolute() / "readParamsT.vb"
+            resource_path(self.gconf["BASE"]["datadir"]) / "readParamsT.vb"
         )
         vbadstpath = pathlib.Path(tempfile.gettempdir()) / tmp_bas_name
         midfilepath = pathlib.Path(tempfile.gettempdir()) / tmp_txt_name

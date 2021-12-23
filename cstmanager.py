@@ -1,8 +1,8 @@
 import cstworker
-import time, os
+import os
 import threading
 import queue
-import copy
+from install_compat import resource_path
 import pathlib
 
 
@@ -16,7 +16,7 @@ class manager(object):
         self.pconfm = pconfm
         self.gconf = gconfm.conf
         self.pconf = pconfm.conf
-        self.cstPatternDir = pathlib.Path(self.gconf["BASE"]["datadir"]).absolute()
+        self.cstPatternDir = resource_path(self.gconf["BASE"]["datadir"])
         self.currProjectDir = pathlib.Path(pconfm.currProjectDir).absolute()
 
         tp = pathlib.Path(self.pconf["DIRS"]["tempdir"])

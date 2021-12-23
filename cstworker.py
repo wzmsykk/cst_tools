@@ -1,9 +1,8 @@
-import os, json, re, copy, sys, shutil
-import result
+import re, copy, shutil
+from install_compat import resource_path
 import numpy as np
 import time
 import subprocess
-import logging
 import hashlib
 import pathlib
 import worker
@@ -17,7 +16,7 @@ class local_cstworker(worker.worker):
         # configs
         # cstType,cstPatternDir,tempDir,taskFileDir,resultDir,cstPath
         self.cstType = config.get("ProjectType", "defaultCSTType")
-        self.cstPatternDir = pathlib.Path(config.get("cstPatternDir", "./data"))
+        self.cstPatternDir = pathlib.Path(config.get("cstPatternDir", resource_path("./data")))
         self.tempDir = pathlib.Path(config["tempPath"])
         self.taskFileDir = pathlib.Path(config["taskFileDir"])
         self.resultDir = pathlib.Path(config["resultDir"])

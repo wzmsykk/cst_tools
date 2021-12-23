@@ -5,19 +5,11 @@
 ###初值需要自己写，留空[]则为默认
 ###
 import os
-import sys
-import shutil
-import re
 import result
-import copy
-import math
 import numpy as np
-import cstmanager
 import yfunction
 import time
 import random
-from decimal import Decimal
-import csv
 import pandas as pd
 
 

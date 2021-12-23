@@ -1,5 +1,5 @@
 from pathlib import Path
-import json
+from install_compat import resource_path
 from projectutil import is_number
 
 
@@ -7,8 +7,8 @@ class vbpreprocess:
     def __init__(self) -> None:
 
         self.resultDir = None
-        self.preProcessDataDir = Path("data/preprocess").absolute()
-        self.altIncludeDir = Path("data").absolute()
+        self.preProcessDataDir = resource_path("data/preprocess")
+        self.altIncludeDir = resource_path("data")
         self.preProcessDocList = list()
         self.preProcessID = 0
         pass

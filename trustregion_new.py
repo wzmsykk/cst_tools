@@ -1,11 +1,6 @@
 import os
-import sys
-import shutil
-import re
 import result
-import copy
 import numpy as np
-import worker
 import yfunction
 
 

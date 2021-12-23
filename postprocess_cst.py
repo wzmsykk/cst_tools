@@ -1,12 +1,12 @@
 from pathlib import Path
-import json
+from install_compat import resource_path
 
 
 class vbpostprocess:
     def __init__(self) -> None:
 
         self.resultDir = None
-        self.postProcessDataDir = Path("data/postprocess").absolute()
+        self.postProcessDataDir = resource_path("data/postprocess")
         self.postProcessDocList = list()
         self.postProcessID = 0
         self.ml_tools = None
