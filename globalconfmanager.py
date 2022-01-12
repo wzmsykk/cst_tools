@@ -128,7 +128,7 @@ class GlobalConfmanager(object):
         ed1 = r":\Program Files (x86)\CST Studio Suite "
         ed2 = r"\CST DESIGN ENVIRONMENT.exe"
         for i in range(ord("C"), ord("Z")):
-            for j in range(2015, 2025):
+            for j in range(2025, 2015,-1):
                 path = pathlib.Path(chr(i) + ed1 + str(j) + ed2)
                 print(path)
                 try:
