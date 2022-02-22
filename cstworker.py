@@ -10,14 +10,14 @@ import postprocess_cst
 
 
 class local_cstworker(worker.worker):
-    def __init__(self, id, type, config, logger):
-        super().__init__(id, type, config, logger)
+    def __init__(self, id, config, logger, type="CST"):
+        super().__init__(id, config, logger, type)
 
         # configs
         # cstType,cstPatternDir,tempDir,taskFileDir,resultDir,cstPath
-        self.cstType = config.get("ProjectType", "defaultCSTType")
+        self.cstType = config.get("ProjectType", "default")
         self.cstPatternDir = pathlib.Path(config.get("cstPatternDir", resource_path("./data")))
-        self.tempDir = pathlib.Path(config["tempPath"])
+        self.workDir = pathlib.Path(config["tempPath"])
         self.taskFileDir = pathlib.Path(config["taskFileDir"])
         self.resultDir = pathlib.Path(config["resultDir"])
         self.cstProjPath = pathlib.Path(config["cstPath"])
@@ -34,7 +34,7 @@ class local_cstworker(worker.worker):
 
         # LOGGING#
 
-        self.logger.info("TempDir:%s" % str(self.tempDir))
+        self.logger.info("TempDir:%s" % str(self.workDir))
         self.logger.info("TaskFileDir:%s" % str(self.taskFileDir))
 
         # FINDCST
@@ -53,7 +53,7 @@ class local_cstworker(worker.worker):
 
         ##COPY cstProj TO TEMP
 
-        self.tmpCstFilePath = self.tempDir / "cstproj.cst"
+        self.tmpCstFilePath = self.workDir / "cstproj.cst"
 
         ##IF tmpCstFile EXISTS, CHECK FILE MD5
         if self.tmpCstFilePath.exists():
@@ -85,13 +85,13 @@ class local_cstworker(worker.worker):
         if self.resultDir.exists():
             shutil.rmtree(self.resultDir)
             self.resultDir.mkdir()
-        if self.tempDir.exists():
-            shutil.rmtree(self.tempDir)
-            self.tempDir.mkdir()
+        if self.workDir.exists():
+            shutil.rmtree(self.workDir)
+            self.workDir.mkdir()
         self.logger.info("Worker_(%s):old runfile removed" % self.ID)
 
     def startCSTenv(self, mainbatchpath):
-        cstlogPath = self.tempDir / "cst.log"
+        cstlogPath = self.workDir / "cst.log"
         self.cstlog = open(cstlogPath, "wb", buffering=0)
         command = (
             "start cmd /k "
@@ -140,10 +140,10 @@ class local_cstworker(worker.worker):
         f1.close()
 
     def createMainCSTbatch(self, hFilePath, mFilePath):
-        oFilePath = self.tempDir / "main.bas"
+        oFilePath = self.workDir / "main.bas"
 
         ###saveVBConfigs
-        cFilePath = self.tempDir / "configs.txt"
+        cFilePath = self.workDir / "configs.txt"
         file_c = open(cFilePath, "w")
         file_c.write(self.cstType + "\n")
         file_c.write(str(self.resultDir.absolute()) + "\n")

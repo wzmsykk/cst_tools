@@ -27,7 +27,7 @@ class vbpreprocess:
             namelist.append(doc["resultFilename"])
         return namelist
 
-    def createPreProcessVBCodeLines(self, createMain=True):
+    def createPreProcessVBCodeLines(self, createMain=False):
         lst = []
         importFileList = []
         for doc in self.preProcessDocList:
@@ -63,9 +63,12 @@ class vbpreprocess:
 
     def dummyReadout(self, *args, **kwargs):
         ## I Do Nothing
-        return 0
+        return None
 
     def commonReadout(self, resultFilename):
+        ## I read All lines from the file
+        if resultFilename is None:
+            return None
         rpath = self.resultDir / resultFilename
         d = self.readAllLines(rpath)
         return d
@@ -80,11 +83,16 @@ class vbpreprocess:
         for doc in self.preProcessDocList:
             d = {}
             d["id"] = doc["id"]
-            d["resultName"] = doc["resultName"]
-            d["value"] = doc.get("readoutmethod", self.dummyReadout)(
-                doc["resultFilename"]
-            )
-            d["params"] = doc["params"]
+            haveResultOutput=doc.get("haveResultOutput",True)
+            if haveResultOutput:
+                d["resultName"] = doc.get("resultName",None)
+                readoutArgs=doc.get("readoutArgs",None)
+                readoutmethod=doc.get("readoutmethod", "dummyReadout")
+                d["value"] = getattr(self,readoutmethod)(readoutArgs)
+                
+            else:
+                d["haveResultOutput"]=False
+            d["params"] = doc.get("params",None)
             resultList.append(d)
         return resultList
 
@@ -99,12 +107,27 @@ class vbpreprocess:
             {"resultFilename": configdict.get("resultFilename", "default_filename")}
         )
         doc.update({"funcString": funcString})
-        doc.update({"readoutmethod": self.commonReadout})
+        doc.update({"readoutmethod": "commonReadout"})
         doc.update({"params": paramdoc})
         self.preProcessDocList.append(doc)
         self.preProcessID += 1
 
-    def preparamize(self, configdict: dict):
+    def SetVirtualRunFlag(self,configdict: dict):
+        ###Input dict{"FlagValue":Bool}
+        ### This flag indicates whether the CST worker will do a actual FEM simulation.
+        ### Useful while just changing project settings.
+        flag_boolean = configdict.get("FlagValue")
+        funcString = "VirtualRun" + '=' + str(flag_boolean)
+        paramdoc = {}
+        doc = dict()
+        doc.update({"id": self.preProcessID})
+        doc.update({"haveResultOutput": False})
+        doc.update({"funcString": funcString})
+        doc.update({"params": paramdoc})
+        self.preProcessDocList.append(doc)
+        self.preProcessID += 1
+
+    def Preparamize(self, configdict: dict):
         funcString = "StartPreProcess"
         paramdoc = {}
         doc = dict()
@@ -115,17 +138,18 @@ class vbpreprocess:
             {"resultFilename": configdict.get("resultFilename", "default_filename")}
         )
         doc.update({"funcString": funcString})
-        doc.update({"readoutmethod": self.commonReadout})
+        doc.update({"readoutmethod": "commonReadout"})
+        
         doc.update({"params": paramdoc})
         self.preProcessDocList.append(doc)
         self.preProcessID += 1
 
-    def getparamlist(self, configdict: dict):
+    def Getparamlist(self, configdict: dict):
         ### dict resultName
-        resultpath = Path(configdict.get("resultpath", "./a.txt"))
+        resultpath = Path(configdict.get("outputname", "a.txt"))
         resultFilename = resultpath.stem
 
-        funcString = "GetParamList " + '"' + str(resultpath) + '"'
+        funcString = "GetParamList " + '"' + str(resultFilename) + '"'
         paramdoc = {}
         doc = dict()
         doc.update({"id": self.preProcessID})
@@ -134,7 +158,7 @@ class vbpreprocess:
         doc.update({"resultFilename": resultFilename})
         doc.update({"resultpath": resultpath})
         doc.update({"funcString": funcString})
-        doc.update({"readoutmethod": self.getparamlist_readout})
+        doc.update({"readoutmethod": "getparamlist_readout"})
         doc.update({"params": paramdoc})
         self.preProcessDocList.append(doc)
         self.preProcessID += 1
@@ -177,7 +201,7 @@ class vbpreprocess:
         fp.close()
         return paramslist
 
-    def saveCSTProject(self, configdict: dict):
+    def SaveCSTProject(self, configdict: dict):
         # dict cst vb path
         outpath = configdict.get("outpath", r"./temp/a.cst")
         outpath = str(Path(outpath).absolute())
@@ -192,7 +216,7 @@ class vbpreprocess:
         )
         doc.update({"funcString": funcString})
         doc.update({"outpath": outpath})
-        doc.update({"readoutmethod": self.commonReadout})
+        doc.update({"readoutmethod": "commonReadout"})
         doc.update({"params": paramdoc})
         self.preProcessDocList.append(doc)
         self.preProcessID += 1

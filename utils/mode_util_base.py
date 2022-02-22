@@ -53,7 +53,7 @@ def read_coffs(filename):
 
 
 
-def result_stats(result_dir=""):
+def result_stats(result_dir="",printhost=True):
     curdir=pathlib.Path(result_dir)
     freqs=curdir.glob("MODE_*_Freq.txt")
     flist=list()
@@ -65,7 +65,7 @@ def result_stats(result_dir=""):
     
     
 
-    for i in range(1,totalmodes):
+    for i in range(1,totalmodes+1):
         pt="MODE_"+str(i)+"_Freq.txt"
         pt=curdir.joinpath(pt)
         fp=open(pt,"r")
@@ -103,13 +103,13 @@ def result_stats(result_dir=""):
         statlist.append((i,tp,fq,coff,mc))
 
     
-
-    uformat="MODE:{}\tType:{}\tFreq:{}\tTEMCoff:{:5f}\tcustType:{}"
-    for element in statlist:
-        print(uformat.format(*element))
+    if printhost:
+        uformat="MODE:{}\tType:{}\tFreq:{}\tTEMCoff:{:5f}\tcustType:{}"
+        for element in statlist:
+            print(uformat.format(*element))
         
 
-    return totalmodes
+    return statlist
 
 def read_field1D(filename):
     xl=[]

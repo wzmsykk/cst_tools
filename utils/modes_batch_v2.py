@@ -294,7 +294,7 @@ def mode_recog(result_dir="",dst_path="res.txt"):
 
 
 
-def result_stats(result_dir=""):
+def result_stats(result_dir="",printhost=False):
     curdir=pathlib.Path(result_dir)
     freqs=curdir.glob("MODE_*_Freq.txt")
     flist=list()
@@ -328,7 +328,7 @@ def result_stats(result_dir=""):
         fp=open(pt,"r")
         lines=fp.readlines()
         line=lines[0]
-        cof=line.split()[1]
+        cof=line.split()[1] ##find 
         fp.close()
 
         #custom result
@@ -347,15 +347,17 @@ def result_stats(result_dir=""):
     
 
     uformat="MODE:{}\tType:{}\tFreq:{}\tTEMCoff:{:5f}\tcustType:{}"
-    for element in statlist:
-        print(uformat.format(*element))
+    if printhost:
+        for element in statlist:
+            print(uformat.format(*element))
         
 
-    return totalmodes
+    return statlist
 if __name__ =='__main__':
     #read_mode_batch(r"D:\cst_tools\result")
     ##convert_field_to_nparray(r"D:\cst_tools\result\R_230.000000_L_160.000000")
     #read_field_data_batch(r"D:\cst_tools\result")
 
-    result_stats(result_dir=r"\\172.1.10.232\pillbox_modes")
+    statlist=result_stats(result_dir=r"\\172.1.10.232\pillref_result\R_190_L_230")
+    print(statlist)
     

@@ -13,6 +13,7 @@ Public paramName() As String
 Public paramValue() As String
 Public totalElaspedTime As Double
 Public postProcessTime As Double
+Public virtualRun As Boolean
 Sub Main
 	Dim cp As String
 	cp="Ver 20200811"
@@ -35,6 +36,7 @@ Sub Main
 	'NEXT WORKING LOOP
 	Dim startTime,endTime As Double
 	Dim status As String
+	
 	Do While count < maxAttempt
 		status=GetJobDef(index)
 		If status = "NewTask" Then
@@ -43,7 +45,9 @@ Sub Main
 			If not IsFileExists(taskFileDir & index &".success") Then 
 				startTime=Timer
 				ChangeParams()
-				'EXTERN'Start()
+				virtualRun=False
+				'EXTERN'CustomPreProcess()
+				'EXTERN'Start(virtualRun)
 				'This Function is used to do the actual job of computing.
 				'runs everytime when parameter changes
 				'Should be implemented in patterns

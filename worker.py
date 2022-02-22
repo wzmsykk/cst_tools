@@ -1,55 +1,36 @@
-
 import logging
+from pathlib import Path
+from typing import Dict, Union, Optional
+from abc import ABCMeta, abstractmethod
+
+from logger import Logger
 
 # 200
 # worker 输入X得到result的工具
 
 
-class testworker(object):  # 测试用worker，不经过cst Dim(X)=2
-    def __init__(self, conf):
-        super().__init__()
-        self.conf = conf
-        self.x = None
-        self.resultName = None
-        self.resultDir = conf["resultDir"]
+class worker(metaclass=ABCMeta):
+    """abstruct worker class"""
 
-    def changex(self, xlist):
-        self.x = xlist.copy()
-
-    def run(self):
-        return self.x
-
-
-class peuCSTworker(object):  # 伪CSTworker，返回查找表
-    def __init__(self, conf):
-        super().__init__()
-        self.conf = conf
-        self.x = None
-        self.resultName = None
-        self.resultDir = conf["resultDir"]
-
-    def changex(self, xlist):
-        self.x = xlist.copy()
-
-    def run(self):
-        return self.x
-
-
-class worker(object):
-    def __init__(self, id, type="test", config=None, logger=None):
-        super().__init__()
+    def __init__(
+        self,
+        id: int,
+        config: Optional[Dict] = None,
+        logger: Optional[Logger] = None,
+        type: str = "Test",
+    ) -> None:
         if logger == None:
             self.logger = logging.getLogger("main." + "worker_" + str(id))
         else:
             self.logger = logger
 
         self.config = config
-        self.resultDir = "./"
-        self.u_param_list = []
-        self.u_value_list = []
+        self.workDir = Path("./")
+        self.resultDir = Path("./")
+        self.runParams: Dict = None
         self.runName = "Default"
-        self.ID = id
-        if type == "test":
+        self._ID = id
+        if str(type).lower() == "test":
             self.logger.info("(DEBUG) test worker:%s" % str(self.ID))
         else:
             self.type = type
@@ -57,32 +38,59 @@ class worker(object):
                 "created worker type %s id:%s" % (str(self.type), str(self.ID))
             )
 
-    def setID(self, id):
-        self.ID = id
+    @property
+    def resultDir(self) -> Path:
+        """worker output result dir"""
+        return self._resultDir
 
+    @resultDir.setter
+    def resultDir(self, value: Union[str, Path]) -> None:
+        self._resultDir = value
+
+    @property
+    def workerDir(self) -> Path:
+        """worker working dir"""
+        return self._workerDir
+
+    @workerDir.setter
+    def workerDir(self, value: Union[str, Path]) -> None:
+        self.workerDir = value
+
+    @property
+    def ID(self) -> int:
+        """read only worker id"""
+        return self._ID
+
+    @abstractmethod
     def stop(self):
         pass
 
-    def run(self, resultname):
+    @abstractmethod
+    def run(self, resultname: str, *args, **kwargs) -> Dict:
         self.runName = resultname  # 这次结果的名称，用于回溯
-        re = resultname
-        return re
+        runResult = {
+            "RunName": self.runName,
+            "TaskStatus": "Success",
+            "ResultData": None,  #### Dummy
+        }
+        return runResult
 
-    def change_uvalue(self, u_param_list, u_value_list):
-        self.u_param_list = u_param_list
-        self.u_value_list = u_value_list
-
-    def runWithx(self, x, resultname):
+    
+    def runWithParam(self, resultname: str, *args, **kwargs) -> Dict:
         self.runName = resultname  # 这次结果的名称，用于回溯
-        self.change_uvalue(u_param_list=[], u_value_list=x)
+        self.runParams = kwargs["params"]
         re = self.run()
         return re
 
-    def runWithParam(self, param_name_list, value_list, resultname):
-        self.runName = resultname  # 这次结果的名称，用于回溯
-        self.change_uvalue(u_param_list=param_name_list, u_value_list=value_list)
-        re = self.run()
-        return re
+   
 
-    def getResultDir(self):
-        return self.resultDir
+class testworker(worker):  # 测试用worker
+    def __init__(self, id: int, config: Optional[Dict] = None, logger: Optional[Logger] = None, type: str = "Test") -> None:
+        super().__init__(id, config, logger, type)
+
+    def runWithParam(self, resultname: str, *args, **kwargs) -> Dict:
+        return super().runWithParam(resultname, *args, **kwargs)
+
+    def run(self, resultname: str, *args, **kwargs) -> Dict:
+        return super().run(resultname, *args, **kwargs)
+

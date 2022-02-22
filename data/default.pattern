@@ -1,10 +1,12 @@
 
 
 '"Ver 20210427"
-Sub Start	
+Sub Start(virtual As Boolean)	
 	outFullDir=resultDir & currentResultName &"\"
-	compute()	
-	postProcess()
+	If not virtual Then
+		compute()	
+		postProcess()
+	End If
 	Backup (outFullDir & cstType &".cst")
 End Sub
 Sub prepareEnv

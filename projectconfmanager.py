@@ -384,6 +384,10 @@ class ProjectConfmanager(object):
         return vblines, newcstpath
 
     def __vbpreprocess_CST(self, confobj, projectDir, savejsonpath=None):
+
+
+        ### invoke a local cst worker to do this
+
         if savejsonpath == None:
             jsonpath = projectDir / self.paramsfilename
         else:
