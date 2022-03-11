@@ -1,4 +1,6 @@
 from pathlib import Path
+
+import json
 import worker
 import time
 import postprocess_sf
@@ -8,24 +10,25 @@ class local_superfish_worker(worker.worker):
     def __init__(self, id:int, type="superfish", config:dict={}, logger=None):
         super().__init__(id, type=type, config=config, logger=logger)
         ## configs
-        self.job_info = config.get("job_info",None)
-        self.workDir = Path(config.get("workdir",""))
-        self.resultDir = Path(config.get("resultdir",""))
-        self.input_macro = config.get("input_macro",[]) ###Main macro of .sf
+        self.config=config
+        self.job_info = self.config.get("job_info",None)
+        self.workDir = Path(self.config.get("workdir",""))
+        self.input_macro = self.config.get("input_macro",[]) ###Main macro of .sf
         
         # LOGGING#
         self.logger.info("LOCAL POISSON SUPERFISH WORKER ID:%s" % str(id))
-        self.logger.info("WorkDir:%s" % str(self.workDir))
+        self.logger.info("WorkDir:%s" % str(self.workDir.absolute()))
         #self.logger.info("TaskFileDir:%s" % str(self.taskFileDir))
         
         # FINDSF
-        self.currentSFENVPATH = Path(config["SFENVPATH"])
+        self.currentSFENVPATH = Path(self.config["SFENVPATH"])
         self.postProcessHelper= postprocess_sf.sfpostprocess()
 
         self.outname="run" +".log"
         self.outpath=self.workDir / (self.outname)
         self.maxWaitTime=999999
         self.sfProcess=None
+        self.sfFileName="MAIN.SF"
     def startSF(self, sfbatchpath):
         command = (
             "start cmd /k "
@@ -33,20 +36,20 @@ class local_superfish_worker(worker.worker):
         )
         self.logger.info(command)
         self.sfProcess = subprocess.Popen(
-            str(sfbatchpath),shell=True
+            str(sfbatchpath),shell=False
         )
         self.logger.info(self.sfProcess)
         
 
     def createMainBatch(self,run_name):
         bFilePath= self.workDir / "mainsf.bat"
-        sfFilePath= self.workDir / "main.sf"
+        sfFilePath= self.workDir / self.sfFileName
 
         autofishpath_str=str(self.currentSFENVPATH / "autofish")
 
 
 
-        sfprojectname="model.sf"
+       
 
         ### create sf proj
         cmda=self.input_macro
@@ -56,9 +59,9 @@ class local_superfish_worker(worker.worker):
 
         ### create cmd batch call
         cmds=[]
-        cmds.append("cd " +str(sfFilePath))
-        cmds.append("start /W  \" \"  \""+autofishpath_str+"\"  "+sfprojectname)
-        cmds.append("echo %errorlevel% >" + str(self.outpath))
+        cmds.append("cd " +str(self.workDir))
+        cmds.append("start /W  \" \"  \""+autofishpath_str+"\"  "+self.sfFileName)
+        cmds.append("echo %errorlevel% >" + str(self.outname))
         with open(bFilePath,"w") as fp:
             for line in cmds:
                 print(line,file=fp)
@@ -76,7 +79,7 @@ class local_superfish_worker(worker.worker):
         self.postProcessHelper.setResultDir(pathc.absolute())
         
         outpath = self.outpath
-
+        startTime = time.time()
         if outpath.exists():
             self.logger.info(
             "WorkerID:%r Name:%r Already Finished."
@@ -85,7 +88,7 @@ class local_superfish_worker(worker.worker):
         else:
             batchfile=self.createMainBatch(self.runName)
             self.startSF(batchfile)
-            startTime = time.time()
+            
             self.logger.info(
                 "WorkerID:%r Name:%r started."
                 % (self.ID, self.runName)
@@ -114,29 +117,38 @@ class local_superfish_worker(worker.worker):
             if escapedTime > self.maxWaitTime:
                 raise TimeoutError
 
-            self.logger.info(
-                "WorkerID:%r Name:%r success."
-                % (self.ID, self.runName)
-            )
-            self.logger.info("ElapsedTime:%r" % escapedTime)
-            self.logger.info("End Time:%r" % time.ctime())
+            
+            
         try:
             postProcessResult = self.postProcessHelper.getResult()
-            runResult = {
             
-            "TaskStatus": "Success",
-            "RunName": self.runName,
-            "PostProcessResult": postProcessResult,
-        }
         except FileNotFoundError:
             postProcessResult = None
             runResult = {
-            
+            "job_info":self.job_info,
             "TaskStatus": "PostProcessFailure",
             "RunName": self.runName,
             "PostProcessResult": postProcessResult,
         }
-        
+            self.logger.info(
+                "WorkerID:%r Name:%r Failed."
+                % (self.ID, self.runName)
+            )
+        else:
+            runResult = {
+            "job_info":self.job_info,
+            "TaskStatus": "Success",
+            "RunName": self.runName,
+            "PostProcessResult": postProcessResult,
+        }
+            self.logger.info(
+                "WorkerID:%r Name:%r success."
+                % (self.ID, self.runName)
+            )
+        self.logger.info("ElapsedTime:%r" % escapedTime)
+        self.logger.info("End Time:%r" % time.ctime())
+        with open(self.workDir / "runresult.json","w") as fp:
+            json.dump(runResult,fp,indent=4)
         return runResult
 
     def stop(self):

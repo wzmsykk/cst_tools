@@ -1,13 +1,12 @@
 from math import atan, tan, sin, cos, pi
 
-from result import result
 
 #### Create Boundary Points Command Lines for SF
 
 
 class SFModelGenerator:
     @classmethod
-    def createLineCmd(st, ed):
+    def createLineCmd(cls,st, ed):
         x0, y0 = st
         x1, y1 = ed
         str0 = r"&PO X=%f,Y=%f &" % (float(x0), float(y0))
@@ -18,7 +17,7 @@ class SFModelGenerator:
         return lines
 
     @classmethod
-    def addPointCmd(pnt):
+    def addPointCmd(cls,pnt):
         x0, y0 = pnt
         str0 = r"&PO X=%f,Y=%f &" % (float(x0), float(y0))
         lines = []
@@ -26,7 +25,7 @@ class SFModelGenerator:
         return lines
 
     @classmethod
-    def createArcEndPCmd(radius, centor, ed):
+    def createArcEndPCmd(cls,radius, centor, ed):
         # The start point of the arc should be defined before this cmdline.
         x0, y0 = centor
         x1, y1 = ed
@@ -40,7 +39,7 @@ class SFModelGenerator:
         return lines
 
     @classmethod
-    def createArcFullCmd(radius, centor, st, ed):
+    def createArcFullCmd(cls,radius, centor, st, ed):
         xs, ys = st
         x0, y0 = centor
         x1, y1 = ed
@@ -56,7 +55,7 @@ class SFModelGenerator:
         return lines
 
     @classmethod
-    def createEllipseArcEndPCmd(A, B, centor, ed):
+    def createEllipseArcEndPCmd(cls,A, B, centor, ed):
         # The start point of the arc should be defined before this cmdline.
         x0, y0 = centor
         x1, y1 = ed
@@ -72,7 +71,7 @@ class SFModelGenerator:
         return lines
 
     @classmethod
-    def createEllipseArcFullCmd(A, B, centor, st, ed):
+    def createEllipseArcFullCmd(cls,A, B, centor, st, ed):
         xs, ys = st
         x0, y0 = centor
         x1, y1 = ed
@@ -90,7 +89,7 @@ class SFModelGenerator:
         return lines
 
     @classmethod
-    def newPointByOffset(pt, offsets):
+    def newPointByOffset(cls,pt, offsets):
         x0, y0 = pt
         xoffset, yoffset = offsets
         np = (x0 + xoffset, y0 + yoffset)
@@ -122,7 +121,7 @@ def get_left(indict):
                 (r2 - ry2 * (1 - cos(cst_alf2))) - (r1 + ry1 * (1 - cos(cst_alf1)))
             ) / ((xlen2 - rx2 * sin(cst_alf2)) - rx1 * sin(cst_alf1))
             d_alf = atan(cst_slop2) - atan(cst_slop1)
-            print("d_alf:", d_alf, ";cst_alf:", cst_alf)
+            #print("d_alf:", d_alf, ";cst_alf:", cst_alf)
 
     elif rx1 + rx2 == xlen2:
         cst_alf1 = 90 / 180 * pi
@@ -174,7 +173,7 @@ def get_right(indict):
                 (r2 - ry2 * (1 - cos(cst_alf2))) - (r1 + ry1 * (1 - cos(cst_alf1)))
             ) / ((xlen2 - rx2 * sin(cst_alf2)) - rx1 * sin(cst_alf1))
             d_alf = atan(cst_slop2) - atan(cst_slop1)
-            print("d_alf:", d_alf, ";cst_alf:", cst_alf)
+            #print("d_alf:", d_alf, ";cst_alf:", cst_alf)
 
     elif rx1 + rx2 == xlen2:
         cst_alf1 = 90 / 180 * pi

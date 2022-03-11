@@ -7,12 +7,13 @@ class sfpostprocess:
 
         self.resultDir = None
         self.modelname = "default"
+        self.resultFilename="MAIN.SFO"
         pass
 
     def setResultDir(self, rDir):
         self.resultDir = Path(rDir)
     def getResult(self):
-        result=self._getResult(self.resultDir / (self.modelname+".SFO"))
+        result=self._getResult(self.resultDir / self.resultFilename)
         return result
     def _getResult(self,ppsfile):
         qvalue=None

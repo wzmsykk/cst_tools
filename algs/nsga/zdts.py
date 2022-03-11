@@ -17,7 +17,7 @@ class commonfunc():
                 raise ValueError
     def getBoundaries(self):
         return self.min_var,self.max_var
-    @abstractmethod
+    
     def create_var_boundary(self):
         max_var=[None for _ in range(self.n)]
         min_var=[None for _ in range(self.n)]        

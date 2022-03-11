@@ -11,7 +11,7 @@ import pathlib
 class manager(object):
     def __init__(self, gconfm, pconfm, params, logger, maxTask=2):
         super().__init__()
-
+        
         self.logger = logger
         self.pconfm = pconfm
         self.gconf = gconfm.conf

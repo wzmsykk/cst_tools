@@ -1,7 +1,9 @@
-import nsgaii
+from .nsgaii_np import nsgaii_var
 import matplotlib.pyplot as plt
 from typing import List
 import multiprocessing
+import math
+import pandas
 from pathlib import Path
 class fnds_callback_create_Image():
     def __init__(self,savedir="") -> None:
@@ -15,7 +17,38 @@ class fnds_callback_create_Image():
         iprocess=multiprocessing.Process(target=image_worker_func,args=(self.savedir,igen,fndslist))
         iprocess.start()
         return 
-def image_worker_func(savedir,igen,fndslist:List[List[nsgaii.nsgaii_var]]):
+class fnds_callback_create_Image_dump_fnds():
+    def __init__(self,savedir="") -> None:
+        self.setNewSavedir(savedir)
+        
+    def setNewSavedir(self,savedir):
+        self.savedir=Path(savedir)
+        if not self.savedir.exists():
+            self.savedir.mkdir(parents=True)
+    def __call__(self,igen,fndslist):
+        iprocess=multiprocessing.Process(target=image_worker_func,args=(self.savedir,igen,fndslist))
+        iprocess.start()
+        dump_fnds_structs(self.savedir,igen,fndslist)
+        return 
+def dump_fnds_structs(savedir,igen,fndslist:List[List[nsgaii_var]]):
+    idf=pandas.DataFrame(columns=["front","id","req","leq","freq","roq"])
+    for ind_f,front in enumerate(fndslist):
+        if front is not None:
+            for ind in front:
+                u={
+                    "front":ind_f,
+                    "id":ind.id,
+                    "req":ind.value[0],
+                    "leq":ind.value[1],
+                    "freq":math.sqrt(ind.result[0])+500,
+                    "roq":ind.result[1]
+                }
+                ndf=pandas.DataFrame(u,index=[0])
+                idf=idf.append(ndf)
+
+    idf.to_csv(savedir / ("Fnds_struct_gen_%d.csv"%igen))
+    pass
+def image_worker_func(savedir,igen,fndslist:List[List[nsgaii_var]]):
     x0=[]
     y0=[]
     x1=[]

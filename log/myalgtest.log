@@ -1,0 +1,1413 @@
+2022-03-11 06:05:47,250 - INFO: created worker type superfish id:0
+2022-03-11 06:05:47,250 - INFO: LOCAL POISSON SUPERFISH WORKER ID:0
+2022-03-11 06:05:47,250 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\0
+2022-03-11 06:05:47,251 - INFO: WorkerID:'0' Name:'Default' Already Finished.
+2022-03-11 06:05:47,251 - INFO: Start Time:'Fri Mar 11 06:05:47 2022'
+2022-03-11 06:05:47,252 - INFO: created worker type superfish id:1
+2022-03-11 06:05:47,252 - INFO: LOCAL POISSON SUPERFISH WORKER ID:1
+2022-03-11 06:05:47,252 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\1
+2022-03-11 06:05:47,253 - INFO: WorkerID:'1' Name:'Default' Already Finished.
+2022-03-11 06:05:47,253 - INFO: Start Time:'Fri Mar 11 06:05:47 2022'
+2022-03-11 06:05:47,254 - INFO: created worker type superfish id:2
+2022-03-11 06:05:47,254 - INFO: LOCAL POISSON SUPERFISH WORKER ID:2
+2022-03-11 06:05:47,254 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\2
+2022-03-11 06:05:47,258 - INFO: WorkerID:'0' Name:'Default' success.
+2022-03-11 06:05:47,259 - INFO: created worker type superfish id:3
+2022-03-11 06:05:47,259 - INFO: LOCAL POISSON SUPERFISH WORKER ID:3
+2022-03-11 06:05:47,259 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\3
+2022-03-11 06:05:47,259 - INFO: start cmd /k temp\2\mainsf.bat
+2022-03-11 06:05:47,264 - INFO: created worker type superfish id:4
+2022-03-11 06:05:47,265 - INFO: LOCAL POISSON SUPERFISH WORKER ID:4
+2022-03-11 06:05:47,265 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\4
+2022-03-11 06:05:47,265 - INFO: start cmd /k temp\3\mainsf.bat
+2022-03-11 06:05:47,265 - INFO: WorkerID:'1' Name:'Default' success.
+2022-03-11 06:05:47,267 - INFO: start cmd /k temp\4\mainsf.bat
+2022-03-11 06:05:47,272 - INFO: <Popen: returncode: None args: 'temp\\2\\mainsf.bat'>
+2022-03-11 06:05:47,272 - INFO: WorkerID:'2' Name:'Default' started.
+2022-03-11 06:05:47,272 - INFO: Start Time:'Fri Mar 11 06:05:47 2022'
+2022-03-11 06:05:47,275 - INFO: <Popen: returncode: None args: 'temp\\3\\mainsf.bat'>
+2022-03-11 06:05:47,275 - INFO: WorkerID:'3' Name:'Default' started.
+2022-03-11 06:05:47,276 - INFO: Start Time:'Fri Mar 11 06:05:47 2022'
+2022-03-11 06:05:47,277 - INFO: <Popen: returncode: None args: 'temp\\4\\mainsf.bat'>
+2022-03-11 06:05:47,278 - INFO: WorkerID:'4' Name:'Default' started.
+2022-03-11 06:05:47,278 - INFO: Start Time:'Fri Mar 11 06:05:47 2022'
+2022-03-11 06:07:01,718 - INFO: created worker type superfish id:0
+2022-03-11 06:07:01,718 - INFO: LOCAL POISSON SUPERFISH WORKER ID:0
+2022-03-11 06:07:01,718 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\0
+2022-03-11 06:07:01,718 - INFO: created worker type superfish id:1
+2022-03-11 06:07:01,718 - INFO: LOCAL POISSON SUPERFISH WORKER ID:1
+2022-03-11 06:07:01,718 - INFO: start cmd /k temp\0\mainsf.bat
+2022-03-11 06:07:01,718 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\1
+2022-03-11 06:07:01,718 - INFO: created worker type superfish id:2
+2022-03-11 06:07:01,718 - INFO: LOCAL POISSON SUPERFISH WORKER ID:2
+2022-03-11 06:07:01,718 - INFO: start cmd /k temp\1\mainsf.bat
+2022-03-11 06:07:01,718 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\2
+2022-03-11 06:07:01,727 - INFO: created worker type superfish id:3
+2022-03-11 06:07:01,728 - INFO: LOCAL POISSON SUPERFISH WORKER ID:3
+2022-03-11 06:07:01,728 - INFO: start cmd /k temp\2\mainsf.bat
+2022-03-11 06:07:01,728 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\3
+2022-03-11 06:07:01,730 - INFO: created worker type superfish id:4
+2022-03-11 06:07:01,730 - INFO: LOCAL POISSON SUPERFISH WORKER ID:4
+2022-03-11 06:07:01,731 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\4
+2022-03-11 06:07:01,731 - INFO: start cmd /k temp\3\mainsf.bat
+2022-03-11 06:07:01,732 - INFO: start cmd /k temp\4\mainsf.bat
+2022-03-11 06:07:01,736 - INFO: <Popen: returncode: None args: 'temp\\1\\mainsf.bat'>
+2022-03-11 06:07:01,737 - INFO: WorkerID:'1' Name:'Default' started.
+2022-03-11 06:07:01,737 - INFO: Start Time:'Fri Mar 11 06:07:01 2022'
+2022-03-11 06:07:01,740 - INFO: <Popen: returncode: None args: 'temp\\0\\mainsf.bat'>
+2022-03-11 06:07:01,740 - INFO: WorkerID:'0' Name:'Default' started.
+2022-03-11 06:07:01,740 - INFO: Start Time:'Fri Mar 11 06:07:01 2022'
+2022-03-11 06:07:01,742 - INFO: <Popen: returncode: None args: 'temp\\2\\mainsf.bat'>
+2022-03-11 06:07:01,743 - INFO: WorkerID:'2' Name:'Default' started.
+2022-03-11 06:07:01,743 - INFO: Start Time:'Fri Mar 11 06:07:01 2022'
+2022-03-11 06:07:01,744 - INFO: <Popen: returncode: None args: 'temp\\3\\mainsf.bat'>
+2022-03-11 06:07:01,745 - INFO: WorkerID:'3' Name:'Default' started.
+2022-03-11 06:07:01,745 - INFO: <Popen: returncode: None args: 'temp\\4\\mainsf.bat'>
+2022-03-11 06:07:01,745 - INFO: Start Time:'Fri Mar 11 06:07:01 2022'
+2022-03-11 06:07:01,745 - INFO: WorkerID:'4' Name:'Default' started.
+2022-03-11 06:07:01,745 - INFO: Start Time:'Fri Mar 11 06:07:01 2022'
+2022-03-11 06:08:39,059 - INFO: WorkerID:'4' Name:'Default' success.
+2022-03-11 06:08:39,059 - INFO: ElapsedTime:97.30950975418091
+2022-03-11 06:08:39,060 - INFO: End Time:'Fri Mar 11 06:08:39 2022'
+2022-03-11 06:08:51,086 - INFO: WorkerID:'2' Name:'Default' success.
+2022-03-11 06:08:51,087 - INFO: ElapsedTime:109.33852648735046
+2022-03-11 06:08:51,087 - INFO: End Time:'Fri Mar 11 06:08:51 2022'
+2022-03-11 06:08:56,121 - INFO: WorkerID:'3' Name:'Default' success.
+2022-03-11 06:08:56,122 - INFO: ElapsedTime:114.37184524536133
+2022-03-11 06:08:56,122 - INFO: End Time:'Fri Mar 11 06:08:56 2022'
+2022-03-11 06:09:13,202 - INFO: WorkerID:'0' Name:'Default' success.
+2022-03-11 06:09:13,202 - INFO: ElapsedTime:131.45771980285645
+2022-03-11 06:09:13,203 - INFO: End Time:'Fri Mar 11 06:09:13 2022'
+2022-03-11 06:14:36,929 - INFO: WorkerID:'1' Name:'Default' success.
+2022-03-11 06:14:36,929 - INFO: ElapsedTime:455.1840398311615
+2022-03-11 06:14:36,936 - INFO: End Time:'Fri Mar 11 06:14:36 2022'
+2022-03-11 15:41:20,869 - INFO: created worker type superfish id:0
+2022-03-11 15:41:20,870 - INFO: LOCAL POISSON SUPERFISH WORKER ID:0
+2022-03-11 15:41:20,870 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\0
+2022-03-11 15:41:20,871 - INFO: created worker type superfish id:1
+2022-03-11 15:41:20,871 - INFO: start cmd /k temp\0\mainsf.bat
+2022-03-11 15:41:20,872 - INFO: LOCAL POISSON SUPERFISH WORKER ID:1
+2022-03-11 15:41:20,872 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\1
+2022-03-11 15:41:20,873 - INFO: created worker type superfish id:2
+2022-03-11 15:41:20,874 - INFO: LOCAL POISSON SUPERFISH WORKER ID:2
+2022-03-11 15:41:20,874 - INFO: start cmd /k temp\1\mainsf.bat
+2022-03-11 15:41:20,874 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\2
+2022-03-11 15:41:20,876 - INFO: created worker type superfish id:3
+2022-03-11 15:41:20,876 - INFO: LOCAL POISSON SUPERFISH WORKER ID:3
+2022-03-11 15:41:20,876 - INFO: start cmd /k temp\2\mainsf.bat
+2022-03-11 15:41:20,876 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\3
+2022-03-11 15:41:20,878 - INFO: created worker type superfish id:4
+2022-03-11 15:41:20,879 - INFO: LOCAL POISSON SUPERFISH WORKER ID:4
+2022-03-11 15:41:20,879 - INFO: start cmd /k temp\3\mainsf.bat
+2022-03-11 15:41:20,879 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\4
+2022-03-11 15:41:20,881 - INFO: start cmd /k temp\4\mainsf.bat
+2022-03-11 15:41:20,886 - INFO: <Popen: returncode: None args: 'temp\\0\\mainsf.bat'>
+2022-03-11 15:41:20,886 - INFO: WorkerID:'0' Name:'Default' started.
+2022-03-11 15:41:20,887 - INFO: Start Time:'Fri Mar 11 15:41:20 2022'
+2022-03-11 15:41:20,888 - INFO: <Popen: returncode: None args: 'temp\\1\\mainsf.bat'>
+2022-03-11 15:41:20,889 - INFO: <Popen: returncode: None args: 'temp\\2\\mainsf.bat'>
+2022-03-11 15:41:20,889 - INFO: WorkerID:'1' Name:'Default' started.
+2022-03-11 15:41:20,889 - INFO: WorkerID:'2' Name:'Default' started.
+2022-03-11 15:41:20,889 - INFO: Start Time:'Fri Mar 11 15:41:20 2022'
+2022-03-11 15:41:20,889 - INFO: <Popen: returncode: None args: 'temp\\3\\mainsf.bat'>
+2022-03-11 15:41:20,890 - INFO: Start Time:'Fri Mar 11 15:41:20 2022'
+2022-03-11 15:41:20,890 - INFO: WorkerID:'3' Name:'Default' started.
+2022-03-11 15:41:20,890 - INFO: Start Time:'Fri Mar 11 15:41:20 2022'
+2022-03-11 15:41:20,891 - INFO: <Popen: returncode: None args: 'temp\\4\\mainsf.bat'>
+2022-03-11 15:41:20,891 - INFO: WorkerID:'4' Name:'Default' started.
+2022-03-11 15:41:20,892 - INFO: Start Time:'Fri Mar 11 15:41:20 2022'
+2022-03-11 15:42:44,256 - INFO: WorkerID:'3' Name:'Default' success.
+2022-03-11 15:42:44,256 - INFO: ElapsedTime:83.3745231628418
+2022-03-11 15:42:44,257 - INFO: End Time:'Fri Mar 11 15:42:44 2022'
+2022-03-11 15:42:56,290 - INFO: WorkerID:'1' Name:'Default' success.
+2022-03-11 15:42:56,290 - INFO: ElapsedTime:95.41218781471252
+2022-03-11 15:42:56,290 - INFO: End Time:'Fri Mar 11 15:42:56 2022'
+2022-03-11 15:43:05,324 - INFO: WorkerID:'4' Name:'Default' success.
+2022-03-11 15:43:05,325 - INFO: ElapsedTime:104.43979144096375
+2022-03-11 15:43:05,325 - INFO: End Time:'Fri Mar 11 15:43:05 2022'
+2022-03-11 15:43:09,331 - INFO: WorkerID:'0' Name:'Default' success.
+2022-03-11 15:43:09,331 - INFO: ElapsedTime:108.46018576622009
+2022-03-11 15:43:09,331 - INFO: End Time:'Fri Mar 11 15:43:09 2022'
+2022-03-11 15:43:40,464 - INFO: WorkerID:'2' Name:'Default' success.
+2022-03-11 15:43:40,464 - INFO: ElapsedTime:139.58463144302368
+2022-03-11 15:43:40,464 - INFO: End Time:'Fri Mar 11 15:43:40 2022'
+2022-03-11 15:44:51,415 - INFO: created worker type superfish id:0
+2022-03-11 15:44:51,416 - INFO: LOCAL POISSON SUPERFISH WORKER ID:0
+2022-03-11 15:44:51,416 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\0
+2022-03-11 15:44:51,417 - INFO: created worker type superfish id:1
+2022-03-11 15:44:51,417 - INFO: LOCAL POISSON SUPERFISH WORKER ID:1
+2022-03-11 15:44:51,418 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\1
+2022-03-11 15:44:51,418 - INFO: start cmd /k temp\0\mainsf.bat
+2022-03-11 15:44:51,419 - INFO: created worker type superfish id:2
+2022-03-11 15:44:51,419 - INFO: LOCAL POISSON SUPERFISH WORKER ID:2
+2022-03-11 15:44:51,419 - INFO: start cmd /k temp\1\mainsf.bat
+2022-03-11 15:44:51,419 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\2
+2022-03-11 15:44:51,420 - INFO: created worker type superfish id:3
+2022-03-11 15:44:51,421 - INFO: LOCAL POISSON SUPERFISH WORKER ID:3
+2022-03-11 15:44:51,421 - INFO: start cmd /k temp\2\mainsf.bat
+2022-03-11 15:44:51,421 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\3
+2022-03-11 15:44:51,422 - INFO: created worker type superfish id:4
+2022-03-11 15:44:51,422 - INFO: LOCAL POISSON SUPERFISH WORKER ID:4
+2022-03-11 15:44:51,423 - INFO: start cmd /k temp\3\mainsf.bat
+2022-03-11 15:44:51,423 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\4
+2022-03-11 15:44:51,424 - INFO: start cmd /k temp\4\mainsf.bat
+2022-03-11 15:44:51,430 - INFO: <Popen: returncode: None args: 'temp\\0\\mainsf.bat'>
+2022-03-11 15:44:51,431 - INFO: <Popen: returncode: None args: 'temp\\1\\mainsf.bat'>
+2022-03-11 15:44:51,431 - INFO: WorkerID:'0' Name:'Default' started.
+2022-03-11 15:44:51,431 - INFO: WorkerID:'1' Name:'Default' started.
+2022-03-11 15:44:51,431 - INFO: Start Time:'Fri Mar 11 15:44:51 2022'
+2022-03-11 15:44:51,431 - INFO: Start Time:'Fri Mar 11 15:44:51 2022'
+2022-03-11 15:44:51,433 - INFO: <Popen: returncode: None args: 'temp\\3\\mainsf.bat'>
+2022-03-11 15:44:51,433 - INFO: <Popen: returncode: None args: 'temp\\4\\mainsf.bat'>
+2022-03-11 15:44:51,433 - INFO: WorkerID:'3' Name:'Default' started.
+2022-03-11 15:44:51,433 - INFO: <Popen: returncode: None args: 'temp\\2\\mainsf.bat'>
+2022-03-11 15:44:51,433 - INFO: WorkerID:'4' Name:'Default' started.
+2022-03-11 15:44:51,434 - INFO: Start Time:'Fri Mar 11 15:44:51 2022'
+2022-03-11 15:44:51,434 - INFO: WorkerID:'2' Name:'Default' started.
+2022-03-11 15:44:51,434 - INFO: Start Time:'Fri Mar 11 15:44:51 2022'
+2022-03-11 15:44:51,434 - INFO: Start Time:'Fri Mar 11 15:44:51 2022'
+2022-03-11 15:46:49,670 - INFO: WorkerID:'4' Name:'Default' success.
+2022-03-11 15:46:49,670 - INFO: ElapsedTime:118.24209642410278
+2022-03-11 15:46:49,670 - INFO: End Time:'Fri Mar 11 15:46:49 2022'
+2022-03-11 15:47:07,720 - INFO: WorkerID:'2' Name:'Default' success.
+2022-03-11 15:47:07,721 - INFO: ElapsedTime:136.28984832763672
+2022-03-11 15:47:07,721 - INFO: End Time:'Fri Mar 11 15:47:07 2022'
+2022-03-11 15:47:34,774 - INFO: WorkerID:'0' Name:'Default' success.
+2022-03-11 15:47:34,774 - INFO: ElapsedTime:163.35400390625
+2022-03-11 15:47:34,774 - INFO: End Time:'Fri Mar 11 15:47:34 2022'
+2022-03-11 15:47:38,798 - INFO: WorkerID:'3' Name:'Default' success.
+2022-03-11 15:47:38,799 - INFO: ElapsedTime:167.36311507225037
+2022-03-11 15:47:38,800 - INFO: End Time:'Fri Mar 11 15:47:38 2022'
+2022-03-11 15:47:41,811 - INFO: WorkerID:'1' Name:'Default' success.
+2022-03-11 15:47:41,812 - INFO: ElapsedTime:170.3884632587433
+2022-03-11 15:47:41,812 - INFO: End Time:'Fri Mar 11 15:47:41 2022'
+2022-03-11 15:49:24,012 - INFO: created worker type superfish id:0
+2022-03-11 15:49:24,012 - INFO: LOCAL POISSON SUPERFISH WORKER ID:0
+2022-03-11 15:49:24,012 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\0
+2022-03-11 15:49:24,013 - INFO: WorkerID:'0' Name:'Default' Already Finished.
+2022-03-11 15:49:24,013 - INFO: Start Time:'Fri Mar 11 15:49:24 2022'
+2022-03-11 15:49:24,013 - INFO: created worker type superfish id:1
+2022-03-11 15:49:24,014 - INFO: LOCAL POISSON SUPERFISH WORKER ID:1
+2022-03-11 15:49:24,014 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\1
+2022-03-11 15:49:24,014 - INFO: WorkerID:'1' Name:'Default' Already Finished.
+2022-03-11 15:49:24,015 - INFO: Start Time:'Fri Mar 11 15:49:24 2022'
+2022-03-11 15:49:24,015 - INFO: created worker type superfish id:2
+2022-03-11 15:49:24,015 - INFO: LOCAL POISSON SUPERFISH WORKER ID:2
+2022-03-11 15:49:24,016 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\2
+2022-03-11 15:49:24,016 - INFO: WorkerID:'2' Name:'Default' Already Finished.
+2022-03-11 15:49:24,017 - INFO: Start Time:'Fri Mar 11 15:49:24 2022'
+2022-03-11 15:49:24,017 - INFO: created worker type superfish id:3
+2022-03-11 15:49:24,021 - INFO: LOCAL POISSON SUPERFISH WORKER ID:3
+2022-03-11 15:49:24,021 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\3
+2022-03-11 15:49:24,022 - INFO: WorkerID:'0' Name:'Default' success.
+2022-03-11 15:49:24,022 - INFO: WorkerID:'3' Name:'Default' Already Finished.
+2022-03-11 15:49:24,022 - INFO: Start Time:'Fri Mar 11 15:49:24 2022'
+2022-03-11 15:49:24,023 - INFO: created worker type superfish id:4
+2022-03-11 15:49:24,024 - INFO: LOCAL POISSON SUPERFISH WORKER ID:4
+2022-03-11 15:49:24,028 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\4
+2022-03-11 15:49:24,028 - INFO: WorkerID:'4' Name:'Default' Already Finished.
+2022-03-11 15:49:24,029 - INFO: Start Time:'Fri Mar 11 15:49:24 2022'
+2022-03-11 15:49:24,029 - INFO: WorkerID:'1' Name:'Default' success.
+2022-03-11 15:49:24,034 - INFO: WorkerID:'2' Name:'Default' success.
+2022-03-11 15:49:24,038 - INFO: WorkerID:'3' Name:'Default' success.
+2022-03-11 15:49:24,042 - INFO: WorkerID:'4' Name:'Default' success.
+2022-03-11 15:49:55,532 - INFO: created worker type superfish id:0
+2022-03-11 15:49:55,532 - INFO: LOCAL POISSON SUPERFISH WORKER ID:0
+2022-03-11 15:49:55,532 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\0
+2022-03-11 15:49:55,539 - INFO: created worker type superfish id:1
+2022-03-11 15:49:55,540 - INFO: LOCAL POISSON SUPERFISH WORKER ID:1
+2022-03-11 15:49:55,540 - INFO: start cmd /k temp\0\mainsf.bat
+2022-03-11 15:49:55,540 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\1
+2022-03-11 15:49:55,541 - INFO: created worker type superfish id:2
+2022-03-11 15:49:55,541 - INFO: LOCAL POISSON SUPERFISH WORKER ID:2
+2022-03-11 15:49:55,541 - INFO: start cmd /k temp\1\mainsf.bat
+2022-03-11 15:49:55,542 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\2
+2022-03-11 15:49:55,543 - INFO: created worker type superfish id:3
+2022-03-11 15:49:55,543 - INFO: LOCAL POISSON SUPERFISH WORKER ID:3
+2022-03-11 15:49:55,543 - INFO: start cmd /k temp\2\mainsf.bat
+2022-03-11 15:49:55,543 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\3
+2022-03-11 15:49:55,544 - INFO: created worker type superfish id:4
+2022-03-11 15:49:55,544 - INFO: LOCAL POISSON SUPERFISH WORKER ID:4
+2022-03-11 15:49:55,544 - INFO: start cmd /k temp\3\mainsf.bat
+2022-03-11 15:49:55,545 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\4
+2022-03-11 15:49:55,546 - INFO: start cmd /k temp\4\mainsf.bat
+2022-03-11 15:49:55,566 - INFO: <Popen: returncode: None args: 'temp\\0\\mainsf.bat'>
+2022-03-11 15:49:55,567 - INFO: WorkerID:'0' Name:'Default' started.
+2022-03-11 15:49:55,567 - INFO: Start Time:'Fri Mar 11 15:49:55 2022'
+2022-03-11 15:49:55,568 - INFO: <Popen: returncode: None args: 'temp\\1\\mainsf.bat'>
+2022-03-11 15:49:55,568 - INFO: WorkerID:'1' Name:'Default' started.
+2022-03-11 15:49:55,569 - INFO: Start Time:'Fri Mar 11 15:49:55 2022'
+2022-03-11 15:49:55,570 - INFO: <Popen: returncode: None args: 'temp\\2\\mainsf.bat'>
+2022-03-11 15:49:55,570 - INFO: WorkerID:'2' Name:'Default' started.
+2022-03-11 15:49:55,571 - INFO: Start Time:'Fri Mar 11 15:49:55 2022'
+2022-03-11 15:49:55,572 - INFO: <Popen: returncode: None args: 'temp\\3\\mainsf.bat'>
+2022-03-11 15:49:55,572 - INFO: WorkerID:'3' Name:'Default' started.
+2022-03-11 15:49:55,572 - INFO: <Popen: returncode: None args: 'temp\\4\\mainsf.bat'>
+2022-03-11 15:49:55,572 - INFO: Start Time:'Fri Mar 11 15:49:55 2022'
+2022-03-11 15:49:55,573 - INFO: WorkerID:'4' Name:'Default' started.
+2022-03-11 15:49:55,573 - INFO: Start Time:'Fri Mar 11 15:49:55 2022'
+2022-03-11 15:51:37,995 - INFO: WorkerID:'2' Name:'Default' success.
+2022-03-11 15:51:37,995 - INFO: ElapsedTime:102.44828987121582
+2022-03-11 15:51:37,995 - INFO: End Time:'Fri Mar 11 15:51:37 2022'
+2022-03-11 15:51:44,005 - INFO: WorkerID:'0' Name:'Default' success.
+2022-03-11 15:51:44,005 - INFO: ElapsedTime:108.47305560112
+2022-03-11 15:51:44,005 - INFO: End Time:'Fri Mar 11 15:51:44 2022'
+2022-03-11 15:51:48,017 - INFO: WorkerID:'1' Name:'Default' success.
+2022-03-11 15:51:48,018 - INFO: ElapsedTime:112.47288751602173
+2022-03-11 15:51:48,018 - INFO: End Time:'Fri Mar 11 15:51:48 2022'
+2022-03-11 15:52:02,116 - INFO: WorkerID:'4' Name:'Default' success.
+2022-03-11 15:52:02,116 - INFO: ElapsedTime:126.57085418701172
+2022-03-11 15:52:02,116 - INFO: End Time:'Fri Mar 11 15:52:02 2022'
+2022-03-11 15:53:28,318 - INFO: WorkerID:'3' Name:'Default' success.
+2022-03-11 15:53:28,318 - INFO: ElapsedTime:212.77423310279846
+2022-03-11 15:53:28,318 - INFO: End Time:'Fri Mar 11 15:53:28 2022'
+2022-03-11 15:53:28,318 - INFO: created worker type superfish id:5
+2022-03-11 15:53:28,318 - INFO: LOCAL POISSON SUPERFISH WORKER ID:5
+2022-03-11 15:53:28,318 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\5
+2022-03-11 15:53:28,318 - INFO: created worker type superfish id:6
+2022-03-11 15:53:28,318 - INFO: LOCAL POISSON SUPERFISH WORKER ID:6
+2022-03-11 15:53:28,318 - INFO: start cmd /k temp\5\mainsf.bat
+2022-03-11 15:53:28,318 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\6
+2022-03-11 15:53:28,333 - INFO: created worker type superfish id:7
+2022-03-11 15:53:28,334 - INFO: LOCAL POISSON SUPERFISH WORKER ID:7
+2022-03-11 15:53:28,334 - INFO: start cmd /k temp\6\mainsf.bat
+2022-03-11 15:53:28,334 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\7
+2022-03-11 15:53:28,334 - INFO: created worker type superfish id:8
+2022-03-11 15:53:28,334 - INFO: start cmd /k temp\7\mainsf.bat
+2022-03-11 15:53:28,334 - INFO: LOCAL POISSON SUPERFISH WORKER ID:8
+2022-03-11 15:53:28,334 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\8
+2022-03-11 15:53:28,334 - INFO: created worker type superfish id:9
+2022-03-11 15:53:28,334 - INFO: LOCAL POISSON SUPERFISH WORKER ID:9
+2022-03-11 15:53:28,334 - INFO: start cmd /k temp\8\mainsf.bat
+2022-03-11 15:53:28,334 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\9
+2022-03-11 15:53:28,334 - INFO: start cmd /k temp\9\mainsf.bat
+2022-03-11 15:53:28,334 - INFO: <Popen: returncode: None args: 'temp\\5\\mainsf.bat'>
+2022-03-11 15:53:28,334 - INFO: WorkerID:'5' Name:'Default' started.
+2022-03-11 15:53:28,334 - INFO: Start Time:'Fri Mar 11 15:53:28 2022'
+2022-03-11 15:53:28,334 - INFO: <Popen: returncode: None args: 'temp\\6\\mainsf.bat'>
+2022-03-11 15:53:28,334 - INFO: WorkerID:'6' Name:'Default' started.
+2022-03-11 15:53:28,334 - INFO: Start Time:'Fri Mar 11 15:53:28 2022'
+2022-03-11 15:53:28,334 - INFO: <Popen: returncode: None args: 'temp\\7\\mainsf.bat'>
+2022-03-11 15:53:28,334 - INFO: WorkerID:'7' Name:'Default' started.
+2022-03-11 15:53:28,334 - INFO: Start Time:'Fri Mar 11 15:53:28 2022'
+2022-03-11 15:53:28,334 - INFO: <Popen: returncode: None args: 'temp\\8\\mainsf.bat'>
+2022-03-11 15:53:28,334 - INFO: WorkerID:'8' Name:'Default' started.
+2022-03-11 15:53:28,334 - INFO: Start Time:'Fri Mar 11 15:53:28 2022'
+2022-03-11 15:53:28,334 - INFO: <Popen: returncode: None args: 'temp\\9\\mainsf.bat'>
+2022-03-11 15:53:28,334 - INFO: WorkerID:'9' Name:'Default' started.
+2022-03-11 15:53:28,334 - INFO: Start Time:'Fri Mar 11 15:53:28 2022'
+2022-03-11 15:55:14,513 - INFO: WorkerID:'5' Name:'Default' success.
+2022-03-11 15:55:14,513 - INFO: ElapsedTime:106.19190049171448
+2022-03-11 15:55:14,513 - INFO: End Time:'Fri Mar 11 15:55:14 2022'
+2022-03-11 15:55:17,515 - INFO: WorkerID:'7' Name:'Default' success.
+2022-03-11 15:55:17,516 - INFO: ElapsedTime:109.17701077461243
+2022-03-11 15:55:17,516 - INFO: End Time:'Fri Mar 11 15:55:17 2022'
+2022-03-11 15:55:18,524 - INFO: WorkerID:'9' Name:'Default' success.
+2022-03-11 15:55:18,525 - INFO: WorkerID:'6' Name:'Default' success.
+2022-03-11 15:55:18,525 - INFO: WorkerID:'8' Name:'Default' success.
+2022-03-11 15:55:18,525 - INFO: ElapsedTime:110.17777276039124
+2022-03-11 15:55:18,525 - INFO: ElapsedTime:110.19387340545654
+2022-03-11 15:55:18,526 - INFO: ElapsedTime:110.17777276039124
+2022-03-11 15:55:18,526 - INFO: End Time:'Fri Mar 11 15:55:18 2022'
+2022-03-11 15:55:18,526 - INFO: End Time:'Fri Mar 11 15:55:18 2022'
+2022-03-11 15:55:18,526 - INFO: End Time:'Fri Mar 11 15:55:18 2022'
+2022-03-11 15:57:51,171 - INFO: created worker type superfish id:0
+2022-03-11 15:57:51,172 - INFO: LOCAL POISSON SUPERFISH WORKER ID:0
+2022-03-11 15:57:51,172 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\0
+2022-03-11 15:57:51,173 - INFO: created worker type superfish id:1
+2022-03-11 15:57:51,174 - INFO: start cmd /k temp\0\mainsf.bat
+2022-03-11 15:57:51,174 - INFO: LOCAL POISSON SUPERFISH WORKER ID:1
+2022-03-11 15:57:51,174 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\1
+2022-03-11 15:57:51,175 - INFO: created worker type superfish id:2
+2022-03-11 15:57:51,175 - INFO: LOCAL POISSON SUPERFISH WORKER ID:2
+2022-03-11 15:57:51,175 - INFO: start cmd /k temp\1\mainsf.bat
+2022-03-11 15:57:51,175 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\2
+2022-03-11 15:57:51,176 - INFO: created worker type superfish id:3
+2022-03-11 15:57:51,177 - INFO: LOCAL POISSON SUPERFISH WORKER ID:3
+2022-03-11 15:57:51,177 - INFO: start cmd /k temp\2\mainsf.bat
+2022-03-11 15:57:51,177 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\3
+2022-03-11 15:57:51,178 - INFO: created worker type superfish id:4
+2022-03-11 15:57:51,178 - INFO: LOCAL POISSON SUPERFISH WORKER ID:4
+2022-03-11 15:57:51,178 - INFO: start cmd /k temp\3\mainsf.bat
+2022-03-11 15:57:51,178 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\4
+2022-03-11 15:57:51,180 - INFO: start cmd /k temp\4\mainsf.bat
+2022-03-11 15:57:51,185 - INFO: <Popen: returncode: None args: 'temp\\1\\mainsf.bat'>
+2022-03-11 15:57:51,185 - INFO: WorkerID:'1' Name:'Default' started.
+2022-03-11 15:57:51,185 - INFO: Start Time:'Fri Mar 11 15:57:51 2022'
+2022-03-11 15:57:51,189 - INFO: <Popen: returncode: None args: 'temp\\0\\mainsf.bat'>
+2022-03-11 15:57:51,189 - INFO: <Popen: returncode: None args: 'temp\\2\\mainsf.bat'>
+2022-03-11 15:57:51,189 - INFO: <Popen: returncode: None args: 'temp\\4\\mainsf.bat'>
+2022-03-11 15:57:51,189 - INFO: WorkerID:'0' Name:'Default' started.
+2022-03-11 15:57:51,189 - INFO: <Popen: returncode: None args: 'temp\\3\\mainsf.bat'>
+2022-03-11 15:57:51,189 - INFO: WorkerID:'2' Name:'Default' started.
+2022-03-11 15:57:51,190 - INFO: WorkerID:'4' Name:'Default' started.
+2022-03-11 15:57:51,190 - INFO: Start Time:'Fri Mar 11 15:57:51 2022'
+2022-03-11 15:57:51,190 - INFO: WorkerID:'3' Name:'Default' started.
+2022-03-11 15:57:51,190 - INFO: Start Time:'Fri Mar 11 15:57:51 2022'
+2022-03-11 15:57:51,190 - INFO: Start Time:'Fri Mar 11 15:57:51 2022'
+2022-03-11 15:57:51,191 - INFO: Start Time:'Fri Mar 11 15:57:51 2022'
+2022-03-11 16:00:09,417 - INFO: WorkerID:'0' Name:'Default' success.
+2022-03-11 16:00:09,417 - INFO: ElapsedTime:138.24090790748596
+2022-03-11 16:00:09,418 - INFO: End Time:'Fri Mar 11 16:00:09 2022'
+2022-03-11 16:00:12,423 - INFO: WorkerID:'1' Name:'Default' success.
+2022-03-11 16:00:12,423 - INFO: ElapsedTime:141.2409815788269
+2022-03-11 16:00:12,423 - INFO: End Time:'Fri Mar 11 16:00:12 2022'
+2022-03-11 16:00:16,427 - INFO: WorkerID:'4' Name:'Default' success.
+2022-03-11 16:00:16,427 - INFO: ElapsedTime:145.24326491355896
+2022-03-11 16:00:16,427 - INFO: End Time:'Fri Mar 11 16:00:16 2022'
+2022-03-11 16:00:21,434 - INFO: WorkerID:'3' Name:'Default' success.
+2022-03-11 16:00:21,434 - INFO: ElapsedTime:150.24931693077087
+2022-03-11 16:00:21,434 - INFO: End Time:'Fri Mar 11 16:00:21 2022'
+2022-03-11 16:00:35,495 - INFO: WorkerID:'2' Name:'Default' success.
+2022-03-11 16:00:35,496 - INFO: ElapsedTime:164.31447529792786
+2022-03-11 16:00:35,496 - INFO: End Time:'Fri Mar 11 16:00:35 2022'
+2022-03-11 16:00:35,503 - INFO: created worker type superfish id:5
+2022-03-11 16:00:35,503 - INFO: LOCAL POISSON SUPERFISH WORKER ID:5
+2022-03-11 16:00:35,503 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\5
+2022-03-11 16:00:35,504 - INFO: created worker type superfish id:6
+2022-03-11 16:00:35,505 - INFO: LOCAL POISSON SUPERFISH WORKER ID:6
+2022-03-11 16:00:35,505 - INFO: start cmd /k temp\5\mainsf.bat
+2022-03-11 16:00:35,505 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\6
+2022-03-11 16:00:35,506 - INFO: created worker type superfish id:7
+2022-03-11 16:00:35,506 - INFO: LOCAL POISSON SUPERFISH WORKER ID:7
+2022-03-11 16:00:35,507 - INFO: start cmd /k temp\6\mainsf.bat
+2022-03-11 16:00:35,507 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\7
+2022-03-11 16:00:35,508 - INFO: created worker type superfish id:8
+2022-03-11 16:00:35,508 - INFO: LOCAL POISSON SUPERFISH WORKER ID:8
+2022-03-11 16:00:35,508 - INFO: start cmd /k temp\7\mainsf.bat
+2022-03-11 16:00:35,508 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\8
+2022-03-11 16:00:35,510 - INFO: created worker type superfish id:9
+2022-03-11 16:00:35,510 - INFO: LOCAL POISSON SUPERFISH WORKER ID:9
+2022-03-11 16:00:35,510 - INFO: start cmd /k temp\8\mainsf.bat
+2022-03-11 16:00:35,510 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\9
+2022-03-11 16:00:35,512 - INFO: start cmd /k temp\9\mainsf.bat
+2022-03-11 16:00:35,515 - INFO: <Popen: returncode: None args: 'temp\\5\\mainsf.bat'>
+2022-03-11 16:00:35,516 - INFO: WorkerID:'5' Name:'Default' started.
+2022-03-11 16:00:35,516 - INFO: Start Time:'Fri Mar 11 16:00:35 2022'
+2022-03-11 16:00:35,516 - INFO: <Popen: returncode: None args: 'temp\\6\\mainsf.bat'>
+2022-03-11 16:00:35,516 - INFO: WorkerID:'6' Name:'Default' started.
+2022-03-11 16:00:35,516 - INFO: <Popen: returncode: None args: 'temp\\7\\mainsf.bat'>
+2022-03-11 16:00:35,517 - INFO: Start Time:'Fri Mar 11 16:00:35 2022'
+2022-03-11 16:00:35,517 - INFO: WorkerID:'7' Name:'Default' started.
+2022-03-11 16:00:35,517 - INFO: Start Time:'Fri Mar 11 16:00:35 2022'
+2022-03-11 16:00:35,518 - INFO: <Popen: returncode: None args: 'temp\\8\\mainsf.bat'>
+2022-03-11 16:00:35,518 - INFO: WorkerID:'8' Name:'Default' started.
+2022-03-11 16:00:35,518 - INFO: Start Time:'Fri Mar 11 16:00:35 2022'
+2022-03-11 16:00:35,519 - INFO: <Popen: returncode: None args: 'temp\\9\\mainsf.bat'>
+2022-03-11 16:00:35,519 - INFO: WorkerID:'9' Name:'Default' started.
+2022-03-11 16:00:35,519 - INFO: Start Time:'Fri Mar 11 16:00:35 2022'
+2022-03-11 16:02:29,783 - INFO: WorkerID:'6' Name:'Default' success.
+2022-03-11 16:02:29,790 - INFO: ElapsedTime:114.27019786834717
+2022-03-11 16:02:29,791 - INFO: End Time:'Fri Mar 11 16:02:29 2022'
+2022-03-11 16:02:29,792 - INFO: WorkerID:'8' Name:'Default' success.
+2022-03-11 16:02:29,793 - INFO: ElapsedTime:114.26620984077454
+2022-03-11 16:02:29,793 - INFO: End Time:'Fri Mar 11 16:02:29 2022'
+2022-03-11 16:02:31,789 - INFO: WorkerID:'7' Name:'Default' success.
+2022-03-11 16:02:31,789 - INFO: ElapsedTime:116.2698917388916
+2022-03-11 16:02:31,789 - INFO: End Time:'Fri Mar 11 16:02:31 2022'
+2022-03-11 16:02:31,803 - INFO: WorkerID:'9' Name:'Default' success.
+2022-03-11 16:02:31,804 - INFO: ElapsedTime:116.28046226501465
+2022-03-11 16:02:31,805 - INFO: End Time:'Fri Mar 11 16:02:31 2022'
+2022-03-11 16:02:32,792 - INFO: WorkerID:'5' Name:'Default' success.
+2022-03-11 16:02:32,793 - INFO: ElapsedTime:117.27617192268372
+2022-03-11 16:02:32,793 - INFO: End Time:'Fri Mar 11 16:02:32 2022'
+2022-03-11 16:07:11,554 - INFO: created worker type superfish id:0
+2022-03-11 16:07:11,554 - INFO: LOCAL POISSON SUPERFISH WORKER ID:0
+2022-03-11 16:07:11,554 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\0
+2022-03-11 16:07:11,554 - INFO: created worker type superfish id:1
+2022-03-11 16:07:11,554 - INFO: LOCAL POISSON SUPERFISH WORKER ID:1
+2022-03-11 16:07:11,554 - INFO: start cmd /k temp\0\mainsf.bat
+2022-03-11 16:07:11,554 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\1
+2022-03-11 16:07:11,554 - INFO: created worker type superfish id:2
+2022-03-11 16:07:11,554 - INFO: LOCAL POISSON SUPERFISH WORKER ID:2
+2022-03-11 16:07:11,554 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\2
+2022-03-11 16:07:11,554 - INFO: start cmd /k temp\1\mainsf.bat
+2022-03-11 16:07:11,554 - INFO: created worker type superfish id:3
+2022-03-11 16:07:11,554 - INFO: LOCAL POISSON SUPERFISH WORKER ID:3
+2022-03-11 16:07:11,554 - INFO: start cmd /k temp\2\mainsf.bat
+2022-03-11 16:07:11,554 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\3
+2022-03-11 16:07:11,554 - INFO: created worker type superfish id:4
+2022-03-11 16:07:11,554 - INFO: LOCAL POISSON SUPERFISH WORKER ID:4
+2022-03-11 16:07:11,554 - INFO: start cmd /k temp\3\mainsf.bat
+2022-03-11 16:07:11,554 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\4
+2022-03-11 16:07:11,554 - INFO: start cmd /k temp\4\mainsf.bat
+2022-03-11 16:07:11,569 - INFO: <Popen: returncode: None args: 'temp\\0\\mainsf.bat'>
+2022-03-11 16:07:11,569 - INFO: WorkerID:'0' Name:'Default' started.
+2022-03-11 16:07:11,569 - INFO: Start Time:'Fri Mar 11 16:07:11 2022'
+2022-03-11 16:07:11,569 - INFO: <Popen: returncode: None args: 'temp\\3\\mainsf.bat'>
+2022-03-11 16:07:11,569 - INFO: <Popen: returncode: None args: 'temp\\1\\mainsf.bat'>
+2022-03-11 16:07:11,569 - INFO: WorkerID:'3' Name:'Default' started.
+2022-03-11 16:07:11,569 - INFO: <Popen: returncode: None args: 'temp\\4\\mainsf.bat'>
+2022-03-11 16:07:11,569 - INFO: <Popen: returncode: None args: 'temp\\2\\mainsf.bat'>
+2022-03-11 16:07:11,569 - INFO: WorkerID:'1' Name:'Default' started.
+2022-03-11 16:07:11,569 - INFO: Start Time:'Fri Mar 11 16:07:11 2022'
+2022-03-11 16:07:11,569 - INFO: WorkerID:'4' Name:'Default' started.
+2022-03-11 16:07:11,569 - INFO: WorkerID:'2' Name:'Default' started.
+2022-03-11 16:07:11,569 - INFO: Start Time:'Fri Mar 11 16:07:11 2022'
+2022-03-11 16:07:11,569 - INFO: Start Time:'Fri Mar 11 16:07:11 2022'
+2022-03-11 16:07:11,569 - INFO: Start Time:'Fri Mar 11 16:07:11 2022'
+2022-03-11 16:09:37,829 - INFO: WorkerID:'4' Name:'Default' success.
+2022-03-11 16:09:37,829 - INFO: ElapsedTime:146.27025961875916
+2022-03-11 16:09:37,829 - INFO: End Time:'Fri Mar 11 16:09:37 2022'
+2022-03-11 16:09:43,852 - INFO: WorkerID:'3' Name:'Default' success.
+2022-03-11 16:09:43,852 - INFO: ElapsedTime:152.29477047920227
+2022-03-11 16:09:43,852 - INFO: End Time:'Fri Mar 11 16:09:43 2022'
+2022-03-11 16:10:01,880 - INFO: WorkerID:'1' Name:'Default' success.
+2022-03-11 16:10:01,881 - INFO: ElapsedTime:170.32222843170166
+2022-03-11 16:10:01,881 - INFO: End Time:'Fri Mar 11 16:10:01 2022'
+2022-03-11 16:10:16,914 - INFO: WorkerID:'0' Name:'Default' success.
+2022-03-11 16:10:16,915 - INFO: ElapsedTime:185.34783673286438
+2022-03-11 16:10:16,915 - INFO: End Time:'Fri Mar 11 16:10:16 2022'
+2022-03-11 16:11:08,961 - INFO: WorkerID:'2' Name:'Default' success.
+2022-03-11 16:11:08,962 - INFO: ElapsedTime:237.39475655555725
+2022-03-11 16:11:08,962 - INFO: End Time:'Fri Mar 11 16:11:08 2022'
+2022-03-11 16:11:08,974 - INFO: created worker type superfish id:5
+2022-03-11 16:11:08,974 - INFO: LOCAL POISSON SUPERFISH WORKER ID:5
+2022-03-11 16:11:08,974 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\5
+2022-03-11 16:11:08,976 - INFO: created worker type superfish id:6
+2022-03-11 16:11:08,976 - INFO: LOCAL POISSON SUPERFISH WORKER ID:6
+2022-03-11 16:11:08,976 - INFO: start cmd /k temp\5\mainsf.bat
+2022-03-11 16:11:08,976 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\6
+2022-03-11 16:11:08,977 - INFO: created worker type superfish id:7
+2022-03-11 16:11:08,978 - INFO: start cmd /k temp\6\mainsf.bat
+2022-03-11 16:11:08,978 - INFO: LOCAL POISSON SUPERFISH WORKER ID:7
+2022-03-11 16:11:08,978 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\7
+2022-03-11 16:11:08,979 - INFO: created worker type superfish id:8
+2022-03-11 16:11:08,979 - INFO: LOCAL POISSON SUPERFISH WORKER ID:8
+2022-03-11 16:11:08,979 - INFO: start cmd /k temp\7\mainsf.bat
+2022-03-11 16:11:08,980 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\8
+2022-03-11 16:11:08,981 - INFO: created worker type superfish id:9
+2022-03-11 16:11:08,981 - INFO: LOCAL POISSON SUPERFISH WORKER ID:9
+2022-03-11 16:11:08,981 - INFO: start cmd /k temp\8\mainsf.bat
+2022-03-11 16:11:08,981 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\9
+2022-03-11 16:11:08,983 - INFO: start cmd /k temp\9\mainsf.bat
+2022-03-11 16:11:08,985 - INFO: <Popen: returncode: None args: 'temp\\5\\mainsf.bat'>
+2022-03-11 16:11:08,985 - INFO: WorkerID:'5' Name:'Default' started.
+2022-03-11 16:11:08,986 - INFO: Start Time:'Fri Mar 11 16:11:08 2022'
+2022-03-11 16:11:08,986 - INFO: <Popen: returncode: None args: 'temp\\6\\mainsf.bat'>
+2022-03-11 16:11:08,986 - INFO: WorkerID:'6' Name:'Default' started.
+2022-03-11 16:11:08,986 - INFO: Start Time:'Fri Mar 11 16:11:08 2022'
+2022-03-11 16:11:08,987 - INFO: <Popen: returncode: None args: 'temp\\7\\mainsf.bat'>
+2022-03-11 16:11:08,988 - INFO: WorkerID:'7' Name:'Default' started.
+2022-03-11 16:11:08,988 - INFO: Start Time:'Fri Mar 11 16:11:08 2022'
+2022-03-11 16:11:08,989 - INFO: <Popen: returncode: None args: 'temp\\8\\mainsf.bat'>
+2022-03-11 16:11:08,990 - INFO: WorkerID:'8' Name:'Default' started.
+2022-03-11 16:11:08,990 - INFO: Start Time:'Fri Mar 11 16:11:08 2022'
+2022-03-11 16:11:08,990 - INFO: <Popen: returncode: None args: 'temp\\9\\mainsf.bat'>
+2022-03-11 16:11:08,990 - INFO: WorkerID:'9' Name:'Default' started.
+2022-03-11 16:11:08,991 - INFO: Start Time:'Fri Mar 11 16:11:08 2022'
+2022-03-11 16:13:31,196 - INFO: WorkerID:'7' Name:'Default' success.
+2022-03-11 16:13:31,197 - INFO: ElapsedTime:142.20671701431274
+2022-03-11 16:13:31,197 - INFO: End Time:'Fri Mar 11 16:13:31 2022'
+2022-03-11 16:13:33,199 - INFO: WorkerID:'5' Name:'Default' success.
+2022-03-11 16:13:33,200 - INFO: ElapsedTime:144.21115922927856
+2022-03-11 16:13:33,201 - INFO: End Time:'Fri Mar 11 16:13:33 2022'
+2022-03-11 16:13:33,264 - INFO: WorkerID:'6' Name:'Default' success.
+2022-03-11 16:13:33,265 - INFO: ElapsedTime:144.27320218086243
+2022-03-11 16:13:33,266 - INFO: WorkerID:'8' Name:'Default' success.
+2022-03-11 16:13:33,272 - INFO: End Time:'Fri Mar 11 16:13:33 2022'
+2022-03-11 16:13:33,274 - INFO: ElapsedTime:144.27021169662476
+2022-03-11 16:13:33,274 - INFO: End Time:'Fri Mar 11 16:13:33 2022'
+2022-03-11 16:13:33,275 - INFO: WorkerID:'9' Name:'Default' success.
+2022-03-11 16:13:33,275 - INFO: ElapsedTime:144.26821541786194
+2022-03-11 16:13:33,276 - INFO: End Time:'Fri Mar 11 16:13:33 2022'
+2022-03-11 16:33:19,787 - INFO: created worker type superfish id:0
+2022-03-11 16:33:19,787 - INFO: LOCAL POISSON SUPERFISH WORKER ID:0
+2022-03-11 16:33:19,787 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\0
+2022-03-11 16:33:19,797 - INFO: created worker type superfish id:1
+2022-03-11 16:33:19,798 - INFO: LOCAL POISSON SUPERFISH WORKER ID:1
+2022-03-11 16:33:19,798 - INFO: start cmd /k temp\0\mainsf.bat
+2022-03-11 16:33:19,798 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\1
+2022-03-11 16:33:19,799 - INFO: created worker type superfish id:2
+2022-03-11 16:33:19,799 - INFO: LOCAL POISSON SUPERFISH WORKER ID:2
+2022-03-11 16:33:19,800 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\2
+2022-03-11 16:33:19,800 - INFO: start cmd /k temp\1\mainsf.bat
+2022-03-11 16:33:19,801 - INFO: created worker type superfish id:3
+2022-03-11 16:33:19,801 - INFO: LOCAL POISSON SUPERFISH WORKER ID:3
+2022-03-11 16:33:19,801 - INFO: start cmd /k temp\2\mainsf.bat
+2022-03-11 16:33:19,802 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\3
+2022-03-11 16:33:19,803 - INFO: created worker type superfish id:4
+2022-03-11 16:33:19,803 - INFO: LOCAL POISSON SUPERFISH WORKER ID:4
+2022-03-11 16:33:19,803 - INFO: start cmd /k temp\3\mainsf.bat
+2022-03-11 16:33:19,803 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\4
+2022-03-11 16:33:19,805 - INFO: start cmd /k temp\4\mainsf.bat
+2022-03-11 16:33:19,812 - INFO: <Popen: returncode: None args: 'temp\\0\\mainsf.bat'>
+2022-03-11 16:33:19,813 - INFO: WorkerID:'0' Name:'Default' started.
+2022-03-11 16:33:19,813 - INFO: Start Time:'Fri Mar 11 16:33:19 2022'
+2022-03-11 16:33:19,814 - INFO: <Popen: returncode: None args: 'temp\\3\\mainsf.bat'>
+2022-03-11 16:33:19,815 - INFO: WorkerID:'3' Name:'Default' started.
+2022-03-11 16:33:19,815 - INFO: <Popen: returncode: None args: 'temp\\1\\mainsf.bat'>
+2022-03-11 16:33:19,815 - INFO: Start Time:'Fri Mar 11 16:33:19 2022'
+2022-03-11 16:33:19,815 - INFO: WorkerID:'1' Name:'Default' started.
+2022-03-11 16:33:19,815 - INFO: Start Time:'Fri Mar 11 16:33:19 2022'
+2022-03-11 16:33:19,816 - INFO: <Popen: returncode: None args: 'temp\\2\\mainsf.bat'>
+2022-03-11 16:33:19,817 - INFO: <Popen: returncode: None args: 'temp\\4\\mainsf.bat'>
+2022-03-11 16:33:19,817 - INFO: WorkerID:'2' Name:'Default' started.
+2022-03-11 16:33:19,817 - INFO: WorkerID:'4' Name:'Default' started.
+2022-03-11 16:33:19,817 - INFO: Start Time:'Fri Mar 11 16:33:19 2022'
+2022-03-11 16:33:19,817 - INFO: Start Time:'Fri Mar 11 16:33:19 2022'
+2022-03-11 16:35:22,100 - INFO: WorkerID:'2' Name:'Default' success.
+2022-03-11 16:35:22,100 - INFO: ElapsedTime:122.29513239860535
+2022-03-11 16:35:22,100 - INFO: End Time:'Fri Mar 11 16:35:22 2022'
+2022-03-11 16:35:42,170 - INFO: WorkerID:'4' Name:'Default' success.
+2022-03-11 16:35:42,170 - INFO: ElapsedTime:142.36113953590393
+2022-03-11 16:35:42,170 - INFO: End Time:'Fri Mar 11 16:35:42 2022'
+2022-03-11 16:35:44,173 - INFO: WorkerID:'0' Name:'Default' success.
+2022-03-11 16:35:44,173 - INFO: ElapsedTime:144.3710491657257
+2022-03-11 16:35:44,173 - INFO: End Time:'Fri Mar 11 16:35:44 2022'
+2022-03-11 16:35:57,224 - INFO: WorkerID:'1' Name:'Default' success.
+2022-03-11 16:35:57,224 - INFO: ElapsedTime:157.41174340248108
+2022-03-11 16:35:57,225 - INFO: End Time:'Fri Mar 11 16:35:57 2022'
+2022-03-11 16:36:19,254 - INFO: WorkerID:'3' Name:'Default' success.
+2022-03-11 16:36:19,254 - INFO: ElapsedTime:179.44669127464294
+2022-03-11 16:36:19,255 - INFO: End Time:'Fri Mar 11 16:36:19 2022'
+2022-03-11 16:36:19,261 - INFO: created worker type superfish id:5
+2022-03-11 16:36:19,262 - INFO: LOCAL POISSON SUPERFISH WORKER ID:5
+2022-03-11 16:36:19,262 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\5
+2022-03-11 16:36:19,263 - INFO: created worker type superfish id:6
+2022-03-11 16:36:19,264 - INFO: LOCAL POISSON SUPERFISH WORKER ID:6
+2022-03-11 16:36:19,264 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\6
+2022-03-11 16:36:19,264 - INFO: start cmd /k temp\5\mainsf.bat
+2022-03-11 16:36:19,266 - INFO: created worker type superfish id:7
+2022-03-11 16:36:19,266 - INFO: LOCAL POISSON SUPERFISH WORKER ID:7
+2022-03-11 16:36:19,266 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\7
+2022-03-11 16:36:19,266 - INFO: start cmd /k temp\6\mainsf.bat
+2022-03-11 16:36:19,267 - INFO: created worker type superfish id:8
+2022-03-11 16:36:19,268 - INFO: LOCAL POISSON SUPERFISH WORKER ID:8
+2022-03-11 16:36:19,268 - INFO: start cmd /k temp\7\mainsf.bat
+2022-03-11 16:36:19,268 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\8
+2022-03-11 16:36:19,269 - INFO: created worker type superfish id:9
+2022-03-11 16:36:19,269 - INFO: LOCAL POISSON SUPERFISH WORKER ID:9
+2022-03-11 16:36:19,270 - INFO: start cmd /k temp\8\mainsf.bat
+2022-03-11 16:36:19,270 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\9
+2022-03-11 16:36:19,271 - INFO: start cmd /k temp\9\mainsf.bat
+2022-03-11 16:36:19,274 - INFO: <Popen: returncode: None args: 'temp\\5\\mainsf.bat'>
+2022-03-11 16:36:19,274 - INFO: WorkerID:'5' Name:'Default' started.
+2022-03-11 16:36:19,275 - INFO: Start Time:'Fri Mar 11 16:36:19 2022'
+2022-03-11 16:36:19,275 - INFO: <Popen: returncode: None args: 'temp\\6\\mainsf.bat'>
+2022-03-11 16:36:19,275 - INFO: WorkerID:'6' Name:'Default' started.
+2022-03-11 16:36:19,276 - INFO: Start Time:'Fri Mar 11 16:36:19 2022'
+2022-03-11 16:36:19,277 - INFO: <Popen: returncode: None args: 'temp\\7\\mainsf.bat'>
+2022-03-11 16:36:19,277 - INFO: WorkerID:'7' Name:'Default' started.
+2022-03-11 16:36:19,277 - INFO: Start Time:'Fri Mar 11 16:36:19 2022'
+2022-03-11 16:36:19,278 - INFO: <Popen: returncode: None args: 'temp\\8\\mainsf.bat'>
+2022-03-11 16:36:19,278 - INFO: WorkerID:'8' Name:'Default' started.
+2022-03-11 16:36:19,278 - INFO: Start Time:'Fri Mar 11 16:36:19 2022'
+2022-03-11 16:36:19,280 - INFO: <Popen: returncode: None args: 'temp\\9\\mainsf.bat'>
+2022-03-11 16:36:19,280 - INFO: WorkerID:'9' Name:'Default' started.
+2022-03-11 16:36:19,280 - INFO: Start Time:'Fri Mar 11 16:36:19 2022'
+2022-03-11 16:38:41,494 - INFO: WorkerID:'8' Name:'Default' success.
+2022-03-11 16:38:41,496 - INFO: ElapsedTime:142.2182216644287
+2022-03-11 16:38:41,497 - INFO: End Time:'Fri Mar 11 16:38:41 2022'
+2022-03-11 16:38:41,514 - INFO: WorkerID:'7' Name:'Default' success.
+2022-03-11 16:38:41,516 - INFO: ElapsedTime:142.228187084198
+2022-03-11 16:38:41,519 - INFO: End Time:'Fri Mar 11 16:38:41 2022'
+2022-03-11 16:38:41,532 - INFO: WorkerID:'5' Name:'Default' success.
+2022-03-11 16:38:41,533 - INFO: WorkerID:'9' Name:'Default' success.
+2022-03-11 16:38:41,534 - INFO: ElapsedTime:142.23417615890503
+2022-03-11 16:38:41,535 - INFO: ElapsedTime:142.22519659996033
+2022-03-11 16:38:41,536 - INFO: End Time:'Fri Mar 11 16:38:41 2022'
+2022-03-11 16:38:41,537 - INFO: WorkerID:'6' Name:'Default' success.
+2022-03-11 16:38:41,537 - INFO: End Time:'Fri Mar 11 16:38:41 2022'
+2022-03-11 16:38:41,538 - INFO: ElapsedTime:142.2311782836914
+2022-03-11 16:38:41,540 - INFO: End Time:'Fri Mar 11 16:38:41 2022'
+2022-03-11 16:38:41,598 - INFO: created worker type superfish id:10
+2022-03-11 16:38:41,599 - INFO: LOCAL POISSON SUPERFISH WORKER ID:10
+2022-03-11 16:38:41,600 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\10
+2022-03-11 16:38:41,602 - INFO: created worker type superfish id:11
+2022-03-11 16:38:41,602 - INFO: start cmd /k temp\10\mainsf.bat
+2022-03-11 16:38:41,602 - INFO: LOCAL POISSON SUPERFISH WORKER ID:11
+2022-03-11 16:38:41,603 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\11
+2022-03-11 16:38:41,605 - INFO: created worker type superfish id:12
+2022-03-11 16:38:41,605 - INFO: LOCAL POISSON SUPERFISH WORKER ID:12
+2022-03-11 16:38:41,605 - INFO: start cmd /k temp\11\mainsf.bat
+2022-03-11 16:38:41,606 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\12
+2022-03-11 16:38:41,607 - INFO: created worker type superfish id:13
+2022-03-11 16:38:41,608 - INFO: LOCAL POISSON SUPERFISH WORKER ID:13
+2022-03-11 16:38:41,608 - INFO: start cmd /k temp\12\mainsf.bat
+2022-03-11 16:38:41,608 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\13
+2022-03-11 16:38:41,610 - INFO: created worker type superfish id:14
+2022-03-11 16:38:41,610 - INFO: LOCAL POISSON SUPERFISH WORKER ID:14
+2022-03-11 16:38:41,610 - INFO: start cmd /k temp\13\mainsf.bat
+2022-03-11 16:38:41,610 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\14
+2022-03-11 16:38:41,612 - INFO: start cmd /k temp\14\mainsf.bat
+2022-03-11 16:38:41,618 - INFO: <Popen: returncode: None args: 'temp\\10\\mainsf.bat'>
+2022-03-11 16:38:41,618 - INFO: <Popen: returncode: None args: 'temp\\11\\mainsf.bat'>
+2022-03-11 16:38:41,618 - INFO: WorkerID:'10' Name:'Default' started.
+2022-03-11 16:38:41,618 - INFO: <Popen: returncode: None args: 'temp\\12\\mainsf.bat'>
+2022-03-11 16:38:41,618 - INFO: WorkerID:'11' Name:'Default' started.
+2022-03-11 16:38:41,619 - INFO: Start Time:'Fri Mar 11 16:38:41 2022'
+2022-03-11 16:38:41,619 - INFO: WorkerID:'12' Name:'Default' started.
+2022-03-11 16:38:41,619 - INFO: Start Time:'Fri Mar 11 16:38:41 2022'
+2022-03-11 16:38:41,619 - INFO: <Popen: returncode: None args: 'temp\\13\\mainsf.bat'>
+2022-03-11 16:38:41,620 - INFO: Start Time:'Fri Mar 11 16:38:41 2022'
+2022-03-11 16:38:41,620 - INFO: WorkerID:'13' Name:'Default' started.
+2022-03-11 16:38:41,620 - INFO: Start Time:'Fri Mar 11 16:38:41 2022'
+2022-03-11 16:38:41,624 - INFO: <Popen: returncode: None args: 'temp\\14\\mainsf.bat'>
+2022-03-11 16:38:41,625 - INFO: WorkerID:'14' Name:'Default' started.
+2022-03-11 16:38:41,625 - INFO: Start Time:'Fri Mar 11 16:38:41 2022'
+2022-03-11 16:40:49,963 - INFO: WorkerID:'13' Name:'Default' success.
+2022-03-11 16:40:49,963 - INFO: ElapsedTime:128.34972548484802
+2022-03-11 16:40:49,963 - INFO: End Time:'Fri Mar 11 16:40:49 2022'
+2022-03-11 16:40:50,971 - INFO: WorkerID:'12' Name:'Default' success.
+2022-03-11 16:40:50,971 - INFO: ElapsedTime:129.36087703704834
+2022-03-11 16:40:50,971 - INFO: End Time:'Fri Mar 11 16:40:50 2022'
+2022-03-11 16:40:52,006 - INFO: WorkerID:'11' Name:'Default' success.
+2022-03-11 16:40:52,006 - INFO: WorkerID:'14' Name:'Default' success.
+2022-03-11 16:40:52,007 - INFO: WorkerID:'10' Name:'Default' success.
+2022-03-11 16:40:52,007 - INFO: ElapsedTime:130.3656940460205
+2022-03-11 16:40:52,008 - INFO: ElapsedTime:130.35771775245667
+2022-03-11 16:40:52,008 - INFO: ElapsedTime:130.36868572235107
+2022-03-11 16:40:52,008 - INFO: End Time:'Fri Mar 11 16:40:52 2022'
+2022-03-11 16:40:52,009 - INFO: End Time:'Fri Mar 11 16:40:52 2022'
+2022-03-11 16:40:52,009 - INFO: End Time:'Fri Mar 11 16:40:52 2022'
+2022-03-11 16:40:52,048 - INFO: created worker type superfish id:15
+2022-03-11 16:40:52,049 - INFO: LOCAL POISSON SUPERFISH WORKER ID:15
+2022-03-11 16:40:52,050 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\15
+2022-03-11 16:40:52,053 - INFO: created worker type superfish id:16
+2022-03-11 16:40:52,053 - INFO: LOCAL POISSON SUPERFISH WORKER ID:16
+2022-03-11 16:40:52,053 - INFO: start cmd /k temp\15\mainsf.bat
+2022-03-11 16:40:52,054 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\16
+2022-03-11 16:40:52,061 - INFO: created worker type superfish id:17
+2022-03-11 16:40:52,061 - INFO: LOCAL POISSON SUPERFISH WORKER ID:17
+2022-03-11 16:40:52,061 - INFO: start cmd /k temp\16\mainsf.bat
+2022-03-11 16:40:52,062 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\17
+2022-03-11 16:40:52,063 - INFO: created worker type superfish id:18
+2022-03-11 16:40:52,064 - INFO: LOCAL POISSON SUPERFISH WORKER ID:18
+2022-03-11 16:40:52,064 - INFO: start cmd /k temp\17\mainsf.bat
+2022-03-11 16:40:52,064 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\18
+2022-03-11 16:40:52,065 - INFO: created worker type superfish id:19
+2022-03-11 16:40:52,065 - INFO: LOCAL POISSON SUPERFISH WORKER ID:19
+2022-03-11 16:40:52,065 - INFO: start cmd /k temp\18\mainsf.bat
+2022-03-11 16:40:52,066 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\19
+2022-03-11 16:40:52,067 - INFO: start cmd /k temp\19\mainsf.bat
+2022-03-11 16:40:52,068 - INFO: <Popen: returncode: None args: 'temp\\15\\mainsf.bat'>
+2022-03-11 16:40:52,068 - INFO: WorkerID:'15' Name:'Default' started.
+2022-03-11 16:40:52,068 - INFO: Start Time:'Fri Mar 11 16:40:52 2022'
+2022-03-11 16:40:52,071 - INFO: <Popen: returncode: None args: 'temp\\16\\mainsf.bat'>
+2022-03-11 16:40:52,071 - INFO: WorkerID:'16' Name:'Default' started.
+2022-03-11 16:40:52,071 - INFO: Start Time:'Fri Mar 11 16:40:52 2022'
+2022-03-11 16:40:52,072 - INFO: <Popen: returncode: None args: 'temp\\17\\mainsf.bat'>
+2022-03-11 16:40:52,072 - INFO: WorkerID:'17' Name:'Default' started.
+2022-03-11 16:40:52,073 - INFO: Start Time:'Fri Mar 11 16:40:52 2022'
+2022-03-11 16:40:52,074 - INFO: <Popen: returncode: None args: 'temp\\18\\mainsf.bat'>
+2022-03-11 16:40:52,074 - INFO: WorkerID:'18' Name:'Default' started.
+2022-03-11 16:40:52,074 - INFO: Start Time:'Fri Mar 11 16:40:52 2022'
+2022-03-11 16:40:52,076 - INFO: <Popen: returncode: None args: 'temp\\19\\mainsf.bat'>
+2022-03-11 16:40:52,076 - INFO: WorkerID:'19' Name:'Default' started.
+2022-03-11 16:40:52,076 - INFO: Start Time:'Fri Mar 11 16:40:52 2022'
+2022-03-11 16:49:14,853 - INFO: created worker type superfish id:0
+2022-03-11 16:49:14,854 - INFO: LOCAL POISSON SUPERFISH WORKER ID:0
+2022-03-11 16:49:14,854 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\0
+2022-03-11 16:49:14,855 - INFO: created worker type superfish id:1
+2022-03-11 16:49:14,855 - INFO: LOCAL POISSON SUPERFISH WORKER ID:1
+2022-03-11 16:49:14,855 - INFO: start cmd /k temp\0\mainsf.bat
+2022-03-11 16:49:14,855 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\1
+2022-03-11 16:49:14,857 - INFO: created worker type superfish id:2
+2022-03-11 16:49:14,857 - INFO: LOCAL POISSON SUPERFISH WORKER ID:2
+2022-03-11 16:49:14,857 - INFO: start cmd /k temp\1\mainsf.bat
+2022-03-11 16:49:14,857 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\2
+2022-03-11 16:49:14,858 - INFO: created worker type superfish id:3
+2022-03-11 16:49:14,859 - INFO: LOCAL POISSON SUPERFISH WORKER ID:3
+2022-03-11 16:49:14,859 - INFO: start cmd /k temp\2\mainsf.bat
+2022-03-11 16:49:14,859 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\3
+2022-03-11 16:49:14,860 - INFO: created worker type superfish id:4
+2022-03-11 16:49:14,860 - INFO: LOCAL POISSON SUPERFISH WORKER ID:4
+2022-03-11 16:49:14,860 - INFO: start cmd /k temp\3\mainsf.bat
+2022-03-11 16:49:14,861 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\4
+2022-03-11 16:49:14,862 - INFO: start cmd /k temp\4\mainsf.bat
+2022-03-11 16:49:14,867 - INFO: <Popen: returncode: None args: 'temp\\0\\mainsf.bat'>
+2022-03-11 16:49:14,867 - INFO: WorkerID:'0' Name:'Default' started.
+2022-03-11 16:49:14,867 - INFO: Start Time:'Fri Mar 11 16:49:14 2022'
+2022-03-11 16:49:14,869 - INFO: <Popen: returncode: None args: 'temp\\1\\mainsf.bat'>
+2022-03-11 16:49:14,869 - INFO: WorkerID:'1' Name:'Default' started.
+2022-03-11 16:49:14,870 - INFO: Start Time:'Fri Mar 11 16:49:14 2022'
+2022-03-11 16:49:14,871 - INFO: <Popen: returncode: None args: 'temp\\2\\mainsf.bat'>
+2022-03-11 16:49:14,871 - INFO: <Popen: returncode: None args: 'temp\\3\\mainsf.bat'>
+2022-03-11 16:49:14,871 - INFO: WorkerID:'2' Name:'Default' started.
+2022-03-11 16:49:14,871 - INFO: <Popen: returncode: None args: 'temp\\4\\mainsf.bat'>
+2022-03-11 16:49:14,871 - INFO: WorkerID:'3' Name:'Default' started.
+2022-03-11 16:49:14,872 - INFO: Start Time:'Fri Mar 11 16:49:14 2022'
+2022-03-11 16:49:14,872 - INFO: WorkerID:'4' Name:'Default' started.
+2022-03-11 16:49:14,872 - INFO: Start Time:'Fri Mar 11 16:49:14 2022'
+2022-03-11 16:49:14,872 - INFO: Start Time:'Fri Mar 11 16:49:14 2022'
+2022-03-11 16:51:01,179 - INFO: WorkerID:'1' Name:'Default' success.
+2022-03-11 16:51:01,179 - INFO: ElapsedTime:106.31857323646545
+2022-03-11 16:51:01,179 - INFO: End Time:'Fri Mar 11 16:51:01 2022'
+2022-03-11 16:51:08,203 - INFO: WorkerID:'3' Name:'Default' success.
+2022-03-11 16:51:08,203 - INFO: ElapsedTime:113.33120942115784
+2022-03-11 16:51:08,204 - INFO: End Time:'Fri Mar 11 16:51:08 2022'
+2022-03-11 16:51:08,215 - INFO: WorkerID:'4' Name:'Default' success.
+2022-03-11 16:51:08,215 - INFO: ElapsedTime:113.32921481132507
+2022-03-11 16:51:08,215 - INFO: End Time:'Fri Mar 11 16:51:08 2022'
+2022-03-11 16:51:11,212 - INFO: WorkerID:'0' Name:'Default' success.
+2022-03-11 16:51:11,212 - INFO: ElapsedTime:116.35120844841003
+2022-03-11 16:51:11,212 - INFO: End Time:'Fri Mar 11 16:51:11 2022'
+2022-03-11 16:51:16,241 - INFO: WorkerID:'2' Name:'Default' success.
+2022-03-11 16:51:16,242 - INFO: ElapsedTime:121.3787100315094
+2022-03-11 16:51:16,242 - INFO: End Time:'Fri Mar 11 16:51:16 2022'
+2022-03-11 16:51:16,244 - INFO: created worker type superfish id:5
+2022-03-11 16:51:16,244 - INFO: LOCAL POISSON SUPERFISH WORKER ID:5
+2022-03-11 16:51:16,244 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\5
+2022-03-11 16:51:16,253 - INFO: created worker type superfish id:6
+2022-03-11 16:51:16,253 - INFO: LOCAL POISSON SUPERFISH WORKER ID:6
+2022-03-11 16:51:16,253 - INFO: start cmd /k temp\5\mainsf.bat
+2022-03-11 16:51:16,253 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\6
+2022-03-11 16:51:16,261 - INFO: created worker type superfish id:7
+2022-03-11 16:51:16,262 - INFO: LOCAL POISSON SUPERFISH WORKER ID:7
+2022-03-11 16:51:16,262 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\7
+2022-03-11 16:51:16,262 - INFO: start cmd /k temp\6\mainsf.bat
+2022-03-11 16:51:16,268 - INFO: created worker type superfish id:8
+2022-03-11 16:51:16,269 - INFO: LOCAL POISSON SUPERFISH WORKER ID:8
+2022-03-11 16:51:16,269 - INFO: start cmd /k temp\7\mainsf.bat
+2022-03-11 16:51:16,269 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\8
+2022-03-11 16:51:16,275 - INFO: created worker type superfish id:9
+2022-03-11 16:51:16,276 - INFO: LOCAL POISSON SUPERFISH WORKER ID:9
+2022-03-11 16:51:16,277 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\9
+2022-03-11 16:51:16,279 - INFO: start cmd /k temp\8\mainsf.bat
+2022-03-11 16:51:16,283 - INFO: start cmd /k temp\9\mainsf.bat
+2022-03-11 16:51:16,284 - INFO: <Popen: returncode: None args: 'temp\\5\\mainsf.bat'>
+2022-03-11 16:51:16,285 - INFO: WorkerID:'5' Name:'Default' started.
+2022-03-11 16:51:16,287 - INFO: Start Time:'Fri Mar 11 16:51:16 2022'
+2022-03-11 16:51:16,290 - INFO: <Popen: returncode: None args: 'temp\\6\\mainsf.bat'>
+2022-03-11 16:51:16,290 - INFO: WorkerID:'6' Name:'Default' started.
+2022-03-11 16:51:16,290 - INFO: Start Time:'Fri Mar 11 16:51:16 2022'
+2022-03-11 16:51:16,295 - INFO: <Popen: returncode: None args: 'temp\\7\\mainsf.bat'>
+2022-03-11 16:51:16,296 - INFO: WorkerID:'7' Name:'Default' started.
+2022-03-11 16:51:16,297 - INFO: Start Time:'Fri Mar 11 16:51:16 2022'
+2022-03-11 16:51:16,301 - INFO: <Popen: returncode: None args: 'temp\\9\\mainsf.bat'>
+2022-03-11 16:51:16,301 - INFO: WorkerID:'9' Name:'Default' started.
+2022-03-11 16:51:16,301 - INFO: Start Time:'Fri Mar 11 16:51:16 2022'
+2022-03-11 16:51:16,301 - INFO: <Popen: returncode: None args: 'temp\\8\\mainsf.bat'>
+2022-03-11 16:51:16,311 - INFO: WorkerID:'8' Name:'Default' started.
+2022-03-11 16:51:16,311 - INFO: Start Time:'Fri Mar 11 16:51:16 2022'
+2022-03-11 16:53:09,550 - INFO: WorkerID:'5' Name:'Default' success.
+2022-03-11 16:53:09,551 - INFO: ElapsedTime:113.29550313949585
+2022-03-11 16:53:09,551 - INFO: End Time:'Fri Mar 11 16:53:09 2022'
+2022-03-11 16:53:11,560 - INFO: WorkerID:'9' Name:'Default' success.
+2022-03-11 16:53:11,560 - INFO: WorkerID:'6' Name:'Default' success.
+2022-03-11 16:53:11,560 - INFO: ElapsedTime:115.2676796913147
+2022-03-11 16:53:11,561 - INFO: WorkerID:'7' Name:'Default' success.
+2022-03-11 16:53:11,561 - INFO: ElapsedTime:115.28997349739075
+2022-03-11 16:53:11,561 - INFO: End Time:'Fri Mar 11 16:53:11 2022'
+2022-03-11 16:53:11,561 - INFO: ElapsedTime:115.28204369544983
+2022-03-11 16:53:11,561 - INFO: End Time:'Fri Mar 11 16:53:11 2022'
+2022-03-11 16:53:11,561 - INFO: End Time:'Fri Mar 11 16:53:11 2022'
+2022-03-11 16:53:13,562 - INFO: WorkerID:'8' Name:'Default' success.
+2022-03-11 16:53:13,563 - INFO: ElapsedTime:117.2776951789856
+2022-03-11 16:53:13,564 - INFO: End Time:'Fri Mar 11 16:53:13 2022'
+2022-03-11 16:55:58,517 - INFO: created worker type superfish id:0
+2022-03-11 16:55:58,517 - INFO: LOCAL POISSON SUPERFISH WORKER ID:0
+2022-03-11 16:55:58,517 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\0
+2022-03-11 16:55:58,523 - INFO: WorkerID:'0' Name:'Default' Already Finished.
+2022-03-11 16:55:58,524 - INFO: Start Time:'Fri Mar 11 16:55:58 2022'
+2022-03-11 16:55:58,524 - INFO: created worker type superfish id:1
+2022-03-11 16:55:58,525 - INFO: LOCAL POISSON SUPERFISH WORKER ID:1
+2022-03-11 16:55:58,525 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\1
+2022-03-11 16:55:58,526 - INFO: WorkerID:'1' Name:'Default' Already Finished.
+2022-03-11 16:55:58,526 - INFO: Start Time:'Fri Mar 11 16:55:58 2022'
+2022-03-11 16:55:58,529 - INFO: created worker type superfish id:2
+2022-03-11 16:55:58,531 - INFO: LOCAL POISSON SUPERFISH WORKER ID:2
+2022-03-11 16:55:58,531 - INFO: WorkerID:'0' Name:'Default' success.
+2022-03-11 16:55:58,531 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\2
+2022-03-11 16:55:58,533 - INFO: WorkerID:'2' Name:'Default' Already Finished.
+2022-03-11 16:55:58,533 - INFO: Start Time:'Fri Mar 11 16:55:58 2022'
+2022-03-11 16:55:58,534 - INFO: created worker type superfish id:3
+2022-03-11 16:55:58,535 - INFO: LOCAL POISSON SUPERFISH WORKER ID:3
+2022-03-11 16:55:58,535 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\3
+2022-03-11 16:55:58,539 - INFO: WorkerID:'3' Name:'Default' Already Finished.
+2022-03-11 16:55:58,540 - INFO: Start Time:'Fri Mar 11 16:55:58 2022'
+2022-03-11 16:55:58,540 - INFO: WorkerID:'1' Name:'Default' success.
+2022-03-11 16:55:58,540 - INFO: created worker type superfish id:4
+2022-03-11 16:55:58,542 - INFO: LOCAL POISSON SUPERFISH WORKER ID:4
+2022-03-11 16:55:58,542 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\4
+2022-03-11 16:55:58,543 - INFO: WorkerID:'4' Name:'Default' Already Finished.
+2022-03-11 16:55:58,543 - INFO: Start Time:'Fri Mar 11 16:55:58 2022'
+2022-03-11 16:55:58,549 - INFO: WorkerID:'2' Name:'Default' success.
+2022-03-11 16:55:58,554 - INFO: WorkerID:'3' Name:'Default' success.
+2022-03-11 16:55:58,559 - INFO: WorkerID:'4' Name:'Default' success.
+2022-03-11 16:56:25,542 - INFO: created worker type superfish id:0
+2022-03-11 16:56:25,542 - INFO: LOCAL POISSON SUPERFISH WORKER ID:0
+2022-03-11 16:56:25,542 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\0
+2022-03-11 16:56:25,551 - INFO: created worker type superfish id:1
+2022-03-11 16:56:25,552 - INFO: LOCAL POISSON SUPERFISH WORKER ID:1
+2022-03-11 16:56:25,552 - INFO: start cmd /k temp\0\mainsf.bat
+2022-03-11 16:56:25,552 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\1
+2022-03-11 16:56:25,554 - INFO: created worker type superfish id:2
+2022-03-11 16:56:25,554 - INFO: LOCAL POISSON SUPERFISH WORKER ID:2
+2022-03-11 16:56:25,554 - INFO: start cmd /k temp\1\mainsf.bat
+2022-03-11 16:56:25,554 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\2
+2022-03-11 16:56:25,556 - INFO: created worker type superfish id:3
+2022-03-11 16:56:25,557 - INFO: LOCAL POISSON SUPERFISH WORKER ID:3
+2022-03-11 16:56:25,557 - INFO: start cmd /k temp\2\mainsf.bat
+2022-03-11 16:56:25,557 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\3
+2022-03-11 16:56:25,559 - INFO: created worker type superfish id:4
+2022-03-11 16:56:25,559 - INFO: LOCAL POISSON SUPERFISH WORKER ID:4
+2022-03-11 16:56:25,559 - INFO: start cmd /k temp\3\mainsf.bat
+2022-03-11 16:56:25,560 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\4
+2022-03-11 16:56:25,562 - INFO: start cmd /k temp\4\mainsf.bat
+2022-03-11 16:56:25,569 - INFO: <Popen: returncode: None args: 'temp\\0\\mainsf.bat'>
+2022-03-11 16:56:25,570 - INFO: <Popen: returncode: None args: 'temp\\2\\mainsf.bat'>
+2022-03-11 16:56:25,570 - INFO: WorkerID:'0' Name:'Default' started.
+2022-03-11 16:56:25,570 - INFO: <Popen: returncode: None args: 'temp\\1\\mainsf.bat'>
+2022-03-11 16:56:25,570 - INFO: WorkerID:'2' Name:'Default' started.
+2022-03-11 16:56:25,571 - INFO: Start Time:'Fri Mar 11 16:56:25 2022'
+2022-03-11 16:56:25,571 - INFO: WorkerID:'1' Name:'Default' started.
+2022-03-11 16:56:25,571 - INFO: Start Time:'Fri Mar 11 16:56:25 2022'
+2022-03-11 16:56:25,572 - INFO: <Popen: returncode: None args: 'temp\\3\\mainsf.bat'>
+2022-03-11 16:56:25,572 - INFO: Start Time:'Fri Mar 11 16:56:25 2022'
+2022-03-11 16:56:25,573 - INFO: WorkerID:'3' Name:'Default' started.
+2022-03-11 16:56:25,573 - INFO: Start Time:'Fri Mar 11 16:56:25 2022'
+2022-03-11 16:56:25,575 - INFO: <Popen: returncode: None args: 'temp\\4\\mainsf.bat'>
+2022-03-11 16:56:25,575 - INFO: WorkerID:'4' Name:'Default' started.
+2022-03-11 16:56:25,575 - INFO: Start Time:'Fri Mar 11 16:56:25 2022'
+2022-03-11 16:58:42,805 - INFO: WorkerID:'1' Name:'Default' success.
+2022-03-11 16:58:42,805 - INFO: ElapsedTime:137.24787044525146
+2022-03-11 16:58:42,805 - INFO: End Time:'Fri Mar 11 16:58:42 2022'
+2022-03-11 16:58:43,842 - INFO: WorkerID:'4' Name:'Default' success.
+2022-03-11 16:58:43,842 - INFO: WorkerID:'0' Name:'Default' success.
+2022-03-11 16:58:43,842 - INFO: ElapsedTime:138.27073574066162
+2022-03-11 16:58:43,843 - INFO: ElapsedTime:138.2811996936798
+2022-03-11 16:58:43,843 - INFO: End Time:'Fri Mar 11 16:58:43 2022'
+2022-03-11 16:58:43,843 - INFO: End Time:'Fri Mar 11 16:58:43 2022'
+2022-03-11 16:59:01,910 - INFO: WorkerID:'3' Name:'Default' success.
+2022-03-11 16:59:01,910 - INFO: ElapsedTime:156.33842968940735
+2022-03-11 16:59:01,911 - INFO: End Time:'Fri Mar 11 16:59:01 2022'
+2022-03-11 16:59:25,983 - INFO: WorkerID:'2' Name:'Default' success.
+2022-03-11 16:59:25,984 - INFO: ElapsedTime:180.41329979896545
+2022-03-11 16:59:25,984 - INFO: End Time:'Fri Mar 11 16:59:25 2022'
+2022-03-11 16:59:25,989 - INFO: created worker type superfish id:5
+2022-03-11 16:59:25,989 - INFO: LOCAL POISSON SUPERFISH WORKER ID:5
+2022-03-11 16:59:26,002 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\5
+2022-03-11 16:59:26,005 - INFO: created worker type superfish id:6
+2022-03-11 16:59:26,005 - INFO: LOCAL POISSON SUPERFISH WORKER ID:6
+2022-03-11 16:59:26,005 - INFO: start cmd /k temp\5\mainsf.bat
+2022-03-11 16:59:26,007 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\6
+2022-03-11 16:59:26,010 - INFO: created worker type superfish id:7
+2022-03-11 16:59:26,011 - INFO: LOCAL POISSON SUPERFISH WORKER ID:7
+2022-03-11 16:59:26,011 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\7
+2022-03-11 16:59:26,012 - INFO: start cmd /k temp\6\mainsf.bat
+2022-03-11 16:59:26,015 - INFO: created worker type superfish id:8
+2022-03-11 16:59:26,016 - INFO: start cmd /k temp\7\mainsf.bat
+2022-03-11 16:59:26,016 - INFO: LOCAL POISSON SUPERFISH WORKER ID:8
+2022-03-11 16:59:26,017 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\8
+2022-03-11 16:59:26,020 - INFO: created worker type superfish id:9
+2022-03-11 16:59:26,020 - INFO: LOCAL POISSON SUPERFISH WORKER ID:9
+2022-03-11 16:59:26,021 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\9
+2022-03-11 16:59:26,021 - INFO: start cmd /k temp\8\mainsf.bat
+2022-03-11 16:59:26,024 - INFO: start cmd /k temp\9\mainsf.bat
+2022-03-11 16:59:26,027 - INFO: <Popen: returncode: None args: 'temp\\5\\mainsf.bat'>
+2022-03-11 16:59:26,028 - INFO: WorkerID:'5' Name:'Default' started.
+2022-03-11 16:59:26,028 - INFO: <Popen: returncode: None args: 'temp\\6\\mainsf.bat'>
+2022-03-11 16:59:26,028 - INFO: Start Time:'Fri Mar 11 16:59:26 2022'
+2022-03-11 16:59:26,029 - INFO: WorkerID:'6' Name:'Default' started.
+2022-03-11 16:59:26,031 - INFO: Start Time:'Fri Mar 11 16:59:26 2022'
+2022-03-11 16:59:26,033 - INFO: <Popen: returncode: None args: 'temp\\7\\mainsf.bat'>
+2022-03-11 16:59:26,034 - INFO: WorkerID:'7' Name:'Default' started.
+2022-03-11 16:59:26,034 - INFO: Start Time:'Fri Mar 11 16:59:26 2022'
+2022-03-11 16:59:26,034 - INFO: <Popen: returncode: None args: 'temp\\8\\mainsf.bat'>
+2022-03-11 16:59:26,035 - INFO: WorkerID:'8' Name:'Default' started.
+2022-03-11 16:59:26,035 - INFO: Start Time:'Fri Mar 11 16:59:26 2022'
+2022-03-11 16:59:26,035 - INFO: <Popen: returncode: None args: 'temp\\9\\mainsf.bat'>
+2022-03-11 16:59:26,036 - INFO: WorkerID:'9' Name:'Default' started.
+2022-03-11 16:59:26,036 - INFO: Start Time:'Fri Mar 11 16:59:26 2022'
+2022-03-11 17:01:31,281 - INFO: WorkerID:'9' Name:'Default' success.
+2022-03-11 17:01:31,281 - INFO: ElapsedTime:125.25824618339539
+2022-03-11 17:01:31,281 - INFO: End Time:'Fri Mar 11 17:01:31 2022'
+2022-03-11 17:01:33,283 - INFO: WorkerID:'6' Name:'Default' success.
+2022-03-11 17:01:33,283 - INFO: ElapsedTime:127.27457642555237
+2022-03-11 17:01:33,283 - INFO: End Time:'Fri Mar 11 17:01:33 2022'
+2022-03-11 17:01:34,293 - INFO: WorkerID:'7' Name:'Default' success.
+2022-03-11 17:01:34,293 - INFO: WorkerID:'8' Name:'Default' success.
+2022-03-11 17:01:34,293 - INFO: ElapsedTime:128.27038884162903
+2022-03-11 17:01:34,294 - INFO: ElapsedTime:128.26540231704712
+2022-03-11 17:01:34,294 - INFO: End Time:'Fri Mar 11 17:01:34 2022'
+2022-03-11 17:01:34,294 - INFO: End Time:'Fri Mar 11 17:01:34 2022'
+2022-03-11 17:01:35,298 - INFO: WorkerID:'5' Name:'Default' success.
+2022-03-11 17:01:35,298 - INFO: ElapsedTime:129.2948386669159
+2022-03-11 17:01:35,298 - INFO: End Time:'Fri Mar 11 17:01:35 2022'
+2022-03-11 17:08:22,373 - INFO: created worker type superfish id:0
+2022-03-11 17:08:22,373 - INFO: LOCAL POISSON SUPERFISH WORKER ID:0
+2022-03-11 17:08:22,373 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\0
+2022-03-11 17:08:22,389 - INFO: created worker type superfish id:1
+2022-03-11 17:08:22,389 - INFO: LOCAL POISSON SUPERFISH WORKER ID:1
+2022-03-11 17:08:22,389 - INFO: start cmd /k temp\0\mainsf.bat
+2022-03-11 17:08:22,389 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\1
+2022-03-11 17:08:22,389 - INFO: created worker type superfish id:2
+2022-03-11 17:08:22,389 - INFO: LOCAL POISSON SUPERFISH WORKER ID:2
+2022-03-11 17:08:22,389 - INFO: start cmd /k temp\1\mainsf.bat
+2022-03-11 17:08:22,389 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\2
+2022-03-11 17:08:22,389 - INFO: created worker type superfish id:3
+2022-03-11 17:08:22,389 - INFO: LOCAL POISSON SUPERFISH WORKER ID:3
+2022-03-11 17:08:22,389 - INFO: start cmd /k temp\2\mainsf.bat
+2022-03-11 17:08:22,389 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\3
+2022-03-11 17:08:22,389 - INFO: created worker type superfish id:4
+2022-03-11 17:08:22,389 - INFO: LOCAL POISSON SUPERFISH WORKER ID:4
+2022-03-11 17:08:22,389 - INFO: start cmd /k temp\3\mainsf.bat
+2022-03-11 17:08:22,389 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\4
+2022-03-11 17:08:22,389 - INFO: start cmd /k temp\4\mainsf.bat
+2022-03-11 17:08:22,389 - INFO: <Popen: returncode: None args: 'temp\\2\\mainsf.bat'>
+2022-03-11 17:08:22,389 - INFO: WorkerID:'2' Name:'Default' started.
+2022-03-11 17:08:22,389 - INFO: Start Time:'Fri Mar 11 17:08:22 2022'
+2022-03-11 17:08:22,389 - INFO: <Popen: returncode: None args: 'temp\\1\\mainsf.bat'>
+2022-03-11 17:08:22,389 - INFO: <Popen: returncode: None args: 'temp\\4\\mainsf.bat'>
+2022-03-11 17:08:22,389 - INFO: WorkerID:'1' Name:'Default' started.
+2022-03-11 17:08:22,389 - INFO: <Popen: returncode: None args: 'temp\\0\\mainsf.bat'>
+2022-03-11 17:08:22,404 - INFO: <Popen: returncode: None args: 'temp\\3\\mainsf.bat'>
+2022-03-11 17:08:22,404 - INFO: WorkerID:'4' Name:'Default' started.
+2022-03-11 17:08:22,404 - INFO: Start Time:'Fri Mar 11 17:08:22 2022'
+2022-03-11 17:08:22,404 - INFO: WorkerID:'0' Name:'Default' started.
+2022-03-11 17:08:22,404 - INFO: WorkerID:'3' Name:'Default' started.
+2022-03-11 17:08:22,404 - INFO: Start Time:'Fri Mar 11 17:08:22 2022'
+2022-03-11 17:08:22,404 - INFO: Start Time:'Fri Mar 11 17:08:22 2022'
+2022-03-11 17:08:22,404 - INFO: Start Time:'Fri Mar 11 17:08:22 2022'
+2022-03-11 17:10:16,604 - INFO: WorkerID:'0' Name:'Default' success.
+2022-03-11 17:10:16,604 - INFO: ElapsedTime:114.2267816066742
+2022-03-11 17:10:16,604 - INFO: End Time:'Fri Mar 11 17:10:16 2022'
+2022-03-11 17:10:44,659 - INFO: WorkerID:'4' Name:'Default' success.
+2022-03-11 17:10:44,659 - INFO: ElapsedTime:142.26615810394287
+2022-03-11 17:10:44,659 - INFO: End Time:'Fri Mar 11 17:10:44 2022'
+2022-03-11 17:10:51,698 - INFO: WorkerID:'3' Name:'Default' success.
+2022-03-11 17:10:51,699 - INFO: ElapsedTime:149.29522037506104
+2022-03-11 17:10:51,699 - INFO: End Time:'Fri Mar 11 17:10:51 2022'
+2022-03-11 17:11:23,791 - INFO: WorkerID:'2' Name:'Default' success.
+2022-03-11 17:11:23,791 - INFO: ElapsedTime:181.38776063919067
+2022-03-11 17:11:23,792 - INFO: End Time:'Fri Mar 11 17:11:23 2022'
+2022-03-11 17:12:03,952 - INFO: WorkerID:'1' Name:'Default' success.
+2022-03-11 17:12:03,953 - INFO: ElapsedTime:221.54970622062683
+2022-03-11 17:12:03,954 - INFO: End Time:'Fri Mar 11 17:12:03 2022'
+2022-03-11 17:12:03,971 - INFO: created worker type superfish id:5
+2022-03-11 17:12:03,971 - INFO: LOCAL POISSON SUPERFISH WORKER ID:5
+2022-03-11 17:12:03,971 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\5
+2022-03-11 17:12:03,974 - INFO: created worker type superfish id:6
+2022-03-11 17:12:03,974 - INFO: LOCAL POISSON SUPERFISH WORKER ID:6
+2022-03-11 17:12:03,974 - INFO: start cmd /k temp\5\mainsf.bat
+2022-03-11 17:12:03,976 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\6
+2022-03-11 17:12:03,977 - INFO: created worker type superfish id:7
+2022-03-11 17:12:03,978 - INFO: LOCAL POISSON SUPERFISH WORKER ID:7
+2022-03-11 17:12:03,978 - INFO: start cmd /k temp\6\mainsf.bat
+2022-03-11 17:12:03,978 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\7
+2022-03-11 17:12:03,980 - INFO: created worker type superfish id:8
+2022-03-11 17:12:03,980 - INFO: LOCAL POISSON SUPERFISH WORKER ID:8
+2022-03-11 17:12:03,980 - INFO: start cmd /k temp\7\mainsf.bat
+2022-03-11 17:12:03,981 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\8
+2022-03-11 17:12:03,982 - INFO: created worker type superfish id:9
+2022-03-11 17:12:03,983 - INFO: LOCAL POISSON SUPERFISH WORKER ID:9
+2022-03-11 17:12:03,983 - INFO: start cmd /k temp\8\mainsf.bat
+2022-03-11 17:12:03,983 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\9
+2022-03-11 17:12:03,985 - INFO: start cmd /k temp\9\mainsf.bat
+2022-03-11 17:12:03,987 - INFO: <Popen: returncode: None args: 'temp\\5\\mainsf.bat'>
+2022-03-11 17:12:03,988 - INFO: WorkerID:'5' Name:'Default' started.
+2022-03-11 17:12:03,988 - INFO: Start Time:'Fri Mar 11 17:12:03 2022'
+2022-03-11 17:12:03,988 - INFO: <Popen: returncode: None args: 'temp\\6\\mainsf.bat'>
+2022-03-11 17:12:03,989 - INFO: WorkerID:'6' Name:'Default' started.
+2022-03-11 17:12:03,989 - INFO: Start Time:'Fri Mar 11 17:12:03 2022'
+2022-03-11 17:12:03,991 - INFO: <Popen: returncode: None args: 'temp\\7\\mainsf.bat'>
+2022-03-11 17:12:03,991 - INFO: WorkerID:'7' Name:'Default' started.
+2022-03-11 17:12:03,991 - INFO: Start Time:'Fri Mar 11 17:12:03 2022'
+2022-03-11 17:12:03,993 - INFO: <Popen: returncode: None args: 'temp\\8\\mainsf.bat'>
+2022-03-11 17:12:03,993 - INFO: WorkerID:'8' Name:'Default' started.
+2022-03-11 17:12:03,993 - INFO: Start Time:'Fri Mar 11 17:12:03 2022'
+2022-03-11 17:12:03,995 - INFO: <Popen: returncode: None args: 'temp\\9\\mainsf.bat'>
+2022-03-11 17:12:03,995 - INFO: WorkerID:'9' Name:'Default' started.
+2022-03-11 17:12:03,995 - INFO: Start Time:'Fri Mar 11 17:12:03 2022'
+2022-03-11 17:14:19,304 - INFO: WorkerID:'8' Name:'Default' success.
+2022-03-11 17:14:19,305 - INFO: ElapsedTime:135.31593561172485
+2022-03-11 17:14:19,305 - INFO: End Time:'Fri Mar 11 17:14:19 2022'
+2022-03-11 17:14:20,308 - INFO: WorkerID:'6' Name:'Default' success.
+2022-03-11 17:14:20,309 - INFO: ElapsedTime:136.31933116912842
+2022-03-11 17:14:20,309 - INFO: End Time:'Fri Mar 11 17:14:20 2022'
+2022-03-11 17:14:27,347 - INFO: WorkerID:'7' Name:'Default' success.
+2022-03-11 17:14:27,348 - INFO: ElapsedTime:143.3496389389038
+2022-03-11 17:14:27,349 - INFO: End Time:'Fri Mar 11 17:14:27 2022'
+2022-03-11 17:14:27,360 - INFO: WorkerID:'9' Name:'Default' success.
+2022-03-11 17:14:27,365 - INFO: ElapsedTime:143.35923552513123
+2022-03-11 17:14:27,366 - INFO: End Time:'Fri Mar 11 17:14:27 2022'
+2022-03-11 17:14:41,387 - INFO: WorkerID:'5' Name:'Default' success.
+2022-03-11 17:14:41,388 - INFO: ElapsedTime:157.40588235855103
+2022-03-11 17:14:41,388 - INFO: End Time:'Fri Mar 11 17:14:41 2022'
+2022-03-11 17:14:41,438 - INFO: created worker type superfish id:10
+2022-03-11 17:14:41,439 - INFO: LOCAL POISSON SUPERFISH WORKER ID:10
+2022-03-11 17:14:41,439 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\10
+2022-03-11 17:14:41,440 - INFO: created worker type superfish id:11
+2022-03-11 17:14:41,440 - INFO: LOCAL POISSON SUPERFISH WORKER ID:11
+2022-03-11 17:14:41,440 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\11
+2022-03-11 17:14:41,440 - INFO: start cmd /k temp\10\mainsf.bat
+2022-03-11 17:14:41,441 - INFO: created worker type superfish id:12
+2022-03-11 17:14:41,442 - INFO: LOCAL POISSON SUPERFISH WORKER ID:12
+2022-03-11 17:14:41,442 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\12
+2022-03-11 17:14:41,442 - INFO: start cmd /k temp\11\mainsf.bat
+2022-03-11 17:14:41,443 - INFO: created worker type superfish id:13
+2022-03-11 17:14:41,443 - INFO: LOCAL POISSON SUPERFISH WORKER ID:13
+2022-03-11 17:14:41,443 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\13
+2022-03-11 17:14:41,443 - INFO: start cmd /k temp\12\mainsf.bat
+2022-03-11 17:14:41,444 - INFO: created worker type superfish id:14
+2022-03-11 17:14:41,445 - INFO: LOCAL POISSON SUPERFISH WORKER ID:14
+2022-03-11 17:14:41,445 - INFO: start cmd /k temp\13\mainsf.bat
+2022-03-11 17:14:41,445 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\14
+2022-03-11 17:14:41,446 - INFO: start cmd /k temp\14\mainsf.bat
+2022-03-11 17:14:41,450 - INFO: <Popen: returncode: None args: 'temp\\10\\mainsf.bat'>
+2022-03-11 17:14:41,451 - INFO: <Popen: returncode: None args: 'temp\\11\\mainsf.bat'>
+2022-03-11 17:14:41,451 - INFO: WorkerID:'10' Name:'Default' started.
+2022-03-11 17:14:41,451 - INFO: WorkerID:'11' Name:'Default' started.
+2022-03-11 17:14:41,451 - INFO: Start Time:'Fri Mar 11 17:14:41 2022'
+2022-03-11 17:14:41,451 - INFO: Start Time:'Fri Mar 11 17:14:41 2022'
+2022-03-11 17:14:41,454 - INFO: <Popen: returncode: None args: 'temp\\12\\mainsf.bat'>
+2022-03-11 17:14:41,454 - INFO: WorkerID:'12' Name:'Default' started.
+2022-03-11 17:14:41,455 - INFO: <Popen: returncode: None args: 'temp\\13\\mainsf.bat'>
+2022-03-11 17:14:41,455 - INFO: Start Time:'Fri Mar 11 17:14:41 2022'
+2022-03-11 17:14:41,455 - INFO: WorkerID:'13' Name:'Default' started.
+2022-03-11 17:14:41,455 - INFO: Start Time:'Fri Mar 11 17:14:41 2022'
+2022-03-11 17:14:41,457 - INFO: <Popen: returncode: None args: 'temp\\14\\mainsf.bat'>
+2022-03-11 17:14:41,457 - INFO: WorkerID:'14' Name:'Default' started.
+2022-03-11 17:14:41,458 - INFO: Start Time:'Fri Mar 11 17:14:41 2022'
+2022-03-11 17:16:42,833 - INFO: WorkerID:'12' Name:'Default' success.
+2022-03-11 17:16:42,833 - INFO: ElapsedTime:121.39080786705017
+2022-03-11 17:16:42,833 - INFO: End Time:'Fri Mar 11 17:16:42 2022'
+2022-03-11 17:16:44,805 - INFO: WorkerID:'11' Name:'Default' success.
+2022-03-11 17:16:44,805 - INFO: ElapsedTime:123.36342692375183
+2022-03-11 17:16:44,805 - INFO: End Time:'Fri Mar 11 17:16:44 2022'
+2022-03-11 17:16:44,852 - INFO: WorkerID:'13' Name:'Default' success.
+2022-03-11 17:16:44,852 - INFO: ElapsedTime:123.39167952537537
+2022-03-11 17:16:44,852 - INFO: End Time:'Fri Mar 11 17:16:44 2022'
+2022-03-11 17:16:44,852 - INFO: WorkerID:'14' Name:'Default' success.
+2022-03-11 17:16:44,852 - INFO: ElapsedTime:123.3906819820404
+2022-03-11 17:16:44,852 - INFO: End Time:'Fri Mar 11 17:16:44 2022'
+2022-03-11 17:16:45,847 - INFO: WorkerID:'10' Name:'Default' success.
+2022-03-11 17:16:45,847 - INFO: ElapsedTime:124.40798926353455
+2022-03-11 17:16:45,847 - INFO: End Time:'Fri Mar 11 17:16:45 2022'
+2022-03-11 17:16:45,894 - INFO: created worker type superfish id:15
+2022-03-11 17:16:45,894 - INFO: LOCAL POISSON SUPERFISH WORKER ID:15
+2022-03-11 17:16:45,894 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\15
+2022-03-11 17:16:45,894 - INFO: created worker type superfish id:16
+2022-03-11 17:16:45,894 - INFO: LOCAL POISSON SUPERFISH WORKER ID:16
+2022-03-11 17:16:45,894 - INFO: start cmd /k temp\15\mainsf.bat
+2022-03-11 17:16:45,894 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\16
+2022-03-11 17:16:45,894 - INFO: created worker type superfish id:17
+2022-03-11 17:16:45,894 - INFO: LOCAL POISSON SUPERFISH WORKER ID:17
+2022-03-11 17:16:45,894 - INFO: start cmd /k temp\16\mainsf.bat
+2022-03-11 17:16:45,910 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\17
+2022-03-11 17:16:45,910 - INFO: created worker type superfish id:18
+2022-03-11 17:16:45,910 - INFO: LOCAL POISSON SUPERFISH WORKER ID:18
+2022-03-11 17:16:45,910 - INFO: start cmd /k temp\17\mainsf.bat
+2022-03-11 17:16:45,910 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\18
+2022-03-11 17:16:45,910 - INFO: created worker type superfish id:19
+2022-03-11 17:16:45,910 - INFO: LOCAL POISSON SUPERFISH WORKER ID:19
+2022-03-11 17:16:45,910 - INFO: start cmd /k temp\18\mainsf.bat
+2022-03-11 17:16:45,910 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\19
+2022-03-11 17:16:45,910 - INFO: start cmd /k temp\19\mainsf.bat
+2022-03-11 17:16:45,925 - INFO: <Popen: returncode: None args: 'temp\\15\\mainsf.bat'>
+2022-03-11 17:16:45,925 - INFO: WorkerID:'15' Name:'Default' started.
+2022-03-11 17:16:45,925 - INFO: Start Time:'Fri Mar 11 17:16:45 2022'
+2022-03-11 17:16:45,925 - INFO: <Popen: returncode: None args: 'temp\\16\\mainsf.bat'>
+2022-03-11 17:16:45,925 - INFO: WorkerID:'16' Name:'Default' started.
+2022-03-11 17:16:45,925 - INFO: Start Time:'Fri Mar 11 17:16:45 2022'
+2022-03-11 17:16:45,925 - INFO: <Popen: returncode: None args: 'temp\\17\\mainsf.bat'>
+2022-03-11 17:16:45,925 - INFO: WorkerID:'17' Name:'Default' started.
+2022-03-11 17:16:45,925 - INFO: Start Time:'Fri Mar 11 17:16:45 2022'
+2022-03-11 17:16:45,925 - INFO: <Popen: returncode: None args: 'temp\\19\\mainsf.bat'>
+2022-03-11 17:16:45,925 - INFO: <Popen: returncode: None args: 'temp\\18\\mainsf.bat'>
+2022-03-11 17:16:45,925 - INFO: WorkerID:'19' Name:'Default' started.
+2022-03-11 17:16:45,925 - INFO: WorkerID:'18' Name:'Default' started.
+2022-03-11 17:16:45,925 - INFO: Start Time:'Fri Mar 11 17:16:45 2022'
+2022-03-11 17:16:45,925 - INFO: Start Time:'Fri Mar 11 17:16:45 2022'
+2022-03-11 17:18:43,283 - INFO: created worker type superfish id:0
+2022-03-11 17:18:43,283 - INFO: LOCAL POISSON SUPERFISH WORKER ID:0
+2022-03-11 17:18:43,284 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\0
+2022-03-11 17:18:43,285 - INFO: created worker type superfish id:1
+2022-03-11 17:18:43,285 - INFO: LOCAL POISSON SUPERFISH WORKER ID:1
+2022-03-11 17:18:43,286 - INFO: start cmd /k temp\0\mainsf.bat
+2022-03-11 17:18:43,286 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\1
+2022-03-11 17:18:43,287 - INFO: created worker type superfish id:2
+2022-03-11 17:18:43,288 - INFO: LOCAL POISSON SUPERFISH WORKER ID:2
+2022-03-11 17:18:43,288 - INFO: start cmd /k temp\1\mainsf.bat
+2022-03-11 17:18:43,288 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\2
+2022-03-11 17:18:43,289 - INFO: created worker type superfish id:3
+2022-03-11 17:18:43,290 - INFO: LOCAL POISSON SUPERFISH WORKER ID:3
+2022-03-11 17:18:43,290 - INFO: start cmd /k temp\2\mainsf.bat
+2022-03-11 17:18:43,290 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\3
+2022-03-11 17:18:43,291 - INFO: created worker type superfish id:4
+2022-03-11 17:18:43,292 - INFO: LOCAL POISSON SUPERFISH WORKER ID:4
+2022-03-11 17:18:43,292 - INFO: start cmd /k temp\3\mainsf.bat
+2022-03-11 17:18:43,292 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\4
+2022-03-11 17:18:43,293 - INFO: start cmd /k temp\4\mainsf.bat
+2022-03-11 17:18:43,297 - INFO: <Popen: returncode: None args: 'temp\\0\\mainsf.bat'>
+2022-03-11 17:18:43,297 - INFO: WorkerID:'0' Name:'Default' started.
+2022-03-11 17:18:43,298 - INFO: Start Time:'Fri Mar 11 17:18:43 2022'
+2022-03-11 17:18:43,300 - INFO: <Popen: returncode: None args: 'temp\\1\\mainsf.bat'>
+2022-03-11 17:18:43,300 - INFO: <Popen: returncode: None args: 'temp\\2\\mainsf.bat'>
+2022-03-11 17:18:43,300 - INFO: WorkerID:'1' Name:'Default' started.
+2022-03-11 17:18:43,300 - INFO: WorkerID:'2' Name:'Default' started.
+2022-03-11 17:18:43,300 - INFO: Start Time:'Fri Mar 11 17:18:43 2022'
+2022-03-11 17:18:43,301 - INFO: Start Time:'Fri Mar 11 17:18:43 2022'
+2022-03-11 17:18:43,302 - INFO: <Popen: returncode: None args: 'temp\\3\\mainsf.bat'>
+2022-03-11 17:18:43,303 - INFO: <Popen: returncode: None args: 'temp\\4\\mainsf.bat'>
+2022-03-11 17:18:43,303 - INFO: WorkerID:'3' Name:'Default' started.
+2022-03-11 17:18:43,303 - INFO: WorkerID:'4' Name:'Default' started.
+2022-03-11 17:18:43,303 - INFO: Start Time:'Fri Mar 11 17:18:43 2022'
+2022-03-11 17:18:43,303 - INFO: Start Time:'Fri Mar 11 17:18:43 2022'
+2022-03-11 17:20:20,480 - INFO: WorkerID:'4' Name:'Default' success.
+2022-03-11 17:20:20,481 - INFO: ElapsedTime:97.17986583709717
+2022-03-11 17:20:20,482 - INFO: End Time:'Fri Mar 11 17:20:20 2022'
+2022-03-11 17:20:33,515 - INFO: WorkerID:'2' Name:'Default' success.
+2022-03-11 17:20:33,515 - INFO: ElapsedTime:110.2215929031372
+2022-03-11 17:20:33,515 - INFO: End Time:'Fri Mar 11 17:20:33 2022'
+2022-03-11 17:20:36,528 - INFO: WorkerID:'3' Name:'Default' success.
+2022-03-11 17:20:36,528 - INFO: ElapsedTime:113.23238778114319
+2022-03-11 17:20:36,528 - INFO: End Time:'Fri Mar 11 17:20:36 2022'
+2022-03-11 17:20:40,559 - INFO: WorkerID:'1' Name:'Default' success.
+2022-03-11 17:20:40,560 - INFO: ElapsedTime:117.26246070861816
+2022-03-11 17:20:40,562 - INFO: End Time:'Fri Mar 11 17:20:40 2022'
+2022-03-11 17:21:02,624 - INFO: WorkerID:'0' Name:'Default' success.
+2022-03-11 17:21:02,625 - INFO: ElapsedTime:139.32681012153625
+2022-03-11 17:21:02,625 - INFO: End Time:'Fri Mar 11 17:21:02 2022'
+2022-03-11 17:21:02,631 - INFO: created worker type superfish id:5
+2022-03-11 17:21:02,631 - INFO: LOCAL POISSON SUPERFISH WORKER ID:5
+2022-03-11 17:21:02,643 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\5
+2022-03-11 17:21:02,646 - INFO: created worker type superfish id:6
+2022-03-11 17:21:02,646 - INFO: LOCAL POISSON SUPERFISH WORKER ID:6
+2022-03-11 17:21:02,646 - INFO: start cmd /k temp\5\mainsf.bat
+2022-03-11 17:21:02,647 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\6
+2022-03-11 17:21:02,649 - INFO: created worker type superfish id:7
+2022-03-11 17:21:02,649 - INFO: LOCAL POISSON SUPERFISH WORKER ID:7
+2022-03-11 17:21:02,649 - INFO: start cmd /k temp\6\mainsf.bat
+2022-03-11 17:21:02,651 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\7
+2022-03-11 17:21:02,654 - INFO: created worker type superfish id:8
+2022-03-11 17:21:02,654 - INFO: LOCAL POISSON SUPERFISH WORKER ID:8
+2022-03-11 17:21:02,654 - INFO: start cmd /k temp\7\mainsf.bat
+2022-03-11 17:21:02,655 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\8
+2022-03-11 17:21:02,658 - INFO: created worker type superfish id:9
+2022-03-11 17:21:02,658 - INFO: LOCAL POISSON SUPERFISH WORKER ID:9
+2022-03-11 17:21:02,659 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\9
+2022-03-11 17:21:02,659 - INFO: start cmd /k temp\8\mainsf.bat
+2022-03-11 17:21:02,662 - INFO: start cmd /k temp\9\mainsf.bat
+2022-03-11 17:21:02,664 - INFO: <Popen: returncode: None args: 'temp\\5\\mainsf.bat'>
+2022-03-11 17:21:02,664 - INFO: WorkerID:'5' Name:'Default' started.
+2022-03-11 17:21:02,665 - INFO: Start Time:'Fri Mar 11 17:21:02 2022'
+2022-03-11 17:21:02,666 - INFO: <Popen: returncode: None args: 'temp\\6\\mainsf.bat'>
+2022-03-11 17:21:02,666 - INFO: WorkerID:'6' Name:'Default' started.
+2022-03-11 17:21:02,666 - INFO: Start Time:'Fri Mar 11 17:21:02 2022'
+2022-03-11 17:21:02,668 - INFO: <Popen: returncode: None args: 'temp\\7\\mainsf.bat'>
+2022-03-11 17:21:02,668 - INFO: WorkerID:'7' Name:'Default' started.
+2022-03-11 17:21:02,669 - INFO: Start Time:'Fri Mar 11 17:21:02 2022'
+2022-03-11 17:21:02,670 - INFO: <Popen: returncode: None args: 'temp\\8\\mainsf.bat'>
+2022-03-11 17:21:02,671 - INFO: WorkerID:'8' Name:'Default' started.
+2022-03-11 17:21:02,671 - INFO: Start Time:'Fri Mar 11 17:21:02 2022'
+2022-03-11 17:21:02,672 - INFO: <Popen: returncode: None args: 'temp\\9\\mainsf.bat'>
+2022-03-11 17:21:02,673 - INFO: WorkerID:'9' Name:'Default' started.
+2022-03-11 17:21:02,673 - INFO: Start Time:'Fri Mar 11 17:21:02 2022'
+2022-03-11 17:22:58,906 - INFO: WorkerID:'6' Name:'Default' success.
+2022-03-11 17:22:58,906 - INFO: ElapsedTime:116.2580213546753
+2022-03-11 17:22:58,906 - INFO: End Time:'Fri Mar 11 17:22:58 2022'
+2022-03-11 17:22:59,923 - INFO: WorkerID:'9' Name:'Default' success.
+2022-03-11 17:22:59,923 - INFO: ElapsedTime:117.26273727416992
+2022-03-11 17:22:59,923 - INFO: End Time:'Fri Mar 11 17:22:59 2022'
+2022-03-11 17:23:00,909 - INFO: WorkerID:'7' Name:'Default' success.
+2022-03-11 17:23:00,909 - INFO: ElapsedTime:118.25635266304016
+2022-03-11 17:23:00,909 - INFO: End Time:'Fri Mar 11 17:23:00 2022'
+2022-03-11 17:23:00,924 - INFO: WorkerID:'5' Name:'Default' success.
+2022-03-11 17:23:00,924 - INFO: ElapsedTime:118.28075122833252
+2022-03-11 17:23:00,924 - INFO: End Time:'Fri Mar 11 17:23:00 2022'
+2022-03-11 17:23:16,983 - INFO: WorkerID:'8' Name:'Default' success.
+2022-03-11 17:23:16,983 - INFO: ElapsedTime:134.32622027397156
+2022-03-11 17:23:16,983 - INFO: End Time:'Fri Mar 11 17:23:16 2022'
+2022-03-11 17:23:17,045 - INFO: created worker type superfish id:10
+2022-03-11 17:23:17,045 - INFO: LOCAL POISSON SUPERFISH WORKER ID:10
+2022-03-11 17:23:17,045 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\10
+2022-03-11 17:23:17,045 - INFO: created worker type superfish id:11
+2022-03-11 17:23:17,045 - INFO: LOCAL POISSON SUPERFISH WORKER ID:11
+2022-03-11 17:23:17,045 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\11
+2022-03-11 17:23:17,045 - INFO: start cmd /k temp\10\mainsf.bat
+2022-03-11 17:23:17,045 - INFO: created worker type superfish id:12
+2022-03-11 17:23:17,045 - INFO: start cmd /k temp\11\mainsf.bat
+2022-03-11 17:23:17,045 - INFO: LOCAL POISSON SUPERFISH WORKER ID:12
+2022-03-11 17:23:17,045 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\12
+2022-03-11 17:23:17,045 - INFO: created worker type superfish id:13
+2022-03-11 17:23:17,061 - INFO: LOCAL POISSON SUPERFISH WORKER ID:13
+2022-03-11 17:23:17,061 - INFO: start cmd /k temp\12\mainsf.bat
+2022-03-11 17:23:17,061 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\13
+2022-03-11 17:23:17,061 - INFO: created worker type superfish id:14
+2022-03-11 17:23:17,061 - INFO: LOCAL POISSON SUPERFISH WORKER ID:14
+2022-03-11 17:23:17,061 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\14
+2022-03-11 17:23:17,061 - INFO: start cmd /k temp\13\mainsf.bat
+2022-03-11 17:23:17,061 - INFO: start cmd /k temp\14\mainsf.bat
+2022-03-11 17:23:17,061 - INFO: <Popen: returncode: None args: 'temp\\10\\mainsf.bat'>
+2022-03-11 17:23:17,076 - INFO: <Popen: returncode: None args: 'temp\\11\\mainsf.bat'>
+2022-03-11 17:23:17,076 - INFO: WorkerID:'10' Name:'Default' started.
+2022-03-11 17:23:17,076 - INFO: WorkerID:'11' Name:'Default' started.
+2022-03-11 17:23:17,076 - INFO: Start Time:'Fri Mar 11 17:23:17 2022'
+2022-03-11 17:23:17,076 - INFO: Start Time:'Fri Mar 11 17:23:17 2022'
+2022-03-11 17:23:17,076 - INFO: <Popen: returncode: None args: 'temp\\14\\mainsf.bat'>
+2022-03-11 17:23:17,076 - INFO: <Popen: returncode: None args: 'temp\\12\\mainsf.bat'>
+2022-03-11 17:23:17,076 - INFO: WorkerID:'14' Name:'Default' started.
+2022-03-11 17:23:17,076 - INFO: WorkerID:'12' Name:'Default' started.
+2022-03-11 17:23:17,076 - INFO: Start Time:'Fri Mar 11 17:23:17 2022'
+2022-03-11 17:23:17,076 - INFO: Start Time:'Fri Mar 11 17:23:17 2022'
+2022-03-11 17:23:17,076 - INFO: <Popen: returncode: None args: 'temp\\13\\mainsf.bat'>
+2022-03-11 17:23:17,076 - INFO: WorkerID:'13' Name:'Default' started.
+2022-03-11 17:23:17,076 - INFO: Start Time:'Fri Mar 11 17:23:17 2022'
+2022-03-11 17:25:44,362 - INFO: WorkerID:'12' Name:'Default' success.
+2022-03-11 17:25:44,362 - INFO: ElapsedTime:147.31633758544922
+2022-03-11 17:25:44,362 - INFO: End Time:'Fri Mar 11 17:25:44 2022'
+2022-03-11 17:25:45,363 - INFO: WorkerID:'11' Name:'Default' success.
+2022-03-11 17:25:45,363 - INFO: ElapsedTime:148.3179953098297
+2022-03-11 17:25:45,363 - INFO: End Time:'Fri Mar 11 17:25:45 2022'
+2022-03-11 17:25:46,349 - INFO: WorkerID:'13' Name:'Default' success.
+2022-03-11 17:25:46,349 - INFO: ElapsedTime:149.28861212730408
+2022-03-11 17:25:46,349 - INFO: End Time:'Fri Mar 11 17:25:46 2022'
+2022-03-11 17:25:46,365 - INFO: WorkerID:'10' Name:'Default' success.
+2022-03-11 17:25:46,365 - INFO: ElapsedTime:149.3197886943817
+2022-03-11 17:25:46,365 - INFO: End Time:'Fri Mar 11 17:25:46 2022'
+2022-03-11 17:26:24,473 - INFO: WorkerID:'14' Name:'Default' success.
+2022-03-11 17:26:24,473 - INFO: ElapsedTime:187.41252756118774
+2022-03-11 17:26:24,473 - INFO: End Time:'Fri Mar 11 17:26:24 2022'
+2022-03-11 17:26:24,489 - INFO: created worker type superfish id:15
+2022-03-11 17:26:24,489 - INFO: LOCAL POISSON SUPERFISH WORKER ID:15
+2022-03-11 17:26:24,489 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\15
+2022-03-11 17:26:24,504 - INFO: created worker type superfish id:16
+2022-03-11 17:26:24,504 - INFO: LOCAL POISSON SUPERFISH WORKER ID:16
+2022-03-11 17:26:24,504 - INFO: start cmd /k temp\15\mainsf.bat
+2022-03-11 17:26:24,504 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\16
+2022-03-11 17:26:24,504 - INFO: created worker type superfish id:17
+2022-03-11 17:26:24,504 - INFO: LOCAL POISSON SUPERFISH WORKER ID:17
+2022-03-11 17:26:24,504 - INFO: start cmd /k temp\16\mainsf.bat
+2022-03-11 17:26:24,504 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\17
+2022-03-11 17:26:24,504 - INFO: created worker type superfish id:18
+2022-03-11 17:26:24,504 - INFO: LOCAL POISSON SUPERFISH WORKER ID:18
+2022-03-11 17:26:24,504 - INFO: start cmd /k temp\17\mainsf.bat
+2022-03-11 17:26:24,504 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\18
+2022-03-11 17:26:24,504 - INFO: created worker type superfish id:19
+2022-03-11 17:26:24,504 - INFO: LOCAL POISSON SUPERFISH WORKER ID:19
+2022-03-11 17:26:24,504 - INFO: start cmd /k temp\18\mainsf.bat
+2022-03-11 17:26:24,504 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\19
+2022-03-11 17:26:24,504 - INFO: start cmd /k temp\19\mainsf.bat
+2022-03-11 17:26:24,520 - INFO: <Popen: returncode: None args: 'temp\\15\\mainsf.bat'>
+2022-03-11 17:26:24,520 - INFO: WorkerID:'15' Name:'Default' started.
+2022-03-11 17:26:24,520 - INFO: Start Time:'Fri Mar 11 17:26:24 2022'
+2022-03-11 17:26:24,520 - INFO: <Popen: returncode: None args: 'temp\\16\\mainsf.bat'>
+2022-03-11 17:26:24,520 - INFO: WorkerID:'16' Name:'Default' started.
+2022-03-11 17:26:24,520 - INFO: Start Time:'Fri Mar 11 17:26:24 2022'
+2022-03-11 17:26:24,520 - INFO: <Popen: returncode: None args: 'temp\\17\\mainsf.bat'>
+2022-03-11 17:26:24,520 - INFO: WorkerID:'17' Name:'Default' started.
+2022-03-11 17:26:24,520 - INFO: Start Time:'Fri Mar 11 17:26:24 2022'
+2022-03-11 17:26:24,520 - INFO: <Popen: returncode: None args: 'temp\\18\\mainsf.bat'>
+2022-03-11 17:26:24,520 - INFO: WorkerID:'18' Name:'Default' started.
+2022-03-11 17:26:24,520 - INFO: Start Time:'Fri Mar 11 17:26:24 2022'
+2022-03-11 17:26:24,520 - INFO: <Popen: returncode: None args: 'temp\\19\\mainsf.bat'>
+2022-03-11 17:26:24,520 - INFO: WorkerID:'19' Name:'Default' started.
+2022-03-11 17:26:24,520 - INFO: Start Time:'Fri Mar 11 17:26:24 2022'
+2022-03-11 17:28:50,716 - INFO: WorkerID:'17' Name:'Default' success.
+2022-03-11 17:28:50,716 - INFO: ElapsedTime:146.21139574050903
+2022-03-11 17:28:50,716 - INFO: End Time:'Fri Mar 11 17:28:50 2022'
+2022-03-11 17:28:54,719 - INFO: WorkerID:'19' Name:'Default' success.
+2022-03-11 17:28:54,719 - INFO: ElapsedTime:150.2150752544403
+2022-03-11 17:28:54,719 - INFO: End Time:'Fri Mar 11 17:28:54 2022'
+2022-03-11 17:28:55,723 - INFO: WorkerID:'18' Name:'Default' success.
+2022-03-11 17:28:55,723 - INFO: ElapsedTime:151.21855449676514
+2022-03-11 17:28:55,723 - INFO: End Time:'Fri Mar 11 17:28:55 2022'
+2022-03-11 17:28:56,719 - INFO: WorkerID:'15' Name:'Default' success.
+2022-03-11 17:28:56,719 - INFO: ElapsedTime:152.2302107810974
+2022-03-11 17:28:56,719 - INFO: End Time:'Fri Mar 11 17:28:56 2022'
+2022-03-11 17:28:56,735 - INFO: WorkerID:'16' Name:'Default' success.
+2022-03-11 17:28:56,735 - INFO: ElapsedTime:152.23021173477173
+2022-03-11 17:28:56,735 - INFO: End Time:'Fri Mar 11 17:28:56 2022'
+2022-03-11 17:28:56,875 - INFO: created worker type superfish id:20
+2022-03-11 17:28:56,875 - INFO: LOCAL POISSON SUPERFISH WORKER ID:20
+2022-03-11 17:28:56,891 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\20
+2022-03-11 17:28:56,891 - INFO: created worker type superfish id:21
+2022-03-11 17:28:56,891 - INFO: LOCAL POISSON SUPERFISH WORKER ID:21
+2022-03-11 17:28:56,891 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\21
+2022-03-11 17:28:56,891 - INFO: start cmd /k temp\20\mainsf.bat
+2022-03-11 17:28:56,891 - INFO: created worker type superfish id:22
+2022-03-11 17:28:56,891 - INFO: LOCAL POISSON SUPERFISH WORKER ID:22
+2022-03-11 17:28:56,891 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\22
+2022-03-11 17:28:56,891 - INFO: start cmd /k temp\21\mainsf.bat
+2022-03-11 17:28:56,891 - INFO: created worker type superfish id:23
+2022-03-11 17:28:56,891 - INFO: LOCAL POISSON SUPERFISH WORKER ID:23
+2022-03-11 17:28:56,891 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\23
+2022-03-11 17:28:56,891 - INFO: start cmd /k temp\22\mainsf.bat
+2022-03-11 17:28:56,891 - INFO: created worker type superfish id:24
+2022-03-11 17:28:56,891 - INFO: LOCAL POISSON SUPERFISH WORKER ID:24
+2022-03-11 17:28:56,891 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\24
+2022-03-11 17:28:56,891 - INFO: start cmd /k temp\23\mainsf.bat
+2022-03-11 17:28:56,906 - INFO: start cmd /k temp\24\mainsf.bat
+2022-03-11 17:28:56,906 - INFO: <Popen: returncode: None args: 'temp\\20\\mainsf.bat'>
+2022-03-11 17:28:56,906 - INFO: <Popen: returncode: None args: 'temp\\21\\mainsf.bat'>
+2022-03-11 17:28:56,906 - INFO: WorkerID:'20' Name:'Default' started.
+2022-03-11 17:28:56,906 - INFO: WorkerID:'21' Name:'Default' started.
+2022-03-11 17:28:56,906 - INFO: Start Time:'Fri Mar 11 17:28:56 2022'
+2022-03-11 17:28:56,906 - INFO: Start Time:'Fri Mar 11 17:28:56 2022'
+2022-03-11 17:28:56,906 - INFO: <Popen: returncode: None args: 'temp\\22\\mainsf.bat'>
+2022-03-11 17:28:56,906 - INFO: WorkerID:'22' Name:'Default' started.
+2022-03-11 17:28:56,906 - INFO: Start Time:'Fri Mar 11 17:28:56 2022'
+2022-03-11 17:28:56,922 - INFO: <Popen: returncode: None args: 'temp\\23\\mainsf.bat'>
+2022-03-11 17:28:56,922 - INFO: WorkerID:'23' Name:'Default' started.
+2022-03-11 17:28:56,922 - INFO: Start Time:'Fri Mar 11 17:28:56 2022'
+2022-03-11 17:28:56,922 - INFO: <Popen: returncode: None args: 'temp\\24\\mainsf.bat'>
+2022-03-11 17:28:56,922 - INFO: WorkerID:'24' Name:'Default' started.
+2022-03-11 17:28:56,922 - INFO: Start Time:'Fri Mar 11 17:28:56 2022'
+2022-03-11 17:31:30,098 - INFO: WorkerID:'20' Name:'Default' success.
+2022-03-11 17:31:30,098 - INFO: ElapsedTime:153.2067849636078
+2022-03-11 17:31:30,098 - INFO: End Time:'Fri Mar 11 17:31:30 2022'
+2022-03-11 17:31:30,113 - INFO: WorkerID:'22' Name:'Default' success.
+2022-03-11 17:31:30,113 - INFO: ElapsedTime:153.2067849636078
+2022-03-11 17:31:30,113 - INFO: End Time:'Fri Mar 11 17:31:30 2022'
+2022-03-11 17:31:33,108 - INFO: WorkerID:'21' Name:'Default' success.
+2022-03-11 17:31:33,108 - INFO: ElapsedTime:156.21753454208374
+2022-03-11 17:31:33,108 - INFO: End Time:'Fri Mar 11 17:31:33 2022'
+2022-03-11 17:31:33,140 - INFO: WorkerID:'24' Name:'Default' success.
+2022-03-11 17:31:33,140 - INFO: ElapsedTime:156.2487757205963
+2022-03-11 17:31:33,155 - INFO: End Time:'Fri Mar 11 17:31:33 2022'
+2022-03-11 17:31:33,155 - INFO: WorkerID:'23' Name:'Default' success.
+2022-03-11 17:31:33,155 - INFO: ElapsedTime:156.2487757205963
+2022-03-11 17:31:33,155 - INFO: End Time:'Fri Mar 11 17:31:33 2022'
+2022-03-11 17:31:33,311 - INFO: created worker type superfish id:25
+2022-03-11 17:31:33,311 - INFO: LOCAL POISSON SUPERFISH WORKER ID:25
+2022-03-11 17:31:33,311 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\25
+2022-03-11 17:31:33,311 - INFO: created worker type superfish id:26
+2022-03-11 17:31:33,311 - INFO: LOCAL POISSON SUPERFISH WORKER ID:26
+2022-03-11 17:31:33,311 - INFO: start cmd /k temp\25\mainsf.bat
+2022-03-11 17:31:33,311 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\26
+2022-03-11 17:31:33,327 - INFO: created worker type superfish id:27
+2022-03-11 17:31:33,327 - INFO: LOCAL POISSON SUPERFISH WORKER ID:27
+2022-03-11 17:31:33,327 - INFO: start cmd /k temp\26\mainsf.bat
+2022-03-11 17:31:33,327 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\27
+2022-03-11 17:31:33,327 - INFO: created worker type superfish id:28
+2022-03-11 17:31:33,327 - INFO: LOCAL POISSON SUPERFISH WORKER ID:28
+2022-03-11 17:31:33,327 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\28
+2022-03-11 17:31:33,327 - INFO: start cmd /k temp\27\mainsf.bat
+2022-03-11 17:31:33,327 - INFO: created worker type superfish id:29
+2022-03-11 17:31:33,327 - INFO: LOCAL POISSON SUPERFISH WORKER ID:29
+2022-03-11 17:31:33,327 - INFO: WorkDir:C:\Users\ykk\Desktop\cst_tools\temp\29
+2022-03-11 17:31:33,327 - INFO: start cmd /k temp\28\mainsf.bat
+2022-03-11 17:31:33,327 - INFO: start cmd /k temp\29\mainsf.bat
+2022-03-11 17:31:33,343 - INFO: <Popen: returncode: None args: 'temp\\25\\mainsf.bat'>
+2022-03-11 17:31:33,343 - INFO: WorkerID:'25' Name:'Default' started.
+2022-03-11 17:31:33,343 - INFO: <Popen: returncode: None args: 'temp\\26\\mainsf.bat'>
+2022-03-11 17:31:33,343 - INFO: Start Time:'Fri Mar 11 17:31:33 2022'
+2022-03-11 17:31:33,343 - INFO: WorkerID:'26' Name:'Default' started.
+2022-03-11 17:31:33,343 - INFO: Start Time:'Fri Mar 11 17:31:33 2022'
+2022-03-11 17:31:33,343 - INFO: <Popen: returncode: None args: 'temp\\27\\mainsf.bat'>
+2022-03-11 17:31:33,343 - INFO: WorkerID:'27' Name:'Default' started.
+2022-03-11 17:31:33,343 - INFO: Start Time:'Fri Mar 11 17:31:33 2022'
+2022-03-11 17:31:33,343 - INFO: <Popen: returncode: None args: 'temp\\28\\mainsf.bat'>
+2022-03-11 17:31:33,343 - INFO: WorkerID:'28' Name:'Default' started.
+2022-03-11 17:31:33,343 - INFO: Start Time:'Fri Mar 11 17:31:33 2022'
+2022-03-11 17:31:33,343 - INFO: <Popen: returncode: None args: 'temp\\29\\mainsf.bat'>
+2022-03-11 17:31:33,343 - INFO: WorkerID:'29' Name:'Default' started.
+2022-03-11 17:31:33,343 - INFO: Start Time:'Fri Mar 11 17:31:33 2022'
+2022-03-11 17:34:04,580 - INFO: WorkerID:'25' Name:'Default' success.
+2022-03-11 17:34:04,580 - INFO: ElapsedTime:151.26875257492065
+2022-03-11 17:34:04,580 - INFO: End Time:'Fri Mar 11 17:34:04 2022'
+2022-03-11 17:34:05,581 - INFO: WorkerID:'27' Name:'Default' success.
+2022-03-11 17:34:05,581 - INFO: ElapsedTime:152.25434041023254
+2022-03-11 17:34:05,581 - INFO: End Time:'Fri Mar 11 17:34:05 2022'
+2022-03-11 17:34:07,569 - INFO: WorkerID:'26' Name:'Default' success.
+2022-03-11 17:34:07,569 - INFO: ElapsedTime:154.24154472351074
+2022-03-11 17:34:07,569 - INFO: End Time:'Fri Mar 11 17:34:07 2022'
+2022-03-11 17:34:07,584 - INFO: WorkerID:'29' Name:'Default' success.
+2022-03-11 17:34:07,584 - INFO: ElapsedTime:154.25709867477417
+2022-03-11 17:34:07,584 - INFO: End Time:'Fri Mar 11 17:34:07 2022'
+2022-03-11 17:34:07,600 - INFO: WorkerID:'28' Name:'Default' success.
+2022-03-11 17:34:07,600 - INFO: ElapsedTime:154.27272057533264
+2022-03-11 17:34:07,600 - INFO: End Time:'Fri Mar 11 17:34:07 2022'

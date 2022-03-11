@@ -15,8 +15,8 @@ class SECHeaderParams:
         self.ICYLIN = 1  # X=>Z,Y=>R, cylindrical coordinates
         self.NORM = 1  # Normalize to EZEROT
         self.EZEROT = 1.0e07  # Accelerating field times T
-        self.XDRI = 0  # Drive point X coordinate
-        self.YDRI = 0  # Drive point Y coordinate
+        self.XDRI = 0.1  # Drive point X coordinate
+        self.YDRI = 0.1  # Drive point Y coordinate
         self.DX = 1  # Mesh spacing in X direction
         self.DY = 1
         self.CONV = 0.1  # In mm
@@ -55,7 +55,7 @@ class SFHeaderGenerator:
                 if reg_section_finish:
                     break
                 if not reg_section_start:
-                    if not line.upper().startswith("&REG"): ###CASE INSENSITVE MATCH
+                    if not line.upper().startswith("&REG"):  ###CASE INSENSITVE MATCH
                         continue
                     else:
                         line = line[4:]  ### remove &REG

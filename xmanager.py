@@ -123,7 +123,7 @@ class xmanager(object):
         print(mconf["tempPath"])
         mconf["postProcess"] = None  ## No Custom postProcess
         msfworker_local = sfworker.local_superfish_worker(
-            id=workerID, type="local", config=mconf, logger=self.logger
+            id=workerID, type="local", self.config=mconf, logger=self.logger
         )
         return msfworker_local
 
