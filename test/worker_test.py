@@ -19,7 +19,7 @@ def test_local_superfish_worker_dummy(tmp_path_factory):
         "resultdir":tmp_dir ,
         "SFENVPATH":r"C:\LANL",
     }
-    sfworker_test=local_superfish_worker(id=0,self.config=test_config)
+    sfworker_test=local_superfish_worker(id=0,config=test_config)
     refbatchstr=[]
     result=sfworker_test.run()
     assert result['TaskStatus']=="PostProcessFailure"
@@ -58,7 +58,7 @@ def test_local_superfish_worker_full(tmp_path_factory):
         "input_macro":batchlines
 
     }
-    sfworker_test=local_superfish_worker(id=0,self.config=test_config)
+    sfworker_test=local_superfish_worker(id=0,config=test_config)
     refbatchstr=[]
     result=sfworker_test.run()
     print(result)

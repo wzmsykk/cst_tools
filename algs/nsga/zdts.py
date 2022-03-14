@@ -29,8 +29,14 @@ class commonfunc():
     @abstractmethod
     def __call__(self,invars):
         print(invars)
-        return invars
+        objs=invars
+        return objs
     
+    def result_with_constraint(self,invars):
+        print(invars)
+        objs=invars
+        c_objs=invars
+        return objs,c_objs
     def check_boundary(self,invars):
         for index,var in enumerate(invars):
             if var>self.max_var[index] or var<self.min_var[index]:

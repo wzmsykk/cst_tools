@@ -40,8 +40,8 @@ def dump_fnds_structs(savedir,igen,fndslist:List[List[nsgaii_var]]):
                     "id":ind.id,
                     "req":ind.value[0],
                     "leq":ind.value[1],
-                    "freq":math.sqrt(ind.result[0])+500,
-                    "roq":ind.result[1]
+                    "freq":math.sqrt(ind.obj[0])+500,
+                    "roq":ind.obj[1]
                 }
                 ndf=pandas.DataFrame(u,index=[0])
                 idf=idf.append(ndf)
@@ -57,18 +57,18 @@ def image_worker_func(savedir,igen,fndslist:List[List[nsgaii_var]]):
     y2=[]
     if fndslist[0] is not None:
         for ind in fndslist[0]:
-            x0.append(ind.result[0])
-            y0.append(ind.result[1])
+            x0.append(ind.obj[0])
+            y0.append(ind.obj[1])
         plt.scatter(x0,y0,c='r',marker='o')
     if fndslist[1] is not None:
         for ind in fndslist[1]:
-            x1.append(ind.result[0])
-            y1.append(ind.result[1])
+            x1.append(ind.obj[0])
+            y1.append(ind.obj[1])
         plt.scatter(x1,y1,c='orange',marker='o')
     if fndslist[2] is not None:
         for ind in fndslist[2]:
-            x2.append(ind.result[0])
-            y2.append(ind.result[1])      
+            x2.append(ind.obj[0])
+            y2.append(ind.obj[1])      
         plt.scatter(x2,y2,c='y',marker='o')
 
     plt.xlabel('f1')

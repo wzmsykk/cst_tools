@@ -1,8 +1,7 @@
 from math import inf, sqrt, floor
 from random import random, seed, shuffle, choices,sample
-from unittest import result
 
-from sympy import I
+
 from .zdts import zdt1, zdt2, zdt3, zdt4
 from typing import List, Set
 import json
@@ -16,7 +15,7 @@ class nsgaii_var:
     def __init__(self, value) -> None:
         self.value = np.array(value)
         self.rank = 0
-        self.result = None
+        self.obj = None
         self.pset: Set[
             nsgaii_var
         ] = set()  ### set of var domed by p ### By Ref so it might be memory safe
@@ -26,6 +25,8 @@ class nsgaii_var:
         self.crowed_dis = 0
         self.crowed_dis_calc_done = False
         
+        self.constraint_obj=None
+        self.constraint_violaton_value=0
         self.id = nsgaii_var._getNewAvailableId()
         
     @classmethod
@@ -38,19 +39,30 @@ class nsgaii_var:
     def duplicate(self)-> "nsgaii_var":
         #### Get An Unsorted Var Duplicate
         dup=nsgaii_var(self.value)
-        dup.result=self.result.copy()        
+        dup.obj=self.obj.copy()        
         return dup
-    def setResult(self, result):
-        self.result = np.array(result)
-
+    def setObjs(self, objective):
+        self.obj = np.array(objective)
+    def setConstraint_objs(self, c_objective):
+        self.constraint_obj = np.array(c_objective)
     def dom(self, other):
-        tarray = np.less(self.result,other.result)
-        earray = np.less_equal(self.result,other.result)
+        tarray = np.less(self.obj,other.obj)
+        earray = np.less_equal(self.obj,other.obj)
         if np.all(earray) and np.any(tarray):
             return True  ### A N Domi B
         else:
             return False
-
+    def constrained_dom(self,other):
+        if self.constraint_violaton_value==0 and other.constraint_violaton_value>0:
+            return True
+        elif self.constraint_violaton_value>0 and other.constraint_violaton_value==0:
+            return False
+        if self.constraint_violaton_value<other.constraint_violaton_value:
+            return True
+        elif self.constraint_violaton_value>other.constraint_violaton_value:
+            return False
+        else:
+            return self.dom(other) 
     def crowed_cmp_lt(self, other):
         if self.rank < other.rank:
             return True
@@ -91,6 +103,17 @@ class nsgaii_var:
     def __hash__(self):
         return hash(self.id)
 
+
+
+def sample_constraint_func(obj,constraint_obj):
+    ###constraint: constraint_obj[0]==500 
+    cv=0
+    for index in range(len(obj)):
+        iobj=obj[index]
+        if iobj>0:
+            cv+=iobj
+    cv+=abs(constraint_obj[0]-500)
+
 class nsgaii():
     def __init__(self,logger=None):
         if logger==None:
@@ -104,6 +127,25 @@ class nsgaii():
 
         self.min_realvar = []
         self.max_realvar = []
+        
+        self.constrained=False
+        self.constraint_func=None
+    def param_check(self):
+        assert self.nobj==len(self.min_realvar)
+        assert self.nobj==len(self.max_realvar)
+        if self.constrained==True:
+            assert self.constraint_func is not None
+
+    def constrained_dominance(self,flist: List[nsgaii_var]):
+        if len(flist) == 0:
+            return
+        if self.constraint_func is None:
+            return
+        for ivar in flist:
+            iobj=ivar.obj
+            iconstrained_obj=ivar.constrained_obj
+            ivar.constraint_violaton_value=self.constraint_func(iconstrained_obj,iobj)
+            
     def fnds(self,vallist: List[nsgaii_var]):  ## Fast non dominated sort
 
         flist: List[List[nsgaii_var]] = [None for _ in range(len(vallist))]
@@ -113,10 +155,18 @@ class nsgaii():
             for q in vallist:
                 if p.id == q.id:
                     continue
-                if p.dom(q):
-                    p.pset.add(q)  ### I DOM YOU
-                elif q.dom(p):
-                    p.n += 1  ## Be Domed count
+
+                if not self.constrained:
+                    if p.dom(q):
+                        p.pset.add(q)  ### I DOM YOU
+                    elif q.dom(p):
+                        p.n += 1  ## Be Domed count
+                else:
+                    if p.constrained_dom(q):
+                        p.pset.add(q)  ### I DOM YOU
+                    elif q.constrained_dom(p):
+                        p.n += 1  ## Be Domed count
+
             if p.n == 0:  ## not domed By Anyone
                 p.rank = 1  ### first front
                 flist[0].append(p)
@@ -145,7 +195,7 @@ class nsgaii():
 
     def crowding_dis_assign(self,
         flist: List[nsgaii_var],
-    ):  # sort vars by the distance of results
+    ):  # sort vars by the distance of objectives
 
         if len(flist) == 0:
             return
@@ -155,19 +205,19 @@ class nsgaii():
                 var.crowed_dis_calc_done = True
             return
         for i in range(self.nobj):
-            ilist = sorted(flist, key=lambda x: x.result[i])
+            ilist = sorted(flist, key=lambda x: x.obj[i])
             ilist[0].crowed_dis = inf
             ilist[0].crowed_dis_calc_done = True
             ilist[-1].crowed_dis = inf
             ilist[-1].crowed_dis_calc_done = True
-            coff = ilist[-1].result[i] - ilist[0].result[i]
+            coff = ilist[-1].obj[i] - ilist[0].obj[i]
             for u in range(len(ilist)):
                 if not ilist[u].crowed_dis_calc_done:
-                    if ilist[u + 1].result[i] == ilist[u - 1].result[i]:
+                    if ilist[u + 1].obj[i] == ilist[u - 1].obj[i]:
                         ilist[u].crowed_dis += 0
                     else:
                         ilist[u].crowed_dis += (
-                            ilist[u + 1].result[i] - ilist[u - 1].result[i]
+                            ilist[u + 1].obj[i] - ilist[u - 1].obj[i]
                         ) / coff
 
 
@@ -268,7 +318,8 @@ class nsgaii():
         #print("offspring pop",len(offspop))
         return offspop
 
-
+    def err_norm(self):
+        pass
     def random_sampling_LHS_np(self,nsamples):
         ###FAST RANDOM USE NUMPY
         ranlist=np.random.random((nsamples,self.nval))
@@ -287,6 +338,7 @@ class nsgaii():
         return sum
 
     def nsgaii_generation_demo(self,model, fnds_callback=None):  ##
+        self.param_check()
         ### fnds_callback for mid output
 
         valarr = self.random_sampling_LHS_np(self.popsize)
@@ -305,14 +357,18 @@ class nsgaii():
             ###WORK To get Obj
 
             for ind in poplist:
-                ind.setResult(list(imodel(ind.value)))
+                ind.setObjs(list(imodel(ind.value)))
             
             childpoplist = self.offspring_gen(poplist)
             
             for ind in childpoplist:
-                ind.setResult(list(imodel(ind.value)))
+                ind.setObjs(list(imodel(ind.value)))
             ###DONE
             poplist = poplist + childpoplist
+
+            if self.constrained:
+                self.constrained_dominance(poplist)
+
             fndsresult = self.fnds(poplist)
             #print("FNDS_SIZE",calc_fnds_size(fndsresult),"INPOP:",len(poplist))
             if fnds_callback is not None:
@@ -348,6 +404,7 @@ class nsgaii():
         return poplist
 
     def nsgaii_generation_parallel(self,model_parallel,fnds_callback=None):  ##
+        self.param_check()
         ### fnds_callback for mid output
 
         valarr = self.random_sampling_LHS_np(self.popsize)
@@ -364,17 +421,35 @@ class nsgaii():
         imodel = model_parallel ####supports job submitting
 
         valuelist=[ind.value for ind in poplist] ####First Run To Get the Initial Pop
-        resultlist=imodel(valuelist)            ###WORK To get Results
-        for i in range(len(poplist)):        
-            poplist[i].setResult(resultlist[i])
+        
+        
+        if self.constrained: ###WORK To get Initial Objs
+            objlist,c_objlist=imodel(valuelist)
+            for i in range(len(poplist)):        
+                poplist[i].setObjs(objlist[i])
+                poplist[i].setConstraint_objs(c_objlist[i])
+        else:
+            objlist=imodel(valuelist)            
+            for i in range(len(poplist)):        
+                poplist[i].setObjs(objlist[i])
+
 
         for igen in range(self.generation):           
 
             childpoplist = self.offspring_gen(poplist)            
             childvaluelist=[ind.value for ind in childpoplist]
-            childresultlist=imodel(childvaluelist)
-            for i in range(len(childpoplist)):        
-                childpoplist[i].setResult(childresultlist[i])
+
+
+            if self.constrained: ###WORK To get ChildPop Objs
+                objlist,c_objlist=imodel(childvaluelist)
+                for i in range(len(childpoplist)):        
+                    childpoplist[i].setObjs(objlist[i])
+                    childpoplist[i].setConstraint_objs(c_objlist[i])
+            else:
+                objlist=imodel(valuelist)            
+                for i in range(len(childpoplist)):        
+                    childpoplist[i].setObjs(objlist[i])
+
 
             ###DONE
             poplist = poplist + childpoplist
@@ -433,7 +508,7 @@ def fnds_test():
     vallist = []
     for i in range(totalnums):
         nvar = nsgaii_var(imodel.test_var())
-        nvar.setResult(list(imodel(nvar.value)))
+        nvar.setObjs(list(imodel(nvar.value)))
         vallist.append(nvar)
 
     # print("TOTAL PTS:", len(set(vallist)))

@@ -54,6 +54,16 @@ class sf_parallel_model():
     def best_solution_check(cls,var):
         #### Not best yet
         return False
+
+
+def u_constraint_func(obj,constraint_obj):
+    ###constraint: constraint_obj[0]==500 
+    cv=0
+    for index in range(len(obj)):
+        iobj=obj[index]
+        if iobj>0:
+            cv+=iobj
+    cv+=(constraint_obj[0]-500)**2
 class myAlg01():
     def __init__(self, manager: sfmanager.manager = None,logger=None):
         if logger is None:
@@ -83,7 +93,7 @@ class myAlg01():
             "D1": 58.43,
             }
         self.paramToOptim=["Req","Leq"]
-        self.resultNames=["frequency","RoverQ"]
+        self.resultNames=["frequency","RoverQ","shunt_dependence"]
         ##OTHERS
         self.nsga:nsgaii=nsgaii()
         self.nsga.nobj = 2    ### OPTIM TARGETS FREQ, R over Q
@@ -94,6 +104,8 @@ class myAlg01():
         self.nsga.generation = 5
         self.nsga.min_realvar = self.getDefaultParamArray()*0.9
         self.nsga.max_realvar = self.getDefaultParamArray()*1.1
+        self.nsga.constrained=True
+        self.nsga.constraint_func=u_constraint_func
     def getDefaultParamArray(self):
         u=[self.default_model_params[item] for item in self.paramToOptim]
         return np.array(u)
@@ -128,16 +140,23 @@ class myAlg01():
         results=self.manager.getFullResults()
         sortedlist=sorted(results,key=lambda x:x["job_info"]["index"])
         pps=[r["PostProcessResult"] for r in sortedlist]
-        processed=[]
+        obj_names=self.resultNames[1:]
+        cobj_names=self.resultNames[0:1]
+        objectives=[]
+        constraint_objs=[]
         for u in pps:
             v=[]
-            for key in self.resultNames:
-                v.append(float(u[key]))
-            v[0]=(v[0]-500)**2
-            v[1]=-v[1]
+            c=[]
+            for key in obj_names:
+                v.append(-float(u[key]))   ###Maximum v == Minimum -v  
+            
             v=np.array(v)
-            processed.append(v)
-        return processed
+            for key in cobj_names:
+                c.append(float(u[key]))
+            c=np.array(c)
+            objectives.append(v)
+            constraint_objs.append(c)
+        return objectives,constraint_objs
     def start(self,callback=None):
         fin_pop=self.nsga.nsgaii_generation_parallel(self.call,fnds_callback=callback)
         return fin_pop
