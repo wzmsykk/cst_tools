@@ -330,19 +330,19 @@ class myAlg01(myAlg):
                 print(self.accu_list)
                 print(
                     (self.accu_list["f_down"] <= fmin)
-                    & (self.accu_list["f_up"] >= fmin)
+                    & (self.accu_list["f_up"] > fmin)
                 )
                 self.input_min[3] = float(
                     self.accu_list.loc[
                         (self.accu_list["f_down"] <= fmin)
-                        & (self.accu_list["f_up"] >= fmin),
+                        & (self.accu_list["f_up"] > fmin),
                         "accuracy",
                     ]
                 )
                 self.input_min[4] = float(
                     self.cell_list.loc[
                         (self.cell_list["f_down"] <= fmin)
-                        & (self.cell_list["f_up"] >= fmin),
+                        & (self.cell_list["f_up"] > fmin),
                         "cell",
                     ]
                 )

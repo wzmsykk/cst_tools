@@ -20,7 +20,8 @@ class fnds_callback_create_Image():
 class fnds_callback_create_Image_dump_fnds():
     def __init__(self,savedir="") -> None:
         self.setNewSavedir(savedir)
-        
+        self.paramToOptim=["Req","Leq"]
+        self.resultNames=["frequency","RoverQ","shunt_dependence"]
     def setNewSavedir(self,savedir):
         self.savedir=Path(savedir)
         if not self.savedir.exists():
@@ -28,26 +29,32 @@ class fnds_callback_create_Image_dump_fnds():
     def __call__(self,igen,fndslist):
         iprocess=multiprocessing.Process(target=image_worker_func,args=(self.savedir,igen,fndslist))
         iprocess.start()
-        dump_fnds_structs(self.savedir,igen,fndslist)
+        self.dump_fnds_structs(self.savedir,igen,fndslist)
         return 
-def dump_fnds_structs(savedir,igen,fndslist:List[List[nsgaii_var]]):
-    idf=pandas.DataFrame(columns=["front","id","req","leq","freq","roq"])
-    for ind_f,front in enumerate(fndslist):
-        if front is not None:
-            for ind in front:
-                u={
-                    "front":ind_f,
-                    "id":ind.id,
+    def dump_fnds_structs(self,savedir,igen,fndslist:List[List[nsgaii_var]]):
+        idf=None
+        _index=0
+        for ind_f,front in enumerate(fndslist):
+            if front is not None:
+                for ind in front:
+                    u={
+                    "_front":ind_f,
+                    "_id":ind.id,
                     "req":ind.value[0],
                     "leq":ind.value[1],
-                    "freq":math.sqrt(ind.obj[0])+500,
-                    "roq":ind.obj[1]
-                }
-                ndf=pandas.DataFrame(u,index=[0])
-                idf=idf.append(ndf)
+                    "freq":ind.constraint_obj[0],
+                    "roq":ind.obj[0],
+                    "shunt_dependence":ind.obj[1]
+                    }
+                    ndf=pandas.DataFrame(u,index=[_index])
+                    _index+=1
+                    if idf is not None:
+                        idf=idf.append(ndf)
+                    else:
+                        idf=ndf
 
-    idf.to_csv(savedir / ("Fnds_struct_gen_%d.csv"%igen))
-    pass
+        idf.to_csv(savedir / ("Fnds_struct_gen_%d.csv"%igen))
+
 def image_worker_func(savedir,igen,fndslist:List[List[nsgaii_var]]):
     x0=[]
     y0=[]

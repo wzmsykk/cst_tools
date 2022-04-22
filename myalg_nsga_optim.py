@@ -130,6 +130,7 @@ class myAlg01():
             "input_macro":batchlines
         }
         return job_config
+    
     def call(self,invar_list):
         for index,invar in enumerate(invar_list):
             outpardict=self.createModelParamsFromArray(invar)

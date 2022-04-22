@@ -156,7 +156,7 @@ class nsgaii():
                 if p.id == q.id:
                     continue
 
-                if not self.constrained:
+                if not self.constrained:  ####Type 1 支配排序
                     if p.dom(q):
                         p.pset.add(q)  ### I DOM YOU
                     elif q.dom(p):
@@ -537,7 +537,7 @@ def nsgaii_test():
     mynsgaii.nobj = 2
     mynsgaii.pmut_real = 0.1
     mynsgaii.eta_m = 1  ## coff for mutation
-    mynsgaii.popsize = 2
+    mynsgaii.popsize = 100
     mynsgaii.generation = 100
     # min_realvar=[0,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10]
     # max_realvar=[1,+10,+10,+10,+10,+10,+10,+10,+10,+10,+10]
@@ -545,10 +545,10 @@ def nsgaii_test():
     icallback = nsgaii_helper.fnds_callback_create_Image()
     for model in models:
         
-        nval = model.n
+        mynsgaii.nval = model.n
         min_realvar_raw, max_realvar_raw = model.getBoundaries()
-        min_realvar, max_realvar =np.array(min_realvar_raw),np.array(max_realvar_raw)
-        print(min_realvar)
+        mynsgaii.min_realvar, mynsgaii.max_realvar =np.array(min_realvar_raw),np.array(max_realvar_raw)
+        print(mynsgaii.min_realvar)
         sttime = time.time()
         icallback.setNewSavedir(model.name)
         poplist = mynsgaii.nsgaii_generation_demo(model, fnds_callback=icallback)
