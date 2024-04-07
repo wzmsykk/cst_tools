@@ -2,7 +2,7 @@ from math import inf, sqrt, floor
 from random import random, seed, shuffle, choices,sample
 
 
-from .zdts import zdt1, zdt2, zdt3, zdt4
+from zdts import zdt1, zdt2, zdt3, zdt4
 from typing import List, Set
 import json
 import numpy as np
@@ -131,8 +131,8 @@ class nsgaii():
         self.constrained=False
         self.constraint_func=None
     def param_check(self):
-        assert self.nobj==len(self.min_realvar)
-        assert self.nobj==len(self.max_realvar)
+        #assert self.nobj==len(self.min_realvar)
+        #assert self.nobj==len(self.max_realvar)
         if self.constrained==True:
             assert self.constraint_func is not None
 
@@ -532,19 +532,18 @@ def nsgaii_test():
     # global popsize
     # global generation
     # global eta_m
-    seed(666)
+    seed(1037)
     mynsgaii=nsgaii()
     mynsgaii.nobj = 2
     mynsgaii.pmut_real = 0.1
     mynsgaii.eta_m = 1  ## coff for mutation
-    mynsgaii.popsize = 100
+    mynsgaii.popsize = 500
     mynsgaii.generation = 100
-    # min_realvar=[0,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10]
-    # max_realvar=[1,+10,+10,+10,+10,+10,+10,+10,+10,+10,+10]
+    #min_realvar=[0,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10]
+    #max_realvar=[1,+10,+10,+10,+10,+10,+10,+10,+10,+10,+10]
     models = [zdt1(), zdt2(), zdt3(), zdt4()]
     icallback = nsgaii_helper.fnds_callback_create_Image()
     for model in models:
-        
         mynsgaii.nval = model.n
         min_realvar_raw, max_realvar_raw = model.getBoundaries()
         mynsgaii.min_realvar, mynsgaii.max_realvar =np.array(min_realvar_raw),np.array(max_realvar_raw)

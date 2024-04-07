@@ -1,4 +1,4 @@
-from .nsgaii_np import nsgaii_var
+from nsgaii_np import nsgaii_var
 import matplotlib.pyplot as plt
 from typing import List
 import multiprocessing
@@ -66,17 +66,17 @@ def image_worker_func(savedir,igen,fndslist:List[List[nsgaii_var]]):
         for ind in fndslist[0]:
             x0.append(ind.obj[0])
             y0.append(ind.obj[1])
-        plt.scatter(x0,y0,c='r',marker='o')
+        plt.scatter(x0,y0,c='none',marker='o', edgecolors='r')
     if fndslist[1] is not None:
         for ind in fndslist[1]:
             x1.append(ind.obj[0])
             y1.append(ind.obj[1])
-        plt.scatter(x1,y1,c='orange',marker='o')
+        plt.scatter(x1,y1,c='none',marker='o', edgecolors='orange')
     if fndslist[2] is not None:
         for ind in fndslist[2]:
             x2.append(ind.obj[0])
             y2.append(ind.obj[1])      
-        plt.scatter(x2,y2,c='y',marker='o')
+        plt.scatter(x2,y2,c='none',marker='o', edgecolors='y')
 
     plt.xlabel('f1')
     plt.ylabel('f2')

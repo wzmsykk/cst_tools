@@ -1,15 +1,11 @@
-from os.path import split
+
 import numpy as np
 import matplotlib.pyplot as plt
 import numpy.fft as fft
 import math
-from numpy.lib.shape_base import kron
-from numpy.lib.type_check import nan_to_num
-from scipy.signal import find_peaks
-import glob
 import pathlib
 import numpy as np
-import json
+
 
 def read_coffs(filename):
     resultlist=[]
@@ -154,17 +150,15 @@ def read_field1D_Complex(filename):
     fp.close()
     return names,npvalue
 
-def read_field3D(filepath):
+def read_field3D(filepath,shape=(128,128,32)):
     fp=open(filepath,"r")
     #推测XYZDIMS
     lines=fp.readlines()
-    xdim=128
-    ydim=128
-    zdim=8
-    narray=np.zeros((128,128,8,6))   
+    xdim,ydim,zdim=shape
+    narray=np.zeros((xdim,ydim,zdim,6))   
     dumpcount=5
     print("Total lines:%d" % len(lines))
-    size=128*128*8
+    size=xdim*ydim*zdim
     print("EXPECTED SIZE:%d"% (size+2))
     line=lines[2]
     words=line.split()
@@ -184,7 +178,7 @@ def read_field3D(filepath):
     header["xdim"]=xdim
     header["ydim"]=ydim
     header["zdim"]=zdim
-    for index in range (128*128*8):
+    for index in range (size):
         line=lines[index+2]
         words=line.split()
         if (index<dumpcount):
@@ -196,8 +190,8 @@ def read_field3D(filepath):
         u=np.array(words[3:])
         u=u.astype(np.float)
         narray[i][j][k]=u
-        if (index<dumpcount):
-            print("i=%d,j=%d,k=%d,u="%(i,j,k),u)
+        # if (index<dumpcount):
+        #     print("i=%d,j=%d,k=%d,u="%(i,j,k),u)
             
     return narray,header
 def read_maxcoords(filename):
