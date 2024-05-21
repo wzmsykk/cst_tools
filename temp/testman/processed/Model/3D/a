@@ -1,0 +1,11 @@
+a
+
+ 8
+ 0	PPSDONE	1	PreprocessDone
+ 1	L	259	
+ 2	Ltube	400	
+ 3	R	229	
+ 4	Rtube	50	
+ 5	fmax	1200	Maximum Freq For Solver
+ 6	fmin	400	Minimun Freq For Solver
+ 7	nmodes	10	Number of modes to calculate

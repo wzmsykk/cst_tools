@@ -46,7 +46,7 @@ Sub Main
 				startTime=Timer
 				ChangeParams()
 				virtualRun=False
-				'EXTERN'CustomPreProcess()
+				'EXTERN''CustomPreProcess()
 				'EXTERN'Start(virtualRun)
 				'This Function is used to do the actual job of computing.
 				'runs everytime when parameter changes

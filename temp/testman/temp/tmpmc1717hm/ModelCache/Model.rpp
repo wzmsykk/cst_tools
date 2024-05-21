@@ -1,0 +1,177 @@
+10
+0
+0
+10
+Frequency (Multiple Modes)
+3D Eigenmode Result
+1
+M0D
+2D and 3D Field Results
+P
+ED10
+3D Eigenmode Result^+MWS+PS+DS.rtp
+10
+Frequency (Multiple Modes)\Mode 1
+Frequency (Multiple Modes)\Mode 2
+Frequency (Multiple Modes)\Mode 3
+Frequency (Multiple Modes)\Mode 4
+Frequency (Multiple Modes)\Mode 5
+Frequency (Multiple Modes)\Mode 6
+Frequency (Multiple Modes)\Mode 7
+Frequency (Multiple Modes)\Mode 8
+Frequency (Multiple Modes)\Mode 9
+Frequency (Multiple Modes)\Mode 10
+Q-Factor (Perturbation) (Multiple Modes)
+3D Eigenmode Result
+1
+M0D
+2D and 3D Field Results
+P
+ED10
+3D Eigenmode Result^+MWS+PS+DS.rtp
+10
+Q-Factor (Perturbation) (Multiple Modes)\Mode 1
+Q-Factor (Perturbation) (Multiple Modes)\Mode 2
+Q-Factor (Perturbation) (Multiple Modes)\Mode 3
+Q-Factor (Perturbation) (Multiple Modes)\Mode 4
+Q-Factor (Perturbation) (Multiple Modes)\Mode 5
+Q-Factor (Perturbation) (Multiple Modes)\Mode 6
+Q-Factor (Perturbation) (Multiple Modes)\Mode 7
+Q-Factor (Perturbation) (Multiple Modes)\Mode 8
+Q-Factor (Perturbation) (Multiple Modes)\Mode 9
+Q-Factor (Perturbation) (Multiple Modes)\Mode 10
+R over Q beta=1 (Multiple Modes)
+3D Eigenmode Result
+1
+M0D
+2D and 3D Field Results
+P
+ED10
+3D Eigenmode Result^+MWS+PS+DS.rtp
+10
+R over Q beta=1 (Multiple Modes)\Mode 1
+R over Q beta=1 (Multiple Modes)\Mode 2
+R over Q beta=1 (Multiple Modes)\Mode 3
+R over Q beta=1 (Multiple Modes)\Mode 4
+R over Q beta=1 (Multiple Modes)\Mode 5
+R over Q beta=1 (Multiple Modes)\Mode 6
+R over Q beta=1 (Multiple Modes)\Mode 7
+R over Q beta=1 (Multiple Modes)\Mode 8
+R over Q beta=1 (Multiple Modes)\Mode 9
+R over Q beta=1 (Multiple Modes)\Mode 10
+Shunt Impedance (Pertubation) beta=1 (Multiple Modes)
+3D Eigenmode Result
+1
+M0D
+2D and 3D Field Results
+P
+ED10
+3D Eigenmode Result^+MWS+PS+DS.rtp
+10
+Shunt Impedance (Pertubation) beta=1 (Multiple Modes)\Mode 1
+Shunt Impedance (Pertubation) beta=1 (Multiple Modes)\Mode 2
+Shunt Impedance (Pertubation) beta=1 (Multiple Modes)\Mode 3
+Shunt Impedance (Pertubation) beta=1 (Multiple Modes)\Mode 4
+Shunt Impedance (Pertubation) beta=1 (Multiple Modes)\Mode 5
+Shunt Impedance (Pertubation) beta=1 (Multiple Modes)\Mode 6
+Shunt Impedance (Pertubation) beta=1 (Multiple Modes)\Mode 7
+Shunt Impedance (Pertubation) beta=1 (Multiple Modes)\Mode 8
+Shunt Impedance (Pertubation) beta=1 (Multiple Modes)\Mode 9
+Shunt Impedance (Pertubation) beta=1 (Multiple Modes)\Mode 10
+Voltage beta=1 (Multiple Modes)
+3D Eigenmode Result
+1
+M0D
+2D and 3D Field Results
+P
+ED10
+3D Eigenmode Result^+MWS+PS+DS.rtp
+10
+Voltage beta=1 (Multiple Modes)\Mode 1
+Voltage beta=1 (Multiple Modes)\Mode 2
+Voltage beta=1 (Multiple Modes)\Mode 3
+Voltage beta=1 (Multiple Modes)\Mode 4
+Voltage beta=1 (Multiple Modes)\Mode 5
+Voltage beta=1 (Multiple Modes)\Mode 6
+Voltage beta=1 (Multiple Modes)\Mode 7
+Voltage beta=1 (Multiple Modes)\Mode 8
+Voltage beta=1 (Multiple Modes)\Mode 9
+Voltage beta=1 (Multiple Modes)\Mode 10
+Total Loss (Pert., Aver.) (Multiple Modes)
+3D Eigenmode Result
+1
+M0D
+2D and 3D Field Results
+P
+ED10
+3D Eigenmode Result^+MWS+PS+DS.rtp
+10
+Total Loss (Pert., Aver.) (Multiple Modes)\Mode 1
+Total Loss (Pert., Aver.) (Multiple Modes)\Mode 2
+Total Loss (Pert., Aver.) (Multiple Modes)\Mode 3
+Total Loss (Pert., Aver.) (Multiple Modes)\Mode 4
+Total Loss (Pert., Aver.) (Multiple Modes)\Mode 5
+Total Loss (Pert., Aver.) (Multiple Modes)\Mode 6
+Total Loss (Pert., Aver.) (Multiple Modes)\Mode 7
+Total Loss (Pert., Aver.) (Multiple Modes)\Mode 8
+Total Loss (Pert., Aver.) (Multiple Modes)\Mode 9
+Total Loss (Pert., Aver.) (Multiple Modes)\Mode 10
+e_Abs (Z)
+Evaluate Field in arbitrary Coordinates
+1
+1D
+2D and 3D Field Results
+P
+ED10
+Evaluate Field in arbitrary Coordinates.rtp
+1
+e_Abs (Z)
+TotalQ_Eigenmode_All
+Loss and Q Value from H-Field
+1
+1D
+2D and 3D Field Results
+P
+ED10
+Loss and Q Value from H-Field^+MWS.rtp
+1
+TotalQ_Eigenmode_All
+R over Q beta=1 (Multiple Modes)_1
+3D Eigenmode Result
+1
+M0D
+2D and 3D Field Results
+P
+ED10
+3D Eigenmode Result^+MWS+PS+DS.rtp
+10
+R over Q beta=1 (Multiple Modes)_1\Mode 1
+R over Q beta=1 (Multiple Modes)_1\Mode 2
+R over Q beta=1 (Multiple Modes)_1\Mode 3
+R over Q beta=1 (Multiple Modes)_1\Mode 4
+R over Q beta=1 (Multiple Modes)_1\Mode 5
+R over Q beta=1 (Multiple Modes)_1\Mode 6
+R over Q beta=1 (Multiple Modes)_1\Mode 7
+R over Q beta=1 (Multiple Modes)_1\Mode 8
+R over Q beta=1 (Multiple Modes)_1\Mode 9
+R over Q beta=1 (Multiple Modes)_1\Mode 10
+R over Q beta=1 (Multiple Modes)_2
+3D Eigenmode Result
+1
+M0D
+2D and 3D Field Results
+P
+ED10
+3D Eigenmode Result^+MWS+PS+DS.rtp
+10
+R over Q beta=1 (Multiple Modes)_2\Mode 1
+R over Q beta=1 (Multiple Modes)_2\Mode 2
+R over Q beta=1 (Multiple Modes)_2\Mode 3
+R over Q beta=1 (Multiple Modes)_2\Mode 4
+R over Q beta=1 (Multiple Modes)_2\Mode 5
+R over Q beta=1 (Multiple Modes)_2\Mode 6
+R over Q beta=1 (Multiple Modes)_2\Mode 7
+R over Q beta=1 (Multiple Modes)_2\Mode 8
+R over Q beta=1 (Multiple Modes)_2\Mode 9
+R over Q beta=1 (Multiple Modes)_2\Mode 10
+0

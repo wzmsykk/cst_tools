@@ -1,10 +1,10 @@
 import os
 from install_compat import resource_path
 
-import cstmanager
-import myAlgorithm_pop
-import globalconfmanager, logger, time
-import projectconfmanager
+from csttool import cstmanager
+from csttool import myAlgorithm_pop
+from csttool import globalconfmanager, logger, time
+from csttool import projectconfmanager
 import argparse
 
 from enum import Enum

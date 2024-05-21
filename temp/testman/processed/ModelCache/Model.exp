@@ -1,0 +1,9 @@
+@CACHEFILEVERSION 2
+@DOUBLE
+fmax
+1200
+fmin
+400
+@LONG
+nmodes
+10

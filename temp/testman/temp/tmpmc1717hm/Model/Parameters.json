@@ -1,0 +1,49 @@
+{
+    "parameters": [
+        {
+            "expr": "229",
+            "name": "R",
+            "value": "229"
+        },
+        {
+            "expr": "259",
+            "name": "L",
+            "value": "259"
+        },
+        {
+            "expr": "50",
+            "name": "Rtube",
+            "value": "50"
+        },
+        {
+            "expr": "400",
+            "name": "Ltube",
+            "value": "400"
+        },
+        {
+            "descr": "Minimun Freq For Solver",
+            "expr": "400",
+            "name": "fmin",
+            "value": "400"
+        },
+        {
+            "descr": "Maximum Freq For Solver",
+            "expr": "1200",
+            "name": "fmax",
+            "value": "1200"
+        },
+        {
+            "descr": "Number of modes to calculate",
+            "expr": "10",
+            "name": "nmodes",
+            "value": "10"
+        },
+        {
+            "descr": "PreprocessDone",
+            "expr": "1",
+            "name": "PPSDONE",
+            "value": "1"
+        }
+    ],
+    "version": 1
+}

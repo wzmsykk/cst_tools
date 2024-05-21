@@ -48,7 +48,7 @@ class commonfunc():
         for _ in range(0,self.n):
             invars.append(0)
         return invars
-    @abstractclassmethod
+    @classmethod
     def best_solution_check(cls,var):        
         return True
 

@@ -1,0 +1,1 @@
+python.exe .\base_tm020.py -p ".\project\pillbox" -f ".\project\pillbox\Pillbox.cst"

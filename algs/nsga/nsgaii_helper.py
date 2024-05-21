@@ -1,4 +1,4 @@
-from nsgaii_np import nsgaii_var
+from .nsgaii_np import nsgaii_var
 import matplotlib.pyplot as plt
 from typing import List
 import multiprocessing

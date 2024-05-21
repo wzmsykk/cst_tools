@@ -1,0 +1,49 @@
+{
+   "execution": {
+      "classname": "SMAPowerByEmagHPCFrame",
+      "libname": "SMAPowerByEmagUI"
+   },
+   "inputVariables": [
+      {
+         "name": "R",
+         "type": "float",
+         "value": 229.0
+      },
+      {
+         "name": "L",
+         "type": "float",
+         "value": 259.0
+      },
+      {
+         "name": "Rtube",
+         "type": "float",
+         "value": 50.0
+      },
+      {
+         "name": "Ltube",
+         "type": "float",
+         "value": 400.0
+      },
+      {
+         "name": "fmin",
+         "type": "float",
+         "value": 400.0
+      },
+      {
+         "name": "fmax",
+         "type": "float",
+         "value": 1200.0
+      },
+      {
+         "name": "nmodes",
+         "type": "float",
+         "value": 10.0
+      },
+      {
+         "name": "PPSDONE",
+         "type": "float",
+         "value": 1.0
+      }
+   ],
+   "outputVariables": []
+}

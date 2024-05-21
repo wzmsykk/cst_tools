@@ -303,7 +303,7 @@ def result_stats(result_dir="",printhost=False):
     statlist=list()
     totalmodes=len(flist)
 
-    
+    print("totalmodes:",totalmodes)
     
 
     for i in range(1,totalmodes):
@@ -358,6 +358,6 @@ if __name__ =='__main__':
     ##convert_field_to_nparray(r"D:\cst_tools\result\R_230.000000_L_160.000000")
     #read_field_data_batch(r"D:\cst_tools\result")
 
-    statlist=result_stats(result_dir=r"\\172.1.10.232\pillref_result\R_190_L_230")
+    statlist=result_stats(result_dir=r"F:\Project\EigenModeRecg\ResultFirst10")
     print(statlist)
     
