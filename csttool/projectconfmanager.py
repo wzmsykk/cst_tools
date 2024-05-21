@@ -8,7 +8,7 @@ import subprocess
 import hashlib
 import tempfile
 import logging
-
+import re
 from . import projectutil
 from . import preprocess_cst
 
@@ -439,15 +439,15 @@ class ProjectConfmanager(object):
         file_1 = open(vbasrcpath, "r")
         file_2 = tmp_bas.file
         list1 = []
-        # for line in file_1.readlines():
-        #     ssd = line
-        #     ssd = re.sub("%PARAMDSTPATH%", str(midfilepath).replace("\\", "\\\\"), ssd)
-        #     ssd = re.sub("%CSTPROJFILE%", str(tmpcstpath).replace("\\", "\\\\"), ssd)
-        #     list1.append(ssd)
-        # file_1.close()
-        list1, newcstpath = self.__gen_vblines_cstpreprocess(
-            str(tmpcstpath), str(midfilepath)
-        )
+        for line in file_1.readlines():
+            ssd = line
+            ssd = re.sub("%PARAMDSTPATH%", str(midfilepath).replace("\\", "\\\\"), ssd)
+            ssd = re.sub("%CSTPROJFILE%", str(tmpcstpath).replace("\\", "\\\\"), ssd)
+            list1.append(ssd)
+        file_1.close()
+        # list1, newcstpath = self.__gen_vblines_cstpreprocess(
+        #     str(tmpcstpath), str(midfilepath)
+        # )
 
         for i in range(len(list1)):
             file_2.write(list1[i])
@@ -471,7 +471,7 @@ class ProjectConfmanager(object):
                 self.logger.info(line)
 
         projectutil.custom_ascii_2_json(midfilepath, jsonpath)
-        return newcstpath
+        return  cstfilepath
         pass
 
     def __checkAndRepairProject(

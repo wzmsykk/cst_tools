@@ -1,7 +1,7 @@
 from pathlib import Path
 from install_compat import resource_path
 from .projectutil import is_number
-
+####BROKEN YET DONT USE
 
 class vbpreprocess:
     def __init__(self) -> None:
@@ -29,6 +29,7 @@ class vbpreprocess:
 
     def createPreProcessVBCodeLines(self, createMain=False):
         lst = []
+        lst.append("Public outputDir As String\n")
         importFileList = []
         for doc in self.preProcessDocList:
             importFile = doc.get("import", None)
@@ -45,12 +46,14 @@ class vbpreprocess:
             lst.append("\n")
             fp.close()
         lst.append("\nSub CustomPreProcess\n")
+        lst.append("outputDir=\"%s\"\n"%self.resultDir)
         for doc in self.preProcessDocList:
             funcString = "    " + doc["funcString"] + "\n"
             lst.append(funcString)
         lst.append("End Sub\n")
+        
         if createMain:
-            lst.append("\nSub Main\n")
+            lst.append("\nSub Main\n")            
             funcString = "    " + "CustomPreProcess" + "\n"
             lst.append(funcString)
             lst.append("End Sub\n")

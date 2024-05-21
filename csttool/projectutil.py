@@ -53,7 +53,7 @@ def custom_ascii_2_json(asciipath, savejsonpath):
 
     par.close()
     fp = open(savejsonpath, "w")
-    json.dump(paramslist, fp=fp)
+    json.dump(paramslist, fp=fp,indent=4)
     fp.close()
     pass
 
