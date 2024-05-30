@@ -47,7 +47,7 @@ Sub Main
 				ChangeParams()
 				virtualRun=False
 				'EXTERN''CustomPreProcess()
-				'EXTERN'Start(virtualRun)
+				'EXTERN'Start()
 				'This Function is used to do the actual job of computing.
 				'runs everytime when parameter changes
 				'Should be implemented in patterns

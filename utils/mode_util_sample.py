@@ -204,10 +204,51 @@ def findTM020index(result_dir):
     tm020index=-1
     for i in range(1,11):
         c=mode_type_final2(result_dir,i)
-        print(mode_type_final2(result_dir,i))
+        #print(mode_type_final2(result_dir,i))
         u.append(c)
         if c[1]=='HX_TM' or c[1] =='TM':
             if c[2]==0 and c[3]==2 and c[4]==0:
                 tm020index=c[0]
     return tm020index
-        
+
+def findTM010index(result_dir):
+    u=[]
+    tm010index=-1
+    for i in range(1,11):
+        c=mode_type_final2(result_dir,i)
+        #print(mode_type_final2(result_dir,i))
+        u.append(c)
+        if c[1]=='HX_TM' or c[1] =='TM':
+            if c[2]==0 and c[3]==1 and c[4]==0:
+                tm010index=c[0]
+                return tm010index
+    return tm010index
+
+def findTM110index(result_dir):
+    u=[]
+    tm110index=-1
+    for i in range(1,11):
+        c=mode_type_final2(result_dir,i)
+        #print(mode_type_final2(result_dir,i))
+        u.append(c)
+        if c[1]=='HX_TM' or c[1] =='TM':
+            if c[2]==1 and c[3]==1 and c[4]==0:
+                tm110index=c[0]
+                return tm110index
+    return tm110index
+
+def findTE111index(result_dir):
+    u=[]
+    te111index=-1
+    for i in range(1,11):
+        c=mode_type_final2(result_dir,i)
+        #print(mode_type_final2(result_dir,i))
+        u.append(c)
+        if c[1]=='HX_TE' or c[1] =='TE':
+            if c[5]==1 and c[6]==1 and c[7]==1:
+                te111index=c[0]
+                return te111index
+    return te111index
+
+if __name__ =="__main__":
+    print(findTM020index(r"F:\Project\EigenModeRecg\ResultFirst10"))

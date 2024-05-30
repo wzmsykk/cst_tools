@@ -1,6 +1,6 @@
 from math import inf, sqrt, floor
 from random import random, seed, shuffle, choices,sample
-
+from time import sleep
 
 from .zdts import zdt1, zdt2, zdt3, zdt4
 from typing import List, Set
@@ -423,15 +423,21 @@ class nsgaii():
         valuelist=[ind.value for ind in poplist] ####First Run To Get the Initial Pop
         
         
-        if self.constrained: ###WORK To get Initial Objs
-            objlist,c_objlist=imodel(valuelist)
-            for i in range(len(poplist)):        
-                poplist[i].setObjs(objlist[i])
-                poplist[i].setConstraint_objs(c_objlist[i])
-        else:
-            objlist=imodel(valuelist)            
-            for i in range(len(poplist)):        
-                poplist[i].setObjs(objlist[i])
+        # if self.constrained: ###WORK To get Initial Objs
+        #     objlist,c_objlist=imodel(valuelist)
+        #     for i in range(len(poplist)):        
+        #         poplist[i].setObjs(objlist[i])
+        #         poplist[i].setConstraint_objs(c_objlist[i])
+        # else:
+            ####Wait For Model To Get Results
+        
+        imodel.sendValueList(valuelist)
+        imodel.startCompute()
+        while (not imodel.compute_done):
+            sleep(1)
+        objlist=imodel.getComputeResult()
+        for i in range(len(poplist)):        
+            poplist[i].setObjs(objlist[i])
 
 
         for igen in range(self.generation):           

@@ -1,12 +1,12 @@
 
 
 '"Ver 20210427"
-Sub Start(virtual As Boolean)	
+Sub Start()	
 	outFullDir=resultDir & currentResultName &"\"
-	If not virtual Then
-		compute()	
-		postProcess()
-	End If
+	
+	compute()	
+	postProcess()
+
 	Backup (outFullDir & cstType &".cst")
 End Sub
 Sub prepareEnv
@@ -54,63 +54,7 @@ Sub postProcess
 	st=Timer
 	outmode = RestoreDoubleParameter("nmodes")
 	For i=1 to outmode
-		SelectTreeItem("2D/3D Results\Modes\Mode "& i &"\e")
-		With ASCIIExport
-			.Reset
-			.FileName (fullPath & "Mode"& i &"EField.txt")
-			.Mode ("FixedNumber")
-			.StepX (12)
-			.StepY (12)
-			.StepZ (8)
-			.Execute
-		End With
-
-		SelectTreeItem("2D/3D Results\Modes\Mode "& i &"\h")
-		With ASCIIExport
-			.Reset
-			.FileName (fullPath & "Mode"& i &"HField.txt")
-			.Mode ("FixedNumber")
-			.StepX (12)
-			.StepY (12)
-			.StepZ (8)
-			.Execute
-		End With
-		SelectTreeItem("Tables\0D Results\Frequency (Multiple Modes)\Mode " & i)
-		With ASCIIExport
-			.Reset
-			.FileName (fullPath & "Mode"& i &"Frequency.txt")
-			.Execute
-		End With
-		SelectTreeItem("Tables\0D Results\Q-Factor (Perturbation) (Multiple Modes)\Mode " & i)
-		With ASCIIExport
-			.Reset
-			.FileName (fullPath & "Mode"& i &"Q-Factor.txt")
-			.Execute
-		End With
-		SelectTreeItem("Tables\0D Results\R over Q beta=1 (Multiple Modes)\Mode " & i)
-		With ASCIIExport
-			.Reset
-			.FileName (fullPath & "Mode"& i &"R_Q.txt")
-			.Execute
-		End With
-		SelectTreeItem("Tables\0D Results\Shunt Impedance (Pertubation) beta=1 (Multiple Modes)\Mode " & i)
-		With ASCIIExport
-			.Reset
-			.FileName (fullPath & "Mode"& i &"ShuntImpedance.txt")
-			.Execute
-		End With
-		SelectTreeItem("Tables\0D Results\Voltage beta=1 (Multiple Modes)\Mode " & i)
-		With ASCIIExport
-			.Reset
-			.FileName (fullPath & "Mode"& i &"Voltage.txt")
-			.Execute
-		End With
-		SelectTreeItem("Tables\0D Results\Total Loss (Pert., Aver.) (Multiple Modes)\Mode " & i)
-		With ASCIIExport
-			.Reset
-			.FileName (fullPath & "Mode"& i &"TotalLoss.txt")
-			.Execute
-		End With
+		
 	Next i
 	ed=Timer
 	postProcessTime=ed-st

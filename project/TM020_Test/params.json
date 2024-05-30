@@ -1,54 +1,70 @@
 [
     {
         "id": 0,
-        "name": "L",
-        "value": "259",
+        "name": "I0",
+        "value": "10",
         "type": "double",
         "fixed": false,
         "description": ""
     },
     {
         "id": 1,
-        "name": "Ltube",
-        "value": "400",
+        "name": "Leq",
+        "value": "120",
         "type": "double",
         "fixed": false,
         "description": ""
     },
     {
         "id": 2,
-        "name": "R",
-        "value": "229",
+        "name": "Ltube",
+        "value": "200",
         "type": "double",
         "fixed": false,
         "description": ""
     },
     {
         "id": 3,
-        "name": "Rtube",
-        "value": "50",
+        "name": "R0",
+        "value": "10",
         "type": "double",
         "fixed": false,
         "description": ""
     },
     {
         "id": 4,
-        "name": "fmax",
-        "value": "1200",
+        "name": "R1",
+        "value": "10",
         "type": "double",
         "fixed": false,
         "description": ""
     },
     {
         "id": 5,
-        "name": "fmin",
-        "value": "400",
+        "name": "Req",
+        "value": "190",
         "type": "double",
         "fixed": false,
         "description": ""
     },
     {
         "id": 6,
+        "name": "Rtube",
+        "value": "30",
+        "type": "double",
+        "fixed": false,
+        "description": ""
+    },
+    {
+        "id": 7,
+        "name": "c3",
+        "value": "Leq",
+        "type": "expression",
+        "fixed": true,
+        "description": ""
+    },
+    {
+        "id": 8,
         "name": "nmodes",
         "value": "10",
         "type": "double",

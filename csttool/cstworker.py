@@ -22,7 +22,7 @@ class local_cstworker(worker.worker):
         self.resultDir = pathlib.Path(workerconfig["resultDir"])
         self.cstProjPath = pathlib.Path(workerconfig["cstPath"])
 
-        self.paramList = copy.deepcopy(workerconfig["paramList"])
+        self.paramDefList = copy.deepcopy(workerconfig["paramList"])
         self.postProcessSetList = workerconfig.get("postProcess",[])
         self.postProcessHelper = postprocess_cst.vbpostprocess()
         self.preprocessHelper = preprocess_cst.vbpreprocess()
@@ -121,28 +121,25 @@ class local_cstworker(worker.worker):
         self.cstStatus == "off"
         self.taskIndex = 0
 
-    def sendTaskFile(self,paramList, run_name):
+    def sendTaskFile(self,params, run_name):
         paramname_list=[]
         value_list=[]
-        for item in paramList:
-            paramname_list.append(item["name"])
-            value_list.append(item["value"])
+        for key,value in params.items():
+            paramname_list.append(key)
+            value_list.append(value)
         tf = self.taskFileDir / (str(self.taskIndex) + ".txt")
-        full_param_list = copy.deepcopy(self.paramList)
-        if len(paramname_list) == 0 and len(value_list) > 0:
-            for i in range(min(len(full_param_list), len(value_list))):
-                full_param_list[i]["value"] = value_list[i]
-        elif len(paramname_list) > 0 and len(value_list) > 0:
-            for i in range(len(paramname_list)):
-                for idict in full_param_list:
-                    if idict["name"] == paramname_list[i]:
-                        idict.update({"value": value_list[i]})
+        full_param_list = copy.deepcopy(self.paramDefList)
+        for i in range(len(paramname_list)):
+            for idict in full_param_list:
+                if idict["name"] == paramname_list[i]:
+                    idict.update({"value": value_list[i]})
         f1 = open(tf, "w")
         f1.write(run_name + "\n")
 
         for i in range(len(full_param_list)):
-            f1.write(str(full_param_list[i]["name"]) + "\n")
-            f1.write(str(full_param_list[i]["value"]) + "\n")
+            if full_param_list[i]["fixed"] == False:
+                f1.write(str(full_param_list[i]["name"]) + "\n")
+                f1.write(str(full_param_list[i]["value"]) + "\n")
         f1.close()
 
     def createMainCSTbatch(self, hFilePath, mFilePath):
@@ -205,7 +202,10 @@ class local_cstworker(worker.worker):
                 % (self.ID, self.taskIndex, self.runName)
             )
         else:
-            self.sendTaskFile(self.paramList, self.runName)
+            # paramlist=[]
+            # for key,value in self.runParams.items():
+            #     paramlist.append({key:value})
+            self.sendTaskFile(self.runParams, self.runName)
 
             waitTime = 0
             startTime = time.time()

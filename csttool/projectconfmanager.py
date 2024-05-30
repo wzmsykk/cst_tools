@@ -227,7 +227,7 @@ class ProjectConfmanager(object):
 
         newconf.add_section("PROJECT")
         newconf.set("PROJECT", "ProjectName", currprojname)
-        newconf.set("PROJECT", "ProjectType", "HOM analysis")
+        newconf.set("PROJECT", "ProjectType", "default")
         newconf.set("PROJECT", "ProjectDescription", "")
         newconf.add_section("DIRS")
         # 保存为相对路径
@@ -615,7 +615,7 @@ class ProjectConfmanager(object):
         ppspath = self.currProjectDir / self.conf.get("PARAMETERS", "ppsfile")
         try:
             fp = open(ppspath, "w")
-            json.dump(ppslist, fp)
+            json.dump(ppslist, fp, indent=4)
             fp.close()
             self.logger.info("后处理设定已保存至%s" % str(ppspath))
             return True

@@ -44,7 +44,7 @@ class manager(object):
 
         # PARALLEL
         self.maxParallelTasks = maxTask
-        self.cstWorkerList = []
+        self.cstWorkerList:list[cstworker.local_cstworker] = [] 
         self.mthreadList = []
         self.taskQueue = queue.Queue()
         self.resultQueue = queue.Queue()
@@ -67,7 +67,7 @@ class manager(object):
                 irun_count = iretry_cnt + 1
                 while irun_count > 0:
                     result = self.cstWorkerList[idx].runWithParam(
-                        mtask["pname_list"], mtask["v_list"], mtask["job_name"]
+                        resultname= mtask["job_name"],params=mtask["params"]
                     )
                     irun_count -= 1
                     if result["TaskStatus"] == "Failure":
@@ -158,11 +158,10 @@ class manager(object):
         return self.resultQueue.get()
 
     def addTask(
-        self, param_name_list=[], value_list=[], job_name="default", retry_cnt=0
+        self, params={}, job_name="default", retry_cnt=0
     ):
         mtask = {}
-        mtask["pname_list"] = param_name_list
-        mtask["v_list"] = value_list
+        mtask["params"] = params
         mtask["job_name"] = job_name
         mtask["retry_cnt"] = retry_cnt
         self.taskQueue.put(mtask)
@@ -174,17 +173,14 @@ class manager(object):
         result = self.getFirstResult()
         return result
 
-    def runWithParam(self, name_list, value_list, job_name, retry_cnt=0):
+    def runWithParam(self, params, job_name, retry_cnt=0):
         """提供参数列表运行CST  (阻塞)
             run with user provided parameters (Synchronized)
 
         Paramaters
         ----------
-        name_list : list 
-            A list of Parameter names.
-
-        value_list : list
-            A list of Parameter values.
+        params : dict
+            A dict of Param name/value pairs
 
         job_name : string 
             User defined job name for this run.
@@ -196,8 +192,7 @@ class manager(object):
 
         """
         self.addTask(
-            param_name_list=name_list,
-            value_list=value_list,
+            params=params,
             job_name=job_name,
             retry_cnt=retry_cnt,
         )
