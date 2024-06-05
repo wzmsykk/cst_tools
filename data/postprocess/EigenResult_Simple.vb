@@ -76,5 +76,20 @@ Function EigenResult_Simple_output(iModeNumber As Integer,queryKey As String,out
     Print #1,"value"
     Print #1,roq
     Close #1
+End Function
 
+Function EigenResult_Simple_All_output(queryKey As String,outputDir As String, outputName As String)
+    Dim result As Double
+    Dim iModeNumber As Integer
+    Open(outputDir & outputName) For Output As #1
+    Print #1,"Result Name"
+    Print #1,"EigenResult_Simple" 'Name
+    Print #1,"Result Type"
+    Print #1,queryKey
+    For iModeNumber = 1 To EigenmodeSolver.GetNumberOfModesCalculated
+        result=EigenResult_Simple(iModeNumber,queryKey)
+        Print #1,"ModeIndex "& iModeNumber
+        Print #1,result
+    Next iModeNumber
+    Close #1
 End Function

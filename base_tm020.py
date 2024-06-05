@@ -48,7 +48,7 @@ class cst_tools_main:
         self.alg = nsgaii_TM020.myAlg_nsga(manager=None, params=None)
 
         # 设置默认后处理
-        defaultPPSListPath = resource_path("data/emptyPPS.json")
+        defaultPPSListPath = resource_path("data/TM020PPS.json")
         lst = self.readPostProcessListFromFile(defaultPPSListPath)
         self.setCurrPostProcessList(lst)
 

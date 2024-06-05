@@ -2,7 +2,8 @@
     {
         "resultName": "frequency",
         "method": "Frequency_All",
-        "params": {}
+        "params": {
+        }
     },
     {
         "resultName": "R_divide_Q",
@@ -11,8 +12,7 @@
             "xoffset": 0.0,
             "yoffset": 0.0
         }
-    },
-    {
+    },{
         "resultName": "Shunt_Inpedence",
         "method": "Shunt_Inpedence_All",
         "params": {
@@ -23,16 +23,19 @@
     {
         "resultName": "Total_Loss",
         "method": "Total_Loss_All",
-        "params": {}
+        "params": {
+        }
     },
     {
         "resultName": "Q-factor",
         "method": "Q_Factor_All",
-        "params": {}
+        "params": {
+        }
     },
     {
         "resultName": "Mode_Rec",
         "method": "ModeRec_All",
-        "params": {}
+        "params": {
+        }
     }
 ]

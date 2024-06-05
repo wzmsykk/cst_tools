@@ -1,5 +1,6 @@
 from pathlib import Path
 from install_compat import resource_path
+from utils.mode_util_sample import allModesResult
 
 
 class vbpostprocess:
@@ -23,11 +24,16 @@ class vbpostprocess:
     def appendPostProcessSteps(self, pslist):
         for doc in pslist:
             params = doc["params"]
+            
             if doc["method"] == "R_over_Q":
                 iModeNumber = doc["params"]["iModeNumber"]
                 xoffset = doc["params"]["xoffset"]
                 yoffset = doc["params"]["yoffset"]
                 self.R_over_Q_zaxis(iModeNumber, xoffset, yoffset, doc["resultName"])
+            elif doc["method"] == "R_over_Q_All":
+                xoffset = doc["params"]["xoffset"]
+                yoffset = doc["params"]["yoffset"]
+                self.R_over_Q_zaxis_All(xoffset, yoffset, doc["resultName"])
             elif doc["method"] == "Shunt_Inpedence":
                 iModeNumber = doc["params"]["iModeNumber"]
                 xoffset = doc["params"]["xoffset"]
@@ -35,15 +41,25 @@ class vbpostprocess:
                 self.Shunt_Inpedence_zaxis(
                     iModeNumber, xoffset, yoffset, doc["resultName"]
                 )
+            elif doc["method"] == "Shunt_Inpedence_All":
+                xoffset = doc["params"]["xoffset"]
+                yoffset = doc["params"]["yoffset"]
+                self.Shunt_Inpedence_zaxis_All(
+                    xoffset, yoffset, doc["resultName"]
+                )
             elif doc["method"] == "Q_Factor":
                 iModeNumber = doc["params"]["iModeNumber"]
                 self.Q_Factor(iModeNumber, doc["resultName"])
+            elif doc["method"] == "Q_Factor_All":
+                self.Q_Factor_All(doc["resultName"])
             elif doc["method"] == "Q_Ext":
                 iModeNumber = doc["params"]["iModeNumber"]
                 self.Q_Ext(iModeNumber, doc["resultName"])
             elif doc["method"] == "Total_Loss":
                 iModeNumber = doc["params"]["iModeNumber"]
                 self.Total_Loss(iModeNumber, doc["resultName"])
+            elif doc["method"] == "Total_Loss_All":
+                self.Total_Loss_All(doc["resultName"])
             elif doc["method"] == "Loss_Enclosure":
                 iModeNumber = doc["params"]["iModeNumber"]
                 self.Loss_Enclosure(iModeNumber, doc["resultName"])
@@ -68,9 +84,10 @@ class vbpostprocess:
             elif doc["method"] == "Frequency":
                 iModeNumber = doc["params"]["iModeNumber"]
                 self.Frequency(iModeNumber, doc["resultName"])
-            elif doc["method"] == "Mode_Recog":
-                iModeNumber = doc["params"]["iModeNumber"]
-                self.mode_rec(iModeNumber, doc["resultName"])
+            elif doc["method"] == "Frequency_All":
+                self.Frequency_All(doc["resultName"])
+            elif doc["method"] == "ModeRec_All":
+                self.Mode_Rec(doc["resultName"])
 
     def getUsedFileNameList(self):
         namelist = list()
@@ -132,8 +149,9 @@ class vbpostprocess:
                 expect = "Name"
         return d
 
-    def R_over_Q_zaxis(self, iModeNumber, xoffset, yoffset, resultName):
 
+    def R_over_Q_zaxis(self, iModeNumber, xoffset, yoffset, resultName):
+        
         resultFilename = "Mode_%d_ROQ_xoffset_%f_yoffset_%f_%s.txt" % (
             iModeNumber,
             xoffset,
@@ -164,7 +182,7 @@ class vbpostprocess:
 
         doc = dict()
         doc.update({"id": self.postProcessID})
-        doc.update({"import": "EigenResult_Complex.vb"})
+        doc.update({"import": "EigenResult_Complex_All.vb"})
         doc.update({"resultName": resultName})
         doc.update({"resultFilename": resultFilename})
         doc.update({"funcString": funcString})
@@ -177,8 +195,44 @@ class vbpostprocess:
         rpath = self.resultDir / resultFilename
         d = self.readFile(rpath)
         return float(d["value"])
+    
+    def R_over_Q_zaxis_All(self, xoffset, yoffset, resultName):
 
-        pass
+        resultFilename = "ROQ_All_xoffset_%f_yoffset_%f_%s.txt" % (
+            xoffset,
+            yoffset,
+            str(resultName),
+        )
+        # iModeNumber As Integer,queryKey As String,axis As Integer,xoffset As Double,yoffset As Double,zoffset As Double, outputPath As String
+        funcString = 'EigenResult_Complex_All_output("R over Q",3,{xoffset},{yoffset},0,outFullDir,"{rFilename}")\n'.format(
+            xoffset=str(xoffset),
+            yoffset=str(yoffset),
+            rFilename=str(resultFilename),
+        )
+        paramdoc = {}
+        paramdoc.update(
+            {"xoffset": xoffset, "yoffset": yoffset}
+        )
+
+        doc = dict()
+        doc.update({"id": self.postProcessID})
+        doc.update({"import": "EigenResult_Complex_All.vb"})
+        doc.update({"resultName": resultName})
+        doc.update({"resultFilename": resultFilename})
+        doc.update({"funcString": funcString})
+        doc.update({"readoutmethod": self.EigenResult_All_readout})
+        doc.update({"params": paramdoc})
+        self.postProcessDocList.append(doc)
+        self.postProcessID += 1
+        
+    def EigenResult_All_readout(self, resultFilename):
+        rpath = self.resultDir / resultFilename
+        d = self.readFile(rpath)
+        dic={}
+        for key,value in d.items():
+            if "ModeIndex" in key:
+                dic.update({key:float(value)})
+        return dic
 
     def Shunt_Inpedence_zaxis(self, iModeNumber, xoffset, yoffset, resultName):
 
@@ -210,11 +264,11 @@ class vbpostprocess:
         )
         doc = dict()
         doc.update({"id": self.postProcessID})
-        doc.update({"import": "EigenResult_Complex.vb"})
+        doc.update({"import": "EigenResult_Complex_All.vb"})
         doc.update({"resultName": resultName})
         doc.update({"resultFilename": resultFilename})
         doc.update({"funcString": funcString})
-        doc.update({"readoutmethod": self.Shunt_Inpedence_zaxis_readout})
+        doc.update({"readoutmethod": self.Shunt_Inpedence_zaxis_all_readout})
         doc.update({"params": paramdoc})
         self.postProcessDocList.append(doc)
         self.postProcessID += 1
@@ -223,7 +277,33 @@ class vbpostprocess:
         rpath = self.resultDir / resultFilename
         d = self.readFile(rpath)
         return float(d["value"])
-
+    
+    def Shunt_Inpedence_zaxis_All(self, xoffset, yoffset, resultName):
+        resultFilename = "SI_All_xoffset_%f_yoffset_%f_%s.txt" % (
+            xoffset,
+            yoffset,
+            str(resultName),
+        )
+        funcString = 'EigenResult_Complex_All_output("Shunt Inpedence",3,{xoffset},{yoffset},0,outFullDir,"{rFilename}")\n'.format(
+            xoffset=str(xoffset),
+            yoffset=str(yoffset),
+            rFilename=str(resultFilename),
+        )
+        paramdoc = {}
+        paramdoc.update(
+            {"xoffset": xoffset, "yoffset": yoffset}
+        )
+        doc = dict()
+        doc.update({"id": self.postProcessID})
+        doc.update({"import": "EigenResult_Complex_All.vb"})
+        doc.update({"resultName": resultName})
+        doc.update({"resultFilename": resultFilename})
+        doc.update({"funcString": funcString})
+        doc.update({"readoutmethod": self.EigenResult_All_readout})
+        doc.update({"params": paramdoc})
+        self.postProcessDocList.append(doc)
+        self.postProcessID += 1
+        
     def Q_Factor(self, iModeNumber, resultName):
         resultFilename = "Mode_%d_Q_Factor_%s.txt" % (iModeNumber, str(resultName))
         i = 0
@@ -250,6 +330,24 @@ class vbpostprocess:
         doc.update({"params": paramdoc})
         self.postProcessDocList.append(doc)
         self.postProcessID += 1
+        
+    def Q_Factor_All(self, resultName):
+        resultFilename = "Q_Factor_All_%s.txt" % (str(resultName))
+        funcString = 'EigenResult_Simple_All_output("Q-Factor",outFullDir,"{rFilename}")\n'.format(
+            rFilename=str(resultFilename)
+        )
+        paramdoc = {}
+        doc = dict()
+        doc.update({"id": self.postProcessID})
+        doc.update({"import": "EigenResult_Simple.vb"})
+        doc.update({"resultName": resultName})
+        doc.update({"resultFilename": resultFilename})
+        doc.update({"funcString": funcString})
+        doc.update({"readoutmethod": self.EigenResult_All_readout})
+        doc.update({"params": paramdoc})
+        self.postProcessDocList.append(doc)
+        self.postProcessID += 1
+        
 
     def Q_Factor_readout(self, resultFilename):
         rpath = self.resultDir / resultFilename
@@ -282,7 +380,28 @@ class vbpostprocess:
         doc.update({"params": paramdoc})
         self.postProcessDocList.append(doc)
         self.postProcessID += 1
+        
 
+        
+    def Q_Ext_All(self, resultName):
+        resultFilename = "Q_Ext_All_%s.txt" % (str(resultName))
+       
+        funcString = 'EigenResult_Simple_All_output("Q_Ext",outFullDir,"{rFilename}")\n'.format(
+            rFilename=str(resultFilename)
+        )
+        paramdoc = {}
+
+        doc = dict()
+        doc.update({"id": self.postProcessID})
+        doc.update({"import": "EigenResult_Simple.vb"})
+        doc.update({"resultName": resultName})
+        doc.update({"resultFilename": resultFilename})
+        doc.update({"funcString": funcString})
+        doc.update({"readoutmethod": self.EigenResult_All_readout})
+        doc.update({"params": paramdoc})
+        self.postProcessDocList.append(doc)
+        self.postProcessID += 1
+        
     def Q_Ext_readout(self, resultFilename):
         rpath = self.resultDir / resultFilename
         d = self.readFile(rpath)
@@ -314,7 +433,24 @@ class vbpostprocess:
         doc.update({"params": paramdoc})
         self.postProcessDocList.append(doc)
         self.postProcessID += 1
+    def Frequency_All(self, resultName):
+        resultFilename = "Frequency_All_%s.txt" % (str(resultName))
 
+        funcString = 'EigenResult_Simple_All_output("Frequency",outFullDir,"{rFilename}")\n'.format(
+            rFilename=str(resultFilename)
+        )
+        paramdoc = {}
+        doc = dict()
+        doc.update({"id": self.postProcessID})
+        doc.update({"import": "EigenResult_Simple.vb"})
+        doc.update({"resultName": resultName})
+        doc.update({"resultFilename": resultFilename})
+        doc.update({"funcString": funcString})
+        doc.update({"readoutmethod": self.EigenResult_All_readout})
+        doc.update({"params": paramdoc})
+        self.postProcessDocList.append(doc)
+        self.postProcessID += 1
+        
     def Frequency_readout(self, resultFilename):
         rpath = self.resultDir / resultFilename
         d = self.readFile(rpath)
@@ -346,7 +482,25 @@ class vbpostprocess:
         doc.update({"params": paramdoc})
         self.postProcessDocList.append(doc)
         self.postProcessID += 1
+        
+    def Total_Loss_All(self, resultName):
+        resultFilename = "Total_Loss_All_%s.txt" % (str(resultName))
+        funcString = 'EigenResult_Simple_All_output("Total Loss",outFullDir,"{rFilename}")\n'.format(
+            rFilename=str(resultFilename)
+        )
+        paramdoc = {}
 
+        doc = dict()
+        doc.update({"id": self.postProcessID})
+        doc.update({"import": "EigenResult_Simple.vb"})
+        doc.update({"resultName": resultName})
+        doc.update({"resultFilename": resultFilename})
+        doc.update({"funcString": funcString})
+        doc.update({"readoutmethod": self.EigenResult_All_readout})
+        doc.update({"params": paramdoc})
+        self.postProcessDocList.append(doc)
+        self.postProcessID += 1
+        
     def Total_Loss_readout(self, resultFilename):
         rpath = self.resultDir / resultFilename
         d = self.readFile(rpath)
@@ -569,41 +723,26 @@ class vbpostprocess:
         d = self.readFile(rpath)
         return float(d["value"])
 
-    def mode_rec(self, iModeNumber, resultName):
-        resultFilename = "Mode_%d_Mode_Info_%s.txt" % (iModeNumber, str(resultName))
-        i = 0
-        while resultFilename in self.getUsedFileNameList():
-            resultFilename = "Mode_%d_Mode_Info_%s_%d.txt" % (
-                iModeNumber,
-                str(resultName),
-                i,
-            )
+    def Mode_Rec(self, resultName):
+
         # TODO
-        funcString = 'EigenResult_Simple_output({iMode},"Total Energy",outFullDir,"{rFilename}")\n'.format(
-            iMode=str(iModeNumber), rFilename=str(resultFilename)
-        )
+        funcString = 'ModeRec_All_output(outFullDir)\n'
 
         paramdoc = {}
-        paramdoc.update(
-            {"iModeNumber": iModeNumber,}
-        )
         doc = dict()
         doc.update({"id": self.postProcessID})
-        doc.update({"import": "EigenResult_Simple.vb"})
+        doc.update({"import": "ModeRec_All.vb"})
         doc.update({"resultName": resultName})
-        doc.update({"resultFilename": resultFilename})
+        doc.update({"resultFilename": None})
         doc.update({"funcString": funcString})
-        doc.update({"readoutmethod": self.mode_rec_readout})
+        doc.update({"readoutmethod": self.Mode_Rec_readout})
         doc.update({"params": paramdoc})
         self.postProcessDocList.append(doc)
         self.postProcessID += 1
 
-    def mode_rec_readout(self, resultFilename):
-        rpath = self.resultDir / resultFilename
-        d={"value":1}
-        # d=self.readFile(rpath)
-        # init torch
-        return float(d["value"])
+    def Mode_Rec_readout(self, resultFilename):
+        mode_result=allModesResult(self.resultDir)
+        return mode_result
 
 
 if __name__ == "__main__":

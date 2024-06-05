@@ -592,8 +592,6 @@ class myAlg_nsga(myAlg):
         self.relative_location = str(manager.currProjectDir) + "\\save\\csv\\"
         if not os.path.exists(self.relative_location):
             os.makedirs(self.relative_location)
-        logpath = os.path.join(manager.getResultDir(), "result.log")
-        self.log = open(logpath, "w")
         self.checkAndSetReady()
 
 
@@ -641,6 +639,9 @@ class myAlg_nsga(myAlg):
     def start(self):
         params={"Leq":90,"Req":190}
         result=self.manager.runWithParam(params=params,job_name="test")
+        print(result)
+        params={"Leq":60,"Req":180}
+        result=self.manager.runWithParam(params=params,job_name="test2")
         print(result)
     def start2(self):
         if self.ready == False:

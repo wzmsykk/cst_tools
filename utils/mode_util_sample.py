@@ -1,4 +1,4 @@
-from .mode_util_base import read_coffs,result_stats,read_field1D,read_field1D_Complex,read_maxcoords
+from .mode_util_base import read_coffs,result_stats,read_field1D,read_field1D_Complex,read_maxcoords,totalmodes
 from .mode_util_base import mode_wavenumber_mnp,main_mode_type
 from .mode_util_base import mode_wavenumber_m,mode_wavenumber_n,mode_wavenumber_p
 from .modes_batch_v2 import read_field3D
@@ -199,6 +199,14 @@ def mode_type_final2(resultdir,modeindex):
     #last 0 indicates it is not manually updated 
     return ml
 
+def allModesResult(result_dir):
+    imodes=totalmodes(result_dir)
+    u=[]
+    for i in range(1,imodes+1):
+        c=mode_type_final2(result_dir,i)
+        #print(mode_type_final2(result_dir,i))
+        u.append(c)
+    return u
 def findTM020index(result_dir):
     u=[]
     tm020index=-1

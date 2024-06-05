@@ -47,7 +47,14 @@ def read_coffs(filename):
 
     return mydict
 
-
+def totalmodes(result_dir):
+    curdir=pathlib.Path(result_dir)
+    freqs=curdir.glob("MODE_*_Freq.txt")
+    flist=list()
+    for tx in freqs:
+        flist.append(tx)
+    totalmodes=len(flist)
+    return totalmodes
 
 def result_stats(result_dir="",printhost=True):
     curdir=pathlib.Path(result_dir)

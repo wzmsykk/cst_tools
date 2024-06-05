@@ -23,6 +23,14 @@
                 "outputPath": "String"
             },
             "Type":"Output"
+        },
+        {
+            "FuncName": "EigenResult_Simple_All_output",
+            "Parameters": {
+                "queryKey": "String",
+                "outputPath": "String"
+            },
+            "Type":"Output"
         }
     ]
 }
