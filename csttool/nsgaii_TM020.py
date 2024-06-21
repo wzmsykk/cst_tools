@@ -21,6 +21,7 @@ import threading
 import multiprocessing
 from typing import List, Set
 from utils.mode_util_sample import findTM020index
+from copy import deepcopy
 class nsgaii_var:
     id = 0
     idlock=threading.Lock()
@@ -115,6 +116,7 @@ class nsgaii_var:
     def __hash__(self):
         return hash(self.id)
     
+
 class myAlg_nsga(myAlg):
     def __init__(self, manager: cstmanager.manager = None, params=None):
         super().__init__(manager, params)
@@ -635,14 +637,80 @@ class myAlg_nsga(myAlg):
         text = f.read()
         return float(text[140:])
     
+
+    def getTM020Result(self,runresult):
+        ppsr=runresult["PostProcessResult"]
+        for ips in ppsr:
+            if ips["resultName"] =="Mode_Rec":
+                mode_result=ips["value"] 
+                
+            
+        tm020index=-1
+        for i in range(0,len(mode_result)):
+            c=mode_result[i]
+            if c[1]=='HX_TM' or c[1] =='TM':
+                if c[2]==0 and c[3]==2 and c[4]==0:
+                    tm020index=c[0]
+                    break
+        querystring="ModeIndex "+str(tm020index)
+        nppsr=deepcopy(ppsr)
+        ar={}
+        for ips in nppsr:
+            if ips["resultName"] =="Mode_Rec":
+                continue
+            else:
+                key=ips["resultName"]
+                value=ips["value"][querystring]
+                ar.update({key:value})
+                
+                
+            
+        processedResult={
+        "WorkerID": runresult.get("WorkerID"),
+        "TaskIndex": runresult.get("TaskIndex"),
+        "TaskStatus": runresult.get("TaskStatus"),
+        "RunName": runresult.get("RunName"),
+        "RunParameters": runresult.get("RunParameters"),
+        "PostProcessResult":ar
+        }
+        return processedResult
     
     def start(self):
-        params={"Leq":90,"Req":190}
-        result=self.manager.runWithParam(params=params,job_name="test")
-        print(result)
-        params={"Leq":60,"Req":180}
-        result=self.manager.runWithParam(params=params,job_name="test2")
-        print(result)
+        
+        # resultPath=self.manager.resultDir / "TestResult.json"
+        
+        # params={"Leq":90,"Req":190}
+        # result=self.manager.runWithParam(params=params,job_name="test")
+        # print(result)
+        # params={"Leq":60,"Req":180}
+        # result=self.manager.runWithParam(params=params,job_name="test2")
+        # print(result)
+
+        # params1={"Leq":90,"Req":190}
+        # self.manager.addTask(params=params1,job_name="TEST01")
+        # params2={"Leq":60,"Req":180}
+        # self.manager.addTask(params=params2,job_name="TEST02")   
+        
+        # params1={"Leq":100,"Req":190}
+        # self.manager.addTask(params=params1,job_name="TEST03")
+        # params2={"Leq":60,"Req":160}
+        # self.manager.addTask(params=params2,job_name="TEST04")
+        
+        # self.manager.startProcessing()            
+        resultPath=r"F:\programs\cst_tools\test\TestResult.json"
+        fp=open(resultPath,"r")
+        results=json.load(fp)
+        pr=self.getTM020Result(results[0])
+        print(pr)
+        #results=self.manager.getFullResults()
+    
+        
+        # fp=open(resultPath,"w")
+        # json.dump(results,fp,indent=4)
+        # fp.close()
+        
+        #print(results)
+        pass
     def start2(self):
         if self.ready == False:
             print("CALCATION NOT READY, PLEASE CHECK SETTINGS.")

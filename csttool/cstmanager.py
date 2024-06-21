@@ -5,7 +5,7 @@ import queue
 from install_compat import resource_path
 import pathlib
 import logging
-
+from time import sleep
 
 
 class manager(object):
@@ -45,10 +45,12 @@ class manager(object):
         # PARALLEL
         self.maxParallelTasks = maxTask
         self.cstWorkerList:list[cstworker.local_cstworker] = [] 
-        self.mthreadList = []
+        self.cstWorkerStatus:list = [] #"ALIVE" "DEAD"
+        self.WorkerListMutex=threading.Lock()
+        self.mthreadList:list[threading.Thread] = []
         self.taskQueue = queue.Queue()
         self.resultQueue = queue.Queue()
-        self.startWorkers()
+        self.startFirstWorkers()
         self.ready = True
 
     def getResultDir(self):
@@ -57,29 +59,33 @@ class manager(object):
     def mthread(self, idx):
         # Listener For Each Worker
         while True:
-            if self.taskQueue.qsize() != 0:
-
+            targetWorker=self.cstWorkerList[idx]
+            if self.cstWorkerStatus=="DEAD":
+                break
+            if self.taskQueue.qsize() != 0:                
                 mtask = self.taskQueue.get()
-                print(mtask)
+                self.logger.debug("WORKER:%s, Received Task:%s"%(targetWorker.ID,str(mtask)))
                 iretry_cnt = mtask["retry_cnt"]
                 if iretry_cnt < 0:
                     iretry_cnt = 0
                 irun_count = iretry_cnt + 1
                 while irun_count > 0:
-                    result = self.cstWorkerList[idx].runWithParam(
+                    result = targetWorker.runWithParam(
                         resultname= mtask["job_name"],params=mtask["params"]
                     )
                     irun_count -= 1
                     if result["TaskStatus"] == "Failure":
                         self.logger.warning(
                             "WORKER ID:%s FAILED. RESTARTING CST ENV."
-                            % str(self.cstWorkerList[idx].ID)
+                            % str(targetWorker.ID)
                         )
-                        newWorkerID = self.getMaxAvilWorkerID()
-                        nworker = self.createLocalWorker(newWorkerID)
-                        if self.cstWorkerList[idx] != None:
-                            self.cstWorkerList[idx].__del__()
-                        self.cstWorkerList[idx] = nworker
+                        newWorkerIndexInList = self.addNewLocalWorkerToList()
+                        nworker = self.cstWorkerList[newWorkerIndexInList]
+                        oldWorkerIndexInList = idx
+                        if targetWorker != None:
+                            self.killLocalWorkerFromList(oldWorkerIndexInList)
+                        targetWorker = nworker
+                        idx = newWorkerIndexInList
                     else:
                         break
                 self.resultQueue.put(result)
@@ -87,8 +93,9 @@ class manager(object):
                 break
 
     def createLocalWorker(self, workerID):
+        workerID_str=str(workerID)
         mconf = {}
-        mconf["tempPath"] = str(self.tempPath / ("worker_" + workerID))
+        mconf["tempPath"] = str(self.tempPath / ("worker_" + workerID_str))
         mconf["CSTENVPATH"] = self.gconf["CST"]["cstexepath"]
         mconf["ProjectType"] = self.cstType
         mconf["cstPatternDir"] = str(self.cstPatternDir)
@@ -96,19 +103,36 @@ class manager(object):
         mconf["cstPath"] = str(self.cstProjPath)
         mconf["paramList"] = self.paramList
         os.makedirs(mconf["tempPath"], exist_ok=True)
-        print(mconf["tempPath"])
-        mconf["taskFileDir"] = str(self.taskFileDir / ("worker_" + workerID))
+        self.logger.debug("WORKERID:%s, Temp Path:%s"%(workerID_str, mconf["tempPath"]))
+        mconf["taskFileDir"] = str(self.taskFileDir / ("worker_" + workerID_str))
         mconf["postProcess"] = self.pconfm.getCurrPPSList()
         mcstworker_local = cstworker.local_cstworker(
-            id=workerID, type="local", workerconfig=mconf, logger=self.logger
+            id=workerID_str, type="local", workerconfig=mconf, logger=self.logger
         )
         return mcstworker_local
-
-    def startWorkers(self):
+    def addNewLocalWorkerToList(self):
+        self.WorkerListMutex.acquire()
+        avilid=self.getMaxAvilWorkerID()
+        self.cstWorkerList.append(self.createLocalWorker(avilid))
+        self.cstWorkerStatus.append("ALIVE")
+        listindex=len(self.cstWorkerList)-1
+        self.WorkerListMutex.release()
+        return listindex
+    def killLocalWorkerFromList(self,index):
+        self.WorkerListMutex.acquire()
+        self.cstWorkerStatus[index]="DEAD"
+        self.cstWorkerList[index].__del__()
+        self.WorkerListMutex.release()
+        return
+    def startFirstWorkers(self):
         workerID = 0
         for i in range(self.maxParallelTasks):
-            self.cstWorkerList.append(self.createLocalWorker(str(workerID)))
-            print("created cstworker. ID=", workerID)
+            newWorker=self.createLocalWorker(workerID)
+            self.WorkerListMutex.acquire()
+            self.cstWorkerList.append(newWorker)
+            self.cstWorkerStatus.append("ALIVE")
+            self.WorkerListMutex.release()
+            self.logger.info("Created cstworker. ID=%s", str(workerID))
             workerID += 1
 
     def getMaxAvilWorkerID(self):
@@ -117,16 +141,23 @@ class manager(object):
         return str(maxid)
 
 
-    def startListening(self):
+    def startProcessing(self):
         if self.ready == False:
-            self.startWorkers()
-        for i in range(self.maxParallelTasks):
-            ithread = threading.Thread(target=manager.mthread, args=(self, i,))
-            self.mthreadList.append(ithread)
+            self.startFirstWorkers()
+        self.logger.debug("WorkerListLength:%s"%len(self.cstWorkerList))
+        for i in range(len(self.cstWorkerList)):
+            self.logger.debug("index:%s,Status:%s"%(i,self.cstWorkerStatus[i]))
+            if self.cstWorkerStatus[i] == "ALIVE":
+                
+                ithread = threading.Thread(target=manager.mthread, args=(self, i,))
+                self.mthreadList.append(ithread)
 
         for thread in self.mthreadList:
             thread.start()
-
+        for thread in self.mthreadList:
+            thread.join()
+        self.mthreadList = []
+        
     def stop(self):
         for iworker in self.cstWorkerList:
             ithread = threading.Thread(target=iworker.stop)
@@ -158,7 +189,7 @@ class manager(object):
         return self.resultQueue.get()
 
     def addTask(
-        self, params={}, job_name="default", retry_cnt=0
+        self, params:dict, job_name:str, retry_cnt:int=0
     ):
         mtask = {}
         mtask["params"] = params
@@ -168,7 +199,7 @@ class manager(object):
 
     def runWithx(self, x, job_name):
         self.addTask(value_list=x, job_name=job_name)
-        self.startListening()
+        self.startProcessing()
         self.synchronize()
         result = self.getFirstResult()
         return result
@@ -196,7 +227,7 @@ class manager(object):
             job_name=job_name,
             retry_cnt=retry_cnt,
         )
-        self.startListening()
+        self.startProcessing()
         self.synchronize()
         result = self.getFirstResult()
         return result

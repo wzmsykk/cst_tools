@@ -33,7 +33,7 @@ class TestCSTManager(unittest.TestCase):
     
     def test_emptymng(self):
         
-        self.cstm.startListening()
+        self.cstm.startProcessing()
         self.cstm.addTask()
         self.cstm.synchronize()
         result=self.cstm.getFullResults()

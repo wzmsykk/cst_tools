@@ -1,0 +1,866 @@
+[
+    {
+        "WorkerID": "0",
+        "TaskIndex": 1,
+        "TaskStatus": "Success",
+        "RunName": "TEST01",
+        "PostProcessResult": [
+            {
+                "id": 0,
+                "resultName": "frequency",
+                "value": {
+                    "ModeIndex 1": 657.712509195263,
+                    "ModeIndex 2": 1009.50119887816,
+                    "ModeIndex 3": 1042.6226943859,
+                    "ModeIndex 4": 1167.82711675325,
+                    "ModeIndex 5": 1220.69111972295,
+                    "ModeIndex 6": 1372.67185593434,
+                    "ModeIndex 7": 1417.02510951761,
+                    "ModeIndex 8": 1458.23493266349,
+                    "ModeIndex 9": 1488.60024362722,
+                    "ModeIndex 10": 1651.88188436088
+                },
+                "params": {}
+            },
+            {
+                "id": 1,
+                "resultName": "R_divide_Q",
+                "value": {
+                    "ModeIndex 1": 214.466189394985,
+                    "ModeIndex 2": 2.12580369947988e-06,
+                    "ModeIndex 3": 0.000289835685766833,
+                    "ModeIndex 4": 66.7850416682186,
+                    "ModeIndex 5": 5.72900862954672e-05,
+                    "ModeIndex 6": 0.000178507910075188,
+                    "ModeIndex 7": 7.52770965555329,
+                    "ModeIndex 8": 3.27157931650371e-06,
+                    "ModeIndex 9": 0.00068368850588434,
+                    "ModeIndex 10": 1.80682376326072e-05
+                },
+                "params": {
+                    "xoffset": 0.0,
+                    "yoffset": 0.0
+                }
+            },
+            {
+                "id": 2,
+                "resultName": "Shunt_Inpedence",
+                "value": {
+                    "ModeIndex 1": 8132717.1823408,
+                    "ModeIndex 2": 0.0904203412621668,
+                    "ModeIndex 3": 13.8349841018364,
+                    "ModeIndex 4": 2280717.50152216,
+                    "ModeIndex 5": 2.62355281416443,
+                    "ModeIndex 6": 9.04816412952818,
+                    "ModeIndex 7": 310120.885971509,
+                    "ModeIndex 8": 0.153060126089778,
+                    "ModeIndex 9": 27.3786576220959,
+                    "ModeIndex 10": 1.4300166660721
+                },
+                "params": {
+                    "xoffset": 0.0,
+                    "yoffset": 0.0
+                }
+            },
+            {
+                "id": 3,
+                "resultName": "Total_Loss",
+                "value": {
+                    "ModeIndex 1": 107164.531992994,
+                    "ModeIndex 2": 147277.947051629,
+                    "ModeIndex 3": 134712.571853905,
+                    "ModeIndex 4": 211027.954990273,
+                    "ModeIndex 5": 163886.32333684,
+                    "ModeIndex 6": 166422.553014661,
+                    "ModeIndex 7": 211730.229102912,
+                    "ModeIndex 8": 190216.658680494,
+                    "ModeIndex 9": 228730.545834514,
+                    "ModeIndex 10": 129450.630345374
+                },
+                "params": {}
+            },
+            {
+                "id": 4,
+                "resultName": "Q-factor",
+                "value": {
+                    "ModeIndex 1": 37920.7426834198,
+                    "ModeIndex 2": 42534.6617301918,
+                    "ModeIndex 3": 47733.8877896713,
+                    "ModeIndex 4": 34150.1247068548,
+                    "ModeIndex 5": 45794.1850643016,
+                    "ModeIndex 6": 50687.7489390642,
+                    "ModeIndex 7": 41197.2432734209,
+                    "ModeIndex 8": 46784.7822969338,
+                    "ModeIndex 9": 40045.5139825438,
+                    "ModeIndex 10": 79145.3319991423
+                },
+                "params": {}
+            },
+            {
+                "id": 5,
+                "resultName": "Mode_Rec",
+                "value": [
+                    [
+                        1,
+                        "TM",
+                        0,
+                        1,
+                        0,
+                        2,
+                        4,
+                        2,
+                        0
+                    ],
+                    [
+                        2,
+                        "HX_TE",
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        0
+                    ],
+                    [
+                        3,
+                        "TM",
+                        1,
+                        1,
+                        0,
+                        1,
+                        6,
+                        4,
+                        0
+                    ],
+                    [
+                        4,
+                        "TM",
+                        0,
+                        1,
+                        1,
+                        25,
+                        7,
+                        3,
+                        0
+                    ],
+                    [
+                        5,
+                        "HX_TE",
+                        2,
+                        1,
+                        1,
+                        2,
+                        1,
+                        1,
+                        0
+                    ],
+                    [
+                        6,
+                        "HX_TM",
+                        2,
+                        1,
+                        0,
+                        2,
+                        2,
+                        2,
+                        0
+                    ],
+                    [
+                        7,
+                        "TM",
+                        0,
+                        2,
+                        0,
+                        2,
+                        7,
+                        4,
+                        0
+                    ],
+                    [
+                        8,
+                        "HX_TE",
+                        3,
+                        1,
+                        1,
+                        3,
+                        1,
+                        1,
+                        0
+                    ],
+                    [
+                        9,
+                        "HX_TM",
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        0
+                    ],
+                    [
+                        10,
+                        "TE",
+                        1,
+                        2,
+                        1,
+                        1,
+                        2,
+                        1,
+                        0
+                    ]
+                ],
+                "params": {}
+            }
+        ]
+    },
+    {
+        "WorkerID": "1",
+        "TaskIndex": 1,
+        "TaskStatus": "Success",
+        "RunName": "TEST02",
+        "PostProcessResult": [
+            {
+                "id": 0,
+                "resultName": "frequency",
+                "value": {
+                    "ModeIndex 1": 670.266823533522,
+                    "ModeIndex 2": 1086.46666957209,
+                    "ModeIndex 3": 1399.01401984693,
+                    "ModeIndex 4": 1447.41277617247,
+                    "ModeIndex 5": 1503.73816047412,
+                    "ModeIndex 6": 1505.88291941452,
+                    "ModeIndex 7": 1569.01719786106,
+                    "ModeIndex 8": 1779.90039090401,
+                    "ModeIndex 9": 1782.65125505989,
+                    "ModeIndex 10": 1788.74646974502
+                },
+                "params": {}
+            },
+            {
+                "id": 1,
+                "resultName": "R_divide_Q",
+                "value": {
+                    "ModeIndex 1": 196.442715164224,
+                    "ModeIndex 2": 0.0015325288634885,
+                    "ModeIndex 3": 5.48887909991021e-05,
+                    "ModeIndex 4": 0.000818123352920253,
+                    "ModeIndex 5": 19.3115290039804,
+                    "ModeIndex 6": 43.9062154119512,
+                    "ModeIndex 7": 8.28878797279076e-05,
+                    "ModeIndex 8": 6.00529394136535e-06,
+                    "ModeIndex 9": 1.59214898840103e-05,
+                    "ModeIndex 10": 0.000692234137463974
+                },
+                "params": {
+                    "xoffset": 0.0,
+                    "yoffset": 0.0
+                }
+            },
+            {
+                "id": 2,
+                "resultName": "Shunt_Inpedence",
+                "value": {
+                    "ModeIndex 1": 5825610.74201344,
+                    "ModeIndex 2": 59.0893997525985,
+                    "ModeIndex 3": 1.78948858556933,
+                    "ModeIndex 4": 34.9026166191231,
+                    "ModeIndex 5": 532433.525984894,
+                    "ModeIndex 6": 1595802.65720217,
+                    "ModeIndex 7": 2.97508226024265,
+                    "ModeIndex 8": 0.232513370362847,
+                    "ModeIndex 9": 0.732318482159716,
+                    "ModeIndex 10": 22.1716374372
+                },
+                "params": {
+                    "xoffset": 0.0,
+                    "yoffset": 0.0
+                }
+            },
+            {
+                "id": 3,
+                "resultName": "Total_Loss",
+                "value": {
+                    "ModeIndex 1": 140385.454963385,
+                    "ModeIndex 2": 174816.595341102,
+                    "ModeIndex 3": 267629.388460948,
+                    "ModeIndex 4": 210157.092288301,
+                    "ModeIndex 5": 338818.456611373,
+                    "ModeIndex 6": 256941.018740962,
+                    "ModeIndex 7": 270965.188273809,
+                    "ModeIndex 8": 283327.039156323,
+                    "ModeIndex 9": 239457.211179522,
+                    "ModeIndex 10": 346172.292740023
+                },
+                "params": {}
+            },
+            {
+                "id": 4,
+                "resultName": "Q-factor",
+                "value": {
+                    "ModeIndex 1": 29655.5193565885,
+                    "ModeIndex 2": 38556.794041773,
+                    "ModeIndex 3": 32602.0769085367,
+                    "ModeIndex 4": 42661.8021531103,
+                    "ModeIndex 5": 27570.7597194998,
+                    "ModeIndex 6": 36345.7119277876,
+                    "ModeIndex 7": 35892.8503179092,
+                    "ModeIndex 8": 38718.066531475,
+                    "ModeIndex 9": 45995.6001288026,
+                    "ModeIndex 10": 32029.1014806445
+                },
+                "params": {}
+            },
+            {
+                "id": 5,
+                "resultName": "Mode_Rec",
+                "value": [
+                    [
+                        1,
+                        "TM",
+                        0,
+                        1,
+                        0,
+                        6,
+                        7,
+                        2,
+                        0
+                    ],
+                    [
+                        2,
+                        "HX_TM",
+                        1,
+                        1,
+                        0,
+                        1,
+                        5,
+                        2,
+                        0
+                    ],
+                    [
+                        3,
+                        "HX_TE",
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        0
+                    ],
+                    [
+                        4,
+                        "TM",
+                        2,
+                        1,
+                        0,
+                        9,
+                        5,
+                        1,
+                        0
+                    ],
+                    [
+                        5,
+                        "TM",
+                        0,
+                        1,
+                        1,
+                        1,
+                        9,
+                        3,
+                        0
+                    ],
+                    [
+                        6,
+                        "TM",
+                        0,
+                        2,
+                        0,
+                        6,
+                        6,
+                        2,
+                        0
+                    ],
+                    [
+                        7,
+                        "HX_TE",
+                        2,
+                        1,
+                        1,
+                        2,
+                        1,
+                        1,
+                        0
+                    ],
+                    [
+                        8,
+                        "HX_TE",
+                        3,
+                        1,
+                        1,
+                        3,
+                        1,
+                        1,
+                        0
+                    ],
+                    [
+                        9,
+                        "HX_TM",
+                        3,
+                        1,
+                        0,
+                        3,
+                        2,
+                        1,
+                        0
+                    ],
+                    [
+                        10,
+                        "HX_TM",
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        0
+                    ]
+                ],
+                "params": {}
+            }
+        ]
+    },
+    {
+        "WorkerID": "0",
+        "TaskIndex": 2,
+        "TaskStatus": "Success",
+        "RunName": "TEST03",
+        "PostProcessResult": [
+            {
+                "id": 0,
+                "resultName": "frequency",
+                "value": {
+                    "ModeIndex 1": 664.215335708179,
+                    "ModeIndex 2": 940.154706460582,
+                    "ModeIndex 3": 1043.83264868483,
+                    "ModeIndex 4": 1117.0516220213,
+                    "ModeIndex 5": 1165.08697053815,
+                    "ModeIndex 6": 1367.59303581084,
+                    "ModeIndex 7": 1401.55868035872,
+                    "ModeIndex 8": 1411.82696889828,
+                    "ModeIndex 9": 1449.50711364365,
+                    "ModeIndex 10": 1613.86475213566
+                },
+                "params": {}
+            },
+            {
+                "id": 1,
+                "resultName": "R_divide_Q",
+                "value": {
+                    "ModeIndex 1": 205.443855756733,
+                    "ModeIndex 2": 5.44746824634864e-06,
+                    "ModeIndex 3": 0.00128287407245035,
+                    "ModeIndex 4": 88.5589392813311,
+                    "ModeIndex 5": 4.95214296884059e-05,
+                    "ModeIndex 6": 0.000112148730433284,
+                    "ModeIndex 7": 0.579845734777512,
+                    "ModeIndex 8": 5.33116507967552e-06,
+                    "ModeIndex 9": 0.00370329165592858,
+                    "ModeIndex 10": 4.29756417343699e-05
+                },
+                "params": {
+                    "xoffset": 0.0,
+                    "yoffset": 0.0
+                }
+            },
+            {
+                "id": 2,
+                "resultName": "Shunt_Inpedence",
+                "value": {
+                    "ModeIndex 1": 8266629.70907412,
+                    "ModeIndex 2": 0.245867970739348,
+                    "ModeIndex 3": 63.8603712088137,
+                    "ModeIndex 4": 3180535.70400334,
+                    "ModeIndex 5": 2.36541328909761,
+                    "ModeIndex 6": 5.79848248627169,
+                    "ModeIndex 7": 23703.2751314434,
+                    "ModeIndex 8": 0.25590091231971,
+                    "ModeIndex 9": 156.645038732655,
+                    "ModeIndex 10": 3.6034090468134
+                },
+                "params": {
+                    "xoffset": 0.0,
+                    "yoffset": 0.0
+                }
+            },
+            {
+                "id": 3,
+                "resultName": "Total_Loss",
+                "value": {
+                    "ModeIndex 1": 101822.235214881,
+                    "ModeIndex 2": 129004.888123665,
+                    "ModeIndex 3": 129088.689393573,
+                    "ModeIndex 4": 191487.267800309,
+                    "ModeIndex 5": 149613.574987213,
+                    "ModeIndex 6": 161964.542487295,
+                    "ModeIndex 7": 210474.915345652,
+                    "ModeIndex 8": 179052.383235116,
+                    "ModeIndex 9": 210242.174700082,
+                    "ModeIndex 10": 119284.343798383
+                },
+                "params": {}
+            },
+            {
+                "id": 4,
+                "resultName": "Q-factor",
+                "value": {
+                    "ModeIndex 1": 40237.9018765238,
+                    "ModeIndex 2": 45134.3559283985,
+                    "ModeIndex 3": 49779.1424584936,
+                    "ModeIndex 4": 35914.3382905652,
+                    "ModeIndex 5": 47765.4482913971,
+                    "ModeIndex 6": 51703.505370675,
+                    "ModeIndex 7": 40878.5884068604,
+                    "ModeIndex 8": 48000.9357232819,
+                    "ModeIndex 9": 42298.8663293323,
+                    "ModeIndex 10": 83847.7077104719
+                },
+                "params": {}
+            },
+            {
+                "id": 5,
+                "resultName": "Mode_Rec",
+                "value": [
+                    [
+                        1,
+                        "TM",
+                        0,
+                        1,
+                        0,
+                        4,
+                        7,
+                        4,
+                        0
+                    ],
+                    [
+                        2,
+                        "HX_TE",
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        0
+                    ],
+                    [
+                        3,
+                        "TM",
+                        1,
+                        1,
+                        0,
+                        1,
+                        1,
+                        2,
+                        0
+                    ],
+                    [
+                        4,
+                        "TM",
+                        0,
+                        1,
+                        1,
+                        2,
+                        7,
+                        3,
+                        0
+                    ],
+                    [
+                        5,
+                        "HX_TE",
+                        2,
+                        1,
+                        1,
+                        2,
+                        1,
+                        1,
+                        0
+                    ],
+                    [
+                        6,
+                        "HX_TM",
+                        2,
+                        1,
+                        0,
+                        2,
+                        1,
+                        2,
+                        0
+                    ],
+                    [
+                        7,
+                        "TM",
+                        0,
+                        2,
+                        0,
+                        4,
+                        7,
+                        4,
+                        0
+                    ],
+                    [
+                        8,
+                        "HX_TE",
+                        3,
+                        1,
+                        1,
+                        3,
+                        1,
+                        1,
+                        0
+                    ],
+                    [
+                        9,
+                        "HX_TM",
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        0
+                    ],
+                    [
+                        10,
+                        "TE",
+                        1,
+                        2,
+                        1,
+                        1,
+                        2,
+                        1,
+                        0
+                    ]
+                ],
+                "params": {}
+            }
+        ]
+    },
+    {
+        "WorkerID": "1",
+        "TaskIndex": 2,
+        "TaskStatus": "Success",
+        "RunName": "TEST04",
+        "PostProcessResult": [
+            {
+                "id": 0,
+                "resultName": "frequency",
+                "value": {
+                    "ModeIndex 1": 757.216917745007,
+                    "ModeIndex 2": 1226.36456379687,
+                    "ModeIndex 3": 1435.12625997304,
+                    "ModeIndex 4": 1561.85415420356,
+                    "ModeIndex 5": 1634.13469183597,
+                    "ModeIndex 6": 1643.65976928542,
+                    "ModeIndex 7": 1696.10168622597,
+                    "ModeIndex 8": 1895.04014151367,
+                    "ModeIndex 9": 1903.54206723985,
+                    "ModeIndex 10": 2006.94910300876
+                },
+                "params": {}
+            },
+            {
+                "id": 1,
+                "resultName": "R_divide_Q",
+                "value": {
+                    "ModeIndex 1": 202.235527074206,
+                    "ModeIndex 2": 0.00259272294303049,
+                    "ModeIndex 3": 0.000145151552306358,
+                    "ModeIndex 4": 26.2519274309284,
+                    "ModeIndex 5": 0.000528501086857488,
+                    "ModeIndex 6": 0.00011961818303348,
+                    "ModeIndex 7": 28.1625828250471,
+                    "ModeIndex 8": 8.18131122459614e-07,
+                    "ModeIndex 9": 0.001152543357454,
+                    "ModeIndex 10": 2.10779639283521e-05
+                },
+                "params": {
+                    "xoffset": 0.0,
+                    "yoffset": 0.0
+                }
+            },
+            {
+                "id": 2,
+                "resultName": "Shunt_Inpedence",
+                "value": {
+                    "ModeIndex 1": 6011259.58191843,
+                    "ModeIndex 2": 101.48480741529,
+                    "ModeIndex 3": 4.77982812681588,
+                    "ModeIndex 4": 708566.949967996,
+                    "ModeIndex 5": 22.4628019868503,
+                    "ModeIndex 6": 4.34350123809359,
+                    "ModeIndex 7": 975097.542315502,
+                    "ModeIndex 8": 0.0316901243283802,
+                    "ModeIndex 9": 37.1298735156899,
+                    "ModeIndex 10": 0.952500146454554
+                },
+                "params": {
+                    "xoffset": 0.0,
+                    "yoffset": 0.0
+                }
+            },
+            {
+                "id": 3,
+                "resultName": "Total_Loss",
+                "value": {
+                    "ModeIndex 1": 157833.555663537,
+                    "ModeIndex 2": 193799.375481881,
+                    "ModeIndex 3": 271094.255588037,
+                    "ModeIndex 4": 358427.631777436,
+                    "ModeIndex 5": 237159.870242849,
+                    "ModeIndex 6": 279417.010890285,
+                    "ModeIndex 7": 302719.791298794,
+                    "ModeIndex 8": 300019.401655862,
+                    "ModeIndex 9": 365072.849982526,
+                    "ModeIndex 10": 273089.492905322
+                },
+                "params": {}
+            },
+            {
+                "id": 4,
+                "resultName": "Q-factor",
+                "value": {
+                    "ModeIndex 1": 29724.0532802761,
+                    "ModeIndex 2": 39142.1720118964,
+                    "ModeIndex 3": 32929.9139476479,
+                    "ModeIndex 4": 26991.0448226063,
+                    "ModeIndex 5": 42502.8491812874,
+                    "ModeIndex 6": 36311.3794905067,
+                    "ModeIndex 7": 34623.8677174266,
+                    "ModeIndex 8": 38734.7742414537,
+                    "ModeIndex 9": 32215.5980298309,
+                    "ModeIndex 10": 45189.3811799033
+                },
+                "params": {}
+            },
+            {
+                "id": 5,
+                "resultName": "Mode_Rec",
+                "value": [
+                    [
+                        1,
+                        "TM",
+                        0,
+                        1,
+                        0,
+                        2,
+                        6,
+                        2,
+                        0
+                    ],
+                    [
+                        2,
+                        "HX_TM",
+                        1,
+                        1,
+                        0,
+                        1,
+                        4,
+                        2,
+                        0
+                    ],
+                    [
+                        3,
+                        "HX_TE",
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        0
+                    ],
+                    [
+                        4,
+                        "TM",
+                        0,
+                        1,
+                        1,
+                        1,
+                        5,
+                        3,
+                        0
+                    ],
+                    [
+                        5,
+                        "TM",
+                        2,
+                        1,
+                        0,
+                        16,
+                        3,
+                        1,
+                        0
+                    ],
+                    [
+                        6,
+                        "HX_TE",
+                        2,
+                        1,
+                        1,
+                        2,
+                        1,
+                        1,
+                        0
+                    ],
+                    [
+                        7,
+                        "TM",
+                        0,
+                        2,
+                        0,
+                        2,
+                        4,
+                        2,
+                        0
+                    ],
+                    [
+                        8,
+                        "HX_TE",
+                        3,
+                        1,
+                        1,
+                        3,
+                        1,
+                        1,
+                        0
+                    ],
+                    [
+                        9,
+                        "HX_TM",
+                        1,
+                        1,
+                        1,
+                        1,
+                        2,
+                        1,
+                        0
+                    ],
+                    [
+                        10,
+                        "HX_TM",
+                        3,
+                        1,
+                        0,
+                        11,
+                        4,
+                        1,
+                        0
+                    ]
+                ],
+                "params": {}
+            }
+        ]
+    }
+]

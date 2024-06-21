@@ -210,10 +210,9 @@ class local_cstworker(worker.worker):
             waitTime = 0
             startTime = time.time()
             self.logger.info(
-                "WorkerID:%r Run:%r Name:%r started."
-                % (self.ID, self.taskIndex, self.runName)
+                "WorkerID:%r Run:%r Name:%r started. Start Time:%r"
+                % (self.ID, self.taskIndex, self.runName, time.ctime())
             )
-            self.logger.info("Start Time:%r" % time.ctime())
             while not flagPath.exists():
                 # ADD process check HERE
                 rcode = self.cstProcess.poll()
@@ -227,6 +226,7 @@ class local_cstworker(worker.worker):
                         "TaskIndex": self.taskIndex,
                         "TaskStatus": "Failure",
                         "RunName": self.runName,
+                        "RunParameters": self.runParams,
                         "PostProcessResult": None,
                     }
                     return runResult
@@ -238,17 +238,17 @@ class local_cstworker(worker.worker):
                     raise TimeoutError
 
             self.logger.info(
-                "WorkerID:%r Run:%r Name:%r success."
-                % (self.ID, self.taskIndex, self.runName)
+                "WorkerID:%r Run:%r Name:%r success. ElapsedTime:%r End Time:%r"
+                % (self.ID, self.taskIndex, self.runName, escapedTime, time.ctime())
             )
-            self.logger.info("ElapsedTime:%r" % escapedTime)
-            self.logger.info("End Time:%r" % time.ctime())
         self.taskIndex += 1
         postProcessResult = self.postProcessHelper.readAllResults()
         runResult = {
+            "WorkerID":self.ID,
             "TaskIndex": self.taskIndex,
             "TaskStatus": "Success",
             "RunName": self.runName,
+            "RunParameters": self.runParams,
             "PostProcessResult": postProcessResult,
         }
         # runResult=result.readModeResult(pathc,1)
