@@ -479,9 +479,9 @@ class myAlg_nsga(myAlg):
         # Leq 60-120mm
         # OBJETIVE
         # FREQ |F_fm-F_obj|<0.05
-        # MAXIMUM Q
-        # MAXIMUM Shunt Impedence
         # MINIMUM ROQ
+        # MAXIMUM Shunt Impedence
+        # MAXIMUM Q
         ####
 
         #First Run To Get the Initial Pop
@@ -511,6 +511,15 @@ class myAlg_nsga(myAlg):
             childpoplist = self.offspring_gen(poplist)      
             #Run To Get the Children POP
             for ind in childpoplist:
+                # flag=False
+                # ###CHECK IF ALREADY CALCULATED
+                # for indc in poplist:
+                #     if ind.value == indc.value:
+                #         ind.obj = deepcopy(indc.obj)
+                #         ind.done= True
+                #         flag=True
+                # if flag:
+                #     continue
                 JobName="GEN_%d_"%igen+str(ind.id)
                 params=self.createParamDictFromNPvar(ind.value)
                 self.manager.addTask(params=params,job_name=JobName)
@@ -656,6 +665,17 @@ class myAlg_nsga(myAlg):
             iobj_list=[]
             for oname in self.output_name:
                 iobj_list.append(pResult["PostProcessResult"][oname])
+                ### Custom Func
+                # OBJETIVE
+                # FREQ |F_fm-F_obj|<0.05
+                # MINIMUM ROQ
+                # MAXIMUM Q
+                # MAXIMUM Shunt Impedence
+                ####
+                iobj_list[0]=abs(iobj_list[0]-1500)
+                iobj_list[1]=iobj_list[1]
+                iobj_list[2]=-iobj_list[2]
+                iobj_list[3]=-iobj_list[3]
                 indarray=np.array(iobj_list)
             objlist.append(indarray)
         return objlist
