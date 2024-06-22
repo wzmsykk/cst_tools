@@ -153,12 +153,12 @@ class myAlg_nsga(myAlg):
         # Shunt-dep
         
         ##### NSGA OPTIONS #####
-        self.nobj = 2
-        self.nval = 10
+        self.nobj = 4
+        self.nval = 2
         self.pmut_real = 0.1
         self.eta_m = 1  ## coff for mutation
-        self.popsize = 200
-        self.generation = 100
+        self.popsize = 4
+        self.generation = 4
 
         self.min_realvar = []
         self.max_realvar = []
@@ -168,11 +168,10 @@ class myAlg_nsga(myAlg):
         
         
         self.input_name_opt = ["Leq", "Req"]
-        self.input_name = ["nmodes", "Leq", "Req"]
-        self.input_min = [10, 60, 180]  ##初始值
-        self.input_max = [10, 120, 200]  ##初始值
+        self.input_name = ["Leq", "Req"]
+        self.input_min = [60, 180]  ##初始值
+        self.input_max = [120, 200]  ##初始值
 
-        self.csv_input_name = self.input_name + ["mode"]
 
         self.output_name = [
             "frequency",
@@ -180,24 +179,9 @@ class myAlg_nsga(myAlg):
             "Q-factor",
             "Shunt_Inpedence",
         ]
-        self.output_name = None
-        self.text_name = ["Frequency", "R_Q", "Q", "Shunt_Inpedence"]
-        self.accu_list = pd.DataFrame(
-            [[0, 1500, 1e-5], [1500, 4100, 1e-4]],
-            columns=["f_down", "f_up", "accuracy"],
-        )
-        self.cell_list = pd.DataFrame(
-            [[0, 1300, 20], [1300, 2000, 15], [2000, 4100, 10]],
-            columns=["f_down", "f_up", "cell"],
-        )
+        
 
-        # self.dimension_input = len(self.input_name)
-        # self.dimension_output = len(self.output_name)
 
-        self.delta_frequency = 50
-
-        self.end_frequency = 2500
-        self.continue_flag = [0, 3738.9532]  # [是否继续，上次做完的最后一次频率]
         
         
     def param_check(self):
@@ -472,7 +456,7 @@ class myAlg_nsga(myAlg):
             print("GEN:%d DONE, SIZE:%d" % (igen,len(acceptedpop)))
             ### GEN DONE
         return poplist
-
+    
     def nsgaii_generation_parallel(self,fnds_callback=None):  ##
         self.param_check()
         ### fnds_callback for mid output
@@ -489,43 +473,59 @@ class myAlg_nsga(myAlg):
             ind = nsgaii_var(var)
             poplist.append(ind)
         
-        valuelist=[ind.value for ind in poplist] ####First Run To Get the Initial Pop
-        
-        
-        # if self.constrained: ###WORK To get Initial Objs
-        #     objlist,c_objlist=imodel(valuelist)
-        #     for i in range(len(poplist)):        
-        #         poplist[i].setObjs(objlist[i])
-        #         poplist[i].setConstraint_objs(c_objlist[i])
-        # else:
-            ####Wait For Model To Get Results
-        ### TO DO ###
-        objlist=[]
-        for value in valuelist:
+        #### OPTIMIZAION 
+        # PARAMETER SPACE
         # Req 180-200mm
         # Leq 60-120mm
-            
-            result=self.manager.runWithParam(name_list=self.input_name_opt,value_list=value)
-            objlist.append(result)
-        
-        
-        # imodel.sendValueList(valuelist)
-        # imodel.startCompute()
-        # while (not imodel.compute_done):
-        #     sleep(1)
-        # objlist=imodel.getComputeResult()
-        # for i in range(len(poplist)):        
-        #     poplist[i].setObjs(objlist[i])
+        # OBJETIVE
+        # FREQ |F_fm-F_obj|<0.05
+        # MAXIMUM Q
+        # MAXIMUM Shunt Impedence
+        # MINIMUM ROQ
+        ####
 
+        #First Run To Get the Initial Pop
+        for ind in poplist:
+            JobName="Init_Pop_"+str(ind.id)
+            params=self.createParamDictFromNPvar(ind.value)
+            self.manager.addTask(params=params,job_name=JobName)
+        ###
+        self.manager.startProcessing()
+        ### WAIT 
+        ### TIME For Processing And Results
+
+        ### Get Results
+        results=self.manager.getFullResults()
+
+        ####Sort Results        
+        results.sort(key=lambda ele:ele["RunName"].split("_")[2])
+        print(results)
+
+        objlist=self.convertSortedResultsListToNumpyList(results)
+        #### Apply Results To Element
+        for i in range(len(poplist)):        
+            poplist[i].setObjs(objlist[i])
 
         for igen in range(self.generation):           
 
-            childpoplist = self.offspring_gen(poplist)            
-            childvaluelist=[ind.value for ind in childpoplist]
+            childpoplist = self.offspring_gen(poplist)      
+            #Run To Get the Children POP
+            for ind in childpoplist:
+                JobName="GEN_%d_"%igen+str(ind.id)
+                params=self.createParamDictFromNPvar(ind.value)
+                self.manager.addTask(params=params,job_name=JobName)
+            ###
+            self.manager.startProcessing()
+            ### WAIT 
+            ### TIME For Processing And Results
 
+            ### Get Results
+            results=self.manager.getFullResults()
+            ####Sort Results        
+            results.sort(key=lambda ele:ele["RunName"].split("_")[2])
+            objlist=self.convertSortedResultsListToNumpyList(results)
 
-            
-            objlist=imodel(valuelist)            
+            #### Apply Results To Element           
             for i in range(len(childpoplist)):        
                 childpoplist[i].setObjs(objlist[i])
 
@@ -602,40 +602,7 @@ class myAlg_nsga(myAlg):
         print(self.getEditableAttrs())
         pass
 
-    def get_y_trans_r_aprallel(self, xs, run_count):
 
-        nor = self.state_y0
-        print("nor:", nor)
-        # r = []
-        y = []
-
-        for j, x in enumerate(xs):
-            self.manager.addTask(self.input_name, x, str(run_count) + str(x[1]))
-
-        self.manager.start()
-        self.manager.synchronize()  # 同步 很重要
-        rl = self.manager.getFullResults()
-        ###SORT RESULTS
-        rg = [i["PostProcessResult"] for i in rl]
-        rg = sorted(rg, key=lambda x: int(x["name"][16:]))
-
-        for irg in rg:
-            print(irg["name"])
-            y.append(irg["value"])
-
-        print("y", y)
-
-        return np.array(y).reshape(len(xs), self.dimension_output)
-
-    
-
-
-
-
-    def get_value(self, file):
-        f = open(file)
-        text = f.read()
-        return float(text[140:])
     
 
     def getTM020Result(self,runresult):
@@ -674,8 +641,25 @@ class myAlg_nsga(myAlg):
         "PostProcessResult":ar
         }
         return processedResult
-    
-    def start(self):
+    def createParamDictFromNPvar(self,var):
+        odict={}
+        for i in range(len(self.input_name)):
+            key=self.input_name[i]
+            value=var[i]
+            odict.update({key:value})
+        return odict
+    def convertSortedResultsListToNumpyList(self,resultslist_sorted):
+        objlist=[]
+        for iresult in resultslist_sorted:     
+            pResult=self.getTM020Result(iresult) 
+            print(pResult)
+            iobj_list=[]
+            for oname in self.output_name:
+                iobj_list.append(pResult["PostProcessResult"][oname])
+                indarray=np.array(iobj_list)
+            objlist.append(indarray)
+        return objlist
+    def start2(self):
         
         # resultPath=self.manager.resultDir / "TestResult.json"
         
@@ -711,33 +695,29 @@ class myAlg_nsga(myAlg):
         
         #print(results)
         pass
-    def start2(self):
+    def start(self):
         if self.ready == False:
             print("CALCATION NOT READY, PLEASE CHECK SETTINGS.")
             print("IS THE JOBMANAGER SET?")
             return -1
         self.logCalcSettings()
-        fmin = self.input_min[1]
-        fmax = self.input_min[2]
         
         start_time = time.time()
         sample = pd.DataFrame([self.input_min], columns=self.input_name)
         samples = pd.DataFrame()
 
         seed(1037)
-        #min_realvar=[0,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10]
-        #max_realvar=[1,+10,+10,+10,+10,+10,+10,+10,+10,+10,+10]
-        #model = tm020cav_parallel()
+
         icallback = fnds_callback_create_Image(savedir="result/nsgaTM020output")
         
         #self.nval = model.n
-        min_realvar_raw, max_realvar_raw = model.getBoundaries()
+        min_realvar_raw, max_realvar_raw = self.input_min,self.input_max
         self.min_realvar, self.max_realvar =np.array(min_realvar_raw),np.array(max_realvar_raw)
         print(self.min_realvar)
         
         sttime = time.time()
-        icallback.setNewSavedir(model.name)
-        poplist = self.nsgaii_generation_parallel(model, fnds_callback=icallback)
+        icallback.setNewSavedir(self.manager.resultDir)
+        poplist = self.nsgaii_generation_parallel(fnds_callback=icallback)
         result = self.fnds(poplist)
         endtime = time.time()
         print("elapsed time=", endtime - sttime)
@@ -758,70 +738,8 @@ class myAlg_nsga(myAlg):
 
         end_time = time.time()
         print(start_time - end_time)
-        self.log.close()
         
         return 0
-# class tm020cav_parallel(commonfunc):
-#     def __init__(self,nofdvs=2) -> None:
-#         super().__init__(nofdvs)
-#         self.name='TM020 cav'
-#         self.log_results=True
-#         # input 2-dims 
-#         # Req 180-200mm
-#         # Leq 60-120mm
-        
-#         # output 4-dims
-#         # freq 1500Mhz
-#         # R over Q
-#         # Q
-#         # Shunt-dep
-#         self.compute_done=False
-#         self.in_value_list=None
-#         self.computed_value_list=None
-#         self.compute_function=None
-#         self.listening_thread=None
-#     def sendValueList(self,valuelist):
-#         self.in_value_list=valuelist
-#     def startListening(self):
-#         self.compute_done=False
-#         self.listening_thread=threading.Thread(target=tm020cav_parallel.callCompute,args=(self.in_value_list))
-#         self.listening_thread.join()
-#         self.compute_done=True
-#     def callCompute(self):
-#         self.computed_value_list=self.compute_function(self.in_value_list)
-#         return self.computed_value_list
-#     def getComputeResult(self):
-#         if self.compute_done==False:            
-#             return None
-#         else:
-#             return self.computed_value_list
-#     def create_var_boundary(self):
-#         max_var=[None for _ in range(self.n)]
-#         min_var=[None for _ in range(self.n)]
-#         min_var[0] = 180
-#         max_var[0] = 200
-#         min_var[1] = 60
-#         max_var[1] = 120
-#         return min_var,max_var
-#     def __call__(self,invars):
-#         ####f1=fx, f2=g(x)h(x)               
-#         freq,roq,q,shuntd=1500,0,0,0
-#         freqdis=abs(1500-freq)
-#         return freq,freqdis,roq,q,shuntd
-#     def check_boundary(self,invars):
-#         flag=True
-#         return flag
-#     def test_var(self):
-#         invars=[]
-#         x1=random()
-#         invars.append(x1)
-#         for i in range(1,self.n):
-#             xi=random()
-#             invars.append(xi)
-#         return invars
-#     @classmethod
-#     def best_solution_check(cls,var):
-#         return True
     
 class fnds_callback_create_Image():
     def __init__(self,savedir="") -> None:
