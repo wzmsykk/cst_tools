@@ -116,6 +116,14 @@ class nsgaii_var:
     def __hash__(self):
         return hash(self.id)
     
+def constraint_function_TM020(iconstrained_obj,iobj):
+    ###iconstrained_obj: Frequency
+    ### abs(Frequency-1500)<threshold
+    threshold=0.05
+    constraint_violaton_value=abs(1500-iconstrained_obj[0]) 
+    if constraint_violaton_value<threshold:
+        constraint_violaton_value=0
+    return constraint_violaton_value
 
 class myAlg_nsga(myAlg):
     def __init__(self, manager: cstmanager.manager = None, params=None):
@@ -132,19 +140,20 @@ class myAlg_nsga(myAlg):
         self.mode_location = None
         self.relative_location = None  # 在setManager后实现
         self.ready = False
-        # y函数,
-        #self.yFunc = yfunction.yfunc(yfunction.myYFunc01)
 
-        ##OTHERS
+        ##WORKER
         self.manager = None
         if manager is not None:
             self.setJobManager(manager)
             
         # self.results=result.result
-
-        # input 2-dims 
+        
+        # input 5-dims 
         # Req 180-200mm
         # Leq 60-120mm
+        # I0 5-20mm
+        # R0 5-20mm
+        # I1 5-20mm
         
         # output 4-dims
         # freq 1500Mhz
@@ -153,26 +162,35 @@ class myAlg_nsga(myAlg):
         # Shunt-dep
         
         ##### NSGA OPTIONS #####
-        self.nobj = 4
-        self.nval = 2
+        self.nobj = 3
+        self.nval = 5
         self.pmut_real = 0.1
         self.eta_m = 1  ## coff for mutation
         self.popsize = 4
-        self.generation = 4
+        self.generation = 2
+        
 
         self.min_realvar = []
         self.max_realvar = []
         
-        self.constrained=False
-        self.constraint_func=None
+        self.constrained=True
+        if self.constrained:
+            self.constraint_func=constraint_function_TM020
+        else:
+            self.constraint_func=None
         
         
-        self.input_name_opt = ["Leq", "Req"]
-        self.input_name = ["Leq", "Req"]
-        self.input_min = [60, 180]  ##初始值
-        self.input_max = [120, 200]  ##初始值
+        self.input_name_opt = ["Leq", "Req","I0","R0","I1"]
+        self.input_name = ["Leq", "Req","I0","R0","I1"]
+        self.input_min = [60, 180,5,5,5]  ##初始值
+        self.input_max = [120, 200,20,20,20]  ##初始值
 
-
+        self.constrained_object_name = ["frequency_offset_abs"]
+        self.object_name = [
+            "R_divide_Q",
+            "Q-factor",
+            "Shunt_Inpedence",
+        ]
         self.output_name = [
             "frequency",
             "R_divide_Q",
@@ -460,7 +478,9 @@ class myAlg_nsga(myAlg):
     def nsgaii_generation_parallel(self,fnds_callback=None):  ##
         self.param_check()
         ### fnds_callback for mid output
-
+        if not isinstance(fnds_callback,list):
+            fnds_callback=[fnds_callback]
+            
         valarr = self.random_sampling_LHS_np(self.popsize)
         val_width=self.max_realvar-self.min_realvar
         valarr=valarr*val_width+self.min_realvar
@@ -477,6 +497,9 @@ class myAlg_nsga(myAlg):
         # PARAMETER SPACE
         # Req 180-200mm
         # Leq 60-120mm
+        # I0 5-20mm
+        # R0 5-20mm
+        # I1 5-20mm
         # OBJETIVE
         # FREQ |F_fm-F_obj|<0.05
         # MINIMUM ROQ
@@ -501,11 +524,13 @@ class myAlg_nsga(myAlg):
         results.sort(key=lambda ele:ele["RunName"].split("_")[2])
         print(results)
 
-        objlist=self.convertSortedResultsListToNumpyList(results)
+        objlist,c_objlist=self.convertSortedResultsListToNumpyList(results)
         #### Apply Results To Element
         for i in range(len(poplist)):        
             poplist[i].setObjs(objlist[i])
-
+        if self.constrained:
+            for i in range(len(poplist)):    
+                poplist[i].setConstraint_objs(c_objlist[i])
         for igen in range(self.generation):           
 
             childpoplist = self.offspring_gen(poplist)      
@@ -532,28 +557,31 @@ class myAlg_nsga(myAlg):
             results=self.manager.getFullResults()
             ####Sort Results        
             results.sort(key=lambda ele:ele["RunName"].split("_")[2])
-            objlist=self.convertSortedResultsListToNumpyList(results)
+            objlist,c_objlist=self.convertSortedResultsListToNumpyList(results)
 
             #### Apply Results To Element           
             for i in range(len(childpoplist)):        
                 childpoplist[i].setObjs(objlist[i])
-
+            if self.constrained:
+                for i in range(len(childpoplist)):    
+                    childpoplist[i].setConstraint_objs(c_objlist[i])
 
             ###DONE
             poplist = poplist + childpoplist
 
-            if len(poplist)<self.popsize: ###check for unfinished calcs and dup random results
-                self.logger.warning("Too Few Pop Results Calculated at gen:%d."%igen)
-                cnt2dup=self.popsize-len(poplist)
-                sampled=sample(poplist,cnt2dup)
-                duplist=[src.dup() for src in sampled]
-                poplist+=duplist
+            # if len(poplist)<self.popsize: ###check for unfinished calcs and dup random results
+            #     self.logger.warning("Too Few Pop Results Calculated at gen:%d."%igen)
+            #     cnt2dup=self.popsize-len(poplist)
+            #     sampled=sample(poplist,cnt2dup)
+            #     duplist=[src.dup() for src in sampled]
+            #     poplist+=duplist
 
 
             fndsresult = self.fnds(poplist)
             #print("FNDS_SIZE",calc_fnds_size(fndsresult),"INPOP:",len(poplist))
-            if fnds_callback is not None:
-                fnds_callback(igen, fndsresult)
+            if len(fnds_callback)>0:
+                for ifnds in fnds_callback:
+                    ifnds(igen, fndsresult)
             ###find accepted
             acceptedpop.clear()
             pack = self.popsize  ###NEEDED TO 
@@ -647,6 +675,7 @@ class myAlg_nsga(myAlg):
         "TaskStatus": runresult.get("TaskStatus"),
         "RunName": runresult.get("RunName"),
         "RunParameters": runresult.get("RunParameters"),
+        "TM020Index" : tm020index,
         "PostProcessResult":ar
         }
         return processedResult
@@ -659,26 +688,38 @@ class myAlg_nsga(myAlg):
         return odict
     def convertSortedResultsListToNumpyList(self,resultslist_sorted):
         objlist=[]
+        c_objlist=[]
         for iresult in resultslist_sorted:     
             pResult=self.getTM020Result(iresult) 
-            print(pResult)
+            #SAVE Full and TM020 Results
+            
+            fp=open(self.manager.resultDir /(str(iresult["RunName"])+"_Result.json"),"w")
+            json.dump(iresult,fp,indent=4)
+            fp.close()
+            fp=open(self.manager.resultDir /(str(iresult["RunName"])+"_TM020Result.json"),"w")
+            json.dump(pResult,fp,indent=4)
+            fp.close()
+            # DONE
             iobj_list=[]
-            for oname in self.output_name:
-                iobj_list.append(pResult["PostProcessResult"][oname])
-                ### Custom Func
-                # OBJETIVE
-                # FREQ |F_fm-F_obj|<0.05
-                # MINIMUM ROQ
-                # MAXIMUM Q
-                # MAXIMUM Shunt Impedence
-                ####
-                iobj_list[0]=abs(iobj_list[0]-1500)
-                iobj_list[1]=iobj_list[1]
-                iobj_list[2]=-iobj_list[2]
-                iobj_list[3]=-iobj_list[3]
-                indarray=np.array(iobj_list)
+            c_iobj_list=[]
+            for oname in self.object_name:
+                iobj_list.append(pResult["PostProcessResult"][oname]) 
+            c_iobj_list.append(pResult["PostProcessResult"]["frequency"])
+            
+                
+            ### Custom Func
+            # OBJETIVE
+            # MINIMUM ROQ
+            # MAXIMUM Q
+            # MAXIMUM Shunt Impedence
+            # CONSTRAINT OBJECTIVE
+            # abs|F_fm-F_obj|<0.05
+            ####
+            indarray=np.array(iobj_list)      
+            cindarray=np.array(c_iobj_list)      
             objlist.append(indarray)
-        return objlist
+            c_objlist.append(cindarray)
+        return objlist,c_objlist
     def start2(self):
         
         # resultPath=self.manager.resultDir / "TestResult.json"
@@ -727,29 +768,21 @@ class myAlg_nsga(myAlg):
         samples = pd.DataFrame()
 
         seed(1037)
-
-        icallback = fnds_callback_create_Image(savedir="result/nsgaTM020output")
-        
+        resultDir=self.manager.resultDir
+        icallback = fnds_callback_create_Image(savedir=resultDir)
+        icallback2 =fnds_callback_dump_individuals(savedir=resultDir,input_names=self.input_name,objnames=self.object_name,cobjnames=self.constrained_object_name,constrainted=self.constrained)
         #self.nval = model.n
         min_realvar_raw, max_realvar_raw = self.input_min,self.input_max
         self.min_realvar, self.max_realvar =np.array(min_realvar_raw),np.array(max_realvar_raw)
         print(self.min_realvar)
         
         sttime = time.time()
-        icallback.setNewSavedir(self.manager.resultDir)
-        poplist = self.nsgaii_generation_parallel(fnds_callback=icallback)
+
+        poplist = self.nsgaii_generation_parallel(fnds_callback=[icallback,icallback2])
         result = self.fnds(poplist)
         endtime = time.time()
         print("elapsed time=", endtime - sttime)
 
-        fp = open(icallback.savedir / "result.txt", "w")
-        ###STATS
-        front = result[0]
-        fsize = len(front)
-        print("Front Size:%d" % fsize, file=fp)
-        for ind in front:
-            print("Id:%d Value:" % ind.id, ind.value, file=fp)
-        fp.close()
         
     
 
@@ -760,6 +793,48 @@ class myAlg_nsga(myAlg):
         print(start_time - end_time)
         
         return 0
+
+class fnds_callback_dump_individuals():
+    def __init__(self,savedir="",input_names:List=[],objnames:List=[],cobjnames:List=[],constrainted=False) -> None:
+        self.setNewSavedir(savedir)
+        self.constrainted=constrainted
+        self.input_names=input_names
+        self.objnames=objnames
+        self.cobjnames=cobjnames
+    def setNewSavedir(self,savedir):
+        self.savedir=Path(savedir)
+        if not self.savedir.exists():
+            self.savedir.mkdir(parents=True)
+    def __call__(self,igen,fndslist):
+        iprocess=multiprocessing.Process(target=dump_individual_worker_func,args=(self.savedir,igen,fndslist,self.input_names,self.objnames,self.cobjnames,self.constrainted))
+        iprocess.start()
+        
+def dump_individual_worker_func(savedir:Path,igen,fndslist:List[List[nsgaii_var]],input_names:List,objnames:List,cobjnames:List,constrainted=False):
+    data_list_all=[]
+    data_row_list=[]
+    prefix_name=["Generation","Index","Front Index"]
+    columnlist=prefix_name+input_names+objnames
+    if constrainted:
+        columnlist+=cobjnames
+        
+    print(columnlist)
+    
+    for ifnd,fnd in enumerate(fndslist):
+        if fnd is not None:
+            for indv in fnd:
+                data_row_list.clear()
+                data_row_list+=[igen,indv.id,ifnd]
+                data_row_list+=indv.value.tolist()
+                data_row_list+=indv.obj.tolist()
+                if constrainted:
+                    data_row_list+=indv.constraint_obj.tolist()
+                data_list_all.append(data_row_list)
+
+    csv=pd.DataFrame(data_list_all,columns=columnlist)
+    fp=open(savedir /("GEN_%d_Individuals.csv"%igen),"w" )
+    csv.to_csv(fp)
+    fp.close()
+    return 
     
 class fnds_callback_create_Image():
     def __init__(self,savedir="") -> None:
@@ -796,8 +871,8 @@ def image_worker_func(savedir,igen,fndslist:List[List[nsgaii_var]]):
             y2.append(ind.obj[1])      
         plt.scatter(x2,y2,c='none',marker='o', edgecolors='y')
 
-    plt.xlabel('f1')
-    plt.ylabel('f2')
+    plt.xlabel('abs(freq-1500)')
+    plt.ylabel('roq')
     #plt.axis('scaled')
     plt.savefig(savedir / ('GEN_%05d_Front.png' %igen), bbox_inches='tight')
     return

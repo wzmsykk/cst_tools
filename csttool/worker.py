@@ -70,6 +70,7 @@ class worker(metaclass=ABCMeta):
         runResult = {
             "RunName": self.runName,
             "TaskStatus": "Success",
+            "RunParameters": self.runParams,
             "ResultData": None,  #### Dummy
         }
         return runResult
