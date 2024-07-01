@@ -327,7 +327,7 @@ class myAlg_nsga(myAlg):
         rnd2 = np.random.random(self.nval)
         barray2 = np.less_equal(rnd2, 0.5)
         nbarray2 = np.logical_not(barray2)
-        v = ind.value
+        v = np.array(ind.value)
         vl = np.array(self.min_realvar)
         vu = np.array(self.max_realvar)
         delta1 = (v - vl) / (vu - vl)
@@ -345,7 +345,7 @@ class myAlg_nsga(myAlg):
 
         v = v + (deltaq1 * barray2 + deltaq2 * nbarray2) * (vu - vl)
         np.clip(v, vl, vu, v)
-        v = v * barray
+        v = v * barray + np.array(ind.value)*np.logical_not(barray) ### BUGFIX
         v=np.clip(v,self.min_realvar,self.max_realvar) ###boundary check
         ind.value = v
 
