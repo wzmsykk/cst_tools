@@ -28,7 +28,7 @@ class local_cstworker(worker.worker):
         self.preprocessHelper = preprocess_cst.vbpreprocess()
         self.taskIndex = 0
         self.cstStatus = "off"
-        self.maxWaitTime = 999999
+        self.maxWaitTime = 999
         self.maxStopWaitTime = 60
         self.cstProcess = None
         self.cstlog = None
@@ -235,7 +235,18 @@ class local_cstworker(worker.worker):
                 currentTime = time.time()
                 escapedTime = currentTime - startTime
                 if escapedTime > self.maxWaitTime:
-                    raise TimeoutError
+                    self.logger.warning("WorkerID:%r Run:%r Name:%r Time Out. Stopping."%(self.ID, self.taskIndex, self.runName))
+                    self.stop()
+                    self.logger.error("CST ENV stopped")
+                    self.logger.error("WORKER FINISHED")
+                    runResult = {
+                        "TaskIndex": self.taskIndex,
+                        "TaskStatus": "Failure",
+                        "RunName": self.runName,
+                        "RunParameters": self.runParams,
+                        "PostProcessResult": None,
+                    }
+                    return runResult
 
             self.logger.info(
                 "WorkerID:%r Run:%r Name:%r success. ElapsedTime:%r End Time:%r"
@@ -255,7 +266,7 @@ class local_cstworker(worker.worker):
         return runResult
 
     def stop(self):
-        self.logger.info("Stopping CST, Please Wait")
+        self.logger.info("WorkerID:%r Stopping CST, Please Wait"%(self.ID))
         secs = 0
         if not self.cstlog is None:
             self.cstlog.close()

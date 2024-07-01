@@ -26,9 +26,11 @@ class nsgaii_var:
     id = 0
     idlock=threading.Lock()
     def __init__(self, value) -> None:
+        
         self.value = np.array(value)
         self.rank = 0
-        self.obj = None
+        self.rawobj = None #Save simulation result for record
+        self.obj = None     #Save Objective transformed for minimum search 
         self.pset: Set[
             nsgaii_var
         ] = set()  ### set of var domed by p ### By Ref so it might be memory safe
@@ -37,11 +39,12 @@ class nsgaii_var:
         self.n = 0
         self.crowed_dis = 0
         self.crowed_dis_calc_done = False
-        
         self.constraint_obj=None
         self.constraint_violaton_value=0
         self.id = nsgaii_var._getNewAvailableId()
-        
+    
+
+    
     @classmethod
     def _getNewAvailableId(cls):
         cls.idlock.acquire()
@@ -54,11 +57,14 @@ class nsgaii_var:
         dup=nsgaii_var(self.value)
         dup.obj=self.obj.copy()        
         return dup
+    def setRawObjs(self, rawobjective):
+        self.rawobj=np.array(rawobjective)
     def setObjs(self, objective):
         self.obj = np.array(objective)
     def setConstraint_objs(self, c_objective):
         self.constraint_obj = np.array(c_objective)
     def dom(self, other):
+        ### FIND MINIMUM
         tarray = np.less(self.obj,other.obj)
         earray = np.less_equal(self.obj,other.obj)
         if np.all(earray) and np.any(tarray):
@@ -166,8 +172,8 @@ class myAlg_nsga(myAlg):
         self.nval = 5
         self.pmut_real = 0.1
         self.eta_m = 1  ## coff for mutation
-        self.popsize = 4
-        self.generation = 2
+        self.popsize = 100
+        self.generation = 20
         
 
         self.min_realvar = []
@@ -185,8 +191,9 @@ class myAlg_nsga(myAlg):
         self.input_min = [60, 180,5,5,5]  ##初始值
         self.input_max = [120, 200,20,20,20]  ##初始值
 
-        self.constrained_object_name = ["frequency_offset_abs"]
+        self.constrained_object_name = ["frequency"]
         self.object_name = [
+            "frequency_offset", 
             "R_divide_Q",
             "Q-factor",
             "Shunt_Inpedence",
@@ -199,8 +206,12 @@ class myAlg_nsga(myAlg):
         ]
         
 
-
-        
+    def getFullNameList(self):
+        namelist=[]
+        namelist=namelist+self.input_name+self.output_name+self.object_name
+        if self.constrained:
+            namelist+=self.constrained_object_name
+        return namelist
         
     def param_check(self):
         #assert self.nobj==len(self.min_realvar)
@@ -481,7 +492,7 @@ class myAlg_nsga(myAlg):
         if not isinstance(fnds_callback,list):
             fnds_callback=[fnds_callback]
             
-        valarr = self.random_sampling_LHS_np(self.popsize)
+        valarr = self.random_sampling_LHS_np(self.popsize*2)
         val_width=self.max_realvar-self.min_realvar
         valarr=valarr*val_width+self.min_realvar
 
@@ -503,7 +514,7 @@ class myAlg_nsga(myAlg):
         # OBJETIVE
         # FREQ |F_fm-F_obj|<0.05
         # MINIMUM ROQ
-        # MAXIMUM Shunt Impedence
+        # MINIMUM Shunt Impedence
         # MAXIMUM Q
         ####
 
@@ -519,75 +530,74 @@ class myAlg_nsga(myAlg):
 
         ### Get Results
         results=self.manager.getFullResults()
-
-        ####Sort Results        
-        results.sort(key=lambda ele:ele["RunName"].split("_")[2])
-        print(results)
-
-        objlist,c_objlist=self.convertSortedResultsListToNumpyList(results)
-        #### Apply Results To Element
-        for i in range(len(poplist)):        
-            poplist[i].setObjs(objlist[i])
-        if self.constrained:
-            for i in range(len(poplist)):    
-                poplist[i].setConstraint_objs(c_objlist[i])
-        for igen in range(self.generation):           
-
-            childpoplist = self.offspring_gen(poplist)      
-            #Run To Get the Children POP
-            for ind in childpoplist:
-                # flag=False
-                # ###CHECK IF ALREADY CALCULATED
-                # for indc in poplist:
-                #     if ind.value == indc.value:
-                #         ind.obj = deepcopy(indc.obj)
-                #         ind.done= True
-                #         flag=True
-                # if flag:
-                #     continue
-                JobName="GEN_%d_"%igen+str(ind.id)
-                params=self.createParamDictFromNPvar(ind.value)
-                self.manager.addTask(params=params,job_name=JobName)
-            ###
-            self.manager.startProcessing()
-            ### WAIT 
-            ### TIME For Processing And Results
-
-            ### Get Results
-            results=self.manager.getFullResults()
-            ####Sort Results        
-            results.sort(key=lambda ele:ele["RunName"].split("_")[2])
-            objlist,c_objlist=self.convertSortedResultsListToNumpyList(results)
-
-            #### Apply Results To Element           
-            for i in range(len(childpoplist)):        
-                childpoplist[i].setObjs(objlist[i])
+        #### Apply Result To Element
+        mapdict={}
+        for index,iresult in enumerate(results):            
+            targetid=int(iresult["RunName"].split("_")[2])    
+            mapdict.update({targetid:index})    
+        processedpoplist=[]
+        for ind in poplist:        
+            resultindex=mapdict.get(ind.id)
+            if results[resultindex]["TaskStatus"]!="Success":
+                ind.done=False
+                continue
+            objarray,c_objarray,rawarray=self.convertResult(results[resultindex])
+            ind.setObjs(objarray)
+            ind.setRawObjs(rawarray)
             if self.constrained:
-                for i in range(len(childpoplist)):    
-                    childpoplist[i].setConstraint_objs(c_objlist[i])
+                ind.setConstraint_objs(c_objarray)
+            ind.done=True
+            processedpoplist.append(ind)
+            
+        poplist=processedpoplist
+        
+        for igen in range(self.generation): 
+            if igen>0:
+                ### CREATE CHILD POP
+                childpoplist = self.offspring_gen(poplist)      
+                #Run To Get the Children POP
+                for ind in childpoplist:
+                    JobName="GEN_%d_"%igen+str(ind.id)
+                    params=self.createParamDictFromNPvar(ind.value)
+                    self.manager.addTask(params=params,job_name=JobName)
+                ###
+                self.manager.startProcessing()
+                ### WAIT 
+                ### TIME For Processing And Results
 
-            ###DONE
-            poplist = poplist + childpoplist
-
-            # if len(poplist)<self.popsize: ###check for unfinished calcs and dup random results
-            #     self.logger.warning("Too Few Pop Results Calculated at gen:%d."%igen)
-            #     cnt2dup=self.popsize-len(poplist)
-            #     sampled=sample(poplist,cnt2dup)
-            #     duplist=[src.dup() for src in sampled]
-            #     poplist+=duplist
-
-
+                ### Get Results
+                results=self.manager.getFullResults()
+                #### Apply Results To Element
+                mapdict={}
+                for index,iresult in enumerate(results):            
+                    targetid=int(iresult["RunName"].split("_")[2])    
+                    mapdict.update({targetid:index})    
+                processedpoplist=[]
+                for ind in childpoplist:        
+                    resultindex=mapdict.get(ind.id)
+                    if results[resultindex]["TaskStatus"]!="Success":
+                        ind.done=False
+                        continue
+                    objarray,c_objarray,rawarray=self.convertResult(results[resultindex])
+                    ind.setObjs(objarray)
+                    ind.setRawObjs(rawarray)
+                    if self.constrained:
+                        ind.setConstraint_objs(c_objarray)
+                    ind.done=True
+                    processedpoplist.append(ind)
+                childpoplist=processedpoplist
+                ###DONE
+                poplist = poplist + childpoplist
+            
+            ### FNDS SORT             
             fndsresult = self.fnds(poplist)
-            #print("FNDS_SIZE",calc_fnds_size(fndsresult),"INPOP:",len(poplist))
             if len(fnds_callback)>0:
                 for ifnds in fnds_callback:
                     ifnds(igen, fndsresult)
             ###find accepted
             acceptedpop.clear()
-            pack = self.popsize  ###NEEDED TO 
-            
+            pack = self.popsize              
             for iset in fndsresult:
-
                 #print("PACK=%d" %pack)
                 if pack <= 0:
                     break
@@ -596,8 +606,7 @@ class myAlg_nsga(myAlg):
                 if pack >= len(iset):
                     for ind in iset:
                         acceptedpop.append(ind)
-                    pack -= len(iset)
-                    
+                    pack -= len(iset)                    
                 else:
                     curfront = list(iset)
                     self.crowding_dis_assign(curfront)
@@ -608,7 +617,10 @@ class myAlg_nsga(myAlg):
                     pack=0
                 #print("    ACC PROP SIZE:%d"%len(acceptedpop),"TO GO:%d" %pack)
             poplist.clear()
-            poplist += acceptedpop
+            poplist += acceptedpop        
+            
+
+
             print("GEN:%d DONE, SIZE:%d" % (igen,len(acceptedpop)))
             ### GEN DONE
         return poplist
@@ -686,40 +698,50 @@ class myAlg_nsga(myAlg):
             value=var[i]
             odict.update({key:value})
         return odict
-    def convertSortedResultsListToNumpyList(self,resultslist_sorted):
-        objlist=[]
-        c_objlist=[]
-        for iresult in resultslist_sorted:     
-            pResult=self.getTM020Result(iresult) 
-            #SAVE Full and TM020 Results
+    def convertResult(self,result):
+        pResult=self.getTM020Result(result) 
+        #SAVE Full and TM020 Results            
+        fp=open(self.manager.resultDir /(str(result["RunName"])+"_Result.json"),"w")
+        json.dump(result,fp,indent=4)
+        fp.close()
+        fp=open(self.manager.resultDir /(str(result["RunName"])+"_TM020Result.json"),"w")
+        json.dump(pResult,fp,indent=4)
+        fp.close()
+        # DONE
+        raw_obj_list=[]
+        c_iobj_list=[]
+        for oname in self.output_name:
+            raw_obj_list.append(pResult["PostProcessResult"][oname]) 
+        c_iobj_list.append(pResult["PostProcessResult"]["frequency"])
+
+        ### Optimization Func
+        # OUTPUT
+        # 0 Frequency
+        # 1 ROQ
+        # 2 Q
+        # 3 Shunt Impedence
+        # OBJETIVE
+        # MINIMUM abs|F_fm-F_obj|
+        # MINIMUM ROQ   +
+        # MAXIMUM Q     -
+        # MINIMUM Shunt Impedence   +
+        # CONSTRAINT OBJECTIVE
+        # abs|F_fm-F_obj|<0.05
+        # F_obj=1500Mhz
+        ####
+        
+        rawarray=np.array(raw_obj_list)
+        objarray=np.array(raw_obj_list)
+        
+        objarray[0]=abs(objarray[0]-1500)
+        objarray[1]=objarray[1]
+        objarray[2]=-objarray[2] # MAXIMUM Q
+        objarray[3]=objarray[3]
+        
+        cindarray=np.array(c_iobj_list) 
             
-            fp=open(self.manager.resultDir /(str(iresult["RunName"])+"_Result.json"),"w")
-            json.dump(iresult,fp,indent=4)
-            fp.close()
-            fp=open(self.manager.resultDir /(str(iresult["RunName"])+"_TM020Result.json"),"w")
-            json.dump(pResult,fp,indent=4)
-            fp.close()
-            # DONE
-            iobj_list=[]
-            c_iobj_list=[]
-            for oname in self.object_name:
-                iobj_list.append(pResult["PostProcessResult"][oname]) 
-            c_iobj_list.append(pResult["PostProcessResult"]["frequency"])
             
-                
-            ### Custom Func
-            # OBJETIVE
-            # MINIMUM ROQ
-            # MAXIMUM Q
-            # MAXIMUM Shunt Impedence
-            # CONSTRAINT OBJECTIVE
-            # abs|F_fm-F_obj|<0.05
-            ####
-            indarray=np.array(iobj_list)      
-            cindarray=np.array(c_iobj_list)      
-            objlist.append(indarray)
-            c_objlist.append(cindarray)
-        return objlist,c_objlist
+        return objarray,cindarray,rawarray
     def start2(self):
         
         # resultPath=self.manager.resultDir / "TestResult.json"
@@ -766,11 +788,12 @@ class myAlg_nsga(myAlg):
         start_time = time.time()
         sample = pd.DataFrame([self.input_min], columns=self.input_name)
         samples = pd.DataFrame()
-
+        namelist= self.getFullNameList()
+        
         seed(1037)
         resultDir=self.manager.resultDir
         icallback = fnds_callback_create_Image(savedir=resultDir)
-        icallback2 =fnds_callback_dump_individuals(savedir=resultDir,input_names=self.input_name,objnames=self.object_name,cobjnames=self.constrained_object_name,constrainted=self.constrained)
+        icallback2 =fnds_callback_dump_individuals(savedir=resultDir,namelist=namelist,constrainted=self.constrained)
         #self.nval = model.n
         min_realvar_raw, max_realvar_raw = self.input_min,self.input_max
         self.min_realvar, self.max_realvar =np.array(min_realvar_raw),np.array(max_realvar_raw)
@@ -790,46 +813,45 @@ class myAlg_nsga(myAlg):
 
 
         end_time = time.time()
-        print(start_time - end_time)
+        print(end_time- start_time)
         
         return 0
 
 class fnds_callback_dump_individuals():
-    def __init__(self,savedir="",input_names:List=[],objnames:List=[],cobjnames:List=[],constrainted=False) -> None:
+    def __init__(self,savedir="",namelist=[],constrainted=False) -> None:
         self.setNewSavedir(savedir)
         self.constrainted=constrainted
-        self.input_names=input_names
-        self.objnames=objnames
-        self.cobjnames=cobjnames
+        self.namelist=namelist
     def setNewSavedir(self,savedir):
         self.savedir=Path(savedir)
         if not self.savedir.exists():
             self.savedir.mkdir(parents=True)
     def __call__(self,igen,fndslist):
-        iprocess=multiprocessing.Process(target=dump_individual_worker_func,args=(self.savedir,igen,fndslist,self.input_names,self.objnames,self.cobjnames,self.constrainted))
+        iprocess=multiprocessing.Process(target=dump_individual_worker_func,args=(self.savedir,igen,fndslist,self.namelist,self.constrainted))
         iprocess.start()
         
-def dump_individual_worker_func(savedir:Path,igen,fndslist:List[List[nsgaii_var]],input_names:List,objnames:List,cobjnames:List,constrainted=False):
+def dump_individual_worker_func(savedir:Path,igen,fndslist:List[List[nsgaii_var]],namelist,constrainted=False):
     data_list_all=[]
-    data_row_list=[]
     prefix_name=["Generation","Index","Front Index"]
-    columnlist=prefix_name+input_names+objnames
-    if constrainted:
-        columnlist+=cobjnames
+    columnlist=prefix_name+namelist
         
-    print(columnlist)
-    
+
     for ifnd,fnd in enumerate(fndslist):
         if fnd is not None:
             for indv in fnd:
-                data_row_list.clear()
+                data_row_list=[]
                 data_row_list+=[igen,indv.id,ifnd]
                 data_row_list+=indv.value.tolist()
+                data_row_list+=indv.rawobj.tolist()
                 data_row_list+=indv.obj.tolist()
                 if constrainted:
                     data_row_list+=indv.constraint_obj.tolist()
                 data_list_all.append(data_row_list)
-
+    if len(data_row_list) >len(columnlist):
+        
+        columnlist+=(len(data_row_list)-len(columnlist))*['']
+    elif len(data_row_list) <len(columnlist):
+        columnlist=columnlist[:len(data_row_list)]
     csv=pd.DataFrame(data_list_all,columns=columnlist)
     fp=open(savedir /("GEN_%d_Individuals.csv"%igen),"w" )
     csv.to_csv(fp)
@@ -857,21 +879,21 @@ def image_worker_func(savedir,igen,fndslist:List[List[nsgaii_var]]):
     y2=[]
     if fndslist[0] is not None:
         for ind in fndslist[0]:
-            x0.append(ind.obj[0])
+            x0.append(ind.rawobj[0])
             y0.append(ind.obj[1])
         plt.scatter(x0,y0,c='none',marker='o', edgecolors='r')
     if fndslist[1] is not None:
         for ind in fndslist[1]:
-            x1.append(ind.obj[0])
+            x1.append(ind.rawobj[0])
             y1.append(ind.obj[1])
         plt.scatter(x1,y1,c='none',marker='o', edgecolors='orange')
     if fndslist[2] is not None:
         for ind in fndslist[2]:
-            x2.append(ind.obj[0])
+            x2.append(ind.rawobj[0])
             y2.append(ind.obj[1])      
         plt.scatter(x2,y2,c='none',marker='o', edgecolors='y')
 
-    plt.xlabel('abs(freq-1500)')
+    plt.xlabel('freq')
     plt.ylabel('roq')
     #plt.axis('scaled')
     plt.savefig(savedir / ('GEN_%05d_Front.png' %igen), bbox_inches='tight')
