@@ -348,7 +348,51 @@ class myAlg_nsga(myAlg):
         v = v * barray + np.array(ind.value)*np.logical_not(barray) ### BUGFIX
         v=np.clip(v,self.min_realvar,self.max_realvar) ###boundary check
         ind.value = v
+        
+    def mutation_real_np_freqlock(self,ind: nsgaii_var):
+        ####
+        #Dom Req main factor of Freq
+        ####
+        domfactorindex=self.input_name.index("Req")
+        
+        rnd = np.random.random(self.nval)
+        
+        barray = np.less(rnd, self.pmut_real)
+        mask=np.ones_like(barray)
+        mask[domfactorindex]=0
+        barray=barray*mask
+        ### NO auto mutation for Dom Req main factor
+        
+        
+        rnd2 = np.random.random(self.nval)
+        barray2 = np.less_equal(rnd2, 0.5)
+        nbarray2 = np.logical_not(barray2)
+        v = np.array(ind.value)
+        vl = np.array(self.min_realvar)
+        vu = np.array(self.max_realvar)
+        delta1 = (v - vl) / (vu - vl)
+        delta2 = (vu - v) / (vu - vl)
+        mut_pow = 1.0 / (self.eta_m + 1.0)
 
+        ##rnd2<=0.5
+        xy1 = (1.0 - delta1)*barray2
+        val1 = 2.0 * rnd2 + (1.0 - 2.0 * rnd2) * xy1 **(self.eta_m + 1.0)
+        deltaq1 = val1** mut_pow - 1.0
+
+        xy2 = (1.0 - delta2)*nbarray2
+        val2 = 2.0 * (1.0 - rnd2) + 2.0 * (rnd2 - 0.5) * xy2** (self.eta_m + 1.0)
+        deltaq2 = 1.0 - val2** mut_pow
+
+        v = v + (deltaq1 * barray2 + deltaq2 * nbarray2) * (vu - vl)
+        np.clip(v, vl, vu, v)
+        v = v * barray + np.array(ind.value)*np.logical_not(barray) ### BUGFIX
+        
+        ###Manual mutation for domfactor
+        ## TODO 
+        
+        v=np.clip(v,self.min_realvar,self.max_realvar) ###boundary check
+        ind.value = v
+        
 
     def tournament(self,ind1: nsgaii_var, ind2: nsgaii_var):
         if ind1.crowed_cmp_lt(ind2):
@@ -527,7 +571,9 @@ class myAlg_nsga(myAlg):
         self.manager.startProcessing()
         ### WAIT 
         ### TIME For Processing And Results
-
+        # if self.constrained:
+        #       ind.constraint_violaton_value=self.constraint_func(ind.constrained_obj,ind.iobj)
+        #     self.constrained_dominance(poplist)
         ### Get Results
         results=self.manager.getFullResults()
         #### Apply Result To Element
@@ -546,6 +592,7 @@ class myAlg_nsga(myAlg):
             ind.setRawObjs(rawarray)
             if self.constrained:
                 ind.setConstraint_objs(c_objarray)
+                ind.constraint_violaton_value=self.constraint_func(ind.constrained_obj,ind.iobj)
             ind.done=True
             processedpoplist.append(ind)
             
@@ -583,6 +630,7 @@ class myAlg_nsga(myAlg):
                     ind.setRawObjs(rawarray)
                     if self.constrained:
                         ind.setConstraint_objs(c_objarray)
+                        ind.constraint_violaton_value=self.constraint_func(ind.constrained_obj,ind.iobj)
                     ind.done=True
                     processedpoplist.append(ind)
                 childpoplist=processedpoplist
@@ -834,7 +882,8 @@ def dump_individual_worker_func(savedir:Path,igen,fndslist:List[List[nsgaii_var]
     data_list_all=[]
     prefix_name=["Generation","Index","Front Index"]
     columnlist=prefix_name+namelist
-        
+    if constrainted:
+        columnlist+=["constraint_value"]
 
     for ifnd,fnd in enumerate(fndslist):
         if fnd is not None:
@@ -846,6 +895,7 @@ def dump_individual_worker_func(savedir:Path,igen,fndslist:List[List[nsgaii_var]
                 data_row_list+=indv.obj.tolist()
                 if constrainted:
                     data_row_list+=indv.constraint_obj.tolist()
+                    data_row_list+=[indv.constraint_violaton_value]
                 data_list_all.append(data_row_list)
     if len(data_row_list) >len(columnlist):
         
