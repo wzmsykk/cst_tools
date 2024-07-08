@@ -39,7 +39,7 @@ class nsgaii_var:
         self.n = 0
         self.crowed_dis = 0
         self.crowed_dis_calc_done = False
-        self.constraint_obj=None
+        self.constrainted_obj=None
         self.constraint_violaton_value=0
         self.id = nsgaii_var._getNewAvailableId()
     
@@ -61,8 +61,8 @@ class nsgaii_var:
         self.rawobj=np.array(rawobjective)
     def setObjs(self, objective):
         self.obj = np.array(objective)
-    def setConstraint_objs(self, c_objective):
-        self.constraint_obj = np.array(c_objective)
+    def setConstrainted_objs(self, c_objective):
+        self.constrainted_obj = np.array(c_objective)
     def dom(self, other):
         ### FIND MINIMUM
         tarray = np.less(self.obj,other.obj)
@@ -71,7 +71,7 @@ class nsgaii_var:
             return True  ### A N Domi B
         else:
             return False
-    def constrained_dom(self,other):
+    def constrainted_dom(self,other):
         if self.constraint_violaton_value==0 and other.constraint_violaton_value>0:
             return True
         elif self.constraint_violaton_value>0 and other.constraint_violaton_value==0:
@@ -122,11 +122,11 @@ class nsgaii_var:
     def __hash__(self):
         return hash(self.id)
     
-def constraint_function_TM020(iconstrained_obj,iobj):
-    ###iconstrained_obj: Frequency
+def constraint_function_TM020(iconstrainted_obj,iobj):
+    ###iconstrainted_obj: Frequency
     ### abs(Frequency-1500)<threshold
     threshold=0.05
-    constraint_violaton_value=abs(1500-iconstrained_obj[0]) 
+    constraint_violaton_value=abs(1500-iconstrainted_obj[0]) 
     if constraint_violaton_value<threshold:
         constraint_violaton_value=0
     return constraint_violaton_value
@@ -179,8 +179,8 @@ class myAlg_nsga(myAlg):
         self.min_realvar = []
         self.max_realvar = []
         
-        self.constrained=True
-        if self.constrained:
+        self.constrainted=True
+        if self.constrainted:
             self.constraint_func=constraint_function_TM020
         else:
             self.constraint_func=None
@@ -191,7 +191,7 @@ class myAlg_nsga(myAlg):
         self.input_min = [60, 180,5,5,5]  ##初始值
         self.input_max = [120, 200,20,20,20]  ##初始值
 
-        self.constrained_object_name = ["frequency"]
+        self.constrainted_object_name = ["frequency"]
         self.object_name = [
             "frequency_offset", 
             "R_divide_Q",
@@ -209,25 +209,25 @@ class myAlg_nsga(myAlg):
     def getFullNameList(self):
         namelist=[]
         namelist=namelist+self.input_name+self.output_name+self.object_name
-        if self.constrained:
-            namelist+=self.constrained_object_name
+        if self.constrainted:
+            namelist+=self.constrainted_object_name
         return namelist
         
     def param_check(self):
         #assert self.nobj==len(self.min_realvar)
         #assert self.nobj==len(self.max_realvar)
-        if self.constrained==True:
+        if self.constrainted==True:
             assert self.constraint_func is not None
 
-    def constrained_dominance(self,flist: List[nsgaii_var]):
+    def constrainted_dominance(self,flist: List[nsgaii_var]):
         if len(flist) == 0:
             return
         if self.constraint_func is None:
             return
         for ivar in flist:
             iobj=ivar.obj
-            iconstrained_obj=ivar.constrained_obj
-            ivar.constraint_violaton_value=self.constraint_func(iconstrained_obj,iobj)
+            iconstrainted_obj=ivar.constrainted_obj
+            ivar.constraint_violaton_value=self.constraint_func(iconstrainted_obj,iobj)
             
     def fnds(self,vallist: List[nsgaii_var]):  ## Fast non dominated sort
 
@@ -239,15 +239,15 @@ class myAlg_nsga(myAlg):
                 if p.id == q.id:
                     continue
 
-                if not self.constrained:  ####Type 1 支配排序
+                if not self.constrainted:  ####Type 1 支配排序
                     if p.dom(q):
                         p.pset.add(q)  ### I DOM YOU
                     elif q.dom(p):
                         p.n += 1  ## Be Domed count
                 else:
-                    if p.constrained_dom(q):
+                    if p.constrainted_dom(q):
                         p.pset.add(q)  ### I DOM YOU
-                    elif q.constrained_dom(p):
+                    elif q.constrainted_dom(p):
                         p.n += 1  ## Be Domed count
 
             if p.n == 0:  ## not domed By Anyone
@@ -493,8 +493,8 @@ class myAlg_nsga(myAlg):
             ###DONE
             poplist = poplist + childpoplist
 
-            if self.constrained:
-                self.constrained_dominance(poplist)
+            if self.constrainted:
+                self.constrainted_dominance(poplist)
 
             fndsresult = self.fnds(poplist)
             #print("FNDS_SIZE",calc_fnds_size(fndsresult),"INPOP:",len(poplist))
@@ -571,9 +571,9 @@ class myAlg_nsga(myAlg):
         self.manager.startProcessing()
         ### WAIT 
         ### TIME For Processing And Results
-        # if self.constrained:
-        #       ind.constraint_violaton_value=self.constraint_func(ind.constrained_obj,ind.iobj)
-        #     self.constrained_dominance(poplist)
+        # if self.constrainted:
+        #       ind.constraint_violaton_value=self.constraint_func(ind.constrainted_obj,ind.iobj)
+        #     self.constrainted_dominance(poplist)
         ### Get Results
         results=self.manager.getFullResults()
         #### Apply Result To Element
@@ -590,9 +590,9 @@ class myAlg_nsga(myAlg):
             objarray,c_objarray,rawarray=self.convertResult(results[resultindex])
             ind.setObjs(objarray)
             ind.setRawObjs(rawarray)
-            if self.constrained:
-                ind.setConstraint_objs(c_objarray)
-                ind.constraint_violaton_value=self.constraint_func(ind.constrained_obj,ind.iobj)
+            if self.constrainted:
+                ind.setConstrainted_objs(c_objarray)
+                ind.constraint_violaton_value=self.constraint_func(ind.constrainted_obj,ind.iobj)
             ind.done=True
             processedpoplist.append(ind)
             
@@ -628,9 +628,9 @@ class myAlg_nsga(myAlg):
                     objarray,c_objarray,rawarray=self.convertResult(results[resultindex])
                     ind.setObjs(objarray)
                     ind.setRawObjs(rawarray)
-                    if self.constrained:
-                        ind.setConstraint_objs(c_objarray)
-                        ind.constraint_violaton_value=self.constraint_func(ind.constrained_obj,ind.iobj)
+                    if self.constrainted:
+                        ind.setConstrainted_objs(c_objarray)
+                        ind.constraint_violaton_value=self.constraint_func(ind.constrainted_obj,ind.iobj)
                     ind.done=True
                     processedpoplist.append(ind)
                 childpoplist=processedpoplist
@@ -841,7 +841,7 @@ class myAlg_nsga(myAlg):
         seed(1037)
         resultDir=self.manager.resultDir
         icallback = fnds_callback_create_Image(savedir=resultDir)
-        icallback2 =fnds_callback_dump_individuals(savedir=resultDir,namelist=namelist,constrainted=self.constrained)
+        icallback2 =fnds_callback_dump_individuals(savedir=resultDir,namelist=namelist,constrainted=self.constrainted)
         #self.nval = model.n
         min_realvar_raw, max_realvar_raw = self.input_min,self.input_max
         self.min_realvar, self.max_realvar =np.array(min_realvar_raw),np.array(max_realvar_raw)
@@ -894,7 +894,7 @@ def dump_individual_worker_func(savedir:Path,igen,fndslist:List[List[nsgaii_var]
                 data_row_list+=indv.rawobj.tolist()
                 data_row_list+=indv.obj.tolist()
                 if constrainted:
-                    data_row_list+=indv.constraint_obj.tolist()
+                    data_row_list+=indv.constrainted_obj.tolist()
                     data_row_list+=[indv.constraint_violaton_value]
                 data_list_all.append(data_row_list)
     if len(data_row_list) >len(columnlist):
