@@ -168,8 +168,8 @@ class myAlg_nsga(myAlg):
         self.nval = 5
         self.pmut_real = 0.1
         self.eta_m = 1  ## coff for mutation
-        self.popsize = 4
-        self.generation = 2
+        self.popsize = 100
+        self.generation = 10
         
 
         self.min_realvar = []
@@ -356,7 +356,7 @@ class myAlg_nsga(myAlg):
         ####
         try:
             domfactorindex=self.input_name.index("Req")
-            targetexist=True
+            domfactorexist=True
         except ValueError:
             domfactorexist=False
         try:
@@ -364,8 +364,6 @@ class myAlg_nsga(myAlg):
             targetexist=True
         except ValueError:    
             targetexist=False
-        targetfreq=1500
-        threshold=0.05
         
         rnd = np.random.random(self.nval)
         
