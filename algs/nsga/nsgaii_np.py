@@ -177,7 +177,7 @@ class nsgaii():
         while len(flist[i]) > 0:
             #print([str(p.n) for p in vallist])
 
-            q_set = list()
+            q_set = set()
             for p in flist[i]:
 
                 for q in p.pset:

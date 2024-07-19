@@ -72,10 +72,6 @@ class nsgaii_var:
         else:
             return False
     def constrainted_dom(self,other):
-        if self.constraint_violaton_value==0 and other.constraint_violaton_value>0:
-            return True
-        elif self.constraint_violaton_value>0 and other.constraint_violaton_value==0:
-            return False
         if self.constraint_violaton_value<other.constraint_violaton_value:
             return True
         elif self.constraint_violaton_value>other.constraint_violaton_value:
@@ -172,8 +168,8 @@ class myAlg_nsga(myAlg):
         self.nval = 5
         self.pmut_real = 0.1
         self.eta_m = 1  ## coff for mutation
-        self.popsize = 100
-        self.generation = 20
+        self.popsize = 4
+        self.generation = 2
         
 
         self.min_realvar = []
@@ -251,7 +247,7 @@ class myAlg_nsga(myAlg):
                         p.n += 1  ## Be Domed count
 
             if p.n == 0:  ## not domed By Anyone
-                p.rank = 1  ### first front
+                p.rank = 0  ### first front
                 flist[0].append(p)
 
         #### Sort
@@ -259,18 +255,18 @@ class myAlg_nsga(myAlg):
 
         while len(flist[i]) > 0:
             #print([str(p.n) for p in vallist])
-
-            q_set = list()
+            q_set = set()
             for p in flist[i]:
 
                 for q in p.pset:
                     q.n -= 1  ### 除p外q仍被支配的个数
                     if q.n == 0:  ### not domed By Anyone Except P
                         q.rank = i + 1
-                        q_set.append(q)
+                        q_set.add(q)
 
             i += 1
-
+            if i>=len(flist):
+                break
             flist[i] = list(q_set)
 
         return flist
@@ -592,7 +588,7 @@ class myAlg_nsga(myAlg):
             ind.setRawObjs(rawarray)
             if self.constrainted:
                 ind.setConstrainted_objs(c_objarray)
-                ind.constraint_violaton_value=self.constraint_func(ind.constrainted_obj,ind.iobj)
+                ind.constraint_violaton_value=self.constraint_func(ind.constrainted_obj,ind.obj)
             ind.done=True
             processedpoplist.append(ind)
             
@@ -630,7 +626,7 @@ class myAlg_nsga(myAlg):
                     ind.setRawObjs(rawarray)
                     if self.constrainted:
                         ind.setConstrainted_objs(c_objarray)
-                        ind.constraint_violaton_value=self.constraint_func(ind.constrainted_obj,ind.iobj)
+                        ind.constraint_violaton_value=self.constraint_func(ind.constrainted_obj,ind.obj)
                     ind.done=True
                     processedpoplist.append(ind)
                 childpoplist=processedpoplist
@@ -870,13 +866,31 @@ class fnds_callback_dump_individuals():
         self.setNewSavedir(savedir)
         self.constrainted=constrainted
         self.namelist=namelist
+        self.relation=True
     def setNewSavedir(self,savedir):
         self.savedir=Path(savedir)
         if not self.savedir.exists():
             self.savedir.mkdir(parents=True)
     def __call__(self,igen,fndslist):
+        
         iprocess=multiprocessing.Process(target=dump_individual_worker_func,args=(self.savedir,igen,fndslist,self.namelist,self.constrainted))
         iprocess.start()
+        fp=open(self.savedir /("GEN_%d_Relations.json"%igen),"w" )
+        d={}
+        if self.relation:
+            for ifnd,fnd in enumerate(fndslist):
+                print(ifnd,fnd)
+                if fnd is not None:
+                    for indv in fnd:
+                        u={indv.id:{"id":indv.id,"rank":indv.rank,
+                        "pset":[i.id for i in indv.pset],
+                        "value":indv.value.tolist()
+                        }}
+                        d.update(u)                                                           
+                                 
+                            
+        json.dump(d,fp,indent=4)                
+        fp.close()
         
 def dump_individual_worker_func(savedir:Path,igen,fndslist:List[List[nsgaii_var]],namelist,constrainted=False):
     data_list_all=[]
@@ -906,6 +920,7 @@ def dump_individual_worker_func(savedir:Path,igen,fndslist:List[List[nsgaii_var]
     fp=open(savedir /("GEN_%d_Individuals.csv"%igen),"w" )
     csv.to_csv(fp)
     fp.close()
+
     return 
     
 class fnds_callback_create_Image():
