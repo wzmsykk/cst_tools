@@ -175,6 +175,11 @@ class myAlg_nsga(myAlg):
         self.min_realvar = []
         self.max_realvar = []
         
+        ##### Freq Options
+        self.targetfreq=1500
+        self.freqthreshold=0.05
+        self.freqlockmut=True
+        
         self.constrainted=True
         if self.constrainted:
             self.constraint_func=constraint_function_TM020
@@ -349,7 +354,18 @@ class myAlg_nsga(myAlg):
         ####
         #Dom Req main factor of Freq
         ####
-        domfactorindex=self.input_name.index("Req")
+        try:
+            domfactorindex=self.input_name.index("Req")
+            targetexist=True
+        except ValueError:
+            domfactorexist=False
+        try:
+            targetvalueindex=self.object_name.index("frequency")
+            targetexist=True
+        except ValueError:    
+            targetexist=False
+        targetfreq=1500
+        threshold=0.05
         
         rnd = np.random.random(self.nval)
         
@@ -385,6 +401,13 @@ class myAlg_nsga(myAlg):
         
         ###Manual mutation for domfactor
         ## TODO 
+        if domfactorexist and targetexist:
+            domfv=np.array(ind.value)[domfactorindex]
+            tgtv=np.array(ind.rawobj)[targetvalueindex]
+            freqdiff=tgtv-self.targetfreq
+            if abs(freqdiff)>self.freqthreshold:
+                newdomfv=(domfv-self.targetfreq)/2.5525+domfv
+            v[domfactorindex]=newdomfv
         
         v=np.clip(v,self.min_realvar,self.max_realvar) ###boundary check
         ind.value = v
@@ -437,7 +460,10 @@ class myAlg_nsga(myAlg):
         ### MUTATION
 
         for child in offspop:
-            self.mutation_real_np(child)
+            if self.freqlockmut:
+                self.mutation_real_np_freqlock(child)
+            else:
+                self.mutation_real_np(child)
         #print("offspring pop",len(offspop))
         return offspop
 
