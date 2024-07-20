@@ -787,19 +787,27 @@ class myAlg_nsga(myAlg):
         face1_Max_e=pResult["PostProcessResult"]["face1_Max_e"]
         face1_Max_h=pResult["PostProcessResult"]["face1_Max_h"]
         Ra=pResult["PostProcessResult"]["Shunt Impedance (Pertubation) beta=1 (Mode 1)"]
-        beta=2e6/Voltage
-        Epk=beta*face1_Max_e*1e-6
-        Hpk=beta*face1_Max_h*1e-6
-        midinfo=[beta,Epk,Hpk]
-        rawarray=np.array(raw_obj_list+midinfo)
-        objarray=[freq,Epk,Ra]
-        
-        objarray[0]=abs(objarray[0]-self.targetfreq)
-        objarray[1]=objarray[1]  # MINIMUM Epk
-        objarray[2]=-objarray[2] # MAXIMUM Shunt-dep
-        objarray=np.array(objarray)
-        cindarray=np.array(c_iobj_list) 
-            
+        if Voltage is not None:
+            beta=2e6/Voltage
+            Epk=beta*face1_Max_e*1e-6
+            Hpk=beta*face1_Max_h*1e-6
+            midinfo=[beta,Epk,Hpk]
+            rawarray=np.array(raw_obj_list+midinfo)
+            objarray=[freq,Epk,Ra]            
+            objarray[0]=abs(objarray[0]-self.targetfreq)
+            objarray[1]=objarray[1]  # MINIMUM Epk
+            objarray[2]=-objarray[2] # MAXIMUM Shunt-dep
+            objarray=np.array(objarray)
+            cindarray=np.array(c_iobj_list) 
+        else:##BAD CALCULATION
+            print("WARNING:CST MISCALCULATON AT JOB %s"%result["RunName"])
+            beta=0
+            Epk=99999
+            Hpk=99999
+            Ra=0
+            midinfo=[beta,Epk,Hpk]
+            rawarray=np.array(raw_obj_list+midinfo)
+            objarray=[99999,Epk,Ra]
             
         return objarray,cindarray,rawarray
     def start2(self):
