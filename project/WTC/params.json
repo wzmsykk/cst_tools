@@ -1,0 +1,170 @@
+[
+    {
+        "id": 0,
+        "name": "C0",
+        "value": "Rx",
+        "type": "expression",
+        "fixed": true,
+        "description": ""
+    },
+    {
+        "id": 1,
+        "name": "C1",
+        "value": "1000",
+        "type": "double",
+        "fixed": false,
+        "description": ""
+    },
+    {
+        "id": 2,
+        "name": "C2",
+        "value": "200",
+        "type": "double",
+        "fixed": false,
+        "description": ""
+    },
+    {
+        "id": 3,
+        "name": "C3",
+        "value": "20",
+        "type": "double",
+        "fixed": false,
+        "description": ""
+    },
+    {
+        "id": 4,
+        "name": "C4",
+        "value": "25",
+        "type": "double",
+        "fixed": false,
+        "description": ""
+    },
+    {
+        "id": 5,
+        "name": "C5",
+        "value": "300",
+        "type": "double",
+        "fixed": false,
+        "description": ""
+    },
+    {
+        "id": 6,
+        "name": "L",
+        "value": "1800",
+        "type": "double",
+        "fixed": false,
+        "description": ""
+    },
+    {
+        "id": 7,
+        "name": "Ltube",
+        "value": "500",
+        "type": "double",
+        "fixed": false,
+        "description": ""
+    },
+    {
+        "id": 8,
+        "name": "Rx",
+        "value": "3600/2",
+        "type": "expression",
+        "fixed": true,
+        "description": ""
+    },
+    {
+        "id": 9,
+        "name": "Ry",
+        "value": "6205/2",
+        "type": "expression",
+        "fixed": true,
+        "description": ""
+    },
+    {
+        "id": 10,
+        "name": "a",
+        "value": "550",
+        "type": "double",
+        "fixed": false,
+        "description": ""
+    },
+    {
+        "id": 11,
+        "name": "angle",
+        "value": "0",
+        "type": "double",
+        "fixed": false,
+        "description": ""
+    },
+    {
+        "id": 12,
+        "name": "d0",
+        "value": "50",
+        "type": "double",
+        "fixed": false,
+        "description": ""
+    },
+    {
+        "id": 13,
+        "name": "d00",
+        "value": "d0",
+        "type": "expression",
+        "fixed": true,
+        "description": ""
+    },
+    {
+        "id": 14,
+        "name": "d1",
+        "value": "Rx-gx0-C1-a",
+        "type": "expression",
+        "fixed": true,
+        "description": ""
+    },
+    {
+        "id": 15,
+        "name": "d11",
+        "value": "Ry-gy0-C1-a",
+        "type": "expression",
+        "fixed": true,
+        "description": ""
+    },
+    {
+        "id": 16,
+        "name": "g",
+        "value": "300",
+        "type": "double",
+        "fixed": false,
+        "description": ""
+    },
+    {
+        "id": 17,
+        "name": "gx0",
+        "value": "75",
+        "type": "double",
+        "fixed": false,
+        "description": ""
+    },
+    {
+        "id": 18,
+        "name": "gy0",
+        "value": "1000",
+        "type": "double",
+        "fixed": false,
+        "description": ""
+    },
+    {
+        "id": 19,
+        "name": "nmodes",
+        "value": "1",
+        "type": "double",
+        "fixed": false,
+        "description": ""
+    },
+    {
+        "id": 20,
+        "name": "offset",
+        "value": "0",
+        "type": "double",
+        "fixed": false,
+        "description": ""
+    }
+]

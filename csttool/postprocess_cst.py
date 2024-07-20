@@ -7,6 +7,7 @@ class vbpostprocess:
     def __init__(self) -> None:
 
         self.resultDir = None
+        self.cstRunResultDir= None
         self.postProcessDataDir = resource_path("data/postprocess")
         self.postProcessDocList = list()
         self.postProcessID = 0
@@ -16,6 +17,8 @@ class vbpostprocess:
     def setResultDir(self, rDir):
         self.resultDir = Path(rDir)
 
+    def setCSTRunResultDir(self, rDir):
+        self.cstRunResultDir= Path(rDir)
     def reset(self):
         self.resultDir = None
         self.postProcessDocList.clear()
@@ -88,6 +91,8 @@ class vbpostprocess:
                 self.Frequency_All(doc["resultName"])
             elif doc["method"] == "ModeRec_All":
                 self.Mode_Rec(doc["resultName"])
+            elif doc["method"] == "Direct_PPS_0D":
+                self.Direct_PPS_0D(doc["resultName"])
 
     def getUsedFileNameList(self):
         namelist = list()
@@ -111,7 +116,8 @@ class vbpostprocess:
         importFileList = []
         for doc in self.postProcessDocList:
             importFile = doc["import"]
-            importFileList.append(importFile)
+            if importFile:
+                importFileList.append(importFile)
         importFileSet = set(importFileList)
         for vbheaderfileName in importFileSet:
             importFilePath = self.postProcessDataDir / vbheaderfileName
@@ -122,8 +128,9 @@ class vbpostprocess:
             fp.close()
         lst.append("\nSub CustomPostProcess\n")
         for doc in self.postProcessDocList:
-            funcString = "    " + doc["funcString"]
-            lst.append(funcString)
+            if doc.get("funcString",None):
+                funcString = "    " + doc["funcString"]
+                lst.append(funcString)
         lst.append("End Sub\n")
         return lst
 
@@ -743,7 +750,33 @@ class vbpostprocess:
     def Mode_Rec_readout(self, resultFilename):
         mode_result=allModesResult(self.resultDir)
         return mode_result
-
+    def Direct_PPS_0D(self,resultName):
+        paramdoc = {}
+        doc = dict()
+        doc.update({"id": self.postProcessID})
+        doc.update({"import": None})
+        doc.update({"resultName": resultName})
+        doc.update({"resultFilename": resultName})
+        doc.update({"funcString": None})
+        doc.update({"readoutmethod": self.Direct_PPS_0D_readout})
+        doc.update({"params": paramdoc})
+        self.postProcessDocList.append(doc)
+        self.postProcessID += 1
+    def Direct_PPS_0D_readout(self,resultName):
+        rpath = self.cstRunResultDir / "Result" / (resultName+".rd0")
+        value = self.cst0dreadout(rpath)
+        return value
+    def cst0dreadout(self,path):
+        ipath = Path(path)
+        if not ipath.exists():
+            return None
+        fp = open(ipath, "r")
+        lines = fp.readlines()
+        if len(lines)>0:
+            value=float(lines[0])
+        else:
+            return None
+        return value
 
 if __name__ == "__main__":
     vbp = vbpostprocess()

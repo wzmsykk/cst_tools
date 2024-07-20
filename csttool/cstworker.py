@@ -193,7 +193,9 @@ class local_cstworker(worker.worker):
         if self.cstStatus == "off":
             raise BaseException
         pathc = self.resultDir / self.runName
+        cstpathc=pathc / self.cstType
         self.postProcessHelper.setResultDir(pathc.absolute())
+        self.postProcessHelper.setCSTRunResultDir(cstpathc.absolute())
         # WAIT RESULTS
         flagPath = self.taskFileDir / (str(self.taskIndex) + ".success")
         if flagPath.exists():
