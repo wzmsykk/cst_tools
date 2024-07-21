@@ -804,10 +804,11 @@ class myAlg_nsga(myAlg):
             beta=0
             Epk=99999
             Hpk=99999
-            Ra=0
+            Ra=-99999
             midinfo=[beta,Epk,Hpk]
             rawarray=np.array(raw_obj_list+midinfo)
             objarray=[99999,Epk,Ra]
+            cindarray=np.array([99999+self.targetfreq]) 
             
         return objarray,cindarray,rawarray
     def start2(self):
