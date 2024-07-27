@@ -518,7 +518,7 @@ class ProjectConfmanager(object):
             self.conf = self.__autoPreProcess(self.conf, cstfilepath)
             # self.readParametersFromCST()
             # self.conf["CST"]["CSTFileMD5"] = currCSTMD5
-            self.__savecfgobj()
+            self.__savecfgobj(self.conf)
             self.logger.warning("已更新保存的MD5")
             self.logger.info("测试MD5 通过")
         elif not paramjsonpath.exists():

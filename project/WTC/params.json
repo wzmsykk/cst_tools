@@ -10,9 +10,9 @@
     {
         "id": 1,
         "name": "C1",
-        "value": "1000",
-        "type": "double",
-        "fixed": false,
+        "value": "L/2",
+        "type": "expression",
+        "fixed": true,
         "description": ""
     },
     {

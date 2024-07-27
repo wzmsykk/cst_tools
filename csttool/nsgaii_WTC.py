@@ -369,8 +369,8 @@ class myAlg_nsga(myAlg):
 
         val1=np.clip(val1,self.min_realvar,self.max_realvar)
         val2=np.clip(val2,self.min_realvar,self.max_realvar)
-        child1 = nsgaii_var(val1)
-        child2 = nsgaii_var(val2)
+        child1 = self.new_nsgaii_var(val1)
+        child2 = self.new_nsgaii_var(val2)
         return child1, child2
 
 
@@ -607,9 +607,9 @@ class myAlg_nsga(myAlg):
         newnsga=nsgaii_var(optvalue)
         if self.require_sim_input_transfrom:
             simvalue=self.sim_input_conv_method(optvalue)
-            newnsga.setSimValue=simvalue
+            newnsga.setSimValue(simvalue)
         else:
-            newnsga.setSimValue=newnsga.value
+            newnsga.setSimValue(newnsga.value)
         return newnsga
     def nsgaii_generation_parallel(self,fnds_callback=None):  ##
         self.param_check()
@@ -828,7 +828,7 @@ class myAlg_nsga(myAlg):
         face1_Max_e=pResult["PostProcessResult"]["face1_Max_e"]
         face1_Max_h=pResult["PostProcessResult"]["face1_Max_h"]
         Ra=pResult["PostProcessResult"]["Shunt Impedance (Pertubation) beta=1 (Mode 1)"]
-        if Voltage is not None:
+        if (Voltage is not None) and (face1_Max_e is not None):
             beta=2e6/Voltage
             Epk=beta*face1_Max_e*1e-6
             Hpk=beta*face1_Max_h*1e-6
@@ -967,7 +967,7 @@ def dump_individual_worker_func(savedir:Path,igen,fndslist:List[List[nsgaii_var]
                 data_row_list+=[igen,indv.id,ifnd]
                 data_row_list+=indv.value.tolist()
                 if require_transform:
-                    data_row_list+=indv.simvalue.tolist
+                    data_row_list+=indv.simvalue.tolist()
                 data_row_list+=indv.rawobj.tolist()
                 data_row_list+=indv.obj.tolist()
                 if constrainted:
