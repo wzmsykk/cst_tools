@@ -27,10 +27,11 @@ class nsgaii_var:
     idlock=threading.Lock()
     def __init__(self, value) -> None:
         
-        self.value = np.array(value)
+        self.value = np.array(value) ###For optim
+        self.simvalue = None ###all implicit and explicit varaiables for simulation generated from self.value
         self.rank = 0
-        self.rawobj = None #Save simulation result for record
-        self.obj = None     #Save Objective transformed for minimum search 
+        self.rawobj = None #Save all mid and final values for record (self.output+self.mid)
+        self.obj = None     #Save Objective transformed for minimum search (self.obj)
         self.pset: Set[
             nsgaii_var
         ] = set()  ### set of var domed by p ### By Ref so it might be memory safe
@@ -63,6 +64,8 @@ class nsgaii_var:
         self.obj = np.array(objective)
     def setConstrainted_objs(self, c_objective):
         self.constrainted_obj = np.array(c_objective)
+    def setSimValue(self,simvalue):
+        self.simvalue=np.array(simvalue)
     def dom(self, other):
         ### FIND MINIMUM
         tarray = np.less(self.obj,other.obj)
@@ -118,14 +121,7 @@ class nsgaii_var:
     def __hash__(self):
         return hash(self.id)
     
-def constraint_function_TM020(iconstrainted_obj,iobj):
-    ###iconstrainted_obj: Frequency
-    ### abs(Frequency-1500)<threshold
-    threshold=0.05
-    constraint_violaton_value=abs(1500-iconstrainted_obj[0]) 
-    if constraint_violaton_value<threshold:
-        constraint_violaton_value=0
-    return constraint_violaton_value
+
 
 class myAlg_nsga(myAlg):
     def __init__(self, manager: cstmanager.manager = None, params=None):
@@ -175,14 +171,10 @@ class myAlg_nsga(myAlg):
         self.min_realvar = []
         self.max_realvar = []
         
-        ##### Freq Options
-        self.targetfreq=1500
-        self.freqthreshold=0.05
-        self.freqlockmut=True
         
         self.constrainted=True
         if self.constrainted:
-            self.constraint_func=constraint_function_TM020
+            self.constraint_func=self.constraint_function_TM020
         else:
             self.constraint_func=None
         
@@ -192,24 +184,58 @@ class myAlg_nsga(myAlg):
         self.input_min = [60, 180,5,5,5]  ##初始值
         self.input_max = [120, 200,20,20,20]  ##初始值
 
-        self.constrainted_object_name = ["frequency"]
-        self.object_name = [
-            "frequency_offset", 
-            "R_divide_Q",
-            "Q-factor",
-            "Shunt_Inpedence",
-        ]
+        self.require_sim_input_transfrom=False   #### IF TRUE disables input_mins and use values below instead
+        self.sim_input_conv_method=self.simtransfromfunc
+        self.opt_input_name=["Leq", "Req","I0","R0","I1"]
+        self.opt_input_min = [60, 180,5,5,5]  ##初始值 for opt
+        self.opt_input_max = [120, 200,20,20,20]  ##初始值
         self.output_name = [
             "frequency",
             "R_divide_Q",
             "Q-factor",
             "Shunt_Inpedence",
         ]
+        self.info_name=[]
+        self.object_name = [
+            "frequency_offset", 
+            "R_divide_Q",
+            "Q-factor",
+            "Shunt_Inpedence",
+        ]
+        self.constrainted_object_name = ["frequency"]
+        ##### Freq Options
+        self.targetfreq=1500
+        self.freqthreshold=0.05
+        self.freqlockmut=True
+        self.freqstr="frequency"
+        self.freqdomstr="Req"
         
+        #### SET RANGE
+        if self.require_sim_input_transfrom:
+            min_realvar_raw, max_realvar_raw =self.opt_input_min,self.opt_input_max
+        else:
+            min_realvar_raw, max_realvar_raw = self.input_min,self.input_max
+        self.min_realvar, self.max_realvar =np.array(min_realvar_raw),np.array(max_realvar_raw)
+
+    def simtransfromfunc(self,altinput):
+        
+        oarr=np.array(altinput)
+        return oarr
+    def constraint_function_TM020(self,iconstrainted_obj,iobj):
+        ###iconstrainted_obj: Frequency
+        ### abs(Frequency-1500)<threshold
+
+        constraint_violaton_value=abs(self.targetfreq-iconstrainted_obj[0]) 
+        if constraint_violaton_value<self.freqthreshold:
+            constraint_violaton_value=0
+        return constraint_violaton_value
 
     def getFullNameList(self):
         namelist=[]
-        namelist=namelist+self.input_name+self.output_name+self.object_name
+        namelist=namelist+self.input_name
+        if self.require_sim_input_transfrom:
+            namelist+=self.opt_input_name
+        namelist+=self.output_name+self.info_name+self.object_name
         if self.constrainted:
             namelist+=self.constrainted_object_name
         return namelist
@@ -316,8 +342,8 @@ class myAlg_nsga(myAlg):
 
         val1=np.clip(val1,self.min_realvar,self.max_realvar)
         val2=np.clip(val2,self.min_realvar,self.max_realvar)
-        child1 = nsgaii_var(val1)
-        child2 = nsgaii_var(val2)
+        child1 = self.new_nsgaii_var(val1)
+        child2 = self.new_nsgaii_var(val2)
         return child1, child2
 
 
@@ -550,6 +576,15 @@ class myAlg_nsga(myAlg):
             ### GEN DONE
         return poplist
     
+    def new_nsgaii_var(self,optvalue):
+        newnsga=nsgaii_var(optvalue)
+        if self.require_sim_input_transfrom:
+            simvalue=self.sim_input_conv_method(optvalue)
+            newnsga.setSimValue(simvalue)
+        else:
+            newnsga.setSimValue(newnsga.value)
+        return newnsga
+    
     def nsgaii_generation_parallel(self,fnds_callback=None):  ##
         self.param_check()
         ### fnds_callback for mid output
@@ -565,7 +600,7 @@ class myAlg_nsga(myAlg):
         acceptedpop:List[nsgaii_var] = []
 
         for var in valarr:
-            ind = nsgaii_var(var)
+            ind = self.new_nsgaii_var(var)
             poplist.append(ind)
         
         #### OPTIMIZAION 
@@ -585,7 +620,7 @@ class myAlg_nsga(myAlg):
         #First Run To Get the Initial Pop
         for ind in poplist:
             JobName="Init_Pop_"+str(ind.id)
-            params=self.createParamDictFromNPvar(ind.value)
+            params=self.createSimParamDictFromNPvar(ind.simvalue)
             self.manager.addTask(params=params,job_name=JobName)
         ###
         self.manager.startProcessing()
@@ -625,7 +660,7 @@ class myAlg_nsga(myAlg):
                 #Run To Get the Children POP
                 for ind in childpoplist:
                     JobName="GEN_%d_"%igen+str(ind.id)
-                    params=self.createParamDictFromNPvar(ind.value)
+                    params=self.createSimParamDictFromNPvar(ind.simvalue)
                     self.manager.addTask(params=params,job_name=JobName)
                 ###
                 self.manager.startProcessing()
@@ -759,11 +794,11 @@ class myAlg_nsga(myAlg):
         "PostProcessResult":ar
         }
         return processedResult
-    def createParamDictFromNPvar(self,var):
+    def createSimParamDictFromNPvar(self,simvar):
         odict={}
         for i in range(len(self.input_name)):
             key=self.input_name[i]
-            value=var[i]
+            value=simvar[i]
             odict.update({key:value})
         return odict
     def convertResult(self,result):
@@ -861,12 +896,8 @@ class myAlg_nsga(myAlg):
         seed(1037)
         resultDir=self.manager.resultDir
         icallback = fnds_callback_create_Image(savedir=resultDir)
-        icallback2 =fnds_callback_dump_individuals(savedir=resultDir,namelist=namelist,constrainted=self.constrainted)
+        icallback2 =fnds_callback_dump_individuals(savedir=resultDir,namelist=namelist,require_transform=self.require_sim_input_transfrom,constrainted=self.constrainted)
         #self.nval = model.n
-        min_realvar_raw, max_realvar_raw = self.input_min,self.input_max
-        self.min_realvar, self.max_realvar =np.array(min_realvar_raw),np.array(max_realvar_raw)
-        print(self.min_realvar)
-        
         sttime = time.time()
 
         poplist = self.nsgaii_generation_parallel(fnds_callback=[icallback,icallback2])
@@ -886,18 +917,19 @@ class myAlg_nsga(myAlg):
         return 0
 
 class fnds_callback_dump_individuals():
-    def __init__(self,savedir="",namelist=[],constrainted=False) -> None:
+    def __init__(self,savedir="",namelist=[],require_transform=False,constrainted=False) -> None:
         self.setNewSavedir(savedir)
         self.constrainted=constrainted
         self.namelist=namelist
         self.relation=True
+        self.require_transform=require_transform
     def setNewSavedir(self,savedir):
         self.savedir=Path(savedir)
         if not self.savedir.exists():
             self.savedir.mkdir(parents=True)
     def __call__(self,igen,fndslist):
         
-        iprocess=multiprocessing.Process(target=dump_individual_worker_func,args=(self.savedir,igen,fndslist,self.namelist,self.constrainted))
+        iprocess=multiprocessing.Process(target=dump_individual_worker_func,args=(self.savedir,igen,fndslist,self.namelist,self.require_transform,self.constrainted))
         iprocess.start()
         fp=open(self.savedir /("GEN_%d_Relations.json"%igen),"w" )
         d={}
@@ -916,7 +948,7 @@ class fnds_callback_dump_individuals():
         json.dump(d,fp,indent=4)                
         fp.close()
         
-def dump_individual_worker_func(savedir:Path,igen,fndslist:List[List[nsgaii_var]],namelist,constrainted=False):
+def dump_individual_worker_func(savedir:Path,igen,fndslist:List[List[nsgaii_var]],namelist,require_transform=False,constrainted=False):
     data_list_all=[]
     prefix_name=["Generation","Index","Front Index"]
     columnlist=prefix_name+namelist
@@ -929,6 +961,8 @@ def dump_individual_worker_func(savedir:Path,igen,fndslist:List[List[nsgaii_var]
                 data_row_list=[]
                 data_row_list+=[igen,indv.id,ifnd]
                 data_row_list+=indv.value.tolist()
+                if require_transform:
+                    data_row_list+=indv.simvalue.tolist()
                 data_row_list+=indv.rawobj.tolist()
                 data_row_list+=indv.obj.tolist()
                 if constrainted:

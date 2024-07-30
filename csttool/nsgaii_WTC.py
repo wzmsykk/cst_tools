@@ -121,14 +121,7 @@ class nsgaii_var:
     def __hash__(self):
         return hash(self.id)
     
-def constraint_function_TM020(iconstrainted_obj,iobj):
-    ###iconstrainted_obj: Frequency
-    ### abs(Frequency-1500)<threshold
-    threshold=0.05
-    constraint_violaton_value=abs(1500-iconstrainted_obj[0]) 
-    if constraint_violaton_value<threshold:
-        constraint_violaton_value=0
-    return constraint_violaton_value
+
 
 class myAlg_nsga(myAlg):
     def __init__(self, manager: cstmanager.manager = None, params=None):
@@ -177,7 +170,6 @@ class myAlg_nsga(myAlg):
         self.min_realvar = []
         self.max_realvar = []
         
-
         
         self.constrainted=True
         if self.constrainted:
@@ -191,7 +183,7 @@ class myAlg_nsga(myAlg):
         self.input_min = [300,1200,45]  ##初始值 for sim
         self.input_max = [600,1800,60]  ##初始值
 
-        self.require_sim_input_transfrom=True   #### disables input_mins 
+        self.require_sim_input_transfrom=True   #### IF TRUE disables input_mins and use values below instead
         self.sim_input_conv_method=self.simtransfromfunc
         self.opt_input_name=["part_L_to_g","L","d0"]
         self.opt_input_min = [0.05,600,45]  ##初始值 for opt
@@ -234,8 +226,6 @@ class myAlg_nsga(myAlg):
         else:
             min_realvar_raw, max_realvar_raw = self.input_min,self.input_max
         self.min_realvar, self.max_realvar =np.array(min_realvar_raw),np.array(max_realvar_raw)
-
-
 
     def simtransfromfunc(self,altinput):
         
@@ -611,6 +601,7 @@ class myAlg_nsga(myAlg):
         else:
             newnsga.setSimValue(newnsga.value)
         return newnsga
+    
     def nsgaii_generation_parallel(self,fnds_callback=None):  ##
         self.param_check()
         ### fnds_callback for mid output
@@ -900,10 +891,8 @@ class myAlg_nsga(myAlg):
         seed(1037)
         resultDir=self.manager.resultDir
         icallback = fnds_callback_create_Image(savedir=resultDir)
-        icallback2 =fnds_callback_dump_individuals(savedir=resultDir,namelist=namelist,constrainted=self.constrainted)
+        icallback2 =fnds_callback_dump_individuals(savedir=resultDir,namelist=namelist,require_transform=self.require_sim_input_transfrom,constrainted=self.constrainted)
         #self.nval = model.n
-        
-        
         sttime = time.time()
 
         poplist = self.nsgaii_generation_parallel(fnds_callback=[icallback,icallback2])
@@ -923,18 +912,19 @@ class myAlg_nsga(myAlg):
         return 0
 
 class fnds_callback_dump_individuals():
-    def __init__(self,savedir="",namelist=[],constrainted=False) -> None:
+    def __init__(self,savedir="",namelist=[],require_transform=False,constrainted=False) -> None:
         self.setNewSavedir(savedir)
         self.constrainted=constrainted
         self.namelist=namelist
         self.relation=True
+        self.require_transform=require_transform
     def setNewSavedir(self,savedir):
         self.savedir=Path(savedir)
         if not self.savedir.exists():
             self.savedir.mkdir(parents=True)
     def __call__(self,igen,fndslist):
         
-        iprocess=multiprocessing.Process(target=dump_individual_worker_func,args=(self.savedir,igen,fndslist,self.namelist,self.constrainted))
+        iprocess=multiprocessing.Process(target=dump_individual_worker_func,args=(self.savedir,igen,fndslist,self.namelist,self.require_transform,self.constrainted))
         iprocess.start()
         fp=open(self.savedir /("GEN_%d_Relations.json"%igen),"w" )
         d={}
