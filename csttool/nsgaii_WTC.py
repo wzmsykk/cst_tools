@@ -851,7 +851,7 @@ class myAlg_nsga(myAlg):
             beta = 0
             Epk = 99999
             Hpk = 99999
-            Ra = -99999
+            Ra = 99999
             midinfo = [beta, Epk, Hpk]
             rawarray = np.array(raw_obj_list + midinfo)
             objarray = [99999, Epk, Ra]
@@ -996,9 +996,9 @@ def dump_individual_worker_func(
             for indv in fnd:
                 data_row_list = []
                 data_row_list += [igen, indv.id, ifnd]
-                data_row_list += indv.value.tolist()
                 if require_transform:
                     data_row_list += indv.simvalue.tolist()
+                data_row_list += indv.value.tolist()                
                 data_row_list += indv.rawobj.tolist()
                 data_row_list += indv.obj.tolist()
                 if constrainted:

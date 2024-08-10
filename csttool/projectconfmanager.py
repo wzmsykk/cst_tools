@@ -266,7 +266,7 @@ class ProjectConfmanager(object):
         savednewcstpath = self.__vbpreprocess_CST(
             confobj, projectDir=self.currProjectDir, savejsonpath=savejsonname
         )
-        confobj.set("CST", "CSTFilename", str(savednewcstpath))
+        confobj.set("CST", "CSTFilename", str(pathlib.Path(savednewcstpath).name))
         file_md5 = self.genMD5FromCST(savednewcstpath)
         confobj.set("CST", "CSTFileMD5", file_md5.hexdigest())
         self.logger.info("Config内容更新完成")
