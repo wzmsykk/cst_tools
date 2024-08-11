@@ -23,7 +23,7 @@ import multiprocessing
 from typing import List, Set
 from utils.mode_util_sample import findTM020index
 from copy import deepcopy
-
+import logging
 
 class nsgaii_var:
     id = 0
@@ -134,7 +134,7 @@ class nsgaii_var:
 
 
 class myAlg_nsga(myAlg):
-    def __init__(self, manager: cstmanager.manager = None, params=None):
+    def __init__(self, manager: cstmanager.manager = None, params=None, Logger=None):
         super().__init__(manager, params)
         self.parameter_range = 0
         self.CSTparams = params
@@ -144,7 +144,10 @@ class myAlg_nsga(myAlg):
 
         # 读写
         # self.mode_location = 'result\\'
-        self.log = None
+        if Logger is not None:
+            self.logger = Logger
+        else:
+            self.logger = logging.getLogger(__name__)
         self.mode_location = None
         self.relative_location = None  # 在setManager后实现
         self.ready = False
@@ -582,7 +585,7 @@ class myAlg_nsga(myAlg):
                 # print("    ACC PROP SIZE:%d"%len(acceptedpop),"TO GO:%d" %pack)
             poplist.clear()
             poplist += acceptedpop
-            print("GEN:%d DONE, SIZE:%d" % (igen, len(acceptedpop)))
+            self.logger.info("GEN:%d DONE, SIZE:%d" % (igen, len(acceptedpop)))
             ### GEN DONE
         return poplist
 
@@ -739,7 +742,7 @@ class myAlg_nsga(myAlg):
             poplist.clear()
             poplist += acceptedpop
 
-            print("GEN:%d DONE, SIZE:%d" % (igen, len(acceptedpop)))
+            self.logger.info("GEN:%d DONE, SIZE:%d" % (igen, len(acceptedpop)))
             ### GEN DONE
         return poplist
 
@@ -894,8 +897,8 @@ class myAlg_nsga(myAlg):
 
     def start(self):
         if self.ready == False:
-            print("CALCATION NOT READY, PLEASE CHECK SETTINGS.")
-            print("IS THE JOBMANAGER SET?")
+            self.logger.info("CALCATION NOT READY, PLEASE CHECK SETTINGS.")
+            self.logger.info("IS THE JOBMANAGER SET?")
             return -1
         self.logCalcSettings()
 
@@ -919,10 +922,10 @@ class myAlg_nsga(myAlg):
         poplist = self.nsgaii_generation_parallel(fnds_callback=[icallback, icallback2])
         result = self.fnds(poplist)
         endtime = time.time()
-        print("elapsed time=", endtime - sttime)
+        self.logger.info("elapsed time=%f"% (endtime - sttime))
 
         end_time = time.time()
-        print(end_time - start_time)
+        self.logger.info(end_time - start_time)
 
         return 0
 
@@ -960,7 +963,6 @@ class fnds_callback_dump_individuals:
         d = {}
         if self.relation:
             for ifnd, fnd in enumerate(fndslist):
-                #print(ifnd, fnd)
                 if fnd is not None:
                     for indv in fnd:
                         u = {
@@ -996,9 +998,9 @@ def dump_individual_worker_func(
             for indv in fnd:
                 data_row_list = []
                 data_row_list += [igen, indv.id, ifnd]
-                data_row_list += indv.value.tolist()
                 if require_transform:
                     data_row_list += indv.simvalue.tolist()
+                data_row_list += indv.value.tolist()
                 data_row_list += indv.rawobj.tolist()
                 data_row_list += indv.obj.tolist()
                 if constrainted:

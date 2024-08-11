@@ -23,7 +23,7 @@ import multiprocessing
 from typing import List, Set
 from utils.mode_util_sample import findTM020index
 from copy import deepcopy
-
+import logging
 
 class nsgaii_var:
     id = 0
@@ -134,7 +134,7 @@ class nsgaii_var:
 
 
 class myAlg_nsga(myAlg):
-    def __init__(self, manager: cstmanager.manager = None, params=None):
+    def __init__(self, manager: cstmanager.manager = None, params=None, Logger=None):
         super().__init__(manager, params)
         self.parameter_range = 0
         self.CSTparams = params
@@ -144,7 +144,10 @@ class myAlg_nsga(myAlg):
 
         # 读写
         # self.mode_location = 'result\\'
-        self.log = None
+        if Logger is not None:
+            self.logger = Logger
+        else:
+            self.logger = logging.getLogger(__name__)
         self.mode_location = None
         self.relative_location = None  # 在setManager后实现
         self.ready = False
@@ -170,7 +173,7 @@ class myAlg_nsga(myAlg):
 
         ##### NSGA OPTIONS #####
         self.nobj = 3
-        self.nval = 3
+        self.nval = 4
         self.pmut_real = 0.1
         self.eta_m = 1  ## coff for mutation
         self.popsize = 4
@@ -185,18 +188,18 @@ class myAlg_nsga(myAlg):
         else:
             self.constraint_func = None
 
-        self.input_name_opt = ["g", "L", "d0"]
-        self.input_name = ["g", "L", "d0"]
-        self.input_min = [300, 1200, 45]  ##初始值 for sim
-        self.input_max = [600, 1800, 60]  ##初始值
+        self.input_name_opt = ["g", "L", "d0","C2"]
+        self.input_name = ["g", "L", "d0","C2"]
+        self.input_min = [300, 1200, 45, 200]  ##初始值 for sim
+        self.input_max = [600, 1800, 60, 400]  ##初始值
 
         self.require_sim_input_transfrom = (
             True  #### IF TRUE disables input_mins and use values below instead
         )
         self.sim_input_conv_method = self.simtransfromfunc
-        self.opt_input_name = ["part_L_to_g", "L", "d0"]
-        self.opt_input_min = [0.05, 600, 45]  ##初始值 for opt
-        self.opt_input_max = [0.49, 1800, 60]  ##初始值
+        self.opt_input_name = ["part_L_to_g", "L", "d0","C2"]
+        self.opt_input_min = [0.05, 600, 45, 200]  ##初始值 for opt
+        self.opt_input_max = [0.49, 1800, 60, 400]  ##初始值
         ####
         ####
         # g<L/2
@@ -600,7 +603,7 @@ class myAlg_nsga(myAlg):
                 # print("    ACC PROP SIZE:%d"%len(acceptedpop),"TO GO:%d" %pack)
             poplist.clear()
             poplist += acceptedpop
-            print("GEN:%d DONE, SIZE:%d" % (igen, len(acceptedpop)))
+            self.logger.info("GEN:%d DONE, SIZE:%d" % (igen, len(acceptedpop)))
             ### GEN DONE
         return poplist
 
@@ -757,7 +760,7 @@ class myAlg_nsga(myAlg):
             poplist.clear()
             poplist += acceptedpop
 
-            print("GEN:%d DONE, SIZE:%d" % (igen, len(acceptedpop)))
+            self.logger.info("GEN:%d DONE, SIZE:%d" % (igen, len(acceptedpop)))
             ### GEN DONE
         return poplist
 
@@ -847,7 +850,7 @@ class myAlg_nsga(myAlg):
             objarray = np.array(objarray)
             cindarray = np.array(c_iobj_list)
         else:  ##BAD CALCULATION
-            print("WARNING:CST MISCALCULATON AT JOB %s" % result["RunName"])
+            self.logger.warning("WARNING:CST MISCALCULATON AT JOB %s" % result["RunName"])
             beta = 0
             Epk = 99999
             Hpk = 99999
@@ -894,8 +897,8 @@ class myAlg_nsga(myAlg):
 
     def start(self):
         if self.ready == False:
-            print("CALCATION NOT READY, PLEASE CHECK SETTINGS.")
-            print("IS THE JOBMANAGER SET?")
+            self.logger.info("CALCATION NOT READY, PLEASE CHECK SETTINGS.")
+            self.logger.info("IS THE JOBMANAGER SET?")
             return -1
         self.logCalcSettings()
 
@@ -919,10 +922,10 @@ class myAlg_nsga(myAlg):
         poplist = self.nsgaii_generation_parallel(fnds_callback=[icallback, icallback2])
         result = self.fnds(poplist)
         endtime = time.time()
-        print("elapsed time=", endtime - sttime)
+        self.logger.info("elapsed time=%f"% (endtime - sttime))
 
         end_time = time.time()
-        print(end_time - start_time)
+        self.logger.info(end_time - start_time)
 
         return 0
 
@@ -960,7 +963,6 @@ class fnds_callback_dump_individuals:
         d = {}
         if self.relation:
             for ifnd, fnd in enumerate(fndslist):
-                print(ifnd, fnd)
                 if fnd is not None:
                     for indv in fnd:
                         u = {
@@ -998,7 +1000,7 @@ def dump_individual_worker_func(
                 data_row_list += [igen, indv.id, ifnd]
                 if require_transform:
                     data_row_list += indv.simvalue.tolist()
-                data_row_list += indv.value.tolist()                
+                data_row_list += indv.value.tolist()
                 data_row_list += indv.rawobj.tolist()
                 data_row_list += indv.obj.tolist()
                 if constrainted:
@@ -1042,23 +1044,25 @@ def image_worker_func(savedir, igen, fndslist: List[List[nsgaii_var]]):
     y1 = []
     x2 = []
     y2 = []
+    xindex=3
+    yindex=1
     if fndslist[0] is not None:
         for ind in fndslist[0]:
-            x0.append(ind.rawobj[0])
-            y0.append(ind.obj[1])
+            x0.append(ind.rawobj[xindex])
+            y0.append(ind.obj[yindex])
         plt.scatter(x0, y0, c="none", marker="o", edgecolors="r")
     if fndslist[1] is not None:
         for ind in fndslist[1]:
-            x1.append(ind.rawobj[0])
-            y1.append(ind.obj[1])
+            x1.append(ind.rawobj[xindex])
+            y1.append(ind.obj[yindex])
         plt.scatter(x1, y1, c="none", marker="o", edgecolors="orange")
     if fndslist[2] is not None:
         for ind in fndslist[2]:
-            x2.append(ind.rawobj[0])
-            y2.append(ind.obj[1])
+            x2.append(ind.rawobj[xindex])
+            y2.append(ind.obj[yindex])
         plt.scatter(x2, y2, c="none", marker="o", edgecolors="y")
 
-    plt.xlabel("freq")
+    plt.xlabel("Ra")
     plt.ylabel("Epk")
     # plt.axis('scaled')
     plt.savefig(savedir / ("GEN_%05d_Front.png" % igen), bbox_inches="tight")

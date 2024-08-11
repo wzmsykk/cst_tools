@@ -45,7 +45,7 @@ class cst_tools_main:
         self.jm = None
 
         # 算法/参数
-        self.alg = nsgaii_WTC.myAlg_nsga(manager=None, params=None)
+        self.alg = nsgaii_WTC.myAlg_nsga(manager=None, params=None, Logger=self.logger)
 
         # 设置默认后处理
         defaultPPSListPath = resource_path("data/WTCPPS.json")
