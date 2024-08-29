@@ -624,8 +624,8 @@ class myAlg_nsga(myAlg):
         # I1 5-20mm
         # OBJETIVE
         # FREQ |F_fm-F_obj|<0.05
-        # MINIMUM ROQ
-        # MINIMUM Shunt Impedence
+        # MAXIMUM ROQ
+        # MAXIMUM Shunt Impedence
         # MAXIMUM Q
         ####
 
@@ -839,9 +839,9 @@ class myAlg_nsga(myAlg):
         # 3 Shunt Impedence
         # OBJETIVE
         # MINIMUM abs|F_fm-F_obj|
-        # MINIMUM ROQ   +
+        # MAXIMUM ROQ   +
         # MAXIMUM Q     -
-        # MINIMUM Shunt Impedence   +
+        # MAXIMUM Shunt Impedence   +
         # CONSTRAINT OBJECTIVE
         # abs|F_fm-F_obj|<0.05
         # F_obj=1500Mhz
@@ -851,9 +851,9 @@ class myAlg_nsga(myAlg):
         objarray = np.array(raw_obj_list)
 
         objarray[0] = abs(objarray[0] - 1500)
-        objarray[1] = objarray[1]
+        objarray[1] = -objarray[1]  # MAXIMUM ROQ
         objarray[2] = -objarray[2]  # MAXIMUM Q
-        objarray[3] = objarray[3]
+        objarray[3] = -objarray[3]   # MAXIMUM Shunt Impedence
 
         cindarray = np.array(c_iobj_list)
 
