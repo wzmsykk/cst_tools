@@ -198,10 +198,18 @@ class local_cstworker(worker.worker):
         self.postProcessHelper.setCSTRunResultDir(cstpathc.absolute())
         # WAIT RESULTS
         flagPath = self.taskFileDir / (str(self.taskIndex) + ".success")
+        flagPathFailure = self.taskFileDir / (str(self.taskIndex) + ".failure")
         if flagPath.exists():
             self.logger.info(
                 "WorkerID:%r Run:%r Name:%r Already Finished."
                 % (self.ID, self.taskIndex, self.runName)
+            )
+        elif flagPathFailure.exists():
+            fp= open(flagPathFailure,"r")
+            fresult=fp.readlines()[2].strip()
+            self.logger.info(
+                "WorkerID:%r Run:%r Name:%r Run Failure. Reported %s"
+                % (self.ID, self.taskIndex, self.runName, fresult)
             )
         else:
             # paramlist=[]
@@ -216,6 +224,24 @@ class local_cstworker(worker.worker):
                 % (self.ID, self.taskIndex, self.runName, time.ctime())
             )
             while not flagPath.exists():
+                
+                if flagPathFailure.exists():
+                    fp= open(flagPathFailure,"r")
+                    fresult=fp.readlines()[2]
+                    self.logger.info(
+                    "WorkerID:%r Run:%r Name:%r Run Failure. Reported %s"
+                    % (self.ID, self.taskIndex, self.runName, fresult)
+                    )
+                    
+                    runResult = {
+                        "TaskIndex": self.taskIndex,
+                        "TaskStatus": "Failure",
+                        "FailureReport":fresult,
+                        "RunName": self.runName,
+                        "RunParameters": self.runParams,
+                        "PostProcessResult": None,
+                    }
+                    return runResult
                 # ADD process check HERE
                 rcode = self.cstProcess.poll()
                 if rcode is None:
@@ -227,6 +253,7 @@ class local_cstworker(worker.worker):
                     runResult = {
                         "TaskIndex": self.taskIndex,
                         "TaskStatus": "Failure",
+                        "FailureReport":"CST Env Stopped.",
                         "RunName": self.runName,
                         "RunParameters": self.runParams,
                         "PostProcessResult": None,

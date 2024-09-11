@@ -164,7 +164,7 @@ class myAlg_nsga(myAlg):
         # Leq 60-120mm
         # I0 5-20mm
         # R0 5-20mm
-        # I1 5-20mm
+        # R1 5-20mm
 
         # output 4-dims
         # freq 1500Mhz
@@ -177,8 +177,8 @@ class myAlg_nsga(myAlg):
         self.nval = 5
         self.pmut_real = 0.1
         self.eta_m = 1  ## coff for mutation
-        self.popsize = 4
-        self.generation = 2
+        self.popsize = 100
+        self.generation = 40
 
         self.min_realvar = []
         self.max_realvar = []
@@ -189,8 +189,8 @@ class myAlg_nsga(myAlg):
         else:
             self.constraint_func = None
 
-        self.input_name_opt = ["Leq", "Req", "I0", "R0", "I1"]
-        self.input_name = ["Leq", "Req", "I0", "R0", "I1"]
+        self.input_name_opt = ["Leq", "Req", "I0", "R0", "R1"]
+        self.input_name = ["Leq", "Req", "I0", "R0", "R1"]
         self.input_min = [60, 180, 5, 5, 5]  ##初始值
         self.input_max = [120, 200, 20, 20, 20]  ##初始值
 
@@ -198,7 +198,7 @@ class myAlg_nsga(myAlg):
             False  #### IF TRUE disables input_mins and use values below instead
         )
         self.sim_input_conv_method = self.simtransfromfunc
-        self.opt_input_name = ["Leq", "Req", "I0", "R0", "I1"]
+        self.opt_input_name = ["Leq", "Req", "I0", "R0", "R1"]
         self.opt_input_min = [60, 180, 5, 5, 5]  ##初始值 for opt
         self.opt_input_max = [120, 200, 40, 40, 40]  ##初始值
         self.output_name = [
@@ -621,7 +621,7 @@ class myAlg_nsga(myAlg):
         # Leq 60-120mm
         # I0 5-20mm
         # R0 5-20mm
-        # I1 5-20mm
+        # R1 5-20mm
         # OBJETIVE
         # FREQ |F_fm-F_obj|<0.05
         # MAXIMUM ROQ
@@ -839,9 +839,9 @@ class myAlg_nsga(myAlg):
         # 3 Shunt Impedence
         # OBJETIVE
         # MINIMUM abs|F_fm-F_obj|
-        # MAXIMUM ROQ   +
+        # MAXIMUM ROQ   -
         # MAXIMUM Q     -
-        # MAXIMUM Shunt Impedence   +
+        # MAXIMUM Shunt Impedence   -
         # CONSTRAINT OBJECTIVE
         # abs|F_fm-F_obj|<0.05
         # F_obj=1500Mhz

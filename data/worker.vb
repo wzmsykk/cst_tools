@@ -36,7 +36,7 @@ Sub Main
 	'NEXT WORKING LOOP
 	Dim startTime,endTime As Double
 	Dim status As String
-	
+	Dim ParamResult As Boolean
 	Do While count < maxAttempt
 		status=GetJobDef(index)
 		If status = "NewTask" Then
@@ -44,7 +44,12 @@ Sub Main
 			CreateResultDir()
 			If not IsFileExists(taskFileDir & index &".success") Then 
 				startTime=Timer
-				ChangeParams()
+				ParamResult=ChangeParams()
+				If ParamResult = False Then 
+					ReportInformation("StructureError Exit CST.")
+					StructureError()
+					Exit Do
+				End If
 				virtualRun=False
 				'EXTERN''CustomPreProcess()
 				'EXTERN'Start()
@@ -137,6 +142,26 @@ Function Success()
 	Close #1
 End Function
 
+Function StructureError()
+	Open(taskFileDir & index &".failure") For Output As #1
+	Print #1,currentResultName
+	Print #1,
+	Print #1,"StructureError"
+	Close #1
+	Dim i As Integer
+	Open(resultDir & currentResultName &"\run.log") For Output As #1
+	For i = LBound(paramName) To UBound(paramName)
+		Print #1,paramName(i)
+		Print #1,paramValue(i)
+		Print #1,
+	Next i
+	Print #1,"totalElaspedTime"
+	Print #1,totalElaspedTime
+	Print #1,"postProcessTime"
+	Print #1,postProcessTime
+	Close #1
+End Function
+
 Function IsFileExists(ByVal strFileName As String) As Boolean
     If Dir(strFileName, 16) <> Empty Then
         IsFileExists = True
@@ -185,10 +210,11 @@ Function GetJobDef(index As Integer) As String
 	GetJobDef="NewTask"
 End Function
 
-Sub ChangeParams
+Function ChangeParams As Boolean
 	Dim i As Integer
 	For i = LBound(paramName) To UBound(paramName)
 		StoreParameter (paramName(i),paramValue(i))
 	Next i
-	Rebuild
-End Sub
+	ChangeParams=Rebuild
+	ReportInformation("ChangeParamsResult:"& ChangeParams)
+End Function

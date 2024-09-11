@@ -25,6 +25,7 @@ from utils.mode_util_sample import findTM020index
 from copy import deepcopy
 import logging
 
+
 class nsgaii_var:
     id = 0
     idlock = threading.Lock()
@@ -173,7 +174,7 @@ class myAlg_nsga(myAlg):
 
         ##### NSGA OPTIONS #####
         self.nobj = 3
-        self.nval = 4
+        self.nval = 11
         self.pmut_real = 0.1
         self.eta_m = 1  ## coff for mutation
         self.popsize = 4
@@ -188,18 +189,101 @@ class myAlg_nsga(myAlg):
         else:
             self.constraint_func = None
 
-        self.input_name_opt = ["g", "L", "d0","C2"]
-        self.input_name = ["g", "L", "d0","C2"]
-        self.input_min = [300, 1200, 45, 200]  ##初始值 for sim
-        self.input_max = [600, 1800, 60, 400]  ##初始值
+        self.input_name_opt = [
+            "d0",
+            "g",
+            "Rx",
+            "Ry",
+            "a",
+            "C2",
+            "C3",
+            "C4",
+            "gx0",
+            "gy0",
+            "L",
+        ]
+        self.input_name = [
+            "d0",
+            "g",
+            "Rx",
+            "Ry",
+            "a",
+            "C2",
+            "C3",
+            "C4",
+            "gx0",
+            "gy0",
+            "L",
+        ]
+        self.input_min = [
+            60,
+            500,
+            1700,
+            3200,
+            700,
+            90,
+            60,
+            10,
+            70,
+            400,
+            1400,
+        ]  ##MIN
+        self.input_max = [
+            80,
+            700,
+            1900,
+            3400,
+            900,
+            110,
+            80,
+            30,
+            80,
+            600,
+            1600,
+        ]  ##MAX
 
-        self.require_sim_input_transfrom = (
-            True  #### IF TRUE disables input_mins and use values below instead
-        )
+        self.require_sim_input_transfrom = False  #### IF TRUE disables input_mins and use values below instead
         self.sim_input_conv_method = self.simtransfromfunc
-        self.opt_input_name = ["part_L_to_g", "L", "d0","C2"]
-        self.opt_input_min = [0.05, 600, 45, 200]  ##初始值 for opt
-        self.opt_input_max = [0.49, 1800, 60, 400]  ##初始值
+        self.opt_input_name = [
+            "d0",
+            "part_L_to_g",
+            "Rx",
+            "Ry",
+            "ka",
+            "C2",
+            "C3",
+            "C4",
+            "gx0",
+            "gy0",
+            "L",
+        ]
+        #a=Ka(Rx-gx0-L/2) 
+        self.opt_input_min = [
+            30,
+            0.05,
+            1700,
+            3000,
+            0,
+            50,
+            10,
+            10,
+            70,
+            250,
+            1000,
+        ]  ##MIN
+        self.opt_input_max = [
+            100,
+            0.49,
+            1900,
+            3600,
+            1,
+            300,
+            100,
+            50,
+            80,
+            1250,
+            2500,
+        ]  ##MAX
         ####
         ####
         # g<L/2
@@ -243,15 +327,49 @@ class myAlg_nsga(myAlg):
             max_realvar_raw
         )
 
-    def simtransfromfunc(self, altinput):
+    def simtransfromfunc(self, input,reverse=False):
 
         ####
         # g<L/2
-        # self.alt_input_name=["part_L_to_g","L","d0"]
-        # g=part_L_to_g*L
+        # in = self.opt_input_name = [
+        #     "d0",
+        #     "part_L_to_g",
+        #     "Rx",
+        #     "Ry",
+        #     "ka",
+        #     "C2",
+        #     "C3",
+        #     "C4",
+        #     "gx0",
+        #     "gy0",
+        #     "L",
+        # ]
+        # out = input_name_opt = [
+        #     "d0",
+        #     "g",
+        #     "Rx",
+        #     "Ry",
+        #     "a",
+        #     "C2",
+        #     "C3",
+        #     "C4",
+        #     "gx0",
+        #     "gy0",
+        #     "L",
+        # ] 
+        # g=part_L_to_g*L;part_L_to_g=g/L
+        # a=Ka(Rx-gx0-L/2);Ka=a/(Rx-gx0-L/2)
         ####
-        oarr = np.array(altinput)
-        oarr[0] = oarr[1] * oarr[0]
+        iarr = np.array(input)
+        oarr = np.array(input)
+        if not reverse:
+            
+            oarr[1] = iarr[1] * iarr[10]
+            oarr[4] = iarr[4] * (iarr[2]-iarr[8]-iarr[10]/2)
+        else:
+            oarr[1] = iarr[1] / iarr[10]
+            oarr[4] = iarr[4] / (iarr[2]-iarr[8]-iarr[10]/2)
+            
         return oarr
 
     def constraint_function_WTC(self, iconstrainted_obj, iobj):
@@ -613,9 +731,20 @@ class myAlg_nsga(myAlg):
             simvalue = self.sim_input_conv_method(optvalue)
             newnsga.setSimValue(simvalue)
         else:
-            newnsga.setSimValue(newnsga.value)
+            simvalue =optvalue
+            newnsga.setSimValue(simvalue)
         return newnsga
-
+    def new_nsgaii_var_reverse(self, simvalue):
+        if self.require_sim_input_transfrom:   
+            optvalue = self.sim_input_conv_method(simvalue,reverse=True)
+            newnsga = nsgaii_var(optvalue) 
+            newnsga.setSimValue(simvalue)
+        else:
+            optvalue=simvalue
+            newnsga = nsgaii_var(optvalue) 
+            newnsga.setSimValue(simvalue)
+        return newnsga
+        
     def nsgaii_generation_parallel(self, fnds_callback=None):  ##
         self.param_check()
         ### fnds_callback for mid output
@@ -628,18 +757,15 @@ class myAlg_nsga(myAlg):
 
         poplist: List[nsgaii_var] = []
         acceptedpop: List[nsgaii_var] = []
-
+        init01=[70,600,1870,3325,800,100,70,20,75,500,1500] ##SIM VALUE
+        ind00=self.new_nsgaii_var_reverse(init01)
+        poplist.append(ind00)
         for var in valarr:
             ind = self.new_nsgaii_var(var)
             poplist.append(ind)
 
         #### OPTIMIZAION
-        # PARAMETER SPACE
-        # Req 180-200mm
-        # Leq 60-120mm
-        # I0 5-20mm
-        # R0 5-20mm
-        # I1 5-20mm
+        #
         # OBJETIVE
         # FREQ |F_fm-F_obj|<0.05
         # MINIUM EPK
@@ -649,7 +775,7 @@ class myAlg_nsga(myAlg):
 
         # First Run To Get the Initial Pop
         for ind in poplist:
-            JobName = "Init_Pop_" + str(ind.id)
+            JobName = "GEN_0_" + str(ind.id)
             params = self.createSimParamDictFromNPvar(ind.simvalue)
             self.manager.addTask(params=params, job_name=JobName)
         ###
@@ -671,7 +797,7 @@ class myAlg_nsga(myAlg):
             resultindex = mapdict.get(ind.id)
             if results[resultindex]["TaskStatus"] != "Success":
                 ind.done = False
-                continue
+                #continue
             objarray, c_objarray, rawarray = self.convertResult(results[resultindex])
             ind.setObjs(objarray)
             ind.setRawObjs(rawarray)
@@ -711,7 +837,7 @@ class myAlg_nsga(myAlg):
                     resultindex = mapdict.get(ind.id)
                     if results[resultindex]["TaskStatus"] != "Success":
                         ind.done = False
-                        continue
+                        #continue
                     objarray, c_objarray, rawarray = self.convertResult(
                         results[resultindex]
                     )
@@ -788,11 +914,15 @@ class myAlg_nsga(myAlg):
 
     def getPPSResult(self, runresult):
         ppsr = runresult["PostProcessResult"]
-        ar = {}
-        for ips in ppsr:
-            key = ips["resultName"]
-            value = ips["value"]
-            ar.update({key: value})
+        ar = None
+        if runresult.get("TaskStatus") == "Failure":
+            pass
+        elif ppsr:
+            ar={}
+            for ips in ppsr:
+                key = ips["resultName"]
+                value = ips["value"]
+                ar.update({key: value})
         processedResult = {
             "WorkerID": runresult.get("WorkerID"),
             "TaskIndex": runresult.get("TaskIndex"),
@@ -807,50 +937,60 @@ class myAlg_nsga(myAlg):
         odict = {}
         for i in range(len(self.input_name)):
             key = self.input_name[i]
-            value = simvar[i]
+            value = float(simvar[i])
             odict.update({key: value})
         return odict
 
     def convertResult(self, result):
-        pResult = self.getPPSResult(result)
+        
         fp = open(
             self.manager.resultDir / (str(result["RunName"]) + "_Result.json"), "w"
         )
         json.dump(result, fp, indent=4)
         fp.close()
-        # DONE
-        raw_obj_list = []
-        c_iobj_list = []
-        for oname in self.output_name:
-            raw_obj_list.append(pResult["PostProcessResult"][oname])
-        for cname in self.constrainted_object_name:
-            c_iobj_list.append(pResult["PostProcessResult"][cname])
+        #  DUMP DONE
+        failflag=False
+        if result.get("TaskStatus") == "Failure":
+            failflag=True
+        else:
+            pResult = self.getPPSResult(result)
+            
+            raw_obj_list = []
+            c_iobj_list = []
+            for oname in self.output_name:
+                raw_obj_list.append(pResult["PostProcessResult"][oname])
+            for cname in self.constrainted_object_name:
+                c_iobj_list.append(pResult["PostProcessResult"][cname])
 
-        # frequency = 44.4MHz
-        # Epk@2MV <7.5MV
-        # Shunt-dep >28MOhm
-        ###MID CALC
-        freq = pResult["PostProcessResult"]["Frequency (Mode 1)"]
-        Voltage = pResult["PostProcessResult"]["Voltage beta=1 (Mode 1)"]
-        face1_Max_e = pResult["PostProcessResult"]["face1_Max_e"]
-        face1_Max_h = pResult["PostProcessResult"]["face1_Max_h"]
-        Ra = pResult["PostProcessResult"][
-            "Shunt Impedance (Pertubation) beta=1 (Mode 1)"
-        ]
-        if (Voltage is not None) and (face1_Max_e is not None):
-            beta = 2e6 / Voltage
-            Epk = beta * face1_Max_e * 1e-6
-            Hpk = beta * face1_Max_h * 1e-6
-            midinfo = [beta, Epk, Hpk]
-            rawarray = np.array(raw_obj_list + midinfo)
-            objarray = [freq, Epk, Ra]
-            objarray[0] = abs(objarray[0] - self.targetfreq)
-            objarray[1] = objarray[1]  # MINIMUM Epk
-            objarray[2] = -objarray[2]  # MAXIMUM Shunt-dep
-            objarray = np.array(objarray)
-            cindarray = np.array(c_iobj_list)
-        else:  ##BAD CALCULATION
-            self.logger.warning("WARNING:CST MISCALCULATON AT JOB %s" % result["RunName"])
+            # frequency = 44.4MHz
+            # Epk@2MV <7.5MV
+            # Shunt-dep >28MOhm
+            ###MID CALC
+            freq = pResult["PostProcessResult"]["Frequency (Mode 1)"]
+            Voltage = pResult["PostProcessResult"]["Voltage beta=1 (Mode 1)"]
+            face1_Max_e = pResult["PostProcessResult"]["face1_Max_e"]
+            face1_Max_h = pResult["PostProcessResult"]["face1_Max_h"]
+            Ra = pResult["PostProcessResult"][
+                "Shunt Impedance (Pertubation) beta=1 (Mode 1)"
+            ]
+            if (Voltage is not None) and (face1_Max_e is not None):
+                beta = 2e6 / Voltage
+                Epk = beta * face1_Max_e * 1e-6
+                Hpk = beta * face1_Max_h * 1e-6
+                midinfo = [beta, Epk, Hpk]
+                rawarray = np.array(raw_obj_list + midinfo)
+                objarray = [freq, Epk, Ra]
+                objarray[0] = abs(objarray[0] - self.targetfreq)
+                objarray[1] = objarray[1]  # MINIMUM Epk
+                objarray[2] = -objarray[2]  # MAXIMUM Shunt-dep
+                objarray = np.array(objarray)
+                cindarray = np.array(c_iobj_list)
+            else:  ##BAD CALCULATION
+                failflag=True
+        if failflag:
+            self.logger.warning(
+                "WARNING:CST MISCALCULATON AT JOB %s" % result["RunName"]
+            )
             beta = 0
             Epk = 99999
             Hpk = 99999
@@ -922,7 +1062,7 @@ class myAlg_nsga(myAlg):
         poplist = self.nsgaii_generation_parallel(fnds_callback=[icallback, icallback2])
         result = self.fnds(poplist)
         endtime = time.time()
-        self.logger.info("elapsed time=%f"% (endtime - sttime))
+        self.logger.info("elapsed time=%f" % (endtime - sttime))
 
         end_time = time.time()
         self.logger.info(end_time - start_time)
@@ -1044,8 +1184,8 @@ def image_worker_func(savedir, igen, fndslist: List[List[nsgaii_var]]):
     y1 = []
     x2 = []
     y2 = []
-    xindex=3
-    yindex=1
+    xindex = 3
+    yindex = 1
     if fndslist[0] is not None:
         for ind in fndslist[0]:
             x0.append(ind.rawobj[xindex])

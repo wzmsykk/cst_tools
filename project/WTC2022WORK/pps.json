@@ -1,0 +1,52 @@
+[
+    {
+        "resultName": "Frequency (Mode 1)",
+        "method": "Direct_PPS_0D",
+        "params": {}
+    },
+    {
+        "resultName": "R over Q beta=1 (Mode 1)",
+        "method": "Direct_PPS_0D",
+        "params": {}
+    },
+    {
+        "resultName": "Q-Factor (Perturbation) (Mode 1)",
+        "method": "Direct_PPS_0D",
+        "params": {}
+    },
+    {
+        "resultName": "Shunt Impedance (Pertubation) beta=1 (Mode 1)",
+        "method": "Direct_PPS_0D",
+        "params": {}
+    },
+    {
+        "resultName": "Voltage beta=1 (Mode 1)",
+        "method": "Direct_PPS_0D",
+        "params": {}
+    },
+    {
+        "resultName": "face1_Max_e",
+        "method": "Direct_PPS_0D",
+        "params": {}
+    },
+    {
+        "resultName": "face1_Max_h",
+        "method": "Direct_PPS_0D",
+        "params": {}
+    },
+    {
+        "resultName": "beta",
+        "method": "Direct_PPS_0D",
+        "params": {}
+    },
+    {
+        "resultName": "Epk@Vc=2MV",
+        "method": "Direct_PPS_0D",
+        "params": {}
+    },
+    {
+        "resultName": "Hpk@Vc=2MV",
+        "method": "Direct_PPS_0D",
+        "params": {}
+    }
+]
