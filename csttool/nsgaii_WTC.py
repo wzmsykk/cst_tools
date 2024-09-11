@@ -991,14 +991,21 @@ class myAlg_nsga(myAlg):
             self.logger.warning(
                 "WARNING:CST MISCALCULATON AT JOB %s" % result["RunName"]
             )
+            ABNORMAL_NUM=99999
             beta = 0
-            Epk = 99999
-            Hpk = 99999
-            Ra = 99999
+            Epk = ABNORMAL_NUM
+            Hpk = ABNORMAL_NUM
+            Ra = ABNORMAL_NUM
+            raw_obj_list = []
+            c_iobj_list = []
+            for oname in self.output_name:
+                raw_obj_list.append(ABNORMAL_NUM)
+            for cname in self.constrainted_object_name:
+                c_iobj_list.append(ABNORMAL_NUM)
             midinfo = [beta, Epk, Hpk]
             rawarray = np.array(raw_obj_list + midinfo)
-            objarray = [99999, Epk, Ra]
-            cindarray = np.array([99999 + self.targetfreq])
+            objarray = [ABNORMAL_NUM, Epk, Ra]
+            cindarray = np.array([ABNORMAL_NUM + self.targetfreq])
 
         return objarray, cindarray, rawarray
 
