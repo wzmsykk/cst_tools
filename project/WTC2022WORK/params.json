@@ -81,6 +81,14 @@
     },
     {
         "id": 10,
+        "name": "bta",
+        "value": "1",
+        "type": "double",
+        "fixed": false,
+        "description": ""
+    },
+    {
+        "id": 11,
         "name": "d0",
         "value": "70",
         "type": "double",
@@ -88,7 +96,7 @@
         "description": ""
     },
     {
-        "id": 11,
+        "id": 12,
         "name": "d1",
         "value": "Rx-gx0-C1-a",
         "type": "expression",
@@ -96,7 +104,7 @@
         "description": ""
     },
     {
-        "id": 12,
+        "id": 13,
         "name": "g",
         "value": "600",
         "type": "double",
@@ -104,7 +112,7 @@
         "description": ""
     },
     {
-        "id": 13,
+        "id": 14,
         "name": "gx0",
         "value": "75",
         "type": "double",
@@ -112,7 +120,7 @@
         "description": ""
     },
     {
-        "id": 14,
+        "id": 15,
         "name": "gy0",
         "value": "500",
         "type": "double",
@@ -120,7 +128,7 @@
         "description": ""
     },
     {
-        "id": 15,
+        "id": 16,
         "name": "nmodes",
         "value": "1",
         "type": "double",

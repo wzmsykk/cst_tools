@@ -177,8 +177,8 @@ class myAlg_nsga(myAlg):
         self.nval = 11
         self.pmut_real = 0.1
         self.eta_m = 1  ## coff for mutation
-        self.popsize = 4
-        self.generation = 2
+        self.popsize = 50
+        self.generation = 20
 
         self.min_realvar = []
         self.max_realvar = []
@@ -226,7 +226,7 @@ class myAlg_nsga(myAlg):
             10,
             70,
             400,
-            1400,
+            700,
         ]  ##MIN
         self.input_max = [
             80,
@@ -239,7 +239,7 @@ class myAlg_nsga(myAlg):
             30,
             80,
             600,
-            1600,
+            2500,
         ]  ##MAX
 
         self.require_sim_input_transfrom = False  #### IF TRUE disables input_mins and use values below instead
