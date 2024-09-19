@@ -40,10 +40,12 @@ class Logger(object):
         when="D",
         backCount=3,
         fmt="%(asctime)s - %(levelname)s: %(message)s",
+        console=True,
     ):
         self.logger = logging.getLogger("main")
         format_str = logging.Formatter(fmt)  # 设置日志格式
         self.logger.setLevel(self.level_relations.get(level))  # 设置日志级别
+        self.console=console
         sh = logging.StreamHandler()  # 往屏幕上输出W
         sh.setFormatter(format_str)  # 设置屏幕上显示的格式
         th = handlers.TimedRotatingFileHandler(
@@ -59,7 +61,8 @@ class Logger(object):
         # midnight 每天凌晨
         th.setFormatter(format_str)  # 设置文件里写入的格式
         self.logger.addHandler(sh)  # 把对象加到logger里
-        self.logger.addHandler(th)
+        if self.console:
+            self.logger.addHandler(th)
 
     def getLogger(self):
         return self.logger
