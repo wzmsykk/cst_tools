@@ -147,7 +147,7 @@ class myAlg_nsga(myAlg):
 
         # 读写
         # self.mode_location = 'result\\'
-        if Logger is not None:
+        if logger is not None:
             self.logger = logger
         else:
             self.logger = logging.getLogger(__name__)
@@ -184,8 +184,8 @@ class myAlg_nsga(myAlg):
         self.popsize = 100
         self.generation = 20
 
-        self.min_realvar = []
-        self.max_realvar = []
+        self.min_opt_realvar = []
+        self.max_opt_realvar = []
 
         self.constrainted = True
         if self.constrainted:
@@ -314,7 +314,7 @@ class myAlg_nsga(myAlg):
         self.freqdomstr = None
 
         #### SET RANGE
-        self.min_realvar, self.max_realvar = np.array(self.input_opt_min), np.array(
+        self.min_opt_realvar, self.max_opt_realvar = np.array(self.input_opt_min), np.array(
             self.input_opt_max
         )
 
@@ -482,8 +482,8 @@ class myAlg_nsga(myAlg):
         val1 = 0.5 * ((1 + gamma) * par1.optvar + (1 - gamma) * par2.optvar)
         val2 = 0.5 * ((1 - gamma) * par1.optvar + (1 + gamma) * par2.optvar)
 
-        val1 = np.clip(val1, self.min_realvar, self.max_realvar)
-        val2 = np.clip(val2, self.min_realvar, self.max_realvar)
+        val1 = np.clip(val1, self.min_opt_realvar, self.max_opt_realvar)
+        val2 = np.clip(val2, self.min_opt_realvar, self.max_opt_realvar)
         child1 = self.new_nsgaii_var_opt(val1)
         child2 = self.new_nsgaii_var_opt(val2)
         return child1, child2
@@ -496,8 +496,8 @@ class myAlg_nsga(myAlg):
         barray2 = np.less_equal(rnd2, 0.5)
         nbarray2 = np.logical_not(barray2)
         v = np.array(ind.optvar)
-        vl = np.array(self.min_realvar)
-        vu = np.array(self.max_realvar)
+        vl = np.array(self.min_opt_realvar)
+        vu = np.array(self.max_opt_realvar)
         delta1 = (v - vl) / (vu - vl)
         delta2 = (vu - v) / (vu - vl)
         mut_pow = 1.0 / (self.eta_m + 1.0)
@@ -514,7 +514,7 @@ class myAlg_nsga(myAlg):
         v = v + (deltaq1 * barray2 + deltaq2 * nbarray2) * (vu - vl)
         np.clip(v, vl, vu, v)
         v = v * barray + np.array(ind.optvar) * np.logical_not(barray)  ### BUGFIX
-        v = np.clip(v, self.min_realvar, self.max_realvar)  ###boundary check
+        v = np.clip(v, self.min_opt_realvar, self.max_opt_realvar)  ###boundary check
         ind.optvar = v
         if self.require_sim2opt_transfrom:
             ind.setSimVar(self.opt2sim(v))
@@ -548,8 +548,8 @@ class myAlg_nsga(myAlg):
         barray2 = np.less_equal(rnd2, 0.5)
         nbarray2 = np.logical_not(barray2)
         v = np.array(ind.optvar)
-        vl = np.array(self.min_realvar)
-        vu = np.array(self.max_realvar)
+        vl = np.array(self.min_opt_realvar)
+        vu = np.array(self.max_opt_realvar)
         delta1 = (v - vl) / (vu - vl)
         delta2 = (vu - v) / (vu - vl)
         mut_pow = 1.0 / (self.eta_m + 1.0)
@@ -577,7 +577,7 @@ class myAlg_nsga(myAlg):
                 newdomfv = (domfv - self.targetfreq) / 2.5525 + domfv
             v[domfactorindex] = newdomfv
 
-        v = np.clip(v, self.min_realvar, self.max_realvar)  ###boundary check
+        v = np.clip(v, self.min_opt_realvar, self.max_opt_realvar)  ###boundary check
         ind.optvar = v
 
     def tournament(self, ind1: nsgaii_var, ind2: nsgaii_var):
@@ -669,16 +669,15 @@ class myAlg_nsga(myAlg):
         newnsga = nsgaii_var(optvar) 
         newnsga.setSimVar(simvar)
         return newnsga
-        
     def nsgaii_generation_parallel(self, fnds_callback=None):  ##
         self.param_check()
         ### fnds_callback for mid output
         if not isinstance(fnds_callback, list):
             fnds_callback = [fnds_callback]
-
-        valarr = self.random_sampling_LHS_np(self.popsize * 2)
-        val_width = self.max_realvar - self.min_realvar
-        valarr = valarr * val_width + self.min_realvar
+        init_overprovison_factor=4 #default 2 /for larger init pop increase this
+        valarr = self.random_sampling_LHS_np(self.popsize * init_overprovison_factor)
+        val_width = self.max_opt_realvar - self.min_opt_realvar
+        valarr = valarr * val_width + self.min_opt_realvar
 
         poplist: List[nsgaii_var] = []
         acceptedpop: List[nsgaii_var] = []
@@ -688,7 +687,7 @@ class myAlg_nsga(myAlg):
         for optvar in valarr:
             ind = self.new_nsgaii_var_opt(optvar)
             poplist.append(ind)
-            self.logger.debug("IDX:%d,OPTVAR:%s,SIMVAR:%s"%(ind.id,str(ind.optvar),str(ind.simvar)))
+            #self.logger.debug("IDX:%d,OPTVAR:%s,SIMVAR:%s"%(ind.id,str(ind.optvar),str(ind.simvar)))
         #### OPTIMIZAION
         #
         # OBJETIVE
@@ -720,6 +719,9 @@ class myAlg_nsga(myAlg):
         processedpoplist = []
         for ind in poplist:
             resultindex = mapdict.get(ind.id)
+            if resultindex is None:
+                ### IN CASE CST MISCALC
+                continue
             objarray, c_objarray, rawarray = self.convertResult(results[resultindex])
             ind.setObjs(objarray)
             ind.setRawObjs(rawarray)
@@ -743,7 +745,7 @@ class myAlg_nsga(myAlg):
                     JobName = "GEN_%d_" % igen + str(ind.id)
                     params = self.createSimParamDictFromNPArr(ind.simvar)
                     self.manager.addTask(params=params, job_name=JobName)
-                    self.logger.debug("CHILDIDX:%d,OPTVAR:%s,SIMVAR:%s"%(ind.id,str(ind.optvar),str(ind.simvar)))
+                    #self.logger.debug("CHILDIDX:%d,OPTVAR:%s,SIMVAR:%s"%(ind.id,str(ind.optvar),str(ind.simvar)))
                 ###
                 self.manager.startProcessing()
                 ### WAIT
@@ -759,6 +761,8 @@ class myAlg_nsga(myAlg):
                 
                 for ind in childpoplist:
                     resultindex = mapdict.get(ind.id)
+                    if resultindex is None:
+                        continue
                     objarray, c_objarray, rawarray = self.convertResult(
                         results[resultindex]
                     )
@@ -771,7 +775,7 @@ class myAlg_nsga(myAlg):
                         )
                     ind.done = True
                     processedpoplist.append(ind)
-                    self.logger.debug("IDX:%d,OPTVAR:%s,SIMVAR:%s"%(ind.id,str(ind.optvar),str(ind.simvar)))
+                    #self.logger.debug("IDX:%d,OPTVAR:%s,SIMVAR:%s"%(ind.id,str(ind.optvar),str(ind.simvar)))
                 childpoplist = processedpoplist
                 ###DONE
                 poplist += childpoplist
@@ -808,10 +812,8 @@ class myAlg_nsga(myAlg):
                     acceptedpop += curfront[0:n2p]
                     pack = 0
                 # print("    ACC PROP SIZE:%d"%len(acceptedpop),"TO GO:%d" %pack)
-            
             poplist += acceptedpop
             acceptedpop.clear()
-            
             self.logger.info("GEN:%d DONE, SIZE:%d" % (igen, len(acceptedpop)))
             ### GEN DONE
         return poplist

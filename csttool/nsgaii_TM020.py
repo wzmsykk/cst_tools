@@ -29,10 +29,10 @@ class nsgaii_var:
     id = 0
     idlock = threading.Lock()
 
-    def __init__(self, value) -> None:
+    def __init__(self, optvar) -> None:
 
-        self.value = np.array(value)  ###For optim
-        self.simvalue = None  ###all implicit and explicit varaiables for simulation generated from self.value
+        self.optvar = np.array(optvar)  ###For optim
+        self.simvar = None  ###all implicit and explicit varaiables for simulation generated from self.value
         self.rank = 0
         self.rawobj = (
             None  # Save all mid and final values for record (self.output+self.mid)
@@ -59,7 +59,7 @@ class nsgaii_var:
 
     def duplicate(self) -> "nsgaii_var":
         #### Get An Unsorted Var Duplicate
-        dup = nsgaii_var(self.value)
+        dup = nsgaii_var(self.optvar)
         dup.obj = self.obj.copy()
         return dup
 
@@ -72,8 +72,8 @@ class nsgaii_var:
     def setConstrainted_objs(self, c_objective):
         self.constrainted_obj = np.array(c_objective)
 
-    def setSimValue(self, simvalue):
-        self.simvalue = np.array(simvalue)
+    def setSimVar(self, simvar):
+        self.simvar = np.array(simvar)
 
     def dom(self, other):
         ### FIND MINIMUM
@@ -134,7 +134,7 @@ class nsgaii_var:
 
 
 class myAlg_nsga(myAlg):
-    def __init__(self, manager: cstmanager.manager = None, params=None, Logger=None):
+    def __init__(self, manager: cstmanager.manager = None, params=None, logger=None):
         super().__init__(manager, params)
         self.parameter_range = 0
         self.CSTparams = params
@@ -144,8 +144,8 @@ class myAlg_nsga(myAlg):
 
         # 读写
         # self.mode_location = 'result\\'
-        if Logger is not None:
-            self.logger = Logger
+        if logger is not None:
+            self.logger = logger
         else:
             self.logger = logging.getLogger(__name__)
         self.mode_location = None
@@ -190,24 +190,29 @@ class myAlg_nsga(myAlg):
             self.constraint_func = None
 
         self.input_name_opt = ["Leq", "Req", "I0", "R0", "R1"]
-        self.input_name = ["Leq", "Req", "I0", "R0", "R1"]
-        self.input_min = [60, 180, 5, 5, 5]  ##初始值
-        self.input_max = [120, 200, 20, 20, 20]  ##初始值
+        self.input_name_sim = ["Leq", "Req", "I0", "R0", "R1"]
+        self.input_sim_min = [60, 180, 5, 5, 5]  ##初始值
+        self.input_sim_max = [120, 200, 20, 20, 20]  ##初始值
 
-        self.require_sim_input_transfrom = (
+        self.require_sim2opt_transfrom = (
             False  #### IF TRUE disables input_mins and use values below instead
         )
-        self.sim_input_conv_method = self.simtransfromfunc
-        self.opt_input_name = ["Leq", "Req", "I0", "R0", "R1"]
-        self.opt_input_min = [60, 180, 5, 5, 5]  ##初始值 for opt
-        self.opt_input_max = [120, 200, 40, 40, 40]  ##初始值
-        self.output_name = [
+        self.opt2sim_method = self.opt2sim
+        if self.require_sim2opt_transfrom:
+            self.input_name_opt = ["Leq", "Req", "I0", "R0", "R1"]
+            self.input_opt_min = [60, 180, 5, 5, 5]  ##初始值 for opt
+            self.input_opt_max = [120, 200, 40, 40, 40]  ##初始值
+        else:
+            self.input_name_opt=self.input_name_sim
+            self.input_opt_min=self.input_sim_min
+            self.input_opt_max=self.input_sim_max
+        self.sim_output_name = [
             "frequency",
             "R_divide_Q",
             "Q-factor",
             "Shunt_Inpedence",
         ]
-        self.info_name = []
+        self.mid_var_name = []
         self.object_name = [
             "frequency_offset",
             "R_divide_Q",
@@ -223,17 +228,13 @@ class myAlg_nsga(myAlg):
         self.freqdomstr = "Req"
 
         #### SET RANGE
-        if self.require_sim_input_transfrom:
-            min_realvar_raw, max_realvar_raw = self.opt_input_min, self.opt_input_max
-        else:
-            min_realvar_raw, max_realvar_raw = self.input_min, self.input_max
-        self.min_realvar, self.max_realvar = np.array(min_realvar_raw), np.array(
-            max_realvar_raw
+        self.min_realvar, self.max_realvar = np.array(self.input_opt_min), np.array(
+            self.input_opt_max
         )
 
-    def simtransfromfunc(self, altinput):
+    def opt2sim(self, input,reverse=False):
 
-        oarr = np.array(altinput)
+        oarr = np.array(input)
         return oarr
 
     def constraint_function_TM020(self, iconstrainted_obj, iobj):
@@ -247,10 +248,9 @@ class myAlg_nsga(myAlg):
 
     def getFullNameList(self):
         namelist = []
-        namelist = namelist + self.input_name
-        if self.require_sim_input_transfrom:
-            namelist += self.opt_input_name
-        namelist += self.output_name + self.info_name + self.object_name
+        namelist = namelist + self.input_name_sim
+        namelist += self.input_name_opt
+        namelist += self.sim_output_name + self.mid_var_name + self.object_name
         if self.constrainted:
             namelist += self.constrainted_object_name
         return namelist
@@ -273,13 +273,13 @@ class myAlg_nsga(myAlg):
                 iconstrainted_obj, iobj
             )
 
-    def fnds(self, vallist: List[nsgaii_var]):  ## Fast non dominated sort
+    def fnds(self, poplist: List[nsgaii_var]):  ## Fast non dominated sort
 
-        flist: List[List[nsgaii_var]] = [None for _ in range(len(vallist))]
+        flist: List[List[nsgaii_var]] = [None for _ in range(len(poplist))]
         flist[0] = list()
         #### Get All Dom Relations
-        for p in vallist:
-            for q in vallist:
+        for p in poplist:
+            for q in poplist:
                 if p.id == q.id:
                     continue
 
@@ -347,19 +347,19 @@ class myAlg_nsga(myAlg):
                             ilist[u + 1].obj[i] - ilist[u - 1].obj[i]
                         ) / coff
 
-    def crossover_real_SBX_np(self, par1, par2):
+    def crossover_real_SBX_np(self, par1:nsgaii_var, par2:nsgaii_var):
 
         uarray = np.random.random(self.nval)
         barray = np.less_equal(uarray, 0.5)
         nbarray = np.logical_not(barray)
         gamma = np.sqrt(2 * uarray) * barray + np.sqrt(0.5 / (1 - uarray)) * nbarray
-        val1 = 0.5 * ((1 + gamma) * par1.value + (1 - gamma) * par2.value)
-        val2 = 0.5 * ((1 - gamma) * par1.value + (1 + gamma) * par2.value)
+        val1 = 0.5 * ((1 + gamma) * par1.optvar + (1 - gamma) * par2.optvar)
+        val2 = 0.5 * ((1 - gamma) * par1.optvar + (1 + gamma) * par2.optvar)
 
         val1 = np.clip(val1, self.min_realvar, self.max_realvar)
         val2 = np.clip(val2, self.min_realvar, self.max_realvar)
-        child1 = self.new_nsgaii_var(val1)
-        child2 = self.new_nsgaii_var(val2)
+        child1 = self.new_nsgaii_var_opt(val1)
+        child2 = self.new_nsgaii_var_opt(val2)
         return child1, child2
 
     def mutation_real_np(self, ind: nsgaii_var):
@@ -369,7 +369,7 @@ class myAlg_nsga(myAlg):
         rnd2 = np.random.random(self.nval)
         barray2 = np.less_equal(rnd2, 0.5)
         nbarray2 = np.logical_not(barray2)
-        v = np.array(ind.value)
+        v = np.array(ind.optvar)
         vl = np.array(self.min_realvar)
         vu = np.array(self.max_realvar)
         delta1 = (v - vl) / (vu - vl)
@@ -387,16 +387,20 @@ class myAlg_nsga(myAlg):
 
         v = v + (deltaq1 * barray2 + deltaq2 * nbarray2) * (vu - vl)
         np.clip(v, vl, vu, v)
-        v = v * barray + np.array(ind.value) * np.logical_not(barray)  ### BUGFIX
+        v = v * barray + np.array(ind.optvar) * np.logical_not(barray)  ### BUGFIX
         v = np.clip(v, self.min_realvar, self.max_realvar)  ###boundary check
-        ind.value = v
+        ind.optvar = v
+        if self.require_sim2opt_transfrom:
+            ind.setSimVar(self.opt2sim(v))
+        else:
+            ind.setSimVar(v)
 
     def mutation_real_np_freqlock(self, ind: nsgaii_var):
         ####
         # Dom Req main factor of Freq
         ####
         try:
-            domfactorindex = self.input_name.index("Req")
+            domfactorindex = self.input_name_sim.index("Req")
             domfactorexist = True
         except ValueError:
             domfactorexist = False
@@ -417,7 +421,7 @@ class myAlg_nsga(myAlg):
         rnd2 = np.random.random(self.nval)
         barray2 = np.less_equal(rnd2, 0.5)
         nbarray2 = np.logical_not(barray2)
-        v = np.array(ind.value)
+        v = np.array(ind.optvar)
         vl = np.array(self.min_realvar)
         vu = np.array(self.max_realvar)
         delta1 = (v - vl) / (vu - vl)
@@ -435,12 +439,12 @@ class myAlg_nsga(myAlg):
 
         v = v + (deltaq1 * barray2 + deltaq2 * nbarray2) * (vu - vl)
         np.clip(v, vl, vu, v)
-        v = v * barray + np.array(ind.value) * np.logical_not(barray)  ### BUGFIX
+        v = v * barray + np.array(ind.optvar) * np.logical_not(barray)  ### BUGFIX
 
         ###Manual mutation for domfactor
         ## TODO
         if domfactorexist and targetexist:
-            domfv = np.array(ind.value)[domfactorindex]
+            domfv = np.array(ind.optvar)[domfactorindex]
             tgtv = np.array(ind.rawobj)[targetvalueindex]
             freqdiff = tgtv - self.targetfreq
             if abs(freqdiff) > self.freqthreshold:
@@ -448,7 +452,7 @@ class myAlg_nsga(myAlg):
             v[domfactorindex] = newdomfv
 
         v = np.clip(v, self.min_realvar, self.max_realvar)  ###boundary check
-        ind.value = v
+        ind.optvar = v
 
     def tournament(self, ind1: nsgaii_var, ind2: nsgaii_var):
         if ind1.crowed_cmp_lt(ind2):
@@ -522,82 +526,23 @@ class myAlg_nsga(myAlg):
                 sum += len(list)
         return sum
 
-    def nsgaii_generation_demo(self, model, fnds_callback=None):  ##
-        self.param_check()
-        ### fnds_callback for mid output
 
-        valarr = self.random_sampling_LHS_np(self.popsize)
-        val_width = self.max_realvar - self.min_realvar
-        valarr = valarr * val_width + self.min_realvar
-
-        poplist = []
-        acceptedpop = []
-
-        for var in valarr:
-            ind = nsgaii_var(var)
-            poplist.append(ind)
-        imodel = model
-        for igen in range(self.generation):
-            ###WORK To get Obj
-
-            for ind in poplist:
-                ind.setObjs(list(imodel(ind.value)))
-
-            childpoplist = self.offspring_gen(poplist)
-
-            for ind in childpoplist:
-                ind.setObjs(list(imodel(ind.value)))
-            ###DONE
-            poplist = poplist + childpoplist
-
-            if self.constrainted:
-                self.constrainted_dominance(poplist)
-
-            fndsresult = self.fnds(poplist)
-            # print("FNDS_SIZE",calc_fnds_size(fndsresult),"INPOP:",len(poplist))
-            if fnds_callback is not None:
-                fnds_callback(igen, fndsresult)
-            ###find accept
-            acceptedpop.clear()
-            pack = self.popsize
-            for iset in fndsresult:
-
-                # print("PACK=%d" %pack)
-                if pack <= 0:
-                    break
-                if not iset:
-                    continue
-                if pack >= len(iset):
-                    for ind in iset:
-                        acceptedpop.append(ind)
-                    pack -= len(iset)
-
-                else:
-                    curfront = list(iset)
-                    self.crowding_dis_assign(curfront)
-                    curfront.sort(
-                        key=lambda x: x.crowed_dis, reverse=True
-                    )  ###按最大拥挤距离排序
-                    n2p = pack
-                    # print("LAST FRONT:%d"%n2p)
-                    acceptedpop += curfront[0:n2p]
-                    pack = 0
-                # print("    ACC PROP SIZE:%d"%len(acceptedpop),"TO GO:%d" %pack)
-            poplist.clear()
-            poplist += acceptedpop
-            self.logger.info("GEN:%d DONE, SIZE:%d" % (igen, len(acceptedpop)))
-            ### GEN DONE
-        return poplist
-
-    def new_nsgaii_var(self, optvalue):
-        newnsga = nsgaii_var(optvalue)
-        if self.require_sim_input_transfrom:
-            simvalue = self.sim_input_conv_method(optvalue)
-            newnsga.setSimValue(simvalue)
+    def new_nsgaii_var_opt(self, optvar):
+        newnsga = nsgaii_var(optvar)
+        if self.require_sim2opt_transfrom:
+            simvar = self.opt2sim_method(optvar)
         else:
-            newnsga.setSimValue(newnsga.value)
+            simvar =optvar
+        newnsga.setSimVar(simvar)
         return newnsga
-
+    def new_nsgaii_var_sim(self, simvar):
+        if self.require_sim2opt_transfrom:   
+            optvar = self.opt2sim_method(simvar,reverse=True)
+        else:
+            optvar=simvar
+        newnsga = nsgaii_var(optvar) 
+        newnsga.setSimVar(simvar)
+        return newnsga
     def nsgaii_generation_parallel(self, fnds_callback=None):  ##
         self.param_check()
         ### fnds_callback for mid output
@@ -611,8 +556,8 @@ class myAlg_nsga(myAlg):
         poplist: List[nsgaii_var] = []
         acceptedpop: List[nsgaii_var] = []
 
-        for var in valarr:
-            ind = self.new_nsgaii_var(var)
+        for optvar in valarr:
+            ind = self.new_nsgaii_var_opt(optvar)
             poplist.append(ind)
 
         #### OPTIMIZAION
@@ -631,8 +576,8 @@ class myAlg_nsga(myAlg):
 
         # First Run To Get the Initial Pop
         for ind in poplist:
-            JobName = "Init_Pop_" + str(ind.id)
-            params = self.createSimParamDictFromNPvar(ind.simvalue)
+            JobName = "GEN_0_" + str(ind.id)
+            params = self.createSimParamDictFromNPArr(ind.simvar)
             self.manager.addTask(params=params, job_name=JobName)
         ###
         self.manager.startProcessing()
@@ -651,9 +596,6 @@ class myAlg_nsga(myAlg):
         processedpoplist = []
         for ind in poplist:
             resultindex = mapdict.get(ind.id)
-            if results[resultindex]["TaskStatus"] != "Success":
-                ind.done = False
-                continue
             objarray, c_objarray, rawarray = self.convertResult(results[resultindex])
             ind.setObjs(objarray)
             ind.setRawObjs(rawarray)
@@ -665,8 +607,9 @@ class myAlg_nsga(myAlg):
             ind.done = True
             processedpoplist.append(ind)
 
-        poplist = processedpoplist
-
+        poplist += processedpoplist
+        processedpoplist.clear()
+        
         for igen in range(self.generation):
             if igen > 0:
                 ### CREATE CHILD POP
@@ -674,7 +617,7 @@ class myAlg_nsga(myAlg):
                 # Run To Get the Children POP
                 for ind in childpoplist:
                     JobName = "GEN_%d_" % igen + str(ind.id)
-                    params = self.createSimParamDictFromNPvar(ind.simvalue)
+                    params = self.createSimParamDictFromNPArr(ind.simvar)
                     self.manager.addTask(params=params, job_name=JobName)
                 ###
                 self.manager.startProcessing()
@@ -688,12 +631,9 @@ class myAlg_nsga(myAlg):
                 for index, iresult in enumerate(results):
                     targetid = int(iresult["RunName"].split("_")[2])
                     mapdict.update({targetid: index})
-                processedpoplist = []
                 for ind in childpoplist:
                     resultindex = mapdict.get(ind.id)
-                    if results[resultindex]["TaskStatus"] != "Success":
-                        ind.done = False
-                        continue
+                    
                     objarray, c_objarray, rawarray = self.convertResult(
                         results[resultindex]
                     )
@@ -708,15 +648,18 @@ class myAlg_nsga(myAlg):
                     processedpoplist.append(ind)
                 childpoplist = processedpoplist
                 ###DONE
-                poplist = poplist + childpoplist
-
+                poplist += childpoplist
+                childpoplist.clear()
+                
             ### FNDS SORT
             fndsresult = self.fnds(poplist)
+            poplist.clear()
+            
             if len(fnds_callback) > 0:
                 for ifnds in fnds_callback:
                     ifnds(igen, fndsresult)
             ###find accepted
-            acceptedpop.clear()
+            
             pack = self.popsize
             for iset in fndsresult:
                 # print("PACK=%d" %pack)
@@ -739,9 +682,8 @@ class myAlg_nsga(myAlg):
                     acceptedpop += curfront[0:n2p]
                     pack = 0
                 # print("    ACC PROP SIZE:%d"%len(acceptedpop),"TO GO:%d" %pack)
-            poplist.clear()
             poplist += acceptedpop
-
+            acceptedpop.clear()
             self.logger.info("GEN:%d DONE, SIZE:%d" % (igen, len(acceptedpop)))
             ### GEN DONE
         return poplist
@@ -803,11 +745,11 @@ class myAlg_nsga(myAlg):
         }
         return processedResult
 
-    def createSimParamDictFromNPvar(self, simvar):
+    def createSimParamDictFromNPArr(self, simvar):
         odict = {}
-        for i in range(len(self.input_name)):
-            key = self.input_name[i]
-            value = simvar[i]
+        for i in range(len(self.input_name_sim)):
+            key = self.input_name_sim[i]
+            value = float(simvar[i])
             odict.update({key: value})
         return odict
 
@@ -827,7 +769,7 @@ class myAlg_nsga(myAlg):
         # DONE
         raw_obj_list = []
         c_iobj_list = []
-        for oname in self.output_name:
+        for oname in self.sim_output_name:
             raw_obj_list.append(pResult["PostProcessResult"][oname])
         c_iobj_list.append(pResult["PostProcessResult"]["frequency"])
 
@@ -903,7 +845,7 @@ class myAlg_nsga(myAlg):
         self.logCalcSettings()
 
         start_time = time.time()
-        sample = pd.DataFrame([self.input_min], columns=self.input_name)
+        sample = pd.DataFrame([self.input_sim_min], columns=self.input_name_sim)
         samples = pd.DataFrame()
         namelist = self.getFullNameList()
 
@@ -913,7 +855,7 @@ class myAlg_nsga(myAlg):
         icallback2 = fnds_callback_dump_individuals(
             savedir=resultDir,
             namelist=namelist,
-            require_transform=self.require_sim_input_transfrom,
+            require_transform=self.require_sim2opt_transfrom,
             constrainted=self.constrainted,
         )
         # self.nval = model.n
@@ -922,7 +864,7 @@ class myAlg_nsga(myAlg):
         poplist = self.nsgaii_generation_parallel(fnds_callback=[icallback, icallback2])
         result = self.fnds(poplist)
         endtime = time.time()
-        self.logger.info("elapsed time=%f"% (endtime - sttime))
+        self.logger.info("elapsed time=%f" % (endtime - sttime))
 
         end_time = time.time()
         self.logger.info(end_time - start_time)
@@ -945,7 +887,7 @@ class fnds_callback_dump_individuals:
         if not self.savedir.exists():
             self.savedir.mkdir(parents=True)
 
-    def __call__(self, igen, fndslist):
+    def __call__(self, igen, fndslist:List[List[nsgaii_var]]):
 
         iprocess = multiprocessing.Process(
             target=dump_individual_worker_func,
@@ -970,13 +912,14 @@ class fnds_callback_dump_individuals:
                                 "id": indv.id,
                                 "rank": indv.rank,
                                 "pset": [i.id for i in indv.pset],
-                                "value": indv.value.tolist(),
+                                "optvar": indv.optvar.tolist(),
                             }
                         }
                         d.update(u)
 
         json.dump(d, fp, indent=4)
         fp.close()
+        iprocess.join()
 
 
 def dump_individual_worker_func(
@@ -998,9 +941,8 @@ def dump_individual_worker_func(
             for indv in fnd:
                 data_row_list = []
                 data_row_list += [igen, indv.id, ifnd]
-                if require_transform:
-                    data_row_list += indv.simvalue.tolist()
-                data_row_list += indv.value.tolist()
+                data_row_list += indv.simvar.tolist()
+                data_row_list += indv.optvar.tolist()
                 data_row_list += indv.rawobj.tolist()
                 data_row_list += indv.obj.tolist()
                 if constrainted:
