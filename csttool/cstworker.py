@@ -227,7 +227,7 @@ class local_cstworker(worker.worker):
                 
                 if flagPathFailure.exists():
                     fp= open(flagPathFailure,"r")
-                    fresult=fp.readlines()[2]
+                    fresult=fp.readlines()[2].strip('\n')
                     self.logger.info(
                     "WorkerID:%r Run:%r Name:%r Run Failure. Reported %s"
                     % (self.ID, self.taskIndex, self.runName, fresult)

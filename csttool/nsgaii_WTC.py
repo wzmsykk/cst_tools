@@ -181,8 +181,8 @@ class myAlg_nsga(myAlg):
         self.nval = 11
         self.pmut_real = 0.1
         self.eta_m = 1  ## coff for mutation
-        self.popsize = 100
-        self.generation = 20
+        self.popsize = 10
+        self.generation = 4
 
         self.min_opt_realvar = []
         self.max_opt_realvar = []
@@ -674,7 +674,7 @@ class myAlg_nsga(myAlg):
         ### fnds_callback for mid output
         if not isinstance(fnds_callback, list):
             fnds_callback = [fnds_callback]
-        init_overprovison_factor=4 #default 2 /for larger init pop increase this
+        init_overprovison_factor=2 #default 2 /for larger init pop increase this
         valarr = self.random_sampling_LHS_np(self.popsize * init_overprovison_factor)
         val_width = self.max_opt_realvar - self.min_opt_realvar
         valarr = valarr * val_width + self.min_opt_realvar
@@ -716,11 +716,13 @@ class myAlg_nsga(myAlg):
         for index, iresult in enumerate(results):
             targetid = int(iresult["RunName"].split("_")[2])
             mapdict.update({targetid: index})
+        #print(mapdict)
         processedpoplist = []
         for ind in poplist:
             resultindex = mapdict.get(ind.id)
             if resultindex is None:
                 ### IN CASE CST MISCALC
+                #print("Misculc at %d"%ind.id)
                 continue
             objarray, c_objarray, rawarray = self.convertResult(results[resultindex])
             ind.setObjs(objarray)
@@ -732,7 +734,7 @@ class myAlg_nsga(myAlg):
                 )
             ind.done = True
             processedpoplist.append(ind)
-
+        poplist.clear()
         poplist += processedpoplist
         processedpoplist.clear()
         
@@ -776,15 +778,16 @@ class myAlg_nsga(myAlg):
                     ind.done = True
                     processedpoplist.append(ind)
                     #self.logger.debug("IDX:%d,OPTVAR:%s,SIMVAR:%s"%(ind.id,str(ind.optvar),str(ind.simvar)))
-                childpoplist = processedpoplist
+                childpoplist.clear()
+                childpoplist += processedpoplist
+                processedpoplist.clear()
                 ###DONE
                 poplist += childpoplist
-                childpoplist.clear()
+                
                 
             ### FNDS SORT
+            #print("LEN_poplist:%d"%len(poplist))
             fndsresult = self.fnds(poplist)
-            poplist.clear()
-            
             if len(fnds_callback) > 0:
                 for ifnds in fnds_callback:
                     ifnds(igen, fndsresult)
@@ -792,7 +795,7 @@ class myAlg_nsga(myAlg):
             
             pack = self.popsize
             for iset in fndsresult:
-                # print("PACK=%d" %pack)
+                #print("PACK=%d" %(pack))
                 if pack <= 0:
                     break
                 if not iset:
@@ -811,10 +814,13 @@ class myAlg_nsga(myAlg):
                     # print("LAST FRONT:%d"%n2p)
                     acceptedpop += curfront[0:n2p]
                     pack = 0
-                # print("    ACC PROP SIZE:%d"%len(acceptedpop),"TO GO:%d" %pack)
+                #print("    ACC PROP SIZE:%d"%len(acceptedpop),"TO GO:%d" %pack)
+                
+            poplist.clear()
             poplist += acceptedpop
-            acceptedpop.clear()
+            
             self.logger.info("GEN:%d DONE, SIZE:%d" % (igen, len(acceptedpop)))
+            acceptedpop.clear()
             ### GEN DONE
         return poplist
 

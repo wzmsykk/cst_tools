@@ -615,7 +615,7 @@ class myAlg_nsga(myAlg):
                 )
             ind.done = True
             processedpoplist.append(ind)
-
+        poplist.clear()
         poplist += processedpoplist
         processedpoplist.clear()
         
@@ -659,7 +659,9 @@ class myAlg_nsga(myAlg):
                         )
                     ind.done = True
                     processedpoplist.append(ind)
+                childpoplist.clear()
                 childpoplist = processedpoplist
+                processedpoplist.clear()
                 ###DONE
                 poplist += childpoplist
                 childpoplist.clear()
@@ -695,9 +697,11 @@ class myAlg_nsga(myAlg):
                     acceptedpop += curfront[0:n2p]
                     pack = 0
                 # print("    ACC PROP SIZE:%d"%len(acceptedpop),"TO GO:%d" %pack)
+            poplist.clear()
             poplist += acceptedpop
-            acceptedpop.clear()
+            
             self.logger.info("GEN:%d DONE, SIZE:%d" % (igen, len(acceptedpop)))
+            acceptedpop.clear()
             ### GEN DONE
         return poplist
 
