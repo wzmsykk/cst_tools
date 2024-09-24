@@ -136,6 +136,7 @@ class nsgaii_var:
 class myAlg_nsga(myAlg):
     def __init__(self, manager: cstmanager.manager = None, params=None, logger=None):
         super().__init__(manager, params)
+        self.debug=True
         self.parameter_range = 0
         self.CSTparams = params
 
@@ -177,11 +178,11 @@ class myAlg_nsga(myAlg):
         self.nval = 5
         self.pmut_real = 0.1
         self.eta_m = 1  ## coff for mutation
-        self.popsize = 100
-        self.generation = 40
+        self.popsize = 4
+        self.generation = 2
 
-        self.min_realvar = []
-        self.max_realvar = []
+        self.min_opt_realvar = []
+        self.max_opt_realvar = []
 
         self.constrainted = True
         if self.constrainted:
@@ -189,10 +190,10 @@ class myAlg_nsga(myAlg):
         else:
             self.constraint_func = None
 
-        self.input_name_opt = ["Leq", "Req", "I0", "R0", "R1"]
-        self.input_name_sim = ["Leq", "Req", "I0", "R0", "R1"]
-        self.input_sim_min = [60, 180, 5, 5, 5]  ##初始值
-        self.input_sim_max = [120, 200, 20, 20, 20]  ##初始值
+        self.input_name_opt = ["Leq", "deq", "RCoaxAbsorb", "WCoaxAbsorb", "HCoaxAbsorb"]
+        self.input_name_sim = ["Leq", "deq", "RCoaxAbsorb", "WCoaxAbsorb", "HCoaxAbsorb"]
+        self.input_sim_min = [50, 340, 40, 5, 20]  ##初始值
+        self.input_sim_max = [90, 360, 60, 10, 35]  ##初始值
 
         self.require_sim2opt_transfrom = (
             False  #### IF TRUE disables input_mins and use values below instead
@@ -223,12 +224,12 @@ class myAlg_nsga(myAlg):
         ##### Freq Options
         self.targetfreq = 1500
         self.freqthreshold = 0.05
-        self.freqlockmut = True
+        self.freqlockmut = False
         self.freqstr = "frequency"
         self.freqdomstr = "Req"
 
         #### SET RANGE
-        self.min_realvar, self.max_realvar = np.array(self.input_opt_min), np.array(
+        self.min_opt_realvar, self.max_opt_realvar = np.array(self.input_opt_min), np.array(
             self.input_opt_max
         )
 
@@ -356,8 +357,8 @@ class myAlg_nsga(myAlg):
         val1 = 0.5 * ((1 + gamma) * par1.optvar + (1 - gamma) * par2.optvar)
         val2 = 0.5 * ((1 - gamma) * par1.optvar + (1 + gamma) * par2.optvar)
 
-        val1 = np.clip(val1, self.min_realvar, self.max_realvar)
-        val2 = np.clip(val2, self.min_realvar, self.max_realvar)
+        val1 = np.clip(val1, self.min_opt_realvar, self.max_opt_realvar)
+        val2 = np.clip(val2, self.min_opt_realvar, self.max_opt_realvar)
         child1 = self.new_nsgaii_var_opt(val1)
         child2 = self.new_nsgaii_var_opt(val2)
         return child1, child2
@@ -370,8 +371,8 @@ class myAlg_nsga(myAlg):
         barray2 = np.less_equal(rnd2, 0.5)
         nbarray2 = np.logical_not(barray2)
         v = np.array(ind.optvar)
-        vl = np.array(self.min_realvar)
-        vu = np.array(self.max_realvar)
+        vl = np.array(self.min_opt_realvar)
+        vu = np.array(self.max_opt_realvar)
         delta1 = (v - vl) / (vu - vl)
         delta2 = (vu - v) / (vu - vl)
         mut_pow = 1.0 / (self.eta_m + 1.0)
@@ -388,7 +389,7 @@ class myAlg_nsga(myAlg):
         v = v + (deltaq1 * barray2 + deltaq2 * nbarray2) * (vu - vl)
         np.clip(v, vl, vu, v)
         v = v * barray + np.array(ind.optvar) * np.logical_not(barray)  ### BUGFIX
-        v = np.clip(v, self.min_realvar, self.max_realvar)  ###boundary check
+        v = np.clip(v, self.min_opt_realvar, self.max_opt_realvar)  ###boundary check
         ind.optvar = v
         if self.require_sim2opt_transfrom:
             ind.setSimVar(self.opt2sim(v))
@@ -422,8 +423,8 @@ class myAlg_nsga(myAlg):
         barray2 = np.less_equal(rnd2, 0.5)
         nbarray2 = np.logical_not(barray2)
         v = np.array(ind.optvar)
-        vl = np.array(self.min_realvar)
-        vu = np.array(self.max_realvar)
+        vl = np.array(self.min_opt_realvar)
+        vu = np.array(self.max_opt_realvar)
         delta1 = (v - vl) / (vu - vl)
         delta2 = (vu - v) / (vu - vl)
         mut_pow = 1.0 / (self.eta_m + 1.0)
@@ -451,7 +452,7 @@ class myAlg_nsga(myAlg):
                 newdomfv = (domfv - self.targetfreq) / 2.5525 + domfv
             v[domfactorindex] = newdomfv
 
-        v = np.clip(v, self.min_realvar, self.max_realvar)  ###boundary check
+        v = np.clip(v, self.min_opt_realvar, self.max_opt_realvar)  ###boundary check
         ind.optvar = v
 
     def tournament(self, ind1: nsgaii_var, ind2: nsgaii_var):
@@ -548,14 +549,16 @@ class myAlg_nsga(myAlg):
         ### fnds_callback for mid output
         if not isinstance(fnds_callback, list):
             fnds_callback = [fnds_callback]
-
-        valarr = self.random_sampling_LHS_np(self.popsize * 2)
-        val_width = self.max_realvar - self.min_realvar
-        valarr = valarr * val_width + self.min_realvar
+        init_overprovison_factor=2 #default 2 /for larger init pop increase this
+        valarr = self.random_sampling_LHS_np(self.popsize * init_overprovison_factor)
+        val_width = self.max_opt_realvar - self.min_opt_realvar
+        valarr = valarr * val_width + self.min_opt_realvar
 
         poplist: List[nsgaii_var] = []
         acceptedpop: List[nsgaii_var] = []
-
+        init01=[78,335.12,53,7.8,28] ##SIM VALUE
+        ind00=self.new_nsgaii_var_sim(init01)
+        poplist.append(ind00)
         for optvar in valarr:
             ind = self.new_nsgaii_var_opt(optvar)
             poplist.append(ind)
@@ -596,6 +599,12 @@ class myAlg_nsga(myAlg):
         processedpoplist = []
         for ind in poplist:
             resultindex = mapdict.get(ind.id)
+            if resultindex is None:
+                ### IN CASE CST MISCALC
+                self.logger.debug("ID:%d No PPS Results"%ind.id)
+                continue
+            if self.debug:
+                self.logger.debug("id:%d Results: "%ind.id+str(results[resultindex]))
             objarray, c_objarray, rawarray = self.convertResult(results[resultindex])
             ind.setObjs(objarray)
             ind.setRawObjs(rawarray)
@@ -633,7 +642,11 @@ class myAlg_nsga(myAlg):
                     mapdict.update({targetid: index})
                 for ind in childpoplist:
                     resultindex = mapdict.get(ind.id)
-                    
+                    if resultindex is None:
+                        ### IN CASE CST MISCALC
+                        continue
+                    if self.debug:
+                        self.logger.debug("id:%d Results: "%ind.id+str(results[resultindex]))
                     objarray, c_objarray, rawarray = self.convertResult(
                         results[resultindex]
                     )

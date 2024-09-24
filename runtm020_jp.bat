@@ -1,0 +1,1 @@
+python.exe .\base_tm020.py -p ".\project\TM020_JP" -f ".\project\TM020_JP\TM020_OPT_Simp_JP.cst"

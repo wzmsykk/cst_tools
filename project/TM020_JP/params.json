@@ -1,0 +1,130 @@
+[
+    {
+        "id": 0,
+        "name": "HCoaxAbsorb",
+        "value": "28",
+        "type": "double",
+        "fixed": false,
+        "description": ""
+    },
+    {
+        "id": 1,
+        "name": "I0",
+        "value": "10",
+        "type": "double",
+        "fixed": false,
+        "description": ""
+    },
+    {
+        "id": 2,
+        "name": "Leq",
+        "value": "78",
+        "type": "double",
+        "fixed": false,
+        "description": ""
+    },
+    {
+        "id": 3,
+        "name": "Ltube",
+        "value": "100",
+        "type": "double",
+        "fixed": false,
+        "description": ""
+    },
+    {
+        "id": 4,
+        "name": "R0",
+        "value": "10",
+        "type": "double",
+        "fixed": false,
+        "description": ""
+    },
+    {
+        "id": 5,
+        "name": "R1",
+        "value": "10",
+        "type": "double",
+        "fixed": false,
+        "description": ""
+    },
+    {
+        "id": 6,
+        "name": "RCoaxAbsorb",
+        "value": "53.0",
+        "type": "double",
+        "fixed": false,
+        "description": ""
+    },
+    {
+        "id": 7,
+        "name": "Req",
+        "value": "deq/2",
+        "type": "expression",
+        "fixed": true,
+        "description": ""
+    },
+    {
+        "id": 8,
+        "name": "Rtube",
+        "value": "dtube/2",
+        "type": "expression",
+        "fixed": true,
+        "description": ""
+    },
+    {
+        "id": 9,
+        "name": "WCoaxAbsorb",
+        "value": "7.8",
+        "type": "double",
+        "fixed": false,
+        "description": ""
+    },
+    {
+        "id": 10,
+        "name": "c3",
+        "value": "Leq",
+        "type": "expression",
+        "fixed": true,
+        "description": ""
+    },
+    {
+        "id": 11,
+        "name": "deq",
+        "value": "355.12",
+        "type": "double",
+        "fixed": false,
+        "description": ""
+    },
+    {
+        "id": 12,
+        "name": "dtube",
+        "value": "52",
+        "type": "double",
+        "fixed": false,
+        "description": ""
+    },
+    {
+        "id": 13,
+        "name": "fmax",
+        "value": "2000",
+        "type": "double",
+        "fixed": false,
+        "description": ""
+    },
+    {
+        "id": 14,
+        "name": "fmin",
+        "value": "0",
+        "type": "double",
+        "fixed": false,
+        "description": ""
+    },
+    {
+        "id": 15,
+        "name": "nmodes",
+        "value": "10",
+        "type": "double",
+        "fixed": false,
+        "description": ""
+    }
+]

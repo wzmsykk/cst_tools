@@ -136,7 +136,7 @@ class nsgaii_var:
 
 
 class myAlg_nsga(myAlg):
-    def __init__(self, manager: cstmanager.manager|None = None, params=None, logger=None):
+    def __init__(self, manager: cstmanager.manager = None, params=None, logger=None):
         super().__init__(manager, params)
         self.debug=True
         self.parameter_range = 0
