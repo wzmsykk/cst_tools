@@ -10,6 +10,11 @@
         "params": {}
     },
     {
+        "resultName": "R over Q (Mode 1)",
+        "method": "Direct_PPS_0D",
+        "params": {}
+    },
+    {
         "resultName": "Q-Factor (Perturbation) (Mode 1)",
         "method": "Direct_PPS_0D",
         "params": {}

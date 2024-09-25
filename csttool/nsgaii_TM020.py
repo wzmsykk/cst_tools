@@ -664,11 +664,10 @@ class myAlg_nsga(myAlg):
                 processedpoplist.clear()
                 ###DONE
                 poplist += childpoplist
-                childpoplist.clear()
+
                 
             ### FNDS SORT
             fndsresult = self.fnds(poplist)
-            poplist.clear()
             
             if len(fnds_callback) > 0:
                 for ifnds in fnds_callback:

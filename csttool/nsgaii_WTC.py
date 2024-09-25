@@ -178,11 +178,11 @@ class myAlg_nsga(myAlg):
 
         ##### NSGA OPTIONS #####
         self.nobj = 3
-        self.nval = 11
+        self.nval = 9
         self.pmut_real = 0.1
         self.eta_m = 1  ## coff for mutation
-        self.popsize = 10
-        self.generation = 4
+        self.popsize = 4
+        self.generation = 2
 
         self.min_opt_realvar = []
         self.max_opt_realvar = []
@@ -202,8 +202,6 @@ class myAlg_nsga(myAlg):
             "C2",
             "C3",
             "C4",
-            "gx0",
-            "gy0",
             "L",
         ]
         self.input_sim_min = [
@@ -215,8 +213,6 @@ class myAlg_nsga(myAlg):
             90,
             60,
             10,
-            70,
-            400,
             700,
         ]  ##MIN
         self.input_sim_max = [
@@ -228,8 +224,6 @@ class myAlg_nsga(myAlg):
             110,
             80,
             30,
-            80,
-            600,
             2500,
         ]  ##MAX
 
@@ -245,8 +239,6 @@ class myAlg_nsga(myAlg):
                 "C2",
                 "C3",
                 "C4",
-                "gx0",
-                "gy0",
                 "L",
             ]
             #a=Ka(Rx-gx0-L/2) 
@@ -259,8 +251,6 @@ class myAlg_nsga(myAlg):
                 50,
                 10,
                 10,
-                70,
-                250,
                 1000,
             ]  ##MIN
             self.input_opt_max = [
@@ -272,8 +262,6 @@ class myAlg_nsga(myAlg):
                 300,
                 100,
                 50,
-                80,
-                1250,
                 2500,
             ]  ##MAX
             ####
@@ -292,11 +280,13 @@ class myAlg_nsga(myAlg):
             "Voltage beta=1 (Mode 1)",
             "face1_Max_e",
             "face1_Max_h",
+            "R over Q (Mode 1)",
         ]
         self.mid_var_name = [
             "beta",
             "Epk@2MV",
             "Hpk@2MV",
+            "TTF"
         ]  ###not used for optim but used for info and Mid Calc
 
         self.object_name = [  ### target name
@@ -331,8 +321,6 @@ class myAlg_nsga(myAlg):
         #     "C2",
         #     "C3",
         #     "C4",
-        #     "gx0",
-        #     "gy0",
         #     "L",
         # ]
         # out = sim = [
@@ -344,8 +332,6 @@ class myAlg_nsga(myAlg):
         #     "C2",
         #     "C3",
         #     "C4",
-        #     "gx0",
-        #     "gy0",
         #     "L",
         # ] 
         # g=part_L_to_g*L;part_L_to_g=g/L
@@ -355,11 +341,11 @@ class myAlg_nsga(myAlg):
         oarr = np.array(input)
         if not reverse:
             
-            oarr[1] = iarr[1] * iarr[10]
-            oarr[4] = iarr[4] * (iarr[2]-iarr[8]-iarr[10]/2)
+            oarr[1] = iarr[1] * iarr[8]
+            oarr[4] = iarr[4] * (iarr[2]-iarr[6]-iarr[8]/2)
         else:
-            oarr[1] = iarr[1] / iarr[10]
-            oarr[4] = iarr[4] / (iarr[2]-iarr[8]-iarr[10]/2)
+            oarr[1] = iarr[1] / iarr[8]
+            oarr[4] = iarr[4] / (iarr[2]-iarr[6]-iarr[8]/2)
             
         return oarr
 
@@ -674,14 +660,15 @@ class myAlg_nsga(myAlg):
         ### fnds_callback for mid output
         if not isinstance(fnds_callback, list):
             fnds_callback = [fnds_callback]
-        init_overprovison_factor=2 #default 2 /for larger init pop increase this
+        init_overprovison_factor=4 #default 2 /for larger init pop increase this
         valarr = self.random_sampling_LHS_np(self.popsize * init_overprovison_factor)
         val_width = self.max_opt_realvar - self.min_opt_realvar
         valarr = valarr * val_width + self.min_opt_realvar
 
         poplist: List[nsgaii_var] = []
         acceptedpop: List[nsgaii_var] = []
-        init01=[70,600,1870,3325,800,100,70,20,75,500,1500] ##SIM VALUE
+        init01=[70,600,1870,3325,800,100,70,20,1500] ##SIM VALUE
+        assert(len(init01)==len(self.input_name_sim))
         ind00=self.new_nsgaii_var_sim(init01)
         poplist.append(ind00)
         for optvar in valarr:
@@ -904,6 +891,8 @@ class myAlg_nsga(myAlg):
             Voltage = pResult["PostProcessResult"]["Voltage beta=1 (Mode 1)"]
             face1_Max_e = pResult["PostProcessResult"]["face1_Max_e"]
             face1_Max_h = pResult["PostProcessResult"]["face1_Max_h"]
+            roq_beta_1=pResult["PostProcessResult"]["R over Q beta=1 (Mode 1)"]
+            roq_beta_inf=pResult["PostProcessResult"]["R over Q (Mode 1)"]
             Ra = pResult["PostProcessResult"][
                 "Shunt Impedance (Pertubation) beta=1 (Mode 1)"
             ]
@@ -911,7 +900,8 @@ class myAlg_nsga(myAlg):
                 beta = 2e6 / Voltage
                 Epk = beta * face1_Max_e * 1e-6
                 Hpk = beta * face1_Max_h * 1e-6
-                midinfo = [beta, Epk, Hpk]
+                ttf = roq_beta_1/roq_beta_inf
+                midinfo = [beta, Epk, Hpk, ttf]
                 rawarray = np.array(raw_obj_list + midinfo)
                 objarray = [freq, Epk, Ra]
                 objarray[0] = abs(objarray[0] - self.targetfreq)
@@ -930,13 +920,14 @@ class myAlg_nsga(myAlg):
             Epk = ABNORMAL_NUM
             Hpk = ABNORMAL_NUM
             Ra = ABNORMAL_NUM
+            ttf = ABNORMAL_NUM
             raw_obj_list = []
             c_iobj_list = []
             for oname in self.sim_output_name:
                 raw_obj_list.append(ABNORMAL_NUM)
             for cname in self.constrainted_object_name:
                 c_iobj_list.append(ABNORMAL_NUM)
-            midinfo = [beta, Epk, Hpk]
+            midinfo = [beta, Epk, Hpk, ttf]
             rawarray = np.array(raw_obj_list + midinfo)
             objarray = [ABNORMAL_NUM, Epk, Ra]
             cindarray = np.array([ABNORMAL_NUM + self.targetfreq])
@@ -987,7 +978,7 @@ class myAlg_nsga(myAlg):
         sample = pd.DataFrame([self.input_sim_min], columns=self.input_name_sim)
         samples = pd.DataFrame()
         namelist = self.getFullNameList()
-
+        self.logger.info("CSV namelist:%s"%str(namelist))
         seed(1037)
         resultDir = self.manager.resultDir
         icallback = fnds_callback_create_Image(savedir=resultDir)
@@ -1092,6 +1083,7 @@ def dump_individual_worker_func(
         columnlist += (len(data_row_list) - len(columnlist)) * [""]
     elif len(data_row_list) < len(columnlist):
         columnlist = columnlist[: len(data_row_list)]
+    u=[len(ele) for ele in data_list_all]
     csv = pd.DataFrame(data_list_all, columns=columnlist)
     fp = open(savedir / ("GEN_%d_Individuals.csv" % igen), "w")
     csv.to_csv(fp)
