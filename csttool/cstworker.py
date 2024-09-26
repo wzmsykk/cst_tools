@@ -32,7 +32,7 @@ class local_cstworker(worker.worker):
         self.maxStopWaitTime = 60
         self.cstProcess = None
         self.cstlog = None
-
+        self.ostype="win"
         # LOGGING#
 
         self.logger.info("TempDir:%s" % str(self.workDir))
@@ -108,9 +108,18 @@ class local_cstworker(worker.worker):
         if self.cstStatus == "off":
             # command2="start cmd /k "+"\""+batFilePath+"\""
             self.logger.info(command2)
+            
+            #############
+            # Open with minimized window on windows
+            SW_MINIMIZE = 6
+            info = subprocess.STARTUPINFO()
+            info.dwFlags = subprocess.STARTF_USESHOWWINDOW
+            info.wShowWindow = SW_MINIMIZE
             self.cstProcess = subprocess.Popen(
-                command2, stdout=self.cstlog, stderr=self.cstlog, shell=True
-            )
+                command2, stdout=self.cstlog, stderr=self.cstlog, shell=True, startupinfo=info
+            ) 
+            # 
+            ##############
             self.logger.info(self.cstProcess)
             self.cstStatus = "on"
 
