@@ -1,0 +1,146 @@
+[
+    {
+        "id": 0,
+        "name": "C0",
+        "value": "Rx",
+        "type": "expression",
+        "fixed": true,
+        "description": ""
+    },
+    {
+        "id": 1,
+        "name": "C1",
+        "value": "L/2",
+        "type": "expression",
+        "fixed": true,
+        "description": ""
+    },
+    {
+        "id": 2,
+        "name": "C2",
+        "value": "100",
+        "type": "double",
+        "fixed": false,
+        "description": ""
+    },
+    {
+        "id": 3,
+        "name": "C3",
+        "value": "64",
+        "type": "double",
+        "fixed": false,
+        "description": ""
+    },
+    {
+        "id": 4,
+        "name": "C4",
+        "value": "14.6",
+        "type": "double",
+        "fixed": false,
+        "description": ""
+    },
+    {
+        "id": 5,
+        "name": "L",
+        "value": "g+L0*2",
+        "type": "expression",
+        "fixed": true,
+        "description": ""
+    },
+    {
+        "id": 6,
+        "name": "L0",
+        "value": "600",
+        "type": "double",
+        "fixed": false,
+        "description": ""
+    },
+    {
+        "id": 7,
+        "name": "Ltube",
+        "value": "500",
+        "type": "double",
+        "fixed": false,
+        "description": ""
+    },
+    {
+        "id": 8,
+        "name": "Rx",
+        "value": "gx0+d0x+d1x+d2x+C1",
+        "type": "expression",
+        "fixed": true,
+        "description": ""
+    },
+    {
+        "id": 9,
+        "name": "Ry",
+        "value": "gy0+d0x+d1x+d2y+C1",
+        "type": "expression",
+        "fixed": true,
+        "description": ""
+    },
+    {
+        "id": 10,
+        "name": "d0x",
+        "value": "C3+C4",
+        "type": "expression",
+        "fixed": true,
+        "description": ""
+    },
+    {
+        "id": 11,
+        "name": "d1x",
+        "value": "100",
+        "type": "double",
+        "fixed": false,
+        "description": ""
+    },
+    {
+        "id": 12,
+        "name": "d2x",
+        "value": "650",
+        "type": "double",
+        "fixed": false,
+        "description": ""
+    },
+    {
+        "id": 13,
+        "name": "d2y",
+        "value": "1650",
+        "type": "double",
+        "fixed": false,
+        "description": ""
+    },
+    {
+        "id": 14,
+        "name": "g",
+        "value": "668",
+        "type": "double",
+        "fixed": false,
+        "description": ""
+    },
+    {
+        "id": 15,
+        "name": "gx0",
+        "value": "70.0",
+        "type": "double",
+        "fixed": false,
+        "description": "\u675f\u7ba1\u5bbd/2"
+    },
+    {
+        "id": 16,
+        "name": "gy0",
+        "value": "500",
+        "type": "double",
+        "fixed": false,
+        "description": "\u675f\u7ba1\u957f/2"
+    },
+    {
+        "id": 17,
+        "name": "nmodes",
+        "value": "1",
+        "type": "double",
+        "fixed": false,
+        "description": ""
+    }
+]

@@ -1,2 +1,2 @@
 SET CST_WAIT_FOR_LICENSE=1
-python.exe .\base_WTC.py -p ".\project\WTC2022WORK" -f ".\project\WTC2022WORK\WTC_NEW_02_2022_OPT.cst"
+python.exe .\base_WTC.py -p ".\project\WTC2022WORKNEW" -f ".\project\WTC2022WORKNEW\WTC_ALT_2022_OPT.cst"

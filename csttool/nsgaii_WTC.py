@@ -180,8 +180,8 @@ class myAlg_nsga(myAlg):
         self.nval = 8
         self.pmut_real = 0.1
         self.eta_m = 1  ## coff for mutation
-        self.popsize = 4
-        self.generation = 2
+        self.popsize = 100
+        self.generation = 20
 
         self.min_opt_realvar = []
         self.max_opt_realvar = []
@@ -214,8 +214,8 @@ class myAlg_nsga(myAlg):
         ]  ##MIN
         self.input_sim_max = [
             500,
-            500,
-            500,
+            200,
+            100,
             200,
             800,
             1800,
@@ -659,7 +659,7 @@ class myAlg_nsga(myAlg):
         ### fnds_callback for mid output
         if not isinstance(fnds_callback, list):
             fnds_callback = [fnds_callback]
-        init_overprovison_factor = 4  # default 2 /for larger init pop increase this
+        init_overprovison_factor = 2  # default 2 /for larger init pop increase this
         valarr = self.random_sampling_LHS_np(self.popsize * init_overprovison_factor)
         val_width = self.max_opt_realvar - self.min_opt_realvar
         valarr = valarr * val_width + self.min_opt_realvar
