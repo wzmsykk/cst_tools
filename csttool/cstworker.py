@@ -110,13 +110,9 @@ class local_cstworker(worker.worker):
             self.logger.info(command2)
             
             #############
-            # Open with minimized window on windows
-            SW_MINIMIZE = 6
-            info = subprocess.STARTUPINFO()
-            info.dwFlags = subprocess.STARTF_USESHOWWINDOW
-            info.wShowWindow = SW_MINIMIZE
+
             self.cstProcess = subprocess.Popen(
-                command2, stdout=self.cstlog, stderr=self.cstlog, shell=True, startupinfo=info
+                command2, stdout=self.cstlog, stderr=self.cstlog, shell=True
             ) 
             # 
             ##############
@@ -316,18 +312,18 @@ class local_cstworker(worker.worker):
             if rcode is None:
                 time.sleep(1)
                 secs += 1
-                self.logger.info("%r secs" % (secs))
+                #self.logger.info("%r secs" % (secs))
             else:
-                self.logger.info("Stop success")
+                self.logger.info("WorkerID:%r Stop success"%(self.ID))
                 return True
-        self.logger.error("failed to stop cst, try killing the process.")
+        self.logger.error("WorkerID:%r failed to stop cst, try killing the process."%(self.ID))
         self.kill()
         time.sleep(10)
         if not self.cstProcess is None:
-            self.logger.warning("cst killed.")
+            self.logger.warning("WorkerID:%r reported process killed."%(self.ID))
             return True
         else:
-            self.logger.error("killing failed")
+            self.logger.error("WorkerID:%r reported process killing failed"%(self.ID))
             return False
 
     def kill(self):

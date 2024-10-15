@@ -180,8 +180,8 @@ class myAlg_nsga(myAlg):
         self.nval = 8
         self.pmut_real = 0.1
         self.eta_m = 1  ## coff for mutation
-        self.popsize = 100
-        self.generation = 20
+        self.popsize = 200
+        self.generation = 40
 
         self.min_opt_realvar = []
         self.max_opt_realvar = []
@@ -894,7 +894,7 @@ class myAlg_nsga(myAlg):
             Ra = pResult["PostProcessResult"][
                 "Shunt Impedance (Pertubation) beta=1 (Mode 1)"
             ]
-            if (Voltage is not None) and (face1_Max_e is not None):
+            if (Voltage is not None) and (face1_Max_e is not None) and (face1_Max_h is not None):
                 beta = 2e6 / Voltage
                 Epk = beta * face1_Max_e * 1e-6
                 Hpk = beta * face1_Max_h * 1e-6
