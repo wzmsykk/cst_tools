@@ -10,7 +10,7 @@ y110=[]
 ye111=[]
 result=[]
 freqs=[]
-names=["L","TM020_index","TM110_index","TE111_index"]
+names=["L","TM020_index","TM110_index","TE111_index","TM020_freq","TM110_freq","TE111_freq"]
 names2=["L","Mode Index","freq"]
 for L in range (60,130,10):
     fdir=r"F:\Project\EigenModeRecg\L%d\ResultFirst10"%L
@@ -27,7 +27,7 @@ for L in range (60,130,10):
     y020.append(float(slist[index020-1][2]))
     y110.append(float(slist[index110-1][2]))
     ye111.append(float(slist[indexe111-1][2]))
-    result.append([L,index020,index110,indexe111])
+    result.append([L,index020,index110,indexe111,float(slist[index020-1][2]),float(slist[index110-1][2]),float(slist[indexe111-1][2])])
 df1=pd.DataFrame(result,columns=names)
 df1.to_csv(r"F:\Project\EigenModeRecg\result_sorted.csv")
 df2=pd.DataFrame(freqs,columns=names2)
