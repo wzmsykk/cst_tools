@@ -5,7 +5,7 @@
 ###addTask 同上
 ###初值需要自己写，留空[]则为默认
 ###
-import os
+import os,shutil
 from .myAlgorithm import myAlg
 from random import random, seed, shuffle, choices, sample
 from math import inf, sqrt, floor
@@ -63,6 +63,7 @@ class nsgaii_var:
     def _setMinAvailableId(cls, minid):
         cls.idlock.acquire()
         cls.id=minid
+        cls.idlock.release()
         return cls.id
     def duplicate(self) -> "nsgaii_var":
         #### Get An Unsorted Var Duplicate
@@ -186,7 +187,7 @@ class myAlg_nsga(myAlg):
         self.pmut_real = 0.1
         self.eta_m = 1  ## coff for mutation
         self.popsize = 4
-        self.generation = 4
+        self.generation = 8
 
         self.min_opt_realvar = []
         self.max_opt_realvar = []
@@ -392,6 +393,12 @@ class myAlg_nsga(myAlg):
 
         flist: List[List[nsgaii_var]] = [None for _ in range(len(poplist))]
         flist[0] = list()
+        
+        #### reset relations
+        for i in poplist:
+            i.pset.clear()
+            i.n=0
+        
         #### Get All Dom Relations
         for p in poplist:
             for q in poplist:
@@ -667,6 +674,7 @@ class myAlg_nsga(myAlg):
         in_pop_list=None
         poplist: List[nsgaii_var] = []
         acceptedpop: List[nsgaii_var] = []
+        processedpoplist: List[nsgaii_var] = []
         ### fnds_callback for mid output
         if not isinstance(fnds_callback, list):
             fnds_callback = [fnds_callback]
@@ -716,7 +724,7 @@ class myAlg_nsga(myAlg):
                 targetid = int(iresult["RunName"].split("_")[2])
                 mapdict.update({targetid: index})
             # print(mapdict)
-            processedpoplist = []
+            
             for ind in poplist:
                 resultindex = mapdict.get(ind.id)
                 if resultindex is None:
@@ -742,6 +750,7 @@ class myAlg_nsga(myAlg):
             if igen > 0:
                 ### CREATE CHILD POP
                 childpoplist = self.offspring_gen(poplist)
+                self.logger.debug("GEN:%d, childpop size:%d"%(igen,len(childpoplist)))
                 # Run To Get the Children POP
                 for ind in childpoplist:
                     JobName = "GEN_%d_" % igen + str(ind.id)
@@ -817,7 +826,7 @@ class myAlg_nsga(myAlg):
 
             poplist.clear()
             poplist += acceptedpop
-
+            self.dump_poplist(igen,poplist)
             self.logger.info("GEN:%d DONE, SIZE:%d" % (igen, len(acceptedpop)))
             acceptedpop.clear()
             ### GEN DONE
@@ -978,29 +987,74 @@ class myAlg_nsga(myAlg):
 
         # print(results)
         pass
+    def dump_poplist(self,igen,poplist):
+        fp = open(self.manager.resultDir / ("GEN_%d_Population.json" % igen), "w")
+        d = {}
+        for indv in poplist:
+
+            u = {
+                indv.id: {
+                    "id": indv.id,
+                    "rank": indv.rank,
+                    "pset": [i.id for i in indv.pset],
+                    "optvar": indv.optvar.tolist(),
+                    "simvar": indv.simvar.tolist(),
+                    "rawobj": indv.rawobj.tolist(),
+                    "obj":indv.obj.tolist(),
+                    "done":indv.done,
+                    "sorted":indv.sorted,
+                    "n":indv.n,
+                    "crowed_dis":indv.crowed_dis,
+                    "crowed_dis_calc_done":indv.crowed_dis_calc_done,
+                    "constrainted_obj":indv.constrainted_obj.tolist(),
+                    "constraint_violaton_value":indv.constraint_violaton_value
+                }
+            }
+            d.update(u)
+
+        json.dump(d, fp, indent=4)
+        fp.close()
+        fp = open(self.manager.resultDir / ("GEN_%d_Info.json" % igen), "w")
+        d ={"current_min_id":nsgaii_var.id,
+            "popsize":self.popsize
+        }
+        json.dump(d, fp, indent=4)
+        fp.close()
     def load_dumped_pop(self):
         ####search avilable save
         savedir=self.manager.resultDir
-        files=savedir.glob("GEN_*_Relations.json")
-        vaild=re.compile(r"GEN_(\d+)_Relations.json")
+        files=savedir.glob("GEN_*_Population.json")        
         if sum(1 for x in files)==0:
             return None
+        
+        files=savedir.glob("GEN_*_Population.json")
         maxigen=0
+        vaild=re.compile(r"GEN_(\d+)_Population.json")
         for file in files:
-            igen=vaild.search(file.name)[1]
+            igen=int(vaild.search(file.name)[1])
             if igen>maxigen:
                 maxigen=igen
         igen=maxigen
-        
-        fp=open(savedir / ("GEN_%d_Relations.json"%igen),"r")        
+        #### Remove corrupted data
+        vaild2=re.compile(r"GEN_(\d+)")
+        files=savedir.glob("GEN_*")
+        for file in files:
+            tgen=int(vaild2.search(file.name)[1])
+            if tgen>igen:
+                if file.is_dir():
+                    shutil.rmtree(file)
+                else:
+                    file.unlink()
+                self.logger.warning("Data file:%s from last run removed."%file.name)
+        ####Done
+        fp=open(savedir / ("GEN_%d_Population.json"%igen),"r")        
         saved=json.load(fp)
         fp.close()
-        fp=open(savedir / ("GEN_%d_Relations.json"%igen),"r")        
-        minid=json.load(fp).get("current_min_id",0)
-        nsgaii_var._setMinAvailableId=minid
+        
         unsorted_poplist=[]
         for _key,value in saved.items():
             nv=nsgaii_var(value["optvar"])
+            nv.id=int(value["id"])
             nv.rank = 0
             nv.setSimVar(value["simvar"])
             nv.setRawObjs(value["rawobj"])
@@ -1012,6 +1066,10 @@ class myAlg_nsga(myAlg):
             "igen":igen,
             "poplist":unsorted_poplist
         }
+        fp=open(savedir / ("GEN_%d_Info.json"%igen),"r")        
+        minid=json.load(fp).get("current_min_id",0)
+        self.logger.info("current_min_id:%d."%minid)
+        nsgaii_var._setMinAvailableId(minid)
         return population
     def load(self):
         if self.ready == False:
@@ -1035,6 +1093,10 @@ class myAlg_nsga(myAlg):
         )
         sttime = time.time()
         population=self.load_dumped_pop()
+        if population is None:
+            self.logger.info("No old run results found, init new run")
+        else:
+            self.logger.info("Old run results found, start new generation at %d" % (population.get("igen",0)+1))
         poplist = self.nsgaii_generation_parallel(fnds_callback=[icallback, icallback2],continue_from_pop=population)
         result = self.fnds(poplist)
         endtime = time.time()
@@ -1130,11 +1192,6 @@ class fnds_callback_dump_individuals:
                         }
                         d.update(u)
 
-        json.dump(d, fp, indent=4)
-        fp.close()
-        fp = open(self.savedir / ("GEN_%d_Info.json" % igen), "w")
-        d ={"current_min_id":nsgaii_var.id,
-        }
         json.dump(d, fp, indent=4)
         fp.close()
         iprocess.join()
