@@ -1071,7 +1071,7 @@ class myAlg_nsga(myAlg):
         self.logger.info("current_min_id:%d."%minid)
         nsgaii_var._setMinAvailableId(minid)
         return population
-    def load(self):
+    def start(self):
         if self.ready == False:
             self.logger.info("CALCATION NOT READY, PLEASE CHECK SETTINGS.")
             self.logger.info("IS THE JOBMANAGER SET?")
@@ -1102,7 +1102,7 @@ class myAlg_nsga(myAlg):
         endtime = time.time()
         self.logger.info("elapsed time=%f" % (endtime - sttime))
     
-    def start(self):
+    def start_OLD(self):
         if self.ready == False:
             self.logger.info("CALCATION NOT READY, PLEASE CHECK SETTINGS.")
             self.logger.info("IS THE JOBMANAGER SET?")

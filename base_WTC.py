@@ -210,7 +210,7 @@ class cst_tools_main:
 
             if method == "GD_PARALLEL_LOCAL":
                 #self.alg.start()
-                self.alg.load()
+                self.alg.start()
         self.jm.stop()
         self.status = projectconfmanager.TaskStatus.DONE
         self.pconfman.updateTaskStatus(self.status)
