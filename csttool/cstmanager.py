@@ -23,13 +23,13 @@ class manager(object):
 
         tp = pathlib.Path(self.pconf["DIRS"]["tempdir"])
         if tp.is_absolute():
-            self.tempPath = tp
+            self.tempDir = tp
         else:
-            self.tempPath = self.currProjectDir / tp
+            self.tempDir = self.currProjectDir / tp
 
-        self.taskFileDir = self.tempPath
-        if not self.tempPath.exists():
-            self.tempPath.mkdir()
+        self.taskFileDir = self.tempDir
+        if not self.tempDir.exists():
+            self.tempDir.mkdir()
         rd = pathlib.Path(self.pconf["DIRS"]["resultdir"])
         if rd.is_absolute():
             self.resultDir = rd
@@ -55,7 +55,6 @@ class manager(object):
 
     def getResultDir(self):
         return self.resultDir
-
     def mthread(self, idx):
         # Listener For Each Worker
         while True:
@@ -95,15 +94,15 @@ class manager(object):
     def createLocalWorker(self, workerID):
         workerID_str=str(workerID)
         mconf = {}
-        mconf["tempPath"] = str(self.tempPath / ("worker_" + workerID_str))
+        mconf["tempDir"] = str(self.tempDir / ("worker_" + workerID_str))
         mconf["CSTENVPATH"] = self.gconf["CST"]["cstexepath"]
         mconf["ProjectType"] = self.cstType
         mconf["cstPatternDir"] = str(self.cstPatternDir)
         mconf["resultDir"] = str(self.resultDir)
         mconf["cstPath"] = str(self.cstProjPath)
         mconf["paramList"] = self.paramList
-        os.makedirs(mconf["tempPath"], exist_ok=True)
-        self.logger.debug("WORKERID:%s, Temp Path:%s"%(workerID_str, mconf["tempPath"]))
+        os.makedirs(mconf["tempDir"], exist_ok=True)
+        self.logger.debug("WORKERID:%s, Temp Dir:%s"%(workerID_str, mconf["tempDir"]))
         mconf["taskFileDir"] = str(self.taskFileDir / ("worker_" + workerID_str))
         mconf["postProcess"] = self.pconfm.getCurrPPSList()
         mcstworker_local = cstworker.local_cstworker(
@@ -144,7 +143,7 @@ class manager(object):
     def startProcessing(self):
         if self.ready == False:
             self.startFirstWorkers()
-        self.logger.debug("WorkerListLength:%s"%len(self.cstWorkerList))
+        #self.logger.debug("WorkerListLength:%s"%len(self.cstWorkerList))
         for i in range(len(self.cstWorkerList)):
             self.logger.debug("index:%s,Status:%s"%(i,self.cstWorkerStatus[i]))
             if self.cstWorkerStatus[i] == "ALIVE":
@@ -231,4 +230,3 @@ class manager(object):
         self.synchronize()
         result = self.getFirstResult()
         return result
-

@@ -17,6 +17,7 @@ from utils import mode_util_sample
 import time
 import pandas as pd
 import json
+import re
 from pathlib import Path
 import threading
 import multiprocessing
@@ -58,7 +59,11 @@ class nsgaii_var:
         cls.id += 1
         cls.idlock.release()
         return cls.id
-
+    @classmethod
+    def _setMinAvailableId(cls, minid):
+        cls.idlock.acquire()
+        cls.id=minid
+        return cls.id
     def duplicate(self) -> "nsgaii_var":
         #### Get An Unsorted Var Duplicate
         dup = nsgaii_var(self.optvar)
@@ -180,8 +185,8 @@ class myAlg_nsga(myAlg):
         self.nval = 8
         self.pmut_real = 0.1
         self.eta_m = 1  ## coff for mutation
-        self.popsize = 200
-        self.generation = 40
+        self.popsize = 4
+        self.generation = 4
 
         self.min_opt_realvar = []
         self.max_opt_realvar = []
@@ -654,77 +659,86 @@ class myAlg_nsga(myAlg):
         newnsga.setSimVar(simvar)
         return newnsga
 
-    def nsgaii_generation_parallel(self, fnds_callback=None):  ##
+    def nsgaii_generation_parallel(self, fnds_callback=None, continue_from_pop=None):  ##
         self.param_check()
+        newstart=True
+        startigen=0
+        in_pop=continue_from_pop
+        in_pop_list=None
+        poplist: List[nsgaii_var] = []
+        acceptedpop: List[nsgaii_var] = []
         ### fnds_callback for mid output
         if not isinstance(fnds_callback, list):
             fnds_callback = [fnds_callback]
-        init_overprovison_factor = 2  # default 2 /for larger init pop increase this
-        valarr = self.random_sampling_LHS_np(self.popsize * init_overprovison_factor)
-        val_width = self.max_opt_realvar - self.min_opt_realvar
-        valarr = valarr * val_width + self.min_opt_realvar
-
-        poplist: List[nsgaii_var] = []
-        acceptedpop: List[nsgaii_var] = []
-        init01 = [100,64,14.6,100,650,1650,668,600]  ##SIM VALUE
-        assert len(init01) == len(self.input_name_sim)
-        ind00 = self.new_nsgaii_var_sim(init01)
-        poplist.append(ind00)
-        for optvar in valarr:
-            ind = self.new_nsgaii_var_opt(optvar)
-            poplist.append(ind)
+        if in_pop is not None:
+            newstart=False
+            startigen=in_pop["igen"]+1
+            in_pop_list=in_pop["poplist"]
+        if newstart:
+            init_overprovison_factor = 2  # default 2 /for larger init pop increase this
+            valarr = self.random_sampling_LHS_np(self.popsize * init_overprovison_factor)
+            val_width = self.max_opt_realvar - self.min_opt_realvar
+            valarr = valarr * val_width + self.min_opt_realvar
+            init01 = [100,64,14.6,100,650,1650,668,600]  ##SIM VALUE
+            assert len(init01) == len(self.input_name_sim)
+            ind00 = self.new_nsgaii_var_sim(init01)
+            poplist.append(ind00)
+            for optvar in valarr:
+                ind = self.new_nsgaii_var_opt(optvar)
+                poplist.append(ind)
             # self.logger.debug("IDX:%d,OPTVAR:%s,SIMVAR:%s"%(ind.id,str(ind.optvar),str(ind.simvar)))
-        #### OPTIMIZAION
-        #
-        # OBJETIVE
-        # FREQ |F_fm-F_obj|<0.05
-        # MINIUM EPK
-        # MAXIMUM Shunt Impedence
-        #
-        ####
+            #### OPTIMIZAION
+            #
+            # OBJETIVE
+            # FREQ |F_fm-F_obj|<0.05
+            # MINIUM EPK
+            # MAXIMUM Shunt Impedence
+            #
+            ####
 
-        # First Run To Get the Initial Pop
-        for ind in poplist:
-            JobName = "GEN_0_" + str(ind.id)
-            params = self.createSimParamDictFromNPArr(ind.simvar)
-            self.manager.addTask(params=params, job_name=JobName)
-        ###
-        self.manager.startProcessing()
-        ### WAIT
-        ### TIME For Processing And Results
-        # if self.constrainted:
-        #       ind.constraint_violaton_value=self.constraint_func(ind.constrainted_obj,ind.iobj)
-        #     self.constrainted_dominance(poplist)
-        ### Get Results
-        results = self.manager.getFullResults()
-        #### Apply Result To Element
-        mapdict = {}
-        for index, iresult in enumerate(results):
-            targetid = int(iresult["RunName"].split("_")[2])
-            mapdict.update({targetid: index})
-        # print(mapdict)
-        processedpoplist = []
-        for ind in poplist:
-            resultindex = mapdict.get(ind.id)
-            if resultindex is None:
-                ### IN CASE CST MISCALC
-                # print("Misculc at %d"%ind.id)
-                continue
-            objarray, c_objarray, rawarray = self.convertResult(results[resultindex])
-            ind.setObjs(objarray)
-            ind.setRawObjs(rawarray)
-            if self.constrainted:
-                ind.setConstrainted_objs(c_objarray)
-                ind.constraint_violaton_value = self.constraint_func(
-                    ind.constrainted_obj, ind.obj
-                )
-            ind.done = True
-            processedpoplist.append(ind)
-        poplist.clear()
-        poplist += processedpoplist
-        processedpoplist.clear()
-
-        for igen in range(self.generation):
+            # First Run To Get the Initial Pop
+            for ind in poplist:
+                JobName = "GEN_0_" + str(ind.id)
+                params = self.createSimParamDictFromNPArr(ind.simvar)
+                self.manager.addTask(params=params, job_name=JobName)
+            ###
+            self.manager.startProcessing()
+            ### WAIT
+            ### TIME For Processing And Results
+            # if self.constrainted:
+            #       ind.constraint_violaton_value=self.constraint_func(ind.constrainted_obj,ind.iobj)
+            #     self.constrainted_dominance(poplist)
+            ### Get Results
+            results = self.manager.getFullResults()
+            #### Apply Result To Element
+            mapdict = {}
+            for index, iresult in enumerate(results):
+                targetid = int(iresult["RunName"].split("_")[2])
+                mapdict.update({targetid: index})
+            # print(mapdict)
+            processedpoplist = []
+            for ind in poplist:
+                resultindex = mapdict.get(ind.id)
+                if resultindex is None:
+                    ### IN CASE CST MISCALC
+                    # print("Misculc at %d"%ind.id)
+                    continue
+                objarray, c_objarray, rawarray = self.convertResult(results[resultindex])
+                ind.setObjs(objarray)
+                ind.setRawObjs(rawarray)
+                if self.constrainted:
+                    ind.setConstrainted_objs(c_objarray)
+                    ind.constraint_violaton_value = self.constraint_func(
+                        ind.constrainted_obj, ind.obj
+                    )
+                ind.done = True
+                processedpoplist.append(ind)
+            poplist.clear()
+            poplist += processedpoplist
+            processedpoplist.clear()
+        else:
+            poplist=in_pop_list
+        for igen in range(startigen,self.generation):
             if igen > 0:
                 ### CREATE CHILD POP
                 childpoplist = self.offspring_gen(poplist)
@@ -907,6 +921,8 @@ class myAlg_nsga(myAlg):
                 objarray[2] = -objarray[2]  # MAXIMUM Shunt-dep
                 objarray = np.array(objarray)
                 cindarray = np.array(c_iobj_list)
+            elif (face1_Max_e<0) or (face1_Max_h<0):
+                failflag = True
             else:  ##BAD CALCULATION
                 failflag = True
         if failflag:
@@ -962,7 +978,68 @@ class myAlg_nsga(myAlg):
 
         # print(results)
         pass
-
+    def load_dumped_pop(self):
+        ####search avilable save
+        savedir=self.manager.resultDir
+        files=savedir.glob("GEN_*_Relations.json")
+        vaild=re.compile(r"GEN_(\d+)_Relations.json")
+        if sum(1 for x in files)==0:
+            return None
+        maxigen=0
+        for file in files:
+            igen=vaild.search(file.name)[1]
+            if igen>maxigen:
+                maxigen=igen
+        igen=maxigen
+        
+        fp=open(savedir / ("GEN_%d_Relations.json"%igen),"r")        
+        saved=json.load(fp)
+        fp.close()
+        fp=open(savedir / ("GEN_%d_Relations.json"%igen),"r")        
+        minid=json.load(fp).get("current_min_id",0)
+        nsgaii_var._setMinAvailableId=minid
+        unsorted_poplist=[]
+        for _key,value in saved.items():
+            nv=nsgaii_var(value["optvar"])
+            nv.rank = 0
+            nv.setSimVar(value["simvar"])
+            nv.setRawObjs(value["rawobj"])
+            nv.setObjs(value["obj"])
+            nv.setConstrainted_objs(value["constrainted_obj"])
+            nv.constraint_violaton_value=value["constraint_violaton_value"]
+            unsorted_poplist.append(nv)
+        population={
+            "igen":igen,
+            "poplist":unsorted_poplist
+        }
+        return population
+    def load(self):
+        if self.ready == False:
+            self.logger.info("CALCATION NOT READY, PLEASE CHECK SETTINGS.")
+            self.logger.info("IS THE JOBMANAGER SET?")
+            return -1
+        self.logCalcSettings()
+        
+        namelist = self.getFullNameList()
+        self.logger.info("CSV namelist:%s" % str(namelist))
+        resultDir = self.manager.resultDir
+        ###clear old temp
+        
+        ###
+        icallback = fnds_callback_create_Image(savedir=resultDir)
+        icallback2 = fnds_callback_dump_individuals(
+            savedir=resultDir,
+            namelist=namelist,
+            require_transform=self.require_sim2opt_transfrom,
+            constrainted=self.constrainted,
+        )
+        sttime = time.time()
+        population=self.load_dumped_pop()
+        poplist = self.nsgaii_generation_parallel(fnds_callback=[icallback, icallback2],continue_from_pop=population)
+        result = self.fnds(poplist)
+        endtime = time.time()
+        self.logger.info("elapsed time=%f" % (endtime - sttime))
+    
     def start(self):
         if self.ready == False:
             self.logger.info("CALCATION NOT READY, PLEASE CHECK SETTINGS.")
@@ -1039,10 +1116,25 @@ class fnds_callback_dump_individuals:
                                 "rank": indv.rank,
                                 "pset": [i.id for i in indv.pset],
                                 "optvar": indv.optvar.tolist(),
+                                "simvar": indv.simvar.tolist(),
+                                "rawobj": indv.rawobj.tolist(),
+                                "obj":indv.obj.tolist(),
+                                "done":indv.done,
+                                "sorted":indv.sorted,
+                                "n":indv.n,
+                                "crowed_dis":indv.crowed_dis,
+                                "crowed_dis_calc_done":indv.crowed_dis_calc_done,
+                                "constrainted_obj":indv.constrainted_obj.tolist(),
+                                "constraint_violaton_value":indv.constraint_violaton_value
                             }
                         }
                         d.update(u)
 
+        json.dump(d, fp, indent=4)
+        fp.close()
+        fp = open(self.savedir / ("GEN_%d_Info.json" % igen), "w")
+        d ={"current_min_id":nsgaii_var.id,
+        }
         json.dump(d, fp, indent=4)
         fp.close()
         iprocess.join()

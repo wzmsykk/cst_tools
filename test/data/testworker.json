@@ -3,7 +3,7 @@
     "cstPath": ".\\test\\data\\Pillbox\\Pillbox.cst",
     "taskFileDir": ".\\temp",
     "resultDir": ".\\temp",
-    "tempPath": ".\\temp",
+    "tempDir": ".\\temp",
     "cstPatternDir": ".\\data",
     "CSTENVPATH": "D:\\Program Files (x86)\\CST Studio Suite 2022\\CST DESIGN ENVIRONMENT.exe",
     "paramList": [

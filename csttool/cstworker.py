@@ -17,7 +17,7 @@ class local_cstworker(worker.worker):
         # cstType,cstPatternDir,tempDir,taskFileDir,resultDir,cstPath
         self.cstType = workerconfig.get("ProjectType", "default")
         self.cstPatternDir = pathlib.Path(workerconfig.get("cstPatternDir", resource_path("./data")))
-        self.workDir = pathlib.Path(workerconfig["tempPath"])
+        self.workDir = pathlib.Path(workerconfig["tempDir"])
         self.taskFileDir = pathlib.Path(workerconfig["taskFileDir"])
         self.resultDir = pathlib.Path(workerconfig["resultDir"])
         self.cstProjPath = pathlib.Path(workerconfig["cstPath"])
@@ -83,9 +83,10 @@ class local_cstworker(worker.worker):
         if self.taskFileDir.exists():
             shutil.rmtree(self.taskFileDir)
             self.taskFileDir.mkdir()
-        if self.resultDir.exists():
-            shutil.rmtree(self.resultDir)
-            self.resultDir.mkdir()
+        # if self.resultDir.exists(): 
+        #     shutil.rmtree(self.resultDir)
+        #     self.resultDir.mkdir()
+        # never clear resultdir
         if self.workDir.exists():
             shutil.rmtree(self.workDir)
             self.workDir.mkdir()

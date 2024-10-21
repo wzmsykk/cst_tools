@@ -21,9 +21,9 @@ class xmanager(object):
 
         tp = pathlib.Path(self.pconf["DIRS"]["tempdir"])
         if tp.is_absolute():
-            self.tempPath = tp
+            self.tempDir = tp
         else:
-            self.tempPath = self.currProjectDir / tp
+            self.tempDir = self.currProjectDir / tp
 
         self.taskFileDir = self.tempPath
         if not self.tempPath.exists():
@@ -97,15 +97,15 @@ class xmanager(object):
     def createLocalCSTWorker(self, workerID):
         ### Persistant worker
         mconf = {}
-        mconf["tempPath"] = str(self.tempPath / ("worker_" + workerID))
+        mconf["tempDir"] = str(self.tempPath / ("worker_" + workerID))
         mconf["CSTENVPATH"] = self.gconf["CST"]["cstexepath"]
         mconf["ProjectType"] = self.cstType
         mconf["cstPatternDir"] = str(self.cstPatternDir)
         mconf["resultDir"] = str(self.resultDir)
         mconf["cstPath"] = str(self.cstProjPath)
         mconf["paramList"] = self.paramList
-        os.makedirs(mconf["tempPath"], exist_ok=True)
-        print(mconf["tempPath"])
+        os.makedirs(mconf["tempDir"], exist_ok=True)
+        print(mconf["tempDir"])
         mconf["taskFileDir"] = str(self.taskFileDir / ("worker_" + workerID))
         mconf["postProcess"] = self.pconfm.getCurrPPSList()
         mcstworker_local = cstworker.local_cstworker(
@@ -116,11 +116,11 @@ class xmanager(object):
     def createLocalSFWorker(self, workerID):
         ### One Time Worker
         mconf = {}
-        mconf["tempPath"] = str(self.tempPath / ("worker_" + workerID))
+        mconf["tempDir"] = str(self.tempPath / ("worker_" + workerID))
         mconf["SFENVPATH"] = self.gconf["CST"]["cstexepath"]
         mconf["resultDir"] = str(self.resultDir)
-        os.makedirs(mconf["tempPath"], exist_ok=True)
-        print(mconf["tempPath"])
+        os.makedirs(mconf["tempDir"], exist_ok=True)
+        print(mconf["tempDir"])
         mconf["postProcess"] = None  ## No Custom postProcess
         msfworker_local = sfworker.local_superfish_worker(
             id=workerID, type="local", self.config=mconf, logger=self.logger

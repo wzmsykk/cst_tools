@@ -107,7 +107,11 @@ class cst_tools_main:
             "-p", "--projectdir", action="store", dest="projectdir", help="project目录"
         )
         self.parser.add_argument(
-            "-f", "--cstfilepath", action="store", dest="cstfilepath", help="输入CST文件路径"
+            "-f",
+            "--cstfilepath",
+            action="store",
+            dest="cstfilepath",
+            help="输入CST文件路径",
         )
         self.parser.add_argument(
             "-c", "--continue", action="store_true", dest="ctn", help="继续模式"
@@ -205,7 +209,8 @@ class cst_tools_main:
             #    worker.stop()
 
             if method == "GD_PARALLEL_LOCAL":
-                self.alg.start()
+                #self.alg.start()
+                self.alg.load()
         self.jm.stop()
         self.status = projectconfmanager.TaskStatus.DONE
         self.pconfman.updateTaskStatus(self.status)
