@@ -247,3 +247,5 @@ class manager(object):
         self.synchronize()
         result = self.getFirstResult()
         return result
+    
+    

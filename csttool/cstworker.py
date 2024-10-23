@@ -108,7 +108,7 @@ class local_cstworker(worker.worker):
         )
         if self.cstStatus == "off":
             # command2="start cmd /k "+"\""+batFilePath+"\""
-            self.logger.info(command2)
+            #self.logger.info(command2)
             
             #############
 
@@ -117,7 +117,7 @@ class local_cstworker(worker.worker):
             ) 
             # 
             ##############
-            self.logger.info(self.cstProcess)
+            self.logger.info("WorkerID:%s Started CST ENV Process PID:%d"%(self.ID,self.cstProcess.pid))
             self.cstStatus = "on"
 
     def stopWork(self):
@@ -315,7 +315,7 @@ class local_cstworker(worker.worker):
                 secs += 1
                 #self.logger.info("%r secs" % (secs))
             else:
-                self.logger.info("WorkerID:%r Stop success"%(self.ID))
+                self.logger.info("WorkerID:%r Stop success. Returned rcode:%d"%(self.ID,rcode))
                 return True
         self.logger.error("WorkerID:%r failed to stop cst, try killing the process."%(self.ID))
         self.kill()
@@ -335,8 +335,6 @@ class local_cstworker(worker.worker):
             self.cstProcess.terminate()
             self.cstProcess.kill()
 
-    def __del__(self):
-        self.kill()
 
     def start(self):
         self.run()
