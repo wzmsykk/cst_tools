@@ -5,7 +5,7 @@
 ###addTask 同上
 ###初值需要自己写，留空[]则为默认
 ###
-import os
+import os, shutil
 from .myAlgorithm import myAlg
 from random import random, seed, shuffle, choices, sample
 from math import inf, sqrt, floor
@@ -17,6 +17,7 @@ from utils import mode_util_sample
 import time
 import pandas as pd
 import json
+import re
 from pathlib import Path
 import threading
 import multiprocessing
@@ -24,6 +25,8 @@ from typing import List, Set
 from utils.mode_util_sample import findTM020index
 from copy import deepcopy
 import logging
+from .logger import Logger
+
 
 class nsgaii_var:
     id = 0
@@ -54,6 +57,13 @@ class nsgaii_var:
     def _getNewAvailableId(cls):
         cls.idlock.acquire()
         cls.id += 1
+        cls.idlock.release()
+        return cls.id
+
+    @classmethod
+    def _setMinAvailableId(cls, minid):
+        cls.idlock.acquire()
+        cls.id = minid
         cls.idlock.release()
         return cls.id
 
@@ -136,7 +146,7 @@ class nsgaii_var:
 class myAlg_nsga(myAlg):
     def __init__(self, manager: cstmanager.manager = None, params=None, logger=None):
         super().__init__(manager, params)
-        self.debug=True
+        self.debug = True
         self.parameter_range = 0
         self.CSTparams = params
 
@@ -190,8 +200,20 @@ class myAlg_nsga(myAlg):
         else:
             self.constraint_func = None
 
-        self.input_name_opt = ["Leq", "deq", "RCoaxAbsorb", "WCoaxAbsorb", "HCoaxAbsorb"]
-        self.input_name_sim = ["Leq", "deq", "RCoaxAbsorb", "WCoaxAbsorb", "HCoaxAbsorb"]
+        self.input_name_opt = [
+            "Leq",
+            "deq",
+            "RCoaxAbsorb",
+            "WCoaxAbsorb",
+            "HCoaxAbsorb",
+        ]
+        self.input_name_sim = [
+            "Leq",
+            "deq",
+            "RCoaxAbsorb",
+            "WCoaxAbsorb",
+            "HCoaxAbsorb",
+        ]
         self.input_sim_min = [50, 340, 40, 5, 20]  ##初始值
         self.input_sim_max = [90, 360, 60, 10, 35]  ##初始值
 
@@ -204,9 +226,9 @@ class myAlg_nsga(myAlg):
             self.input_opt_min = [60, 180, 5, 5, 5]  ##初始值 for opt
             self.input_opt_max = [120, 200, 40, 40, 40]  ##初始值
         else:
-            self.input_name_opt=self.input_name_sim
-            self.input_opt_min=self.input_sim_min
-            self.input_opt_max=self.input_sim_max
+            self.input_name_opt = self.input_name_sim
+            self.input_opt_min = self.input_sim_min
+            self.input_opt_max = self.input_sim_max
         self.sim_output_name = [
             "frequency",
             "R_divide_Q",
@@ -229,11 +251,11 @@ class myAlg_nsga(myAlg):
         self.freqdomstr = "Req"
 
         #### SET RANGE
-        self.min_opt_realvar, self.max_opt_realvar = np.array(self.input_opt_min), np.array(
-            self.input_opt_max
-        )
+        self.min_opt_realvar, self.max_opt_realvar = np.array(
+            self.input_opt_min
+        ), np.array(self.input_opt_max)
 
-    def opt2sim(self, input,reverse=False):
+    def opt2sim(self, input, reverse=False):
 
         oarr = np.array(input)
         return oarr
@@ -278,6 +300,11 @@ class myAlg_nsga(myAlg):
 
         flist: List[List[nsgaii_var]] = [None for _ in range(len(poplist))]
         flist[0] = list()
+
+        #### reset relations
+        for i in poplist:
+            i.pset.clear()
+            i.n = 0
         #### Get All Dom Relations
         for p in poplist:
             for q in poplist:
@@ -348,7 +375,7 @@ class myAlg_nsga(myAlg):
                             ilist[u + 1].obj[i] - ilist[u - 1].obj[i]
                         ) / coff
 
-    def crossover_real_SBX_np(self, par1:nsgaii_var, par2:nsgaii_var):
+    def crossover_real_SBX_np(self, par1: nsgaii_var, par2: nsgaii_var):
 
         uarray = np.random.random(self.nval)
         barray = np.less_equal(uarray, 0.5)
@@ -527,102 +554,119 @@ class myAlg_nsga(myAlg):
                 sum += len(list)
         return sum
 
-
     def new_nsgaii_var_opt(self, optvar):
         newnsga = nsgaii_var(optvar)
         if self.require_sim2opt_transfrom:
             simvar = self.opt2sim_method(optvar)
         else:
-            simvar =optvar
+            simvar = optvar
         newnsga.setSimVar(simvar)
         return newnsga
+
     def new_nsgaii_var_sim(self, simvar):
-        if self.require_sim2opt_transfrom:   
-            optvar = self.opt2sim_method(simvar,reverse=True)
+        if self.require_sim2opt_transfrom:
+            optvar = self.opt2sim_method(simvar, reverse=True)
         else:
-            optvar=simvar
-        newnsga = nsgaii_var(optvar) 
+            optvar = simvar
+        newnsga = nsgaii_var(optvar)
         newnsga.setSimVar(simvar)
         return newnsga
-    def nsgaii_generation_parallel(self, fnds_callback=None):  ##
+
+    def nsgaii_generation_parallel(
+        self, fnds_callback=None, continue_from_pop=None
+    ):  ##
         self.param_check()
+        newstart = True
+        startigen = 0
+        in_pop = continue_from_pop
+        in_pop_list = None
+        poplist: List[nsgaii_var] = []
+        acceptedpop: List[nsgaii_var] = []
+        processedpoplist: List[nsgaii_var] = []
         ### fnds_callback for mid output
         if not isinstance(fnds_callback, list):
             fnds_callback = [fnds_callback]
-        init_overprovison_factor=2 #default 2 /for larger init pop increase this
-        valarr = self.random_sampling_LHS_np(self.popsize * init_overprovison_factor)
-        val_width = self.max_opt_realvar - self.min_opt_realvar
-        valarr = valarr * val_width + self.min_opt_realvar
+        if in_pop is not None:
+            newstart = False
+            startigen = in_pop["igen"] + 1
+            in_pop_list = in_pop["poplist"]
+        if newstart:
+            init_overprovison_factor = 2  # default 2 /for larger init pop increase this
+            valarr = self.random_sampling_LHS_np(
+                self.popsize * init_overprovison_factor
+            )
+            val_width = self.max_opt_realvar - self.min_opt_realvar
+            valarr = valarr * val_width + self.min_opt_realvar
+            init01 = [78, 335.12, 53, 7.8, 28]  ##SIM VALUE
+            assert len(init01) == len(self.input_name_sim)
+            ind00 = self.new_nsgaii_var_sim(init01)
+            poplist.append(ind00)
+            for optvar in valarr:
+                ind = self.new_nsgaii_var_opt(optvar)
+                poplist.append(ind)
+            #### OPTIMIZAION
+            # PARAMETER SPACE
+            # Req 180-200mm
+            # Leq 60-120mm
+            # I0 5-20mm
+            # R0 5-20mm
+            # R1 5-20mm
+            # OBJETIVE
+            # FREQ |F_fm-F_obj|<0.05
+            # MAXIMUM ROQ
+            # MAXIMUM Shunt Impedence
+            # MAXIMUM Q
+            ####
 
-        poplist: List[nsgaii_var] = []
-        acceptedpop: List[nsgaii_var] = []
-        init01=[78,335.12,53,7.8,28] ##SIM VALUE
-        ind00=self.new_nsgaii_var_sim(init01)
-        poplist.append(ind00)
-        for optvar in valarr:
-            ind = self.new_nsgaii_var_opt(optvar)
-            poplist.append(ind)
-
-        #### OPTIMIZAION
-        # PARAMETER SPACE
-        # Req 180-200mm
-        # Leq 60-120mm
-        # I0 5-20mm
-        # R0 5-20mm
-        # R1 5-20mm
-        # OBJETIVE
-        # FREQ |F_fm-F_obj|<0.05
-        # MAXIMUM ROQ
-        # MAXIMUM Shunt Impedence
-        # MAXIMUM Q
-        ####
-
-        # First Run To Get the Initial Pop
-        for ind in poplist:
-            JobName = "GEN_0_" + str(ind.id)
-            params = self.createSimParamDictFromNPArr(ind.simvar)
-            self.manager.addTask(params=params, job_name=JobName)
-        ###
-        self.manager.startProcessing()
-        ### WAIT
-        ### TIME For Processing And Results
-        # if self.constrainted:
-        #       ind.constraint_violaton_value=self.constraint_func(ind.constrainted_obj,ind.iobj)
-        #     self.constrainted_dominance(poplist)
-        ### Get Results
-        results = self.manager.getFullResults()
-        #### Apply Result To Element
-        mapdict = {}
-        for index, iresult in enumerate(results):
-            targetid = int(iresult["RunName"].split("_")[2])
-            mapdict.update({targetid: index})
-        processedpoplist = []
-        for ind in poplist:
-            resultindex = mapdict.get(ind.id)
-            if resultindex is None:
-                ### IN CASE CST MISCALC
-                self.logger.debug("ID:%d No PPS Results"%ind.id)
-                continue
-            if self.debug:
-                self.logger.debug("id:%d Results: "%ind.id+str(results[resultindex]))
-            objarray, c_objarray, rawarray = self.convertResult(results[resultindex])
-            ind.setObjs(objarray)
-            ind.setRawObjs(rawarray)
-            if self.constrainted:
-                ind.setConstrainted_objs(c_objarray)
-                ind.constraint_violaton_value = self.constraint_func(
-                    ind.constrainted_obj, ind.obj
+            # First Run To Get the Initial Pop
+            for ind in poplist:
+                JobName = "GEN_0_" + str(ind.id)
+                params = self.createSimParamDictFromNPArr(ind.simvar)
+                self.manager.addTask(params=params, job_name=JobName)
+            ###
+            self.manager.startProcessing()
+            ### WAIT
+            ### TIME For Processing And Results
+            # if self.constrainted:
+            #       ind.constraint_violaton_value=self.constraint_func(ind.constrainted_obj,ind.iobj)
+            #     self.constrainted_dominance(poplist)
+            ### Get Results
+            results = self.manager.getFullResults()
+            #### Apply Result To Element
+            mapdict = {}
+            for index, iresult in enumerate(results):
+                targetid = int(iresult["RunName"].split("_")[2])
+                mapdict.update({targetid: index})
+            for ind in poplist:
+                resultindex = mapdict.get(ind.id)
+                if resultindex is None:
+                    ### IN CASE CST MISCALC
+                    self.logger.debug("ID:%d No PPS Results" % ind.id)
+                    continue
+                objarray, c_objarray, rawarray = self.convertResult(
+                    results[resultindex]
                 )
-            ind.done = True
-            processedpoplist.append(ind)
-        poplist.clear()
-        poplist += processedpoplist
-        processedpoplist.clear()
-        
-        for igen in range(self.generation):
+                ind.setObjs(objarray)
+                ind.setRawObjs(rawarray)
+                if self.constrainted:
+                    ind.setConstrainted_objs(c_objarray)
+                    ind.constraint_violaton_value = self.constraint_func(
+                        ind.constrainted_obj, ind.obj
+                    )
+                ind.done = True
+                processedpoplist.append(ind)
+            poplist.clear()
+            poplist += processedpoplist
+            processedpoplist.clear()
+        else:
+            poplist = in_pop_list
+        for igen in range(startigen, self.generation):
             if igen > 0:
                 ### CREATE CHILD POP
                 childpoplist = self.offspring_gen(poplist)
+                self.logger.debug(
+                    "GEN:%d, childpop size:%d" % (igen, len(childpoplist))
+                )
                 # Run To Get the Children POP
                 for ind in childpoplist:
                     JobName = "GEN_%d_" % igen + str(ind.id)
@@ -640,13 +684,12 @@ class myAlg_nsga(myAlg):
                 for index, iresult in enumerate(results):
                     targetid = int(iresult["RunName"].split("_")[2])
                     mapdict.update({targetid: index})
+
                 for ind in childpoplist:
                     resultindex = mapdict.get(ind.id)
                     if resultindex is None:
                         ### IN CASE CST MISCALC
                         continue
-                    if self.debug:
-                        self.logger.debug("id:%d Results: "%ind.id+str(results[resultindex]))
                     objarray, c_objarray, rawarray = self.convertResult(
                         results[resultindex]
                     )
@@ -660,20 +703,18 @@ class myAlg_nsga(myAlg):
                     ind.done = True
                     processedpoplist.append(ind)
                 childpoplist.clear()
-                childpoplist = processedpoplist
+                childpoplist += processedpoplist
                 processedpoplist.clear()
                 ###DONE
                 poplist += childpoplist
 
-                
             ### FNDS SORT
             fndsresult = self.fnds(poplist)
-            
             if len(fnds_callback) > 0:
                 for ifnds in fnds_callback:
                     ifnds(igen, fndsresult)
             ###find accepted
-            
+
             pack = self.popsize
             for iset in fndsresult:
                 # print("PACK=%d" %pack)
@@ -698,7 +739,7 @@ class myAlg_nsga(myAlg):
                 # print("    ACC PROP SIZE:%d"%len(acceptedpop),"TO GO:%d" %pack)
             poplist.clear()
             poplist += acceptedpop
-            
+            self.dump_poplist(igen, poplist)
             self.logger.info("GEN:%d DONE, SIZE:%d" % (igen, len(acceptedpop)))
             acceptedpop.clear()
             ### GEN DONE
@@ -716,8 +757,7 @@ class myAlg_nsga(myAlg):
 
     def setJobManager(self, manager: cstmanager.manager):
         self.manager = manager
-        self.mode_location = str(manager.currProjectDir) + "\\result\\"
-        self.relative_location = str(manager.currProjectDir) + "\\save\\csv\\"
+        self.relative_location = str(manager.currProjectDir) + "\\save\\"
         if not os.path.exists(self.relative_location):
             os.makedirs(self.relative_location)
         self.checkAndSetReady()
@@ -811,7 +851,7 @@ class myAlg_nsga(myAlg):
         objarray[0] = abs(objarray[0] - 1500)
         objarray[1] = -objarray[1]  # MAXIMUM ROQ
         objarray[2] = -objarray[2]  # MAXIMUM Q
-        objarray[3] = -objarray[3]   # MAXIMUM Shunt Impedence
+        objarray[3] = -objarray[3]  # MAXIMUM Shunt Impedence
 
         cindarray = np.array(c_iobj_list)
 
@@ -853,19 +893,95 @@ class myAlg_nsga(myAlg):
         # print(results)
         pass
 
+    def dump_poplist(self, igen, poplist):
+        fp = open(self.manager.resultDir / ("GEN_%d_Population.json" % igen), "w")
+        d = {}
+        for indv in poplist:
+
+            u = {
+                indv.id: {
+                    "id": indv.id,
+                    "rank": indv.rank,
+                    "pset": [i.id for i in indv.pset],
+                    "optvar": indv.optvar.tolist(),
+                    "simvar": indv.simvar.tolist(),
+                    "rawobj": indv.rawobj.tolist(),
+                    "obj": indv.obj.tolist(),
+                    "done": indv.done,
+                    "sorted": indv.sorted,
+                    "n": indv.n,
+                    "crowed_dis": indv.crowed_dis,
+                    "crowed_dis_calc_done": indv.crowed_dis_calc_done,
+                    "constrainted_obj": indv.constrainted_obj.tolist(),
+                    "constraint_violaton_value": indv.constraint_violaton_value,
+                }
+            }
+            d.update(u)
+
+        json.dump(d, fp, indent=4)
+        fp.close()
+        fp = open(self.manager.resultDir / ("GEN_%d_Info.json" % igen), "w")
+        d = {"current_min_id": nsgaii_var.id, "popsize": self.popsize}
+        json.dump(d, fp, indent=4)
+        fp.close()
+
+    def load_dumped_pop(self):
+        ####search avilable save
+        savedir = self.manager.resultDir
+        files = savedir.glob("GEN_*_Population.json")
+        if sum(1 for x in files) == 0:
+            return None
+
+        files = savedir.glob("GEN_*_Population.json")
+        maxigen = 0
+        vaild = re.compile(r"GEN_(\d+)_Population.json")
+        for file in files:
+            igen = int(vaild.search(file.name)[1])
+            if igen > maxigen:
+                maxigen = igen
+        igen = maxigen
+        #### Remove corrupted data
+        vaild2 = re.compile(r"GEN_(\d+)")
+        files = savedir.glob("GEN_*")
+        for file in files:
+            tgen = int(vaild2.search(file.name)[1])
+            if tgen > igen:
+                if file.is_dir():
+                    shutil.rmtree(file)
+                else:
+                    file.unlink()
+                self.logger.warning("Data file:%s from last run removed." % file.name)
+        ####Done
+        fp = open(savedir / ("GEN_%d_Population.json" % igen), "r")
+        saved = json.load(fp)
+        fp.close()
+
+        unsorted_poplist = []
+        for _key, value in saved.items():
+            nv = nsgaii_var(value["optvar"])
+            nv.id = int(value["id"])
+            nv.rank = 0
+            nv.setSimVar(value["simvar"])
+            nv.setRawObjs(value["rawobj"])
+            nv.setObjs(value["obj"])
+            nv.setConstrainted_objs(value["constrainted_obj"])
+            nv.constraint_violaton_value = value["constraint_violaton_value"]
+            unsorted_poplist.append(nv)
+        population = {"igen": igen, "poplist": unsorted_poplist}
+        fp = open(savedir / ("GEN_%d_Info.json" % igen), "r")
+        minid = json.load(fp).get("current_min_id", 0)
+        self.logger.info("current_min_id:%d." % minid)
+        nsgaii_var._setMinAvailableId(minid)
+        return population
+
     def start(self):
         if self.ready == False:
             self.logger.info("CALCATION NOT READY, PLEASE CHECK SETTINGS.")
             self.logger.info("IS THE JOBMANAGER SET?")
             return -1
         self.logCalcSettings()
-
-        start_time = time.time()
-        sample = pd.DataFrame([self.input_sim_min], columns=self.input_name_sim)
-        samples = pd.DataFrame()
         namelist = self.getFullNameList()
-
-        seed(1037)
+        self.logger.info("CSV namelist:%s" % str(namelist))
         resultDir = self.manager.resultDir
         icallback = fnds_callback_create_Image(savedir=resultDir)
         icallback2 = fnds_callback_dump_individuals(
@@ -874,18 +990,21 @@ class myAlg_nsga(myAlg):
             require_transform=self.require_sim2opt_transfrom,
             constrainted=self.constrainted,
         )
-        # self.nval = model.n
         sttime = time.time()
-
-        poplist = self.nsgaii_generation_parallel(fnds_callback=[icallback, icallback2])
+        population = self.load_dumped_pop()
+        if population is None:
+            self.logger.info("No old run results found, init new run")
+        else:
+            self.logger.info(
+                "Old run results found, start new generation at %d"
+                % (population.get("igen", 0) + 1)
+            )
+        poplist = self.nsgaii_generation_parallel(
+            fnds_callback=[icallback, icallback2], continue_from_pop=population
+        )
         result = self.fnds(poplist)
         endtime = time.time()
         self.logger.info("elapsed time=%f" % (endtime - sttime))
-
-        end_time = time.time()
-        self.logger.info(end_time - start_time)
-
-        return 0
 
 
 class fnds_callback_dump_individuals:
@@ -903,7 +1022,7 @@ class fnds_callback_dump_individuals:
         if not self.savedir.exists():
             self.savedir.mkdir(parents=True)
 
-    def __call__(self, igen, fndslist:List[List[nsgaii_var]]):
+    def __call__(self, igen, fndslist: List[List[nsgaii_var]]):
 
         iprocess = multiprocessing.Process(
             target=dump_individual_worker_func,
@@ -929,6 +1048,16 @@ class fnds_callback_dump_individuals:
                                 "rank": indv.rank,
                                 "pset": [i.id for i in indv.pset],
                                 "optvar": indv.optvar.tolist(),
+                                "simvar": indv.simvar.tolist(),
+                                "rawobj": indv.rawobj.tolist(),
+                                "obj": indv.obj.tolist(),
+                                "done": indv.done,
+                                "sorted": indv.sorted,
+                                "n": indv.n,
+                                "crowed_dis": indv.crowed_dis,
+                                "crowed_dis_calc_done": indv.crowed_dis_calc_done,
+                                "constrainted_obj": indv.constrainted_obj.tolist(),
+                                "constraint_violaton_value": indv.constraint_violaton_value,
                             }
                         }
                         d.update(u)
@@ -966,7 +1095,6 @@ def dump_individual_worker_func(
                     data_row_list += [indv.constraint_violaton_value]
                 data_list_all.append(data_row_list)
     if len(data_row_list) > len(columnlist):
-
         columnlist += (len(data_row_list) - len(columnlist)) * [""]
     elif len(data_row_list) < len(columnlist):
         columnlist = columnlist[: len(data_row_list)]
