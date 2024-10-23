@@ -44,6 +44,7 @@ class manager(object):
 
         # PARALLEL
         self.maxParallelTasks = maxTask
+        self.maxWorkerJobCountLimit=10 # To avoid CST memory leak, set the worker max job can do.
         self.cstWorkerList:list[cstworker.local_cstworker] = [] 
         self.cstWorkerStatus:list = [] #"ALIVE" "DEAD"
         self.WorkerListMutex=threading.Lock()
@@ -57,11 +58,25 @@ class manager(object):
         return self.resultDir
     def mthread(self, idx):
         # Listener For Each Worker
+        job_done=0
         while True:
             targetWorker=self.cstWorkerList[idx]
+            if job_done>=self.maxWorkerJobCountLimit:
+                self.logger.info(
+                    "WORKER ID:%s DONE JOB COUNT:%d, MaxJobCountLimit:%d. RESTARTING CST ENV."
+                    % (str(targetWorker.ID),job_done,self.maxWorkerJobCountLimit)
+                )
+                newWorkerIndexInList = self.addNewLocalWorkerToList()
+                nworker = self.cstWorkerList[newWorkerIndexInList]
+                oldWorkerIndexInList = idx
+                if targetWorker != None:
+                    self.stopLocalWorkerFromList(oldWorkerIndexInList)
+                targetWorker = nworker
+                idx = newWorkerIndexInList
+                job_done=0
             if self.cstWorkerStatus=="DEAD":
                 break
-            if self.taskQueue.qsize() != 0:                
+            if self.taskQueue.qsize() != 0:     
                 mtask = self.taskQueue.get()
                 self.logger.debug("WORKER:%s, Received Task:%s"%(targetWorker.ID,str(mtask)))
                 iretry_cnt = mtask["retry_cnt"]
@@ -82,10 +97,12 @@ class manager(object):
                         nworker = self.cstWorkerList[newWorkerIndexInList]
                         oldWorkerIndexInList = idx
                         if targetWorker != None:
-                            self.killLocalWorkerFromList(oldWorkerIndexInList)
+                            self.stopLocalWorkerFromList(oldWorkerIndexInList)
                         targetWorker = nworker
                         idx = newWorkerIndexInList
+                        job_done=0 ####reset
                     else:
+                        job_done+=1 ###success
                         break
                 self.resultQueue.put(result)
             else:
@@ -117,10 +134,10 @@ class manager(object):
         listindex=len(self.cstWorkerList)-1
         self.WorkerListMutex.release()
         return listindex
-    def killLocalWorkerFromList(self,index):
+    def stopLocalWorkerFromList(self,index):
         self.WorkerListMutex.acquire()
+        self.cstWorkerList[index].stop()
         self.cstWorkerStatus[index]="DEAD"
-        self.cstWorkerList[index].__del__()
         self.WorkerListMutex.release()
         return
     def startFirstWorkers(self):

@@ -33,6 +33,7 @@ class local_cstworker(worker.worker):
         self.cstProcess = None
         self.cstlog = None
         self.ostype="win"
+
         # LOGGING#
 
         self.logger.info("TempDir:%s" % str(self.workDir))
@@ -64,10 +65,8 @@ class local_cstworker(worker.worker):
                 self.logger.warning(
                     "CstProjectFile is not consistent with the one in temp."
                 )
-                self.clearall3()
-                shutil.copyfile(src=self.cstProjPath, dst=self.tmpCstFilePath)
-        else:
-            shutil.copyfile(src=self.cstProjPath, dst=self.tmpCstFilePath)
+        self.clearall3()  ##### Now Always Clear Worker Folders
+        shutil.copyfile(src=self.cstProjPath, dst=self.tmpCstFilePath)
 
         mainBatchFilePath = self.createMainCSTbatch(headerFilePath, cstPatternPath)
         self.startCSTenv(mainBatchFilePath)
@@ -86,6 +85,7 @@ class local_cstworker(worker.worker):
         # if self.resultDir.exists(): 
         #     shutil.rmtree(self.resultDir)
         #     self.resultDir.mkdir()
+        
         # never clear resultdir
         if self.workDir.exists():
             shutil.rmtree(self.workDir)
@@ -328,9 +328,11 @@ class local_cstworker(worker.worker):
             return False
 
     def kill(self):
+        
         if not self.cstlog is None:
             self.cstlog.close()
         if not self.cstProcess is None:
+            self.cstProcess.terminate()
             self.cstProcess.kill()
 
     def __del__(self):
