@@ -4,6 +4,6 @@ __pycache__/
 build/
 dist/
 log/*
-*/result/
-*/temp/
-*/save/
+*/result/*
+*/temp/*
+*/save/*

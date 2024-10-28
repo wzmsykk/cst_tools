@@ -187,8 +187,8 @@ class myAlg_nsga(myAlg):
         self.nval = 8
         self.pmut_real = 0.1
         self.eta_m = 1  ## coff for mutation
-        self.popsize = 200
-        self.generation = 20
+        self.popsize = 4
+        self.generation = 4
 
         self.min_opt_realvar = []
         self.max_opt_realvar = []
@@ -938,8 +938,9 @@ class myAlg_nsga(myAlg):
                 objarray[2] = -objarray[2]  # MAXIMUM Shunt-dep
                 objarray = np.array(objarray)
                 cindarray = np.array(c_iobj_list)
-            elif (face1_Max_e < 0) or (face1_Max_h < 0):
-                failflag = True
+            elif (face1_Max_e is not None) and (face1_Max_h is not None):
+                if (face1_Max_e < 0) or (face1_Max_h < 0):
+                    failflag = True
             else:  ##BAD CALCULATION
                 failflag = True
         if failflag:

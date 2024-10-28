@@ -188,8 +188,8 @@ class myAlg_nsga(myAlg):
         self.nval = 5
         self.pmut_real = 0.1
         self.eta_m = 1  ## coff for mutation
-        self.popsize = 4
-        self.generation = 2
+        self.popsize = 100
+        self.generation = 20
 
         self.min_opt_realvar = []
         self.max_opt_realvar = []
