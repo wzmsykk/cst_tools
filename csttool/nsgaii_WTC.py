@@ -187,8 +187,8 @@ class myAlg_nsga(myAlg):
         self.nval = 8
         self.pmut_real = 0.1
         self.eta_m = 1  ## coff for mutation
-        self.popsize = 4
-        self.generation = 4
+        self.popsize = 400
+        self.generation = 100
 
         self.min_opt_realvar = []
         self.max_opt_realvar = []
@@ -802,11 +802,8 @@ class myAlg_nsga(myAlg):
             ### FNDS SORT
             # print("LEN_poplist:%d"%len(poplist))
             fndsresult = self.fnds(poplist)
-            if len(fnds_callback) > 0:
-                for ifnds in fnds_callback:
-                    ifnds(igen, fndsresult)
+            
             ###find accepted
-
             pack = self.popsize
             for iset in fndsresult:
                 # print("PACK=%d" %(pack))
@@ -829,6 +826,13 @@ class myAlg_nsga(myAlg):
                     acceptedpop += curfront[0:n2p]
                     pack = 0
                 # print("    ACC PROP SIZE:%d"%len(acceptedpop),"TO GO:%d" %pack)
+            
+            ####DUMP RESULTS
+            if len(fnds_callback) > 0:
+                for ifnds in fnds_callback:
+                    ifnds(igen, fndsresult)
+            
+            
             poplist.clear()
             poplist += acceptedpop
             self.dump_poplist(igen, poplist)
@@ -1184,7 +1188,7 @@ def dump_individual_worker_func(
     columnlist = prefix_name + namelist
     if constrainted:
         columnlist += ["constraint_value"]
-
+    columnlist += ["crowd_distance"]
     for ifnd, fnd in enumerate(fndslist):
         if fnd is not None:
             for indv in fnd:
@@ -1197,6 +1201,7 @@ def dump_individual_worker_func(
                 if constrainted:
                     data_row_list += indv.constrainted_obj.tolist()
                     data_row_list += [indv.constraint_violaton_value]
+                data_row_list += [indv.crowed_dis]
                 data_list_all.append(data_row_list)
     if len(data_row_list) > len(columnlist):
         columnlist += (len(data_row_list) - len(columnlist)) * [""]
