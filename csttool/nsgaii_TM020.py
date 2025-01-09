@@ -189,7 +189,7 @@ class myAlg_nsga(myAlg):
         self.pmut_real = 0.1
         self.eta_m = 1  ## coff for mutation
         self.popsize = 100
-        self.generation = 20
+        self.generation = 40
 
         self.min_opt_realvar = []
         self.max_opt_realvar = []
@@ -591,19 +591,21 @@ class myAlg_nsga(myAlg):
             startigen = in_pop["igen"] + 1
             in_pop_list = in_pop["poplist"]
         if newstart:
-            init_overprovison_factor = 2  # default 2 /for larger init pop increase this
+            init_overprovison_factor = 1  # default 2 /for larger init pop increase this
+            self.logger.info("GEN:0 overprovison factor:%d" % (init_overprovison_factor))
             valarr = self.random_sampling_LHS_np(
                 self.popsize * init_overprovison_factor
             )
             val_width = self.max_opt_realvar - self.min_opt_realvar
             valarr = valarr * val_width + self.min_opt_realvar
-            init01 = [78, 335.12, 53, 7.8, 28]  ##SIM VALUE
+            init01 = [78, 355.12, 53, 7.8, 28]  ##SIM VALUE
             assert len(init01) == len(self.input_name_sim)
             ind00 = self.new_nsgaii_var_sim(init01)
             poplist.append(ind00)
             for optvar in valarr:
                 ind = self.new_nsgaii_var_opt(optvar)
                 poplist.append(ind)
+            self.logger.info("GEN:0 total pop size:%d" % (len(poplist)))
             #### OPTIMIZAION
             # PARAMETER SPACE
             # Req 180-200mm
@@ -613,7 +615,7 @@ class myAlg_nsga(myAlg):
             # R1 5-20mm
             # OBJETIVE
             # FREQ |F_fm-F_obj|<0.05
-            # MAXIMUM ROQ
+            # MINIMUM ROQ
             # MAXIMUM Shunt Impedence
             # MAXIMUM Q
             ####
@@ -823,38 +825,51 @@ class myAlg_nsga(myAlg):
         json.dump(pResult, fp, indent=4)
         fp.close()
         # DONE
-        raw_obj_list = []
-        c_iobj_list = []
-        for oname in self.sim_output_name:
-            raw_obj_list.append(pResult["PostProcessResult"][oname])
-        c_iobj_list.append(pResult["PostProcessResult"]["frequency"])
+        failflag = False
+        if result.get("TaskStatus") == "Failure":
+            failflag = True
+        else:
+            raw_obj_list = []
+            c_iobj_list = []
+            for oname in self.sim_output_name:
+                raw_obj_list.append(pResult["PostProcessResult"][oname])
+            c_iobj_list.append(pResult["PostProcessResult"]["frequency"])
 
-        ### Optimization Func
-        # OUTPUT
-        # 0 Frequency
-        # 1 ROQ
-        # 2 Q
-        # 3 Shunt Impedence
-        # OBJETIVE
-        # MINIMUM abs|F_fm-F_obj|
-        # MAXIMUM ROQ   -
-        # MAXIMUM Q     -
-        # MAXIMUM Shunt Impedence   -
-        # CONSTRAINT OBJECTIVE
-        # abs|F_fm-F_obj|<0.05
-        # F_obj=1500Mhz
-        ####
+            ### Optimization Func
+            # OUTPUT
+            # 0 Frequency
+            # 1 ROQ
+            # 2 Q
+            # 3 Shunt Impedence
+            # OBJETIVE
+            # MINIMUM abs|F_fm-F_obj|
+            # MINIMUM ROQ   -
+            # MAXIMUM Q     -
+            # MAXIMUM Shunt Impedence   -
+            # CONSTRAINT OBJECTIVE
+            # abs|F_fm-F_obj|<0.05
+            # F_obj=1500Mhz
+            ####
 
-        rawarray = np.array(raw_obj_list)
-        objarray = np.array(raw_obj_list)
+            rawarray = np.array(raw_obj_list)
+            objarray = np.array(raw_obj_list)
 
-        objarray[0] = abs(objarray[0] - 1500)
-        objarray[1] = -objarray[1]  # MAXIMUM ROQ
-        objarray[2] = -objarray[2]  # MAXIMUM Q
-        objarray[3] = -objarray[3]  # MAXIMUM Shunt Impedence
+            objarray[0] = abs(objarray[0] - 1500)
+            objarray[1] = +objarray[1]  # MINIMUM ROQ
+            objarray[2] = -objarray[2]  # MAXIMUM Q
+            objarray[3] = -objarray[3]  # MAXIMUM Shunt Impedence
 
-        cindarray = np.array(c_iobj_list)
-
+            cindarray = np.array(c_iobj_list)
+        if failflag:
+            self.logger.warning("CST MISCALCULATON AT JOB %s" % result["RunName"])
+            ABNORMAL_NUM = 99999
+            for oname in self.sim_output_name:
+                raw_obj_list.append(ABNORMAL_NUM)
+            for cname in self.constrainted_object_name:
+                c_iobj_list.append(ABNORMAL_NUM)
+            for cname in self.object_name:
+                objarray.append(ABNORMAL_NUM)
+            objarray[1] = -ABNORMAL_NUM
         return objarray, cindarray, rawarray
 
     def start2(self):

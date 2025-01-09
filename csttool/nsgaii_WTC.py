@@ -892,7 +892,7 @@ class myAlg_nsga(myAlg):
         return odict
 
     def convertResult(self, result):
-
+        
         fp = open(
             self.manager.resultDir / (str(result["RunName"]) + "_Result.json"), "w"
         )

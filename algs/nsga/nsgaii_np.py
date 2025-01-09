@@ -1,8 +1,8 @@
 from math import inf, sqrt, floor
 from random import random, seed, shuffle, choices,sample
 from time import sleep
-
-from .zdts import zdt1, zdt2, zdt3, zdt4
+from pathlib import Path
+from zdts import zdt1, zdt2, zdt3, zdt4
 from typing import List, Set
 import json
 import numpy as np
@@ -184,7 +184,7 @@ class nsgaii():
                     q.n -= 1  ### 除p外q仍被支配的个数
                     if q.n == 0:  ### not domed By Anyone Except P
                         q.rank = i + 1
-                        q_set.append(q)
+                        q_set.add(q)
 
             i += 1
 
@@ -204,6 +204,8 @@ class nsgaii():
                 var.crowed_dis = inf
                 var.crowed_dis_calc_done = True
             return
+        for var in flist:
+            var.crowed_dis_calc_done = False
         for i in range(self.nobj):
             ilist = sorted(flist, key=lambda x: x.obj[i])
             ilist[0].crowed_dis = inf
@@ -219,7 +221,8 @@ class nsgaii():
                         ilist[u].crowed_dis += (
                             ilist[u + 1].obj[i] - ilist[u - 1].obj[i]
                         ) / coff
-
+        for var in flist:
+            var.crowed_dis_calc_done = True
 
     def crossover_real_SBX_np(self,par1, par2):
 
@@ -262,7 +265,7 @@ class nsgaii():
 
         v = v + (deltaq1 * barray2 + deltaq2 * nbarray2) * (vu - vl)
         np.clip(v, vl, vu, v)
-        v = v * barray
+        v = v * barray + np.array(ind.value) * np.logical_not(barray)  ### BUGFIX
         v=np.clip(v,self.min_realvar,self.max_realvar) ###boundary check
         ind.value = v
 
@@ -340,7 +343,8 @@ class nsgaii():
     def nsgaii_generation_demo(self,model, fnds_callback=None):  ##
         self.param_check()
         ### fnds_callback for mid output
-
+        if not isinstance(fnds_callback, list):
+            fnds_callback = [fnds_callback]
         valarr = self.random_sampling_LHS_np(self.popsize)
         val_width=self.max_realvar-self.min_realvar
         valarr=valarr*val_width+self.min_realvar
@@ -353,26 +357,22 @@ class nsgaii():
             ind = nsgaii_var(var)
             poplist.append(ind)
         imodel = model
+        
+        ###WORK To get Obj
+        for ind in poplist:
+            ind.setObjs(list(imodel(ind.value)))
+        
         for igen in range(self.generation):
-            ###WORK To get Obj
-
-            for ind in poplist:
-                ind.setObjs(list(imodel(ind.value)))
-            
-            childpoplist = self.offspring_gen(poplist)
-            
-            for ind in childpoplist:
-                ind.setObjs(list(imodel(ind.value)))
-            ###DONE
-            poplist = poplist + childpoplist
-
-            if self.constrained:
-                self.constrained_dominance(poplist)
+            if igen>0:            
+                childpoplist = self.offspring_gen(poplist)
+                for ind in childpoplist:
+                    ind.setObjs(list(imodel(ind.value)))
+                ###DONE
+                poplist = poplist + childpoplist
+                if self.constrained:
+                    self.constrained_dominance(poplist)
 
             fndsresult = self.fnds(poplist)
-            #print("FNDS_SIZE",calc_fnds_size(fndsresult),"INPOP:",len(poplist))
-            if fnds_callback is not None:
-                fnds_callback(igen, fndsresult)
             ###find accept
             acceptedpop.clear()
             pack = self.popsize
@@ -384,6 +384,8 @@ class nsgaii():
                 if not iset:
                     continue
                 if pack >= len(iset):
+                    curfront = list(iset)
+                    self.crowding_dis_assign(curfront)
                     for ind in iset:
                         acceptedpop.append(ind)
                     pack -= len(iset)
@@ -397,6 +399,10 @@ class nsgaii():
                     acceptedpop += curfront[0:n2p]
                     pack=0
                 #print("    ACC PROP SIZE:%d"%len(acceptedpop),"TO GO:%d" %pack)
+            if len(fnds_callback) > 0:
+                for ifnds in fnds_callback:
+                    ifnds(self, igen, fndsresult)
+                    
             poplist.clear()
             poplist += acceptedpop
             print("GEN:%d DONE, SIZE:%d" % (igen,len(acceptedpop)))
@@ -404,6 +410,9 @@ class nsgaii():
         return poplist
 
     def nsgaii_generation_parallel(self,model_parallel,fnds_callback=None):  ##
+        
+        if not isinstance(fnds_callback, list):
+            fnds_callback = [fnds_callback]
         self.param_check()
         ### fnds_callback for mid output
 
@@ -469,9 +478,6 @@ class nsgaii():
 
 
             fndsresult = self.fnds(poplist)
-            #print("FNDS_SIZE",calc_fnds_size(fndsresult),"INPOP:",len(poplist))
-            if fnds_callback is not None:
-                fnds_callback(igen, fndsresult)
             ###find accepted
             acceptedpop.clear()
             pack = self.popsize  ###NEEDED TO 
@@ -484,6 +490,8 @@ class nsgaii():
                 if not iset:
                     continue
                 if pack >= len(iset):
+                    curfront = list(iset)
+                    self.crowding_dis_assign(curfront) ###EXTRA INFOMATIONS
                     for ind in iset:
                         acceptedpop.append(ind)
                     pack -= len(iset)
@@ -497,6 +505,11 @@ class nsgaii():
                     acceptedpop += curfront[0:n2p]
                     pack=0
                 #print("    ACC PROP SIZE:%d"%len(acceptedpop),"TO GO:%d" %pack)
+                
+            if len(fnds_callback) > 0:
+                for ifnds in fnds_callback:
+                    ifnds(self, igen, fndsresult)
+                    
             poplist.clear()
             poplist += acceptedpop
             print("GEN:%d DONE, SIZE:%d" % (igen,len(acceptedpop)))
@@ -542,26 +555,31 @@ def nsgaii_test():
     mynsgaii=nsgaii()
     mynsgaii.nobj = 2
     mynsgaii.pmut_real = 0.1
-    mynsgaii.eta_m = 1  ## coff for mutation
-    mynsgaii.popsize = 500
-    mynsgaii.generation = 100
+    mynsgaii.eta_m = 15  ## coff for mutation
+    mynsgaii.popsize = 200
+    mynsgaii.generation = 300
     #min_realvar=[0,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10]
     #max_realvar=[1,+10,+10,+10,+10,+10,+10,+10,+10,+10,+10]
     models = [zdt1(), zdt2(), zdt3(), zdt4()]
-    icallback = nsgaii_helper.fnds_callback_create_Image()
+    icallback1 = nsgaii_helper.fnds_callback_create_Image()
+    icallback2 = nsgaii_helper.fnds_callback_dump_fnds()
+    icallbacks=[icallback1,icallback2]
     for model in models:
         mynsgaii.nval = model.n
         min_realvar_raw, max_realvar_raw = model.getBoundaries()
         mynsgaii.min_realvar, mynsgaii.max_realvar =np.array(min_realvar_raw),np.array(max_realvar_raw)
         print(mynsgaii.min_realvar)
+        print(mynsgaii.max_realvar)
         sttime = time.time()
-        icallback.setNewSavedir(model.name)
-        poplist = mynsgaii.nsgaii_generation_demo(model, fnds_callback=icallback)
+        savedir=Path(model.name)
+        for icallback in icallbacks:
+            icallback.setNewSavedir(savedir)
+        poplist = mynsgaii.nsgaii_generation_demo(model, fnds_callback=icallbacks)
         result = mynsgaii.fnds(poplist)
         endtime = time.time()
         print("elapsed time=", endtime - sttime)
 
-        fp = open(icallback.savedir / "result.txt", "w")
+        fp = open(savedir / "result.txt", "w")
         ###STATS
         front = result[0]
         fsize = len(front)
@@ -573,6 +591,7 @@ def nsgaii_test():
             print("Id:%d Value:" % ind.id, ind.value, file=fp)
         print("Result accept rate:%f" % (accept / fsize), file=fp)
         fp.close()
+        nsgaii_helper.crowd_distance_stats_from_dump(savedir)
 
 
 if __name__ == "__main__":

@@ -1,10 +1,13 @@
-from .nsgaii_np import nsgaii_var
+from nsgaii_np import nsgaii_var
 import matplotlib.pyplot as plt
 from typing import List
 import multiprocessing
 import math
-import pandas
+from math import inf
+import pandas as pd
+import re
 from pathlib import Path
+import numpy as np
 class fnds_callback_create_Image():
     def __init__(self,savedir="") -> None:
         self.setNewSavedir(savedir)
@@ -13,47 +16,44 @@ class fnds_callback_create_Image():
         self.savedir=Path(savedir)
         if not self.savedir.exists():
             self.savedir.mkdir(parents=True)
-    def __call__(self,igen,fndslist):
+    def __call__(self,nsgaii_obj,igen,fndslist):
         iprocess=multiprocessing.Process(target=image_worker_func,args=(self.savedir,igen,fndslist))
         iprocess.start()
         return 
-class fnds_callback_create_Image_dump_fnds():
+class fnds_callback_dump_fnds():
     def __init__(self,savedir="") -> None:
         self.setNewSavedir(savedir)
-        self.paramToOptim=["Req","Leq"]
-        self.resultNames=["frequency","RoverQ","shunt_dependence"]
+        
     def setNewSavedir(self,savedir):
         self.savedir=Path(savedir)
         if not self.savedir.exists():
             self.savedir.mkdir(parents=True)
-    def __call__(self,igen,fndslist):
-        iprocess=multiprocessing.Process(target=image_worker_func,args=(self.savedir,igen,fndslist))
-        iprocess.start()
-        self.dump_fnds_structs(self.savedir,igen,fndslist)
+    def __call__(self,nsgaii_obj,igen,fndslist):
+        data_list_all=[]
+        columnlist=[]
+        prefix_name = ["Generation", "Index", "Front Index"]
+        columnlist+=prefix_name
+        for idx in range(nsgaii_obj.nval):
+            columnlist.append("x_%d"%idx)
+        for idx in range(nsgaii_obj.nobj):
+            columnlist.append("f_%d"%idx)
+        columnlist+=["Crowd Distance"]
+        
+        for ifnd, fnd in enumerate(fndslist):
+            if fnd is not None:
+                for indv in fnd:
+                    data_row_list = []
+                    data_row_list += [igen, indv.id, ifnd]
+                    data_row_list += indv.value.tolist()
+                    data_row_list += indv.obj.tolist()
+                    data_row_list += [indv.crowed_dis]
+                    data_list_all.append(data_row_list)
+        csv = pd.DataFrame(data_list_all, columns=columnlist)
+        fp = open(self.savedir / ("GEN_%d_Population.csv" % igen), "w")
+        csv.to_csv(fp)
+        fp.close()
         return 
-    def dump_fnds_structs(self,savedir,igen,fndslist:List[List[nsgaii_var]]):
-        idf=None
-        _index=0
-        for ind_f,front in enumerate(fndslist):
-            if front is not None:
-                for ind in front:
-                    u={
-                    "_front":ind_f,
-                    "_id":ind.id,
-                    "req":ind.value[0],
-                    "leq":ind.value[1],
-                    "freq":ind.constraint_obj[0],
-                    "roq":ind.obj[0],
-                    "shunt_dependence":ind.obj[1]
-                    }
-                    ndf=pandas.DataFrame(u,index=[_index])
-                    _index+=1
-                    if idf is not None:
-                        idf=idf.append(ndf)
-                    else:
-                        idf=ndf
 
-        idf.to_csv(savedir / ("Fnds_struct_gen_%d.csv"%igen))
 
 def image_worker_func(savedir,igen,fndslist:List[List[nsgaii_var]]):
     x0=[]
@@ -83,3 +83,49 @@ def image_worker_func(savedir,igen,fndslist:List[List[nsgaii_var]]):
     #plt.axis('scaled')
     plt.savefig(savedir / ('GEN_%05d_Front.png' %igen), bbox_inches='tight')
     return
+
+def crowd_distance_stats_from_dump(savedir,gens=None):
+    maxcl=[]
+    mincl=[]
+    avgcl=[]
+    xs=[]
+    savedir=Path(savedir)
+    if not gens:### auto detect in save dir
+        files = savedir.glob("GEN_*_Population.csv")
+        if sum(1 for x in files) == 0:
+            return None
+
+        files = savedir.glob("GEN_*_Population.csv")
+        maxigen = 0
+        vaild = re.compile(r"GEN_(\d+)_Population.csv")
+        for file in files:
+            igen = int(vaild.search(file.name)[1])
+            if igen > maxigen:
+                maxigen = igen
+        igen = maxigen
+        gens=igen+1
+    for igen in range(gens):
+        csvpath=Path(savedir) / ("GEN_%d_Population.csv" % igen)
+        df=pd.read_csv(csvpath)
+        query=df[df['Front Index']<1]
+        crowdlist=query["Crowd Distance"].tolist()
+        filtered=[]
+        for item in crowdlist:
+            if item != inf:
+                filtered.append(item)
+        if len(filtered) ==0:
+            continue
+        maxc=np.max(filtered)
+        minc=np.min(filtered)
+        avgc=np.mean(filtered)
+        maxcl.append(maxc)
+        mincl.append(minc)
+        avgcl.append(avgc)
+        xs.append(igen)
+    result=pd.DataFrame(list(zip(xs,maxcl,avgcl,mincl)),columns=["generation","max distance","avg distance","min distance"])
+    result.to_csv(Path(savedir) / "Distances.csv")
+    plt.plot(xs,maxcl)
+    plt.plot(xs,mincl)
+    plt.plot(xs,avgcl)
+    plt.savefig(Path(savedir) / "Distances.png")
+    plt.close()

@@ -4,7 +4,7 @@ from abc import ABCMeta, abstractmethod,abstractclassmethod
 
 class commonfunc():
     __metaclass__=ABCMeta
-    tolerance=1e-8
+    tolerance=1e-3
     def __init__(self,nofdvs) -> None:
         self.n=nofdvs
         self.name="dummyfunc"
