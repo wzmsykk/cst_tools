@@ -11,9 +11,15 @@ from csttool.runtime_protocol import (
     ParameterAssignment,
     ParameterKind,
     ProtocolError,
+    StopAcknowledge,
+    StopRequest,
     Task,
     decode_task,
+    decode_stop_ack,
+    decode_stop_request,
     encode_task,
+    encode_stop_ack,
+    encode_stop_request,
     new_session_id,
     validate_ack,
     wait_completion_or_stop,
@@ -105,6 +111,20 @@ def test_acknowledge_matches_completion(tmp_path):
     assert protocol.read_ack(completion) == Acknowledge(task.task_id, task.session_id)
     with pytest.raises(ProtocolError, match="does not belong"):
         validate_ack(completion, Acknowledge(task.task_id, new_session_id()))
+
+
+def test_stop_request_and_ack_are_session_scoped(tmp_path):
+    protocol = FileProtocol(tmp_path)
+    session_id = new_session_id()
+    request = StopRequest(session_id)
+    ack = StopAcknowledge(session_id)
+
+    assert decode_stop_request(encode_stop_request(request)) == request
+    assert decode_stop_ack(encode_stop_ack(ack)) == ack
+    protocol.request_stop(session_id)
+    assert protocol.read_stop_request(session_id) == request
+    with pytest.raises(ProtocolError, match="another worker session"):
+        protocol.read_stop_request(new_session_id())
 
 
 def test_wait_completion_has_a_bounded_timeout(tmp_path):

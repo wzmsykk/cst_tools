@@ -64,6 +64,8 @@ def test_vba_codec_is_a_library_with_required_contracts():
         "Public Function CSTP_ReadTask",
         "Public Function CSTP_WriteCompletion",
         "Public Function CSTP_ReadAck",
+        "Public Function CSTP_ReadStopRequest",
+        "Public Function CSTP_WriteStopAck",
         "Private Function CSTP_AtomicWrite",
     ):
         assert symbol in source

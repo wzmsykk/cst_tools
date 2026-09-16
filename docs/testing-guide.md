@@ -94,3 +94,23 @@ python -m pytest -q -m integration --run-cst `
 ```
 
 联合回归可同时运行 `test/protocol_contract_integration_test.py` 和 `test/protocol_worker_integration_test.py`。P3 通过前后都不替换 legacy `data/worker.vb`。
+
+P4 双任务 Warm Gate：
+
+```powershell
+python -m pytest -q -m integration --run-cst `
+  --cst-exe "D:\Program Files (x86)\CST Studio Suite 2022\CST DESIGN ENVIRONMENT.exe" `
+  test/protocol_warm_worker_integration_test.py
+```
+
+该 Gate 验证 task 级独立结果目录、Completion/Ack 串行栅栏、两次不同 `.rd0` 以及 Stop Request/Ack 后的标准退出。它记录时间，但单次双点测试不用于宣称 Warm 性能收益。
+
+P4.5 固定 HOM 结构 Cold/Warm 扫频基准：
+
+```powershell
+python -m pytest -q -m integration --run-cst `
+  --cst-exe "D:\Program Files (x86)\CST Studio Suite 2022\CST DESIGN ENVIRONMENT.exe" `
+  test/protocol_hom_scan_benchmark_integration_test.py
+```
+
+该 Gate 运行两个独立 Cold 频段，再在一个 Warm 进程中运行相同两个频段；逐频段比较 `.rd0`，并在 `.pytest_cache/cst-p4-5/<run>/benchmark.json` 保存计时报告。当前实测整体墙钟加速约 `1.563x`，但双点结果不替代多频段重复统计。

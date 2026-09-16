@@ -4,6 +4,8 @@
 Public Const CSTP_TASK_MAGIC As String = "CST_TASK_V1"
 Public Const CSTP_COMPLETION_MAGIC As String = "CST_COMPLETION_V1"
 Public Const CSTP_ACK_MAGIC As String = "CST_ACK_V1"
+Public Const CSTP_STOP_REQUEST_MAGIC As String = "CST_STOP_REQUEST_V1"
+Public Const CSTP_STOP_ACK_MAGIC As String = "CST_STOP_ACK_V1"
 
 Public Type CSTP_Parameter
     Name As String
@@ -166,6 +168,42 @@ Public Function CSTP_ReadAck( _
         Exit Function
     End If
     CSTP_ReadAck = True
+End Function
+
+Public Function CSTP_ReadStopRequest( _
+    ByVal filePath As String, _
+    ByVal expectedSessionId As String, _
+    ByRef errorMessage As String) As Boolean
+
+    Dim keys() As String
+    Dim values() As String
+    Dim fieldCount As Long
+    Dim sessionId As String
+
+    CSTP_ReadStopRequest = False
+    If Not CSTP_LoadFields(filePath, CSTP_STOP_REQUEST_MAGIC, keys, values, fieldCount, errorMessage) Then Exit Function
+    If fieldCount <> 1 Then
+        errorMessage = "stop request contains missing or unknown fields"
+        Exit Function
+    End If
+    If Not CSTP_GetRequired(keys, values, fieldCount, "session_id", sessionId, errorMessage) Then Exit Function
+    If sessionId <> expectedSessionId Then
+        errorMessage = "stop request belongs to another worker session"
+        Exit Function
+    End If
+    CSTP_ReadStopRequest = True
+End Function
+
+Public Function CSTP_WriteStopAck( _
+    ByVal filePath As String, _
+    ByVal sessionId As String, _
+    ByRef errorMessage As String) As Boolean
+
+    Dim keys(0 To 0) As String
+    Dim values(0 To 0) As String
+    keys(0) = "session_id"
+    values(0) = sessionId
+    CSTP_WriteStopAck = CSTP_AtomicWrite(filePath, CSTP_STOP_ACK_MAGIC, keys, values, 1, errorMessage)
 End Function
 
 Private Function CSTP_LoadFields( _

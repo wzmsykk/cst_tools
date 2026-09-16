@@ -7,6 +7,12 @@ Sub Main
     Dim stage As String
     Dim acknowledged As Boolean
     Dim rebuilt As Boolean
+    Dim rebuildStart As Double
+    Dim solveStart As Double
+    Dim flushStart As Double
+    Dim rebuildSeconds As Double
+    Dim solveSeconds As Double
+    Dim flushSeconds As Double
     Dim i As Long
 
     On Error GoTo WorkerFailed
@@ -29,7 +35,9 @@ Sub Main
 
     stage = "rebuild"
     CSTPW_WriteMarker "%MARKER_PATH%", "stage:rebuild"
+    rebuildStart = Timer
     rebuilt = Rebuild
+    rebuildSeconds = CSTPW_Elapsed(rebuildStart, Timer)
     If Not rebuilt Then
         CSTPW_PublishFailure task, "REBUILD_FAILED", "Rebuild returned False"
         Exit Sub
@@ -37,15 +45,20 @@ Sub Main
 
     stage = "solver"
     CSTPW_WriteMarker "%MARKER_PATH%", "stage:solver"
+    solveStart = Timer
     EigenmodeSolver.Start
+    solveSeconds = CSTPW_Elapsed(solveStart, Timer)
 
     stage = "flush"
     CSTPW_WriteMarker "%MARKER_PATH%", "stage:flush"
+    flushStart = Timer
     Backup "%SNAPSHOT_PATH%"
+    flushSeconds = CSTPW_Elapsed(flushStart, Timer)
     If Dir("%RESULT_PATH%") = "" Then
         CSTPW_PublishFailure task, "RESULT_FLUSH_FAILED", "native rd0 result was not flushed"
         Exit Sub
     End If
+    CSTPW_WriteTiming "%TIMING_PATH%", task.TaskId, rebuildSeconds, solveSeconds, flushSeconds
 
     stage = "completion"
     CSTPW_WriteMarker "%MARKER_PATH%", "stage:completion"
@@ -88,6 +101,25 @@ WorkerFailed:
         errorCode = "INTERNAL_ERROR"
     End If
     CSTPW_PublishFailure task, errorCode, errorMessage
+End Sub
+
+Private Function CSTPW_Elapsed(ByVal started As Double, ByVal finished As Double) As Double
+    If finished >= started Then
+        CSTPW_Elapsed = finished - started
+    Else
+        CSTPW_Elapsed = 86400# - started + finished
+    End If
+End Function
+
+Private Sub CSTPW_WriteTiming(ByVal filePath As String, ByVal taskId As String, ByVal rebuildSeconds As Double, ByVal solveSeconds As Double, ByVal flushSeconds As Double)
+    Dim fileNumber As Integer
+    fileNumber = FreeFile
+    Open filePath For Output As #fileNumber
+    Print #fileNumber, taskId
+    Print #fileNumber, CStr(rebuildSeconds)
+    Print #fileNumber, CStr(solveSeconds)
+    Print #fileNumber, CStr(flushSeconds)
+    Close #fileNumber
 End Sub
 
 Private Sub CSTPW_PublishFailure(ByRef task As CSTP_Task, ByVal errorCode As String, ByVal errorMessage As String)

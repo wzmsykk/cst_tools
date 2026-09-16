@@ -7,7 +7,7 @@
 - [x] 已存在 `.failure` 时立即返回 Failure。
 - [x] 修复成功返回 TaskIndex 加一偏移。
 - [x] `.rd0` 缺失时返回明确失败，不返回成功 `None`。
-- [ ] 每个 Worker 使用独立结果目录。
+- [x] Worker v1 每个任务使用独立结果目录；legacy Worker 等迁移时再切换。
 
 ## P1：最小协议
 
@@ -53,6 +53,36 @@ P2.5 至此完成。下一步 P3 使用独立 Worker v1 路径验证 default 工
 验证记录：真实 Worker v1 Gate 已在 CST Studio Suite 2022 上通过（2026-09-17，`1 passed in 54.13s`）。CST 通过应用级 `-m` 执行独立 Worker v1；Worker 打开临时工程副本，应用参数并完成求解和 Backup，确认 `.rd0` 已落盘后才发布 Completion。Python 使用现有 `cst0dreadout` 读得 `503.782` 后发布 Ack，Worker 随后调用官方 `Save`、`Quit`，测试确认未留下需要用户处理的 CST/UI 进程。
 
 P3 没有替换 legacy `worker.vb`，也没有引入 Result Manifest、通用 Operation ABI 或新 Transport。真实 CST 产物证明该结果是目录化路径，而不是早先假设的扁平 `Result/<name>.rd0`。
+
+## P4：最小 Warm Worker 双任务验证
+
+- [x] 同一 CST 进程连续执行两个任务。
+- [x] 每个任务使用 `results/<task-uuid>/` 独立结果目录。
+- [x] 第一任务 Ack 前不读取或执行第二任务。
+- [x] 两个任务分别使用 literal 和 expression 参数。
+- [x] 两个 `.rd0` 均由 Python 在对应 Completion 后读取。
+- [x] 第二个 Ack 后发送 session-scoped Stop Request。
+- [x] Worker 写出 Stop Ack 后执行官方 `Save`、`Quit`。
+- [x] 记录每个任务的 Rebuild、Solve、Backup Flush 时间。
+
+验证记录：真实 Warm Worker Gate 已在 CST Studio Suite 2022 上通过（2026-09-17，`1 passed in 241.76s`）。`R=229, L=R+30` 得到 `503.782`；`R=230, L=R+29` 得到 `501.576`，因此第二次读取不是第一任务残留。两次计时分别约为 `Rebuild 0.608s / Solve 104.498s / Flush 0.819s` 和 `Rebuild 1.059s / Solve 105.670s / Flush 2.310s`。本样本证明了串行时序、结果隔离和可控退出，但没有证明 Solve 加速；Warm/Cold 性能结论仍需多点对照。
+
+P4 使用独立的有界双任务 Worker Gate，不替换 legacy `worker.vb`。Stop 协议仅包含 session ID，不扩展为通用控制或恢复协议。
+
+## P4.5：固定 HOM 结构扫频基准
+
+- [x] 使用 `HOM analysis_clean.cst`，所有几何参数保持不变。
+- [x] 仅改变 `fmin/fmax`：`720–800 MHz`、`800–880 MHz`。
+- [x] 两个频段分别执行独立 Cold 进程。
+- [x] 同一 CST 进程串行执行两个 Warm 频段。
+- [x] Cold/Warm 使用相同 Task/Completion/Ack 和独立结果目录。
+- [x] 比较每个频段的原生 Frequency `.rd0`。
+- [x] 记录 Rebuild、Solve、Flush 和进程墙钟时间。
+- [x] Stop Ack 后标准 Save/Quit，无 CST/UI 残留。
+
+验证记录：真实 HOM Cold/Warm Gate 已在 CST Studio Suite 2022 上通过（2026-09-17，`1 passed in 446.68s`）。Cold 两次墙钟合计 `270.062s`，Warm 双任务墙钟 `172.796s`，整体加速 `1.563x`。`720–800 MHz` 的 Cold/Warm Frequency 均为 `765.981`；`800–880 MHz` 均为 `826.770`。第二频段 Solve 从 Cold `41.012s` 降至 Warm `26.477s`。结果支持“复杂 HOM 结构不变、只改变频率范围”时保留 Warm CST 的价值。
+
+该双点结果是可重复基准的起点，不外推为所有工程或所有频段的固定加速比。后续性能结论仍应使用更多频段和重复运行统计。
 
 ## 明确不做
 

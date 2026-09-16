@@ -19,6 +19,8 @@ from uuid import UUID, uuid4
 TASK_MAGIC = "CST_TASK_V1"
 COMPLETION_MAGIC = "CST_COMPLETION_V1"
 ACK_MAGIC = "CST_ACK_V1"
+STOP_REQUEST_MAGIC = "CST_STOP_REQUEST_V1"
+STOP_ACK_MAGIC = "CST_STOP_ACK_V1"
 
 
 class ProtocolError(ValueError):
@@ -134,6 +136,22 @@ class Acknowledge:
         _validate_uuid("session_id", self.session_id)
 
 
+@dataclass(frozen=True, slots=True)
+class StopRequest:
+    session_id: str
+
+    def __post_init__(self) -> None:
+        _validate_uuid("session_id", self.session_id)
+
+
+@dataclass(frozen=True, slots=True)
+class StopAcknowledge:
+    session_id: str
+
+    def __post_init__(self) -> None:
+        _validate_uuid("session_id", self.session_id)
+
+
 def new_session_id() -> str:
     return str(uuid4())
 
@@ -216,6 +234,26 @@ def decode_ack(text: str) -> Acknowledge:
     )
 
 
+def encode_stop_request(request: StopRequest) -> str:
+    return _encode(STOP_REQUEST_MAGIC, (("session_id", request.session_id),))
+
+
+def decode_stop_request(text: str) -> StopRequest:
+    fields = _decode(text, STOP_REQUEST_MAGIC)
+    _reject_unknown(fields, {"session_id"})
+    return StopRequest(_required(fields, "session_id"))
+
+
+def encode_stop_ack(ack: StopAcknowledge) -> str:
+    return _encode(STOP_ACK_MAGIC, (("session_id", ack.session_id),))
+
+
+def decode_stop_ack(text: str) -> StopAcknowledge:
+    fields = _decode(text, STOP_ACK_MAGIC)
+    _reject_unknown(fields, {"session_id"})
+    return StopAcknowledge(_required(fields, "session_id"))
+
+
 def validate_completion(task: Task, completion: Completion) -> None:
     if (completion.task_id, completion.session_id) != (task.task_id, task.session_id):
         raise ProtocolError("completion does not belong to this task and session")
@@ -287,6 +325,30 @@ class FileProtocol:
             return None
         ack = decode_ack(path.read_text(encoding="utf-8"))
         validate_ack(completion, ack)
+        return ack
+
+    def request_stop(self, session_id: str) -> Path:
+        return atomic_publish(
+            self.root / "stop.request",
+            encode_stop_request(StopRequest(session_id)),
+        )
+
+    def read_stop_request(self, session_id: str) -> StopRequest | None:
+        path = self.root / "stop.request"
+        if not path.exists():
+            return None
+        request = decode_stop_request(path.read_text(encoding="utf-8"))
+        if request.session_id != session_id:
+            raise ProtocolError("stop request belongs to another worker session")
+        return request
+
+    def read_stop_ack(self, session_id: str) -> StopAcknowledge | None:
+        path = self.root / "stop.ack"
+        if not path.exists():
+            return None
+        ack = decode_stop_ack(path.read_text(encoding="utf-8"))
+        if ack.session_id != session_id:
+            raise ProtocolError("stop acknowledge belongs to another worker session")
         return ack
 
 

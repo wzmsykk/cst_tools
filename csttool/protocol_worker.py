@@ -19,6 +19,7 @@ class WorkerWorkspace:
     project_path: Path
     snapshot_path: Path
     result_path: Path
+    timing_path: Path
     macro_path: Path
     marker_path: Path
 
@@ -40,15 +41,17 @@ def prepare_worker_workspace(
     snapshot_path = root / "worker-result.cst"
     result_path = root / "worker-result" / "Result" / f"{result_name}.rd0"
     marker_path = root / "worker.result"
+    timing_path = root / "timing.txt"
     macro_path = root / "runtime_worker_v1.bas"
     shutil.copy2(source_project, project_path)
     build_worker_macro(
         macro_path, task_path=task_path, completion_path=completion_path,
         ack_path=ack_path, snapshot_path=snapshot_path, result_path=result_path,
-        project_path=project_path, marker_path=marker_path, session_id=task.session_id,
+        timing_path=timing_path, project_path=project_path,
+        marker_path=marker_path, session_id=task.session_id,
     )
     return WorkerWorkspace(root, protocol, task, project_path, snapshot_path,
-                           result_path, macro_path, marker_path)
+                           result_path, timing_path, macro_path, marker_path)
 
 
 def build_worker_macro(
@@ -59,6 +62,7 @@ def build_worker_macro(
     ack_path: str | Path,
     snapshot_path: str | Path,
     result_path: str | Path,
+    timing_path: str | Path,
     project_path: str | Path,
     marker_path: str | Path,
     session_id: str,
@@ -71,6 +75,7 @@ def build_worker_macro(
         "%ACK_PATH%": _vb_string(Path(ack_path).absolute()),
         "%SNAPSHOT_PATH%": _vb_string(Path(snapshot_path).absolute()),
         "%RESULT_PATH%": _vb_string(Path(result_path).absolute()),
+        "%TIMING_PATH%": _vb_string(Path(timing_path).absolute()),
         "%PROJECT_PATH%": _vb_string(Path(project_path).absolute()),
         "%MARKER_PATH%": _vb_string(Path(marker_path).absolute()),
         "%SESSION_ID%": _vb_string(session_id),
