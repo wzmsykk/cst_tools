@@ -134,3 +134,5 @@ python -m pytest -q -m integration --run-cst `
 ```
 
 该 Gate 通过 CST 官方模板迭代器记录求解前和显式评估后的注册 inventory，并在唯一一次 Solver 完成后调用 `EvaluateResultTemplates`。显式评估前后的 Frequency `.rd0` 必须一致，期间不得修改工程参数、Rebuild 或再次启动 Solver。报告写入 `.pytest_cache/cst-p5-6/<run>/report.json`。CST 2022 没有公开模板注册/删除 VBA API，因此模板安装保留为 Project Profile 的一次性制备步骤，不进入运行期 Python/VBA 协议。
+
+P6 复用同一集成测试文件，并增加缺失能力的 fail-fast Gate。正向 Gate 验证 `hom-2022-v1` 的五个模板；负向 Gate 临时要求一个不存在的模板，必须返回 `PROFILE_CAPABILITY_MISSING`，且不产生 timing/result 文件、不启动 Solver、不留下 CST/UI 进程。

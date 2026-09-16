@@ -125,6 +125,22 @@ CST 2022 的公开 VBA API 提供模板枚举和评估，但不提供新增、�
 
 验证记录：真实 P5.6 Gate 已在 CST Studio Suite 2022 上通过（2026-09-17，`1 passed in 178.71s`）。官方 iterator 返回 5 个已注册 M0D 模板，均由 `3D Eigenmode Result` 提供；显式 `EvaluateResultTemplates` 前后 inventory 完全一致，Frequency 均为 `765.981 MHz`。本次只调用一次 Solver，求解后没有参数更新，并在 Completion/Ack 后标准 Save/Quit；只保留运行前即存在的 `cstd.exe` 许可服务。
 
+## P6：最小 HOM Project Profile
+
+- [x] 只定义一个 `hom-2022-v1` Profile，不引入通用 Schema 或动态能力协商。
+- [x] 声明 CST 2022、prepared 源工程和 Warm 任务只允许修改 `fmin/fmax`。
+- [x] 集中声明 5 个必需 M0D Result Template 的完整注册身份。
+- [x] 集中声明 5 个原生标量路径、单位和 3 条固定 R/Q 积分线。
+- [x] 声明动态 R/Q、Shunt Impedance、Total Loss 和 Voltage 继续使用运行时 VBA。
+- [x] Python 在生成 Worker 前拒绝 Profile 未允许的任务参数。
+- [x] Worker 在参数更新、Rebuild 和 Solver 前使用 CST 官方 iterator 校验模板能力。
+- [x] 缺少能力时发布 `PROFILE_CAPABILITY_MISSING`，不启动 Solver，并标准退出。
+- [x] 现有 HOM reader 和 R/Q 路由从 Profile 派生，同时保留兼容常量。
+
+P6 仍不自动安装 Result Template，也不引入 Profile 哈希、Manifest 或通用 Operation ABI。prepared 工程是 Profile 的权威载体；运行期只做确定性预检。
+
+验证记录：真实 P6 Gate 已在 CST Studio Suite 2022 上通过（2026-09-17，`2 passed in 292.90s`）。正向 `hom-2022-v1` Profile 在参数更新前确认五个模板后完成唯一一次 Solver，显式模板评估前后 Frequency 均为 `765.981 MHz`。负向 Profile 临时声明一个不存在的模板，Worker 返回 `PROFILE_CAPABILITY_MISSING`，未生成 timing/result 文件，并以 CST 批处理退出码 0 标准结束；两次测试均未留下新增 CST/UI 进程。
+
 ## 明确不做
 
 - [ ] 不做 Result Asset Manifest。

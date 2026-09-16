@@ -1,5 +1,6 @@
 import pytest
 
+from csttool.hom_project_profile import HOM_PROFILE_V1
 from csttool.protocol_hom_template_evaluation import (
     prepare_hom_template_evaluation_workspace,
     read_result_template_inventory,
@@ -24,8 +25,12 @@ def test_p5_6_worker_uses_supported_template_inventory_and_evaluation(tmp_path):
     assert macro.count("EvaluateResultTemplates") == 1
     assert "ResetTemplateIterator" in macro
     assert "GetNextTemplate" in macro
+    assert '"PROFILE_CAPABILITY_MISSING"' in macro
     assert "Update Params" not in macro
+    assert macro.index("template-inventory-before") < macro.index('stage = "parameters"')
     assert macro.index("template-inventory-before") < macro.index("EigenmodeSolver.Start")
+    for requirement in HOM_PROFILE_V1.required_templates:
+        assert requirement.result_name in macro
     assert macro.index("EigenmodeSolver.Start") < macro.index(
         "template-evaluate-current-run"
     )

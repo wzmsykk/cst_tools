@@ -8,6 +8,8 @@ from pathlib import Path
 from types import MappingProxyType
 from typing import Mapping
 
+from .hom_project_profile import HOM_PROFILE_V1, NativeScalarCapability
+
 
 class NativeResultError(ValueError):
     """A required native CST result is missing or malformed."""
@@ -17,11 +19,7 @@ class NativeResultMissingError(NativeResultError, FileNotFoundError):
     """A required native result file does not exist."""
 
 
-@dataclass(frozen=True, slots=True)
-class HomScalarSpec:
-    key: str
-    relative_path: Path
-    unit: str
+HomScalarSpec = NativeScalarCapability
 
 
 @dataclass(frozen=True, slots=True)
@@ -32,27 +30,11 @@ class HomScalarValue:
     source_path: Path
 
 
-HOM_NATIVE_SCALARS = (
-    HomScalarSpec("frequency", Path("Frequency (Multiple Modes)") / "Mode 1.rd0", "MHz"),
-    HomScalarSpec("q_factor", Path("Q-Factor (Perturbation) (Multiple Modes)") / "Mode 1.rd0", "1"),
-    HomScalarSpec("r_over_q", Path("R over Q beta=1 (Multiple Modes)") / "Mode 1.rd0", "ohm"),
-    HomScalarSpec(
-        "r_over_q_offset_5mm",
-        Path("R over Q beta=1 (Multiple Modes)_offset1=5mm (Multiple Modes)") / "Mode 1.rd0",
-        "ohm",
-    ),
-    HomScalarSpec(
-        "r_over_q_offset_10mm",
-        Path("R over Q beta=1 (Multiple Modes)_offset2=10mm (Multiple Modes)") / "Mode 1.rd0",
-        "ohm",
-    ),
-)
+HOM_NATIVE_SCALARS = HOM_PROFILE_V1.native_scalars
 
 HOM_RESULT_CLASSIFICATION: Mapping[str, str] = MappingProxyType({
     **{spec.key: "native" for spec in HOM_NATIVE_SCALARS},
-    "shunt_impedance": "runtime-vba",
-    "total_loss": "runtime-vba",
-    "voltage": "runtime-vba",
+    **{key: "runtime-vba" for key in HOM_PROFILE_V1.runtime_vba_metrics},
 })
 
 

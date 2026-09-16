@@ -82,13 +82,23 @@ class HomResultPlan:
     integration_line: IntegrationLine
 
 
-HOM_NATIVE_R_OVER_Q: Mapping[IntegrationLine, str] = MappingProxyType(
-    {
-        IntegrationLine("z"): "r_over_q",
-        IntegrationLine("z", yoffset_mm=5): "r_over_q_offset_5mm",
-        IntegrationLine("z", yoffset_mm=10): "r_over_q_offset_10mm",
-    }
-)
+def _profile_native_r_over_q() -> Mapping[IntegrationLine, str]:
+    from .hom_project_profile import HOM_PROFILE_V1
+
+    return MappingProxyType(
+        {
+            IntegrationLine(
+                item.axis,
+                item.xoffset_mm,
+                item.yoffset_mm,
+                item.zoffset_mm,
+            ): item.native_key
+            for item in HOM_PROFILE_V1.native_r_over_q
+        }
+    )
+
+
+HOM_NATIVE_R_OVER_Q = _profile_native_r_over_q()
 
 
 def plan_hom_r_over_q(

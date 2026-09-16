@@ -5,6 +5,11 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
+from .hom_project_profile import (
+    HOM_PROFILE_V1,
+    HomProjectProfile,
+    ResultTemplateRequirement,
+)
 from .protocol_worker import WorkerWorkspace, _vb_string, prepare_worker_workspace
 from .runtime_protocol import Task
 
@@ -32,8 +37,10 @@ def prepare_hom_template_evaluation_workspace(
     source_project: str | Path,
     *,
     result_name: str,
+    profile: HomProjectProfile = HOM_PROFILE_V1,
 ) -> HomTemplateEvaluationWorkspace:
     """Prepare a worker that inventories and re-evaluates existing templates."""
+    profile.validate_task(task)
     worker = prepare_worker_workspace(root, task, source_project, result_name=result_name)
     inventory_before_path = worker.root / "templates-before.tsv"
     inventory_after_path = worker.root / "templates-after.tsv"
@@ -47,6 +54,7 @@ def prepare_hom_template_evaluation_workspace(
         live_result_path=live_result_path,
         result_before_path=result_before_path,
         result_after_path=result_after_path,
+        required_templates=profile.required_templates,
     )
     return HomTemplateEvaluationWorkspace(
         worker,
@@ -79,18 +87,25 @@ def _install_template_evaluation_extension(
     live_result_path: Path,
     result_before_path: Path,
     result_after_path: Path,
+    required_templates: tuple[ResultTemplateRequirement, ...],
 ) -> None:
     macro = macro_path.read_text(encoding="ascii")
     solver = '    stage = "solver"\n'
+    parameters = '    stage = "parameters"\n'
     flush = '    stage = "flush"\n'
-    if macro.count(solver) != 1 or macro.count(flush) != 1:
+    if (
+        macro.count(solver) != 1
+        or macro.count(parameters) != 1
+        or macro.count(flush) != 1
+    ):
         raise ValueError("one-shot worker stages are ambiguous")
 
     macro = macro.replace(
-        solver,
+        parameters,
         '    stage = "template-inventory-before"\n'
         f'    CSTPW_WriteTemplateInventory "{_vb_string(inventory_before_path.absolute())}"\n\n'
-        + solver,
+        + _profile_checks(required_templates)
+        + parameters,
         1,
     )
     macro = macro.replace(
@@ -127,6 +142,22 @@ Private Sub CSTPW_WriteTemplateInventory(ByVal filePath As String)
     Wend
     Close #fileNumber
 End Sub
+
+Private Function CSTPW_HasRegisteredTemplate(ByVal requiredResultName As String, ByVal requiredType As String, ByVal requiredTemplateName As String, ByVal requiredFolder As String) As Boolean
+    Dim resultName As String
+    Dim templateType As String
+    Dim templateName As String
+    Dim folder As String
+
+    CSTPW_HasRegisteredTemplate = False
+    ResetTemplateIterator
+    While GetNextTemplate(resultName, templateType, templateName, folder)
+        If resultName = requiredResultName And templateType = requiredType And templateName = requiredTemplateName And folder = requiredFolder Then
+            CSTPW_HasRegisteredTemplate = True
+            Exit Function
+        End If
+    Wend
+End Function
 '''
     lowered = macro.lower()
     if lowered.count("sub main") != 1:
@@ -136,3 +167,28 @@ End Sub
     if "update params" in lowered:
         raise ValueError("P5.6 worker must not update parameters after solving")
     macro_path.write_text(macro, encoding="ascii", newline="\n")
+
+
+def _profile_checks(
+    required_templates: tuple[ResultTemplateRequirement, ...],
+) -> str:
+    checks = []
+    for item in required_templates:
+        arguments = ", ".join(
+            f'"{_vb_string(value)}"'
+            for value in (
+                item.result_name,
+                item.template_type,
+                item.template_name,
+                item.folder,
+            )
+        )
+        message = _vb_string(f"missing registered template: {item.result_name}")
+        checks.append(
+            f"    If Not CSTPW_HasRegisteredTemplate({arguments}) Then\n"
+            f'        CSTPW_PublishFailure task, "PROFILE_CAPABILITY_MISSING", "{message}"\n'
+            "        Quit\n"
+            "        Exit Sub\n"
+            "    End If\n"
+        )
+    return "".join(checks) + "\n"
