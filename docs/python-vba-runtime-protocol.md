@@ -1,8 +1,9 @@
 # CST Python / VBA Runtime Protocol
 
-状态：设计草案，作为下一阶段实现基线  
+状态：架构参考；wire format 与当前进度以最小协议和当前状态文档为准
 协议版本：`CST_TASK_V1` / `CST_COMPLETION_V1`  
-日期：2026-09-16
+日期：2026-09-17
+当前总览：[CST Tools 当前状态与实施路线](./current-status.md)
 
 ## 1. 决策摘要
 
@@ -10,9 +11,9 @@ Python 与 VBA 不应形成覆盖所有能力的通用 RPC。两者之间只保�
 
 参数发现、`.cst` 静态信息读取、结果解析、优化算法和批量调度属于 Python。运行时 VBA 只负责必须处于 CST 进程内的状态变更和 API 调用。
 
-## 2. 当前协议审计
+## 2. legacy 协议审计（历史问题）
 
-当前实现以 `<index>.txt` 提交任务，以 `<index>.success/.failure` 表示完成，存在以下确定问题：
+本节描述的是尚未迁移的 legacy Manager/Worker 路径。独立 P2.5–P6 Gate 已用 Task/Completion/Ack v1 修复其中身份、原子提交、Ack、结果隔离和失败误判问题，但尚未替换生产 `CSTManager` 后端。
 
 - Python 直接写最终文件；固定等待 `0.1 s` 不能避免 VBA 读到半文件。
 - 递增 index 没有全局 task ID、Worker 世代、参数哈希和 attempt。

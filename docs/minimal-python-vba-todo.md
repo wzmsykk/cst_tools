@@ -1,5 +1,8 @@
 # 最小 Python / VBA 协议 TODO
 
+状态：P0–P6 已完成；当前实施记录
+当前总览：[CST Tools 当前状态与实施路线](./current-status.md)
+
 设计依据：[最小 Python / VBA Runtime Protocol](./minimal-python-vba-protocol.md)
 
 ## P0：修复现有确定缺陷
@@ -16,7 +19,7 @@
 - [x] 实现 `.tmp -> final` 原子提交。
 - [x] 增加 task UUID 和 Worker session UUID。
 - [x] 保留 literal/expression 参数语义。
-- [x] 只定义 `INVALID_TASK`、`REBUILD_FAILED`、`SOLVER_FAILED`、`RESULT_FLUSH_FAILED`、`INTERNAL_ERROR`。
+- [x] 定义最小错误码；P6 追加 `PROFILE_CAPABILITY_MISSING` 用于求解前能力拒绝。
 
 ## P2：fake Worker 安全网
 

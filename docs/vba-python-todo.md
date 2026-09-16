@@ -1,11 +1,12 @@
 # CST VBA 与 Python 联合改造 TODO
 
-状态：活动规划  
-日期：2026-09-16
+状态：历史完整改造规划；当前延期
+日期：2026-09-17
+当前实施入口：[CST Tools 当前状态与实施路线](./current-status.md)
 
 设计依据：[CST VBA 与 Python 联合架构设计](./vba-python-integration-design.md)
 
-> 执行顺序更新：本 TODO 暂不直接进入 P0/P1。应先完成 [原生结果优先 TODO](./cst-native-results-todo.md) 的可行性盘点，并按 [CST `.cst` 项目文件知识库](./cst-project-file-knowledge-base.md) 建立统一只读容器层。盘点结果将决定哪些 Operation ABI 工作仍有必要，避免先建设后删除。
+> 执行顺序更新：本 TODO 不再作为当前阶段编号。项目已按更小的 P2.5–P6 路径完成协议、Warm/HOM 原生结果和最小 Profile Gate。完整 Operation ABI、Manifest、Schema 和批量 VB 改写继续延期，只有第二个真实 Profile 出现共同需求后才重新裁剪。
 
 ## 当前基线
 
@@ -13,7 +14,8 @@
 - [x] CSTManager 使用固定 Worker 池和明确生命周期。
 - [x] 当前后处理生成器改为声明式注册表。
 - [x] `defaultPPS.json`、`TM020PPS.json`、`WTCPPS.json` 可生成。
-- [x] 当前默认测试 29 个通过，4 个 CST 集成测试隔离。
+- [x] 当前默认测试 76 个通过，11 个 CST 集成测试隔离（2026-09-17）。
+- [x] `hom-2022-v1` 最小 Profile、五个模板预检和 fail-fast Gate 已完成。
 - [x] CSTManager API 和设计文档已建立。
 - [ ] 新联合 ABI、Operation 包和 Result Codec 尚未实现。
 - [ ] 当前声明式 `VBPostProcessor` 仅作为迁移基线，不是最终架构。

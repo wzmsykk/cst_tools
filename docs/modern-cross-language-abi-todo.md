@@ -1,8 +1,13 @@
 # 现代跨语言 ABI 实施 TODO
 
+状态：历史完整 ABI 草案，当前不实施
+当前替代方案：[CST Tools 当前状态与实施路线](./current-status.md)与[最小 Python/VBA 协议](./minimal-python-vba-protocol.md)
+
+本文的 ResultAsset、参数哈希、Worker capability handshake 和多层 Adapter 属于曾探索的完整方案，不是当前 `csttool.runtime_protocol` 的已实现契约。以下清单保留作未来需求库，不得据此判断当前完成度。
+
 设计依据：[CST Python / VBA 现代跨语言 ABI 设计](./modern-cross-language-abi-design.md)
 
-## 已完成
+## 历史原型曾覆盖（当前最小实现不承诺）
 
 - [x] Semantic ABI 与 Wire Codec 分层。
 - [x] Python Task/Completion/Ack/ResultAsset 不可变模型。

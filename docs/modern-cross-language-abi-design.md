@@ -1,8 +1,10 @@
 # CST Python / VBA 现代跨语言 ABI 设计
 
-状态：修订提案，优先于旧 Runtime Protocol 中冲突的线格式示例  
-日期：2026-09-16  
-对应实现：`csttool.runtime_protocol`
+状态：历史完整 ABI 提案；当前延期，不对应当前 wire format
+日期：2026-09-17
+当前实现依据：[CST Tools 当前状态与实施路线](./current-status.md)与[最小 Python/VBA Runtime Protocol](./minimal-python-vba-protocol.md)
+
+本文保留成熟 ABI 模型和长期约束，但其中 ResultAsset Manifest、参数哈希、percent-encoding、Worker 世代和 capability handshake 未进入当前最小 `csttool.runtime_protocol`。不得把第 4、6、8、9 节当作现状或近期 TODO。
 
 ## 1. 参考模型与取舍
 
@@ -123,7 +125,7 @@ Python 绝不解析错误字符串决定重试。每次重试使用新 task ID�
 
 ## 8. 已实现的功能安全网
 
-`csttool.runtime_protocol` 已实现但尚未接入生产 Worker：
+以下内容属于历史完整 ABI 原型目标，不是当前最小 `csttool.runtime_protocol` 的能力：
 
 - frozen dataclass Task/Completion/Ack/ResultAsset；
 - literal/expression 参数模型；
@@ -136,7 +138,7 @@ Python 绝不解析错误字符串决定重试。每次重试使用新 task ID�
 
 对应单元测试覆盖 round-trip、表达式转义、篡改检测、顺序无关哈希、失败约束、路径逃逸、Ack 和禁止覆盖。
 
-## 9. 下一功能切片
+## 9. 历史建议切片（当前暂停）
 
 按以下顺序实现，避免同时改 Python 和 VBA 多层：
 

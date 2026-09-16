@@ -1,7 +1,8 @@
 # CST 原生结果优先 TODO
 
-状态：当前最高优先级  
-日期：2026-09-16
+状态：长期路线；HOM 最小闭环已完成到 P6
+日期：2026-09-17
+当前总览：[CST Tools 当前状态与实施路线](./current-status.md)
 
 知识依据：[Warm CST 与原生结果知识库](./cst-warm-native-results-knowledge-base.md)；[CST `.cst` 项目文件知识库](./cst-project-file-knowledge-base.md)
 
@@ -66,6 +67,8 @@
 P5 已完成上述 HOM Profile 的最小闭环：固定路径、严格标量 Codec、单位、缺失/损坏错误和两个频段的 Cold/Warm 一致性。这里不勾选整个 Gate 1，因为 WTC、TM020、场数据及跨版本盘点仍未完成；也不把 HOM 专用 reader 提升为通用 Provider ABI。
 
 P5.5 补充边界：官方 3D Eigenmode Result Template 通过 `coordinates=0/1/2` 支持 x/y/z 积分轴，并通过 `u1/v1/w1` 定义横向位置；原生能力不是 z 轴限定。请求与当前工程实际预定义的任意轴模板实例精确匹配时是 `native`，否则是 `runtime-vba`。当前 HOM Profile 只预装 z 轴 0/5/10 mm。求解后修改工程参数会触发 `Update Params` 并丢失当前结果，因此不得用工程参数驱动 a posteriori 模板位置。求解后动态位置直接传给 `EigenResult_Complex`，或在后续独立 Gate 中验证不触发参数更新的模板实例设置修改。
+
+P5.6/P6 已进一步证明：CST 官方 iterator 可区分“已注册模板”与仅存在的 `.r0d/.r1d` artifact，`EvaluateResultTemplates` 可对当前 Run 重新评估；`hom-2022-v1` 已集中声明五个模板和五个原生结果，并在任何参数更新、Rebuild、Solver 前执行能力预检。该结论只覆盖当前 HOM/CST 2022 prepared 工程，不代表 Gate 1 的其他 Profile 已完成。
 
 - [ ] 盘点 Frequency。
 - [ ] 盘点 Q-Factor。
@@ -195,22 +198,22 @@ P5.5 补充边界：官方 3D Eigenmode Result Template 通过 `coordinates=0/1/
 ## Gate 8：Project Profile
 
 - [ ] 定义 Profile Schema。
-- [ ] 声明 prepared CST 工程。
-- [ ] 声明原生结果能力。
+- [x] 为 `hom-2022-v1` 声明 prepared CST 工程。
+- [x] 为 `hom-2022-v1` 声明原生结果能力。
 - [ ] 声明 Python 派生能力。
-- [ ] 声明可选 VBA Extension。
-- [ ] 记录 CST 版本。
+- [x] 为 `hom-2022-v1` 声明可选运行时 VBA 能力。
+- [x] 记录 `hom-2022-v1` 的 CST 版本。
 - [ ] 记录源工程和 Profile 哈希。
 - [ ] 记录成员 manifest、模型状态、HISTORY LIST 和参数 schema 哈希。
-- [ ] 记录 Result Template/结果成员 inventory，并区分“存在”和“已解码”。
-- [ ] 运行前校验必需结果存在。
+- [x] 运行期用官方 iterator 校验 `hom-2022-v1` 注册模板，不以 artifact 存在代替注册。
+- [x] 在参数更新和 Solver 前校验 `hom-2022-v1` 必需模板能力。
 - [ ] 评估自动安装 Result Template 的 Preparation Macro。
 - [ ] 将 Solver、frequency、mode count、Mesh 和 Boundary 建模为声明式目标状态。
-- [ ] 区分 Profile 固定设置和允许 Warm 修改的参数化设置。
+- [x] `hom-2022-v1` 固定 prepared 工程，仅允许 Warm 修改 `fmin/fmax`。
 - [ ] 记录每个参数化设置的结果失效、重新网格和 Warm 复用规则。
 - [ ] 对复合工程记录各 scope 的物理角色、依赖、数据交换和求解顺序。
 - [ ] 分 scope 声明 Solver、参数和结果能力。
-- [ ] 无法自动安装时保留权威 prepared 工程并验证能力。
+- [x] `hom-2022-v1` 保留权威 prepared 工程并验证能力。
 
 验收标准：用户不需要为每次运行手动定义后处理步骤。
 
@@ -280,7 +283,7 @@ P5.5 补充边界：官方 3D Eigenmode Result Template 通过 `coordinates=0/1/
 
 ## 实施约束
 
-- 本 TODO 是当前最高优先级，先于完整 Operation ABI 建设。
+- 本 TODO 是长期原生结果路线；近期实施顺序以 `current-status.md` 为准，仍先于完整 Operation ABI 建设。
 - 探针阶段只能只读，不修改生产 CST 工程。
 - `.cst` 容器能力复用 `cst_version` 的思路但必须工程化；禁止维护第二套无测试解析器。
 - `.rd0` 是结果交换数据；`.r0d/.r1d` 是 Result Template artifact，不能把模板设置或缓存字段当作当前结果。

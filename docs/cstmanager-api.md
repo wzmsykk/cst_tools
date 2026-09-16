@@ -1,5 +1,7 @@
 # CSTManager API 与使用指南
 
+状态：现有 production/legacy Manager 公共接口。P2.5–P6 的最小协议、HOM 原生结果和 Profile Gate 尚未替换该后端；迁移状态见[当前状态与实施路线](./current-status.md)。
+
 `CSTManager` 是优化算法与本地 CST 进程之间的批量任务调度器。它管理固定数量的 CST Worker，负责并发执行、失败重试、Worker 回收和结果汇总。
 
 ## 导入

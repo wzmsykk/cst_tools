@@ -1,5 +1,7 @@
 # CST Tools 测试基础
 
+当前阶段和已通过 Gate 汇总见[当前状态与实施路线](./current-status.md)。
+
 ## 测试层级
 
 ### 1. 默认测试
@@ -39,7 +41,7 @@ python -m pytest -q -m integration --run-cst `
 
 测试通过版本化 OLE ProgID（例如 `CSTStudio.Application.2022`）创建 CST，并持有 `studio.NewMWS` 返回的项目对象。Contract Macro 写出 `contract.result` 并返回后，外部控制器依次调用文档规定的 `Project.Quit` 和 `Application.Quit`，分别关闭项目和退出应用。只有控制器正常返回且本次测试新增的 CST 进程全部退出，测试才会通过。
 
-不要从 batch macro 内调用 `Quit`，CST 2022.5 会报告正在运行 batch job 而拒绝关闭。如果标准 `Project.Quit` / `Application.Quit` 超时、出现保存对话框或残留 CST 进程，测试会为恢复环境而强制清理本次新增的进程，但 Gate 仍必须失败并要求检查日志。测试开始前已存在的 CST 进程不在清理范围内。
+Contract Macro 由外部 OLE 控制器持有项目对象，因此宏内不得调用 `Quit`；宏返回后由控制器调用 `Project.Quit` / `Application.Quit`。应用级 `-m` Worker 则在 Ack 或明确的 fail-fast 终止路径中请求 `Save/Quit`，并由测试继续验证批处理进程最终正常退出。CST 可能在 batch 尚未返回时记录“Unable to close sheet”诊断，但只要批处理随后以退出码 0 结束且无新增进程/UI 残留，生命周期 Gate 仍成立。任何超时、保存对话框或残留进程都会使 Gate 失败；强制清理只用于恢复环境，不算标准退出。
 
 因此真实 Gate 除协议兼容性外，还证明：测试打开或新建的项目得到妥善处理，结束后不留下必须由用户通过 UI 保存或关闭的问题；在标准退出被实际证明失败之前，不以结束进程代替正常生命周期。
 

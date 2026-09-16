@@ -1,5 +1,7 @@
 # CSTManager 设计文档
 
+状态：现有 production/legacy 调度层设计。当前最小 Worker/Profile 实现作为独立 Gate 演进，尚未接入本 Manager；迁移状态见[当前状态与实施路线](./current-status.md)。
+
 ## 1. 目的
 
 `CSTManager` 为需要反复调用 CST 的优化算法提供一个有边界、可恢复、可测试的本地并发执行层。

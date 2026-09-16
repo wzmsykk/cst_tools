@@ -1,7 +1,9 @@
 # Warm CST 与原生结果知识库
 
-状态：当前架构认知  
-日期：2026-09-16
+状态：当前架构认知；HOM 已验证到 P6
+日期：2026-09-17
+
+实施状态和 Gate 汇总见[当前状态与实施路线](./current-status.md)。
 
 项目文件结构、参数表、HISTORY LIST、指纹和安全写回边界详见 [CST `.cst` 项目文件知识库](./cst-project-file-knowledge-base.md)。后续 `.cst` 访问按该文档的容器化、只读优先和窄范围写回原则实施。
 

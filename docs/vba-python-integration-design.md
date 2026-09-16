@@ -1,8 +1,10 @@
 # CST VBA 与 Python 联合架构设计
 
-状态：提案，尚未实现  
+状态：历史完整架构提案；当前只实施其最小子集
 版本：0.1  
-日期：2026-09-16
+日期：2026-09-17
+
+当前 P2.5–P6 没有采用通用 Operation ABI、Manifest 或 Profile Schema；实际边界见[当前状态与实施路线](./current-status.md)。本文继续作为长期设计素材，不是当前完成度说明。
 
 > 优先级说明：在实施完整 Operation ABI 前，必须先完成原生结果可读性验证。若主要指标均可由 CST 工程内部结果直接读取，本设计中的后处理 Operation 范围应收缩为少量必要的 VBA Extension。`.cst` 静态信息、能力清单和 Project Profile 指纹统一由 `cst_project` 层提供，不允许 Worker、Provider 和生成器各自解析容器。参见 [Warm CST 与原生结果知识库](./cst-warm-native-results-knowledge-base.md)、[CST `.cst` 项目文件知识库](./cst-project-file-knowledge-base.md) 和 [原生结果优先 TODO](./cst-native-results-todo.md)。
 

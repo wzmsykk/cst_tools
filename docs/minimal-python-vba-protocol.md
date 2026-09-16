@@ -1,7 +1,9 @@
 # 最小 Python / VBA Runtime Protocol
 
-状态：推荐实施方案；取代“第一阶段完整 ABI”思路  
-日期：2026-09-16
+状态：已实现并通过 P2.5–P6 独立 Gate；尚未替换 production Manager
+日期：2026-09-17
+
+当前实现、HOM Profile 和后续顺序见[当前状态与实施路线](./current-status.md)。
 
 ## 1. 只解决当前真实问题
 
