@@ -32,9 +32,12 @@
 
 ## P2.5：接入前 Gate
 
-- [ ] 使用目标 CST 的 VBA/WWB 解释器执行 golden vectors，而不仅是静态检查。
-- [ ] 把 VBA Codec 编译进一份独立测试宏，验证 ASCII 文件读写和 `Name temp As final`。
+- [x] 使用目标 CST 2022.5 的 VBA/WWB 解释器执行 golden vectors，而不仅是静态检查。
+- [x] 把 VBA Codec 编译进一份独立测试宏，验证 ASCII 文件读写和 `Name temp As final`。
+- [x] 使用标准 OLE `Project.Quit` / `Application.Quit` 关闭测试项目和应用，并验证无 CST/UI 残留；强制清场发生时 Gate 失败。
 - [ ] 通过后再修改 `worker.vb`；失败时只修 Codec，不动 Worker 生命周期。
+
+验证记录：真实 Contract Test 已通过。外部控制器通过版本化 `CSTStudio.Application` OLE 接口创建并持有项目，宏写出成功 marker 后正常返回，再依次调用标准 `Project.Quit` 和 `Application.Quit`。CST batch macro 内不得调用 `Quit`。只有标准退出成功且未留下需要用户通过 UI 处理的窗口或进程，Gate 才能通过；强制结束仅用于失败清场。
 
 ## P3：真实 CST 最小验证
 

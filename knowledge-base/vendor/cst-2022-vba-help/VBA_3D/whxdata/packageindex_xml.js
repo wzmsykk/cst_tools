@@ -1,0 +1,1 @@
+gXMLBuffer="<?xml version=\"1.0\" encoding=\"utf-8\"?><cki><ck fm=\"!\" to=\"a\"/><ck fm=\"a1\" to=\"cst\"/><ck fm=\"cst_job\" to=\"getlistlength\"/><ck fm=\"getloadedfrequency\" to=\"nam\"/><ck fm=\"name\" to=\"roughnes\"/><ck fm=\"round\" to=\"the\"/><ck fm=\"their\" to=\"…\"/></cki>";

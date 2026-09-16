@@ -37,6 +37,12 @@ python -m pytest -q -m integration --run-cst `
 
 真实测试只验证 WWB 协议 Codec：读取 Task、写 Completion、等待 Ack。它不打开工程、不运行 Solver，是接入生产 `worker.vb` 前的方言兼容 Gate。
 
+测试通过版本化 OLE ProgID（例如 `CSTStudio.Application.2022`）创建 CST，并持有 `studio.NewMWS` 返回的项目对象。Contract Macro 写出 `contract.result` 并返回后，外部控制器依次调用文档规定的 `Project.Quit` 和 `Application.Quit`，分别关闭项目和退出应用。只有控制器正常返回且本次测试新增的 CST 进程全部退出，测试才会通过。
+
+不要从 batch macro 内调用 `Quit`，CST 2022.5 会报告正在运行 batch job 而拒绝关闭。如果标准 `Project.Quit` / `Application.Quit` 超时、出现保存对话框或残留 CST 进程，测试会为恢复环境而强制清理本次新增的进程，但 Gate 仍必须失败并要求检查日志。测试开始前已存在的 CST 进程不在清理范围内。
+
+因此真实 Gate 除协议兼容性外，还证明：测试打开或新建的项目得到妥善处理，结束后不留下必须由用户通过 UI 保存或关闭的问题；在标准退出被实际证明失败之前，不以结束进程代替正常生命周期。
+
 ## Golden vectors
 
 冻结文件位于 `test/data/runtime_protocol_v1/`。Python 编码器必须逐字节匹配：

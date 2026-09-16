@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Adobe RoboHelp 11" />
+<title>ParticleMCC Object</title>
+<link rel="StyleSheet" href="../online_help_vba.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+        origWidth = innerWidth;
+        origHeight = innerHeight;
+        onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+/*<![CDATA[*/
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+/*]]>*/
+</style>
+
+<script type="text/javascript" language="javascript1.2" src="../whmsg.js" charset="utf-8">
+</script>
+<script type="text/javascript" language="javascript" src="../whver.js" charset="utf-8">
+</script>
+<script type="text/javascript" language="javascript1.2" src="../whutils.js" charset="utf-8">
+</script>
+<script type="text/javascript" language="javascript1.2" src="../whproxy.js" charset="utf-8">
+</script>
+<script type="text/javascript" language="javascript1.2" src="../whlang.js" charset="utf-8">
+</script>
+<script type="text/javascript" language="javascript1.2" src="../whtopic.js" charset="utf-8">
+</script>
+</head>
+<body>
+<script type="text/javascript" language="javascript1.2">
+//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+        var strUrl = document.location.href;
+        var bc = 0;
+        var n = strUrl.toLowerCase().indexOf("bc-");
+        if(n != -1)
+        {
+                document.location.replace(strUrl.substring(0, n));
+                bc = strUrl.substring(n+3);
+        }
+
+        if (window.addTocInfo)
+        {
+        
+        }
+        if (window.writeBtnStyle)
+                writeBtnStyle();
+
+        if (window.writeIntopicBar)
+                writeIntopicBar(0);
+
+        
+        document.write("<p style=\"font-family: Tahoma; font-size: 9pt; font-weight: 400;  font-style:normal; color: rgb(0, 0, 0); text-decoration:none; text-align: left\"> ");
+AddMasterBreadcrumbs("../index.htm", "font-family: Tahoma; font-size: 9pt; font-weight: 400;  font-style:normal; color: rgb(0, 0, 0); text-decoration:none; text-align: left", "|", "Home", "../special_vbaobjects/special_vbaobjects_vbaobjects.htm");
+document.write("ParticleMCC Object<\/p>");
+
+}
+else
+        if (window.gbIE4)
+                document.location.reload();
+
+onLoadHandler = function()
+{
+  if (window.setRelStartPage)
+        {
+        setTimeout("setRelStartPage('../index.htm');", 1)
+
+    setTimeout("UpdateBreadCrumbsMarker();", 1);
+        }
+}
+
+if (window.addEventListener){  
+        window.addEventListener('load', onLoadHandler, false);   
+} else if (window.attachEvent){  
+        window.attachEvent('onload', onLoadHandler);  
+}
+
+function onSetStartPage()
+{
+  autoSync(1);
+  sendSyncInfo();
+  sendAveInfoOut();
+}
+//-->
+//]]>
+</script><script type="text/javascript" src="../ehlpdhtm.js" language="JavaScript1.2">
+</script>
+<p class="VBA-Heading-Object">ParticleMCC Object</p>
+<p class="VBA-Text">The ParticleMCC object defines all the settings to control the Monte Carlo Collision models. These can be used within the particle solvers: TRK, Es-PIC and PIC.</p>
+<ul>
+<li class="p-VBA-Index-Category">
+<p class="VBA-Index-Category"><a href="#ParticleMCC">General Methods</a></p>
+</li>
+<li class="p-VBA-Index-Category">
+<p class="VBA-Index-Category"><a href="#BackgroundGas">Background Gas</a></p>
+</li>
+<li class="p-VBA-Index-Category">
+<p class="VBA-Index-Category"><a href="#Collision">Collision</a></p>
+</li>
+<li class="p-VBA-Index-Category">
+<p class="VBA-Index-Category"><a href="#ParticleMCC_Examples">Examples</a></p>
+</li>
+</ul>
+<p class="VBA-Heading-Category"><a name="ParticleMCC" id="ParticleMCC"></a> General Methods</p>
+<p class="VBA-Heading-Method">Reset</p>
+<p class="VBA-Text-Indent">Delete all defined background gases and collisions.</p>
+<p class="VBA-Heading-Method">&#160;</p>
+<p class="VBA-Heading-Method">EnableAcceleration ( <span><a href="../common_vbageneral/common_general_bool_data_type.htm" id="a791" style="font-weight: normal;" name="a791">bool</a></span> <span style="font-style: italic;"><i>flag</i></span> )</p>
+<p class="VBA-Text-Indent">Enables or disables the OpenMP acceleration of the particle collision routines.</p>
+<p class="VBA-Heading-Category"><a name="BackgroundGas" id="BackgroundGas"></a>Background Gas</p>
+<p class="VBA-Heading-Method">SetGasName( <a href="../common_vbageneral/common_general_string.htm" id="a3611" style="font-weight: normal;" name="a3611">string</a> name )</p>
+<p class="VBA-Text-Indent">Set the name of a background gas.</p>
+<p class="VBA-Text-Indent">&#160;</p>
+<p class="VBA-Heading-Method">SetGasMass ( &#160;<a href="../common_vbageneral/common_general_string.htm" id="a481" style="font-weight: normal;" name="a481">double</a> mass )</p>
+<p class="VBA-Text-Indent">This method sets the mass of a background gas particle in atomic units.</p>
+<p class="VBA-Text-Indent">&#160;</p>
+<p class="VBA-Heading-Method">SetGasPressure ( &#160;<a href="../common_vbageneral/common_general_string.htm" id="a4811" style="font-weight: normal;" name="a4811">double</a> pressure )</p>
+<p class="VBA-Text-Indent">This method sets the pressure of the background gas. The pressure is defined in Torr.</p>
+<p class="VBA-Text-Indent">&#160;</p>
+<p class="VBA-Heading-Method">SetGasTemperature ( &#160;<a href="../common_vbageneral/common_general_string.htm" id="a48111" style="font-weight: normal;" name="a48111">double</a> temperature )</p>
+<p class="VBA-Text-Indent">This method sets the temperature of the background gas. The temperature is defined in Kelvin.</p>
+<p class="VBA-Text-Indent">&#160;</p>
+<p class="VBA-Heading-Method">AddGas</p>
+<p class="VBA-Text-Indent">Add a gas entry to the MCC model with the all of the above defined values.</p>
+<p class="VBA-Heading-Category"><a name="Collision" id="Collision"></a>Collision</p>
+<p class="VBA-Heading-Method">IsActive( <span><a href="../common_vbageneral/common_general_bool_data_type.htm" id="a7911" style="font-weight: normal;" name="a7911">bool</a></span> <span style="font-style: italic;"><i>flag</i></span> )</p>
+<p class="VBA-Text-Indent">Enables or disables the following defined collision.</p>
+<p class="VBA-Text-Indent">&#160;</p>
+<p class="VBA-Heading-Method">SetIncidentSpecies ( <a href="../common_vbageneral/common_general_string.htm" id="a36111" style="font-weight: normal;" name="a36111">string</a> particle species name )</p>
+<p class="VBA-Text-Indent">Set the name of the incident species. A particle source with such a species has to be active within the simulation.</p>
+<p class="VBA-Text-Indent">&#160;</p>
+<p class="VBA-Heading-Method">SetTargetedSpecies ( <a href="../common_vbageneral/common_general_string.htm" id="a36112" style="font-weight: normal;" name="a36112">string</a> background gas name )</p>
+<p class="VBA-Text-Indent">Set the name of the targeted species. A background gas with this name has to be defined.</p>
+<p class="VBA-Text-Indent">&#160;</p>
+<p class="VBA-Heading-Method">SetCollisionType ( <a href="../common_vbageneral/common_general_string.htm" id="a361121" style="font-weight: normal;" name="a361121">string</a> collision type )</p>
+<p class="VBA-Text-Indent">Select the collision type of the defined collision. Valid types are "ionization","excitation", "elastic" and "ion-elastic".</p>
+<p class="VBA-Text-Indent">&#160;</p>
+<p class="VBA-Heading-Method">SetParameter ( &#160;<a href="../common_vbageneral/common_general_string.htm" id="a481111" style="font-weight: normal;" name="a481111">double</a> parameter )</p>
+<p class="VBA-Text-Indent">This method sets the parameter of the defined collision. The ionization model requires this parameter for setting the electron shape parameter.</p>
+<p class="VBA-Text-Example">&#160;</p>
+<p class="VBA-Heading-Method">SetCoulombScattering ( <a href="../common_vbageneral/common_general_bool_data_type.htm" id="a79111" style="font-weight: normal;" name="a79111">bool</a> <span style="font-style: italic;"><i>flag</i></span> )</p>
+<p class="VBA-Text-Indent">Switches between a Coulomb or isotropic scattering model.</p>
+<p class="VBA-Text-Indent">&#160;</p>
+<p class="VBA-Heading-Method">SetCrossSectionFileName ( <a href="../common_vbageneral/common_general_string.htm" id="a361111" style="font-weight: normal;" name="a361111">string</a> fileame )</p>
+<p class="VBA-Text-Indent">This method can be used to set the name of the file which is used to import the cross-section data. To import the data, the method CrossSectionImportDataPair must be used.</p>
+<p class="VBA-Text-Indent">&#160;</p>
+<p class="VBA-Heading-Method">CrossSectionImportDataPair ( <a href="../common_vbageneral/common_general_string.htm" id="a4811111" style="font-weight: normal;" name="a4811111">double</a> dEnergy, <a href="../common_vbageneral/common_general_string.htm" id="a4811112" style="font-weight: normal;" name="a4811112">double</a> dCrossSection )</p>
+<p class="VBA-Text-Indent">This method sets the collision cross section at a given energy. This is equivalent to importing one data pair of the energy - cross section curve.</p>
+<p class="VBA-Text-Indent">&#160;</p>
+<p class="VBA-Heading-Method">AddCollision</p>
+<p class="VBA-Text-Indent">Add a collision entry to the MCC model with the all of the above defined values.</p>
+<p class="VBA-Heading-Category"><a name="ParticleMCC_Examples" id="ParticleMCC_Examples"></a>Particle Monte Carlo Collision Examples</p>
+<p class="VBA-Text-Example" style="color: #008000;"><span style="color: #008000;"><font color="green">' Particle Monte Carlo Collision definition of one background gas and one collision</font></span></p>
+<p class="VBA-Text-Example">With ParticleMCC</p>
+<p class="VBA-Text-Example">&#160;&#160;&#160;&#160;&#160;.Reset</p>
+<p class="VBA-Text-Example">&#160;&#160;&#160;&#160;&#160;.EnableAcceleration "False"</p>
+<p class="VBA-Text-Example">&#160;&#160;&#160;&#160;&#160;.SetGasName "He"</p>
+<p class="VBA-Text-Example">&#160;&#160;&#160;&#160;&#160;.SetGasMass "4"</p>
+<p class="VBA-Text-Example">&#160;&#160;&#160;&#160;&#160;.SetGasPressure "0.01"</p>
+<p class="VBA-Text-Example">&#160;&#160;&#160;&#160;&#160;.SetGasTemperature "300"</p>
+<p class="VBA-Text-Example">&#160;&#160;&#160;&#160;&#160;.AddGas</p>
+<p class="VBA-Text-Example">&#160;&#160;&#160;&#160;&#160;.IsActive "True"</p>
+<p class="VBA-Text-Example">&#160;&#160;&#160;&#160;&#160;.SetIncidentSpecies "electron"</p>
+<p class="VBA-Text-Example">&#160;&#160;&#160;&#160;&#160;.SetTargetedSpecies "He"</p>
+<p class="VBA-Text-Example">&#160;&#160;&#160;&#160;&#160;.SetCollisionType "excitation"</p>
+<p class="VBA-Text-Example">&#160;&#160;&#160;&#160;&#160;.SetParameter ""</p>
+<p class="VBA-Text-Example">&#160;&#160;&#160;&#160;&#160;.SetCoulombScattering "True"</p>
+<p class="VBA-Text-Example">&#160;&#160;&#160;&#160;&#160;.SetCrossSectionFileName "crosssection.txt"</p>
+<p class="VBA-Text-Example">&#160;&#160;&#160;&#160;&#160;.CrossSectionImportDataPair "2.000e+01", "2.00e-20"</p>
+<p class="VBA-Text-Example">&#160;&#160;&#160;&#160;&#160;.CrossSectionImportDataPair "2.200e+01", "2.00e-20"</p>
+<p class="VBA-Text-Example">&#160;&#160;&#160;&#160;&#160;.AddCollision</p>
+<p class="VBA-Text-Example">End With</p>
+<p class="VBA-Text-Example">&#160;</p>
+<div style="width: 100%; position: relative;" id="footer">
+<p>&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">
+//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+        writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]>
+</script>
+</body>
+</html>

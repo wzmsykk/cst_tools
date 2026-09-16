@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Adobe RoboHelp 11" />
+<title>Fan Object</title>
+<link rel="StyleSheet" href="../online_help_vba.css" type="text/css" />
+<style type="text/css">
+/*<![CDATA[*/
+<!--
+body { border-bottom-style:None; }
+-->
+/*]]>*/
+</style>
+
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+        origWidth = innerWidth;
+        origHeight = innerHeight;
+        onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+/*<![CDATA[*/
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+/*]]>*/
+</style>
+
+<script type="text/javascript" language="javascript1.2" src="../whmsg.js" charset="utf-8">
+</script>
+<script type="text/javascript" language="javascript" src="../whver.js" charset="utf-8">
+</script>
+<script type="text/javascript" language="javascript1.2" src="../whutils.js" charset="utf-8">
+</script>
+<script type="text/javascript" language="javascript1.2" src="../whproxy.js" charset="utf-8">
+</script>
+<script type="text/javascript" language="javascript1.2" src="../whlang.js" charset="utf-8">
+</script>
+<script type="text/javascript" language="javascript1.2" src="../whtopic.js" charset="utf-8">
+</script>
+</head>
+<body>
+<script type="text/javascript" language="javascript1.2">
+//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+        var strUrl = document.location.href;
+        var bc = 0;
+        var n = strUrl.toLowerCase().indexOf("bc-");
+        if(n != -1)
+        {
+                document.location.replace(strUrl.substring(0, n));
+                bc = strUrl.substring(n+3);
+        }
+
+        if (window.addTocInfo)
+        {
+        addTocInfo("3D Simulation VBA\nVBA Objects\nSources and Ports\nThermal\nFan Object");
+
+        }
+        if (window.writeBtnStyle)
+                writeBtnStyle();
+
+        if (window.writeIntopicBar)
+                writeIntopicBar(0);
+
+        
+        document.write("<p style=\"font-family: Tahoma; font-size: 9pt; font-weight: 400;  font-style:normal; color: rgb(0, 0, 0); text-decoration:none; text-align: left\"> ");
+AddMasterBreadcrumbs("../index.htm", "font-family: Tahoma; font-size: 9pt; font-weight: 400;  font-style:normal; color: rgb(0, 0, 0); text-decoration:none; text-align: left", "|", "Home", "../special_vbaobjects/special_vbaobjects_vbaobjects.htm");
+document.write("<a style=\"font-family: Tahoma; font-size: 9pt; font-weight: 400;  font-style:normal; color: rgb(0, 0, 0); text-decoration:none; text-align: left\" href=\"../special_vbaobjects/special_vbaobjects_vbaobjects.htm\">3D Simulation VBA<\/a> | <a style=\"font-family: Tahoma; font-size: 9pt; font-weight: 400;  font-style:normal; color: rgb(0, 0, 0); text-decoration:none; text-align: left\" href=\"../special_vbaobjects/special_vbaobjects_vbaobjects.htm\">VBA Objects<\/a> | <a style=\"font-family: Tahoma; font-size: 9pt; font-weight: 400;  font-style:normal; color: rgb(0, 0, 0); text-decoration:none; text-align: left\" href=\"../special_vbasignals/special_vbasignals_timesignal_object.htm\">Sources and Ports<\/a> | <a style=\"font-family: Tahoma; font-size: 9pt; font-weight: 400;  font-style:normal; color: rgb(0, 0, 0); text-decoration:none; text-align: left\" href=\"special_vbathermalsolver_fan.htm\">Thermal<\/a> | Fan Object<\/p>");
+
+}
+else
+        if (window.gbIE4)
+                document.location.reload();
+
+onLoadHandler = function()
+{
+  if (window.setRelStartPage)
+        {
+        setTimeout("setRelStartPage('../index.htm');", 1)
+
+    setTimeout("UpdateBreadCrumbsMarker();", 1);
+        }
+}
+
+if (window.addEventListener){  
+        window.addEventListener('load', onLoadHandler, false);   
+} else if (window.attachEvent){  
+        window.attachEvent('onload', onLoadHandler);  
+}
+
+function onSetStartPage()
+{
+  autoSync(1);
+  sendSyncInfo();
+  sendAveInfoOut();
+}
+//-->
+//]]>
+</script><script type="text/javascript" src="../ehlpdhtm.js" language="JavaScript1.2">
+</script>
+<table cellspacing="0" width="100%">
+<col style="width: 50%;" />
+<col style="width: 50%;" />
+<tr>
+<td style="vertical-align: middle;"><a href="http://www.3ds.com/SIMULIA" target="_blank"><img src="../ds_simulia.png" alt="" style="border: none;" border="0" /></a></td>
+<td style="vertical-align: middle;">
+<p style="text-align: right;"><a href="https://www.3ds.com/products-services/3dexperience/" target="_blank"><img src="../3dexp.png" alt="" style="border: none;" width="60" height="70" border="0" /></a></p>
+</td>
+</tr>
+</table>
+<h1>Fan Object</h1>
+<p class="VBA-Text">This object is used to create new fan object for the <a href="special_vbathermalsolver_chtsolver.htm">Conjugate Heat Transfer Solver</a>.</p>
+<ul>
+<li class="p-VBA-Index-Category">
+<p class="VBA-Index-Category"><a href="#Methods">Methods</a></p>
+</li>
+<li class="p-VBA-Index-Category">
+<p class="VBA-Index-Category"><a href="#Defaults">Default Settings</a></p>
+</li>
+<li class="p-VBA-Index-Category">
+<p class="VBA-Index-Category"><a href="#Example">Example</a></p>
+</li>
+</ul>
+<p class="VBA-Heading-Category"><a name="Methods" id="Methods"></a>Methods</p>
+<p class="VBA-Heading-Method">Reset</p>
+<p class="VBA-Text-Indent">Resets all internal settings of the fan source to their default values.</p>
+<p class="VBA-Text-Indent">&#160;</p>
+<p class="VBA-Heading-Method">Name ( <span style="font-style: italic;"><i><a href="../common_vbageneral/common_general_string.htm" id="a6" style="font-weight: normal; font-style: normal;" name="a6">string</a> name</i></span> )</p>
+<p class="VBA-Text-Indent">Specifies the <span style="font-style: italic;"><i>name</i></span> of the fan.</p>
+<p class="VBA-Text-Indent">&#160;</p>
+<p class="vba-text-indent" style="margin-left: 0px;"><span style="font-weight: bold;">FlowType (</span> <a href="../common_vbageneral/common_general_enum.htm" id="a51" style="font-weight: normal; font-style: normal;" name="a51">enum</a> <span style="font-style: italic; font-weight: bold;"><i>type</i></span> <span style="font-weight: bold;">)</span></p>
+<p class="VBA-Text-Indent">Selects the type of the flow description for the fan. Currently only the type "Normal" is supported.</p>
+<p class="VBA-Text-Indent">&#160;</p>
+<p class="vba-text-indent" style="margin-left: 0px;"><span style="font-weight: bold;">DeratingFactor (</span> <a href="../common_vbageneral/common_general_expression.htm">double expression</a> <span style="font-style: italic; font-weight: bold;"><i>value</i></span> <span style="font-weight: bold;">)</span></p>
+<p class="VBA-Text-Indent">Sets the derating factor for the fan.</p>
+<p class="VBA-Text-Indent">default: <span style="font-style: italic;"><i>value = 1.0</i></span></p>
+<p class="VBA-Heading-Method">&#160;</p>
+<p class="vba-text-indent" style="margin-left: 0px;"><span style="font-weight: bold;"><a name="FlowSpecType" id="FlowSpecType"></a>FlowSpecType (</span> <a href="../common_vbageneral/common_general_enum.htm" id="a512" style="font-weight: normal; font-style: normal;" name="a512">enum</a> <span style="font-style: italic; font-weight: bold;"><i>type</i></span> <span style="font-weight: bold;">)</span></p>
+<p class="VBA-Text-Indent">Specifies whether the temperature or dissipated heat will be prescribed for the fan. Available types are "<span style="font-style: italic;"><i>Dissipated hea</i></span>t" and "<span style="font-style: italic;"><i>Temperature</i></span>".</p>
+<p class="VBA-Text-Indent">default: <span style="font-style: italic;"><i>type = "Dissipated heat"</i></span></p>
+<p class="vba-text-indent" style="margin-left: 0px;">&#160;</p>
+<p class="vba-text-indent" style="margin-left: 0px;"><span style="font-weight: bold;">DissipatedHeat (</span> <a href="../common_vbageneral/common_general_expression.htm">double expression</a> <span style="font-style: italic; font-weight: bold;"><i>value</i></span> <span style="font-weight: bold;">)</span></p>
+<p class="VBA-Text-Indent">Sets the dissipated heat <span style="font-style: italic;"><i>value</i></span> for the fan in Watt. This setting will be considered by the solver only, if the <span style="font-style: italic;"><i><a href="#FlowSpecType">flow specification type</a></i></span> is "Dissipated heat".</p>
+<p class="VBA-Text-Indent">default: <span style="font-style: italic;"><i>value = 0</i></span></p>
+<p class="VBA-Heading-Method">&#160;</p>
+<p class="vba-text-indent" style="margin-left: 0px;"><span style="font-weight: bold;">Temperature (</span> <a href="../common_vbageneral/common_general_expression.htm">double expression</a> <span style="font-style: italic; font-weight: bold;"><i>value,</i></span>&#160;<a href="../common_vbageneral/common_general_enum.htm" id="a511" style="font-weight: normal; font-style: normal;" name="a511">enum</a> <span style="font-style: italic; font-weight: bold;"><i>unit</i></span> &#160;<span style="font-weight: bold;">)</span></p>
+<p class="VBA-Text-Indent">Sets the temperature <span style="font-style: italic;"><i>value</i></span> for the fan in the given <span style="font-style: italic;"><i>unit</i></span>. &#160;Available units are "Celsius", "Fahrenheit" and "Kelvin". This setting will be considered by the solver only, if the <span style="font-style: italic;"><i><a href="#FlowSpecType">flow specification type</a></i></span> is "Temperature".</p>
+<p class="VBA-Text-Indent">default: <span style="font-style: italic;"><i>value = 0, unit = &lt;project temperature unit&gt;</i></span></p>
+<p class="VBA-Heading-Method">&#160;</p>
+<p class="vba-text-indent" style="margin-left: 0px;"><span style="font-weight: bold;"><a name="FanCharacteristics" id="FanCharacteristics"></a>FanCharacteristics (</span> <a href="../common_vbageneral/common_general_enum.htm" id="a5121" style="font-weight: normal; font-style: normal;" name="a5121">enum</a> <span style="font-style: italic; font-weight: bold;"><i>type</i></span> <span style="font-weight: bold;">)</span></p>
+<p class="VBA-Text-Indent">Specifies which parameters will be provided to define the fan characteristics. Available fan characteristic types are:</p>
+<table style="vertical-align: top; margin-left: 24px; left: 0px; top: 749px;" cellspacing="0" width="560">
+<col style="width: 17.318%;" />
+<col style="width: 82.682%;" />
+<tr style="vertical-align: top;">
+<td style="border: Solid 1px #000000; width: 17.318%; padding-right: 10px; padding-left: 10px;">
+<p class="VBA-Text">"FixedVolume"</p>
+</td>
+<td style="border-top: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 82.682%; padding-right: 10px; padding-left: 10px;">
+<p class="VBA-Text">The <a href="#VolumeFlowRate">volume flow rate</a> and the corresponding <a href="#VolumeFlowUnit">unit</a> are taken into account.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 17.318%; padding-right: 10px; padding-left: 10px;">
+<p class="VBA-Text">"Linear"</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 82.682%; padding-right: 10px; padding-left: 10px;">
+<p class="VBA-Text">The <a href="#VolumeFlowRate">volume flow rate</a> and the <a href="#StagnationPressure">stagnation pressure</a> with respective units are taken into account.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 17.318%; padding-right: 10px; padding-left: 10px;">
+<p class="VBA-Text">"Nonlinear"</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 82.682%; padding-right: 10px; padding-left: 10px;">
+<p class="VBA-Text">The fan characteristics are described by a user-defined <a href="#AddCurveValue">Flow rate / Pressure curve</a>.</p>
+</td>
+</tr>
+</table>
+<p class="VBA-Text-Indent">&#160;</p>
+<p class="VBA-Text-Indent">default: <span style="font-style: italic;"><i>type = "FixedVolume"</i></span></p>
+<p class="VBA-Text-Indent">&#160;</p>
+<p class="VBA-Heading-Method"><a name="VolumeFlowRate" id="VolumeFlowRate"></a>VolumeFlowRate ( <span style="font-weight: normal;"><a href="../common_vbageneral/common_general_expression.htm">double expression</a></span> <span style="font-style: italic;"><i>value</i></span> )</p>
+<p class="VBA-Text-Indent">Specifies the volume flow rate.&#160;This setting is ignored for the "nonlinear" <a href="#FanCharacteristics">fan characteristics</a> type.</p>
+<p class="VBA-Text-Indent">default: <span style="font-style: italic;"><i>value = 0</i></span></p>
+<p class="VBA-Text-Indent">&#160;</p>
+<p class="vba-text-indent" style="margin-left: 0px;"><span style="font-weight: bold;"><a name="VolumeFlowUnit" id="VolumeFlowUnit"></a>VolumeFlowUnit (</span> <a href="../common_vbageneral/common_general_enum.htm" id="a5" style="font-weight: normal; font-style: normal;" name="a5">enum</a> <span style="font-style: italic; font-weight: bold;"><i>unit</i></span> <span style="font-weight: bold;">)</span></p>
+<p class="VBA-Text-Indent">Specifies the unit in which the <a href="#VolumeFlowRate">volume flow rate</a> or the <a href="#AddCurveValue">fan curve abscissa</a> is given. Available units are "m3/h" and "CFM".</p>
+<p class="VBA-Text-Indent">default: <span style="font-style: italic;"><i>unit = "m3/h"</i></span></p>
+<p class="VBA-Text-Indent">&#160;</p>
+<p class="VBA-Heading-Method"><a name="StagnationPressure" id="StagnationPressure"></a>StagnationPressure ( <span style="font-weight: normal;"><a href="../common_vbageneral/common_general_expression.htm">double expression</a></span> <span style="font-style: italic;"><i>value</i></span> )</p>
+<p class="VBA-Text-Indent">Specifies the stagnation pressure for the fan.&#160;This setting is considered only for the "linear" <a href="#FanCharacteristics">fan characteristics</a> type.</p>
+<p class="VBA-Text-Indent">default: <span style="font-style: italic;"><i>value = 0</i></span></p>
+<p class="VBA-Text-Indent">&#160;</p>
+<p class="vba-text-indent" style="margin-left: 0px;"><span style="font-weight: bold;">PressureUnit (</span> <a href="../common_vbageneral/common_general_enum.htm" id="a52" style="font-weight: normal; font-style: normal;" name="a52">enum</a> <span style="font-style: italic; font-weight: bold;"><i>unit</i></span> <span style="font-weight: bold;">)</span></p>
+<p class="VBA-Text-Indent">Specifies the unit in which the <a href="#StagnationPressure">stagnation pressure</a> or <a href="#AddCurveValue">fan curve pressure</a> is prescribed. Available units are "atm" and "bar", "Pa" and "psi". This setting is ignored for the "FixedVolume"" <a href="#FanCharacteristics">fan characteristics</a> type.</p>
+<p class="VBA-Text-Indent">default: <span style="font-style: italic;"><i>unit = "Pascal"</i></span></p>
+<p class="VBA-Text-Indent">&#160;</p>
+<p class="VBA-Heading-Method"><a name="AddCurveValue" id="AddCurveValue"></a>AddCurveValue ( <span style="font-weight: normal;"><a href="../common_vbageneral/common_general_expression.htm">double expression</a></span> <span style="font-style: italic;"><i>flow_rate,</i></span> <span style="font-weight: normal;"><a href="../common_vbageneral/common_general_expression.htm">double expression</a></span> <span style="font-style: italic;"><i>pressure</i></span> )</p>
+<p class="VBA-Text-Indent">Adds a (<span style="font-style: italic;"><i>flow_rate, pressure</i></span>) pair to the user-defined nonlinear fan curve definition. At least two pair have to be defined to create a curve. This setting is considered only for the "nonlinear" <a href="#FanCharacteristics">fan characteristics</a> type.</p>
+<p class="VBA-Text-Indent">&#160;</p>
+<p class="VBA-Heading-Method">AddEntryFace ( <span style="font-weight: normal;"><a href="../common_vbageneral/common_general_solid_names.htm">solidname</a></span> <span style="font-style: italic;"><i>solidname,</i></span> <span style="font-weight: normal;"><a href="../common_vbageneral/common_general_integer.htm">int</a></span> <span style="font-style: italic;"><i>faceid</i></span> &#160;)</p>
+<p class="VBA-Text-Indent">Defines the face on which the flow enters the fan. This will be the face belonging to the specified <span style="font-style: italic;"><i>faceid</i></span> of the solid with name <span style="font-style: italic;"><i>solidname</i></span>.</p>
+<p class="VBA-Text-Indent">&#160;</p>
+<p class="VBA-Heading-Method">AddExitFace ( <span style="font-weight: normal;"><a href="../common_vbageneral/common_general_solid_names.htm">solidname</a></span> <span style="font-style: italic;"><i>solidname,</i></span> <span style="font-weight: normal;"><a href="../common_vbageneral/common_general_integer.htm">int</a></span> <span style="font-style: italic;"><i>faceid</i></span> &#160;)</p>
+<p class="VBA-Text-Indent">Defines the face on which the flow leaves the fan. This will be the face belonging to the specified <span style="font-style: italic;"><i>faceid</i></span> of the solid with name <span style="font-style: italic;"><i>solidname</i></span>.</p>
+<p class="VBA-Text-Indent">&#160;</p>
+<p class="VBA-Heading-Method">Create</p>
+<p class="VBA-Text-Indent">Creates the fan with its previously made settings.</p>
+<p class="vba-text-indent">&#160;</p>
+<p class="VBA-Heading-Method">Delete ( <span style="font-style: italic;"><i><a href="../common_vbageneral/common_general_string.htm" id="a2" style="font-weight: normal; font-style: normal;" name="a2">string</a> name</i></span> )</p>
+<p class="VBA-Text-Indent">Deletes the fan with the given <span style="font-style: italic;"><i>name</i></span>.</p>
+<p class="VBA-Text-Indent">&#160;</p>
+<p class="VBA-Heading-Method">Rename &#160;( <span style="font-style: italic;"><i><a href="../common_vbageneral/common_general_string.htm" id="a3" style="font-weight: normal; font-style: normal;" name="a3">string</a> oldname,</i></span> &#160;<span style="font-style: italic;"><i><a href="../common_vbageneral/common_general_string.htm" id="a4" style="font-weight: normal; font-style: normal;" name="a4">string</a> newname</i></span> &#160;)</p>
+<p class="VBA-Text-Indent">Renames the fan with the given <span style="font-style: italic;"><i>oldname</i></span> to the defined <span style="font-style: italic;"><i>newname</i></span>.</p>
+<p class="VBA-Heading-Category"><a name="Defaults" id="Defaults"></a>Default Settings</p>
+<p class="VBA-Text-Example">Name ("")</p>
+<p class="VBA-Text-Example">FlowType ("Normal")</p>
+<p class="VBA-Text-Example">DeratingFactor (1)</p>
+<p class="VBA-Text-Example">FlowSpecType ("Dissipated heat")</p>
+<p class="VBA-Text-Example">DissipatedHeat (0)</p>
+<p class="VBA-Text-Example">Temperature (0, <span style="font-style: italic;"><i>&lt;project temperature unit&gt;</i></span>)</p>
+<p class="VBA-Text-Example">FanCharacteristics ("FixedVolume")</p>
+<p class="VBA-Text-Example">VolumeFlowRate (0)</p>
+<p class="VBA-Text-Example">VolumeFlowUnit ("m3/h")</p>
+<p class="VBA-Text-Example">StagnationPressure (0)</p>
+<p class="VBA-Text-Example">PressureUnit ("Pa")</p>
+<p class="VBA-Heading-Category"><a name="Example" id="Example"></a>Example</p>
+<p class="VBA-Text-Example">With Fan</p>
+<p class="VBA-Text-Example">&#160;&#160;&#160;&#160;&#160;.Reset</p>
+<p class="VBA-Text-Example">&#160;&#160;&#160;&#160;&#160;.Name "myfan"</p>
+<p class="VBA-Text-Example">&#160;&#160;&#160;&#160;&#160;.FlowType "Normal"</p>
+<p class="VBA-Text-Example">&#160;&#160;&#160;&#160;&#160;.DeratingFactor "1"</p>
+<p class="VBA-Text-Example">&#160;&#160;&#160;&#160;&#160;.FlowSpecType "Temperature"</p>
+<p class="VBA-Text-Example">&#160;&#160;&#160;&#160;&#160;.Temperature "20", "Celsius"</p>
+<p class="VBA-Text-Example">&#160;&#160;&#160;&#160;&#160;.FanCharacteristics "Linear"</p>
+<p class="VBA-Text-Example">&#160;&#160;&#160;&#160;&#160;.VolumeFlowUnit "m3/h"</p>
+<p class="VBA-Text-Example">&#160;&#160;&#160;&#160;&#160;.PressureUnit "Pa"</p>
+<p class="VBA-Text-Example">&#160;&#160;&#160;&#160;&#160;.VolumeFlowRate "0"</p>
+<p class="VBA-Text-Example">&#160;&#160;&#160;&#160;&#160;.StagnationPressure "0.2"</p>
+<p class="VBA-Text-Example">&#160;&#160;&#160;&#160;&#160;.AddEntryFace "component1:solid5", "4"</p>
+<p class="VBA-Text-Example">&#160;&#160;&#160;&#160;&#160;.AddExitFace "component1:solid5", "6"</p>
+<p class="VBA-Text-Example">&#160;&#160;&#160;&#160;&#160;.Create</p>
+<p class="VBA-Text-Example">End With</p>
+<p class="VBA-Text-Example">&#160;</p>
+<?rh-p style="margin-bottom: 0px; text-align: Right; margin-left: 18px; 
+                 margin-right: 18px; margin-top: 18px;" ?>
+<div style="width: 100%; position: relative;" id="footer">
+<p style="border-bottom: Solid 1px #dddddd; text-align: Left; margin-left: 0px; font-family: Arial, sans-serif; line-height: Normal; margin-top: 9px; margin-right: 0px; margin-bottom: 6px; border-left-width: 1px; border-top-width: 1px; border-right-width: 1px;"><span style="text-align: Left; font-family: Arial, sans-serif; line-height: Normal;">&#160;</span></p>
+<table cellspacing="0" width="100%">
+<col style="width: 50%;" />
+<col style="width: 50%;" />
+<tr>
+<td style="vertical-align: Top;"><span style="font-family: Arial, sans-serif; line-height: Normal; font-size: 8pt;"><font size="1" style="font-size:8pt;">CST Studio Suite 2022</font></span></td>
+<td style="vertical-align: Top;">
+<p style="text-align: right;"><img src="../3ds.png" alt="" style="border: none;" border="0" /></p>
+</td>
+</tr>
+</table>
+<p>&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">
+//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+        writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]>
+</script>
+</body>
+</html>

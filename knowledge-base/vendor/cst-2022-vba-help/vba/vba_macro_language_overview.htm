@@ -1,0 +1,1357 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="Originator" content="ImportDoc" />
+<meta name="OriginalFile" content="VBA Macro Language Overview.doc" />
+<meta name="generator" content="Adobe RoboHelp 11" />
+<title>VBA Overview</title>
+<link rel="StyleSheet" href="../online_help.css" type="text/css" />
+<link rel="StyleSheet" href="../online_help.css" type="text/css" />
+<style type="text/css">
+/*<![CDATA[*/
+<!--
+body { border-bottom-style:None; }
+-->
+/*]]>*/
+</style>
+
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+        origWidth = innerWidth;
+        origHeight = innerHeight;
+        onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+/*<![CDATA[*/
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+/*]]>*/
+</style>
+
+<script type="text/javascript" language="javascript1.2" src="../whmsg.js" charset="utf-8">
+</script>
+<script type="text/javascript" language="javascript" src="../whver.js" charset="utf-8">
+</script>
+<script type="text/javascript" language="javascript1.2" src="../whutils.js" charset="utf-8">
+</script>
+<script type="text/javascript" language="javascript1.2" src="../whproxy.js" charset="utf-8">
+</script>
+<script type="text/javascript" language="javascript1.2" src="../whlang.js" charset="utf-8">
+</script>
+<script type="text/javascript" language="javascript1.2" src="../whtopic.js" charset="utf-8">
+</script>
+</head>
+<body lang="DE" xml:lang="DE">
+<script type="text/javascript" language="javascript1.2">
+//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+        var strUrl = document.location.href;
+        var bc = 0;
+        var n = strUrl.toLowerCase().indexOf("bc-");
+        if(n != -1)
+        {
+                document.location.replace(strUrl.substring(0, n));
+                bc = strUrl.substring(n+3);
+        }
+
+        if (window.addTocInfo)
+        {
+        addTocInfo("Automation and Scripting\nVisual Basic (VBA)\nVBA Overview");
+
+        }
+        if (window.writeBtnStyle)
+                writeBtnStyle();
+
+        if (window.writeIntopicBar)
+                writeIntopicBar(0);
+
+        
+        document.write("<p style=\"font-family: Tahoma; font-size: 9pt; font-weight: 400;  font-style:normal; color: rgb(0, 0, 0); text-decoration:none; text-align: left\"> ");
+AddMasterBreadcrumbs("../cst_studio_suite_help.htm", "font-family: Tahoma; font-size: 9pt; font-weight: 400;  font-style:normal; color: rgb(0, 0, 0); text-decoration:none; text-align: left", "|", "Home", "../general/welcome_de.htm");
+document.write("<a style=\"font-family: Tahoma; font-size: 9pt; font-weight: 400;  font-style:normal; color: rgb(0, 0, 0); text-decoration:none; text-align: left\" href=\"vba_macro_language_overview.htm\">Automation and Scripting<\/a> | <a style=\"font-family: Tahoma; font-size: 9pt; font-weight: 400;  font-style:normal; color: rgb(0, 0, 0); text-decoration:none; text-align: left\" href=\"vba_macro_language_overview.htm\">Visual Basic (VBA)<\/a> | VBA Overview<\/p>");
+
+}
+else
+        if (window.gbIE4)
+                document.location.reload();
+
+onLoadHandler = function()
+{
+  if (window.setRelStartPage)
+        {
+        setTimeout("setRelStartPage('../cst_studio_suite_help.htm');", 1)
+
+    setTimeout("UpdateBreadCrumbsMarker();", 1);
+        }
+}
+
+if (window.addEventListener){  
+        window.addEventListener('load', onLoadHandler, false);   
+} else if (window.attachEvent){  
+        window.attachEvent('onload', onLoadHandler);  
+}
+
+function onSetStartPage()
+{
+  autoSync(1);
+  sendSyncInfo();
+  sendAveInfoOut();
+}
+//-->
+//]]>
+</script><script type="text/javascript" src="../ehlpdhtm.js" language="JavaScript1.2">
+</script>
+<table cellspacing="0" width="100%">
+<col style="width: 50%;" />
+<col style="width: 50%;" />
+<tr>
+<td style="vertical-align: middle;"><a href="http://www.3ds.com/SIMULIA" target="_blank"><img src="../ds_simulia.png" alt="" style="border: none;" border="0" /></a></td>
+<td style="vertical-align: middle;">
+<p style="text-align: right;"><a href="https://www.3ds.com/products-services/3dexperience/" target="_blank"><img src="../3dexp.png" alt="" style="border: none;" width="60" height="70" border="0" /></a></p>
+</td>
+</tr>
+</table>
+<h1><span lang="EN-US" xml:lang="EN-US">VBA Overview</span></h1>
+<h3><span lang="EN-US" xml:lang="EN-US">T</span>he CST Studio Suite tools can be controlled from a Visual Basic (VBA) script. The language of the built in BASIC interpreter is almost 100% compatible with the Visual Basic for Application language. This language may be used either for creating own structure libraries or for the automation of common tasks.</h3>
+<h3><span lang="EN-US" xml:lang="EN-US">A powerful environment can be used for automating any task within its modules or even in combination with external programs. The powerful VBA (Visual Basic for Applications) compatible macro language is equipped with a fully featured development environment including an editor and a debugger. An interface to OLE automation enables a seamless integration into the Windows environment (e.g. Microsoft Office<sup>®</sup>, MATLAB<sup>®</sup>, AutoCAD<sup>®</sup>, MathCAD<sup>®</sup>, Windows Scripting Host, etc.).</span> The editor opens automatically if a macro is edited or created. It can also be opened by selecting <a href="../ribbons/de/homede.htm" id="a1" name="a1">Home:</a> <i><span lang="EN-US" xml:lang="EN-US">Macros</span></i><i><span lang="EN-US" xml:lang="EN-US">&#160;</span></i>&gt; <i><span lang="EN-US" xml:lang="EN-US">Open VBA Macro Editor <img src="../icons/ds_toolbars/general/vbaeditor.png" alt="" style="border: none;" width="16" height="16" border="0" />.</span></i></h3>
+<h4>Contents</h4>
+<p class="Overview1"><a href="#Introduction">Introduction</a></p>
+<p class="Overview1"><span lang="EN-US" xml:lang="EN-US">&#160;<a href="#VBA2">VBA Development Environment</a></span></p>
+<p class="Overview2"><span lang="EN-US" xml:lang="EN-US"><a href="#Help">VBA Help System</a></span></p>
+<p class="Overview2"><span lang="EN-US" xml:lang="EN-US"><a href="#Editor">VBA Editor Shortcuts</a></span></p>
+<p class="Overview1"><span lang="EN-US" xml:lang="EN-US"><a href="#Language1">VBA Language Elements</a></span></p>
+<p class="Overview2"><span lang="EN-US" xml:lang="EN-US"><a href="#Variables">Variables, Data Types and Type Conversions</a></span></p>
+<p class="Overview2"><span lang="EN-US" xml:lang="EN-US"><a href="#Applications">Applications, Objects and Their Methods</a></span></p>
+<p class="Overview2"><span lang="EN-US" xml:lang="EN-US"><a href="#Flow">Flow Control</a></span></p>
+<p class="Overview2"><span lang="EN-US" xml:lang="EN-US"><a href="#File">File Operations</a></span></p>
+<p class="Overview2"><span lang="EN-US" xml:lang="EN-US"><a href="#Graphical">Graphical User Interface Builder</a></span></p>
+<p class="Overview2"><a href="#Mathematical">Mathematical Functions, Operators and Constants</a></p>
+<p class="Overview1"><span lang="EN-US" xml:lang="EN-US"><a href="#Concepts">Concepts of Macro Programming in CST Studio Suite</a></span></p>
+<p class="Overview2"><a href="#Global"><span lang="EN-US" xml:lang="EN-US">Global Macros and <i>Library Path</i></span></a></p>
+<p class="Overview1"><span lang="EN-US" xml:lang="EN-US"><a href="#Control">Control Macros</a></span></p>
+<p class="Overview1"><span lang="EN-US" xml:lang="EN-US"><a href="#Structure">Structure Macros</a></span></p>
+<p class="Overview1"><a href="#Pre-Loaded"><span lang="EN-US" xml:lang="EN-US">P</span>re-Loaded VBA Macros</a></p>
+<h4><a name="Introduction" id="Introduction">Introduction</a></h4>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">The following sections start by providing general information on the VBA-based macro language before the actual integration into CST Studio Suite is discussed. The explanations are supported by a variety of examples which should assist you in building your own macros. We strongly recommend you work through this introduction, which should only take a few hours, to obtain a good working knowledge of macro programming in general.</span> The syntax of the BASIC interpreter is explained in the <a href="../sax_basic/ww_00000.htm">WinWrap Basic Language Reference</a>.</p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">CST Studio Suite</span> is implemented as an OLE automation server. &#160;A <span style="font-family: Arial, sans-serif;">&#160;<a href="../advanced/vbaapplicationobject.htm">VBA Application Object</a> can be used to control the program.</span> Each part of the program can be controlled by special VBA objects:</p>
+<p class="Topic-Text-Indent">&#160;</p>
+<table style="margin-left: 40px; vertical-align: Center;" cellspacing="0">
+<col />
+<col />
+<tr style="vertical-align: top;">
+<td style="padding-right: 10px; padding-left: 10px;">
+<p><a href="../mergedProjects/VBA_3D/special_vbaobjects/special_vbaobjects_vbaobjects.htm"><img src="../image/microwavestudio64.png" alt="" style="border: none;" width="64" height="64" border="0" /></a></p>
+</td>
+<td style="padding-right: 10px; padding-left: 10px;">
+<p><a href="../mergedProjects/VBA_3D/special_vbaobjects/special_vbaobjects_vbaobjects.htm">CST MWS/CST CS VBA Objects</a></p>
+<p style="text-align: left;"><a href="../mergedProjects/VBA_3D/special_vbaobjects/special_vbaobjects_examples_overview.htm">CST MWS/CST CS VBA Examples</a></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="padding-right: 10px; padding-left: 10px;">
+<p><a href="../mergedProjects/VBA_3D/special_vbaobjects/special_vbaobjects_vbaobjects.htm"><img src="../image/cablestudio64.png" alt="" style="border: none;" width="64" height="64" border="0" /></a></p>
+</td>
+<td style="padding-right: 10px; padding-left: 10px;">
+<p><a href="../mergedProjects/VBA_3D/special_vbaobjects/special_vbaobjects_vbaobjects.htm">CST MWS/CST CS VBA Objects</a></p>
+<p style="text-align: left;"><a href="../mergedProjects/VBA_3D/special_vbaobjects/special_vbaobjects_examples_overview.htm">CST MWS/CST CS VBA Examples</a></p>
+<p>&#160;</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="padding-right: 10px; padding-left: 10px;">
+<p><a href="../mergedProjects/VBA_3D/special_vbaobjects/special_vbaobjects_vbaobjects.htm"><img src="../image/emstudio64.png" alt="" style="border: none;" width="64" height="64" border="0" /></a></p>
+</td>
+<td style="padding-right: 10px; padding-left: 10px;">
+<p><a href="../mergedProjects/VBA_3D/special_vbaobjects/special_vbaobjects_vbaobjects.htm">CST EMS VBA Objects</a></p>
+<p><a href="../mergedProjects/VBA_3D/special_vbaobjects/special_vbaobjects_examples_overview.htm">CST EMS VBA Examples</a></p>
+<p>&#160;</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="padding-right: 10px; padding-left: 10px;">
+<p><a href="../mergedProjects/VBA_3D/special_vbaobjects/special_vbaobjects_vbaobjects.htm"><img src="../image/particlestudio64.png" alt="" style="border: none;" width="64" height="64" border="0" /></a></p>
+</td>
+<td style="padding-right: 10px; padding-left: 10px;">
+<p><a href="../mergedProjects/VBA_3D/special_vbaobjects/special_vbaobjects_vbaobjects.htm">CST PS VBA Objects</a></p>
+<p><a href="../mergedProjects/VBA_3D/special_vbaobjects/special_vbaobjects_examples_overview.htm">CST PS VBA Examples</a></p>
+<p>&#160;</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="padding-right: 10px; padding-left: 10px;">
+<p><a href="../mergedProjects/VBA_3D/special_vbaobjects/special_vbaobjects_vbaobjects.htm"><img src="../image/mpstudio64.png" alt="" style="border: none;" width="64" height="64" border="0" /></a></p>
+</td>
+<td style="padding-right: 10px; padding-left: 10px;">
+<p><a href="../mergedProjects/VBA_3D/special_vbaobjects/special_vbaobjects_vbaobjects.htm">CST MPS VBA Objects</a></p>
+<p><a href="../mergedProjects/VBA_3D/special_vbaobjects/special_vbaobjects_examples_overview.htm">CST MPS VBA Examples</a></p>
+<p>&#160;</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="padding-right: 10px; padding-left: 10px;">
+<p><a href="../mergedProjects/VBA_DES/special_vbaobjects/cstdesignstudiovbaobjects.htm"><img src="../image/designstudio64.png" alt="" style="border: none;" width="64" height="64" border="0" /></a></p>
+</td>
+<td style="padding-right: 10px; padding-left: 10px;">
+<p><a href="../mergedProjects/VBA_DES/special_vbaobjects/cstdesignstudiovbaobjects.htm">CST DS VBA Objects</a></p>
+<p><a href="../mergedProjects/VBA_DES/special_vbaobjects/vbaexamplesoverview.htm">CST DS VBA Examples</a></p>
+</td>
+</tr>
+</table>
+<p class="Topic-Text-Indent">&#160;</p>
+<h4><span lang="EN-US" xml:lang="EN-US"><a name="VBA2" id="VBA2">&#160;VBA Development Environment</a></span></h4>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">You can open the VBA development environment by choosing</span> <a href="../ribbons/de/homede.htm" id="a2" name="a2">Home:</a> <i><span lang="EN-US" xml:lang="EN-US">Macros</span></i> &gt; <i><span lang="EN-US" xml:lang="EN-US">Macros</span></i><i><span lang="EN-US" xml:lang="EN-US">&#160;</span></i>&gt; <span lang="EN-US" xml:lang="EN-US"><i>Open VBA Macro Editor <img src="../icons/ds_toolbars/general/vbaeditor.png" alt="" style="border: none;" width="16" height="16" border="0" /></i>.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">The development environment consists of a Ribbon tab and an editor window as shown below:</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText" style="text-align: left; margin-left: 158px;"><img src="vba_macro_language_overview-dateien/toolbar.png" alt="" style="border: none;" width="973" height="117" border="0" /></p>
+<p>&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">In addition to the Ribbon tab, the editor also features a context menu (opened by pressing the right mouse button) which contains more tools such as find, replace, etc.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText" style="text-align: left; margin-left: 158px;"><img src="vba_macro_language_overview-dateien/contextmenu.png" alt="" style="border: none;" width="414" height="248" border="0" /></p>
+<p class="DokuText" style="text-align: center;">&#160;</p>
+<h5><span lang="EN-US" xml:lang="EN-US">VBA <a name="Help" id="Help">Help System</a></span></h5>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">You can easily access the VBA online help system from CST Studio Suite by selecting <i>Help</i></span> &gt; <span lang="EN-US" xml:lang="EN-US"><i>Help Contents</i> from the main window<i>.</i></span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">The contents of this help system are divided into three different sections. The first section provides reference information on the basic VBA language elements. A second part contains specific information on the collection of</span> <span lang="EN-US" xml:lang="EN-US">CST Studio Suite objects and a detailed explanation of their methods. Finally, the third section contains examples that may be used right away or give you some ideas for developing your own macros.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">Pressing the F1-key in the editor window provides some context-specific help on the keyword positioned at the mouse cursors location. If no keyword can be found, a general help page will appear allowing you to navigate through the help system.</span></p>
+<h5><span lang="EN-US" xml:lang="EN-US">VBA <a name="Editor" id="Editor">Editor Shortcuts</a></span></h5>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">The following shortcuts are available within the VBA editor or debugger:</span></p>
+<p class="DokuText">&#160;</p>
+<table style="vertical-align: top; height: 66px; left: 309px; top: 1710px; margin-left: 200px;" cellspacing="0" width="326">
+<col style="width: 35.583%;" />
+<col style="width: 64.417%;" />
+<tr style="vertical-align: top;">
+<td style="border: Solid 1px #000000; width: 35.583%; padding-right: 10px; padding-left: 10px;">
+<p style="text-align: justify;"><span lang="EN-US" xml:lang="EN-US">Ctrl+N</span></p>
+</td>
+<td style="border-top: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 64.417%; padding-right: 10px; padding-left: 10px;">
+<p><span lang="EN-US" xml:lang="EN-US">Open new file</span></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 35.583%; padding-right: 10px; padding-left: 10px;">
+<p style="text-align: justify;"><span lang="EN-US" xml:lang="EN-US">Ctrl+O</span></p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 64.417%; padding-right: 10px; padding-left: 10px;">
+<p><span lang="EN-US" xml:lang="EN-US">Open existing file</span></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 35.583%; padding-right: 10px; padding-left: 10px;">
+<p style="text-align: justify;"><span lang="EN-US" xml:lang="EN-US">Ctrl+S</span></p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 64.417%; padding-right: 10px; padding-left: 10px;">
+<p style="text-align: justify;"><span lang="EN-US" xml:lang="EN-US">Save current sheet</span></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 35.583%; padding-right: 10px; padding-left: 10px;">
+<p style="text-align: justify;"><span lang="EN-US" xml:lang="EN-US">Ctrl+P</span></p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 64.417%; padding-right: 10px; padding-left: 10px;">
+<p><span lang="EN-US" xml:lang="EN-US">Print current sheet</span></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 35.583%; padding-right: 10px; padding-left: 10px;">
+<p style="text-align: justify;">&#160;</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 64.417%; padding-right: 10px; padding-left: 10px;">
+<p>&#160;</p>
+</td>
+</tr>
+</table>
+<p class="DokuText">&#160;</p>
+<table style="vertical-align: top; height: 66px; left: 309px; top: 1710px; margin-left: 200px;" cellspacing="0" width="326">
+<col style="width: 35.89%;" />
+<col style="width: 64.11%;" />
+<tr style="vertical-align: top;">
+<td style="border: Solid 1px #000000; width: 35.89%; padding-right: 10px; padding-left: 10px;">
+<p style="text-align: left;">Ctrl+Z</p>
+</td>
+<td style="border-top: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 64.11%; padding-right: 10px; padding-left: 10px;">
+<p style="text-align: justify;">Undo</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 35.89%; padding-right: 10px; padding-left: 10px;">
+<p style="text-align: left;"><span lang="EN-US" xml:lang="EN-US">Ctrl+X</span></p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 64.11%; padding-right: 10px; padding-left: 10px;">
+<p style="text-align: justify;"><span lang="EN-US" xml:lang="EN-US">Cut</span></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 35.89%; padding-right: 10px; padding-left: 10px;">
+<p style="text-align: left;"><span lang="EN-US" xml:lang="EN-US">Ctrl+C</span></p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 64.11%; padding-right: 10px; padding-left: 10px;">
+<p style="text-align: justify;"><span lang="EN-US" xml:lang="EN-US">Copy</span></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 35.89%; padding-right: 10px; padding-left: 10px;">
+<p style="text-align: left;"><span lang="IT" xml:lang="IT">Ctrl+V</span></p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 64.11%; padding-right: 10px; padding-left: 10px;">
+<p>Paste</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 35.89%; padding-right: 10px; padding-left: 10px;">
+<p style="text-align: left;"><span lang="IT" xml:lang="IT">Del</span></p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 64.11%; padding-right: 10px; padding-left: 10px;">
+<p><span lang="EN-US" xml:lang="EN-US">Delete</span></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 35.89%; padding-right: 10px; padding-left: 10px;">
+<p style="text-align: left;">Tab</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 64.11%; padding-right: 10px; padding-left: 10px;">
+<p>Indent</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 35.89%; padding-right: 10px; padding-left: 10px;">
+<p style="text-align: left;">Shift+Tab</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 64.11%; padding-right: 10px; padding-left: 10px;">
+<p>Outdent</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 35.89%; padding-right: 10px; padding-left: 10px;">
+<p style="text-align: left;">Ctrl+F</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 64.11%; padding-right: 10px; padding-left: 10px;">
+<p>Find</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 35.89%; padding-right: 10px; padding-left: 10px;">
+<p style="text-align: left;">Ctrl+R</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 64.11%; padding-right: 10px; padding-left: 10px;">
+<p>Replace</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 35.89%; padding-right: 10px; padding-left: 10px;">
+<p style="text-align: left;">F3</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 64.11%; padding-right: 10px; padding-left: 10px;">
+<p>Find or replace again</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 35.89%; padding-right: 10px; padding-left: 10px;">
+<p style="text-align: left;">Ctrl+Space</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 64.11%; padding-right: 10px; padding-left: 10px;">
+<p>Complete word / command</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 35.89%; padding-right: 10px; padding-left: 10px;">
+<p style="text-align: left;">Ctrl+I</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 64.11%; padding-right: 10px; padding-left: 10px;">
+<p>Parameter info</p>
+</td>
+</tr>
+</table>
+<p style="margin-left: 1.0cm; text-align: justify;">&#160;</p>
+<table style="vertical-align: top; height: 66px; left: 309px; top: 1710px; margin-left: 200px;" cellspacing="0" width="326">
+<col style="width: 35.583%;" />
+<col style="width: 64.417%;" />
+<tr style="vertical-align: top;">
+<td style="border: Solid 1px #000000; width: 35.583%; padding-right: 10px; padding-left: 10px;">
+<p>F5</p>
+</td>
+<td style="border-top: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 64.417%; padding-right: 10px; padding-left: 10px;">
+<p>Run macro execution</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 35.583%; padding-right: 10px; padding-left: 10px;">
+<p>Shift+F5</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 64.417%; padding-right: 10px; padding-left: 10px;">
+<p>Stop macro execution</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 35.583%; padding-right: 10px; padding-left: 10px;">
+<p>Esc</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 64.417%; padding-right: 10px; padding-left: 10px;">
+<p>Pause macro execution</p>
+</td>
+</tr>
+</table>
+<p style="margin-left: 318px;">&#160;</p>
+<table style="vertical-align: top; height: 66px; left: 309px; top: 1710px; margin-left: 200px;" cellspacing="0" width="326">
+<col style="width: 35.89%;" />
+<col style="width: 64.11%;" />
+<tr style="vertical-align: top;">
+<td style="border: Solid 1px #000000; width: 35.89%; padding-right: 10px; padding-left: 10px;">
+<p>F8</p>
+</td>
+<td style="border-top: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 64.11%; padding-right: 10px; padding-left: 10px;">
+<p>Debug step into</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 35.89%; padding-right: 10px; padding-left: 10px;">
+<p>Shift+F8</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 64.11%; padding-right: 10px; padding-left: 10px;">
+<p>Debug step over</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 35.89%; padding-right: 10px; padding-left: 10px;">
+<p>Ctrl+F8</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 64.11%; padding-right: 10px; padding-left: 10px;">
+<p>Debug step out</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 35.89%; padding-right: 10px; padding-left: 10px;">
+<p>F7</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 64.11%; padding-right: 10px; padding-left: 10px;">
+<p>Debug step to cursor</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 35.89%; padding-right: 10px; padding-left: 10px;">
+<p>F9</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 64.11%; padding-right: 10px; padding-left: 10px;">
+<p>Debug toggle breakpoint</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 35.89%; padding-right: 10px; padding-left: 10px;">
+<p>Shift+Ctrl+F9</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 64.11%; padding-right: 10px; padding-left: 10px;">
+<p>Clear all breakpoints</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 35.89%; padding-right: 10px; padding-left: 10px;">
+<p>Shift+F9</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 64.11%; padding-right: 10px; padding-left: 10px;">
+<p>Quick watch</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 35.89%; padding-right: 10px; padding-left: 10px;">
+<p>Ctrl+F9</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 64.11%; padding-right: 10px; padding-left: 10px;">
+<p>Add watch</p>
+</td>
+</tr>
+</table>
+<p style="margin-left: 318px;">&#160;</p>
+<h4><span lang="EN-US" xml:lang="EN-US">VBA <a name="Language1" id="Language1">Language Elements</a></span></h4>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">The following subsections provide a basic overview of typically used VBA language elements and should help you get started with this programming language. The online documentation contains more detailed information on these topics as well.</span></p>
+<h5><span lang="EN-US" xml:lang="EN-US">Subroutines and Functions</span></h5>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">A VBA-script can be regarded as a collection of subroutines and functions. Each VBA program must have at least a subroutine</span> <span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New';">Sub Main</span> <span lang="EN-US" xml:lang="EN-US">which will automatically be called when the program is started. The following example illustrates how other functions can be used from within this main routine:</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; text-align: left; margin-left: 158px;">Option Explicit</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; text-align: left; margin-left: 158px;">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; text-align: left; margin-left: 158px;">Sub Main</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; text-align: left; margin-left: 198px;">Dim s3 As String</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; text-align: left; margin-left: 198px;">s3 = MultiStr ("Hello ",4)</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; text-align: left; margin-left: 198px;">' This is a comment (displayed in green color)</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; text-align: left; margin-left: 198px;">MsgBox s3</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; text-align: left; margin-left: 158px;">End Sub</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; text-align: left; margin-left: 158px;">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; text-align: left; margin-left: 158px;">Function MultiStr (s1 As String, n As Integer) As String</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; text-align: left; margin-left: 198px;">Dim i As Integer</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; text-align: left; margin-left: 198px;">Dim s2 As String</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; text-align: left; margin-left: 198px;">s2 = ""</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; text-align: left; margin-left: 198px;">For i = 1 To n</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; text-align: left; margin-left: 238px;">s2 = s2 &amp; s1</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; text-align: left; margin-left: 198px;">Next i</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; text-align: left; margin-left: 198px;">MultiStr = s2</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; text-align: left; margin-left: 158px;">End Function</p>
+<p style="margin-left: 118px;">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">You should now enter this simple example into the VBA development environment while familiarizing yourself with the editors functions. Start by selecting the corresponding button:</span> <img src="../icons/ds_toolbars/general/runmacro.png" alt="" style="border: none;" width="16" height="16" border="0" /><span lang="EN-US" xml:lang="EN-US">&#160;(F5). The program should display a message box containing a single line of text: Hello Hello Hello Hello."</span></p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">Place the</span> <span lang="EN-US" xml:lang="EN-US" style="margin-left: 1.0cm; text-align: justify;">cursor over a keyword for which you want to see an explanation. Pressing the F1 key will then automatically invoke the online help system showing some detailed information about the particular keyword if available.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">You can now set a breakpoint at the line s2 = s2 &amp; s1 by placing the cursor somewhere in this line and selecting the icon <img src="../icons/ds_toolbars/general/tooglebreakpoint24.png" alt="" style="border: none;" width="16" height="16" border="0" />&#160;(F9). Breakpoints are visualized by highlighting the corresponding line and showing a red dot at the beginning of the line.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">Start the macro execution again by selecting <img src="../icons/ds_toolbars/general/runmacro.png" alt="" style="border: none;" width="16" height="16" border="0" />&#160;(F5). The execution should then pause automatically at the breakpoint. Once the execution is paused, you can check the current values of a variable by moving the mouse-pointer over the variable of interest. A tooltip will then appear informing you of the variables content. You may also double-click on the variable (e.g. s2) and select the option <i>Show Data</i></span><i><span lang="EN-US" xml:lang="EN-US">&#160;</span></i>&gt; <i><span lang="EN-US" xml:lang="EN-US">Quick Watch</span></i><i><span lang="EN-US" xml:lang="EN-US">&#160;</span></i>&gt; <i><span lang="EN-US" xml:lang="EN-US">Add to Watch</span></i> <span lang="EN-US" xml:lang="EN-US">(<i>Ctrl</i>+F9) from the context menu (opened by pressing the right mouse button)</span><span lang="EN-US" xml:lang="EN-US">. The latter function automatically places a <i>variable watch</i> inside the watch frame on top of the editor window. This watch will then always display the current value of the variable making debugging very easy.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">This simple example demonstrates the ability of the interactive design environment for developing, testing and executing scripts. Before you are able to completely understand the script used in the example above, we need to introduce some other important language elements.</span></p>
+<h5><span lang="EN-US" xml:lang="EN-US"><a name="Variables" id="Variables">Variables, Data Types and Type Conversions</a></span></h5>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">As in every programming language, VBA offers the ability to define variables. We strongly recommend declaring all variables before using them in order to prevent naming conflicts. The statement</span> <span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New';">Option Explicit</span> <span lang="EN-US" xml:lang="EN-US">at the very beginning of the script (see the example above) forces the declaration of variables before they can be accessed by the program.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">Each variable must belong to a certain data type with the most important ones being</span> <span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New';">Double, Integer, Long, String</span> <span lang="EN-US" xml:lang="EN-US">and</span> <span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New';">Boolean</span><span lang="EN-US" xml:lang="EN-US">.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText" style="margin-left: 2.0cm;"><b style="font-weight: bold;"><span lang="EN-US" xml:lang="EN-US">Please note</span></b><span lang="EN-US" xml:lang="EN-US">: VBA allows a very general data type called</span> <span lang="EN-US" xml:lang="EN-US" style="font-family: Courier;">Variant</span><span lang="EN-US" xml:lang="EN-US">. We do not usually recommend using this data type and will therefore skip it in this introduction.</span></p>
+<p class="DokuText" style="margin-left: 0cm;">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">Variables are declared using the</span> <span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New';">Dim</span> <span lang="EN-US" xml:lang="EN-US">statement with the following syntax:</span></p>
+<p class="DokuText">&#160;</p>
+<table style="vertical-align: top; left: 0px; top: 3197px; margin-left: 200px;" cellspacing="0" width="378">
+<col style="width: 100%;" />
+<tr style="vertical-align: top;">
+<td style="width: 100%; padding-right: 10px; padding-left: 10px;">
+<p style="font-style: italic;"><span lang="EN-US" xml:lang="EN-US">Dim s As String</span></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="width: 100%; padding-right: 10px; padding-left: 10px;">
+<p style="font-style: italic;"><span lang="EN-US" xml:lang="EN-US">Dim d As Double</span></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="width: 100%; padding-right: 10px; padding-left: 10px;">
+<p style="font-style: italic;">Dim i As Integer</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="width: 100%; padding-right: 10px; padding-left: 10px;">
+<p style="font-style: italic;">Dim j As Long</p>
+</td>
+</tr>
+</table>
+<p style="margin-left: 1.0cm;">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">Instead of explicitly declaring the data type by using the</span> <span lang="EN-US" xml:lang="EN-US" style="font-family: Courier;">As</span> <span lang="EN-US" xml:lang="EN-US">statement, you may also append a $ sign to the variable name to indicate that it is of a string type. The same is valid for integer (%), long (&amp;) and double (#) data types.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">Thus the following declarations are equivalent although we recommend using the first one:</span></p>
+<p class="DokuText" style="font-style: italic;">&#160;</p>
+<table style="vertical-align: top; left: 0px; top: 3197px; margin-left: 200px;" cellspacing="0" width="378">
+<col style="width: 50%;" />
+<col style="width: 50%;" />
+<tr style="vertical-align: top;">
+<td style="width: 50%; padding-right: 10px; padding-left: 10px;">
+<p style="font-style: italic;"><span lang="EN-US" xml:lang="EN-US">Dim s As String</span></p>
+</td>
+<td style="width: 50%; padding-right: 10px; padding-left: 10px;">
+<p style="font-style: italic;"><span lang="EN-US" xml:lang="EN-US">Dim s$</span></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="width: 50%; padding-right: 10px; padding-left: 10px;">
+<p style="font-style: italic;"><span lang="EN-US" xml:lang="EN-US">Dim d As Double</span></p>
+</td>
+<td style="width: 50%; padding-right: 10px; padding-left: 10px;">
+<p style="font-style: italic;"><span lang="EN-US" xml:lang="EN-US">Dim d#</span></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="width: 50%; padding-right: 10px; padding-left: 10px;">
+<p style="font-style: italic;">Dim i As Integer</p>
+</td>
+<td style="width: 50%; padding-right: 10px; padding-left: 10px;">
+<p style="font-style: italic;">Dim i%</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="width: 50%; padding-right: 10px; padding-left: 10px;">
+<p style="font-style: italic;">Dim j As Long</p>
+</td>
+<td style="width: 50%; padding-right: 10px; padding-left: 10px;">
+<p style="font-style: italic;">Dim j&amp;</p>
+</td>
+</tr>
+</table>
+<p class="DokuText" style="margin-left: 2.0cm;">&#160;</p>
+<p class="DokuText" style="margin-left: 2.0cm;"><b style="font-weight: bold;"><span lang="EN-US" xml:lang="EN-US">Please note</span></b><span lang="EN-US" xml:lang="EN-US">: The integer data type is only 16 bits wide and thus can only contain values within the range of 32768 ... 32767. Use the long data type for storing 32 bit integer values.</span></p>
+<p class="DokuText" style="margin-left: 0cm;">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">All CST Studio Suite parameters which are currently defined in the project can automatically be accessed as</span> <span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New';">Double</span> <span lang="EN-US" xml:lang="EN-US">variables from within the script. Problems may occur if the same names are accidentally used in a VBA script for local variables.&#160;&#160;To prevent naming conflicts, we strongly recommend always using the statement</span> <span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New';">Option Explicit</span><span lang="EN-US" xml:lang="EN-US">. Following this rule, you will automatically get an error message in the event of multiply defined variables.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText" style="text-align: left; margin-left: 156px;"><img src="vba_macro_language_overview-dateien/parameterlist.png" alt="" style="border: none;" width="646" height="236" border="0" /></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">You can also change the CST Studio Suite parameters from within the script by using the</span> <span lang="EN-US" xml:lang="EN-US" style="font-family: Courier;">StoreParameter</span> <span lang="EN-US" xml:lang="EN-US">command as shown in the following code segment:</span></p>
+<p class="DokuText">&#160;</p>
+<p style="text-indent: 21.15pt; text-align: left; margin-left: 120px;"><span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New';">StoreParameter("width", 20)</span></p>
+<p class="DokuText" style="margin-left: 0cm;">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">VBA is type safe. Therefore type-conversions are sometimes necessary, e.g. when printing out a double value as a string by using the</span> <span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New';">MsgBox</span> <span lang="EN-US" xml:lang="EN-US">function:</span></p>
+<p style="margin-left: 1.0cm;">&#160;</p>
+<p style="text-indent: -2.0cm; text-align: left; margin-left: 120px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</span><span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New';">Dim d1 As Double</span></p>
+<p style="text-indent: -2.0cm; text-align: left; margin-left: 120px;"><span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New';">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;d1 = 1.23</span></p>
+<p style="text-indent: -2.0cm; text-align: left; margin-left: 120px;"><span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New';">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;MsgBox CStr(d1)</span></p>
+<p style="margin-left: 1.0cm;">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">Here the function</span> <span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New';">CStr()</span> <span lang="EN-US" xml:lang="EN-US">is used to convert the given argument into a string data type (Convert into String). Another quite common conversion function is</span> <span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New';">CDbl(),</span> <span lang="EN-US" xml:lang="EN-US">which can be used to convert an arbitrary data type into a double, if possible. If the conversion fails, an error will occur.</span> <span lang="EN-US" xml:lang="EN-US">A much more general way to evaluate an expression and to convert the result to a double data type is to use the</span> <span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New';">Evaluate()</span> <span lang="EN-US" xml:lang="EN-US">function:</span></p>
+<p class="DokuText">&#160;</p>
+<p style="text-indent: -2.0cm; margin-left: 120px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</span><span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New';">Dim d as Double</span></p>
+<p style="text-indent: -2.0cm; margin-left: 120px;"><span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New';">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;d = CDbl("5")&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;OK</span></p>
+<p style="text-indent: -2.0cm; margin-left: 120px; font-family: 'Courier New';"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;d = CDbl("5+3") &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;OK</span></p>
+<p style="text-indent: -2.0cm; margin-left: 120px; font-family: 'Courier New';"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;d = CDbl("5+3a") &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;ERROR</span></p>
+<p style="text-indent: -2.0cm; margin-left: 120px;"><span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New';">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;d = Evaluate("5+3") &#160;&#160;&#160;&#160;&#160;&#160;OK</span></p>
+<p class="DokuText" style="margin-left: 120px;">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">For further information such as on how to declare array elements or how to use constants, please refer to the online help system.</span></p>
+<h5><span lang="EN-US" xml:lang="EN-US"><a name="Applications" id="Applications">Applications, Objects and Their Methods</a></span></h5>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">One of the most powerful aspects of VBA language is the object-oriented approach, which allows the seamless combination and integration of component objects from various applications, e.g. MS Office® (Word®,PowerPoint®, Excel®,Outlook®), Matlab®, CST Studio Suite. A single script may thus access functionality from several applications at the same time.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">External objects need to be created by using the</span> <span lang="EN-US" xml:lang="EN-US" style="font-family: Courier;">CreateObject()</span> <span lang="EN-US" xml:lang="EN-US">command before they can be accessed from within the script:</span></p>
+<p class="DokuText">&#160;</p>
+<p style="text-indent: -2.0cm; text-align: left; margin-left: 120px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</span><span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New';">Dim word as object, ppt as object</span></p>
+<p style="text-indent: -2.0cm; text-align: left; margin-left: 120px;"><span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New';">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;Set word = CreateObject("Word.Application")</span></p>
+<p style="text-indent: -2.0cm; text-align: left; margin-left: 120px;"><span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New';">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;Set ppt&#160;&#160;= CreateObject("PowerPoint.Application")</span></p>
+<p class="DokuText">&#160;</p>
+<p style="margin-left: 1.0cm;">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">After creating an external COM object, you are able to access its methods directly from within your VBA script. For more information on its COM interface, please refer to the documentation for that particular application.</span></p>
+<p class="DokuText">&#160;</p>
+<p style="margin-left: 1.0cm; text-align: justify;"><span lang="EN-US" xml:lang="EN-US">Since CST Studio Suite also features a COM interface, the corresponding objects can also be accessed by third-party applications. The following code segment shows how to start and control e.g. CST Microwave Studio from an external program using VBA:</span></p>
+<p style="margin-left: 1.0cm; text-align: justify;">&#160;</p>
+<p style="font-family: 'Courier New', monospace; text-align: left; margin-left: 158px;">Sub Main()</p>
+<p style="font-family: 'Courier New', monospace; text-align: left; margin-left: 158px;">&#160;&#160;&#160;&#160;Dim studio As Object</p>
+<p style="font-family: 'Courier New', monospace; text-align: left; margin-left: 158px;">&#160;&#160;&#160;&#160;Set studio = CreateObject("CSTStudio.Application")</p>
+<p style="font-family: 'Courier New', monospace; text-align: left; margin-left: 158px;">&#160;</p>
+<p style="font-family: 'Courier New', monospace; text-align: left; margin-left: 158px;">&#160;&#160;&#160;&#160;Dim mws As Object</p>
+<p style="font-family: 'Courier New', monospace; text-align: left; margin-left: 158px;">&#160;&#160;&#160;&#160;Set mws = studio.NewMWS</p>
+<p style="font-family: 'Courier New', monospace; text-align: left; margin-left: 158px;">&#160;</p>
+<p style="font-family: 'Courier New', monospace; text-align: left; margin-left: 158px;">&#160;&#160;&#160;&#160;Dim brick As Object</p>
+<p style="font-family: 'Courier New', monospace; text-align: left; margin-left: 158px;">&#160;&#160;&#160;&#160;Set brick = mws.brick</p>
+<p style="font-family: 'Courier New', monospace; text-align: left; margin-left: 158px;">&#160;&#160;&#160;&#160;brick.Name "brick"</p>
+<p style="font-family: 'Courier New', monospace; text-align: left; margin-left: 158px;">&#160;&#160;&#160;&#160;brick.Xrange 0, 1</p>
+<p style="font-family: 'Courier New', monospace; text-align: left; margin-left: 158px;">&#160;&#160;&#160;&#160;brick.Yrange 0, 1</p>
+<p style="font-family: 'Courier New', monospace; text-align: left; margin-left: 158px;">&#160;&#160;&#160;&#160;brick.Zrange 0, 1</p>
+<p style="font-family: 'Courier New', monospace; text-align: left; margin-left: 158px;">&#160;&#160;&#160;&#160;brick.Create</p>
+<p style="font-family: 'Courier New', monospace; text-align: left; margin-left: 158px;">&#160;</p>
+<p style="font-family: 'Courier New', monospace; text-align: left; margin-left: 158px;">&#160;&#160;&#160;&#160;mws.SaveAs "C:\temp\test.cst", False</p>
+<p style="font-family: 'Courier New', monospace; text-align: left; margin-left: 158px;">&#160;&#160;&#160;&#160;mws.Quit</p>
+<p style="font-family: 'Courier New', monospace; text-align: left; margin-left: 158px;">&#160;</p>
+<p style="font-family: 'Courier New', monospace; text-align: left; margin-left: 158px;">&#160;&#160;&#160;&#160;Set studio = Nothing</p>
+<p style="font-family: 'Courier New', monospace; text-align: left; margin-left: 158px;">End Sub</p>
+<p>&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">Please refer to the online documentation for more information on the particular methods available for the COM objects provided by CST Studio Suite.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">Access to the objects methods can be simplified by using a</span> <span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New'; font-style: italic;">With -</span> <span lang="EN-US" xml:lang="EN-US" style="font-style: italic;">&#160;</span><span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New'; font-style: italic;">End With</span> <span lang="EN-US" xml:lang="EN-US">block as shown in the example below:</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">Sub Main()</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;&#160;&#160;&#160;Dim studio As Object</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;&#160;&#160;&#160;Set studio = CreateObject("CSTStudio.Application")</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;&#160;&#160;&#160;With studio.NewMWS</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;With .Brick</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;.Name "brick"</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;.Xrange 0, 1</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;.Yrange 0, 1</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;.Zrange 0, 1</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;.Create</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;End With</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;.SaveAs "C:\temp\test.cst", False</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;.Quit</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;&#160;&#160;&#160;End With</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span style="font-family: 'Courier New', monospace;">&#160;&#160;&#160;&#160;Set studio = Nothing</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">End Sub</p>
+<p>&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">Please note that in the case of nested</span> <span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New'; font-style: italic;">With -</span> <span lang="EN-US" xml:lang="EN-US" style="font-style: italic;">&#160;</span><span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New'; font-style: italic;">End With</span> <span lang="EN-US" xml:lang="EN-US">structures, the innermost block is used.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">The VBA interpreter of CST Studio Suite allows you to access its objects directly without using the</span> <span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New';">CreateObject</span> <span lang="EN-US" xml:lang="EN-US">command. The methods of the application object are available as global functions, and all other objects can be used as global objects. For use in the CST Studio Suite environment, the example shown above can be simplified to the following:</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; text-align: left; margin-left: 158px;">Sub Main</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; text-align: left; margin-left: 158px;">&#160;&#160;&#160;&#160;With Brick</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; text-align: left; margin-left: 158px;">&#160;&#160;&#160;&#160;&#160;&#160;.Name "brick"</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; text-align: left; margin-left: 158px;">&#160;&#160;&#160;&#160;&#160;&#160;.Xrange 0, 1</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; text-align: left; margin-left: 158px;">&#160;&#160;&#160;&#160;&#160;&#160;.Yrange 0, 1</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; text-align: left; margin-left: 158px;">&#160;&#160;&#160;&#160;&#160;&#160;.Zrange 0, 1</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; text-align: left; margin-left: 158px;">&#160;&#160;&#160;&#160;&#160;&#160;.Create</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; text-align: left; margin-left: 158px;">&#160;&#160;&#160;&#160;End With</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; text-align: left; margin-left: 158px;">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; text-align: left; margin-left: 158px;">&#160;&#160;&#160;&#160;SaveAs "C:\temp\test.cst", False</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; text-align: left; margin-left: 158px;">End Sub</p>
+<p class="DokuText" style="margin-left: 118px;">&#160;</p>
+<h5><span lang="EN-US" xml:lang="EN-US"><a name="Flow" id="Flow">Flow Control</a></span></h5>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">The VBA language offers a wide variety of flow control elements.&#160;&#160;The most frequently used ones are the</span> <span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New'; font-style: italic;">If</span> <span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New'; font-style: italic;">Then</span> <span lang="EN-US" xml:lang="EN-US" style="font-style: italic;">-</span> <span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New'; font-style: italic;">Else</span> <span lang="EN-US" xml:lang="EN-US" style="font-style: italic;">-</span> <span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New'; font-style: italic;">End If</span><span lang="EN-US" xml:lang="EN-US">,</span> <span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New'; font-style: italic;">While -</span> <span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New'; font-style: italic;">Wend</span> <span lang="EN-US" xml:lang="EN-US">or</span> <span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New'; font-style: italic;">For</span> <span lang="EN-US" xml:lang="EN-US" style="font-style: italic;">-</span> <span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New'; font-style: italic;">Next</span> <span lang="EN-US" xml:lang="EN-US">statements shown in the examples below:</span></p>
+<p>&#160;</p>
+<p class="DokuText" style="margin-left: 160px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;</span><span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New', monospace;">If Boolean_Expression Then</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 120px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;' IF - STATEMENT</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 120px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;&#160;&#160;Else</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 120px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;' Else-STATEMENT</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 120px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;&#160;&#160;End If</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 120px;">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 120px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;&#160;&#160;While Boolean_Expression</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 120px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;STATEMENTs</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 120px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;&#160;&#160;Wend</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 120px;">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 120px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;&#160;&#160;For i = 1 To n</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 120px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;STATEMENTs</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 120px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;&#160;&#160;Next i</span></p>
+<p style="margin-left: 1.0cm;">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">Please find more information on these and other flow control elements in the online help which can be find in <a href="../sax_basic/ww_00000.htm">WinWrap Basic Language Reference</a> .</span><i><span lang="EN-US" xml:lang="EN-US">&#160;</span></i></p>
+<h5><span lang="EN-US" xml:lang="EN-US"><a name="File" id="File">File Operations</a></span></h5>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">Accessing files from a VBA script is rather straightforward. After opening a file for either reading or writing, you can assign a numbered stream to it which can then be used to access the file. This is shown in the example below:</span></p>
+<p style="margin-left: 1.0cm;">&#160;</p>
+<p class="DokuText" style="margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New', monospace;">Dim sline as String</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">Open "mydata.txt" For Input As #1</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;&#160;While Not EOF(1)</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 198px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;&#160;Line Input #1,sline</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 198px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;&#160;Debug.Print sline</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 198px;"><span lang="EN-US" xml:lang="EN-US">Wend</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">Close #1</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">Open "mydata.txt" For Output As #2</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;&#160;&#160;Print #2, "Test Output"</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">Close #2</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">Open "mydata.txt" For Append As #3</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;&#160;&#160;Print #3, "Test Output 2"</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">Close #3</span></p>
+<p style="margin-left: 1.0cm;">&#160;</p>
+<p style="margin-left: 2.0cm; text-align: justify;"><b style="font-weight: bold;"><span lang="EN-US" xml:lang="EN-US">Please note</span></b><span lang="EN-US" xml:lang="EN-US">: The Debug.Print method is used to generate debug text output which is written to an output window in the development environment.</span></p>
+<p style="margin-left: 1.0cm; text-align: justify;">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">Any CST Studio Suite result which is displayed in the Navigation Trees 1D Results folder should be accessed using the</span> <span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New';">Result1D</span> <span lang="EN-US" xml:lang="EN-US">object rather than by direct file access. A similar</span> <span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New';">Result3D</span> <span lang="EN-US" xml:lang="EN-US">object exists for the access of 3D result field data. The usage of these objects are introduced later in this section.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">Find further information on file handling (e.g. checking directory contents with the</span> <span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New';">Dir$</span> <span lang="EN-US" xml:lang="EN-US">command) in the</span> <span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New';">File Group</span> <span lang="EN-US" xml:lang="EN-US">of the language reference part of the VBA online help system.</span></p>
+<h5><a name="Graphical" id="Graphical"><span lang="EN-US" xml:lang="EN-US">Graphical User Interface Builder</span></a></h5>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">You can easily create and customize your own dialog boxes by using the graphical user interface builder which you can open either by selecting the icon</span> <span lang="EN-US" xml:lang="EN-US" style="font-style: italic;">User Interface</span><i><span lang="EN-US" xml:lang="EN-US">&#160;</span></i>&gt; <span lang="EN-US" xml:lang="EN-US"><i>Edit Dialog Box</i></span> <img src="../icons/ds_toolbars/general/edituserdialog.png" alt="" style="border: none;" width="16" height="16" border="0" /><span lang="EN-US" xml:lang="EN-US">.</span></p>
+<p style="margin-left: 1.0cm; text-align: justify;">&#160;</p>
+<p style="text-align: left; margin-left: 160px;"><img src="vba_macro_language_overview-dateien/userdialog.png" alt="" style="border: none;" width="413" height="365" border="0" /></p>
+<p style="margin-left: 1.0cm; text-align: justify;">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">A customized dialog box can then be created by placing user interface components on the dialog sheet. However, describing all the details of creating user defined dialog boxes is beyond the scope of this manual. Refer to the online help for more information.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">Most dialogs' controls store their data as strings, so a conversion of strings to other data types may be necessary. As already shown earlier, a string can be easily converted to a double value by using the</span> <span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New';">CDbl()</span> <span lang="EN-US" xml:lang="EN-US">or</span> <span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New';">Evaluate()</span> <span lang="EN-US" xml:lang="EN-US">functions.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">Another important source of information on this topic is the pre-loaded result templates or macros which are covered later in this document. Most of these scripts contain user-defined dialog boxes with a variety of controls.</span></p>
+<h5><span lang="EN-US" xml:lang="EN-US"><a name="Mathematical" id="Mathematical">Mathematical Functions, Operators and Constants</a></span></h5>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">The VBA language offers various mathematical functions and operators. If you are familiar with other programming languages, you may already know most of them.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">However, there are a few functions that have a slightly different meaning when compared to other programming languages such as C or C++:</span></p>
+<p class="DokuText">&#160;</p>
+<table style="vertical-align: top; height: 80px; left: 289px; top: 6803px; margin-left: 200px;" cellspacing="0" width="387">
+<col style="width: 33.038%;" />
+<col style="width: 66.962%;" />
+<tr style="vertical-align: top;">
+<td style="border: Solid 1px #000000; width: 33.038%; padding-right: 10px; padding-left: 10px;">
+<p class="DokuText" style="margin-left: 0cm; text-align: left;"><span lang="EN-US" xml:lang="EN-US">Sqr(a)</span></p>
+</td>
+<td style="border-top: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 66.962%; padding-right: 10px; padding-left: 10px;">
+<p class="DokuText" style="margin-left: 0cm;"><span lang="EN-US" xml:lang="EN-US">Square root of a</span></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 33.038%; padding-right: 10px; padding-left: 10px;">
+<p class="DokuText" style="margin-left: 0cm; text-align: left;"><span lang="EN-US" xml:lang="EN-US">a^2</span></p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 66.962%; padding-right: 10px; padding-left: 10px;">
+<p class="DokuText" style="margin-left: 0cm;"><span lang="EN-US" xml:lang="EN-US">a * a</span></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 33.038%; padding-right: 10px; padding-left: 10px;">
+<p class="DokuText" style="margin-left: 0cm; text-align: left;"><span lang="EN-US" xml:lang="EN-US">Log(a)</span></p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 66.962%; padding-right: 10px; padding-left: 10px;">
+<p class="DokuText" style="margin-left: 0cm;"><span lang="EN-US" xml:lang="EN-US">Natural logarithm of a</span></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 33.038%; padding-right: 10px; padding-left: 10px;">
+<p class="DokuText" style="margin-left: 0cm; text-align: left;"><span lang="IT" xml:lang="IT">Log(a) / Log(10)</span></p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 66.962%; padding-right: 10px; padding-left: 10px;">
+<p class="DokuText" style="margin-left: 0cm; text-align: left;"><span lang="EN-US" xml:lang="EN-US">Logarithm of a to a base of 10</span></p>
+</td>
+</tr>
+</table>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">Refer to the help on operators and general mathematics in the online help system.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">In addition to the VBA standard language elements, CST Studio Suite provides a collection of mathematical functions that are frequently used in scientific computing:</span></p>
+<p class="DokuText">&#160;</p>
+<table style="vertical-align: top; left: 162px; top: 6958px; margin-left: 120px;" cellspacing="0">
+<col />
+<col />
+<tr style="vertical-align: top; height: 18px;">
+<td style="border: Solid 1px #000000; padding-right: 10px; padding-left: 10px;">
+<p>Pi</p>
+</td>
+<td style="border-top: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; padding-right: 10px; padding-left: 10px;">
+<p>3.141592654...</p>
+</td>
+</tr>
+<tr style="vertical-align: top; height: 31px;">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; padding-right: 10px; padding-left: 10px;">
+<p>re(am,phD) / im(am,phD)</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; padding-right: 10px; padding-left: 10px;">
+<p class="DokuText" style="margin-left: 0px;"><span lang="EN-US" xml:lang="EN-US">&#160;Real or imaginary part of a complex number</span></p>
+<p><span lang="EN-US" xml:lang="EN-US">(am = amplitude, phD = phase in degrees)</span></p>
+</td>
+</tr>
+<tr style="vertical-align: top; height: 34px;">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; padding-right: 10px; padding-left: 10px;">
+<p style="text-align: left;"><span lang="EN-US" xml:lang="EN-US">SinD</span><span lang="EN-US" xml:lang="EN-US">(x), CosD(x), TanD(x)</span></p>
+<p style="text-align: left;">&#160;</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; padding-right: 10px; padding-left: 10px;">
+<p style="text-align: left;"><span lang="EN-US" xml:lang="EN-US">Sin, cos, tan with x being the angle in degrees</span></p>
+</td>
+</tr>
+<tr style="vertical-align: top; height: 34px;">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; padding-right: 10px; padding-left: 10px;">
+<p><span lang="EN-US" xml:lang="EN-US">ASinD(), ACosD(), ATnD()</span></p>
+<p>&#160;</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; padding-right: 10px; padding-left: 10px;">
+<p class="DokuText" style="margin-left: 0cm;"><span lang="EN-US" xml:lang="EN-US">Arc sin / Arc cos / Arc tan with the result being an angle in degrees</span></p>
+</td>
+</tr>
+<tr style="vertical-align: top; height: 31px;">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; padding-right: 10px; padding-left: 10px;">
+<p class="DokuText" style="margin-left: 0px;"><span lang="FR" xml:lang="FR">ATn2(y,x)</span></p>
+<p>&#160;</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; padding-right: 10px; padding-left: 10px;">
+<p class="DokuText" style="margin-left: 0cm;"><span lang="EN-US" xml:lang="EN-US">Polar angle of the complex number x + iy measured in radian</span></p>
+</td>
+</tr>
+<tr style="vertical-align: top; height: 31px;">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; padding-right: 10px; padding-left: 10px;">
+<p class="DokuText" style="margin-left: 0px;"><span lang="FR" xml:lang="FR">ATn2D(y,x)</span></p>
+<p>&#160;</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; padding-right: 10px; padding-left: 10px;">
+<p class="DokuText" style="margin-left: 0cm;"><span lang="EN-US" xml:lang="EN-US">Polar angle of the complex number x + iy measured in degrees</span></p>
+</td>
+</tr>
+<tr style="vertical-align: top; height: 31px;">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; padding-right: 10px; padding-left: 10px;">
+<p class="DokuText" style="margin-left: 0px;"><span lang="EN-US" xml:lang="EN-US">Evaluate(x)</span></p>
+<p class="dokutext">&#160;</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; padding-right: 10px; padding-left: 10px;">
+<p class="DokuText" style="margin-left: 0cm;"><span lang="EN-US" xml:lang="EN-US">Evaluates the mathematical expression x and returns its numerical value (as double)</span></p>
+</td>
+</tr>
+<tr style="vertical-align: top; height: 31px;">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; padding-right: 10px; padding-left: 10px;">
+<p>Min(x,y)</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; padding-right: 10px; padding-left: 10px;">
+<p class="DokuText" style="margin-left: 0cm;">Minimum of x and y</p>
+<p class="DokuText" style="margin-left: 0cm;">&#160;</p>
+</td>
+</tr>
+<tr style="vertical-align: top; height: 28px;">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; padding-right: 10px; padding-left: 10px;">
+<p>Max(x,y)</p>
+<p>&#160;</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; padding-right: 10px; padding-left: 10px;">
+<p class="DokuText" style="margin-left: 0cm;">Maximum of x and y</p>
+</td>
+</tr>
+<tr style="vertical-align: top; height: 17px;">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; padding-right: 10px; padding-left: 10px;">
+<p>ln(x)</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; padding-right: 10px; padding-left: 10px;">
+<p class="DokuText" style="margin-left: 0cm;">Natural logarithm of x</p>
+<p class="DokuText" style="margin-left: 0cm;">&#160;</p>
+</td>
+</tr>
+<tr style="vertical-align: top; height: 31px;">
+<td colspan="2" style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; padding-right: 10px; padding-left: 10px;">
+<p class="DokuText" style="margin-left: 0cm;">Other <span lang="EN-US" xml:lang="EN-US">mathematical functions like Sgn(x) are listed here: WinWrap Basic</span> <a href="../sax_basic/ww_00305.htm">Math Group</a>.</p>
+<p class="DokuText" style="margin-left: 0cm;">&#160;</p>
+</td>
+</tr>
+</table>
+<p style="margin-left: 1.0cm;">&#160;</p>
+<p style="margin-left: 1.0cm;">For more information see <a href="../sax_basic/ww_00000.htm">WinWrap Basic Language Reference</a>.</p>
+<p style="margin-left: 2.0cm;">&#160;</p>
+<p style="margin-left: 2.0cm;"><b style="font-weight: bold;"><span lang="EN-US" xml:lang="EN-US">Please note</span></b><span lang="EN-US" xml:lang="EN-US">: All mathematical functions can also be used in dialog box entry fields whenever CST Studio Suite allows you to enter a mathematical expression.</span></p>
+<h4><span lang="EN-US" xml:lang="EN-US"><a name="Concepts" id="Concepts">Concepts of Macro Programming in CST Studio Suite</a></span></h4>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">After introducing the fundamental concepts of VBA programming, the next sections focus on how VBA language is integrated in CST Studio Suite modules.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">A few tools within CST Studio Suite can be extended by providing user-defined functions:</span></p>
+<p class="DokuText">&#160;</p>
+<p style="margin-left: 70.9pt; text-indent: -14.2pt;"><span lang="EN-US" xml:lang="EN-US" style="font-family: Wingdings;">o&#160;&#160;</span><span lang="EN-US" xml:lang="EN-US">Project templates to customize settings for particular structures</span></p>
+<p style="margin-left: 70.9pt; text-indent: -14.2pt;"><span lang="EN-US" xml:lang="EN-US" style="font-family: Wingdings;">o<span style="font: 7.0pt 'Times New Roman';">&#160;&#160;&#160;&#160;</span></span><span lang="EN-US" xml:lang="EN-US">Result templates for the automated extraction of simulation results</span></p>
+<p style="margin-left: 70.9pt; text-indent: -14.2pt;"><span lang="EN-US" xml:lang="EN-US" style="font-family: Wingdings;">o</span><span lang="EN-US" xml:lang="EN-US" style="font-family: Wingdings; font: 7.0pt 'Times New Roman';">&#160;&#160;&#160;</span><span lang="EN-US" xml:lang="EN-US">User-defined excitation functions for transient analysis (accessed from the <i>Excitation signal</i> dialog box<i>)</i></span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">You can also create macros to automate common tasks. Each of these macros can be assigned to either of the following groups:</span></p>
+<p class="DokuText">&#160;</p>
+<p style="margin-left: 70.9pt; text-align: justify; text-indent: -14.2pt;"><span lang="EN-US" xml:lang="EN-US" style="font-family: Wingdings;">o<span style="font: 7.0pt 'Times New Roman';">&#160;&#160;&#160;&#160;</span></span><span lang="EN-US" xml:lang="EN-US">Structure modeling macros: These macros need to be stored in the history list to ensure a proper structure update as a consequence of parametric changes.</span></p>
+<p style="margin-left: 70.9pt; text-align: justify; text-indent: -14.2pt;"><span lang="EN-US" xml:lang="EN-US" style="font-family: Wingdings;">o<span style="font: 7.0pt 'Times New Roman';">&#160;&#160;&#160;&#160;</span></span><span lang="EN-US" xml:lang="EN-US">Control Macros: These macros do not need to be stored in the history list and are thus usually employed for post-processing calculations.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">This does not apply to CST Design Studio where all macros can be considered as <i>Control Macros</i>.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">The user-defined excitation functions are always stored as part of a certain project. The text files containing the functions VBA code have the file extension "usf".</span></p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">Therefore, if the projects name is "test.cst", the file path of a user defined excitation function will be "./test/Model/3D/model.usf."</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">Storage of the structure or control macros can be local (within the project) or global (available for all projects). Project templates and the result templates are always stored globally.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText" style="margin-left: 72px;"><b style="font-weight: bold;"><span lang="EN-US" xml:lang="EN-US">Please note:</span></b> <span lang="EN-US" xml:lang="EN-US">CST Design Studio does currently not support local macros. Therefore all macros created in CST Design Studio are stored globally for all projects.</span></p>
+<h5><span lang="EN-US" xml:lang="EN-US">Local Project Macros</span></h5>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">Local macros are stored as part of a particular project and obtain a numbered file extension, e.g. 000, 001, 002, etc.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">Assuming the name of the project to be test.cst," the file paths of the local macros could be any one of the following: "./test/Model/3D/model.000", "./test/Model/3D/model.001," etc.</span></p>
+<h5><span lang="EN-US" xml:lang="EN-US"><a name="Global" id="Global">Global Macros and <i>Library Path</i></a></span></h5>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">All global macros are stored in a folder named Macros located in the <i>Global Library Path</i>.</span> <span lang="EN-US" xml:lang="EN-US">By default, it is set to the <i>Library</i> folder in the CST Studio Suite installation directory.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">However, when working in a group of users, you may change the location of this directory to a shared folder accessible to everyone. Each user should then specify its location by selecting</span> <a href="../ribbons/de/backstageview.htm">File:</a> <span lang="EN-US" xml:lang="EN-US" style="font-style: italic;">Options</span><i><span lang="EN-US" xml:lang="EN-US">&#160;</span></i>&gt; <i><span lang="EN-US" xml:lang="EN-US" style="font-style: italic;">Library Path</span></i><span lang="EN-US" xml:lang="EN-US">.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">The file names of global macros are always built by the keyword macro and a numbered extension, e.g. "macro.000", "macro.001", etc. It is not necessary to ensure consecutive numbering of the macros.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">By default, each installation of CST Studio Suite contains a collection of useful global macros. The file extension of these macros starts at 500 in order to avoid naming conflicts with your own global macros.</span></p>
+<p class="DokuText" style="margin-left: 0cm;">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">The following picture shows the contents of the <i>Macros</i> submenu in CST Microwave Studio after two macros have been created:</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText" style="text-align: left; margin-left: 158px;"><img src="vba_macro_language_overview-dateien/mainmenu.png" alt="" style="border: none;" width="478" height="504" border="0" /></p>
+<p class="DokuText" style="margin-left: 78px; text-align: center;">&#160;</p>
+<p class="DokuText" style="margin-left: 0cm;">&#160;</p>
+<h4><span lang="EN-US" xml:lang="EN-US"><a name="Control" id="Control">Control Macros</a></span></h4>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">A macro belongs to the class of control macros if it does not need to be stored in the history list. The following list provides an overview of frequently used control macros:</span></p>
+<ul style="list-style: disc;">
+<li class="p">
+<p style="margin-left: 51.05pt; text-indent: -19.85pt;"><span lang="EN-US" xml:lang="EN-US">Any kind of numerical post-processing of S-Parameters, farfields, probes, voltages or electromagnetic fields</span></p>
+</li>
+<li class="p">
+<p style="margin-left: 51.05pt; text-indent: -19.85pt;"><span lang="EN-US" xml:lang="EN-US" style="font-family: Wingdings;"><span style="font: 7.0pt 'Times New Roman';">&#160;</span></span><span lang="EN-US" xml:lang="EN-US">Exporting the screens contents as pictures or videos in various formats</span></p>
+</li>
+<li class="p">
+<p style="margin-left: 51.05pt; text-indent: -19.85pt;"><span lang="EN-US" xml:lang="EN-US" style="font-family: Wingdings;"><span style="font: 7.0pt 'Times New Roman';">&#160;</span></span><span lang="EN-US" xml:lang="EN-US">Project management, e.g. archiving models, cleaning up temporary working directories, etc.</span></p>
+</li>
+<li class="p">
+<p style="margin-left: 51.05pt; text-indent: -19.85pt;"><span lang="EN-US" xml:lang="EN-US" style="font-family: Wingdings;"><span style="font: 7.0pt 'Times New Roman';">&#160;</span></span><span lang="EN-US" xml:lang="EN-US">Control and execution of computational sequences</span></p>
+</li>
+<li class="p">
+<p style="margin-left: 51.05pt; text-indent: -19.85pt;"><span lang="EN-US" xml:lang="EN-US" style="font-family: Wingdings;"><span style="font: 7.0pt 'Times New Roman';">&#160;</span></span><span lang="EN-US" xml:lang="EN-US">Comparison of result data from several projects or measurements</span></p>
+</li>
+</ul>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">The following sections introduce the most important building blocks used by control macros. These code segments are frequently used in the rather complex pre-loaded result templates or macros which are covered in more detail in the next chapters.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText" style="margin-left: 2.0cm;"><b style="font-weight: bold;"><span lang="EN-US" xml:lang="EN-US">Please note:</span></b> <span lang="EN-US" xml:lang="EN-US">A control macro always has a * sign in front of its name, indicating that it is a control macro rather than a structure macro.</span></p>
+<h5><span lang="EN-US" xml:lang="EN-US">Result1D /</span> Result1DComplex <span lang="EN-US" xml:lang="EN-US">Object</span></h5>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">The Result1D object offers convenient access to one-dimensional result data. The following list gives an overview of which result types can be accessed using this object (refer to the online help for details on file naming conventions):</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText" style="margin-left: 64.35pt; text-indent: -18.0pt;"><span lang="EN-US" xml:lang="EN-US">1.<span style="font: 7.0pt 'Times New Roman';">&#160;&#160;&#160;&#160;&#160;&#160;&#160;</span></span><span lang="EN-US" xml:lang="EN-US">Result data stored as part of the project with the file extension sig, e.g. time signals, S-parameters, etc.</span></p>
+<p class="DokuText" style="margin-left: 64.35pt; text-indent: -18.0pt;"><span lang="EN-US" xml:lang="EN-US">2.<span style="font: 7.0pt 'Times New Roman';">&#160;&#160;&#160;&#160;&#160;&#160;&#160;</span></span><span lang="EN-US" xml:lang="EN-US">Voltage monitor data</span></p>
+<p class="DokuText" style="margin-left: 64.35pt; text-indent: -18.0pt;"><span lang="EN-US" xml:lang="EN-US">3.<span style="font: 7.0pt 'Times New Roman';">&#160;&#160;&#160;&#160;&#160;&#160;&#160;</span></span><span lang="EN-US" xml:lang="EN-US">Probe results</span></p>
+<p class="DokuText" style="margin-left: 64.35pt; text-indent: -18.0pt;"><span lang="EN-US" xml:lang="EN-US">4.<span style="font: 7.0pt 'Times New Roman';">&#160;&#160;&#160;&#160;&#160;&#160;&#160;</span></span><span lang="EN-US" xml:lang="EN-US">VSWR results, Z+Y-matrices</span></p>
+<p class="DokuText" style="margin-left: 46.35pt;">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">The Result1D object allows the corresponding file to be opened and its contents to be accessed via methods of an object-oriented manner.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">Many methods of the Result1D object deliver the index of a particular element rather than its value directly (e.g.</span> <span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New';">.GetClosestIndexFromX</span><span lang="EN-US" xml:lang="EN-US">,</span> <span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New';">.GetGlobalMaximum</span><span lang="EN-US" xml:lang="EN-US">,</span> <span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New';">.GetFirstMinimum</span><span lang="EN-US" xml:lang="EN-US">). You can then access the numerical X/Y value of the indexed data point by using the objects functions</span> <span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New';">.GetX</span><span lang="EN-US" xml:lang="EN-US">, and</span> <span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New';">.GetY</span><span lang="EN-US" xml:lang="EN-US">.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">The following examples demonstrate the usage of the</span> <span lang="EN-US" xml:lang="EN-US">Result1D object for various tasks. Please refer to the VBA online documentation for more information.</span><span lang="EN-US" xml:lang="EN-US">&#160;</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><b style="font-weight: bold;"><span lang="EN-US" xml:lang="EN-US" style="font-size: 10.0pt;">Example 1:</span></b> <span lang="EN-US" xml:lang="EN-US">Access S11 phase results which are stored in the file &lt;project name&gt;^cS1(1)1(1).sig</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">Dim n As Long, i As Long</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">Dim vx As Double, vy As Double</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;</p>
+<p class="DokuText" style="margin-left: 158px; font-family: 'Courier New', monospace;"><span lang="EN-US" xml:lang="EN-US">With</span> Result1DComplex ("cS1(1)1(1)")</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;</span><span lang="EN-US" xml:lang="EN-US">D</span>im oPhase As Object</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;&#160;&#160;&#160;&#160;Set oPhase = .Phase &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;' Open the phase of S11<span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;n =</span> oPhase<span lang="EN-US" xml:lang="EN-US">.GetN &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;' Get number of frequency samples</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;For i = 0 To n-1&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;' Read all points with zero based</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;' indices</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;vx =</span> oPhase<span lang="EN-US" xml:lang="EN-US">.GetX(i)&#160;&#160;&#160;' Get frequency of data point</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;vy =</span> oPhase<span lang="EN-US" xml:lang="EN-US">.GetY(i)&#160;&#160;&#160;' Get phase of data point</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;Next i</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">End With</span></p>
+<p style="text-autospace: none;">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">In order to create a new data set containing the group delay time as a function of frequency (which can be calculated from the S-parameters phase data), you would need to implement the following steps:</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText" style="margin-left: 70.9pt; text-indent: -14.2pt;"><span lang="EN-US" xml:lang="EN-US">1.<span style="font: 7.0pt 'Times New Roman';">&#160;&#160;&#160;&#160;&#160;</span></span><span lang="EN-US" xml:lang="EN-US">Create a new</span> <span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New';">Result1D</span> <span lang="EN-US" xml:lang="EN-US">object.</span></p>
+<p class="DokuText" style="margin-left: 70.9pt; text-indent: -14.2pt;"><span lang="EN-US" xml:lang="EN-US">2.</span><span style="font: 7.0pt 'Times New Roman';">&#160;&#160;&#160;&#160;&#160;</span><span lang="EN-US" xml:lang="EN-US">Loop over all frequency samples, calculate delay time for each frequency sample and store its result in the new</span> <span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New';">Result1D</span> <span lang="EN-US" xml:lang="EN-US">object.</span></p>
+<p class="DokuText" style="margin-left: 70.9pt; text-indent: -14.2pt;"><span lang="EN-US" xml:lang="EN-US">3.<span style="font: 7.0pt 'Times New Roman';">&#160;&#160;&#160;&#160;&#160;</span></span><span lang="EN-US" xml:lang="EN-US">Save the</span> <span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New';">Result1D</span> <span lang="EN-US" xml:lang="EN-US">object.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><b style="font-weight: bold;"><span lang="EN-US" xml:lang="EN-US" style="font-size: 10.0pt;">Example 2:</span></b> <span lang="EN-US" xml:lang="EN-US">Determine the maximum return loss and the magnitude of S11 at a frequency of 33 GHz (both in dB).</span></p>
+<p class="DokuText" style="margin-left: 0cm;">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">Dim maxr As double, s11_33GHz As Double</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">Dim s11 As Object</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">Set s11&#160;&#160;&#160;=</span> Result1DComplex("cS1(1)1(1)")</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span style="font-family: 'Courier New', monospace;">Dim oMagnitude As Object &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;' |S11|</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">Set oMagnitude = s11.Magnitude</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span style="font-family: 'Courier New', monospace;">maxr &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;= oMagnitude.GetY(oMagnitude.GetGlobalMaximum())</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">s11_33GHz &#160;&#160;&#160;&#160;&#160;= oMagnitude.GetY(oMagnitude.GetClosestIndexFromX(33))</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span style="font-family: 'Courier New', monospace;">maxr &#160;&#160;&#160;&#160;&#160;&#160;= 20*Log(maxr)/Log(10) &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;' convert to dB</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">s11_33GHz &#160;= 20*Log(s11_33GHz)/Log(10)</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;</p>
+<p class="DokuText"><b style="font-weight: bold;"><span lang="EN-US" xml:lang="EN-US" style="font-size: 10.0pt;">Example 3:</span></b> <span lang="EN-US" xml:lang="EN-US">Determine the frequency of the VSWRs global minimum.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">Solver.CalculateVSWR&#160;&#160;&#160;' calculate the VSWR and</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;' and store it in</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;' &lt;project name&gt;^vswr1(1).sig</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">Dim fmin As Double</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">With Result1D("vswr1(1)")</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 198px;"><span lang="EN-GB" xml:lang="EN-GB">Fmin&#160;&#160;&#160;= .GetX(.GetGlobalMinimum())</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 198px;"><span lang="EN-GB" xml:lang="EN-GB">&#160;&#160;&#160;&#160;</span><span lang="EN-US" xml:lang="EN-US">' please note that this frequency is returned in</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 198px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;' the currently active frequency unit, e.g. GHz</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 198px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;' to obtain its value in Hz, you need to</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 198px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;' multiply it by Units.GetFrequencyUnitToSI</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">End With</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><b style="font-weight: bold;"><span lang="EN-US" xml:lang="EN-US" style="font-size: 10.0pt;">Example 4:</span></b> <span lang="EN-US" xml:lang="EN-US">Calculate the real part of S11 at a certain frequency (here 0.65 GHz)</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span style="font-family: 'Courier New', monospace;">Dim s11 As Object</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">Dim r11 As Object</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">Set s11 = Result1DComplex ("cS1(1)1(1)")</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">Set r11 = s11.real</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span style="font-family: 'Courier New', monospace;">Dim n As Integer</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">Dim frq As Double</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">Dim real As Double</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">frq=0.65</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">n=a11.GetClosestIndexFromX(frq)</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span style="font-family: 'Courier New', monospace;">frq=0.65</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">n=r11.GetClosestIndexFromX(frq)</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">real = r11.GetY(n)</p>
+<p class="DokuText" style="margin-left: 35.4pt;">&#160;</p>
+<p class="DokuText" style="margin-left: 35.4pt;">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">You may also access files that have been created by a VBA script using the Result1D object. However, these files must contain two columned X/Y data.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">In order to access external data, you may use a code segment similar to the following:</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">' just copying the file in order to access it by using the</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">' Result1D object</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">With Result1D("")</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;.LoadPlainFile("C:\TEMP\mydata.txt")</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">.</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">.</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">.</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">End With</span></p>
+<h5><span lang="EN-US" xml:lang="EN-US">Result3D Object</span></h5>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">The Result3D object offers convenient access to 3D result file data similarly to the previously discussed Result1D object. In particular, the Result3D object allows the loading and saving of binary 3D field data in addition to some basic mathematical operations such as add, subtract, multiply, etc.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">The following example demonstrates how to load 3D result field data in order to calculate a superposition of fields which is then saved as binary result field data.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><b style="font-weight: bold;"><span lang="EN-US" xml:lang="EN-US" style="font-size: 10.0pt;">Example:</span></b> <span lang="EN-US" xml:lang="EN-US">Calculate a superposition of 3D result fields.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">Dim field1 as Object, field2 as Object</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">' Load the 3D result data fields "e1" and "e2"</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">' (e.g. modes calculated by the eigenmode solver)</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">Set field1 = Result3D("^mode_e_1")</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">Set field2 = Result3D("^mode_e_2")</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">' First scale field1 and field2 by scalar factors</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">field1.ScalarMult 2</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">field2.ScalarMult 1.5</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">' Now add field2 to field1 (field1 will be overridden)</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">field1.Add field2</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">' Finally save field1 as a new result data field</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">field1.Save "^combination"</span></p>
+<p class="DokuText" style="margin-left: 0cm;">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">Please refer to the online help for more explanations about methods available for this powerful object.</span></p>
+<h5><span lang="EN-US" xml:lang="EN-US">Adding Data Items to the Navigation Tree</span></h5>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">CST Studio Suite™ offers the possibility of adding two columned X/Y ASCII data files to the result tree which can then be displayed in the same way as other one-dimensional data sets. The following exemplary code segment illustrates how this can be achieved for an external data file:</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText" style="margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;</span><span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New', monospace;">With ResultTree</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 118px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;.Reset</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 118px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;.Type "XYSignal"</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 118px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;.Subtype "Linear"</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 118px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;.Title "TDR: Time Dependent Impedance Z(t) in Ohms"</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 118px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;.Xlabel "Time / " + Units.GetTimeUnit()</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 118px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;.Ylabel "Z(t)"</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 118px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</span>.Name "1D Results\TDR Results\Z(t)"</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 118px;">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;<span lang="EN-US" xml:lang="EN-US">.File "C:\Data\myfile.txt"</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 118px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;.Add</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 118px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;End With</span></p>
+<p class="PlainText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">In order to compare curves by plotting them together on the same graph, both curves must have identical titles, x-labels and y-labels. Otherwise the message Incompatible result data will be displayed when both curves are selected.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">In the same way, 3D field result data can be added to the Navigation Tree:</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;With ResultTree</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 118px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;.Reset</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 118px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;.Type "Efield3D"</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 118px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;.Name "3D Results\E-Field\My E-field"</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 118px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</span><span lang="PT-BR" xml:lang="PT-BR">.File "C:\Data\myfile.m3d"</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 118px;"><span lang="PT-BR" xml:lang="PT-BR">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</span><span lang="EN-US" xml:lang="EN-US">.Add</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 118px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;End With</span></p>
+<h5><span lang="EN-US" xml:lang="EN-US">Traverse Folders and Select Items from the Navigation Tree</span></h5>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">A particular item in the Navigation Tree can be easily selected using the</span> <span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New';">SelectTreeItem</span> <span lang="EN-US" xml:lang="EN-US">function. This function returns a Boolean value indicating whether the specified item existed and therefore could be selected.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">The name of a tree item is specified by its sequence of folders starting at the trees root with the folder names separated by \ characters, e.g.:</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText" style="text-align: left; margin-left: 168px;"><span lang="EN-US" xml:lang="EN-US">&#160;</span><span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New', monospace;">SelectTreeItem "1D Results\TDR Results\My Result"</span></p>
+<p class="PlainText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">You can traverse the tree starting from a particular item (e.g. the root item) by using a script similar to the following code segment:</span></p>
+<p class="PlainText"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">Dim sItem As String</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">sItem = ResultTree.GetFirstChildName("Farfields")</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">While sItem &lt;&gt; ""</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;&#160;&#160;SelectTreeItem sItem</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;&#160;&#160;.</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;&#160;&#160;.</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;&#160;&#160;.</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;&#160;&#160;sItem = ResultTree.GetNextItemName(sItem)</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">Wend</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">Please note that the Navigation Trees contents are mode-dependent (e.g. results are not accessible in the mesh mode). To ensure that the program is currently not in mesh mode, use the following statement:</span></p>
+<p class="DokuText" style="margin-left: 0cm;">&#160;</p>
+<p class="PlainText" style="margin-left: 35.25pt;"><span lang="EN-US" xml:lang="EN-US">' ensure that the mesh mode has been switched off</span></p>
+<p class="PlainText" style="margin-left: 35.25pt;"><span lang="EN-US" xml:lang="EN-US">Mesh.ViewMeshMode&#160;&#160;False</span></p>
+<h5><span lang="EN-US" xml:lang="EN-US">Access the Currently Displayed Plot Data</span></h5>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">A few commands can be used to access the data of the currently active plot. Therefore, you should first select a particular plot by using the</span> <span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New';">SelectTreeItem</span> <span lang="EN-US" xml:lang="EN-US">method before using one of the following commands:</span></p>
+<p class="DokuText" style="margin-left: 0cm;">&#160;</p>
+<p class="DokuText" style="text-indent: -18.0pt; margin-left: 181px;"><span lang="EN-US" xml:lang="EN-US" style="font-family: Wingdings;">o<span style="font: 7.0pt 'Times New Roman';">&#160;&#160;&#160;&#160;&#160;&#160;&#160;</span></span><span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New';">GetFieldVector</span></p>
+<p class="DokuText" style="text-indent: -18.0pt; margin-left: 181px;"><span lang="EN-US" xml:lang="EN-US" style="font-family: Wingdings;">o<span style="font: 7.0pt 'Times New Roman';">&#160;&#160;&#160;&#160;&#160;&#160;&#160;</span></span><span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New';">GetFieldFrequency</span></p>
+<p class="DokuText" style="text-indent: -18.0pt; margin-left: 181px;"><span lang="EN-US" xml:lang="EN-US" style="font-family: Wingdings;">o<span style="font: 7.0pt 'Times New Roman';">&#160;&#160;&#160;&#160;&#160;&#160;&#160;</span></span><span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New';">GetFieldPlotMaximum</span></p>
+<p class="DokuText" style="text-indent: -18.0pt; margin-left: 181px;"><span lang="EN-US" xml:lang="EN-US" style="font-family: Wingdings;">o<span style="font: 7.0pt 'Times New Roman';">&#160;&#160;&#160;&#160;&#160;&#160;&#160;</span></span><span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New';">GetFieldPlotMinimum</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">Refer to the online documentation for more information on these methods.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><b style="font-weight: bold;"><span lang="EN-US" xml:lang="EN-US" style="font-size: 10.0pt;">Example 1:</span></b> <span lang="EN-US" xml:lang="EN-US">Select the fundamental 3D eigenmode and determine its resonance frequency and the field vector at a particular position. Finally, display a message box that provides the maximum value of the field.</span></p>
+<p class="PlainText" style="margin-left: 35.45pt;">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">' select the corresponding Navigation Tree item to display</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">' the modes electric field</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">SelectTreeItem "2D/3D Results\Modes\Mode 1\e"</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">' determine the modes frequency</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">dFrequency = GetFieldFrequency()</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">Dim xp As Double, yp As Double, zp As Double</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">xp = 0.0</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">yp = 0.0</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">zp = 0.0</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">' get the field vector at a particular location (xp, yp, zp)</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">' the real and imaginary parts of the vectors components</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">' are stored in the variables: vxre, vyre, vzre (real parts)</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">' and vxim, vyim, vzim (imaginary parts)</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">Dim vxre As Double, vyre As Double, vzre As Double</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">Dim vxim As Double, vyim As Double, vzim As Double</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">GetFieldVector(xp, yp, zp, vxre, vyre, vzre, vxim, vyim, vzim )</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">' display the fields maximum strength</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">MsgBox "Max=" + CStr(GetFieldPlotMaximum)</span></p>
+<p class="DokuText" style="margin-left: 35.45pt;">&#160;</p>
+<p class="DokuText"><b style="font-weight: bold;"><span lang="EN-US" xml:lang="EN-US" style="font-size: 10.0pt;">Example 2:</span></b> <span lang="EN-US" xml:lang="EN-US">Plot a tables contents and export the data to an ASCII file.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">SelectTreeItem "Tables\s11"</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span style="font-family: 'Courier New', monospace;">With ASCIIExport</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;&#160;&#160;&#160;&#160;.Reset</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;&#160;&#160;&#160;&#160;.FileName "mys11.sig"</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;&#160;&#160;&#160;&#160;.Execute</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">End With</p>
+<h5><span lang="EN-US" xml:lang="EN-US">Access Farfield Data from a VBA Script</span></h5>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">Direct access to the farfield at a particular location can easily be obtained using the</span> <span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New';">CalculatePoint</span> <span lang="EN-US" xml:lang="EN-US">method of the</span> <span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New';">FarfieldPlot</span> <span lang="EN-US" xml:lang="EN-US">object as shown below:</span></p>
+<p class="DokuText" style="margin-left: 0cm;">&#160;</p>
+<p class="DokuText" style="margin-left: 158px; font-family: 'Courier New', monospace;"><span lang="EN-US" xml:lang="EN-US">FarfieldPlot.SetPlotMode "Directivity"</span></p>
+<p class="DokuText" style="margin-left: 158px; font-family: 'Courier New', monospace;"><span lang="EN-US" xml:lang="EN-US">FarfieldPlot.CalculatePoint (dTheta, 0, "Abs", "farfield [1]")</span></p>
+<p class="PlainText" style="margin-left: 42.55pt;">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">The third argument of the .</span><span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New';">CalculatePoint</span> <span lang="EN-US" xml:lang="EN-US">method can be any member of the following list:</span></p>
+<p class="DokuText">&#160;</p>
+<p class="PlainText" style="margin-left: 42.55pt;"><span lang="EN-US" xml:lang="EN-US">"Abs"/"Theta"/"Phi"/"Axial Ratio"/"Left Polarization"/"Right Polarization"/"Th_Re"/"Th_Im"/"Ph_Re"/"Ph_Im"/"Th_Phase"/"Ph_Phase"</span></p>
+<p class="PlainText" style="margin-left: 42.55pt;">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">Note that the result obtained by the .</span><span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New';">CalculatePoint</span> <span lang="EN-US" xml:lang="EN-US">method depends on the currently selected plot mode. Make sure that the plot mode is adjusted to the desired one (</span><span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New';">directivity / gain / efield / hfield / pfield / rcs / rcssw / scale2max</span><span lang="EN-US" xml:lang="EN-US">) by using the .</span><span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New';">SetPlotMode</span> <span lang="EN-US" xml:lang="EN-US">method before accessing the farfields data.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">In addition to direct access to individual farfield data, you can also create a one-dimensional farfield plot and then export its data:</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">SelectTreeItem("Farfield\farfield [1]")&#160;</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">With FarfieldPlot</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;.SetPlotMode "directivity"&#160;</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;.Vary "theta"&#160;</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;.ThetaStep 25&#160;</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;.PlotType "3d"&#160;</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;.Plot</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">End With</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">With ASCIIExport</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;&#160;&#160;&#160;&#160;.Reset</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;&#160;&#160;&#160;&#160;.FileName "farfield.sig"</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;&#160;&#160;&#160;&#160;.Execute</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">End With</p>
+<p class="PlainText" style="margin-left: 42.55pt;">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">The following example demonstrates how to create an X/Y data file containing the vertical diagram using the .</span><span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New';">CalculatePoint</span> <span lang="EN-US" xml:lang="EN-US">method rather than exporting plot data:</span></p>
+<p class="PlainText" style="margin-left: 42.55pt;">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">Dim dTheta As Double, dValue As Double</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">Open "C:\Data\mydata.txt" For Output As #1</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">FarfieldPlot.SetPlotMode "directivity"</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">For dTheta = 0 To 180 STEP 5</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 198px;"><span lang="EN-US" xml:lang="EN-US">dValue = FarfieldPlot.CalculatePoint(</span><span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New', monospace; margin-left: 158px;">dTheta, 0, "Abs", farfield [1]")</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;&#160;&#160;Print #1, CStr(dTheta) + "&#160;&#160;" +&#160;&#160;CStr(dValue)</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">Next dTheta</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">Close #1</span></p>
+<h4><span lang="EN-US" xml:lang="EN-US"><a name="Structure" id="Structure">Structure Macros</a></span></h4>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">The main difference between structure macros (identified by their .mcs file extension) and the previously introduced command macros is that structure macros are stored in the history list after their execution. Whenever a macro becomes part of the structures construction, it is important that history updates recall the macro execution in order to fully regenerate the structure.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">Structure macros may be used for various purposes at different complexity levels. However, this document can cover only some fundamental concepts on structure macro development. If you frequently need to develop such macros, we advise you to attend a training class specialized on this topic. Contact your support center for more information.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">Please note that CST Design Studio does not support structure macros.</span></p>
+<h5><span lang="EN-US" xml:lang="EN-US">Create a Structure Macro or a New Project Template</span></h5>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">You may frequently need to change some default settings for your particular kind of application. The following list gives some examples for such default settings:</span></p>
+<p class="DokuText" style="margin-left: 0cm;">&#160;</p>
+<p style="margin-left: 51.05pt; text-indent: -19.85pt;"><span lang="EN-US" xml:lang="EN-US" style="font-family: Wingdings;">o<span style="font: 7.0pt 'Times New Roman';">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</span></span><span lang="EN-US" xml:lang="EN-US">Set the units to mil and MHz rather than use mm and GHz.</span></p>
+<p style="margin-left: 51.05pt; text-indent: -19.85pt;"><span lang="EN-US" xml:lang="EN-US" style="font-family: Wingdings;">o<span style="font: 7.0pt 'Times New Roman';">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</span></span><span lang="EN-US" xml:lang="EN-US">Define a certain set of material properties</span></p>
+<p style="margin-left: 51.05pt; text-indent: -19.85pt;"><span lang="EN-US" xml:lang="EN-US" style="font-family: Wingdings;">o<span style="font: 7.0pt 'Times New Roman';">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</span></span><span lang="EN-US" xml:lang="EN-US">Set the frequency range to a default of e.g. 0 - 3 GHz.</span></p>
+<p style="margin-left: 51.05pt; text-indent: -19.85pt;"><span lang="EN-US" xml:lang="EN-US" style="font-family: Wingdings;">o<span style="font: 7.0pt 'Times New Roman';">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</span></span><span lang="EN-US" xml:lang="EN-US">Define farfield monitors for frequencies of 0.9 GHz and 1.8 GHz.</span></p>
+<p>&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">The most convenient way to achieve such changes to the default settings depending on the structure type is to define project templates for these devices. Such a template is simply a particular kind of structure macro and can be created as such.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">You should start creating your template with an empty history list. Select <i>File</i></span> &gt; <i><span lang="EN-US" xml:lang="EN-US">New and Recent</span></i> <span lang="EN-US" xml:lang="EN-US">and select the corresponding module in order to start a new project.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">Afterwards, you should perform all the frequently used steps which should later be automatically provided by the macro:</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText" style="margin-left: 92.7pt; text-indent: -18.0pt;"><span lang="EN-US" xml:lang="EN-US">1.<span style="font: 7.0pt 'Times New Roman';">&#160;&#160;&#160;&#160;&#160;&#160;&#160;</span></span><span lang="EN-US" xml:lang="EN-US">Select a <i>Project Template</i></span></p>
+<p class="DokuText" style="margin-left: 92.7pt; text-indent: -18.0pt;"><span lang="EN-US" xml:lang="EN-US">2.<span style="font: 7.0pt 'Times New Roman';">&#160;&#160;&#160;&#160;&#160;&#160;&#160;</span></span><span lang="EN-US" xml:lang="EN-US">Define the units.</span></p>
+<p class="DokuText" style="margin-left: 92.7pt; text-indent: -18.0pt;"><span lang="EN-US" xml:lang="EN-US">3.<span style="font: 7.0pt 'Times New Roman';">&#160;&#160;&#160;&#160;&#160;&#160;&#160;</span></span><span lang="EN-US" xml:lang="EN-US">Define default materials (e.g. a set of standard dielectric materials, etc.).</span></p>
+<p class="DokuText" style="margin-left: 92.7pt; text-indent: -18.0pt;"><span lang="EN-US" xml:lang="EN-US">4.<span style="font: 7.0pt 'Times New Roman';">&#160;&#160;&#160;&#160;&#160;&#160;&#160;</span></span><span lang="EN-US" xml:lang="EN-US">Define the background material.</span></p>
+<p class="DokuText" style="margin-left: 92.7pt; text-indent: -18.0pt;"><span lang="EN-US" xml:lang="EN-US">5.<span style="font: 7.0pt 'Times New Roman';">&#160;&#160;&#160;&#160;&#160;&#160;&#160;</span></span><span lang="EN-US" xml:lang="EN-US">Define a default frequency range.</span></p>
+<p class="DokuText" style="margin-left: 92.7pt; text-indent: -18.0pt;"><span lang="EN-US" xml:lang="EN-US">6.<span style="font: 7.0pt 'Times New Roman';">&#160;&#160;&#160;&#160;&#160;&#160;&#160;</span></span><span lang="EN-US" xml:lang="EN-US">Define a collection of frequently used monitors.</span></p>
+<p class="DokuText" style="margin-left: 92.7pt; text-indent: -18.0pt;"><span lang="EN-US" xml:lang="EN-US">7.<span style="font: 7.0pt 'Times New Roman';">&#160;&#160;&#160;&#160;&#160;&#160;&#160;</span></span><span lang="EN-US" xml:lang="EN-US">Change some default settings for the mesh generation.</span></p>
+<p class="DokuText" style="margin-left: 92.7pt; text-indent: -18.0pt;"><span lang="EN-US" xml:lang="EN-US">8.<span style="font: 7.0pt 'Times New Roman';">&#160;&#160;&#160;&#160;&#160;&#160;&#160;</span></span><span lang="EN-US" xml:lang="EN-US">Change some solver settings.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">This list can provide only some ideas on what can be customized by the template. You may include other operations as well.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">Once all necessary steps have been completed, you should open the history list by selecting</span> <a href="../ribbons/de/homede.htm" id="a3" name="a3">Home:</a> <i><span lang="EN-US" xml:lang="EN-US">Edit</span></i> &gt; <i><span lang="EN-US" xml:lang="EN-US">History List.</span></i> In the <span style="font-style: italic;">History List</span> dialog box press the <span style="font-style: italic;">More &gt;&gt;</span> button to enter the expert mode:</p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText" style="margin-left: 158px; text-align: left;"><img src="vba_macro_language_overview-dateien/history.png" alt="" style="border: none;" width="533" height="202" border="0" /></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US" style="color: #000000;">You should then select all commands to be included in the template and click the <i>Macro</i> button. You will be prompted to assign a name to the macro (e.g. My Defaults) and click <i>OK</i>.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText" style="text-align: left; margin-left: 156px;"><img src="vba_macro_language_overview-dateien/structuremacro.png" alt="" style="border: none;" width="304" height="179" border="0" /></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US" style="color: #000000;">The VBA editor will then automatically open showing the contents of the new structure macro. The first line in the macro contains a comment line with the name of the macro.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US" style="color: #000000;">You can now call this project macro by selecting its name from the <i>Macros</i> menu. Once a structure macro is executed by choosing it from the main menu, it will be appended to the history list.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US" style="color: #000000;">You can create global structure macros in the same way by activating the <i>Make globally available</i> option in the dialog box where you also specify the name for the macro.</span></p>
+<p class="DokuText">&#160;</p>
+<h5><span lang="EN-US" xml:lang="EN-US">Difficulties in Creating Structure Macros</span></h5>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">Creating structure macros by selecting a couple of lines in the history list and then automatically converting this into a VBA code sequence is very convenient.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">However, it is important to note that just taking a few lines out of a construction history and building a macro from this will not usually work for the following reasons:</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText" style="margin-left: 46.35pt; text-indent: -18.0pt;"><span lang="EN-US" xml:lang="EN-US">1.<span style="font: 7.0pt 'Times New Roman';">&#160;&#160;&#160;&#160;&#160;&#160;&#160;</span></span><span lang="EN-US" xml:lang="EN-US">The construction may depend on earlier operations in the history that are not part of the newly created macro. Therefore, pick operations may fail, or the structure elements for deletions or transformations simply do not exist. In order to avoid these problems, we recommend exporting a command sequence from the beginning of the history list.</span></p>
+<p class="DokuText" style="margin-left: 46.35pt; text-indent: -18.0pt;"><span lang="EN-US" xml:lang="EN-US">2.<span style="font: 7.0pt 'Times New Roman';">&#160;&#160;&#160;&#160;&#160;&#160;&#160;</span></span><span lang="EN-US" xml:lang="EN-US">Naming conflicts may occur if the macro uses shape names that have already been defined elsewhere. This problem can be solved only by adding some additional coding in regard to shape naming in the macro.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">Because of these pitfalls, we do not recommend you use the macro functionality for simply re-using parts of a models history to build a new structure.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">We strongly suggest exporting the corresponding parts of the existing model into a SAT file first. In a second step, you may import this file into the new project using the working coordinate system for proper placement of imported shapes. The import feature will automatically take care of possible naming conflicts and rename the imported shapes in order to avoid such problems.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">The imported structure can then be modified to some extent using the <i>Local Modification</i> commands. Refer to the corresponding <i>Getting Started</i> manual for more information on this topic.</span></p>
+<h5><span lang="EN-US" xml:lang="EN-US">Use Dialog Boxes in Structure Macros</span></h5>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">Creating parametric structure macros usually requires user-defined dialog boxes for defining structural parameters. However, these dialog boxes should appear only when the macro is called from the menu and should not be shown when the history list is processed.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">This behavior can be achieved using the VBA statements</span> <span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New';">BeginHide</span> <span lang="EN-US" xml:lang="EN-US">and</span> <span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New';">EndHide</span> <span lang="EN-US" xml:lang="EN-US">in the structure macro. All VBA code placed between these two lines will automatically be removed from the macros code before being written into the history list.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">However, the dialog box code should usually provide some parameters which will later be used in the macro. Therefore, you need to declare these parameters before the</span> <span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New';">BeginHide</span> <span lang="EN-US" xml:lang="EN-US">statement. The keyword</span> <span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New';">Assign</span> <span lang="EN-US" xml:lang="EN-US">should then be placed right before the</span> <span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New';">EndHide</span> <span lang="EN-US" xml:lang="EN-US">command for each parameter in order to define its current value, which will then be stored as such in the history list. The following code segment shows the usage of these commands:</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">Dim dRadius As Double</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">BeginHide</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 198px;"><span lang="EN-US" xml:lang="EN-US">&#160;' some code defining dRadius by using user dialog boxes</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 198px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;.</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 198px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;.</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 198px;"><span lang="EN-US" xml:lang="EN-US">&#160;&#160;&#160;.</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 198px;">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 198px;"><span lang="EN-US" xml:lang="EN-US">&#160;Assign("dRadius")</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 198px;">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;"><span lang="EN-US" xml:lang="EN-US">EndHide</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px;">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">After you run this code segment, the history list item will contain the following VBA code only:</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px; text-align: left;"><span lang="EN-US" xml:lang="EN-US">Dim dRadius As Double</span></p>
+<p class="DokuText" style="font-family: 'Courier New', monospace; margin-left: 158px; text-align: left;"><span lang="EN-US" xml:lang="EN-US">dRadius = 0.23&#160;&#160;&#160;' or whatever has been assigned to it</span> <span lang="EN-US" xml:lang="EN-US" style="font-family: 'Courier New', monospace; margin-left: 158px;">by the user</span></p>
+<h5><span lang="EN-US" xml:lang="EN-US">Common Pitfalls in the Usage of Structure Macros</span></h5>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">The following list summarizes some common pitfalls in the usage of structure macros:</span></p>
+<p class="DokuText" style="margin-left: 0cm;">&#160;</p>
+<p class="DokuText" style="margin-left: 64.35pt; text-indent: -18.0pt;"><span lang="EN-US" xml:lang="EN-US">1.<span style="font: 7.0pt 'Times New Roman';">&#160;&#160;&#160;&#160;&#160;&#160;&#160;</span></span><span lang="EN-US" xml:lang="EN-US">The first comment line of a structure macro must not contain an asterisk * character preceding the macros name (otherwise it would be considered as a command macro and would therefore not be stored in the history list).</span></p>
+<p class="DokuText" style="margin-left: 64.35pt; text-indent: -18.0pt;"><span lang="EN-US" xml:lang="EN-US">2.</span><span style="font: 7.0pt 'Times New Roman';">&#160;&#160;&#160;&#160;&#160;&#160;&#160;</span><span lang="EN-US" xml:lang="EN-US">A structure macro is appended to the history list only if it is called from the <i>Macros</i> menu. Running the macro in the VBA debugger by clicking the start button <img src="../icons/ds_toolbars/general/runmacro.png" alt="" style="border: none;" width="16" height="16" border="0" />&#160;will not store the macros contents in the history list.</span></p>
+<p class="DokuText" style="margin-left: 64.35pt; text-indent: -18.0pt;"><span lang="EN-US" xml:lang="EN-US">3.<span style="font: 7.0pt 'Times New Roman';">&#160;&#160;&#160;&#160;&#160;&#160;&#160;</span></span><span lang="EN-US" xml:lang="EN-US">Naming conflicts with existing parts of the project may occur which need to be addressed carefully.</span></p>
+<h4><a name="Pre-Loaded" id="Pre-Loaded">Pre-Loaded VBA Macros</a></h4>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">The installation of CST Studio Suite</span> <span lang="EN-US" xml:lang="EN-US">contains a selection of pre-loaded global macros which are useful to automate a variety of common tasks. These macros can mainly be categorized as follows:</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText" style="margin-left: 63.8pt; text-indent: -18.0pt;"><span lang="EN-US" xml:lang="EN-US">1.<span style="font: 7.0pt 'Times New Roman';">&#160;&#160;&#160;&#160;&#160;&#160;&#160;</span></span><span lang="EN-US" xml:lang="EN-US">File and result handling</span></p>
+<p class="DokuText" style="margin-left: 63.8pt; text-indent: -18.0pt;"><span lang="EN-US" xml:lang="EN-US">2.<span style="font: 7.0pt 'Times New Roman';">&#160;&#160;&#160;&#160;&#160;&#160;&#160;</span></span><span lang="EN-US" xml:lang="EN-US">Structure generation macros</span></p>
+<p class="DokuText" style="margin-left: 63.8pt; text-indent: -18.0pt;"><span lang="EN-US" xml:lang="EN-US">3.<span style="font: 7.0pt 'Times New Roman';">&#160;&#160;&#160;&#160;&#160;&#160;&#160;</span></span><span lang="EN-US" xml:lang="EN-US">Creating pictures, videos and reports</span></p>
+<p class="DokuText" style="margin-left: 63.8pt; text-indent: -18.0pt;"><span lang="EN-US" xml:lang="EN-US">4.<span style="font: 7.0pt 'Times New Roman';">&#160;&#160;&#160;&#160;&#160;&#160;&#160;</span></span><span lang="EN-US" xml:lang="EN-US">Post-processing individual simulations</span></p>
+<p class="DokuText" style="margin-left: 63.8pt; text-indent: -18.0pt;"><span lang="EN-US" xml:lang="EN-US">5.<span style="font: 7.0pt 'Times New Roman';">&#160;&#160;&#160;&#160;&#160;&#160;&#160;</span></span><span lang="EN-US" xml:lang="EN-US">Post-processing multiple simulations and running parameter sweeps</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">You can start each of these macros by selecting its name from the hierarchical structure in the <i>Macros</i> menu. For CST Design Studio, however, macros are accessed from the <i>Macros</i> folder in the Navigation Tree.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">The macros dialog boxes contain <i>Help</i> buttons that open the online help system providing more information.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">We recommend you browse through the contents of the <i>Macros</i> menu to familiarize yourself with the macros already available.</span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">Global macros are stored in the Macros subfolder of the <i>Library Path</i>. This path can be set by choosing <a href="../ribbons/de/backstageview.htm" id="a4" name="a4">File:</a></span> <span lang="EN-US" xml:lang="EN-US" style="font-style: italic;">Options</span><i><span lang="EN-US" xml:lang="EN-US">&#160;</span></i>&gt; <i><span lang="EN-US" xml:lang="EN-US" style="font-style: italic;">Library Path</span></i><span lang="EN-US" xml:lang="EN-US"><i>.</i></span></p>
+<p class="DokuText">&#160;</p>
+<p class="DokuText"><span lang="EN-US" xml:lang="EN-US">If you experience any problems using the pre-loaded macros, or if you have suggestions for new macros, please contact technical support <a href="https://www.3ds.com/support" target="_blank">3ds.com/support</a></span></p>
+<?rh-p style="margin-bottom: 0px; text-align: Right; margin-left: 18px; 
+                 margin-right: 18px; margin-top: 18px;" ?>
+<div style="width: 100%; position: relative;" id="footer">
+<p style="border-bottom: Solid 1px #dddddd; text-align: Left; margin-left: 0px; font-family: Arial, sans-serif; line-height: Normal; margin-top: 9px; margin-right: 0px; margin-bottom: 6px; border-left-width: 1px; border-top-width: 1px; border-right-width: 1px;">&#160;</p>
+<table cellspacing="0" width="100%">
+<col style="width: 50%;" />
+<col style="width: 50%;" />
+<tr>
+<td style="vertical-align: Top;"><span style="font-family: Arial, sans-serif; line-height: Normal; font-size: 8pt;">CST Studio Suite 2022</span></td>
+<td style="vertical-align: Top;">
+<p style="text-align: right;"><img src="../3ds.png" alt="" style="border: none;" border="0" /></p>
+</td>
+</tr>
+</table>
+<p>&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">
+//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+        writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]>
+</script>
+</body>
+</html>

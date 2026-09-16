@@ -8,24 +8,20 @@ Sub Main
 
     If Not CSTP_ReadTask("%TASK_PATH%", "%SESSION_ID%", task, errorCode, errorMessage) Then
         CSTPC_WriteMarker "%MARKER_PATH%", "failure:" & errorCode & ":" & errorMessage
-        Quit
         Exit Sub
     End If
 
     If task.ParameterCount <> 2 Then
         CSTPC_WriteMarker "%MARKER_PATH%", "failure:unexpected parameter count"
-        Quit
         Exit Sub
     End If
     If task.Parameters(0).Kind <> "literal" Or task.Parameters(1).Kind <> "expression" Then
         CSTPC_WriteMarker "%MARKER_PATH%", "failure:parameter kinds changed"
-        Quit
         Exit Sub
     End If
 
     If Not CSTP_WriteCompletion("%COMPLETION_PATH%", task.TaskId, task.SessionId, True, "", "", completionError) Then
         CSTPC_WriteMarker "%MARKER_PATH%", "failure:" & completionError
-        Quit
         Exit Sub
     End If
 
@@ -37,7 +33,6 @@ Sub Main
                 Exit For
             Else
                 CSTPC_WriteMarker "%MARKER_PATH%", "failure:" & errorMessage
-                Quit
                 Exit Sub
             End If
         End If
@@ -49,7 +44,6 @@ Sub Main
     Else
         CSTPC_WriteMarker "%MARKER_PATH%", "failure:ack timeout"
     End If
-    Quit
 End Sub
 
 Private Sub CSTPC_WriteMarker(ByVal filePath As String, ByVal message As String)
