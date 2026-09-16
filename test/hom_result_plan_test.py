@@ -1,5 +1,8 @@
+from dataclasses import replace
+
 import pytest
 
+from csttool.hom_project_profile import HOM_PROFILE_V1, NativeRoverQCapability
 from csttool.hom_result_plan import (
     HomRoverQRequest,
     IntegrationLine,
@@ -7,6 +10,7 @@ from csttool.hom_result_plan import (
     ResultTemplatePhase,
     UnsafeResultTemplateChange,
     integration_line_from_template_settings,
+    native_r_over_q_for_profile,
     plan_hom_r_over_q,
     validate_result_template_change,
 )
@@ -58,6 +62,33 @@ def test_unregistered_integral_lines_keep_runtime_vba(line):
     plan = plan_hom_r_over_q(line)
     assert plan.provider is ResultProvider.RUNTIME_VBA
     assert plan.native_key is None
+
+
+def test_r_over_q_routing_uses_the_supplied_profile():
+    custom_line = IntegrationLine("x", yoffset_mm=3)
+    custom = replace(
+        HOM_PROFILE_V1,
+        profile_id="custom-routing-test",
+        native_r_over_q=(
+            NativeRoverQCapability("x", 0, 3, 0, "custom_native_r_over_q"),
+        ),
+    )
+
+    assert native_r_over_q_for_profile(custom) == {
+        custom_line: "custom_native_r_over_q"
+    }
+    custom_plan = plan_hom_r_over_q(custom_line, profile=custom)
+    default_line_plan = plan_hom_r_over_q(IntegrationLine("z"), profile=custom)
+
+    assert custom_plan.provider is ResultProvider.NATIVE
+    assert custom_plan.native_key == "custom_native_r_over_q"
+    assert default_line_plan.provider is ResultProvider.RUNTIME_VBA
+
+
+def test_r_over_q_routing_rejects_two_capability_sources():
+    line = IntegrationLine("z")
+    with pytest.raises(ValueError, match="either native_results or profile"):
+        plan_hom_r_over_q(line, {line: "native"}, profile=HOM_PROFILE_V1)
 
 
 def test_integration_axis_and_offsets_are_validated():

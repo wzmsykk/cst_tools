@@ -6,12 +6,11 @@ from dataclasses import dataclass
 from enum import Enum
 import math
 from types import MappingProxyType
-from typing import Mapping
+from typing import TYPE_CHECKING, Mapping
 
-
-class ResultProvider(str, Enum):
-    NATIVE = "native"
-    RUNTIME_VBA = "runtime-vba"
+if TYPE_CHECKING:
+    from .hom_project_profile import HomProjectProfile
+from .result_provider import ResultProvider, select_result_provider
 
 
 class ResultTemplatePhase(str, Enum):
@@ -82,9 +81,9 @@ class HomResultPlan:
     integration_line: IntegrationLine
 
 
-def _profile_native_r_over_q() -> Mapping[IntegrationLine, str]:
-    from .hom_project_profile import HOM_PROFILE_V1
-
+def native_r_over_q_for_profile(
+    profile: HomProjectProfile,
+) -> Mapping[IntegrationLine, str]:
     return MappingProxyType(
         {
             IntegrationLine(
@@ -93,22 +92,34 @@ def _profile_native_r_over_q() -> Mapping[IntegrationLine, str]:
                 item.yoffset_mm,
                 item.zoffset_mm,
             ): item.native_key
-            for item in HOM_PROFILE_V1.native_r_over_q
+            for item in profile.native_r_over_q
         }
     )
 
 
-HOM_NATIVE_R_OVER_Q = _profile_native_r_over_q()
+def _default_hom_profile() -> HomProjectProfile:
+    from .hom_project_profile import HOM_PROFILE_V1
+
+    return HOM_PROFILE_V1
+
+
+HOM_NATIVE_R_OVER_Q = native_r_over_q_for_profile(_default_hom_profile())
 
 
 def plan_hom_r_over_q(
     request: IntegrationLine,
-    native_results: Mapping[IntegrationLine, str] = HOM_NATIVE_R_OVER_Q,
+    native_results: Mapping[IntegrationLine, str] | None = None,
+    *,
+    profile: HomProjectProfile | None = None,
 ) -> HomResultPlan:
-    native_key = native_results.get(request)
-    if native_key is not None:
-        return HomResultPlan(ResultProvider.NATIVE, native_key, request)
-    return HomResultPlan(ResultProvider.RUNTIME_VBA, None, request)
+    if native_results is not None and profile is not None:
+        raise ValueError("pass either native_results or profile, not both")
+    if native_results is None:
+        native_results = native_r_over_q_for_profile(
+            profile if profile is not None else _default_hom_profile()
+        )
+    selection = select_result_provider(request, native_results)
+    return HomResultPlan(selection.provider, selection.native_key, request)
 
 
 def integration_line_from_template_settings(

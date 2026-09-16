@@ -1,7 +1,7 @@
 # CST Tools 当前状态与实施路线
 
 状态日期：2026-09-17
-当前基线提交：`51b00ff Add minimal HOM project profile P6`
+当前基线提交：`a76cf32 Align documentation with P6 status`（其后工作区实现 P6.5 I–P7，尚未提交）
 
 本文是项目当前状态的权威入口。历史设计文档仍保留其分析价值；若与本文或[最小 Python/VBA 协议 TODO](./minimal-python-vba-todo.md)冲突，以本文和已经通过的真实 CST Gate 为准。
 
@@ -52,8 +52,11 @@ native CST result -> Python-derived result -> optional runtime VBA
 | P5.5 | x/y/z 任意积分轴运行时 R/Q；固定模板与动态 VBA 路由 | z 轴 5 mm 与原生模板一致 |
 | P5.6 | CST 官方 iterator 盘点注册模板；`EvaluateResultTemplates` 当前 Run 评估 | 5 个 M0D 模板，评估前后 `765.981 MHz` |
 | P6 | `hom-2022-v1` 最小 Profile；求解前能力预检和 fail-fast | 正负两个 Gate 均通过 |
+| P6.5 I | Profile 接入有界 HOM Warm Worker；会话级单次预检 | 五项结果一致，Warm `1.379x`；缺模板在首个 Solver 前失败 |
+| P6.5 II | 同一 Profile 驱动原生读取、结果分类和 R/Q 路由 | 变体 Profile 测试通过；真实多轴 Gate 保持一致 |
+| P7 | Profile、严格标量读取、Provider 选择抽成通用核心 | 基础 `ProjectProfile` Worker、fail-fast、多轴 Gate 均通过 |
 
-当前默认测试基线为 `76 passed, 11 deselected`。P6 定向真实 CST Gate 为 `2 passed in 292.90s`。
+当前默认测试基线为 `88 passed, 12 deselected`。P7 缺模板 Gate 为 `1 passed in 127.38s`，真实多轴 Gate 为 `1 passed in 178.02s`。
 
 ## 4. `hom-2022-v1` Profile
 
@@ -83,7 +86,7 @@ Profile 验证使用 CST 官方 `ResetTemplateIterator/GetNextTemplate`，比较
 ## 6. 尚未完成
 
 - legacy `CSTManager/local_cstworker/worker.vb` 尚未迁移到当前最小协议；
-- Profile 尚未扩展到 default、TM020、WTC、Pillbox 或复合 Enlarged/HOM；
+- 当前暂不扩展到 default、TM020、WTC、Pillbox 或复合 Enlarged/HOM Profile；
 - 没有自动安装 Result Template；
 - 没有通用 Profile Schema、Manifest、动态 capability negotiation 或多 Transport；
 - 没有完成 `cst_version` 只读核心的仓内提取和跨版本矩阵；
@@ -91,15 +94,15 @@ Profile 验证使用 CST 官方 `ResetTemplateIterator/GetNextTemplate`，比较
 - Shunt Impedance、Total Loss、Voltage 仍缺少原生/Python 派生等价性证明；
 - 旧 PPS、重复 Pattern 和生产 VB 尚未删除。
 
-这些项目不是 P6 的隐含组成部分。没有新的失败样例或第二个真实 Profile 前，不扩大为通用 ABI。
+这些项目不是 P6 的隐含组成部分。下一阶段只抽取已经由 HOM Gate 证明的通用核心，不以第二个 Profile 为前置条件，也不扩大为通用 ABI。
 
 ## 7. 推荐后续顺序
 
-1. 将 `hom-2022-v1` 预检复用到 HOM Warm Worker，会话启动时检查一次，任务仍只传 `fmin/fmax`；
-2. 用同一 Profile 同时驱动 Warm Worker、原生结果读取和运行时 R/Q 路由，删除剩余 HOM 硬编码入口；
-3. 选择第二个确有业务价值的 Profile（优先 WTC 或 TM020）重复原生结果盘点，而不是先设计通用 Schema；
-4. 两个 Profile 出现真实共同需求后，再提取最小 Profile 序列化格式；
-5. 最后才评估 legacy Manager 切换和旧 VBA/PPS 删除。
+1. 将 P7 通用核心接入下一条生产候选执行路径，但暂不切换 legacy Manager；
+2. 明确兼容层弃用顺序，优先让新代码直接使用 `ProjectProfile` 和通用 reader；
+3. 保留 HOM 专属 R/Q 薄适配层，不把物理量语义下沉到通用核心；
+4. 暂不做 Profile 序列化、Manifest、动态 capability negotiation、插件 ABI 或多 Profile 注册表；
+5. 在生产候选路径通过真实 Gate 后，再评估 legacy Manager 切换和旧 VBA/PPS 删除。
 
 ## 8. 文档导航
 

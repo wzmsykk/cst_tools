@@ -1,6 +1,6 @@
 # CST 原生结果优先 TODO
 
-状态：长期路线；HOM 最小闭环已完成到 P6
+状态：长期路线；HOM 最小闭环与通用核心抽取已完成到 P7
 日期：2026-09-17
 当前总览：[CST Tools 当前状态与实施路线](./current-status.md)
 
@@ -69,6 +69,8 @@ P5 已完成上述 HOM Profile 的最小闭环：固定路径、严格标量 Cod
 P5.5 补充边界：官方 3D Eigenmode Result Template 通过 `coordinates=0/1/2` 支持 x/y/z 积分轴，并通过 `u1/v1/w1` 定义横向位置；原生能力不是 z 轴限定。请求与当前工程实际预定义的任意轴模板实例精确匹配时是 `native`，否则是 `runtime-vba`。当前 HOM Profile 只预装 z 轴 0/5/10 mm。求解后修改工程参数会触发 `Update Params` 并丢失当前结果，因此不得用工程参数驱动 a posteriori 模板位置。求解后动态位置直接传给 `EigenResult_Complex`，或在后续独立 Gate 中验证不触发参数更新的模板实例设置修改。
 
 P5.6/P6 已进一步证明：CST 官方 iterator 可区分“已注册模板”与仅存在的 `.r0d/.r1d` artifact，`EvaluateResultTemplates` 可对当前 Run 重新评估；`hom-2022-v1` 已集中声明五个模板和五个原生结果，并在任何参数更新、Rebuild、Solver 前执行能力预检。该结论只覆盖当前 HOM/CST 2022 prepared 工程，不代表 Gate 1 的其他 Profile 已完成。
+
+P6.5/P7 已将同一 Profile 接入 Warm Worker、原生读取和 R/Q 路由，并把 Profile、严格标量读取和 Provider 选择抽成不依赖 HOM 单例的通用内存核心。当前暂不新增其他工程 Profile，也不把该核心扩大为 Result Manifest、序列化 Schema 或通用 Provider ABI；HOM R/Q 物理语义仍留在领域适配层。
 
 - [ ] 盘点 Frequency。
 - [ ] 盘点 Q-Factor。

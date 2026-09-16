@@ -9,6 +9,8 @@ from typing import Mapping
 
 from install_compat import resource_path
 
+from .hom_project_profile import HOM_PROFILE_V1, HomProjectProfile
+from .project_profile import ProfileValidationError
 from .hom_result_plan import IntegrationLine
 from .protocol_worker import WorkerWorkspace, _vb_string, prepare_worker_workspace
 from .runtime_protocol import Task
@@ -35,7 +37,13 @@ def prepare_hom_runtime_postprocess_workspace(
     source_project: str | Path,
     *,
     result_name: str,
+    profile: HomProjectProfile = HOM_PROFILE_V1,
 ) -> HomRuntimePostprocessWorkspace:
+    profile.validate_task(task)
+    if "r_over_q_dynamic" not in profile.runtime_vba_metrics:
+        raise ProfileValidationError(
+            f"profile {profile.profile_id} does not declare dynamic R/Q"
+        )
     worker = prepare_worker_workspace(
         root, task, source_project, result_name=result_name
     )

@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 
 from csttool.hom_native_results import read_hom_native_results
+from csttool.hom_project_profile import HOM_PROFILE_V1
 from csttool.postprocess_cst import VBPostProcessor
 from csttool.protocol_hom_runtime_postprocess import (
     prepare_hom_runtime_postprocess_workspace,
@@ -33,17 +34,12 @@ def _read_runtime_scalar(path):
 def test_hom_runtime_r_over_q_uses_solved_fields_without_parameter_update(
     cst_executable,
 ):
-    source = (
-        Path(__file__).parent.parent
-        / "project"
-        / "HOM analysis"
-        / "HOM analysis_clean.cst"
-    )
+    source = Path(__file__).parent.parent / HOM_PROFILE_V1.source_project
     root = Path.cwd() / ".pytest_cache" / "cst-p5-5" / new_session_id()[:8]
     session_id = new_session_id()
     task = Task.create(session_id, {"fmin": "720", "fmax": "800"})
     workspace = prepare_hom_runtime_postprocess_workspace(
-        root, task, source, result_name=RESULT_NAME
+        root, task, source, result_name=RESULT_NAME, profile=HOM_PROFILE_V1
     )
     worker = workspace.worker
     baseline = cst_processes(windows_process_snapshot())
@@ -59,7 +55,9 @@ def test_hom_runtime_r_over_q_uses_solved_fields_without_parameter_update(
                 worker, task, process, timeout=1800
             )
             assert completion.status is CompletionStatus.SUCCESS, completion
-            native = read_hom_native_results(worker.snapshot_path.with_suffix(""))
+            native = read_hom_native_results(
+                worker.snapshot_path.with_suffix(""), HOM_PROFILE_V1
+            )
             runtime = {
                 key: _read_runtime_scalar(path)
                 for key, path in workspace.result_paths.items()

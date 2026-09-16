@@ -1,6 +1,6 @@
 # 最小 Python / VBA 协议 TODO
 
-状态：P0–P6 已完成；当前实施记录
+状态：P0–P7 已完成；当前实施记录
 当前总览：[CST Tools 当前状态与实施路线](./current-status.md)
 
 设计依据：[最小 Python / VBA Runtime Protocol](./minimal-python-vba-protocol.md)
@@ -143,6 +143,50 @@ CST 2022 的公开 VBA API 提供模板枚举和评估，但不提供新增、�
 P6 仍不自动安装 Result Template，也不引入 Profile 哈希、Manifest 或通用 Operation ABI。prepared 工程是 Profile 的权威载体；运行期只做确定性预检。
 
 验证记录：真实 P6 Gate 已在 CST Studio Suite 2022 上通过（2026-09-17，`2 passed in 292.90s`）。正向 `hom-2022-v1` Profile 在参数更新前确认五个模板后完成唯一一次 Solver，显式模板评估前后 Frequency 均为 `765.981 MHz`。负向 Profile 临时声明一个不存在的模板，Worker 返回 `PROFILE_CAPABILITY_MISSING`，未生成 timing/result 文件，并以 CST 批处理退出码 0 标准结束；两次测试均未留下新增 CST/UI 进程。
+
+## P6.5 I：HOM Profile 接入有界 Warm Worker
+
+- [x] `prepare_warm_worker_workspace` 接受可选 Profile；未传 Profile 时保留 P4 Pillbox 行为。
+- [x] Python 在生成宏前用同一 Profile 校验整批任务，HOM 任务仍只允许 `fmin/fmax`。
+- [x] Worker 打开 prepared 工程后、进入任务循环前只盘点一次注册模板。
+- [x] 预检通过后，同一 CST 进程继续执行两个 Warm 频段，不在任务间重复能力协商。
+- [x] 缺模板时首个任务返回 `PROFILE_CAPABILITY_MISSING`，不产生 timing/result、不进入 Solver，也不读取第二任务。
+- [x] HOM Cold/Warm 基准显式传入 `HOM_PROFILE_V1`，并记录 Profile ID、预检次数和模板数。
+- [x] Completion/Ack/Stop 后保持标准 Save/Quit，未留下新增 CST/UI 进程。
+
+验证记录：真实正向 HOM Gate 已在 CST Studio Suite 2022 上通过（2026-09-17，`1 passed in 570.44s`）。Profile `hom-2022-v1` 在会话启动时预检一次，共确认 5 个注册模板；两个频段的五项原生结果分别与 Cold 完全一致。Cold 两次墙钟合计 `328.828s`，Warm 双任务墙钟 `238.484s`，本次整体加速 `1.379x`。负向缺模板 Gate 亦通过（`1 passed in 93.22s`）：在首个 Solver 前返回规定错误，第二任务没有 Completion，并正常退出。
+
+P6.5 I 只把既有 Profile 作为 Warm 会话的可选启动前置条件，没有增加 Profile 文件格式、哈希、动态协商或通用 Operation ABI。下一步进入 P6.5 II 时，应优先清除剩余 HOM 硬编码入口，使原生结果读取和运行时 R/Q 路由也直接由同一 Profile 驱动。
+
+## P6.5 II：同一 Profile 驱动结果读取与 R/Q 路由
+
+- [x] 原生 `.rd0` 读取器接受显式 `HomProjectProfile`，从该实例取得结果 key、路径和单位。
+- [x] 结果分类由传入 Profile 的原生标量和运行时 VBA 能力生成。
+- [x] R/Q 路由接受显式 Profile，从其固定积分线能力选择 `native` 或 `runtime-vba`。
+- [x] 同时传入 Profile 和旧式映射时明确拒绝，避免两个能力来源产生歧义。
+- [x] 运行时 R/Q Workspace 校验任务参数及 `r_over_q_dynamic` 能力声明。
+- [x] HOM Cold/Warm 与多轴运行时 Gate 显式贯穿同一个 `HOM_PROFILE_V1`；原兼容常量和默认调用仍保留。
+- [x] 使用变体 Profile 单元测试证明读取路径、单位、结果分类和积分线路由不再偷用默认 HOM 常量。
+
+验证记录：默认测试为 `84 passed, 12 deselected`。真实多轴 Gate 已在 CST Studio Suite 2022 上通过（2026-09-17，`1 passed in 209.16s`）：x/y/z 四条运行时积分线结果与既有基线一致，其中 z 轴 5 mm 的运行时值 `0.243960805493702 ohm` 与同一 Profile 声明的原生结果 `0.243961 ohm` 一致；求解后没有参数更新，Completion/Ack 后标准退出，未留下新增 CST/UI 进程。
+
+P6.5 II 没有删除兼容常量，也没有建立通用 Profile Schema。当前 HOM 执行、读取和路由已经共享一个 Profile 能力来源。
+
+## P7：单 Profile 基础上的通用核心抽取
+
+当前暂不建设多个工程 Profile。P7 的目标是把已经通过真实 CST Gate 的机制从 HOM 命名中解耦，而不是通过增加第二个工程扩大需求面。
+
+- [x] 将通用字段抽入领域无关的 `ProjectProfile`；`HomProjectProfile` 仅作为携带 R/Q 路由元数据的兼容扩展。
+- [x] 将严格标量读取器抽成接受 `NativeScalarCapability` 集合的通用函数；HOM reader 只作为兼容包装。
+- [x] 将结果分类抽成通用 Profile 能力查询，通用模块不引用 `HOM_PROFILE_V1`。
+- [x] 将 Warm Worker Profile 参数改为通用类型，保持无 Profile 的 P4 路径不变。
+- [x] 保留 `IntegrationLine` 和 R/Q 路由为 HOM/电磁领域适配层，底层 Provider 选择改用通用接口。
+- [x] 保持现有 P6.5 I–II 真实 Gate 数值、fail-fast、Completion/Ack 和标准退出行为不变。
+- [x] 保留旧公开常量和函数作为兼容层；本阶段不强制删除。
+
+P7 明确不做 Profile 文件格式、数据库/注册表、可扩展继承框架、插件发现、动态 capability negotiation、通用 Operation ABI 或多 Transport。当前单层 `HomProjectProfile` 仅为兼容扩展。验收标准是“核心模块不依赖 HOM 单例且现有 HOM 行为不变”，不是“能够描述任意 CST 工作流”。
+
+实现记录：通用核心拆为 `project_profile.py`、`native_results.py` 和 `result_provider.py`。默认测试为 `88 passed, 12 deselected`，其中包含直接使用基础 `ProjectProfile` 构建 Warm Worker 的测试。真实缺模板 Gate 通过（2026-09-17，`1 passed in 127.38s`），仍在首个 Solver 前 fail-fast；真实多轴 Gate 通过（`1 passed in 178.02s`），z 轴 5 mm 原生结果 `0.243961 ohm` 与运行时结果 `0.243960805493711 ohm` 一致。两次均标准退出且未留下新增 CST/UI 进程。
 
 ## 明确不做
 

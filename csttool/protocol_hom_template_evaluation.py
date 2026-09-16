@@ -5,11 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
-from .hom_project_profile import (
-    HOM_PROFILE_V1,
-    HomProjectProfile,
-    ResultTemplateRequirement,
-)
+from .hom_project_profile import HOM_PROFILE_V1
+from .project_profile import ProjectProfile, ResultTemplateRequirement
 from .protocol_worker import WorkerWorkspace, _vb_string, prepare_worker_workspace
 from .runtime_protocol import Task
 
@@ -37,7 +34,7 @@ def prepare_hom_template_evaluation_workspace(
     source_project: str | Path,
     *,
     result_name: str,
-    profile: HomProjectProfile = HOM_PROFILE_V1,
+    profile: ProjectProfile = HOM_PROFILE_V1,
 ) -> HomTemplateEvaluationWorkspace:
     """Prepare a worker that inventories and re-evaluates existing templates."""
     profile.validate_task(task)

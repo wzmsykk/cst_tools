@@ -107,7 +107,7 @@ python -m pytest -q -m integration --run-cst `
 
 该 Gate 验证 task 级独立结果目录、Completion/Ack 串行栅栏、两次不同 `.rd0` 以及 Stop Request/Ack 后的标准退出。它记录时间，但单次双点测试不用于宣称 Warm 性能收益。
 
-P4.5 固定 HOM 结构 Cold/Warm 扫频基准：
+P4.5/P6.5 I 固定 HOM 结构 Cold/Warm 扫频基准：
 
 ```powershell
 python -m pytest -q -m integration --run-cst `
@@ -115,7 +115,17 @@ python -m pytest -q -m integration --run-cst `
   test/protocol_hom_scan_benchmark_integration_test.py
 ```
 
-该 Gate 运行两个独立 Cold 频段，再在一个 Warm 进程中运行相同两个频段；逐频段比较 Frequency、Q-Factor、轴上 R/Q、5 mm 偏轴 R/Q、10 mm 偏轴 R/Q 共 5 个原生 `.rd0`，并在 `.pytest_cache/cst-p4-5/<run>/benchmark.json` 保存计时报告。P5 扩展后的当前实测整体墙钟加速约 `1.445x`，但双点结果不替代多频段重复统计。
+该 Gate 运行两个独立 Cold 频段，再在一个 Warm 进程中运行相同两个频段；逐频段比较 Frequency、Q-Factor、轴上 R/Q、5 mm 偏轴 R/Q、10 mm 偏轴 R/Q 共 5 个原生 `.rd0`，并在 `.pytest_cache/cst-p4-5/<run>/benchmark.json` 保存计时报告。P6.5 I 起，HOM Warm Worker 显式使用 `HOM_PROFILE_V1`：打开工程后、任务循环前只验证一次五个必需模板，报告同时记录 `profile_id`、`profile_preflight_count` 和模板数。本次实测 Cold `328.828s`、Warm `238.484s`，整体墙钟加速约 `1.379x`；双点结果不替代多频段重复统计。
+
+缺模板的 P6.5 I fail-fast Gate 可单独运行：
+
+```powershell
+python -m pytest -q -m integration --run-cst `
+  --cst-exe "D:\Program Files (x86)\CST Studio Suite 2022\CST DESIGN ENVIRONMENT.exe" `
+  test/protocol_hom_scan_benchmark_integration_test.py::test_missing_hom_profile_template_stops_warm_session_before_first_solver
+```
+
+该 Gate 必须在第一个 Solver 前返回 `PROFILE_CAPABILITY_MISSING`，不产生 timing/result，不发布第二任务 Completion，并通过标准 CST 生命周期退出。
 
 P5.5 固定模板/动态运行时后处理边界 Gate：
 
@@ -137,4 +147,8 @@ python -m pytest -q -m integration --run-cst `
 
 该 Gate 通过 CST 官方模板迭代器记录求解前和显式评估后的注册 inventory，并在唯一一次 Solver 完成后调用 `EvaluateResultTemplates`。显式评估前后的 Frequency `.rd0` 必须一致，期间不得修改工程参数、Rebuild 或再次启动 Solver。报告写入 `.pytest_cache/cst-p5-6/<run>/report.json`。CST 2022 没有公开模板注册/删除 VBA API，因此模板安装保留为 Project Profile 的一次性制备步骤，不进入运行期 Python/VBA 协议。
 
-P6 复用同一集成测试文件，并增加缺失能力的 fail-fast Gate。正向 Gate 验证 `hom-2022-v1` 的五个模板；负向 Gate 临时要求一个不存在的模板，必须返回 `PROFILE_CAPABILITY_MISSING`，且不产生 timing/result 文件、不启动 Solver、不留下 CST/UI 进程。
+P6 复用同一集成测试文件，并增加一次性 Worker 的缺失能力 fail-fast Gate。正向 Gate 验证 `hom-2022-v1` 的五个模板；负向 Gate 临时要求一个不存在的模板，必须返回 `PROFILE_CAPABILITY_MISSING`，且不产生 timing/result 文件、不启动 Solver、不留下 CST/UI 进程。P6.5 I 则在上述 Cold/Warm 基准文件中验证相同契约已进入有界 Warm Worker。
+
+P6.5 II 不增加新的 CST 工作流，而是收紧能力来源：Cold/Warm 基准显式将同一个 `HOM_PROFILE_V1` 传给 Workspace 和原生结果读取器；P5.5 多轴 Gate 同时用它校验任务、动态 R/Q 能力和原生对照结果。默认测试还使用变体 Profile 验证自定义 `.rd0` 路径、单位、结果分类和积分线路由，防止代码退回模块级 HOM 硬编码。真实回归继续使用前述 P5.5 命令。
+
+P7 将通用核心拆为 `project_profile.py`、`native_results.py` 和 `result_provider.py`。默认测试直接用基础 `ProjectProfile` 构建 Warm Worker，并验证通用严格标量读取和与物理类型无关的 Provider 选择。HOM 模块继续提供兼容入口和 R/Q 领域适配。P7 真实回归使用 P6.5 I 的缺模板定向命令与 P5.5 多轴命令；不需要新增 CST 工作流。

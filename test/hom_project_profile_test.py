@@ -8,7 +8,11 @@ from csttool.hom_project_profile import (
     ResultTemplateRequirement,
 )
 from csttool.hom_native_results import HOM_NATIVE_SCALARS
-from csttool.hom_result_plan import HOM_NATIVE_R_OVER_Q, IntegrationLine
+from csttool.hom_result_plan import (
+    HOM_NATIVE_R_OVER_Q,
+    IntegrationLine,
+    native_r_over_q_for_profile,
+)
 from csttool.protocol_hom_template_evaluation import ResultTemplateRecord
 from csttool.runtime_protocol import Task, new_session_id
 
@@ -57,6 +61,7 @@ def test_native_readers_and_routing_are_derived_from_profile():
         IntegrationLine("z", yoffset_mm=5): "r_over_q_offset_5mm",
         IntegrationLine("z", yoffset_mm=10): "r_over_q_offset_10mm",
     }
+    assert native_r_over_q_for_profile(HOM_PROFILE_V1) == HOM_NATIVE_R_OVER_Q
 
 
 def test_profile_can_represent_a_missing_required_template():
