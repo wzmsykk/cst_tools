@@ -112,6 +112,19 @@ P5 证明的是“现有 CST 原生标量的严格读取”和 Cold/Warm 一致�
 
 Result Template 生命周期由此分为两类：求解前可安装模板并设置随后参与本次求解的参数；求解后只能直接 Evaluate 已注册模板、修改不触发工程参数更新的模板实例设置，或调用运行时 VBA。禁止以工程参数变化模拟求解后的动态积分位置。
 
+## P5.6：已注册 Result Template 的运行期边界
+
+- [x] 使用 CST 官方 `ResetTemplateIterator` / `GetNextTemplate` 盘点项目已注册模板，而不是用 `.r0d/.r1d` 文件存在性冒充注册状态。
+- [x] 使用官方 `EvaluateResultTemplates` 对当前 Run 重新评估全部已注册模板。
+- [x] 显式评估前后 inventory 必须一致，代表运行期没有偷偷新增、删除或改名。
+- [x] 显式评估前后的原生 Frequency `.rd0` 必须一致。
+- [x] 整个 Gate 只运行一次 Solver，求解后不调用 `StoreParameter`、`Update Params` 或 Rebuild。
+- [x] Completion/Ack 后仍使用标准 Save/Quit；强制清理发生时 Gate 失败。
+
+CST 2022 的公开 VBA API 提供模板枚举和评估，但不提供新增、复制、删除模板的方法；官方自带 `Import Result Templates` 宏也已废弃，并要求在 Template Based Post-Processing 对话框中复制/粘贴。因此 P5.6 不把 GUI 自动化包装成运行协议：模板安装属于一次性的 Project Profile 制备与版本评审，运行期只验证声明能力并执行评估。`.r0d/.r1d` 修改器仍只用于读取、diff 和受控实验，不能声称完成模板注册。
+
+验证记录：真实 P5.6 Gate 已在 CST Studio Suite 2022 上通过（2026-09-17，`1 passed in 178.71s`）。官方 iterator 返回 5 个已注册 M0D 模板，均由 `3D Eigenmode Result` 提供；显式 `EvaluateResultTemplates` 前后 inventory 完全一致，Frequency 均为 `765.981 MHz`。本次只调用一次 Solver，求解后没有参数更新，并在 Completion/Ack 后标准 Save/Quit；只保留运行前即存在的 `cstd.exe` 许可服务。
+
 ## 明确不做
 
 - [ ] 不做 Result Asset Manifest。

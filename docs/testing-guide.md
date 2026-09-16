@@ -124,3 +124,13 @@ python -m pytest -q -m integration --run-cst `
 ```
 
 该 Gate 只运行一次 Solver，随后以当前场结果调用 `EigenResult_Complex` 分别计算 x、y、z 积分轴；覆盖 x 轴 y=5 mm、y 轴 x=5 mm、z 轴 y=5 mm 和 z 轴 y=7.5 mm。z 轴 5 mm 与预安装原生 Result Template 对照；后处理阶段不得调用 `StoreParameter`、`Update Params`、Rebuild 或第二次 Solver。结果报告写入 `.pytest_cache/cst-p5-5/<run>/report.json`。
+
+P5.6 已注册 Result Template 当前运行评估 Gate：
+
+```powershell
+python -m pytest -q -m integration --run-cst `
+  --cst-exe "D:\Program Files (x86)\CST Studio Suite 2022\CST DESIGN ENVIRONMENT.exe" `
+  test/protocol_hom_template_evaluation_integration_test.py
+```
+
+该 Gate 通过 CST 官方模板迭代器记录求解前和显式评估后的注册 inventory，并在唯一一次 Solver 完成后调用 `EvaluateResultTemplates`。显式评估前后的 Frequency `.rd0` 必须一致，期间不得修改工程参数、Rebuild 或再次启动 Solver。报告写入 `.pytest_cache/cst-p5-6/<run>/report.json`。CST 2022 没有公开模板注册/删除 VBA API，因此模板安装保留为 Project Profile 的一次性制备步骤，不进入运行期 Python/VBA 协议。
