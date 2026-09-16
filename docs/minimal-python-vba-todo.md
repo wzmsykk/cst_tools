@@ -28,25 +28,31 @@
 - [x] Completion 必须匹配 task。
 - [x] Ack 前不得读取下一任务。
 - [x] failure 不进入结果读取。
-- [ ] 超时后停止 Worker。
+- [x] 超时后停止 Worker；成功 Completion 不停止 Worker。
 
 ## P2.5：接入前 Gate
 
 - [x] 使用目标 CST 2022.5 的 VBA/WWB 解释器执行 golden vectors，而不仅是静态检查。
 - [x] 把 VBA Codec 编译进一份独立测试宏，验证 ASCII 文件读写和 `Name temp As final`。
 - [x] 使用标准 OLE `Project.Quit` / `Application.Quit` 关闭测试项目和应用，并验证无 CST/UI 残留；强制清场发生时 Gate 失败。
-- [ ] 通过后再修改 `worker.vb`；失败时只修 Codec，不动 Worker 生命周期。
+- [x] Gate 已通过；允许进入 P3 的独立 Worker v1 接入。失败期间只修 Codec，未改 legacy `worker.vb` 生命周期。
 
-验证记录：真实 Contract Test 已通过。外部控制器通过版本化 `CSTStudio.Application` OLE 接口创建并持有项目，宏写出成功 marker 后正常返回，再依次调用标准 `Project.Quit` 和 `Application.Quit`。CST batch macro 内不得调用 `Quit`。只有标准退出成功且未留下需要用户通过 UI 处理的窗口或进程，Gate 才能通过；强制结束仅用于失败清场。
+验证记录：真实 Contract Test 已在包含完整 P2 的当前实现上通过（2026-09-16，`1 passed in 24.32s`）。外部控制器通过版本化 `CSTStudio.Application` OLE 接口创建并持有项目，宏写出成功 marker 后正常返回，再依次调用标准 `Project.Quit` 和 `Application.Quit`。由 OLE 持有项目的 Contract 宏内不得调用 `Quit`；P3 的应用级 `-m` Worker 则在 Ack 后自行 `Save`、`Quit`。只有标准退出成功且未留下需要用户通过 UI 处理的窗口或进程，Gate 才能通过；强制结束仅用于失败清场。
+
+P2.5 至此完成。下一步 P3 使用独立 Worker v1 路径验证 default 工程、参数、Rebuild/Solve/Flush 和一个 `.rd0`；在 P3 通过前不替换现有 legacy `worker.vb`，新旧协议不得共用 Worker 目录。
 
 ## P3：真实 CST 最小验证
 
-- [ ] default 工程。
-- [ ] 一个 literal 参数。
-- [ ] 一个 expression 参数。
-- [ ] 一次 Rebuild/Solve/Flush。
-- [ ] 一个 `.rd0` 结果。
-- [ ] Python 读取完成后 Ack。
+- [x] default Pillbox 工程的独立临时副本。
+- [x] 一个 literal 参数：`nmodes=1`。
+- [x] 一个 expression 参数：`L=R + 30`。
+- [x] 一次 Rebuild/Eigenmode Solve/Backup Flush。
+- [x] 一个 `.rd0` 结果：`Result/Frequency (Multiple Modes)/Mode 1.rd0`。
+- [x] Python 读取完成后 Ack。
+
+验证记录：真实 Worker v1 Gate 已在 CST Studio Suite 2022 上通过（2026-09-17，`1 passed in 54.13s`）。CST 通过应用级 `-m` 执行独立 Worker v1；Worker 打开临时工程副本，应用参数并完成求解和 Backup，确认 `.rd0` 已落盘后才发布 Completion。Python 使用现有 `cst0dreadout` 读得 `503.782` 后发布 Ack，Worker 随后调用官方 `Save`、`Quit`，测试确认未留下需要用户处理的 CST/UI 进程。
+
+P3 没有替换 legacy `worker.vb`，也没有引入 Result Manifest、通用 Operation ABI 或新 Transport。真实 CST 产物证明该结果是目录化路径，而不是早先假设的扁平 `Result/<name>.rd0`。
 
 ## 明确不做
 

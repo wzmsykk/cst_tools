@@ -16,6 +16,7 @@ from csttool.runtime_protocol import (
     encode_task,
     new_session_id,
     validate_ack,
+    wait_completion_or_stop,
 )
 
 
@@ -119,6 +120,7 @@ class FakeSerialWorker:
         self.protocol = protocol
         self.session_id = session_id
         self.waiting_for = None
+        self.stopped = False
 
     def process(self, task):
         if self.waiting_for is not None:
@@ -140,6 +142,9 @@ class FakeSerialWorker:
             return False
         self.waiting_for = None
         return True
+
+    def stop(self):
+        self.stopped = True
 
 
 def test_fake_worker_does_not_advance_before_ack(tmp_path):
@@ -167,3 +172,57 @@ def test_fake_worker_rejects_task_from_old_session(tmp_path):
 
     with pytest.raises(ProtocolError, match="old worker session"):
         worker.process(old_task)
+
+
+def test_completion_timeout_stops_owning_worker(tmp_path):
+    protocol = FileProtocol(tmp_path)
+    task = make_task()
+    worker = FakeSerialWorker(protocol, task.session_id)
+
+    with pytest.raises(TimeoutError, match=task.task_id):
+        wait_completion_or_stop(
+            protocol,
+            task,
+            timeout=0.01,
+            worker=worker,
+            poll_interval=0.001,
+        )
+
+    assert worker.stopped is True
+
+
+def test_completed_task_does_not_stop_worker(tmp_path):
+    protocol = FileProtocol(tmp_path)
+    task = make_task()
+    worker = FakeSerialWorker(protocol, task.session_id)
+    completion = Completion(
+        task.task_id,
+        task.session_id,
+        CompletionStatus.SUCCESS,
+    )
+    protocol.publish_completion(completion)
+
+    assert wait_completion_or_stop(protocol, task, 1, worker) == completion
+    assert worker.stopped is False
+
+
+def test_stop_failure_does_not_hide_completion_timeout(tmp_path):
+    protocol = FileProtocol(tmp_path)
+    task = make_task()
+    worker = FakeSerialWorker(protocol, task.session_id)
+
+    def fail_to_stop():
+        raise RuntimeError("worker stop failed")
+
+    worker.stop = fail_to_stop
+    with pytest.raises(TimeoutError, match=task.task_id) as captured:
+        wait_completion_or_stop(
+            protocol,
+            task,
+            timeout=0.01,
+            worker=worker,
+            poll_interval=0.001,
+        )
+
+    assert isinstance(captured.value.__cause__, RuntimeError)
+    assert str(captured.value.__cause__) == "worker stop failed"

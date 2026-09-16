@@ -12,7 +12,7 @@ from enum import Enum
 import os
 from pathlib import Path
 import time
-from typing import Mapping
+from typing import Any, Mapping, Protocol
 from uuid import UUID, uuid4
 
 
@@ -23,6 +23,13 @@ ACK_MAGIC = "CST_ACK_V1"
 
 class ProtocolError(ValueError):
     """The peer supplied a malformed or unrelated protocol message."""
+
+
+class StoppableWorker(Protocol):
+    """Minimal lifecycle surface required by timeout handling."""
+
+    def stop(self) -> Any:
+        ...
 
 
 class ParameterKind(str, Enum):
@@ -281,6 +288,29 @@ class FileProtocol:
         ack = decode_ack(path.read_text(encoding="utf-8"))
         validate_ack(completion, ack)
         return ack
+
+
+def wait_completion_or_stop(
+    protocol: FileProtocol,
+    task: Task,
+    timeout: float,
+    worker: StoppableWorker,
+    *,
+    poll_interval: float = 0.1,
+) -> Completion:
+    """Wait for one completion and stop its worker if the wait times out."""
+    try:
+        return protocol.wait_completion(
+            task,
+            timeout,
+            poll_interval=poll_interval,
+        )
+    except TimeoutError as timeout_error:
+        try:
+            worker.stop()
+        except Exception as stop_error:
+            raise timeout_error from stop_error
+        raise
 
 
 def atomic_publish(destination: str | Path, text: str) -> Path:

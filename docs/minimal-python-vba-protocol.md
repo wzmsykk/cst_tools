@@ -126,6 +126,8 @@ acknowledge(task_id) -> None
 
 不创建通用 Message Bus、Transport 抽象层或依赖注入框架。文件操作可以放在一个 `FileProtocol` 类中；确认出现第二种 Transport 后再抽象接口。
 
+Python 编排层使用 `wait_completion_or_stop(...)` 等待单个任务。等待超时必须先调用该任务所属 Worker 的 `stop()`，然后继续抛出 `TimeoutError`；成功收到 Completion 时不得停止 Worker。该函数只绑定最小的 `stop()` 生命周期接口，不把重试、结果读取或生产 Worker 实现塞进文件协议。
+
 ## 6. 结果读取
 
 暂不让 VBA 枚举结果。Python 根据当前 Project Profile 获取期望结果：
@@ -145,7 +147,7 @@ Completion success
 1. 修复旧 Worker 的 failure 分支和 TaskIndex 偏移。
 2. 实现最小 Task/Completion/Ack Codec 与原子文件操作。
 3. 使用 fake Worker 测半文件、旧 session、failure、Ack 前不得推进。
-4. 用 default 工程运行一个 literal 参数、一个 expression 参数和一个 `.rd0` 结果。
+4. 已用 Pillbox 工程副本运行一个 literal 参数、一个 expression 参数和一个原生 `.rd0` 结果；Python 读取后 Ack，Worker 再 Save/Quit。
 5. 通过后再决定是否迁移 TM020/WTC。
 
 完成第 4 步之前，不开发 Result Manifest、Operation Manifest 或通用 Extension ABI。

@@ -85,4 +85,12 @@ workspace/
 - 错误 session 被拒绝；
 - Ack 前 Worker 不推进。
 
-该 Gate 通过后，下一步才是把相同 Codec 接入一份独立 Worker v1 Pattern，然后用 default CST 工程验证 Rebuild/Solve/`.rd0`。
+该 Gate 已通过，且相同 Codec 已接入独立的一次性 Worker v1。P3 使用 Pillbox 临时副本验证 literal/expression 参数、Rebuild、Eigenmode Solve、Backup Flush、Python 读取 `Result/Frequency (Multiple Modes)/Mode 1.rd0`、Ack 和官方 Save/Quit：
+
+```powershell
+python -m pytest -q -m integration --run-cst `
+  --cst-exe "D:\Program Files (x86)\CST Studio Suite 2022\CST DESIGN ENVIRONMENT.exe" `
+  test/protocol_worker_integration_test.py
+```
+
+联合回归可同时运行 `test/protocol_contract_integration_test.py` 和 `test/protocol_worker_integration_test.py`。P3 通过前后都不替换 legacy `data/worker.vb`。
