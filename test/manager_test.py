@@ -9,6 +9,10 @@ from csttool.globalconfmanager import GlobalConfmanager
 from csttool.projectconfmanager import ProjectConfmanager
 from csttool.logger import Logger
 import json
+import pytest
+
+
+pytestmark = pytest.mark.integration
 
 
 testdatapath=Path("./test/data")
@@ -43,4 +47,3 @@ class TestCSTManager(unittest.TestCase):
    
      
 
-        

@@ -211,12 +211,22 @@ class local_cstworker(worker.worker):
                 % (self.ID, self.taskIndex, self.runName)
             )
         elif flagPathFailure.exists():
-            fp= open(flagPathFailure,"r")
-            fresult=fp.readlines()[2].strip('\n')
+            with open(flagPathFailure, "r") as fp:
+                lines = fp.readlines()
+            fresult = lines[2].strip("\n") if len(lines) > 2 else "Unknown CST failure"
             self.logger.info(
                 "WorkerID:%r Run:%r Name:%r Run Failure. Reported %s"
                 % (self.ID, self.taskIndex, self.runName, fresult)
             )
+            return {
+                "WorkerID": self.ID,
+                "TaskIndex": self.taskIndex,
+                "TaskStatus": "Failure",
+                "FailureReport": fresult,
+                "RunName": self.runName,
+                "RunParameters": self.runParams,
+                "PostProcessResult": None,
+            }
         else:
             # paramlist=[]
             # for key,value in self.runParams.items():
@@ -287,16 +297,17 @@ class local_cstworker(worker.worker):
                 "WorkerID:%r Run:%r Name:%r success. ElapsedTime:%r End Time:%r"
                 % (self.ID, self.taskIndex, self.runName, escapedTime, time.ctime())
             )
-        self.taskIndex += 1
+        completed_task_index = self.taskIndex
         postProcessResult = self.postProcessHelper.readAllResults()
         runResult = {
             "WorkerID":self.ID,
-            "TaskIndex": self.taskIndex,
+            "TaskIndex": completed_task_index,
             "TaskStatus": "Success",
             "RunName": self.runName,
             "RunParameters": self.runParams,
             "PostProcessResult": postProcessResult,
         }
+        self.taskIndex += 1
         # runResult=result.readModeResult(pathc,1)
         return runResult
 

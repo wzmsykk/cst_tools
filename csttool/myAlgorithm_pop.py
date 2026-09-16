@@ -5,7 +5,7 @@
 ###初值需要自己写，留空[]则为默认
 ###
 import os
-from myAlgorithm import myAlg
+from .myAlgorithm import myAlg
 
 import math
 import numpy as np

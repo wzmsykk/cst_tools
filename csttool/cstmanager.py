@@ -1,251 +1,442 @@
-from . import cstworker
-import os
-import threading
-import queue
-from install_compat import resource_path
-import pathlib
+"""Concurrent execution manager for local CST workers.
+
+The manager owns a fixed-size worker pool.  Algorithms submit immutable tasks,
+then execute a batch and collect results in submission order.  Worker creation
+is injectable so the scheduler can be tested without starting CST.
+"""
+
+from __future__ import annotations
+
+from concurrent.futures import Future, ThreadPoolExecutor
+from dataclasses import dataclass, field
+from enum import Enum, auto
 import logging
-from time import sleep
+from pathlib import Path
+from queue import Empty, Queue
+from threading import RLock
+from typing import Any, Callable, Iterable, Mapping, Protocol
+import warnings
+
+from install_compat import resource_path
+
+from . import cstworker
 
 
-class manager(object):
-    def __init__(self, gconfm, pconfm, params, logger=None, maxTask=2):
-        super().__init__()
-        if logger is not None:
-            self.logger = logger
-        else:
-            self.logger = logging.getLogger(__name__)
+class WorkerProtocol(Protocol):
+    """The part of ``local_cstworker`` used by the scheduler."""
+
+    ID: str
+
+    def runWithParam(self, resultname: str, *, params: Mapping[str, Any]) -> dict:
+        ...
+
+    def stop(self) -> Any:
+        ...
+
+
+class ManagerState(Enum):
+    IDLE = auto()
+    RUNNING = auto()
+    STOPPING = auto()
+    CLOSED = auto()
+
+
+class WorkerState(Enum):
+    ALIVE = auto()
+    RESTARTING = auto()
+    DEAD = auto()
+
+
+@dataclass(frozen=True, slots=True)
+class SimulationTask:
+    """One named CST simulation request."""
+
+    params: Mapping[str, Any]
+    job_name: str
+    retry_count: int = 0
+
+    def __post_init__(self) -> None:
+        if not self.job_name:
+            raise ValueError("job_name must not be empty")
+        if self.retry_count < 0:
+            raise ValueError("retry_count must be non-negative")
+
+
+@dataclass(slots=True)
+class _QueuedTask:
+    sequence: int
+    task: SimulationTask
+
+
+@dataclass(slots=True)
+class _WorkerSlot:
+    worker_id: str
+    worker: WorkerProtocol
+    completed_jobs: int = 0
+    state: WorkerState = WorkerState.ALIVE
+
+
+WorkerFactory = Callable[[str, dict[str, Any], logging.Logger], WorkerProtocol]
+
+
+class CSTManager:
+    """Manage a bounded pool of replaceable local CST workers.
+
+    ``startProcessing`` remains blocking for compatibility with the existing
+    optimization algorithms.  New code can use :meth:`run_batch` or
+    :meth:`execute` instead.
+    """
+
+    def __init__(
+        self,
+        gconfm,
+        pconfm,
+        params,
+        logger: logging.Logger | None = None,
+        maxTask: int = 2,
+        *,
+        worker_factory: WorkerFactory | None = None,
+        max_jobs_per_worker: int = 10,
+    ) -> None:
+        if maxTask < 1:
+            raise ValueError("maxTask must be at least 1")
+        if max_jobs_per_worker < 1:
+            raise ValueError("max_jobs_per_worker must be at least 1")
+
+        self.logger = logger or logging.getLogger(__name__)
         self.pconfm = pconfm
         self.gconf = gconfm.conf
         self.pconf = pconfm.conf
-        self.cstPatternDir = resource_path(self.gconf["BASE"]["datadir"])
-        self.currProjectDir = pathlib.Path(pconfm.currProjectDir).absolute()
+        self.paramList = params
+        self.maxParallelTasks = maxTask
+        self.maxWorkerJobCountLimit = max_jobs_per_worker
+        self._worker_factory = worker_factory or self._create_local_worker
 
-        tp = pathlib.Path(self.pconf["DIRS"]["tempdir"])
-        if tp.is_absolute():
-            self.tempDir = tp
-        else:
-            self.tempDir = self.currProjectDir / tp
-
+        self.cstPatternDir = Path(resource_path(self.gconf["BASE"]["datadir"]))
+        self.currProjectDir = Path(pconfm.currProjectDir).absolute()
+        self.tempDir = self._project_path(self.pconf["DIRS"]["tempdir"])
+        self.resultDir = self._project_path(self.pconf["DIRS"]["resultdir"])
+        self.tempDir.mkdir(parents=True, exist_ok=True)
+        self.resultDir.mkdir(parents=True, exist_ok=True)
         self.taskFileDir = self.tempDir
-        if not self.tempDir.exists():
-            self.tempDir.mkdir()
-        rd = pathlib.Path(self.pconf["DIRS"]["resultdir"])
-        if rd.is_absolute():
-            self.resultDir = rd
-        else:
-            self.resultDir = self.currProjectDir / rd
-
-        if not self.resultDir.exists():
-            self.resultDir.mkdir()
         self.cstProjPath = self.currProjectDir / self.pconf["CST"]["CSTFilename"]
         self.cstType = self.pconf["PROJECT"]["ProjectType"]
-        self.paramList = params
 
-        # PARALLEL
-        self.maxParallelTasks = maxTask
-        self.maxWorkerJobCountLimit=10 # To avoid CST memory leak, set the worker max job can do.
-        self.cstWorkerList:list[cstworker.local_cstworker] = [] 
-        self.cstWorkerStatus:list = [] #"ALIVE" "DEAD"
-        self.WorkerListMutex=threading.Lock()
-        self.mthreadList:list[threading.Thread] = []
-        self.taskQueue = queue.Queue()
-        self.resultQueue = queue.Queue()
-        self.startFirstWorkers()
-        self.ready = True
+        self._state = ManagerState.IDLE
+        self._state_lock = RLock()
+        self._task_queue: Queue[_QueuedTask] = Queue()
+        self._result_queue: Queue[tuple[int, dict]] = Queue()
+        self._slots: list[_WorkerSlot] = []
+        self._next_sequence = 0
+        self._executor = ThreadPoolExecutor(
+            max_workers=maxTask,
+            thread_name_prefix="cst-worker",
+        )
+        self._start_initial_workers()
 
-    def getResultDir(self):
+    def _project_path(self, configured_path: str) -> Path:
+        path = Path(configured_path)
+        return path if path.is_absolute() else self.currProjectDir / path
+
+    @property
+    def state(self) -> ManagerState:
+        with self._state_lock:
+            return self._state
+
+    @property
+    def ready(self) -> bool:
+        return self.state is not ManagerState.CLOSED
+
+    @property
+    def cstWorkerList(self) -> list[WorkerProtocol]:
+        """Compatibility view of the live workers."""
+        with self._state_lock:
+            return [slot.worker for slot in self._slots]
+
+    @property
+    def cstWorkerStatus(self) -> list[str]:
+        """Compatibility view of worker states."""
+        with self._state_lock:
+            return [slot.state.name for slot in self._slots]
+
+    def _worker_config(self, worker_id: str) -> dict[str, Any]:
+        worker_dir = self.tempDir / f"worker_{worker_id}"
+        worker_dir.mkdir(parents=True, exist_ok=True)
+        return {
+            "tempDir": str(worker_dir),
+            "taskFileDir": str(worker_dir),
+            "CSTENVPATH": self.gconf["CST"]["cstexepath"],
+            "ProjectType": self.cstType,
+            "cstPatternDir": str(self.cstPatternDir),
+            "resultDir": str(self.resultDir),
+            "cstPath": str(self.cstProjPath),
+            "paramList": self.paramList,
+            "postProcess": self.pconfm.getCurrPPSList(),
+        }
+
+    @staticmethod
+    def _create_local_worker(
+        worker_id: str,
+        config: dict[str, Any],
+        logger: logging.Logger,
+    ) -> WorkerProtocol:
+        return cstworker.local_cstworker(
+            id=worker_id,
+            type="local",
+            workerconfig=config,
+            logger=logger,
+        )
+
+    def _create_worker(self, worker_id: str) -> WorkerProtocol:
+        self.logger.debug("Creating CST worker %s", worker_id)
+        return self._worker_factory(
+            worker_id,
+            self._worker_config(worker_id),
+            self.logger,
+        )
+
+    def _start_initial_workers(self) -> None:
+        for index in range(self.maxParallelTasks):
+            worker_id = str(index)
+            self._slots.append(_WorkerSlot(worker_id, self._create_worker(worker_id)))
+            self.logger.info("Created cstworker. ID=%s", worker_id)
+
+    def getResultDir(self) -> Path:
         return self.resultDir
-    def mthread(self, idx):
-        # Listener For Each Worker
-        job_done=0
-        while True:
-            targetWorker=self.cstWorkerList[idx]
-            if job_done>=self.maxWorkerJobCountLimit:
-                self.logger.info(
-                    "WORKER ID:%s DONE JOB COUNT:%d, MaxJobCountLimit:%d. RESTARTING CST ENV."
-                    % (str(targetWorker.ID),job_done,self.maxWorkerJobCountLimit)
+
+    def submit(self, task: SimulationTask) -> int:
+        """Queue a task and return its monotonically increasing sequence ID."""
+        with self._state_lock:
+            if self._state in {ManagerState.STOPPING, ManagerState.CLOSED}:
+                raise RuntimeError("CSTManager is shutting down or closed")
+            sequence = self._next_sequence
+            self._next_sequence += 1
+            self._task_queue.put(_QueuedTask(sequence, task))
+            return sequence
+
+    def addTask(self, params: Mapping[str, Any], job_name: str, retry_cnt: int = 0) -> int:
+        """Compatibility wrapper around :meth:`submit`."""
+        # A historical caller used addTask(input_names, params, job_name).
+        if not isinstance(job_name, str) and isinstance(retry_cnt, str):
+            warnings.warn(
+                "addTask(input_names, params, job_name) is deprecated; "
+                "use addTask(params, job_name)",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+            params, job_name, retry_cnt = job_name, retry_cnt, 0
+        return self.submit(
+            SimulationTask(params=params, job_name=job_name, retry_count=retry_cnt)
+        )
+
+    def _replace_worker(self, slot: _WorkerSlot) -> None:
+        slot.state = WorkerState.RESTARTING
+        old_worker = slot.worker
+        try:
+            old_worker.stop()
+        except Exception:
+            self.logger.exception("Failed to stop CST worker %s", slot.worker_id)
+
+        try:
+            slot.worker = self._create_worker(slot.worker_id)
+        except Exception:
+            slot.state = WorkerState.DEAD
+            raise
+        else:
+            slot.completed_jobs = 0
+            slot.state = WorkerState.ALIVE
+
+    @staticmethod
+    def _exception_result(task: SimulationTask, exc: Exception) -> dict[str, Any]:
+        return {
+            "TaskStatus": "Failure",
+            "FailureReport": f"{type(exc).__name__}: {exc}",
+            "RunName": task.job_name,
+            "RunParameters": task.params,
+            "PostProcessResult": None,
+        }
+
+    def _execute_task(self, slot: _WorkerSlot, task: SimulationTask) -> dict:
+        result: dict[str, Any] | None = None
+        for attempt in range(task.retry_count + 1):
+            try:
+                result = slot.worker.runWithParam(
+                    resultname=task.job_name,
+                    params=task.params,
                 )
-                newWorkerIndexInList = self.addNewLocalWorkerToList()
-                nworker = self.cstWorkerList[newWorkerIndexInList]
-                oldWorkerIndexInList = idx
-                if targetWorker != None:
-                    self.stopLocalWorkerFromList(oldWorkerIndexInList)
-                targetWorker = nworker
-                idx = newWorkerIndexInList
-                job_done=0
-            if self.cstWorkerStatus=="DEAD":
-                break
-            if self.taskQueue.qsize() != 0:     
-                mtask = self.taskQueue.get()
-                self.logger.debug("WORKER:%s, Received Task:%s"%(targetWorker.ID,str(mtask)))
-                iretry_cnt = mtask["retry_cnt"]
-                if iretry_cnt < 0:
-                    iretry_cnt = 0
-                irun_count = iretry_cnt + 1
-                while irun_count > 0:
-                    result = targetWorker.runWithParam(
-                        resultname= mtask["job_name"],params=mtask["params"]
+            except Exception as exc:
+                self.logger.exception(
+                    "Worker %s raised while running %s",
+                    slot.worker_id,
+                    task.job_name,
+                )
+                result = self._exception_result(task, exc)
+
+            if result.get("TaskStatus") != "Failure":
+                slot.completed_jobs += 1
+                return result
+
+            self.logger.warning(
+                "Worker %s failed task %s (attempt %d/%d); restarting",
+                slot.worker_id,
+                task.job_name,
+                attempt + 1,
+                task.retry_count + 1,
+            )
+            self._replace_worker(slot)
+
+        assert result is not None
+        return result
+
+    def _drain_tasks(self, slot: _WorkerSlot) -> None:
+        while self.state is ManagerState.RUNNING:
+            try:
+                queued = self._task_queue.get_nowait()
+            except Empty:
+                return
+
+            try:
+                if slot.completed_jobs >= self.maxWorkerJobCountLimit:
+                    self.logger.info(
+                        "Worker %s reached the %d-job limit; restarting",
+                        slot.worker_id,
+                        self.maxWorkerJobCountLimit,
                     )
-                    irun_count -= 1
-                    if result["TaskStatus"] == "Failure":
-                        self.logger.warning(
-                            "WORKER ID:%s FAILED. RESTARTING CST ENV."
-                            % str(targetWorker.ID)
-                        )
-                        newWorkerIndexInList = self.addNewLocalWorkerToList()
-                        nworker = self.cstWorkerList[newWorkerIndexInList]
-                        oldWorkerIndexInList = idx
-                        if targetWorker != None:
-                            self.stopLocalWorkerFromList(oldWorkerIndexInList)
-                        targetWorker = nworker
-                        idx = newWorkerIndexInList
-                        job_done=0 ####reset
-                    else:
-                        job_done+=1 ###success
-                        break
-                self.resultQueue.put(result)
-            else:
+                    self._replace_worker(slot)
+                result = self._execute_task(slot, queued.task)
+                self._result_queue.put((queued.sequence, result))
+            finally:
+                self._task_queue.task_done()
+
+    def startProcessing(self) -> None:
+        """Run every currently queued task and block until the batch finishes."""
+        with self._state_lock:
+            if self._state is ManagerState.CLOSED:
+                raise RuntimeError("CSTManager is closed")
+            if self._state is not ManagerState.IDLE:
+                raise RuntimeError(f"CSTManager cannot start from {self._state.name}")
+            if self._task_queue.empty():
+                return
+            self._state = ManagerState.RUNNING
+            slots = [slot for slot in self._slots if slot.state is WorkerState.ALIVE]
+
+        if not slots:
+            with self._state_lock:
+                self._state = ManagerState.IDLE
+            raise RuntimeError("No live CST workers are available")
+
+        futures: list[Future[None]] = []
+        try:
+            futures = [self._executor.submit(self._drain_tasks, slot) for slot in slots]
+            for future in futures:
+                future.result()
+        finally:
+            with self._state_lock:
+                if self._state is ManagerState.RUNNING:
+                    self._state = ManagerState.IDLE
+
+    def synchronize(self) -> None:
+        """Compatibility no-op: ``startProcessing`` is already blocking."""
+        self._task_queue.join()
+
+    def _drain_results(self) -> list[tuple[int, dict]]:
+        collected: list[tuple[int, dict]] = []
+        while True:
+            try:
+                collected.append(self._result_queue.get_nowait())
+            except Empty:
                 break
+        collected.sort(key=lambda item: item[0])
+        return collected
 
-    def createLocalWorker(self, workerID):
-        workerID_str=str(workerID)
-        mconf = {}
-        mconf["tempDir"] = str(self.tempDir / ("worker_" + workerID_str))
-        mconf["CSTENVPATH"] = self.gconf["CST"]["cstexepath"]
-        mconf["ProjectType"] = self.cstType
-        mconf["cstPatternDir"] = str(self.cstPatternDir)
-        mconf["resultDir"] = str(self.resultDir)
-        mconf["cstPath"] = str(self.cstProjPath)
-        mconf["paramList"] = self.paramList
-        os.makedirs(mconf["tempDir"], exist_ok=True)
-        self.logger.debug("WORKERID:%s, Temp Dir:%s"%(workerID_str, mconf["tempDir"]))
-        mconf["taskFileDir"] = str(self.taskFileDir / ("worker_" + workerID_str))
-        mconf["postProcess"] = self.pconfm.getCurrPPSList()
-        mcstworker_local = cstworker.local_cstworker(
-            id=workerID_str, type="local", workerconfig=mconf, logger=self.logger
-        )
-        return mcstworker_local
-    def addNewLocalWorkerToList(self):
-        self.WorkerListMutex.acquire()
-        avilid=self.getMaxAvilWorkerID()
-        self.cstWorkerList.append(self.createLocalWorker(avilid))
-        self.cstWorkerStatus.append("ALIVE")
-        listindex=len(self.cstWorkerList)-1
-        self.WorkerListMutex.release()
-        return listindex
-    def stopLocalWorkerFromList(self,index):
-        self.WorkerListMutex.acquire()
-        self.cstWorkerList[index].stop()
-        self.cstWorkerStatus[index]="DEAD"
-        self.WorkerListMutex.release()
-        return
-    def startFirstWorkers(self):
-        workerID = 0
-        for i in range(self.maxParallelTasks):
-            newWorker=self.createLocalWorker(workerID)
-            self.WorkerListMutex.acquire()
-            self.cstWorkerList.append(newWorker)
-            self.cstWorkerStatus.append("ALIVE")
-            self.WorkerListMutex.release()
-            self.logger.info("Created cstworker. ID=%s", str(workerID))
-            workerID += 1
+    def getFullResults(self) -> list[dict]:
+        return [result for _, result in self._drain_results()]
 
-    def getMaxAvilWorkerID(self):
-        idlist = [int(worker.ID) for worker in self.cstWorkerList]
-        maxid = max(idlist) + 1
-        return str(maxid)
+    def getFirstResult(self) -> dict:
+        collected = self._drain_results()
+        if not collected:
+            raise Empty("No CST results are available")
+        first, *remaining = collected
+        # Preserve any additional results for callers mixing the old APIs.
+        for item in remaining:
+            self._result_queue.put(item)
+        return first[1]
 
-
-    def startProcessing(self):
-        if self.ready == False:
-            self.startFirstWorkers()
-        #self.logger.debug("WorkerListLength:%s"%len(self.cstWorkerList))
-        for i in range(len(self.cstWorkerList)):
-            self.logger.debug("index:%s,Status:%s"%(i,self.cstWorkerStatus[i]))
-            if self.cstWorkerStatus[i] == "ALIVE":
-                
-                ithread = threading.Thread(target=manager.mthread, args=(self, i,))
-                self.mthreadList.append(ithread)
-
-        for thread in self.mthreadList:
-            thread.start()
-        for thread in self.mthreadList:
-            thread.join()
-        self.mthreadList = []
-        
-    def stop(self):
-        for iworker in self.cstWorkerList:
-            ithread = threading.Thread(target=iworker.stop)
-            ithread.start()
-        for iworker in self.cstWorkerList:
-            ithread.join()
-        with self.taskQueue.mutex:
-            self.taskQueue.queue.clear()
-        with self.resultQueue.mutex:
-            self.resultQueue.queue.clear()
-        self.cstWorkerList.clear()
-        self.mthreadList.clear()
-        self.ready = False
-        self.logger.info("MANAGER 终止结束")
-
-    def synchronize(self):
-        # WAIT UNTIL ALL TASK FINISHED
-        for thread in self.mthreadList:
-            thread.join()
-        self.mthreadList = []
-
-    def getFullResults(self):
-        mlist = []
-        for i in range(self.resultQueue.qsize()):
-            mlist.append(self.resultQueue.get())
-        return mlist
-
-    def getFirstResult(self):
-        return self.resultQueue.get()
-
-    def addTask(
-        self, params:dict, job_name:str, retry_cnt:int=0
-    ):
-        mtask = {}
-        mtask["params"] = params
-        mtask["job_name"] = job_name
-        mtask["retry_cnt"] = retry_cnt
-        self.taskQueue.put(mtask)
-
-    def runWithx(self, x, job_name):
-        self.addTask(value_list=x, job_name=job_name)
+    def run_batch(self, tasks: Iterable[SimulationTask]) -> list[dict]:
+        for task in tasks:
+            self.submit(task)
         self.startProcessing()
-        self.synchronize()
-        result = self.getFirstResult()
-        return result
+        return self.getFullResults()
 
-    def runWithParam(self, params, job_name, retry_cnt=0):
-        """提供参数列表运行CST  (阻塞)
-            run with user provided parameters (Synchronized)
+    def execute(self, task: SimulationTask) -> dict:
+        results = self.run_batch([task])
+        if not results:
+            raise RuntimeError("CST task completed without a result")
+        return results[0]
 
-        Paramaters
-        ----------
-        params : dict
-            A dict of Param name/value pairs
-
-        job_name : string 
-            User defined job name for this run.
-
-        Returns
-        -------
-        result : list
-            A list of Run results.
-
-        """
-        self.addTask(
-            params=params,
-            job_name=job_name,
-            retry_cnt=retry_cnt,
+    def runWithParam(
+        self,
+        params: Mapping[str, Any],
+        job_name: str,
+        retry_cnt: int = 0,
+    ) -> dict:
+        return self.execute(
+            SimulationTask(params=params, job_name=job_name, retry_count=retry_cnt)
         )
-        self.startProcessing()
-        self.synchronize()
-        result = self.getFirstResult()
-        return result
-    
-    
+
+    def runWithx(self, x: Mapping[str, Any], job_name: str) -> dict:
+        warnings.warn(
+            "runWithx is deprecated; use runWithParam",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return self.runWithParam(params=x, job_name=job_name)
+
+    def stop(self) -> None:
+        with self._state_lock:
+            if self._state is ManagerState.CLOSED:
+                return
+            self._state = ManagerState.STOPPING
+            slots = list(self._slots)
+
+        def stop_slot(slot: _WorkerSlot) -> None:
+            try:
+                slot.worker.stop()
+            except Exception:
+                self.logger.exception("Failed to stop CST worker %s", slot.worker_id)
+            finally:
+                slot.state = WorkerState.DEAD
+
+        with ThreadPoolExecutor(
+            max_workers=len(slots) or 1,
+            thread_name_prefix="cst-stop",
+        ) as stop_executor:
+            list(stop_executor.map(stop_slot, slots))
+
+        self._executor.shutdown(wait=True, cancel_futures=True)
+        self._clear_queue(self._task_queue)
+        self._clear_queue(self._result_queue)
+        with self._state_lock:
+            self._slots.clear()
+            self._state = ManagerState.CLOSED
+        self.logger.info("CSTManager stopped")
+
+    @staticmethod
+    def _clear_queue(target: Queue) -> None:
+        while True:
+            try:
+                target.get_nowait()
+            except Empty:
+                return
+            else:
+                target.task_done()
+
+    def __enter__(self) -> "CSTManager":
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback) -> None:
+        self.stop()
+
+
+# Backward-compatible name used throughout the existing application.
+manager = CSTManager

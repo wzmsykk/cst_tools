@@ -2,7 +2,7 @@ from math import inf, sqrt, floor
 from random import random, seed, shuffle, choices,sample
 from time import sleep
 from pathlib import Path
-from zdts import zdt1, zdt2, zdt3, zdt4
+from .zdts import zdt1, zdt2, zdt3, zdt4
 from typing import List, Set
 import json
 import numpy as np
@@ -183,7 +183,7 @@ class nsgaii():
                 for q in p.pset:
                     q.n -= 1  ### 除p外q仍被支配的个数
                     if q.n == 0:  ### not domed By Anyone Except P
-                        q.rank = i + 1
+                        q.rank = i + 2
                         q_set.add(q)
 
             i += 1

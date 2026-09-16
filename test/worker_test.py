@@ -6,6 +6,10 @@ import unittest
 from csttool.cstworker import local_cstworker
 from csttool.preprocess_cst import vbpreprocess
 import json
+import pytest
+
+
+pytestmark = pytest.mark.integration
 
 testdatapath=Path("./test/data")
 class TestData(unittest.TestCase):
@@ -27,4 +31,3 @@ class TestCSTWorker(unittest.TestCase):
    
      
 
-        

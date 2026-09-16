@@ -3,7 +3,8 @@ from install_compat import resource_path
 
 from csttool import cstmanager
 from csttool import myAlgorithm_pop
-from csttool import globalconfmanager, logger, time
+from csttool import globalconfmanager, logger
+import time
 from csttool import projectconfmanager
 import argparse
 

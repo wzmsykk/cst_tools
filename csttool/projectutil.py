@@ -6,7 +6,7 @@ def is_number(s):
     try:  # 如果能运行float(s)语句，返回True（字符串s是浮点数）
         float(s)
         return True
-    except ValueError:  # ValueError为Python的一种标准异常，表示"传入无效的参数"
+    except (TypeError, ValueError):  # 不是数字或无法转换为数字
         pass  # 如果引发了ValueError这种异常，不做任何事情（pass：不做任何事情，一般用做占位语句）
     try:
         import unicodedata  # 处理ASCii码的包
@@ -64,6 +64,40 @@ def getParamsList(jsonpath):
     pamlist = json.load(f)
     f.close()
     return pamlist
+
+
+def convert_cst_parameters_to_legacy(cst_parameters):
+    """Convert ``Model/Parameters.json`` records to the legacy params schema.
+
+    CST stores the source expression (``expr``) separately from its current
+    evaluated result (``value``).  The legacy VB path used
+    ``GetParameterSValue``, so its ``value`` field actually contained the
+    expression.  Preserve that behavior while retaining both modern fields.
+    """
+    result = []
+    seen = set()
+    for index, parameter in enumerate(cst_parameters):
+        name = str(parameter.get("name", ""))
+        if not name:
+            raise ValueError("CST parameter at index %d has no name" % index)
+        if name in seen:
+            raise ValueError("duplicate CST parameter name: %s" % name)
+        seen.add(name)
+        expression = str(parameter.get("expr", ""))
+        evaluated_value = str(parameter.get("value", ""))
+        legacy_value = expression if expression.strip() else evaluated_value
+        literal = is_number(legacy_value)
+        result.append({
+            "id": index,
+            "name": name,
+            "value": legacy_value,
+            "type": "double" if literal else "expression",
+            "fixed": not literal,
+            "description": str(parameter.get("descr", "") or ""),
+            "expr": expression,
+            "evaluated_value": evaluated_value,
+        })
+    return result
 
 
 def convert_json_params_to_list(json_dict_list):
