@@ -97,6 +97,20 @@ P4 使用独立的有界双任务 Worker Gate，不替换 legacy `worker.vb`。S
 
 P5 证明的是“现有 CST 原生标量的严格读取”和 Cold/Warm 一致性。它尚未证明这些原生 R/Q 与 `EigenResult_Complex.vb` 自定义算法数值等价，因此暂不删除复杂 R/Q VBA；若业务仍依赖该算法，应先建立同参数基线再决定迁移。
 
+## P5.5：固定 Result Template 与动态运行时后处理边界
+
+- [x] 将 R/Q 能力按积分位置路由，而不是把整个指标统一标记为 `native`。
+- [x] 工程内预定义的 z 轴 0/5/10 mm 积分线使用原生 Result Template 输出。
+- [x] 任意积分位置继续使用 `EigenResult_Complex` 运行时 VBA。
+- [x] 显式拒绝求解后通过修改工程参数驱动 Result Template；`Update Params` 会使当前求解结果失效。
+- [x] 使用同一次 Solver 结果运行 5 mm 和 7.5 mm 复杂 R/Q 后处理，不执行第二次 Rebuild/Solver。
+- [x] 5 mm 运行时 VBA 与工程内预安装 Result Template 数值对照。
+- [x] Completion/Ack 后标准 Save/Quit，无 CST/UI 残留。
+
+验证记录：真实 P5.5 Gate 已在 CST Studio Suite 2022 上通过（2026-09-17，`1 passed in 157.49s`）。5 mm 的 `EigenResult_Complex` 输出为 `0.243960805493713 ohm`，与原生 Result Template 的 `0.243961 ohm` 在输出精度内一致；同一次求解后的任意 7.5 mm 积分位置得到 `0.338608596491386 ohm`。本次 Rebuild、Solve、Flush 分别约 `4.857s`、`44.867s`、`4.348s`，运行时后处理阶段没有修改工程参数。
+
+Result Template 生命周期由此分为两类：求解前可安装模板并设置随后参与本次求解的参数；求解后只能直接 Evaluate 已注册模板、修改不触发工程参数更新的模板实例设置，或调用运行时 VBA。禁止以工程参数变化模拟求解后的动态积分位置。
+
 ## 明确不做
 
 - [ ] 不做 Result Asset Manifest。

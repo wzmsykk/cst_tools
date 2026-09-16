@@ -114,3 +114,13 @@ python -m pytest -q -m integration --run-cst `
 ```
 
 该 Gate 运行两个独立 Cold 频段，再在一个 Warm 进程中运行相同两个频段；逐频段比较 Frequency、Q-Factor、轴上 R/Q、5 mm 偏轴 R/Q、10 mm 偏轴 R/Q 共 5 个原生 `.rd0`，并在 `.pytest_cache/cst-p4-5/<run>/benchmark.json` 保存计时报告。P5 扩展后的当前实测整体墙钟加速约 `1.445x`，但双点结果不替代多频段重复统计。
+
+P5.5 固定模板/动态运行时后处理边界 Gate：
+
+```powershell
+python -m pytest -q -m integration --run-cst `
+  --cst-exe "D:\Program Files (x86)\CST Studio Suite 2022\CST DESIGN ENVIRONMENT.exe" `
+  test/protocol_hom_runtime_postprocess_integration_test.py
+```
+
+该 Gate 只运行一次 Solver，随后以当前场结果调用 `EigenResult_Complex` 计算 5 mm 和任意 7.5 mm 积分位置。5 mm 与预安装原生 Result Template 对照；后处理阶段不得调用 `StoreParameter`、`Update Params`、Rebuild 或第二次 Solver。结果报告写入 `.pytest_cache/cst-p5-5/<run>/report.json`。

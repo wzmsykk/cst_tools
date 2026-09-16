@@ -65,6 +65,8 @@
 
 P5 已完成上述 HOM Profile 的最小闭环：固定路径、严格标量 Codec、单位、缺失/损坏错误和两个频段的 Cold/Warm 一致性。这里不勾选整个 Gate 1，因为 WTC、TM020、场数据及跨版本盘点仍未完成；也不把 HOM 专用 reader 提升为通用 Provider ABI。
 
+P5.5 补充边界：HOM R/Q 只有在请求的积分线与工程内预定义的 z 轴 0/5/10 mm 实例精确匹配时才是 `native`；其他位置是 `runtime-vba`。求解后修改工程参数会触发 `Update Params` 并丢失当前结果，因此不得用工程参数驱动 a posteriori 模板位置。求解后动态位置直接传给 `EigenResult_Complex`，或在后续独立 Gate 中验证不触发参数更新的模板实例设置修改。
+
 - [ ] 盘点 Frequency。
 - [ ] 盘点 Q-Factor。
 - [ ] 盘点 Total Loss。
