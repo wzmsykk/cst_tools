@@ -60,26 +60,29 @@ def test_hom_runtime_r_over_q_uses_solved_fields_without_parameter_update(
             )
             assert completion.status is CompletionStatus.SUCCESS, completion
             native = read_hom_native_results(worker.snapshot_path.with_suffix(""))
-            runtime_5mm, metadata_5mm = _read_runtime_scalar(
-                workspace.r_over_q_5mm_path
-            )
-            runtime_7_5mm, metadata_7_5mm = _read_runtime_scalar(
-                workspace.r_over_q_7_5mm_path
-            )
-            assert runtime_5mm == pytest.approx(
+            runtime = {
+                key: _read_runtime_scalar(path)
+                for key, path in workspace.result_paths.items()
+            }
+            assert runtime["z_5mm"][0] == pytest.approx(
                 native["r_over_q_offset_5mm"].value, rel=1e-6, abs=1e-9
             )
-            assert math.isfinite(runtime_7_5mm)
-            assert float(metadata_5mm["yoffset"]) == 5.0
-            assert float(metadata_7_5mm["yoffset"]) == 7.5
+            assert all(math.isfinite(value) for value, _ in runtime.values())
+            for key, line in workspace.integration_lines.items():
+                metadata = runtime[key][1]
+                assert int(metadata["axisNumber"]) == line.axis_number
+                assert float(metadata["xoffset"]) == line.xoffset_mm
+                assert float(metadata["yoffset"]) == line.yoffset_mm
+                assert float(metadata["zoffset"]) == line.zoffset_mm
             (root / "report.json").write_text(
                 json.dumps(
                     {
                         "native_r_over_q_5mm": native[
                             "r_over_q_offset_5mm"
                         ].value,
-                        "runtime_r_over_q_5mm": runtime_5mm,
-                        "runtime_r_over_q_7_5mm": runtime_7_5mm,
+                        "runtime_r_over_q": {
+                            key: value for key, (value, _) in runtime.items()
+                        },
                         "post_solve_parameter_update": False,
                     },
                     indent=2,

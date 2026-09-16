@@ -123,4 +123,4 @@ python -m pytest -q -m integration --run-cst `
   test/protocol_hom_runtime_postprocess_integration_test.py
 ```
 
-该 Gate 只运行一次 Solver，随后以当前场结果调用 `EigenResult_Complex` 计算 5 mm 和任意 7.5 mm 积分位置。5 mm 与预安装原生 Result Template 对照；后处理阶段不得调用 `StoreParameter`、`Update Params`、Rebuild 或第二次 Solver。结果报告写入 `.pytest_cache/cst-p5-5/<run>/report.json`。
+该 Gate 只运行一次 Solver，随后以当前场结果调用 `EigenResult_Complex` 分别计算 x、y、z 积分轴；覆盖 x 轴 y=5 mm、y 轴 x=5 mm、z 轴 y=5 mm 和 z 轴 y=7.5 mm。z 轴 5 mm 与预安装原生 Result Template 对照；后处理阶段不得调用 `StoreParameter`、`Update Params`、Rebuild 或第二次 Solver。结果报告写入 `.pytest_cache/cst-p5-5/<run>/report.json`。

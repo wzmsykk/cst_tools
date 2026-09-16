@@ -91,6 +91,43 @@ def test_unknown_method_and_missing_parameter_fail_early():
         )
 
 
+@pytest.mark.parametrize(
+    ("axis", "offsets", "axis_number"),
+    [
+        ("x", {"xoffset": 0, "yoffset": 2, "zoffset": 3}, 1),
+        ("y", {"xoffset": 1, "yoffset": 0, "zoffset": 3}, 2),
+        ("z", {"xoffset": 1, "yoffset": 2, "zoffset": 0}, 3),
+    ],
+)
+def test_complex_pps_generation_supports_every_axis(axis, offsets, axis_number):
+    processor = VBPostProcessor()
+    processor.appendPostProcessSteps(
+        [
+            {
+                "method": "R_over_Q",
+                "resultName": f"roq_{axis}",
+                "params": {"iModeNumber": 1, "axis": axis, **offsets},
+            }
+        ]
+    )
+
+    step = processor.postProcessDocList[0]
+    assert step["params"]["axis"] == axis
+    assert (
+        f'EigenResult_Complex_output(1,"R over Q",{axis_number},'
+        in step["funcString"]
+    )
+    assert f"_axis_{axis}_" in step["resultFilename"] or axis == "z"
+
+
+def test_historical_zaxis_wrapper_keeps_filename_contract():
+    processor = VBPostProcessor()
+    processor.R_over_Q_zaxis(1, 0, 5, "legacy")
+    assert processor.postProcessDocList[0]["resultFilename"] == (
+        "Mode_1_ROQ_xoffset_0.000000_yoffset_5.000000_legacy.txt"
+    )
+
+
 def test_scalar_and_all_mode_results_are_parsed(tmp_path):
     processor = VBPostProcessor()
     processor.setResultDir(tmp_path)

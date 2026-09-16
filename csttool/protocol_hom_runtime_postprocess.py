@@ -4,18 +4,29 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
+from types import MappingProxyType
+from typing import Mapping
 
 from install_compat import resource_path
 
+from .hom_result_plan import IntegrationLine
 from .protocol_worker import WorkerWorkspace, _vb_string, prepare_worker_workspace
 from .runtime_protocol import Task
+
+
+_GATE_LINES = {
+    "x_5mm": IntegrationLine("x", yoffset_mm=5),
+    "y_5mm": IntegrationLine("y", xoffset_mm=5),
+    "z_5mm": IntegrationLine("z", yoffset_mm=5),
+    "z_7_5mm": IntegrationLine("z", yoffset_mm=7.5),
+}
 
 
 @dataclass(frozen=True, slots=True)
 class HomRuntimePostprocessWorkspace:
     worker: WorkerWorkspace
-    r_over_q_5mm_path: Path
-    r_over_q_7_5mm_path: Path
+    result_paths: Mapping[str, Path]
+    integration_lines: Mapping[str, IntegrationLine]
 
 
 def prepare_hom_runtime_postprocess_workspace(
@@ -30,13 +41,26 @@ def prepare_hom_runtime_postprocess_workspace(
     )
     output_dir = worker.root / "runtime-results"
     output_dir.mkdir()
-    path_5mm = output_dir / "r-over-q-5mm.txt"
-    path_7_5mm = output_dir / "r-over-q-7_5mm.txt"
-    _install_fixed_runtime_extension(worker.macro_path, output_dir)
-    return HomRuntimePostprocessWorkspace(worker, path_5mm, path_7_5mm)
+    result_paths = {
+        key: output_dir / f"r-over-q-{key.replace('_', '-')}.txt"
+        for key in _GATE_LINES
+    }
+    _install_fixed_runtime_extension(
+        worker.macro_path, output_dir, result_paths, _GATE_LINES
+    )
+    return HomRuntimePostprocessWorkspace(
+        worker,
+        MappingProxyType(result_paths),
+        MappingProxyType(dict(_GATE_LINES)),
+    )
 
 
-def _install_fixed_runtime_extension(macro_path: Path, output_dir: Path) -> None:
+def _install_fixed_runtime_extension(
+    macro_path: Path,
+    output_dir: Path,
+    result_paths: Mapping[str, Path],
+    integration_lines: Mapping[str, IntegrationLine],
+) -> None:
     macro = macro_path.read_text(encoding="ascii")
     extension = Path(
         resource_path("data/postprocess/EigenResult_Complex_All.vb")
@@ -50,11 +74,19 @@ def _install_fixed_runtime_extension(macro_path: Path, output_dir: Path) -> None
     if macro.count(flush) != 1:
         raise ValueError("one-shot worker flush stage is ambiguous")
     directory = _vb_string(str(output_dir.absolute()) + "\\")
+    calls = []
+    for key, line in integration_lines.items():
+        filename = _vb_string(result_paths[key].name)
+        calls.append(
+            '    EigenResult_Complex_output 1, "R over Q", '
+            f'{line.axis_number}, {line.xoffset_mm:g}, {line.yoffset_mm:g}, '
+            f'{line.zoffset_mm:g}, "{directory}", "{filename}"\n'
+        )
     postprocess = (
         '    stage = "runtime-postprocess"\n'
         '    CSTPW_WriteMarker "%MARKER_PATH%", "stage:runtime-postprocess"\n'
-        f'    EigenResult_Complex_output 1, "R over Q", 3, 0, 5, 0, "{directory}", "r-over-q-5mm.txt"\n'
-        f'    EigenResult_Complex_output 1, "R over Q", 3, 0, 7.5, 0, "{directory}", "r-over-q-7_5mm.txt"\n\n'
+        + "".join(calls)
+        + "\n"
         + flush
     )
     marker_path = _vb_string(worker_marker_path(macro))

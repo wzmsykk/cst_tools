@@ -2,9 +2,11 @@ import pytest
 
 from csttool.hom_result_plan import (
     HomRoverQRequest,
+    IntegrationLine,
     ResultProvider,
     ResultTemplatePhase,
     UnsafeResultTemplateChange,
+    integration_line_from_template_settings,
     plan_hom_r_over_q,
     validate_result_template_change,
 )
@@ -20,10 +22,53 @@ def test_predefined_hom_integral_lines_use_native_results(yoffset, key):
     assert plan.native_key == key
 
 
-def test_arbitrary_hom_integral_line_keeps_runtime_vba():
-    plan = plan_hom_r_over_q(HomRoverQRequest("z", 0, 7.5))
+@pytest.mark.parametrize(
+    ("coordinate", "expected"),
+    [
+        ("0", IntegrationLine("x", yoffset_mm=2, zoffset_mm=3)),
+        ("1", IntegrationLine("y", xoffset_mm=1, zoffset_mm=3)),
+        ("2", IntegrationLine("z", xoffset_mm=1, yoffset_mm=2)),
+    ],
+)
+def test_official_template_coordinates_support_every_axis(coordinate, expected):
+    line = integration_line_from_template_settings(
+        {
+            "coordinates": coordinate,
+            "maxrange": "1",
+            "u1": "1",
+            "v1": "2",
+            "w1": "3",
+        }
+    )
+    assert line == expected
+    plan = plan_hom_r_over_q(line, {line: f"native_{line.axis}"})
+    assert plan.provider is ResultProvider.NATIVE
+    assert plan.native_key == f"native_{line.axis}"
+
+
+@pytest.mark.parametrize(
+    "line",
+    [
+        IntegrationLine("x", yoffset_mm=5),
+        IntegrationLine("y", xoffset_mm=5),
+        IntegrationLine("z", yoffset_mm=7.5),
+    ],
+)
+def test_unregistered_integral_lines_keep_runtime_vba(line):
+    plan = plan_hom_r_over_q(line)
     assert plan.provider is ResultProvider.RUNTIME_VBA
     assert plan.native_key is None
+
+
+def test_integration_axis_and_offsets_are_validated():
+    with pytest.raises(ValueError, match="x, y, or z"):
+        IntegrationLine("bad")
+    with pytest.raises(ValueError, match="along the integration axis"):
+        IntegrationLine("x", xoffset_mm=1)
+    with pytest.raises(ValueError, match="resolved numeric"):
+        integration_line_from_template_settings(
+            {"coordinates": "0", "maxrange": "1", "v1": "parameter_name"}
+        )
 
 
 def test_post_solve_template_change_cannot_update_project_parameters():
