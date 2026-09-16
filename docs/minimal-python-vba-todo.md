@@ -84,6 +84,19 @@ P4 使用独立的有界双任务 Worker Gate，不替换 legacy `worker.vb`。S
 
 该双点结果是可重复基准的起点，不外推为所有工程或所有频段的固定加速比。后续性能结论仍应使用更多频段和重复运行统计。
 
+## P5：HOM 原生结果最小闭环
+
+- [x] 为已验证的 HOM 工程定义固定结果映射，不引入通用 Result Manifest 或 Operation ABI。
+- [x] 直接读取 CST 工程快照中的 5 个原生 `.rd0`：Frequency、Q-Factor、轴上 R/Q、5 mm 偏轴 R/Q、10 mm 偏轴 R/Q。
+- [x] 结果对象携带稳定 key、数值、单位和来源路径。
+- [x] 缺失、空文件、多行、非数值及非有限值均返回明确错误。
+- [x] Cold/Warm 两个频段逐项比较全部 5 个原生指标。
+- [x] 将当前工程中不存在原生 `.rd0` 的 Shunt Impedance、Total Loss、Voltage 明确归类为 `runtime-vba`。
+
+验证记录：扩展后的真实 HOM Gate 已在 CST Studio Suite 2022 上通过（2026-09-17，`1 passed in 523.97s`）。`720–800 MHz` 的 Cold/Warm 结果完全一致：Frequency `765.981 MHz`、Q-Factor `229.748`、R/Q `0.125728 ohm`、5 mm 偏轴 R/Q `0.243961 ohm`、10 mm 偏轴 R/Q `0.457261 ohm`；`800–880 MHz` 对应为 `826.770 MHz`、`54.0335`、`0.00750064 ohm`、`0.00747065 ohm`、`0.0432976 ohm`。Cold 两次墙钟合计 `307.860s`，Warm 双任务墙钟 `213.031s`，整体加速 `1.445x`。
+
+P5 证明的是“现有 CST 原生标量的严格读取”和 Cold/Warm 一致性。它尚未证明这些原生 R/Q 与 `EigenResult_Complex.vb` 自定义算法数值等价，因此暂不删除复杂 R/Q VBA；若业务仍依赖该算法，应先建立同参数基线再决定迁移。
+
 ## 明确不做
 
 - [ ] 不做 Result Asset Manifest。

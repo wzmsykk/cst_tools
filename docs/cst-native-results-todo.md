@@ -58,6 +58,12 @@
 |---|---|---|---|---|---|---|---|---|
 | WTC | Frequency | Direct PPS | `.rd0` | text | 待确认 | Mode 1 | 待验证 | native |
 | TM020 | Frequency | Simple VB | 待查 | 待查 | 待确认 | all modes | 待验证 | 待定 |
+| HOM | Frequency | CST native | `Frequency (Multiple Modes)/Mode 1.rd0` | text scalar | MHz | Mode 1 | CST 2022.5 已验证 | fixed HOM reader |
+| HOM | Q-Factor | CST native | `Q-Factor (Perturbation) (Multiple Modes)/Mode 1.rd0` | text scalar | 1 | Mode 1 | CST 2022.5 已验证 | fixed HOM reader |
+| HOM | R/Q（轴上、5 mm、10 mm） | CST native | 三个 `R over Q beta=1.../Mode 1.rd0` | text scalar | ohm | Mode 1 | CST 2022.5 已验证 | fixed HOM reader |
+| HOM | Shunt Impedance / Total Loss / Voltage | Runtime VBA | 当前工程无对应 `.rd0` | — | 待算法确认 | Mode 1 | CST 2022.5 已盘点 | runtime-vba |
+
+P5 已完成上述 HOM Profile 的最小闭环：固定路径、严格标量 Codec、单位、缺失/损坏错误和两个频段的 Cold/Warm 一致性。这里不勾选整个 Gate 1，因为 WTC、TM020、场数据及跨版本盘点仍未完成；也不把 HOM 专用 reader 提升为通用 Provider ABI。
 
 - [ ] 盘点 Frequency。
 - [ ] 盘点 Q-Factor。

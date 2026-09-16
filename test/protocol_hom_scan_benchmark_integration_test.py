@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from csttool.postprocess_cst import VBPostProcessor
+from csttool.hom_native_results import read_hom_native_results
 from csttool.protocol_warm_worker import prepare_warm_worker_workspace
 from csttool.protocol_worker import prepare_worker_workspace
 from csttool.runtime_protocol import CompletionStatus, Task, new_session_id
@@ -43,14 +43,14 @@ def _run_cold(cst_executable, root, source, parameters):
         try:
             completion = wait_completion_or_controller_exit(workspace, task, process, timeout=1800)
             assert completion.status is CompletionStatus.SUCCESS, completion
-            value = VBPostProcessor.cst0dreadout(workspace.result_path)
+            native = read_hom_native_results(workspace.snapshot_path.with_suffix(""))
             workspace.protocol.acknowledge(completion)
             wait_for_standard_exit(process, baseline, timeout=120)
         finally:
             forced = force_cleanup(process, baseline)
     assert not forced, f"Cold worker required forced cleanup: {forced}"
     return {
-        "frequency": value,
+        "native_results": {key: result.value for key, result in native.items()},
         "wall_seconds": time.monotonic() - started,
         **_timing(workspace.timing_path),
     }
@@ -77,7 +77,7 @@ def _run_warm(cst_executable, root, source, parameter_sets):
                     workspace, task, process, timeout=1800
                 )
                 assert completion.status is CompletionStatus.SUCCESS, completion
-                values.append(VBPostProcessor.cst0dreadout(artifact.result_path))
+                values.append(read_hom_native_results(artifact.snapshot_path.with_suffix("")))
                 workspace.protocol.acknowledge(completion)
             workspace.protocol.request_stop(session_id)
             deadline = time.monotonic() + 60
@@ -94,7 +94,10 @@ def _run_warm(cst_executable, root, source, parameter_sets):
     return {
         "wall_seconds": time.monotonic() - started,
         "tasks": [
-            {"frequency": value, **_timing(artifact.timing_path)}
+            {
+                "native_results": {key: result.value for key, result in value.items()},
+                **_timing(artifact.timing_path),
+            }
             for value, artifact in zip(values, workspace.tasks)
         ],
     }
@@ -128,5 +131,7 @@ def test_fixed_hom_structure_warm_frequency_scan_is_faster_and_consistent(cst_ex
     )
 
     for cold_run, warm_run in zip(cold, warm["tasks"]):
-        assert warm_run["frequency"] == pytest.approx(cold_run["frequency"], abs=1e-6)
+        assert warm_run["native_results"] == pytest.approx(
+            cold_run["native_results"], abs=1e-6
+        )
     assert report["warm_wall_total_seconds"] < report["cold_wall_total_seconds"]

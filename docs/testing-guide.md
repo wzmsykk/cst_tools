@@ -113,4 +113,4 @@ python -m pytest -q -m integration --run-cst `
   test/protocol_hom_scan_benchmark_integration_test.py
 ```
 
-该 Gate 运行两个独立 Cold 频段，再在一个 Warm 进程中运行相同两个频段；逐频段比较 `.rd0`，并在 `.pytest_cache/cst-p4-5/<run>/benchmark.json` 保存计时报告。当前实测整体墙钟加速约 `1.563x`，但双点结果不替代多频段重复统计。
+该 Gate 运行两个独立 Cold 频段，再在一个 Warm 进程中运行相同两个频段；逐频段比较 Frequency、Q-Factor、轴上 R/Q、5 mm 偏轴 R/Q、10 mm 偏轴 R/Q 共 5 个原生 `.rd0`，并在 `.pytest_cache/cst-p4-5/<run>/benchmark.json` 保存计时报告。P5 扩展后的当前实测整体墙钟加速约 `1.445x`，但双点结果不替代多频段重复统计。
