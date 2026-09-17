@@ -7,7 +7,16 @@ from pathlib import Path
 
 from PyQt5.QtCore import QAbstractListModel, QModelIndex, Qt, pyqtSignal
 from PyQt5.QtGui import QDoubleValidator, QIntValidator
-from PyQt5.QtWidgets import QDialog, QFileDialog, QListView, QMessageBox
+from PyQt5.QtWidgets import (
+    QDialog,
+    QFileDialog,
+    QGridLayout,
+    QHBoxLayout,
+    QLabel,
+    QListView,
+    QMessageBox,
+    QVBoxLayout,
+)
 
 from GUI.config_models import (
     PostProcessSetting,
@@ -19,7 +28,7 @@ from GUI.ui_post_edit import Ui_AddComplexPostDialog
 from GUI.theme import apply_theme, set_visual_role, style_dialog_buttons
 
 
-class myPostProcessDataModel(QAbstractListModel):
+class PostProcessListModel(QAbstractListModel):
     def __init__(self, pps=None) -> None:
         super().__init__()
         self.pps: list[PostProcessSetting] = []
@@ -77,16 +86,43 @@ class myPostProcessDataModel(QAbstractListModel):
             else PostProcessSetting.from_mapping(item)
             for item in values
         ]
+        self._ensure_unique(settings)
         self.beginResetModel()
         self.pps = settings
         self.endResetModel()
 
+    def replaceRow(self, row, data) -> bool:
+        if not 0 <= row < len(self.pps):
+            return False
+        setting = (
+            data
+            if isinstance(data, PostProcessSetting)
+            else PostProcessSetting.from_mapping(data)
+        )
+        if any(
+            index != row and item.result_name == setting.result_name
+            for index, item in enumerate(self.pps)
+        ):
+            raise ValueError(f"后处理结果名称重复: {setting.result_name}")
+        self.pps[row] = setting
+        model_index = self.index(row, 0)
+        self.dataChanged.emit(
+            model_index, model_index, [Qt.DisplayRole, Qt.UserRole]
+        )
+        return True
 
-class myAddPPSDialog(QDialog, Ui_AddComplexPostDialog):
+    @staticmethod
+    def _ensure_unique(settings):
+        names = [item.result_name for item in settings]
+        if len(names) != len(set(names)):
+            raise ValueError("后处理结果名称不能重复")
+
+
+class AddPostProcessDialog(QDialog, Ui_AddComplexPostDialog):
     _signal_data_updated = pyqtSignal()
 
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, parent=None) -> None:
+        super().__init__(parent)
         self.setupUi(self)
         apply_theme(self)
         style_dialog_buttons(self.buttonBox)
@@ -100,8 +136,37 @@ class myAddPPSDialog(QDialog, Ui_AddComplexPostDialog):
         self.xoffsetEdit.setValidator(QDoubleValidator(self))
         self.yoffsetEdit.setValidator(QDoubleValidator(self))
         self.reset()
+        self._install_responsive_layout()
         self.buttonBox.accepted.disconnect()
         self.buttonBox.accepted.connect(self.accept)
+
+    def _install_responsive_layout(self):
+        self.setMinimumSize(520, 380)
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(26, 22, 26, 20)
+        layout.setSpacing(14)
+        layout.addWidget(self.PostprocessNameLabel)
+        result_row = QHBoxLayout()
+        result_row.addWidget(self.label_3)
+        result_row.addWidget(self.resultNameEdit, 1)
+        layout.addLayout(result_row)
+        advanced = QGridLayout(self.AdvSettingframe)
+        advanced.setContentsMargins(14, 12, 14, 12)
+        advanced.addWidget(self.label, 0, 0)
+        advanced.addWidget(self.xoffsetEdit, 0, 1)
+        advanced.addWidget(self.label_5, 0, 2)
+        advanced.addWidget(self.label_2, 1, 0)
+        advanced.addWidget(self.yoffsetEdit, 1, 1)
+        advanced.addWidget(self.label_6, 1, 2)
+        advanced.setColumnStretch(1, 1)
+        layout.addWidget(self.AdvSettingframe)
+        mode_row = QHBoxLayout()
+        mode_row.addStretch(1)
+        mode_row.addWidget(self.label_4)
+        mode_row.addWidget(self.ModeIndexEdit)
+        layout.addLayout(mode_row)
+        layout.addStretch(1)
+        layout.addWidget(self.buttonBox)
 
     def reset(self):
         self.setComplexMode(False)
@@ -120,6 +185,16 @@ class myAddPPSDialog(QDialog, Ui_AddComplexPostDialog):
         self.targetPPS = None if ppsname is None else str(ppsname)
         self.PostprocessNameLabel.setText(self.targetPPS or "None")
         return self.targetPPS
+
+    def load_setting(self, setting: PostProcessSetting):
+        self.reset()
+        self.setTargetPPS(setting.method)
+        base = setting.method[:-4] if setting.method.endswith("_All") else setting.method
+        self.setComplexMode(base in {"R_over_Q", "Shunt_Inpedence"})
+        self.resultNameEdit.setText(setting.result_name)
+        self.ModeIndexEdit.setText(str(setting.params.get("iModeNumber", 1)))
+        self.xoffsetEdit.setText(str(setting.params.get("xoffset", 0)))
+        self.yoffsetEdit.setText(str(setting.params.get("yoffset", 0)))
 
     def _build_setting(self):
         params = {"iModeNumber": int(self.ModeIndexEdit.text())}
@@ -144,18 +219,20 @@ class myAddPPSDialog(QDialog, Ui_AddComplexPostDialog):
         super().accept()
 
 
-class myPPSDialog(QDialog, Ui_PostProcessSettingDialog):
+class PostProcessSettingsDialog(QDialog, Ui_PostProcessSettingDialog):
     _signal_done = pyqtSignal()
 
-    def __init__(self, Logger=None) -> None:
-        super().__init__()
+    def __init__(self, Logger=None, parent=None) -> None:
+        super().__init__(parent)
         self.setupUi(self)
         apply_theme(self)
         style_dialog_buttons(self.buttonBox)
         self.setWindowTitle("后处理结果设置")
-        self.addDialog = myAddPPSDialog()
+        self.addDialog = AddPostProcessDialog(parent=self)
         self.logger = Logger
-        self.listModel = myPostProcessDataModel()
+        self.listModel = PostProcessListModel()
+        self._committed_settings = []
+        self._editing_row = None
         self.listView.setModel(self.listModel)
         self.listView.setEditTriggers(QListView.NoEditTriggers)
         self.listView.setAlternatingRowColors(False)
@@ -163,9 +240,57 @@ class myPPSDialog(QDialog, Ui_PostProcessSettingDialog):
         set_visual_role(self.DeleteButton, "danger")
         set_visual_role(self.SaveJsonButton, "quiet")
         set_visual_role(self.LoadJsonButton, "quiet")
+        self._install_responsive_layout()
+        self.buttonBox.accepted.disconnect()
+        self.buttonBox.rejected.disconnect()
+        self.buttonBox.accepted.connect(self.accept)
+        self.buttonBox.rejected.connect(self.reject)
         self.setSignalNSlots()
 
+    def _install_responsive_layout(self):
+        self.resize(980, 620)
+        self.setMinimumSize(780, 520)
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(24, 22, 24, 18)
+        layout.setSpacing(14)
+        content = QHBoxLayout()
+        content.setSpacing(18)
+        list_column = QVBoxLayout()
+        list_column.addWidget(QLabel("已配置结果", self))
+        list_column.addWidget(self.listView, 1)
+        list_column.addWidget(self.DeleteButton)
+        content.addLayout(list_column, 1)
+        actions = QVBoxLayout()
+        actions.addWidget(QLabel("添加结果", self))
+        grid = QGridLayout()
+        buttons = (
+            self.AddROQButton,
+            self.AddSIButton,
+            self.AddLossButton,
+            self.AddFreqButton,
+            self.AddQButton,
+            self.AddQExtButton,
+            self.AddLossButton_Enclosure,
+            self.AddLossButton_Volume,
+            self.AddLossButton_Surface,
+            self.AddQButton_Enclosure,
+            self.AddQButton_Volume,
+            self.AddQButton_Surface,
+        )
+        for index, button in enumerate(buttons):
+            grid.addWidget(button, index // 2, index % 2)
+        actions.addLayout(grid)
+        actions.addStretch(1)
+        files = QHBoxLayout()
+        files.addWidget(self.LoadJsonButton)
+        files.addWidget(self.SaveJsonButton)
+        actions.addLayout(files)
+        content.addLayout(actions, 2)
+        layout.addLayout(content, 1)
+        layout.addWidget(self.buttonBox)
+
     def setSignalNSlots(self):
+        self.listView.doubleClicked.connect(self.editItem)
         actions = {
             self.AddROQButton: ("R_over_Q", True),
             self.AddQButton: ("Q_Factor", False),
@@ -188,21 +313,37 @@ class myPPSDialog(QDialog, Ui_PostProcessSettingDialog):
         self.SaveJsonButton.clicked.connect(self.savePPSJson)
         self.LoadJsonButton.clicked.connect(self.loadPPSJson)
         self.addDialog._signal_data_updated.connect(self.addItem)
-        self.buttonBox.accepted.connect(self.saveAndHide)
-
-    def saveAndHide(self):
-        self.hide()
+    def accept(self):
+        self._committed_settings = list(self.listModel.pps)
         self._signal_done.emit()
+        super().accept()
+
+    def reject(self):
+        self.listModel.replace(self._committed_settings)
+        super().reject()
 
     def showAddDialog(self, ppsType, isComplex):
+        self._editing_row = None
         self.addDialog.reset()
         self.addDialog.setComplexMode(isComplex)
         self.addDialog.setTargetPPS(ppsType)
         self.addDialog.show()
 
+    def editItem(self, index=None):
+        index = index or self.listView.currentIndex()
+        if not index.isValid():
+            return
+        self._editing_row = index.row()
+        self.addDialog.load_setting(self.listModel.getData(index.row()))
+        self.addDialog.show()
+
     def addItem(self):
         try:
-            self.listModel.append(self.addDialog.data)
+            if self._editing_row is None:
+                self.listModel.append(self.addDialog.data)
+            else:
+                self.listModel.replaceRow(self._editing_row, self.addDialog.data)
+                self._editing_row = None
         except (TypeError, ValueError) as exc:
             self._report_error("添加后处理配置失败", exc)
 
@@ -214,6 +355,7 @@ class myPPSDialog(QDialog, Ui_PostProcessSettingDialog):
 
     def setPPSList(self, ppslist):
         self.listModel.replace(ppslist)
+        self._committed_settings = list(self.listModel.pps)
 
     def getPPSList(self):
         return [item.to_legacy_dict() for item in self.listModel.pps]

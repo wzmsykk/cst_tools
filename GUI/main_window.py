@@ -1,8 +1,8 @@
 from PyQt5.QtWidgets import QMainWindow
-from GUI.algo_pop_window import myAlgDialog
+from GUI.algorithm_settings_dialog import AlgorithmSettingsDialog
 from GUI.run_controller import GuiBackend, GuiRunController, RunState
 from GUI.ui_main import Ui_MainWindow
-from GUI.postprocess_dialog import myPPSDialog
+from GUI.postprocess_settings_dialog import PostProcessSettingsDialog
 from GUI.theme import apply_theme, set_visual_role
 from PyQt5.QtWidgets import QFileDialog, QPlainTextEdit, QProgressBar
 from base import cst_tools_main
@@ -27,7 +27,7 @@ class QPlainTextEditLogger(logging.Handler):
         self._emitter.message.emit(self.format(record))
 
 
-class mywindow(QMainWindow, Ui_MainWindow):
+class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(
         self,
         maintool: GuiBackend | None = None,
@@ -35,7 +35,7 @@ class mywindow(QMainWindow, Ui_MainWindow):
         pps_dialog=None,
         controller: GuiRunController | None = None,
     ):
-        super(mywindow, self).__init__()
+        super().__init__()
         self.setupUi(self)
         apply_theme(self)
         self.setWindowTitle("CST Batch Studio")
@@ -68,8 +68,10 @@ class mywindow(QMainWindow, Ui_MainWindow):
         self.logger.addHandler(self.logTextBox)
         self.logger.info("使用PyQt5图形窗口运行模式")
 
-        self.CalcDialogBox = calc_dialog or myAlgDialog()
-        self.PPSDialogBox = pps_dialog or myPPSDialog(Logger=self.logger)
+        self.CalcDialogBox = calc_dialog or AlgorithmSettingsDialog(parent=self)
+        self.PPSDialogBox = pps_dialog or PostProcessSettingsDialog(
+            Logger=self.logger, parent=self
+        )
 
         ppslist = self.maintool.getCurrPostProcessList()
         self.PPSDialogBox.setPPSList(ppslist)
@@ -109,9 +111,13 @@ class mywindow(QMainWindow, Ui_MainWindow):
 
     def showCalcDialogBox(self):
         self.CalcDialogBox.show()
+        self.CalcDialogBox.raise_()
+        self.CalcDialogBox.activateWindow()
 
     def showPPSDialogBox(self):
         self.PPSDialogBox.show()
+        self.PPSDialogBox.raise_()
+        self.PPSDialogBox.activateWindow()
 
     def updateAlgSetting(self):
         self.maintool.setAlgAttrs(self.CalcDialogBox.getValues())
@@ -179,6 +185,8 @@ class mywindow(QMainWindow, Ui_MainWindow):
             self.workerCountSpinBox,
         ):
             widget.setEnabled(controls_enabled)
+        self.CalcDialogBox.setEnabled(controls_enabled)
+        self.PPSDialogBox.setEnabled(controls_enabled)
         self.StartButton.setEnabled(
             controls_enabled
             and self.controller.inputs_ready

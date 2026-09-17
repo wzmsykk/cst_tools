@@ -10,7 +10,7 @@ from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5.QtGui import QCloseEvent
 from PyQt5.QtWidgets import QApplication
 
-from GUI.mymainwindow import mywindow
+from GUI.main_window import MainWindow
 from GUI.run_controller import InvalidRunState, RunState
 
 
@@ -27,6 +27,7 @@ class FakeDialog(QObject):
         super().__init__()
         self.values = {}
         self.items = []
+        self.enabled = True
 
     def setDefaultValues(self, values):
         self.values = dict(values)
@@ -41,6 +42,15 @@ class FakeDialog(QObject):
         return list(self.items)
 
     def show(self):
+        pass
+
+    def setEnabled(self, enabled):
+        self.enabled = bool(enabled)
+
+    def raise_(self):
+        pass
+
+    def activateWindow(self):
         pass
 
 
@@ -105,7 +115,7 @@ class FakeMainTool:
 
 def make_window(qapp):
     tool = FakeMainTool()
-    window = mywindow(tool, FakeDialog(), FakeDialog())
+    window = MainWindow(tool, FakeDialog(), FakeDialog())
     return window, tool
 
 
@@ -123,11 +133,11 @@ def choose_inputs(window, monkeypatch, tmp_path):
     project_dir = str(tmp_path)
     cst_path = str(tmp_path / "input.cst")
     monkeypatch.setattr(
-        "GUI.mymainwindow.QFileDialog.getExistingDirectory",
+        "GUI.main_window.QFileDialog.getExistingDirectory",
         lambda *args, **kwargs: project_dir,
     )
     monkeypatch.setattr(
-        "GUI.mymainwindow.QFileDialog.getOpenFileName",
+        "GUI.main_window.QFileDialog.getOpenFileName",
         lambda *args, **kwargs: (cst_path, True),
     )
     window.read_dir()
@@ -139,7 +149,7 @@ def test_start_requires_both_project_directory_and_cst_file(qapp, monkeypatch, t
     assert not window.StartButton.isEnabled()
 
     monkeypatch.setattr(
-        "GUI.mymainwindow.QFileDialog.getExistingDirectory",
+        "GUI.main_window.QFileDialog.getExistingDirectory",
         lambda *args, **kwargs: str(tmp_path),
     )
     window.read_dir()
@@ -147,7 +157,7 @@ def test_start_requires_both_project_directory_and_cst_file(qapp, monkeypatch, t
     assert not window.StartButton.isEnabled()
 
     monkeypatch.setattr(
-        "GUI.mymainwindow.QFileDialog.getOpenFileName",
+        "GUI.main_window.QFileDialog.getOpenFileName",
         lambda *args, **kwargs: (str(tmp_path / "input.cst"), True),
     )
     window.read_cst()
@@ -160,7 +170,7 @@ def test_selecting_cst_first_does_not_invent_project_directory(
 ):
     window, tool = make_window(qapp)
     monkeypatch.setattr(
-        "GUI.mymainwindow.QFileDialog.getOpenFileName",
+        "GUI.main_window.QFileDialog.getOpenFileName",
         lambda *args, **kwargs: (str(tmp_path / "input.cst"), True),
     )
 
@@ -181,11 +191,15 @@ def test_buttons_stay_locked_until_background_end_signal(qapp, monkeypatch, tmp_
     process_until(qapp, lambda: tool.start_count == 1)
     assert not window.StartButton.isEnabled()
     assert not window.selectProjectDirButton.isEnabled()
+    assert not window.CalcDialogBox.enabled
+    assert not window.PPSDialogBox.enabled
 
     tool.run_gate.set()
     process_until(qapp, lambda: window.controller.state is RunState.READY)
     assert window.StartButton.isEnabled()
     assert window.selectProjectDirButton.isEnabled()
+    assert window.CalcDialogBox.enabled
+    assert window.PPSDialogBox.enabled
     process_until(qapp, lambda: window.controller._thread is None)
     window.close()
 
@@ -207,6 +221,24 @@ def test_worker_count_is_configurable_and_locked_during_run(
     process_until(qapp, lambda: window.controller.state is RunState.READY)
     process_until(qapp, lambda: window.controller._thread is None)
     assert window.workerCountSpinBox.isEnabled()
+    window.close()
+
+
+def test_continue_and_safe_options_are_user_configurable(
+    qapp, monkeypatch, tmp_path
+):
+    window, tool = make_window(qapp)
+    choose_inputs(window, monkeypatch, tmp_path)
+    assert window.checkBox_CTN.isEnabled()
+    assert window.checkBox_SAFE.isEnabled()
+    window.checkBox_CTN.setChecked(True)
+    window.checkBox_SAFE.setChecked(True)
+
+    window.run()
+    process_until(qapp, lambda: tool.start_count == 1)
+    assert tool.flags == (True, True)
+    tool.run_gate.set()
+    process_until(qapp, lambda: not window.controller.has_active_work)
     window.close()
 
 
@@ -233,7 +265,7 @@ def test_initialization_failure_does_not_start_worker(
 def test_cancelled_file_dialog_does_not_make_window_ready(qapp, monkeypatch):
     window, tool = make_window(qapp)
     monkeypatch.setattr(
-        "GUI.mymainwindow.QFileDialog.getExistingDirectory",
+        "GUI.main_window.QFileDialog.getExistingDirectory",
         lambda *args, **kwargs: "",
     )
     window.read_dir()

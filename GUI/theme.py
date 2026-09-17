@@ -20,6 +20,25 @@ QLabel {
     background: transparent;
     color: #344054;
 }
+QLabel#titleLabel {
+    color: #102a43;
+    font-size: 22pt;
+    font-weight: 700;
+}
+QLabel#subtitleLabel {
+    color: #667085;
+    font-size: 10pt;
+}
+QLabel#sectionLabel {
+    color: #344054;
+    font-size: 10pt;
+    font-weight: 700;
+}
+QFrame#setupPanel, QFrame#logPanel {
+    background-color: #ffffff;
+    border: 1px solid #d8e1eb;
+    border-radius: 10px;
+}
 QLineEdit, QSpinBox, QPlainTextEdit, QListView {
     background-color: #ffffff;
     border: 1px solid #cbd5e1;

@@ -1,1 +1,1 @@
-pyinstaller --onefile base_win.spec
+pyinstaller --onefile gui_app.spec

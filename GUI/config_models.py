@@ -129,7 +129,11 @@ def decode_postprocess_document(document: Any) -> list[PostProcessSetting]:
         raise ValueError("后处理配置必须是列表或版本化对象")
     if not isinstance(entries, Sequence) or isinstance(entries, (str, bytes)):
         raise ValueError("postProcesses 必须是列表")
-    return [PostProcessSetting.from_mapping(item) for item in entries]
+    settings = [PostProcessSetting.from_mapping(item) for item in entries]
+    names = [item.result_name for item in settings]
+    if len(names) != len(set(names)):
+        raise ValueError("后处理结果名称不能重复")
+    return settings
 
 
 def encode_postprocess_document(

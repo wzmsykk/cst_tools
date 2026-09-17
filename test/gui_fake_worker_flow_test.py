@@ -14,7 +14,7 @@ from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5.QtGui import QCloseEvent
 from PyQt5.QtWidgets import QApplication
 
-from GUI.mymainwindow import mywindow
+from GUI.main_window import MainWindow
 from GUI.run_controller import RunState
 from csttool.cstmanager import CSTManager, ManagerState, SimulationTask
 
@@ -32,6 +32,7 @@ class FakeDialog(QObject):
         super().__init__()
         self.values = {}
         self.items = []
+        self.enabled = True
 
     def setDefaultValues(self, values):
         self.values = dict(values)
@@ -46,6 +47,15 @@ class FakeDialog(QObject):
         return list(self.items)
 
     def show(self):
+        pass
+
+    def setEnabled(self, enabled):
+        self.enabled = bool(enabled)
+
+    def raise_(self):
+        pass
+
+    def activateWindow(self):
         pass
 
 
@@ -206,15 +216,15 @@ def process_until(qapp, predicate, timeout=5):
 
 def make_window(qapp, tmp_path, monkeypatch, **backend_options):
     backend = FakeWorkerGuiBackend(tmp_path, **backend_options)
-    window = mywindow(backend, FakeDialog(), FakeDialog())
+    window = MainWindow(backend, FakeDialog(), FakeDialog())
     cst_path = tmp_path / "input.cst"
     cst_path.write_bytes(b"fake project")
     monkeypatch.setattr(
-        "GUI.mymainwindow.QFileDialog.getExistingDirectory",
+        "GUI.main_window.QFileDialog.getExistingDirectory",
         lambda *args, **kwargs: str(tmp_path),
     )
     monkeypatch.setattr(
-        "GUI.mymainwindow.QFileDialog.getOpenFileName",
+        "GUI.main_window.QFileDialog.getOpenFileName",
         lambda *args, **kwargs: (str(cst_path), True),
     )
     window.selectProjectDirButton.click()

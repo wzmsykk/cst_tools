@@ -3,7 +3,7 @@
 block_cipher = None
 
 
-a = Analysis(['base_win.py'],
+a = Analysis(['gui_app.py'],
              pathex=['C:\\Users\\ykk\\Desktop\\cst_tools'],
              binaries=[],
              datas=[('./data','./data')],
@@ -23,7 +23,7 @@ exe = EXE(pyz,
           a.zipfiles,
           a.datas,
           [],
-          name='base_win',
+          name='gui_app',
           debug=False,
           bootloader_ignore_signals=False,
           strip=False,

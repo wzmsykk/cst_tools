@@ -46,6 +46,26 @@ python -m pytest -q test/gui_theme_test.py
 
 该 Gate 验证共享主题覆盖输入、日志、运行/失败状态，按钮使用 primary、quiet、danger 语义角色，并检查设置窗口的本地化操作文字。主题还通过 Qt offscreen 实际渲染检查。
 
+GUI P5 在同一主题 Gate 中验证主窗口使用真实 Qt Layout，而不是固定坐标；测试分别调整到默认尺寸和最小尺寸，确认日志面板随可用空间伸缩。Qt Designer 源文件可单独校验：
+
+```powershell
+python -m PyQt5.uic.pyuic GUI/ui_main.ui | Out-Null
+```
+
+GUI P6 在配置与主窗口 Gate 中进一步验证：
+
+- 无效算法设置不会关闭窗口，取消恢复已提交值；
+- 后处理保存提交、取消回滚及双击编辑；
+- 重复结果名无法通过新增、整体替换或 JSON 解码进入模型；
+- 设置窗口具有主窗口父子生命周期，并在运行期间冻结；
+- 继续运行和安全模式的选择真实传递到后端。
+
+GUI 唯一启动入口：
+
+```powershell
+python gui_app.py
+```
+
 ### 2. 定向协议测试
 
 ```powershell

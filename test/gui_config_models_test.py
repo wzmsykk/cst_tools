@@ -5,16 +5,16 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 import pytest
 from PyQt5.QtTest import QSignalSpy
-from PyQt5.QtWidgets import QApplication
+from PyQt5.QtWidgets import QApplication, QWidget
 
-from GUI.algo_pop_window import myAlgDialog
+from GUI.algorithm_settings_dialog import AlgorithmSettingsDialog
 from GUI.config_models import (
     AlgorithmSettings,
     PostProcessSetting,
     decode_postprocess_document,
     encode_postprocess_document,
 )
-from GUI.postprocess_dialog import myPostProcessDataModel, myPPSDialog
+from GUI.postprocess_settings_dialog import PostProcessListModel, PostProcessSettingsDialog
 
 
 @pytest.fixture(scope="module")
@@ -38,13 +38,39 @@ def test_algorithm_settings_are_typed_and_cross_validated():
 
 
 def test_algorithm_dialog_installs_numeric_validators_and_returns_copy(qapp):
-    dialog = myAlgDialog()
+    dialog = AlgorithmSettingsDialog()
     dialog.setDefaultValues({"fmin": 500, "fmax": 700, "endfreq": 2500, "cfreq": 650})
     assert dialog.fminLineEdit.validator() is not None
     dialog.setValues()
     values = dialog.getValues()
     values["fmin"] = 1
     assert dialog.getValues()["fmin"] == 500
+
+
+def test_algorithm_dialog_validation_blocks_accept_and_cancel_restores_values(
+    qapp, monkeypatch
+):
+    dialog = AlgorithmSettingsDialog()
+    dialog.setDefaultValues(
+        {"fmin": 500, "fmax": 700, "endfreq": 2500, "cfreq": 650}
+    )
+    warnings = []
+    monkeypatch.setattr(
+        "GUI.algorithm_settings_dialog.QMessageBox.warning",
+        lambda *args: warnings.append(args),
+    )
+    completed = QSignalSpy(dialog._signal_done)
+    dialog.show()
+    dialog.fminLineEdit.setText("800")
+    dialog.fmaxLineEdit.setText("700")
+    dialog.accept()
+    assert dialog.isVisible()
+    assert len(completed) == 0
+    assert warnings
+
+    dialog.reject()
+    assert dialog.fminLineEdit.text() == "500.0"
+    assert dialog.fmaxLineEdit.text() == "700.0"
 
 
 def test_postprocess_uses_stable_key_and_separate_display_name():
@@ -60,7 +86,7 @@ def test_postprocess_uses_stable_key_and_separate_display_name():
 
 
 def test_postprocess_model_emits_structural_row_signals(qapp):
-    model = myPostProcessDataModel()
+    model = PostProcessListModel()
     inserted = QSignalSpy(model.rowsInserted)
     removed = QSignalSpy(model.rowsRemoved)
     model.append(pps())
@@ -70,9 +96,11 @@ def test_postprocess_model_emits_structural_row_signals(qapp):
 
 
 def test_postprocess_model_rejects_duplicate_result_names(qapp):
-    model = myPostProcessDataModel([pps()])
+    model = PostProcessListModel([pps()])
     with pytest.raises(ValueError, match="重复"):
         model.append(pps())
+    with pytest.raises(ValueError, match="重复"):
+        model.replace([pps(), pps()])
 
 
 def test_versioned_json_round_trip_and_legacy_list_compatibility():
@@ -84,10 +112,50 @@ def test_versioned_json_round_trip_and_legacy_list_compatibility():
 
 
 def test_set_pps_list_replaces_instead_of_duplicating(qapp):
-    dialog = myPPSDialog()
+    dialog = PostProcessSettingsDialog()
     dialog.setPPSList([pps("first")])
     dialog.setPPSList([pps("second")])
     assert [item["resultName"] for item in dialog.getPPSList()] == ["second"]
+
+
+def test_postprocess_cancel_rolls_back_and_accept_commits(qapp):
+    dialog = PostProcessSettingsDialog()
+    dialog.setPPSList([pps("committed")])
+    dialog.listModel.append(pps("draft"))
+    dialog.reject()
+    assert [item["resultName"] for item in dialog.getPPSList()] == ["committed"]
+
+    dialog.listModel.append(pps("saved"))
+    dialog.accept()
+    dialog.listModel.removeRow(1)
+    dialog.reject()
+    assert [item["resultName"] for item in dialog.getPPSList()] == [
+        "committed",
+        "saved",
+    ]
+
+
+def test_existing_postprocess_item_can_be_edited(qapp):
+    dialog = PostProcessSettingsDialog()
+    dialog.setPPSList([pps("old")])
+    changed = QSignalSpy(dialog.listModel.dataChanged)
+    dialog.editItem(dialog.listModel.index(0, 0))
+    dialog.addDialog.data = pps("new")
+    dialog.addItem()
+    assert dialog.getPPSList()[0]["resultName"] == "new"
+    assert len(changed) == 1
+
+
+def test_settings_dialogs_have_parent_lifecycle_and_responsive_layouts(qapp):
+    parent = QWidget()
+    algorithm = AlgorithmSettingsDialog(parent=parent)
+    postprocess = PostProcessSettingsDialog(parent=parent)
+    assert algorithm.parent() is parent
+    assert postprocess.parent() is parent
+    assert postprocess.addDialog.parent() is postprocess
+    assert algorithm.layout() is not None
+    assert postprocess.layout() is not None
+    assert postprocess.minimumWidth() >= 780
 
 
 def test_invalid_postprocess_document_is_rejected():
@@ -97,3 +165,5 @@ def test_invalid_postprocess_document_is_rejected():
         PostProcessSetting.from_mapping(
             {"resultName": "x", "method": "UI label", "params": {}}
         )
+    with pytest.raises(ValueError, match="重复"):
+        decode_postprocess_document([pps(), pps()])
