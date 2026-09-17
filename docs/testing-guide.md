@@ -22,6 +22,14 @@ python -m pytest -q test/gui_main_window_test.py
 
 该 Gate 验证完整输入才进入 `READY`、准备和运行期间按钮持续锁定、初始化失败进入 `FAILED`、取消文件选择保持未就绪、后台日志经 Qt signal 更新、失败后可重试、重复启动被拒绝，以及非法状态转换明确失败。P2 进一步验证运行中关闭进入 `STOPPING`、标准停止请求幂等、等待运行/停止线程结束后自动关闭，以及真实四阶段进度更新。
 
+GUI P2.5 使用真实 `CSTManager` 和注入的 Fake Worker 运行完整界面流程：
+
+```powershell
+python -m pytest -q test/gui_fake_worker_flow_test.py
+```
+
+该 Gate 通过界面按钮启动两个 Manager 任务，验证双 Worker 并发、结果顺序、Worker Failure 到 GUI FAILED 的传播，以及运行中关闭通过 `CSTManager.stop()` 停止全部 Fake Worker。它不启动 CST。
+
 ### 2. 定向协议测试
 
 ```powershell

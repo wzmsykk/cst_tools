@@ -40,6 +40,17 @@ GUI 重构先修复线程、状态和生命周期边界，再调整布局和交�
 
 实现记录：运行中关闭会拒绝当前 close event，进入 STOPPING，在独立线程中调用后端 request_stop()；只有运行线程和停止线程都结束后才自动重新关闭窗口。重复关闭不会重复发送停止请求。当前 legacy 算法没有可靠的总任务数/完成任务回调，因此 P2 只显示真实阶段进度 1/4–4/4，不伪造任务百分比。GUI 定向测试为 13 passed，完整默认测试为 101 passed, 12 deselected。
 
+## P2.5：Fake Worker GUI 全流程 Gate
+
+- [x] 保留真实主窗口、GuiRunController、QThread 和 CSTManager，只替换最底层 CST Worker。
+- [x] 通过界面按钮完成目录/CST 选择和启动，不直接调用 Manager。
+- [x] 成功流程提交两个任务，验证返回顺序、双 Worker 并发和标准关闭。
+- [x] Fake Worker 返回 Failure 时，GUI 进入 FAILED、显示可操作错误并允许重试。
+- [x] Fake Worker 阻塞期间关闭窗口，验证 STOPPING、CSTManager.stop() 和全部 Worker 停止。
+- [x] Gate 不读取真实 CST 配置、不启动 CST，也不创建可见窗口。
+
+验证记录：Fake Worker GUI 全流程 Gate 为 3 passed；完整默认测试为 104 passed, 12 deselected。成功流程的并发峰值为 2，结果顺序为 band-1、band-2；失败和关闭流程最终 Manager 均为 CLOSED，所有创建的 Fake Worker 均收到 stop。
+
 ## P3：配置对话框与数据模型
 
 - [ ] 算法设置使用有类型配置对象和 Qt Validator。

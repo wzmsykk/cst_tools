@@ -1,7 +1,7 @@
 # CST Tools 当前状态与实施路线
 
 状态日期：2026-09-17
-当前基线提交：`fdeb633 Add GUI lifecycle safety net P0`（其后工作区实现 GUI P1–P2，尚未提交）
+当前基线提交：`b020383 Refactor GUI run lifecycle through P2`（其后工作区实现 GUI P2.5，尚未提交）
 
 本文是项目当前状态的权威入口。历史设计文档仍保留其分析价值；若与本文或[最小 Python/VBA 协议 TODO](./minimal-python-vba-todo.md)冲突，以本文和已经通过的真实 CST Gate 为准。
 
@@ -58,8 +58,9 @@ native CST result -> Python-derived result -> optional runtime VBA
 | GUI P0 | offscreen Qt 安全网、启动条件、线程信号和按钮锁定 | GUI `8 passed`；完整默认测试通过 |
 | GUI P1 | 显式 RunState、组合式 Worker、后台准备和集中状态渲染 | GUI `10 passed`；失败可重试、重复启动被拒绝 |
 | GUI P2 | 标准停止、非阻塞受控关闭、阶段与进度显示 | GUI `13 passed`；关闭等待全部线程结束 |
+| GUI P2.5 | 真实 GUI/Controller/Manager 配合 Fake Worker 的全流程 Gate | 成功、失败、运行中关闭三条流程通过 |
 
-当前默认测试基线为 `101 passed, 12 deselected`。P7 缺模板 Gate 为 `1 passed in 127.38s`，真实多轴 Gate 为 `1 passed in 178.02s`；GUI P2 定向测试为 `13 passed`。
+当前默认测试基线为 `104 passed, 12 deselected`。P7 缺模板 Gate 为 `1 passed in 127.38s`，真实多轴 Gate 为 `1 passed in 178.02s`；GUI P2 定向测试为 `13 passed`，Fake Worker GUI Gate 为 `3 passed`。
 
 ## 4. `hom-2022-v1` Profile
 
