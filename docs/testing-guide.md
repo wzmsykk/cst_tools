@@ -66,6 +66,22 @@ GUI 唯一启动入口：
 python gui_app.py
 ```
 
+GUI P6.5 源码启动与打包 Gate：
+
+```powershell
+python gui_app.py --smoke-test
+python -m PyInstaller --clean --noconfirm gui_app.spec
+dist\gui_app.exe --smoke-test
+```
+
+`--smoke-test` 使用真实 GUI 后端创建主窗口、处理 Qt 事件并标准关闭，但不会选择工程或启动 CST。最终打包 Gate 应从仓库外目录启动 `gui_app.exe`，并要求退出码为 0。入口、spec 和启动脚本的默认自动化检查为：
+
+```powershell
+python -m pytest -q test/gui_entrypoint_test.py
+```
+
+当前 Anaconda 构建会报告部分 MKL MPI/PGI/SYCL 可选 DLL 缺失；独立目录 smoke 已以退出码 0 通过，因此这些警告不属于 GUI 启动所需依赖。单文件包仍约 331.8 MB，后续可通过拆分 legacy 数值分析依赖进一步缩减。
+
 ### 2. 定向协议测试
 
 ```powershell

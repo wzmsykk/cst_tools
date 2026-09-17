@@ -1,7 +1,7 @@
 # CST Tools 当前状态与实施路线
 
 状态日期：2026-09-17
-当前基线提交：`ed5107f Redesign GUI visual theme`（其后工作区实现 GUI P5–P6，尚未提交）
+当前基线提交：`5f862a6 Complete GUI workflow and rename modules`（其后工作区实现 GUI P6.5，尚未提交）
 
 本文是项目当前状态的权威入口。历史设计文档仍保留其分析价值；若与本文或[最小 Python/VBA 协议 TODO](./minimal-python-vba-todo.md)冲突，以本文和已经通过的真实 CST Gate 为准。
 
@@ -64,8 +64,9 @@ native CST result -> Python-derived result -> optional runtime VBA
 | GUI P4 | 统一浅色工程工作台主题、语义操作样式和运行状态反馈 | 离屏渲染成功；主题与既有 GUI Gate 通过 |
 | GUI P5 | 固定坐标主窗口改为响应式双栏工作台 | 缩放布局与 UI 源文件编译 Gate 通过 |
 | GUI P6 | 对话框事务、运行期冻结、已有项编辑、父子生命周期和明确源码命名 | GUI 功能 Gate 36 passed |
+| GUI P6.5 | 真实后端启动、可移植 PyInstaller 配置与独立目录打包 smoke | 打包程序退出码 0，无 CST/UI 残留 |
 
-当前默认测试基线为 `124 passed, 12 deselected`。P7 缺模板 Gate 为 `1 passed in 127.38s`，真实多轴 Gate 为 `1 passed in 178.02s`；GUI 功能与 Fake Worker 定向测试合计为 `36 passed`。
+当前默认测试基线为 `127 passed, 12 deselected`。P7 缺模板 Gate 为 `1 passed in 127.38s`，真实多轴 Gate 为 `1 passed in 178.02s`；GUI 入口、功能与 Fake Worker 定向测试合计为 `39 passed`。
 
 ## 4. `hom-2022-v1` Profile
 

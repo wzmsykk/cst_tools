@@ -1,6 +1,6 @@
 # GUI 重构 TODO
 
-状态：P0–P6 已完成；当前实施记录
+状态：P0–P6.5 已完成；当前实施记录
 
 ## 目标与边界
 
@@ -106,6 +106,18 @@ GUI 重构先修复线程、状态和生命周期边界，再调整布局和交�
 - [x] 手写模块重命名为 `main_window.py`、`algorithm_settings_dialog.py` 和 `postprocess_settings_dialog.py`。
 
 实现记录：GUI 现在具有明确的“编辑工作副本 → 保存提交 / 取消回滚”语义。主窗口是所有设置窗口的 Qt owner，关闭主窗口不会遗留独立顶层窗口。启动命令统一为 `python gui_app.py`，PyInstaller 使用 `gui_app.spec`。GUI 功能 Gate 为 36 passed，完整默认测试为 124 passed, 12 deselected。
+
+## P6.5：真实启动与打包 Gate
+
+- [x] 真实 `cst_tools_main` 后端可创建并标准关闭主窗口，不启动 CST。
+- [x] `gui_app.py --smoke-test` 提供自动创建、处理事件和标准退出路径。
+- [x] PyInstaller spec 使用项目相对路径，不再引用旧用户桌面目录。
+- [x] 打包收集 `data/` 与默认配置模板，并关闭发布版控制台窗口。
+- [x] 排除 pytest、Sphinx、Jupyter、Dask 等未使用的开发/可选集成模块。
+- [x] 实际构建 `dist/gui_app.exe`，并从仓库外独立临时目录启动。
+- [x] 打包进程以退出码 0 结束，无需用户通过 UI 关闭。
+
+验证记录：源码与入口定向 Gate 为 39 passed；完整默认测试为 127 passed, 12 deselected。单文件产物大小为 331,751,465 bytes，SHA-256 为 `74148BEB43962CF645E8A57B4DB635D4D06F64977218E96AB10C367FCF8B40B8`。当前体积较大源于 legacy 算法生产路径直接依赖 NumPy、pandas、Matplotlib 和 SciPy；体积优化不阻塞 P6.5 功能 Gate。
 
 ## 明确不做
 
