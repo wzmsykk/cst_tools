@@ -142,6 +142,20 @@ GUI 重构先修复线程、状态和生命周期边界，再调整布局和交�
 
 实现记录：新代码的依赖方向为 `GUI -> GuiApplicationService -> CstApplicationBackend -> Manager/Algorithm`。兼容适配器只服务尚未迁移的注入式旧 Engine 和测试替身；生产默认路径不再经过 `base.py`。定向测试为 `23 passed`，完整默认测试为 `131 passed, 12 deselected`。本阶段不把仅支持有界双任务 Gate 的 `protocol_warm_worker` 宣称为通用生产后端；其接入需单独的真实 CST Gate。
 
+## P9：新后端内部收口
+
+- [x] 新后端内部只保留 snake_case API，删除 camelCase 转调链。
+- [x] 将命令行解析和旧返回值语义移入 `base.cst_tools_main` 兼容壳。
+- [x] 建立 CREATED、INITIALIZED、PREPARED、RUNNING、STOPPING、STOPPED、FAILED 生命周期。
+- [x] 拒绝重复初始化、未准备执行和运行期修改配置等非法顺序。
+- [x] 初始化失败后允许显式重试，成功运行后允许下一次运行。
+- [x] 算法异常通过 `finally` 标准停止并释放 Manager。
+- [x] GUI 停止线程和执行清理共享一次性停止栅栏，避免重复关闭。
+- [x] 增加后端生命周期、异常清理和重试契约测试。
+- [x] 保持 Manager、Worker、算法和 Python/VBA 协议不变。
+
+实现记录：`CstApplicationBackend` 不再包含 argparse、进程退出或旧方法名；`base.py` 是唯一旧 API/CLI 兼容入口。P9 与 GUI 兼容定向测试为 `29 passed`，完整默认测试为 `137 passed, 12 deselected`。API、状态和兼容范围见 `application-backend.md`。
+
 ## 明确不做
 
 - [x] P0–P3 不提前混入视觉主题；P4 在生命周期和配置边界稳定后独立实施。

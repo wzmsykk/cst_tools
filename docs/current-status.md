@@ -67,8 +67,9 @@ native CST result -> Python-derived result -> optional runtime VBA
 | GUI P6.5 | 真实后端启动、可移植 PyInstaller 配置与独立目录打包 smoke | 打包程序退出码 0，无 CST/UI 残留 |
 | GUI P7 | Application Service 隔离 Qt、运行控制器与 legacy engine | GUI 中 legacy 调用仅保留在单一适配器 |
 | GUI P8 | 生产编排迁入 `csttool.application_backend`，GUI 默认切换新后端 | 旧 `base.cst_tools_main` 降为兼容入口；全量测试通过 |
+| GUI P9 | 新后端内部 API、生命周期、异常和清理语义收口 | CLI/旧方法移至兼容壳；异常路径标准停止 Manager |
 
-当前默认测试基线为 `131 passed, 12 deselected`。协议 P7 缺模板 Gate 为 `1 passed in 127.38s`，真实多轴 Gate 为 `1 passed in 178.02s`；GUI 新后端迁移相关定向测试为 `23 passed`。
+当前默认测试基线为 `137 passed, 12 deselected`。协议 P7 缺模板 Gate 为 `1 passed in 127.38s`，真实多轴 Gate 为 `1 passed in 178.02s`；P9 后端与 GUI 兼容定向测试为 `29 passed`。
 
 ## 4. `hom-2022-v1` Profile
 
@@ -128,4 +129,5 @@ Profile 验证使用 CST 官方 `ResetTemplateIterator/GetNextTemplate`，比较
 - Result Template 格式：[Result Template 文件结构](./cst-result-template-format.md)
 - CSTManager 公共接口：[CSTManager API](./cstmanager-api.md)
 - CSTManager 设计：[CSTManager 设计文档](./cstmanager-design.md)
+- 应用后端 API 与生命周期：[CST Application Backend](./application-backend.md)
 - 历史完整 ABI 提案：[现代跨语言 ABI 设计](./modern-cross-language-abi-design.md)

@@ -244,4 +244,16 @@ python -m pytest -q `
   test/gui_main_window_test.py
 ```
 
-该 Gate 验证 GUI 默认装配新的 `CstApplicationBackend`、旧式注入 Engine 的兼容转换、Fake Worker 成功/失败/停止流程以及窗口状态语义。它不启动 CST。迁移后还必须运行完整默认测试；当前结果为 `131 passed, 12 deselected`。
+该 Gate 验证 GUI 默认装配新的 `CstApplicationBackend`、旧式注入 Engine 的兼容转换、Fake Worker 成功/失败/停止流程以及窗口状态语义。它不启动 CST。
+
+P9 后端生命周期 Gate：
+
+```powershell
+python -m pytest -q `
+  test/application_backend_test.py `
+  test/gui_application_service_test.py `
+  test/gui_fake_worker_flow_test.py `
+  test/gui_main_window_test.py
+```
+
+该 Gate 进一步验证显式生命周期、非法调用拒绝、初始化失败后重试、算法异常清理、停止幂等性和旧 API 兼容壳。P9 定向结果为 `29 passed`；完整默认测试为 `137 passed, 12 deselected`。
