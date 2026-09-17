@@ -1,7 +1,7 @@
 # CST Tools 当前状态与实施路线
 
 状态日期：2026-09-17
-当前基线提交：`a76cf32 Align documentation with P6 status`（其后工作区实现 P6.5 I–P7，尚未提交）
+当前基线提交：`70d0873 Generalize CST project profile core through P7`（其后工作区实现 GUI P0，尚未提交）
 
 本文是项目当前状态的权威入口。历史设计文档仍保留其分析价值；若与本文或[最小 Python/VBA 协议 TODO](./minimal-python-vba-todo.md)冲突，以本文和已经通过的真实 CST Gate 为准。
 
@@ -55,8 +55,9 @@ native CST result -> Python-derived result -> optional runtime VBA
 | P6.5 I | Profile 接入有界 HOM Warm Worker；会话级单次预检 | 五项结果一致，Warm `1.379x`；缺模板在首个 Solver 前失败 |
 | P6.5 II | 同一 Profile 驱动原生读取、结果分类和 R/Q 路由 | 变体 Profile 测试通过；真实多轴 Gate 保持一致 |
 | P7 | Profile、严格标量读取、Provider 选择抽成通用核心 | 基础 `ProjectProfile` Worker、fail-fast、多轴 Gate 均通过 |
+| GUI P0 | offscreen Qt 安全网、启动条件、线程信号和按钮锁定 | GUI `8 passed`；完整默认测试通过 |
 
-当前默认测试基线为 `88 passed, 12 deselected`。P7 缺模板 Gate 为 `1 passed in 127.38s`，真实多轴 Gate 为 `1 passed in 178.02s`。
+当前默认测试基线为 `96 passed, 12 deselected`。P7 缺模板 Gate 为 `1 passed in 127.38s`，真实多轴 Gate 为 `1 passed in 178.02s`；GUI P0 定向测试为 `8 passed`。
 
 ## 4. `hom-2022-v1` Profile
 
@@ -108,6 +109,7 @@ Profile 验证使用 CST 官方 `ResetTemplateIterator/GetNextTemplate`，比较
 
 - 当前实施记录：[最小 Python/VBA 协议 TODO](./minimal-python-vba-todo.md)
 - 测试命令与 Gate：[测试指南](./testing-guide.md)
+- GUI 重构路线：[GUI 重构 TODO](./gui-refactor-todo.md)
 - 运行协议：[Python/VBA Runtime Protocol](./python-vba-runtime-protocol.md)
 - 原生结果路线：[CST 原生结果优先 TODO](./cst-native-results-todo.md)
 - 工程格式知识：[CST 项目文件知识库](./cst-project-file-knowledge-base.md)

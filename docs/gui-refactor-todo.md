@@ -1,0 +1,52 @@
+# GUI 重构 TODO
+
+状态：P0 已完成；当前实施记录
+
+## 目标与边界
+
+GUI 重构先修复线程、状态和生命周期边界，再调整布局和交互。当前仍通过适配层调用 legacy `cst_tools_main`；本阶段不切换生产 `CSTManager` 后端，也不修改 Python/VBA Runtime Protocol。
+
+## P0：无界面安全网与确定性启动边界
+
+- [x] 使用 `QT_QPA_PLATFORM=offscreen` 在默认 pytest 中运行真实 Qt Widget。
+- [x] 主窗口允许注入假业务后端和假对话框，测试不读取真实配置、不启动 CST。
+- [x] 只有项目目录与 CST 文件都已选择时才启用“开始”。
+- [x] 取消文件对话框不再用当前目录冒充用户选择。
+- [x] `wininit()` 或运行配置准备失败时不启动后台线程。
+- [x] 启动后所有操作按钮保持禁用，直到后台 `_signal_end` 到达。
+- [x] 后台任务使用 `try/except/finally`，异常时同时发布错误和结束信号。
+- [x] Python logging 通过 Qt signal 回到 GUI 线程，不由 Worker 直接修改文本控件。
+- [x] 保持现有 `.ui` 布局、算法设置和后处理设置入口不变。
+
+验证记录：GUI P0 定向测试为 `8 passed`；完整默认测试为 `96 passed, 12 deselected`。测试覆盖初始/Ready/Running 状态、输入选择顺序、初始化失败、取消选择、跨线程日志以及后台异常恢复，不需要 CST 或可见桌面。
+
+## P1：运行状态与控制器解耦
+
+- [ ] 引入明确的 `RunState`：`IDLE`、`READY`、`RUNNING`、`STOPPING`、`FAILED`。
+- [ ] 将按钮状态集中为一个状态渲染函数，删除分散的 freeze/unfreeze 方法。
+- [ ] 用组合式 Qt Worker 替代 `QThread + cst_tools_main` 多重继承。
+- [ ] 定义最小 `GuiBackend` Protocol，使窗口不依赖 legacy 具体类。
+- [ ] 将准备阶段放到后台，避免 `prepareProject` 等耗时操作阻塞 GUI 线程。
+- [ ] 为重复启动、失败后重试和非法状态转换增加测试。
+
+## P2：受控关闭与进度
+
+- [ ] 窗口关闭时区分空闲和运行中状态。
+- [ ] 运行中关闭先请求 Manager/Worker 正常停止并等待完成。
+- [ ] 标准停止未证明无效时禁止用强制结束进程代替生命周期。
+- [ ] 增加任务级进度、当前阶段和可操作错误信息。
+
+## P3：配置对话框与数据模型
+
+- [ ] 算法设置使用有类型配置对象和 Qt Validator。
+- [ ] 后处理设置使用稳定枚举/key，修复显示名称与协议名称混用。
+- [ ] 列表模型使用 `beginInsertRows/endInsertRows` 和对应删除通知。
+- [ ] JSON 文件增加版本、结构校验和明确错误反馈。
+- [ ] 保留现有配置的兼容读取路径。
+
+## 明确不做
+
+- [ ] P0–P1 不重新设计视觉主题。
+- [ ] 不直接编辑生成的 `ui_*.py` 作为长期布局来源；布局变化应修改 `.ui` 后重新生成。
+- [ ] 不在 GUI 中复制 Manager 调度、Profile 校验或结果读取逻辑。
+- [ ] 不让 GUI 线程等待 Solver、文件协议或 Worker 退出。

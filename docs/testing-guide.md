@@ -14,6 +14,14 @@ python -m pytest -q
 
 覆盖 Python 单元测试、Manager 并发、最小文件协议、fake Worker、golden vectors、VBA 静态契约和 Contract Macro 构建。
 
+默认测试也以 `QT_QPA_PLATFORM=offscreen` 覆盖 GUI P0，不显示窗口、不读取真实 CST 配置，也不启动 CST。定向运行命令：
+
+```powershell
+python -m pytest -q test/gui_main_window_test.py
+```
+
+该 Gate 验证完整输入才进入 Ready、运行期间按钮持续锁定、初始化失败不启动、取消文件选择保持未就绪、后台日志经 Qt signal 更新，以及后台异常仍发布 error/end 信号。
+
 ### 2. 定向协议测试
 
 ```powershell

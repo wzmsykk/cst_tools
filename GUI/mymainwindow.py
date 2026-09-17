@@ -1,12 +1,16 @@
-from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow
+from PyQt5.QtWidgets import QMainWindow
 from GUI.algo_pop_window import myAlgDialog
 from GUI.ui_main import Ui_MainWindow
 from GUI.postprocess_dialog import myPPSDialog
 from PyQt5.QtWidgets import QFileDialog, QPlainTextEdit
 from base import TaskType, cst_tools_main
-from PyQt5.QtCore import QThread, pyqtSignal
+from PyQt5.QtCore import QObject, QThread, pyqtSignal
 import logging
-import os, pathlib
+import pathlib
+
+
+class _LogEmitter(QObject):
+    message = pyqtSignal(str)
 
 
 class QPlainTextEditLogger(logging.Handler):
@@ -14,27 +18,35 @@ class QPlainTextEditLogger(logging.Handler):
         super().__init__()
         self.widget = QPlainTextEdit(parent)
         self.widget.setReadOnly(True)
+        self._emitter = _LogEmitter()
+        self._emitter.message.connect(self.widget.appendPlainText)
 
     def emit(self, record):
-        msg = self.format(record)
-        self.widget.appendPlainText(msg)
+        self._emitter.message.emit(self.format(record))
 
 
 class cst_tools_main_qt(QThread, cst_tools_main):
     _signal_start = pyqtSignal()
     _signal_end = pyqtSignal()
+    _signal_error = pyqtSignal(str)
 
     def __init__(self) -> None:
-        super(cst_tools_main_qt, self).__init__()
+        QThread.__init__(self)
+        cst_tools_main.__init__(self)
 
     def run(self):
         self._signal_start.emit()
-        self.starttask()
-        self._signal_end.emit()
+        try:
+            self.starttask()
+        except Exception as exc:
+            self.logger.exception("GUI 后台任务失败")
+            self._signal_error.emit(str(exc))
+        finally:
+            self._signal_end.emit()
 
 
 class mywindow(QMainWindow, Ui_MainWindow):
-    def __init__(self):
+    def __init__(self, maintool=None, calc_dialog=None, pps_dialog=None):
         super(mywindow, self).__init__()
         self.setupUi(self)
 
@@ -44,14 +56,13 @@ class mywindow(QMainWindow, Ui_MainWindow):
         self.uiProjectDir = None
         self.uiCSTFilePath = None
 
-        self.freezeStartButtons()
-        self.maintool = cst_tools_main_qt()
-        self.maintool.glogger.logger.addHandler(self.logTextBox)
-        self.logger = self.maintool.glogger.getLogger()
+        self.maintool = maintool or cst_tools_main_qt()
+        self.logger = self.maintool.logger
+        self.logger.addHandler(self.logTextBox)
         self.logger.info("使用PyQt5图形窗口运行模式")
 
-        self.CalcDialogBox = myAlgDialog()
-        self.PPSDialogBox = myPPSDialog(Logger=self.logger)
+        self.CalcDialogBox = calc_dialog or myAlgDialog()
+        self.PPSDialogBox = pps_dialog or myPPSDialog(Logger=self.logger)
 
         ppslist = self.maintool.getCurrPostProcessList()
         self.PPSDialogBox.setPPSList(ppslist)
@@ -59,6 +70,7 @@ class mywindow(QMainWindow, Ui_MainWindow):
 
         # DATA
         self.CalcDialogBox.setDefaultValues(self.maintool.getAlgAttrs())
+        self._update_start_enabled()
 
     def closeEvent(self, event):
         self.logger.info("主窗口被用户关闭")
@@ -73,6 +85,8 @@ class mywindow(QMainWindow, Ui_MainWindow):
 
         self.maintool._signal_start.connect(self.freezeAllButtons)
         self.maintool._signal_end.connect(self.unFreezeAllButtons)
+        if hasattr(self.maintool, "_signal_error"):
+            self.maintool._signal_error.connect(self.onRunError)
 
         self.CalcDialogBox._signal_done.connect(self.updateAlgSetting)
         self.PPSDialogBox._signal_done.connect(self.updatePPSSetting)
@@ -89,35 +103,41 @@ class mywindow(QMainWindow, Ui_MainWindow):
     def updatePPSSetting(self):
         self.maintool.setCurrPostProcessList(self.PPSDialogBox.getPPSList())
 
+    def onRunError(self, message):
+        self.logger.error("后台任务失败: %s", message)
+
     def read_dir(self):
         # 选取输出目录
         self.uiProjectDir = QFileDialog.getExistingDirectory(
             self, "选取文件夹", self.uiProjectDir
         )
 
-        if self.uiProjectDir == None or self.uiProjectDir == "":
-            curcwd = str(pathlib.Path(os.getcwd()).absolute())
-            self.uiProjectDir = curcwd
+        if not self.uiProjectDir:
+            return
         self.dirNameLineEdit.setText(self.uiProjectDir)
         self.maintool.setProjectDir(self.uiProjectDir)
-        self.unfreezeStartButtons()
+        self._update_start_enabled()
 
     def read_cst(self):
         # 选取输入CST
-        if self.uiProjectDir == None:
-            curcwd = str(pathlib.Path(os.getcwd()))
-            self.uiProjectDir = curcwd
+        initial_dir = self.uiProjectDir or str(pathlib.Path.cwd())
         self.uiCSTFilePath, ok = QFileDialog.getOpenFileName(
-            self, "选取CST文件", self.uiProjectDir
+            self, "选取CST文件", initial_dir
         )
+        if not self.uiCSTFilePath:
+            return
         self.cstFilePathLineEdit.setText(self.uiCSTFilePath)
         self.maintool.setCSTFilePath(self.uiCSTFilePath)
+        self._update_start_enabled()
+
+    def _update_start_enabled(self):
+        self.StartButton.setEnabled(bool(self.uiProjectDir and self.uiCSTFilePath))
 
     def freezeStartButtons(self):
         self.StartButton.setEnabled(False)
 
     def unfreezeStartButtons(self):
-        self.StartButton.setEnabled(True)
+        self._update_start_enabled()
 
     def freezeAllButtons(self):
         self.selectProjectDirButton.setEnabled(False)
@@ -132,18 +152,30 @@ class mywindow(QMainWindow, Ui_MainWindow):
         self.selectCSTPathButton.setEnabled(True)
         self.AlgSettingButton.setEnabled(True)
         self.postProcessButton.setEnabled(True)
+        self._update_start_enabled()
 
     def uiStartWork(self):
         self.logger.info("UI:STARTING WORK")
         self.freezeAllButtons()
-        self.maintool.start()
-        self.unFreezeAllButtons()
+        try:
+            self.maintool.start()
+        except Exception:
+            self.unFreezeAllButtons()
+            raise
 
     def run(self):
+        if not self.uiProjectDir or not self.uiCSTFilePath:
+            self.logger.error("请先选择项目目录和 CST 文件")
+            self._update_start_enabled()
+            return
         ctn = self.checkBox_CTN.isChecked()
         safe = self.checkBox_SAFE.isChecked()
         self.maintool.setFlags(ctn, safe)
-        self.maintool.wininit()
-        self.maintool.setRunInfos()
+        if self.maintool.wininit() is False:
+            self.logger.error("CST 环境初始化失败")
+            return
+        if self.maintool.setRunInfos() == 0:
+            self.logger.error("运行配置准备失败")
+            return
         self.uiStartWork()
 
