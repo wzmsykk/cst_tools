@@ -20,7 +20,7 @@ python -m pytest -q
 python -m pytest -q test/gui_main_window_test.py
 ```
 
-该 Gate 验证完整输入才进入 `READY`、准备和运行期间按钮持续锁定、初始化失败进入 `FAILED`、取消文件选择保持未就绪、后台日志经 Qt signal 更新、失败后可重试、重复启动被拒绝，以及非法状态转换明确失败。P2 进一步验证运行中关闭进入 `STOPPING`、标准停止请求幂等、等待运行/停止线程结束后自动关闭，以及真实四阶段进度更新。
+该 Gate 验证完整输入才进入 `READY`、准备和运行期间按钮持续锁定、初始化失败进入 `FAILED`、取消文件选择保持未就绪、后台日志经 Qt signal 更新、失败后可重试、重复启动被拒绝，以及非法状态转换明确失败。P2 进一步验证运行中关闭进入 `STOPPING`、标准停止请求幂等、等待运行/停止线程结束后自动关闭，以及真实四阶段进度更新。P2.6 验证 Worker 数量可配置，并在一次运行期间锁定。
 
 GUI P2.5 使用真实 `CSTManager` 和注入的 Fake Worker 运行完整界面流程：
 
@@ -28,7 +28,15 @@ GUI P2.5 使用真实 `CSTManager` 和注入的 Fake Worker 运行完整界面�
 python -m pytest -q test/gui_fake_worker_flow_test.py
 ```
 
-该 Gate 通过界面按钮启动两个 Manager 任务，验证双 Worker 并发、结果顺序、Worker Failure 到 GUI FAILED 的传播，以及运行中关闭通过 `CSTManager.stop()` 停止全部 Fake Worker。它不启动 CST。
+该 Gate 通过界面按钮启动两个 Manager 任务，验证双 Worker 并发、结果顺序、Worker Failure 到 GUI FAILED 的传播，以及运行中关闭通过 `CSTManager.stop()` 停止全部 Fake Worker。它还验证 GUI 选择 1 个 Worker 后，真实 Manager 池只创建一个 Worker、并发峰值为 1。它不启动 CST。
+
+GUI P3 的类型配置、Qt 模型通知及新旧 JSON 兼容测试：
+
+```powershell
+python -m pytest -q test/gui_config_models_test.py
+```
+
+该 Gate 验证算法频率范围校验、数字 Validator、稳定后处理 method key、显示名分离、插入/删除行通知、重复结果名拒绝、版本化 JSON 往返，以及 legacy 顶层列表兼容。
 
 ### 2. 定向协议测试
 

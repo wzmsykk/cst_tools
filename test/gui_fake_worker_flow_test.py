@@ -124,6 +124,7 @@ class FakeWorkerGuiBackend:
         self.workers = []
         self.manager = None
         self.results = []
+        self.worker_count = 2
 
     def setProjectDir(self, path):
         self.project_dir = path
@@ -146,6 +147,9 @@ class FakeWorkerGuiBackend:
     def setFlags(self, start_from_existing, safe):
         self.flags = (start_from_existing, safe)
 
+    def setWorkerCount(self, worker_count):
+        self.worker_count = int(worker_count)
+
     def wininit(self):
         return bool(self.project_dir and self.cst_path)
 
@@ -164,7 +168,7 @@ class FakeWorkerGuiBackend:
             FakeProjectConfig(root, self.pps),
             params=["fmin", "fmax"],
             logger=self.logger,
-            maxTask=2,
+            maxTask=self.worker_count,
             worker_factory=worker_factory,
         )
 
@@ -233,6 +237,22 @@ def test_gui_success_flow_uses_real_manager_with_fake_workers(
     assert backend.manager.state is ManagerState.CLOSED
     assert all(worker.stopped for worker in backend.workers)
     assert window.runProgressBar.value() == 4
+    window.close()
+
+
+def test_gui_selected_worker_count_controls_real_manager_pool(
+    qapp, tmp_path, monkeypatch
+):
+    window, backend = make_window(qapp, tmp_path, monkeypatch)
+    window.workerCountSpinBox.setValue(1)
+
+    window.StartButton.click()
+    process_until(qapp, lambda: window.controller.state is RunState.READY)
+    process_until(qapp, lambda: not window.controller.has_active_work)
+
+    assert backend.worker_count == 1
+    assert len(backend.workers) == 1
+    assert backend.tracker["peak"] == 1
     window.close()
 
 

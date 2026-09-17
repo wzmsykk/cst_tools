@@ -26,6 +26,8 @@ class GuiBackend(Protocol):
 
     def setFlags(self, start_from_existing: bool, safe: bool) -> None: ...
 
+    def setWorkerCount(self, worker_count: int) -> None: ...
+
     def wininit(self) -> bool: ...
 
     def setRunInfos(self): ...
@@ -52,17 +54,25 @@ class _BackendRunWorker(QObject):
     failed = pyqtSignal(str)
     stage_changed = pyqtSignal(str)
 
-    def __init__(self, backend: GuiBackend, start_from_existing: bool, safe: bool):
+    def __init__(
+        self,
+        backend: GuiBackend,
+        start_from_existing: bool,
+        safe: bool,
+        worker_count: int,
+    ):
         super().__init__()
         self._backend = backend
         self._start_from_existing = start_from_existing
         self._safe = safe
+        self._worker_count = worker_count
 
     @pyqtSlot()
     def execute(self) -> None:
         try:
             self.stage_changed.emit("initializing")
             self._backend.setFlags(self._start_from_existing, self._safe)
+            self._backend.setWorkerCount(self._worker_count)
             if self._backend.wininit() is False:
                 raise RuntimeError("CST 环境初始化失败")
             self.stage_changed.emit("preparing")
@@ -134,7 +144,9 @@ class GuiRunController(QObject):
         if self.state is not target:
             self._transition(target)
 
-    def start(self, start_from_existing: bool, safe: bool) -> bool:
+    def start(
+        self, start_from_existing: bool, safe: bool, worker_count: int = 2
+    ) -> bool:
         if not self.inputs_ready:
             return False
         if self.state not in {RunState.READY, RunState.FAILED}:
@@ -144,7 +156,10 @@ class GuiRunController(QObject):
 
         thread = QThread(self)
         worker = _BackendRunWorker(
-            self.backend, bool(start_from_existing), bool(safe)
+            self.backend,
+            bool(start_from_existing),
+            bool(safe),
+            int(worker_count),
         )
         worker.moveToThread(thread)
         thread.started.connect(worker.execute)

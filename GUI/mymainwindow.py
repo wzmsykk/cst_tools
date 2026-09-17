@@ -161,6 +161,7 @@ class mywindow(QMainWindow, Ui_MainWindow):
             self.selectCSTPathButton,
             self.AlgSettingButton,
             self.postProcessButton,
+            self.workerCountSpinBox,
         ):
             widget.setEnabled(controls_enabled)
         self.StartButton.setEnabled(
@@ -178,6 +179,8 @@ class mywindow(QMainWindow, Ui_MainWindow):
             return
         ctn = self.checkBox_CTN.isChecked()
         safe = self.checkBox_SAFE.isChecked()
-        if self.controller.start(ctn, safe):
+        worker_count = self.workerCountSpinBox.value()
+        if self.controller.start(ctn, safe, worker_count):
+            self.logger.info("本次运行使用 %d 个 CST Worker", worker_count)
             self.logger.info("UI:STARTING WORK")
 

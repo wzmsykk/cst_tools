@@ -58,6 +58,7 @@ class FakeMainTool:
         self.start_exception = None
         self.stop_count = 0
         self.stop_exception = None
+        self.worker_count = None
 
     def getCurrPostProcessList(self):
         return []
@@ -73,6 +74,9 @@ class FakeMainTool:
 
     def setFlags(self, ctn, safe):
         self.flags = (ctn, safe)
+
+    def setWorkerCount(self, worker_count):
+        self.worker_count = worker_count
 
     def wininit(self):
         return self.wininit_result
@@ -183,6 +187,26 @@ def test_buttons_stay_locked_until_background_end_signal(qapp, monkeypatch, tmp_
     assert window.StartButton.isEnabled()
     assert window.selectProjectDirButton.isEnabled()
     process_until(qapp, lambda: window.controller._thread is None)
+    window.close()
+
+
+def test_worker_count_is_configurable_and_locked_during_run(
+    qapp, monkeypatch, tmp_path
+):
+    window, tool = make_window(qapp)
+    choose_inputs(window, monkeypatch, tmp_path)
+    window.workerCountSpinBox.setValue(3)
+
+    window.run()
+    process_until(qapp, lambda: tool.start_count == 1)
+
+    assert tool.worker_count == 3
+    assert not window.workerCountSpinBox.isEnabled()
+
+    tool.run_gate.set()
+    process_until(qapp, lambda: window.controller.state is RunState.READY)
+    process_until(qapp, lambda: window.controller._thread is None)
+    assert window.workerCountSpinBox.isEnabled()
     window.close()
 
 

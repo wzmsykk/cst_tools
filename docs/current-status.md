@@ -1,7 +1,7 @@
 # CST Tools 当前状态与实施路线
 
 状态日期：2026-09-17
-当前基线提交：`b020383 Refactor GUI run lifecycle through P2`（其后工作区实现 GUI P2.5，尚未提交）
+当前基线提交：`2337e76 Add fake worker GUI flow gate`（其后工作区实现 GUI P2.6–P3，尚未提交）
 
 本文是项目当前状态的权威入口。历史设计文档仍保留其分析价值；若与本文或[最小 Python/VBA 协议 TODO](./minimal-python-vba-todo.md)冲突，以本文和已经通过的真实 CST Gate 为准。
 
@@ -59,8 +59,10 @@ native CST result -> Python-derived result -> optional runtime VBA
 | GUI P1 | 显式 RunState、组合式 Worker、后台准备和集中状态渲染 | GUI `10 passed`；失败可重试、重复启动被拒绝 |
 | GUI P2 | 标准停止、非阻塞受控关闭、阶段与进度显示 | GUI `13 passed`；关闭等待全部线程结束 |
 | GUI P2.5 | 真实 GUI/Controller/Manager 配合 Fake Worker 的全流程 Gate | 成功、失败、运行中关闭三条流程通过 |
+| GUI P2.6 | GUI 可调 Worker 并发数，运行请求冻结配置并传入 Manager | 选择 1 时仅创建一个 Worker，并发峰值为 1 |
+| GUI P3 | 类型化算法/PPS 设置、稳定 method key、正确 Qt 模型通知、版本化 JSON | 新旧 JSON 兼容；P3 与 GUI 定向测试通过 |
 
-当前默认测试基线为 `104 passed, 12 deselected`。P7 缺模板 Gate 为 `1 passed in 127.38s`，真实多轴 Gate 为 `1 passed in 178.02s`；GUI P2 定向测试为 `13 passed`，Fake Worker GUI Gate 为 `3 passed`。
+当前默认测试基线为 `114 passed, 12 deselected`。P7 缺模板 Gate 为 `1 passed in 127.38s`，真实多轴 Gate 为 `1 passed in 178.02s`；P3 与既有 GUI/Fake Worker 定向测试合计为 `26 passed`。
 
 ## 4. `hom-2022-v1` Profile
 

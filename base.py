@@ -43,6 +43,7 @@ class cst_tools_main:
         self.ReadyForActualTask = False
         # WORKER MANAGER
         self.jm = None
+        self.worker_count = 2
 
         # 算法/参数
         self.alg = myAlgorithm_pop.myAlg01(manager=None, params=None)
@@ -68,6 +69,13 @@ class cst_tools_main:
         self.ctn = startFromExisted
         self.safe = safe
         self.logger.info("BASE:SET CTN=%s,SAFE=%s" % (str(self.ctn), str(self.safe)))
+
+    def setWorkerCount(self, worker_count):
+        worker_count = int(worker_count)
+        if worker_count < 1:
+            raise ValueError("worker_count must be at least 1")
+        self.worker_count = worker_count
+        self.logger.info("BASE:SET WORKER COUNT=%d", self.worker_count)
 
     def setCurrPostProcessList(self, ppslist):
         return self.pconfman.setCurrPPSList(ppslist)
@@ -168,7 +176,7 @@ class cst_tools_main:
                 pconfm=self.pconfman,
                 gconfm=self.gconfman,
                 logger=self.logger,
-                maxTask=2,
+                maxTask=self.worker_count,
             )
             self.logger.info("JOB MANAGER 创建完成")
         else:

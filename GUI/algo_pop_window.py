@@ -1,10 +1,8 @@
-from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow, QDialog
+from PyQt5.QtWidgets import QDialog, QMessageBox
 from GUI.ui_algo_pop import Ui_AlgoPopDialog
-from PyQt5.QtWidgets import QFileDialog, QPlainTextEdit
-from base import TaskType, cst_tools_main
-from PyQt5.QtCore import QThread, pyqtSignal
-import logging
-import os, pathlib
+from GUI.config_models import AlgorithmSettings
+from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtGui import QDoubleValidator
 
 
 class myAlgDialog(QDialog, Ui_AlgoPopDialog):
@@ -15,6 +13,15 @@ class myAlgDialog(QDialog, Ui_AlgoPopDialog):
         self.setupUi(self)
         self.logger = Logger
         self.data = dict()
+        validator = QDoubleValidator(self)
+        validator.setNotation(QDoubleValidator.StandardNotation)
+        for editor in (
+            self.fmaxLineEdit,
+            self.fminLineEdit,
+            self.maxFreqThresholdLineEdit,
+            self.continueFreqLineEdit,
+        ):
+            editor.setValidator(validator)
         self.buttonBox.accepted.connect(self.saveAndHide)
 
     def setDefaultValues(self, param_dict):
@@ -26,16 +33,25 @@ class myAlgDialog(QDialog, Ui_AlgoPopDialog):
         self.continueCheckBox.setChecked(bool(self.data.get("cflag", 0)))
 
     def setValues(self):
-        self.data.update({"fmax": float(self.fmaxLineEdit.text())})
-        self.data.update({"fmin": float(self.fminLineEdit.text())})
-        self.data.update({"endfreq": float(self.maxFreqThresholdLineEdit.text())})
-        self.data.update({"cfreq": float(self.continueFreqLineEdit.text())})
-        self.data.update({"cflag": int(self.continueCheckBox.isChecked())})
+        settings = AlgorithmSettings.from_mapping(
+            {
+                "fmax": self.fmaxLineEdit.text(),
+                "fmin": self.fminLineEdit.text(),
+                "endfreq": self.maxFreqThresholdLineEdit.text(),
+                "cfreq": self.continueFreqLineEdit.text(),
+                "cflag": self.continueCheckBox.isChecked(),
+            }
+        )
+        self.data = settings.to_legacy_dict()
 
     def saveAndHide(self):
-        self.setValues()
+        try:
+            self.setValues()
+        except (TypeError, ValueError) as exc:
+            QMessageBox.warning(self, "算法设置无效", str(exc))
+            return
         self.hide()
         self._signal_done.emit()
 
     def getValues(self):
-        return self.data
+        return dict(self.data)

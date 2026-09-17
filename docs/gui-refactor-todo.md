@@ -1,6 +1,6 @@
 # GUI 重构 TODO
 
-状态：P0–P2 已完成；当前实施记录
+状态：P0–P3 已完成；当前实施记录
 
 ## 目标与边界
 
@@ -51,13 +51,25 @@ GUI 重构先修复线程、状态和生命周期边界，再调整布局和交�
 
 验证记录：Fake Worker GUI 全流程 Gate 为 3 passed；完整默认测试为 104 passed, 12 deselected。成功流程的并发峰值为 2，结果顺序为 band-1、band-2；失败和关闭流程最终 Manager 均为 CLOSED，所有创建的 Fake Worker 均收到 stop。
 
+## P2.6：GUI 可调 Worker 并发数
+
+- [x] 主窗口提供 1–64 的 Worker 数量选择，默认保持 2。
+- [x] 启动时将选择值冻结到本次运行，并在 RUNNING/STOPPING 期间锁定控件。
+- [x] legacy GUI 后端不再硬编码 maxTask=2，由运行请求设置 CSTManager 的池大小。
+- [x] Fake Worker Gate 验证选择 1 时只创建一个 Worker，实际并发峰值为 1。
+- [x] 不在 GUI 中复制 Manager 调度逻辑。
+
+验证记录：GUI 与 Fake Worker 定向测试为 18 passed。并发数从窗口经 GuiRunController、GuiBackend 传入 CSTManager；运行结束后控件重新启用。
+
 ## P3：配置对话框与数据模型
 
-- [ ] 算法设置使用有类型配置对象和 Qt Validator。
-- [ ] 后处理设置使用稳定枚举/key，修复显示名称与协议名称混用。
-- [ ] 列表模型使用 `beginInsertRows/endInsertRows` 和对应删除通知。
-- [ ] JSON 文件增加版本、结构校验和明确错误反馈。
-- [ ] 保留现有配置的兼容读取路径。
+- [x] 算法设置使用有类型配置对象和 Qt Validator。
+- [x] 后处理设置使用稳定 method key，显示名称与协议名称分离。
+- [x] 列表模型使用 `beginInsertRows/endInsertRows`、`beginRemoveRows/endRemoveRows` 和 reset 通知。
+- [x] JSON 文件增加版本、结构校验和明确错误反馈。
+- [x] 保留现有配置的兼容读取路径。
+
+实现记录：新增 `AlgorithmSettings` 与 `PostProcessSetting` 类型边界。算法设置校验数字、频率上下限及继续频率；后处理设置校验受支持 method、结果名、Mode Index 和复杂积分参数，并拒绝重复结果名。历史协议 key `Shunt_Inpedence` 保持不变，界面显示为 `Shunt Impedance`。新导出文件使用 `schemaVersion: 1` 与 `postProcesses`，同时继续读取旧的顶层列表；传给 legacy 后端时仍输出原字典结构。P3 与既有 GUI 定向测试为 26 passed，完整默认测试为 114 passed, 12 deselected。
 
 ## 明确不做
 
