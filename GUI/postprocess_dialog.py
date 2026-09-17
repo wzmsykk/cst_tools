@@ -16,6 +16,7 @@ from GUI.config_models import (
 )
 from GUI.ui_post import Ui_PostProcessSettingDialog
 from GUI.ui_post_edit import Ui_AddComplexPostDialog
+from GUI.theme import apply_theme, set_visual_role, style_dialog_buttons
 
 
 class myPostProcessDataModel(QAbstractListModel):
@@ -87,6 +88,11 @@ class myAddPPSDialog(QDialog, Ui_AddComplexPostDialog):
     def __init__(self) -> None:
         super().__init__()
         self.setupUi(self)
+        apply_theme(self)
+        style_dialog_buttons(self.buttonBox)
+        self.setWindowTitle("新增后处理结果")
+        self.resultNameEdit.setPlaceholderText("用于结果文件与汇总表的唯一名称")
+        set_visual_role(self.buttonBox.button(self.buttonBox.Ok), "primary")
         self.complexMode = False
         self.targetPPS = None
         self.data = {}
@@ -144,11 +150,19 @@ class myPPSDialog(QDialog, Ui_PostProcessSettingDialog):
     def __init__(self, Logger=None) -> None:
         super().__init__()
         self.setupUi(self)
+        apply_theme(self)
+        style_dialog_buttons(self.buttonBox)
+        self.setWindowTitle("后处理结果设置")
         self.addDialog = myAddPPSDialog()
         self.logger = Logger
         self.listModel = myPostProcessDataModel()
         self.listView.setModel(self.listModel)
         self.listView.setEditTriggers(QListView.NoEditTriggers)
+        self.listView.setAlternatingRowColors(False)
+        self.listView.setToolTip("本次计算将生成的后处理结果")
+        set_visual_role(self.DeleteButton, "danger")
+        set_visual_role(self.SaveJsonButton, "quiet")
+        set_visual_role(self.LoadJsonButton, "quiet")
         self.setSignalNSlots()
 
     def setSignalNSlots(self):

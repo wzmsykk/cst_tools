@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>CST Batch Studio</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QPushButton" name="selectProjectDirButton">

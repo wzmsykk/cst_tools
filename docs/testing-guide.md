@@ -38,6 +38,14 @@ python -m pytest -q test/gui_config_models_test.py
 
 该 Gate 验证算法频率范围校验、数字 Validator、稳定后处理 method key、显示名分离、插入/删除行通知、重复结果名拒绝、版本化 JSON 往返，以及 legacy 顶层列表兼容。
 
+GUI P4 的共享主题与语义视觉状态测试：
+
+```powershell
+python -m pytest -q test/gui_theme_test.py
+```
+
+该 Gate 验证共享主题覆盖输入、日志、运行/失败状态，按钮使用 primary、quiet、danger 语义角色，并检查设置窗口的本地化操作文字。主题还通过 Qt offscreen 实际渲染检查。
+
 ### 2. 定向协议测试
 
 ```powershell

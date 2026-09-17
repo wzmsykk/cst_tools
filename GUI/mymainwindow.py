@@ -3,6 +3,7 @@ from GUI.algo_pop_window import myAlgDialog
 from GUI.run_controller import GuiBackend, GuiRunController, RunState
 from GUI.ui_main import Ui_MainWindow
 from GUI.postprocess_dialog import myPPSDialog
+from GUI.theme import apply_theme, set_visual_role
 from PyQt5.QtWidgets import QFileDialog, QPlainTextEdit, QProgressBar
 from base import cst_tools_main
 from PyQt5.QtCore import QObject, QTimer, pyqtSignal
@@ -36,6 +37,17 @@ class mywindow(QMainWindow, Ui_MainWindow):
     ):
         super(mywindow, self).__init__()
         self.setupUi(self)
+        apply_theme(self)
+        self.setWindowTitle("CST Batch Studio")
+        self.dirNameLineEdit.setReadOnly(True)
+        self.dirNameLineEdit.setPlaceholderText("选择用于保存任务和结果的项目目录")
+        self.cstFilePathLineEdit.setReadOnly(True)
+        self.cstFilePathLineEdit.setPlaceholderText("选择作为计算模板的 CST 工程文件")
+        self.workerCountSpinBox.setToolTip("同时运行的 CST 实例数量；资源不足时请降低")
+        self.StartButton.setToolTip("使用当前工程、算法与后处理设置启动任务")
+        set_visual_role(self.StartButton, "primary")
+        set_visual_role(self.AlgSettingButton, "quiet")
+        set_visual_role(self.postProcessButton, "quiet")
 
         self.logTextBox = QPlainTextEditLogger(self)
         self.LogBoxLayout.addWidget(self.logTextBox.widget)
@@ -155,6 +167,9 @@ class mywindow(QMainWindow, Ui_MainWindow):
         )
 
     def renderRunState(self, state):
+        self.statusbar.setProperty("state", state.name.lower())
+        self.statusbar.style().unpolish(self.statusbar)
+        self.statusbar.style().polish(self.statusbar)
         controls_enabled = state not in {RunState.RUNNING, RunState.STOPPING}
         for widget in (
             self.selectProjectDirButton,
