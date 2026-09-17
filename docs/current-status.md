@@ -1,7 +1,7 @@
 # CST Tools 当前状态与实施路线
 
 状态日期：2026-09-17
-当前基线提交：`861bd5f Add GUI startup and packaging gate`（其后工作区实现 GUI P7，尚未提交）
+当前基线提交：`f302c61 Modernize application backend lifecycle`（其后工作区实施 Manager API 替换，尚未提交）
 
 本文是项目当前状态的权威入口。历史设计文档仍保留其分析价值；若与本文或[最小 Python/VBA 协议 TODO](./minimal-python-vba-todo.md)冲突，以本文和已经通过的真实 CST Gate 为准。
 
@@ -68,8 +68,9 @@ native CST result -> Python-derived result -> optional runtime VBA
 | GUI P7 | Application Service 隔离 Qt、运行控制器与 legacy engine | GUI 中 legacy 调用仅保留在单一适配器 |
 | GUI P8 | 生产编排迁入 `csttool.application_backend`，GUI 默认切换新后端 | 旧 `base.cst_tools_main` 降为兼容入口；全量测试通过 |
 | GUI P9 | 新后端内部 API、生命周期、异常和清理语义收口 | CLI/旧方法移至兼容壳；异常路径标准停止 Manager |
+| P10 | 生产算法替换旧 Manager API | 默认、TM020、WTC 使用 `CSTManager`、`SimulationTask`、`execute/run_batch` |
 
-当前默认测试基线为 `137 passed, 12 deselected`。协议 P7 缺模板 Gate 为 `1 passed in 127.38s`，真实多轴 Gate 为 `1 passed in 178.02s`；P9 后端与 GUI 兼容定向测试为 `29 passed`。
+当前默认测试基线为 `139 passed, 12 deselected`。协议 P7 缺模板 Gate 为 `1 passed in 127.38s`，真实多轴 Gate 为 `1 passed in 178.02s`；P10 Manager 替换定向测试为 `14 passed`。
 
 ## 4. `hom-2022-v1` Profile
 
@@ -98,7 +99,7 @@ Profile 验证使用 CST 官方 `ResetTemplateIterator/GetNextTemplate`，比较
 
 ## 6. 尚未完成
 
-- `CSTManager/local_cstworker/worker.vb` 和 `myAlgorithm_pop` 尚未迁移到当前最小协议；
+- `local_cstworker/worker.vb` 尚未迁移到当前最小文件协议；`CSTManager` 之上的维护中算法已使用现代任务 API；
 - `base.cst_tools_main` 仍作为旧脚本兼容入口，待外部调用方完成弃用；
 - 当前暂不扩展到 default、TM020、WTC、Pillbox 或复合 Enlarged/HOM Profile；
 - 没有自动安装 Result Template；
@@ -112,11 +113,11 @@ Profile 验证使用 CST 官方 `ResetTemplateIterator/GetNextTemplate`，比较
 
 ## 7. 推荐后续顺序
 
-1. 在新应用后端内部增加一条显式的 Profile/Warm 生产候选路径，但暂不替换默认 `CSTManager`；
-2. 盘点外部 `base.cst_tools_main` 调用方并给出弃用窗口，新代码禁止继续导入它；
-3. 保留 HOM 专属 R/Q 薄适配层，不把物理量语义下沉到通用核心；
-4. 暂不做 Profile 序列化、Manifest、动态 capability negotiation、插件 ABI 或多 Profile 注册表；
-5. 在生产候选路径通过真实 Gate 后，再评估 legacy Manager 切换和旧 VBA/PPS 删除。
+1. 用真实 CST 分别验证默认、TM020 和 WTC 的 `SimulationTask` 生产调用；
+2. 将 Profile/Warm Worker 泛化为可接受任意任务数的生产候选 Worker，再通过 `worker_factory` 接入 `CSTManager`；
+3. 盘点外部 `base.cst_tools_main` 与 Manager 弃用接口调用方；
+4. 保留 HOM 专属 R/Q 薄适配层，不把物理量语义下沉到通用核心；
+5. 暂不做 Profile 序列化、Manifest、动态 capability negotiation、插件 ABI 或多 Profile 注册表。
 
 ## 8. 文档导航
 

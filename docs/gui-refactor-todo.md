@@ -156,6 +156,19 @@ GUI 重构先修复线程、状态和生命周期边界，再调整布局和交�
 
 实现记录：`CstApplicationBackend` 不再包含 argparse、进程退出或旧方法名；`base.py` 是唯一旧 API/CLI 兼容入口。P9 与 GUI 兼容定向测试为 `29 passed`，完整默认测试为 `137 passed, 12 deselected`。API、状态和兼容范围见 `application-backend.md`。
 
+## P10：生产 Manager API 替换
+
+- [x] 应用后端默认工厂直接使用正式 `CSTManager`，不再使用 `manager` 别名。
+- [x] 定义算法所需的最小 `SimulationManager` Protocol。
+- [x] 默认 HOM 扫描算法使用 `SimulationTask` 和 `execute/run_batch`。
+- [x] 将参数名和值列表转换为明确的参数字典，消除旧调用签名歧义。
+- [x] TM020、WTC 批量种群算法使用 `run_batch` 并保持提交顺序。
+- [x] TM020、WTC 历史入口直接创建 `CSTManager`。
+- [x] 增加只提供现代 API 的假 Manager 契约测试。
+- [x] 保留 Manager 旧方法作为仓外兼容层，不在本阶段删除。
+
+实现记录：维护中的生产算法不再依赖 `addTask/startProcessing/getFullResults/runWithParam`。底层 Worker 仍使用经过验证的 Worker Protocol；有界双任务 Warm Worker 尚不能直接替换任意长度生产调度。P10 定向测试为 `14 passed`，完整默认测试为 `139 passed, 12 deselected`。
+
 ## 明确不做
 
 - [x] P0–P3 不提前混入视觉主题；P4 在生命周期和配置边界稳定后独立实施。

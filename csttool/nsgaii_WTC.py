@@ -144,7 +144,7 @@ class nsgaii_var:
 
 
 class myAlg_nsga(myAlg):
-    def __init__(self, manager: cstmanager.manager = None, params=None, logger=None):
+    def __init__(self, manager: cstmanager.SimulationManager = None, params=None, logger=None):
         super().__init__(manager, params)
         self.debug = True
         self.parameter_range = 0
@@ -709,19 +709,20 @@ class myAlg_nsga(myAlg):
             ####
 
             # First Run To Get the Initial Pop
-            for ind in poplist:
-                JobName = "GEN_0_" + str(ind.id)
-                params = self.createSimParamDictFromNPArr(ind.simvar)
-                self.manager.addTask(params=params, job_name=JobName)
-            ###
-            self.manager.startProcessing()
+            tasks = [
+                cstmanager.SimulationTask(
+                    params=self.createSimParamDictFromNPArr(ind.simvar),
+                    job_name="GEN_0_" + str(ind.id),
+                )
+                for ind in poplist
+            ]
             ### WAIT
             ### TIME For Processing And Results
             # if self.constrainted:
             #       ind.constraint_violaton_value=self.constraint_func(ind.constrainted_obj,ind.iobj)
             #     self.constrainted_dominance(poplist)
             ### Get Results
-            results = self.manager.getFullResults()
+            results = self.manager.run_batch(tasks)
             #### Apply Result To Element
             mapdict = {}
             for index, iresult in enumerate(results):
@@ -758,18 +759,18 @@ class myAlg_nsga(myAlg):
                     "GEN:%d, childpop size:%d" % (igen, len(childpoplist))
                 )
                 # Run To Get the Children POP
-                for ind in childpoplist:
-                    JobName = "GEN_%d_" % igen + str(ind.id)
-                    params = self.createSimParamDictFromNPArr(ind.simvar)
-                    self.manager.addTask(params=params, job_name=JobName)
-                    # self.logger.debug("CHILDIDX:%d,OPTVAR:%s,SIMVAR:%s"%(ind.id,str(ind.optvar),str(ind.simvar)))
-                ###
-                self.manager.startProcessing()
+                tasks = [
+                    cstmanager.SimulationTask(
+                        params=self.createSimParamDictFromNPArr(ind.simvar),
+                        job_name="GEN_%d_" % igen + str(ind.id),
+                    )
+                    for ind in childpoplist
+                ]
                 ### WAIT
                 ### TIME For Processing And Results
 
                 ### Get Results
-                results = self.manager.getFullResults()
+                results = self.manager.run_batch(tasks)
                 #### Apply Results To Element
                 mapdict = {}
                 for index, iresult in enumerate(results):
@@ -851,7 +852,7 @@ class myAlg_nsga(myAlg):
         self.CSTparams = params
         self.checkAndSetReady()
 
-    def setJobManager(self, manager: cstmanager.manager):
+    def setJobManager(self, manager: cstmanager.SimulationManager):
         self.manager = manager
         self.relative_location = str(manager.currProjectDir) + "\\save\\"
         if not os.path.exists(self.relative_location):
@@ -974,7 +975,9 @@ class myAlg_nsga(myAlg):
 
         # params={"Leq":90,"Req":190}
         params = {}
-        result = self.manager.runWithParam(params=params, job_name="test")
+        result = self.manager.execute(
+            cstmanager.SimulationTask(params=params, job_name="test")
+        )
         print(result)
         print(self.convertResult(result))
         # params={"Leq":60,"Req":180}

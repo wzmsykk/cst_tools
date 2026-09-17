@@ -167,7 +167,7 @@ class cst_tools_main:
             raise RuntimeError
         projectparams = self.pconfman.getParamsList()
         if self.jm is None:
-            self.jm = cstmanager.manager(
+            self.jm = cstmanager.CSTManager(
                 params=projectparams,
                 pconfm=self.pconfman,
                 gconfm=self.gconfman,

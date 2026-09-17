@@ -1,9 +1,4 @@
 ﻿"""produce LHS sample"""
-###修改内容
-###runWithX 修改为 runWithParam 需要提供param_name_list 和 value_list 作为参数
-###addTask 同上
-###初值需要自己写，留空[]则为默认
-###
 import os
 from .myAlgorithm import myAlg
 
@@ -16,7 +11,7 @@ import pandas as pd
 
 
 class myAlg01(myAlg):
-    def __init__(self, manager: cstmanager.manager = None, params=None):
+    def __init__(self, manager: cstmanager.SimulationManager = None, params=None):
         super().__init__(manager, params)
         self.parameter_range = 0
         self.CSTparams = params
@@ -82,7 +77,7 @@ class myAlg01(myAlg):
         self.CSTparams = params
         self.checkAndSetReady()
 
-    def setJobManager(self, manager: cstmanager.manager):
+    def setJobManager(self, manager: cstmanager.SimulationManager):
         self.manager = manager
         self.mode_location = str(manager.currProjectDir) + "\\result\\"
         self.relative_location = str(manager.currProjectDir) + "\\save\\csv\\"
@@ -127,12 +122,11 @@ class myAlg01(myAlg):
         # r = []
         y = []
 
-        for j, x in enumerate(xs):
-            self.manager.addTask(self.input_name, x, str(run_count) + str(x[1]))
-
-        self.manager.start()
-        self.manager.synchronize()  # 同步 很重要
-        rl = self.manager.getFullResults()
+        tasks = [
+            self._simulation_task(x, str(run_count) + str(x[1]))
+            for x in xs
+        ]
+        rl = self.manager.run_batch(tasks)
         ###SORT RESULTS
         rg = [i["PostProcessResult"] for i in rl]
         rg = sorted(rg, key=lambda x: int(x["name"][16:]))
@@ -144,6 +138,19 @@ class myAlg01(myAlg):
         print("y", y)
 
         return np.array(y).reshape(len(xs), self.dimension_output)
+
+    def _simulation_task(self, values, job_name, retry_count=0):
+        params = dict(zip(self.input_name, values))
+        return cstmanager.SimulationTask(
+            params=params,
+            job_name=job_name,
+            retry_count=retry_count,
+        )
+
+    def _execute_simulation(self, values, job_name, retry_count=0):
+        return self.manager.execute(
+            self._simulation_task(values, job_name, retry_count)
+        )
 
     def write_many(self, title, data):
         name = self.relative_location + title + ".csv"
@@ -274,8 +281,7 @@ class myAlg01(myAlg):
         samples = pd.DataFrame()
 
         if self.continue_flag[0] == 0:
-            runresult = self.manager.runWithParam(
-                self.input_name,
+            runresult = self._execute_simulation(
                 self.input_min,
                 "frequency"
                 + str(1000000)[1:]
@@ -283,7 +289,7 @@ class myAlg01(myAlg):
                 + str(fmin).replace(".", "-")
                 + "_"
                 + str(fmax),
-                retry_cnt=1,
+                retry_count=1,
             )
             if runresult["TaskStatus"] == "Success":
                 self.state_y0 = np.array(runresult["PostProcessResult"])
@@ -347,8 +353,7 @@ class myAlg01(myAlg):
                     ]
                 )
                 print("input is:", self.input_min)
-                runresult = self.manager.runWithParam(
-                    self.input_name,
+                runresult = self._execute_simulation(
                     self.input_min,
                     "frequency"
                     + str(1000000)[1:]
@@ -356,7 +361,7 @@ class myAlg01(myAlg):
                     + str(fmin).replace(".", "-")
                     + "_"
                     + str(fmax),
-                    retry_cnt=1,
+                    retry_count=1,
                 )
                 if runresult["TaskStatus"] == "Success":
                     self.state_y0 = np.array(runresult["PostProcessResult"])
@@ -402,8 +407,7 @@ class myAlg01(myAlg):
                     self.input_min[1] = (
                         float(math.ceil(sample["frequency"] * 10)) / 10
                     )  ## round up float to 1 decimals
-                    runresult = self.manager.runWithParam(
-                        self.input_name,
+                    runresult = self._execute_simulation(
                         self.input_min,
                         "frequency"
                         + str(1000000)[1:]
@@ -417,8 +421,7 @@ class myAlg01(myAlg):
                         print("Variate Loop Failure")
                         fmax = math.floor(sample["frequency"]) + self.delta_frequency
                         print("Adjust New Fmax to %f" % fmax)
-                        runresult = self.manager.runWithParam(
-                            self.input_name,
+                        runresult = self._execute_simulation(
                             self.input_min,
                             "frequency"
                             + str(1000000)[1:]

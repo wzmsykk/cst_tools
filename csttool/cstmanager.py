@@ -34,6 +34,20 @@ class WorkerProtocol(Protocol):
         ...
 
 
+class SimulationManager(Protocol):
+    """Modern task API consumed by production algorithms."""
+
+    currProjectDir: Path
+
+    def getResultDir(self) -> Path: ...
+
+    def execute(self, task: "SimulationTask") -> dict: ...
+
+    def run_batch(self, tasks: Iterable["SimulationTask"]) -> list[dict]: ...
+
+    def stop(self) -> None: ...
+
+
 class ManagerState(Enum):
     IDLE = auto()
     RUNNING = auto()

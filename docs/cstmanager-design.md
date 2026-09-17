@@ -1,6 +1,6 @@
 # CSTManager 设计文档
 
-状态：现有 production/legacy 调度层设计。当前最小 Worker/Profile 实现作为独立 Gate 演进，尚未接入本 Manager；迁移状态见[当前状态与实施路线](./current-status.md)。
+状态：当前生产调度层设计。维护中的默认、TM020 和 WTC 算法已经使用 `SimulationTask`；最小 Worker/Profile 实现仍作为独立 Gate 演进，尚未替换底层 Worker。
 
 ## 1. 目的
 
@@ -200,15 +200,15 @@ with CSTManager(...) as manager:
 
 ## 11. 兼容策略
 
-当前算法仍使用历史队列接口，因此重构采用“新内核、旧外壳”策略：
+仓内维护中算法已经切换到现代任务接口；旧外壳仅用于尚未盘点的外部调用方：
 
 - 正式类名为 `CSTManager`，保留 `manager` 别名；
 - 推荐 `SimulationTask`、`run_batch()` 和 `execute()`；
-- 保留 `addTask()`、`startProcessing()` 和结果读取接口；
+- 暂时保留 `addTask()`、`startProcessing()` 和结果读取接口；
 - 对已知旧三参数 `addTask` 形式进行兼容，但发出弃用警告；
 - `synchronize()` 暂时保留为兼容操作。
 
-待所有算法迁移到新 API 后，可以在一个主版本升级中删除弃用接口。
+默认、TM020 和 WTC 已完成迁移。删除弃用接口仍需先确认仓外脚本以及 `utils/`、`unused/` 中的历史样例不再被使用。
 
 ## 12. 可测试性
 
@@ -237,7 +237,7 @@ Worker 工厂是显式依赖注入点。并发单元测试使用假 Worker 验�
 
 建议的后续演进顺序：
 
-1. 将所有算法迁移到 `SimulationTask` 和 `run_batch()`；
+1. 通过真实 CST Gate 验证默认、TM020 和 WTC 的现代任务调用；
 2. 为成功和失败结果建立正式数据类，逐步替代字典；
 3. 为 Worker 增加明确的启动、健康检查、超时和强制终止协议；
 4. 增加任务取消与进度事件；

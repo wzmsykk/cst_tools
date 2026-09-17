@@ -77,7 +77,7 @@ class CstApplicationBackend:
             Logger=self.logger,
         )
         self.alg = algorithm or myAlgorithm_pop.myAlg01(manager=None, params=None)
-        self._manager_factory = manager_factory or cstmanager.manager
+        self._manager_factory = manager_factory or cstmanager.CSTManager
 
         default_pps_path = resource_path("data/defaultPPS.json")
         default_pps = self.pconfman.readPPSListFromFile(default_pps_path)

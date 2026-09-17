@@ -257,3 +257,14 @@ python -m pytest -q `
 ```
 
 该 Gate 进一步验证显式生命周期、非法调用拒绝、初始化失败后重试、算法异常清理、停止幂等性和旧 API 兼容壳。P9 定向结果为 `29 passed`；完整默认测试为 `137 passed, 12 deselected`。
+
+## P10 Manager API 替换 Gate
+
+```powershell
+python -m pytest -q `
+  test/algorithm_manager_contract_test.py `
+  test/cstmanager_test.py `
+  test/application_backend_test.py
+```
+
+该 Gate 使用只实现 `execute/run_batch` 的 Manager 替身验证默认算法已经脱离旧队列接口，同时覆盖并发顺序、失败重试、Worker 回收和应用后端清理。当前定向结果为 `14 passed`，完整默认测试为 `139 passed, 12 deselected`。真实 CST 的默认、TM020 和 WTC 路径仍需分别执行生产验收；默认测试不宣称底层 Worker 已切换到 P7 Warm 文件协议。

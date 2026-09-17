@@ -1,6 +1,6 @@
 # CSTManager API 与使用指南
 
-状态：现有 production/legacy Manager 公共接口。P2.5–P6 的最小协议、HOM 原生结果和 Profile Gate 尚未替换该后端；迁移状态见[当前状态与实施路线](./current-status.md)。
+状态：当前生产调度接口。默认、TM020 和 WTC 维护中算法已使用结构化任务 API；P2.5–P7 的 Profile/Warm Worker 尚未替换底层 `local_cstworker`。
 
 `CSTManager` 是优化算法与本地 CST 进程之间的批量任务调度器。它管理固定数量的 CST Worker，负责并发执行、失败重试、Worker 回收和结果汇总。
 
@@ -12,7 +12,7 @@
 from csttool.cstmanager import CSTManager, SimulationTask
 ```
 
-旧代码仍可使用：
+外部旧代码暂时仍可使用：
 
 ```python
 from csttool import cstmanager
@@ -20,7 +20,7 @@ from csttool import cstmanager
 manager = cstmanager.manager(...)
 ```
 
-`manager` 是 `CSTManager` 的兼容别名。
+`manager` 是 `CSTManager` 的弃用兼容别名。仓内生产入口不得继续使用。
 
 ## 创建 Manager
 
@@ -120,9 +120,9 @@ finally:
 
 优先使用 `with`。`stop()` 可以重复调用，第二次调用不会重复关闭资源。
 
-## 分步批处理兼容 API
+## 弃用兼容 API
 
-现有优化算法可以继续使用队列式接口：
+历史外部算法可以临时继续使用队列式接口：
 
 ```python
 manager.addTask({"radius": 90.0}, "GEN_0_1")
@@ -138,7 +138,7 @@ results = manager.getFullResults()
 
 加入任务并返回单调递增的内部序号，不会立即运行任务。
 
-历史形式 `addTask(input_names, params, job_name)` 暂时兼容，但会产生 `DeprecationWarning`，新代码不应继续使用。
+历史形式 `addTask(input_names, params, job_name)` 暂时兼容，但会产生 `DeprecationWarning`。仓内维护中算法已经迁移，不应新增任何调用。
 
 ### `startProcessing() -> None`
 
