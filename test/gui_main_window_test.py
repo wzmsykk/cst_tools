@@ -1,14 +1,17 @@
 import logging
 import os
 import threading
+import time
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 import pytest
 from PyQt5.QtCore import QObject, pyqtSignal
+from PyQt5.QtGui import QCloseEvent
 from PyQt5.QtWidgets import QApplication
 
-from GUI.mymainwindow import cst_tools_main_qt, mywindow
+from GUI.mymainwindow import mywindow
+from GUI.run_controller import InvalidRunState, RunState
 
 
 @pytest.fixture(scope="module")
@@ -41,14 +44,9 @@ class FakeDialog(QObject):
         pass
 
 
-class FakeMainTool(QObject):
-    _signal_start = pyqtSignal()
-    _signal_end = pyqtSignal()
-    _signal_error = pyqtSignal(str)
-
+class FakeMainTool:
     def __init__(self):
-        super().__init__()
-        self.logger = logging.getLogger(f"gui-p0-{id(self)}")
+        self.logger = logging.getLogger(f"gui-test-{id(self)}")
         self.logger.handlers.clear()
         self.logger.setLevel(logging.DEBUG)
         self.project_dir = None
@@ -56,6 +54,10 @@ class FakeMainTool(QObject):
         self.start_count = 0
         self.wininit_result = True
         self.run_info_result = None
+        self.run_gate = threading.Event()
+        self.start_exception = None
+        self.stop_count = 0
+        self.stop_exception = None
 
     def getCurrPostProcessList(self):
         return []
@@ -78,12 +80,17 @@ class FakeMainTool(QObject):
     def setRunInfos(self):
         return self.run_info_result
 
-    def start(self):
+    def starttask(self):
         self.start_count += 1
-        self._signal_start.emit()
+        if self.start_exception is not None:
+            raise self.start_exception
+        assert self.run_gate.wait(3), "test backend was not released"
 
-    def finish(self):
-        self._signal_end.emit()
+    def request_stop(self):
+        self.stop_count += 1
+        if self.stop_exception is not None:
+            raise self.stop_exception
+        self.run_gate.set()
 
     def setAlgAttrs(self, values):
         self.alg_values = values
@@ -96,6 +103,16 @@ def make_window(qapp):
     tool = FakeMainTool()
     window = mywindow(tool, FakeDialog(), FakeDialog())
     return window, tool
+
+
+def process_until(qapp, predicate, timeout=3):
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        qapp.processEvents()
+        if predicate():
+            return
+        time.sleep(0.01)
+    raise AssertionError("Qt condition was not reached before timeout")
 
 
 def choose_inputs(window, monkeypatch, tmp_path):
@@ -156,14 +173,16 @@ def test_buttons_stay_locked_until_background_end_signal(qapp, monkeypatch, tmp_
     choose_inputs(window, monkeypatch, tmp_path)
 
     window.run()
-    assert tool.start_count == 1
+    assert window.controller.state is RunState.RUNNING
+    process_until(qapp, lambda: tool.start_count == 1)
     assert not window.StartButton.isEnabled()
     assert not window.selectProjectDirButton.isEnabled()
 
-    tool.finish()
-    qapp.processEvents()
+    tool.run_gate.set()
+    process_until(qapp, lambda: window.controller.state is RunState.READY)
     assert window.StartButton.isEnabled()
     assert window.selectProjectDirButton.isEnabled()
+    process_until(qapp, lambda: window.controller._thread is None)
     window.close()
 
 
@@ -180,8 +199,10 @@ def test_initialization_failure_does_not_start_worker(
 
     window.run()
 
+    process_until(qapp, lambda: window.controller.state is RunState.FAILED)
     assert tool.start_count == 0
     assert window.StartButton.isEnabled()
+    process_until(qapp, lambda: window.controller._thread is None)
     window.close()
 
 
@@ -208,23 +229,110 @@ def test_background_logging_reaches_widget_through_qt_signal(qapp):
     window.close()
 
 
-def test_worker_exception_always_emits_error_and_end(qapp, monkeypatch):
-    def fake_init(worker):
-        worker.logger = logging.getLogger(f"gui-worker-{id(worker)}")
-        worker.logger.handlers.clear()
-        worker.logger.addHandler(logging.NullHandler())
+def test_worker_exception_enters_failed_state_and_can_retry(
+    qapp, monkeypatch, tmp_path
+):
+    window, tool = make_window(qapp)
+    choose_inputs(window, monkeypatch, tmp_path)
+    tool.start_exception = RuntimeError("boom")
 
-    monkeypatch.setattr("base.cst_tools_main.__init__", fake_init)
-    worker = cst_tools_main_qt()
-    worker.starttask = lambda: (_ for _ in ()).throw(RuntimeError("boom"))
-    errors = []
-    ended = []
-    worker._signal_error.connect(errors.append)
-    worker._signal_end.connect(lambda: ended.append(True))
+    window.run()
+    process_until(qapp, lambda: window.controller.state is RunState.FAILED)
+    process_until(qapp, lambda: window.controller._thread is None)
+    assert window.StartButton.isEnabled()
+    assert "boom" in window.logTextBox.widget.toPlainText()
 
-    worker.start()
-    assert worker.wait(3000)
-    qapp.processEvents()
+    tool.start_exception = None
+    tool.run_gate.set()
+    window.run()
+    process_until(qapp, lambda: window.controller.state is RunState.READY)
+    process_until(qapp, lambda: window.controller._thread is None)
+    assert tool.start_count == 2
+    window.close()
 
-    assert errors == ["boom"]
-    assert ended == [True]
+
+def test_repeated_start_is_rejected_while_running(qapp, monkeypatch, tmp_path):
+    window, tool = make_window(qapp)
+    choose_inputs(window, monkeypatch, tmp_path)
+
+    window.run()
+    window.run()
+    process_until(qapp, lambda: tool.start_count == 1)
+    assert window.controller.state is RunState.RUNNING
+
+    tool.run_gate.set()
+    process_until(qapp, lambda: window.controller.state is RunState.READY)
+    process_until(qapp, lambda: window.controller._thread is None)
+    assert tool.start_count == 1
+    window.close()
+
+
+def test_illegal_state_transition_is_explicit(qapp):
+    window, _ = make_window(qapp)
+    with pytest.raises(InvalidRunState, match="IDLE -> STOPPING"):
+        window.controller._transition(RunState.STOPPING)
+    window.close()
+
+
+def test_stage_progress_is_reported_without_blocking_ui(
+    qapp, monkeypatch, tmp_path
+):
+    window, tool = make_window(qapp)
+    choose_inputs(window, monkeypatch, tmp_path)
+    stages = []
+    window.controller.stage_changed.connect(stages.append)
+
+    window.run()
+    process_until(qapp, lambda: "running" in stages)
+    assert stages[:3] == ["initializing", "preparing", "running"]
+    assert window.statusbar.currentMessage() == "RUNNING: running"
+    assert window.runProgressBar.maximum() == 4
+    assert window.runProgressBar.value() == 3
+
+    tool.run_gate.set()
+    process_until(qapp, lambda: window.controller.state is RunState.READY)
+    process_until(qapp, lambda: window.controller._thread is None)
+    assert stages[-1] == "completed"
+    assert window.runProgressBar.value() == 4
+    window.close()
+
+
+def test_close_while_running_requests_standard_stop_and_waits(
+    qapp, monkeypatch, tmp_path
+):
+    window, tool = make_window(qapp)
+    choose_inputs(window, monkeypatch, tmp_path)
+    window.run()
+    process_until(qapp, lambda: tool.start_count == 1)
+
+    event = QCloseEvent()
+    window.closeEvent(event)
+
+    assert not event.isAccepted()
+    assert window.controller.state is RunState.STOPPING
+    assert window._close_pending
+    process_until(qapp, lambda: tool.stop_count == 1)
+    process_until(qapp, lambda: not window.controller.has_active_work)
+    process_until(qapp, lambda: not window._close_pending)
+    assert tool.stop_count == 1
+
+
+def test_repeated_close_does_not_duplicate_stop_request(
+    qapp, monkeypatch, tmp_path
+):
+    window, tool = make_window(qapp)
+    choose_inputs(window, monkeypatch, tmp_path)
+    window.run()
+    process_until(qapp, lambda: tool.start_count == 1)
+
+    first = QCloseEvent()
+    second = QCloseEvent()
+    window.closeEvent(first)
+    window.closeEvent(second)
+
+    process_until(qapp, lambda: tool.stop_count == 1)
+    process_until(qapp, lambda: not window.controller.has_active_work)
+    process_until(qapp, lambda: not window._close_pending)
+    assert not first.isAccepted()
+    assert not second.isAccepted()
+    assert tool.stop_count == 1

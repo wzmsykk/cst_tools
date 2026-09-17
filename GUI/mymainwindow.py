@@ -1,10 +1,11 @@
 from PyQt5.QtWidgets import QMainWindow
 from GUI.algo_pop_window import myAlgDialog
+from GUI.run_controller import GuiBackend, GuiRunController, RunState
 from GUI.ui_main import Ui_MainWindow
 from GUI.postprocess_dialog import myPPSDialog
-from PyQt5.QtWidgets import QFileDialog, QPlainTextEdit
-from base import TaskType, cst_tools_main
-from PyQt5.QtCore import QObject, QThread, pyqtSignal
+from PyQt5.QtWidgets import QFileDialog, QPlainTextEdit, QProgressBar
+from base import cst_tools_main
+from PyQt5.QtCore import QObject, QTimer, pyqtSignal
 import logging
 import pathlib
 
@@ -25,38 +26,32 @@ class QPlainTextEditLogger(logging.Handler):
         self._emitter.message.emit(self.format(record))
 
 
-class cst_tools_main_qt(QThread, cst_tools_main):
-    _signal_start = pyqtSignal()
-    _signal_end = pyqtSignal()
-    _signal_error = pyqtSignal(str)
-
-    def __init__(self) -> None:
-        QThread.__init__(self)
-        cst_tools_main.__init__(self)
-
-    def run(self):
-        self._signal_start.emit()
-        try:
-            self.starttask()
-        except Exception as exc:
-            self.logger.exception("GUI 后台任务失败")
-            self._signal_error.emit(str(exc))
-        finally:
-            self._signal_end.emit()
-
-
 class mywindow(QMainWindow, Ui_MainWindow):
-    def __init__(self, maintool=None, calc_dialog=None, pps_dialog=None):
+    def __init__(
+        self,
+        maintool: GuiBackend | None = None,
+        calc_dialog=None,
+        pps_dialog=None,
+        controller: GuiRunController | None = None,
+    ):
         super(mywindow, self).__init__()
         self.setupUi(self)
 
         self.logTextBox = QPlainTextEditLogger(self)
         self.LogBoxLayout.addWidget(self.logTextBox.widget)
+        self.runProgressBar = QProgressBar(self)
+        self.runProgressBar.setRange(0, 4)
+        self.runProgressBar.setValue(0)
+        self.runProgressBar.setTextVisible(True)
+        self.statusbar.addPermanentWidget(self.runProgressBar)
 
         self.uiProjectDir = None
         self.uiCSTFilePath = None
+        self._close_pending = False
+        self._stage = ""
 
-        self.maintool = maintool or cst_tools_main_qt()
+        self.maintool = maintool or cst_tools_main()
+        self.controller = controller or GuiRunController(self.maintool)
         self.logger = self.maintool.logger
         self.logger.addHandler(self.logTextBox)
         self.logger.info("使用PyQt5图形窗口运行模式")
@@ -70,10 +65,18 @@ class mywindow(QMainWindow, Ui_MainWindow):
 
         # DATA
         self.CalcDialogBox.setDefaultValues(self.maintool.getAlgAttrs())
-        self._update_start_enabled()
+        self._sync_readiness()
+        self.renderRunState(self.controller.state)
 
     def closeEvent(self, event):
+        if self.controller.has_active_work:
+            self._close_pending = True
+            self.logger.info("主窗口关闭请求：等待后台任务标准停止")
+            self.controller.request_stop()
+            event.ignore()
+            return
         self.logger.info("主窗口被用户关闭")
+        self.logger.removeHandler(self.logTextBox)
         event.accept()
 
     def setSignalNSlots(self):
@@ -83,10 +86,11 @@ class mywindow(QMainWindow, Ui_MainWindow):
         self.AlgSettingButton.clicked.connect(self.showCalcDialogBox)
         self.postProcessButton.clicked.connect(self.showPPSDialogBox)
 
-        self.maintool._signal_start.connect(self.freezeAllButtons)
-        self.maintool._signal_end.connect(self.unFreezeAllButtons)
-        if hasattr(self.maintool, "_signal_error"):
-            self.maintool._signal_error.connect(self.onRunError)
+        self.controller.state_changed.connect(self.renderRunState)
+        self.controller.stage_changed.connect(self.renderStage)
+        self.controller.progress_changed.connect(self.renderProgress)
+        self.controller.error.connect(self.onRunError)
+        self.controller.settled.connect(self._finishPendingClose)
 
         self.CalcDialogBox._signal_done.connect(self.updateAlgSetting)
         self.PPSDialogBox._signal_done.connect(self.updatePPSSetting)
@@ -105,6 +109,21 @@ class mywindow(QMainWindow, Ui_MainWindow):
 
     def onRunError(self, message):
         self.logger.error("后台任务失败: %s", message)
+        self.statusbar.showMessage(f"FAILED: {message}")
+
+    def renderStage(self, stage):
+        self._stage = stage
+        self.statusbar.showMessage(f"{self.controller.state.name}: {stage}")
+
+    def renderProgress(self, current, total):
+        self.runProgressBar.setRange(0, total)
+        self.runProgressBar.setValue(current)
+        self.runProgressBar.setFormat(f"%v/%m {self._stage}")
+
+    def _finishPendingClose(self):
+        if self._close_pending and not self.controller.has_active_work:
+            self._close_pending = False
+            QTimer.singleShot(0, self.close)
 
     def read_dir(self):
         # 选取输出目录
@@ -116,7 +135,7 @@ class mywindow(QMainWindow, Ui_MainWindow):
             return
         self.dirNameLineEdit.setText(self.uiProjectDir)
         self.maintool.setProjectDir(self.uiProjectDir)
-        self._update_start_enabled()
+        self._sync_readiness()
 
     def read_cst(self):
         # 选取输入CST
@@ -128,54 +147,37 @@ class mywindow(QMainWindow, Ui_MainWindow):
             return
         self.cstFilePathLineEdit.setText(self.uiCSTFilePath)
         self.maintool.setCSTFilePath(self.uiCSTFilePath)
-        self._update_start_enabled()
+        self._sync_readiness()
 
-    def _update_start_enabled(self):
-        self.StartButton.setEnabled(bool(self.uiProjectDir and self.uiCSTFilePath))
+    def _sync_readiness(self):
+        self.controller.set_inputs_ready(
+            bool(self.uiProjectDir and self.uiCSTFilePath)
+        )
 
-    def freezeStartButtons(self):
-        self.StartButton.setEnabled(False)
-
-    def unfreezeStartButtons(self):
-        self._update_start_enabled()
-
-    def freezeAllButtons(self):
-        self.selectProjectDirButton.setEnabled(False)
-        self.StartButton.setEnabled(False)
-        self.selectCSTPathButton.setEnabled(False)
-        self.AlgSettingButton.setEnabled(False)
-        self.postProcessButton.setEnabled(False)
-
-    def unFreezeAllButtons(self):
-        self.selectProjectDirButton.setEnabled(True)
-        self.StartButton.setEnabled(True)
-        self.selectCSTPathButton.setEnabled(True)
-        self.AlgSettingButton.setEnabled(True)
-        self.postProcessButton.setEnabled(True)
-        self._update_start_enabled()
-
-    def uiStartWork(self):
-        self.logger.info("UI:STARTING WORK")
-        self.freezeAllButtons()
-        try:
-            self.maintool.start()
-        except Exception:
-            self.unFreezeAllButtons()
-            raise
+    def renderRunState(self, state):
+        controls_enabled = state not in {RunState.RUNNING, RunState.STOPPING}
+        for widget in (
+            self.selectProjectDirButton,
+            self.selectCSTPathButton,
+            self.AlgSettingButton,
+            self.postProcessButton,
+        ):
+            widget.setEnabled(controls_enabled)
+        self.StartButton.setEnabled(
+            controls_enabled
+            and self.controller.inputs_ready
+            and state in {RunState.READY, RunState.FAILED}
+        )
+        suffix = f": {self._stage}" if self._stage else ""
+        self.statusbar.showMessage(f"{state.name}{suffix}")
 
     def run(self):
         if not self.uiProjectDir or not self.uiCSTFilePath:
             self.logger.error("请先选择项目目录和 CST 文件")
-            self._update_start_enabled()
+            self._sync_readiness()
             return
         ctn = self.checkBox_CTN.isChecked()
         safe = self.checkBox_SAFE.isChecked()
-        self.maintool.setFlags(ctn, safe)
-        if self.maintool.wininit() is False:
-            self.logger.error("CST 环境初始化失败")
-            return
-        if self.maintool.setRunInfos() == 0:
-            self.logger.error("运行配置准备失败")
-            return
-        self.uiStartWork()
+        if self.controller.start(ctn, safe):
+            self.logger.info("UI:STARTING WORK")
 

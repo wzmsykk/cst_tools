@@ -181,6 +181,14 @@ class cst_tools_main:
         self.alg.setEditableAttrs(dict)
         self.logger.info("ALG参数设置完毕")
 
+    def request_stop(self):
+        """Request the active manager to stop through its standard lifecycle."""
+        manager = self.jm
+        if manager is None:
+            self.logger.info("GUI stop requested before a manager was created")
+            return
+        manager.stop()
+
     def starttask(self):
         self.status = projectconfmanager.TaskStatus.RUNNING
         self.pconfman.updateTaskStatus(self.status)
