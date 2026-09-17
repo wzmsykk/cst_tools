@@ -1,11 +1,11 @@
 from PyQt5.QtWidgets import QMainWindow
 from GUI.algorithm_settings_dialog import AlgorithmSettingsDialog
-from GUI.run_controller import GuiBackend, GuiRunController, RunState
+from GUI.application_service import CstApplicationService
+from GUI.run_controller import GuiRunController, RunState
 from GUI.ui_main import Ui_MainWindow
 from GUI.postprocess_settings_dialog import PostProcessSettingsDialog
 from GUI.theme import apply_theme, set_visual_role
 from PyQt5.QtWidgets import QFileDialog, QPlainTextEdit, QProgressBar
-from base import cst_tools_main
 from PyQt5.QtCore import QObject, QTimer, pyqtSignal
 import logging
 import pathlib
@@ -30,7 +30,7 @@ class QPlainTextEditLogger(logging.Handler):
 class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(
         self,
-        maintool: GuiBackend | None = None,
+        engine=None,
         calc_dialog=None,
         pps_dialog=None,
         controller: GuiRunController | None = None,
@@ -62,9 +62,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self._close_pending = False
         self._stage = ""
 
-        self.maintool = maintool or cst_tools_main()
-        self.controller = controller or GuiRunController(self.maintool)
-        self.logger = self.maintool.logger
+        self.service = CstApplicationService(engine)
+        self.controller = controller or GuiRunController(self.service)
+        self.logger = self.service.logger
         self.logger.addHandler(self.logTextBox)
         self.logger.info("使用PyQt5图形窗口运行模式")
 
@@ -73,12 +73,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             Logger=self.logger, parent=self
         )
 
-        ppslist = self.maintool.getCurrPostProcessList()
+        ppslist = self.service.get_postprocess_settings()
         self.PPSDialogBox.setPPSList(ppslist)
         self.setSignalNSlots()
 
         # DATA
-        self.CalcDialogBox.setDefaultValues(self.maintool.getAlgAttrs())
+        self.CalcDialogBox.setDefaultValues(self.service.get_algorithm_settings())
         self._sync_readiness()
         self.renderRunState(self.controller.state)
 
@@ -120,10 +120,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.PPSDialogBox.activateWindow()
 
     def updateAlgSetting(self):
-        self.maintool.setAlgAttrs(self.CalcDialogBox.getValues())
+        self.service.update_algorithm_settings(self.CalcDialogBox.getValues())
 
     def updatePPSSetting(self):
-        self.maintool.setCurrPostProcessList(self.PPSDialogBox.getPPSList())
+        self.service.update_postprocess_settings(self.PPSDialogBox.getPPSList())
 
     def onRunError(self, message):
         self.logger.error("后台任务失败: %s", message)
@@ -152,7 +152,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if not self.uiProjectDir:
             return
         self.dirNameLineEdit.setText(self.uiProjectDir)
-        self.maintool.setProjectDir(self.uiProjectDir)
+        self.service.select_project_directory(self.uiProjectDir)
         self._sync_readiness()
 
     def read_cst(self):
@@ -164,7 +164,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if not self.uiCSTFilePath:
             return
         self.cstFilePathLineEdit.setText(self.uiCSTFilePath)
-        self.maintool.setCSTFilePath(self.uiCSTFilePath)
+        self.service.select_cst_file(self.uiCSTFilePath)
         self._sync_readiness()
 
     def _sync_readiness(self):

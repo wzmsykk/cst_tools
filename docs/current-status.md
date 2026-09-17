@@ -1,7 +1,7 @@
 # CST Tools 当前状态与实施路线
 
 状态日期：2026-09-17
-当前基线提交：`5f862a6 Complete GUI workflow and rename modules`（其后工作区实现 GUI P6.5，尚未提交）
+当前基线提交：`861bd5f Add GUI startup and packaging gate`（其后工作区实现 GUI P7，尚未提交）
 
 本文是项目当前状态的权威入口。历史设计文档仍保留其分析价值；若与本文或[最小 Python/VBA 协议 TODO](./minimal-python-vba-todo.md)冲突，以本文和已经通过的真实 CST Gate 为准。
 
@@ -16,7 +16,7 @@
 5. Project Profile 声明 prepared 工程、允许修改的参数、注册模板和结果能力；
 6. 不把 CST Result Template GUI 操作包装成运行期 ABI。
 
-当前实现是独立、安全、可验证的增量路径，尚未替换 legacy `worker.vb` 和生产 `CSTManager` 后端。
+当前实现是独立、安全、可验证的增量路径。GUI 已迁移到新的应用后端边界；底层生产 `CSTManager`、`worker.vb` 和算法执行链尚未切换到 P7 Profile/Warm 协议核心。
 
 ## 2. 当前执行链
 
@@ -65,8 +65,10 @@ native CST result -> Python-derived result -> optional runtime VBA
 | GUI P5 | 固定坐标主窗口改为响应式双栏工作台 | 缩放布局与 UI 源文件编译 Gate 通过 |
 | GUI P6 | 对话框事务、运行期冻结、已有项编辑、父子生命周期和明确源码命名 | GUI 功能 Gate 36 passed |
 | GUI P6.5 | 真实后端启动、可移植 PyInstaller 配置与独立目录打包 smoke | 打包程序退出码 0，无 CST/UI 残留 |
+| GUI P7 | Application Service 隔离 Qt、运行控制器与 legacy engine | GUI 中 legacy 调用仅保留在单一适配器 |
+| GUI P8 | 生产编排迁入 `csttool.application_backend`，GUI 默认切换新后端 | 旧 `base.cst_tools_main` 降为兼容入口；全量测试通过 |
 
-当前默认测试基线为 `127 passed, 12 deselected`。P7 缺模板 Gate 为 `1 passed in 127.38s`，真实多轴 Gate 为 `1 passed in 178.02s`；GUI 入口、功能与 Fake Worker 定向测试合计为 `39 passed`。
+当前默认测试基线为 `131 passed, 12 deselected`。协议 P7 缺模板 Gate 为 `1 passed in 127.38s`，真实多轴 Gate 为 `1 passed in 178.02s`；GUI 新后端迁移相关定向测试为 `23 passed`。
 
 ## 4. `hom-2022-v1` Profile
 
@@ -95,7 +97,8 @@ Profile 验证使用 CST 官方 `ResetTemplateIterator/GetNextTemplate`，比较
 
 ## 6. 尚未完成
 
-- legacy `CSTManager/local_cstworker/worker.vb` 尚未迁移到当前最小协议；
+- `CSTManager/local_cstworker/worker.vb` 和 `myAlgorithm_pop` 尚未迁移到当前最小协议；
+- `base.cst_tools_main` 仍作为旧脚本兼容入口，待外部调用方完成弃用；
 - 当前暂不扩展到 default、TM020、WTC、Pillbox 或复合 Enlarged/HOM Profile；
 - 没有自动安装 Result Template；
 - 没有通用 Profile Schema、Manifest、动态 capability negotiation 或多 Transport；
@@ -108,8 +111,8 @@ Profile 验证使用 CST 官方 `ResetTemplateIterator/GetNextTemplate`，比较
 
 ## 7. 推荐后续顺序
 
-1. 将 P7 通用核心接入下一条生产候选执行路径，但暂不切换 legacy Manager；
-2. 明确兼容层弃用顺序，优先让新代码直接使用 `ProjectProfile` 和通用 reader；
+1. 在新应用后端内部增加一条显式的 Profile/Warm 生产候选路径，但暂不替换默认 `CSTManager`；
+2. 盘点外部 `base.cst_tools_main` 调用方并给出弃用窗口，新代码禁止继续导入它；
 3. 保留 HOM 专属 R/Q 薄适配层，不把物理量语义下沉到通用核心；
 4. 暂不做 Profile 序列化、Manifest、动态 capability negotiation、插件 ABI 或多 Profile 注册表；
 5. 在生产候选路径通过真实 Gate 后，再评估 legacy Manager 切换和旧 VBA/PPS 删除。

@@ -3,38 +3,9 @@
 from __future__ import annotations
 
 from enum import Enum, auto
-import logging
-from typing import Protocol
 
 from PyQt5.QtCore import QObject, QThread, pyqtSignal, pyqtSlot
-
-
-class GuiBackend(Protocol):
-    logger: logging.Logger
-
-    def setProjectDir(self, path: str) -> None: ...
-
-    def setCSTFilePath(self, path: str) -> None: ...
-
-    def getCurrPostProcessList(self): ...
-
-    def setCurrPostProcessList(self, values) -> None: ...
-
-    def getAlgAttrs(self): ...
-
-    def setAlgAttrs(self, values) -> None: ...
-
-    def setFlags(self, start_from_existing: bool, safe: bool) -> None: ...
-
-    def setWorkerCount(self, worker_count: int) -> None: ...
-
-    def wininit(self) -> bool: ...
-
-    def setRunInfos(self): ...
-
-    def starttask(self): ...
-
-    def request_stop(self) -> None: ...
+from GUI.application_service import GuiApplicationService, RunRequest
 
 
 class RunState(Enum):
@@ -56,30 +27,22 @@ class _BackendRunWorker(QObject):
 
     def __init__(
         self,
-        backend: GuiBackend,
-        start_from_existing: bool,
-        safe: bool,
-        worker_count: int,
+        service: GuiApplicationService,
+        request: RunRequest,
     ):
         super().__init__()
-        self._backend = backend
-        self._start_from_existing = start_from_existing
-        self._safe = safe
-        self._worker_count = worker_count
+        self._service = service
+        self._request = request
 
     @pyqtSlot()
     def execute(self) -> None:
         try:
             self.stage_changed.emit("initializing")
-            self._backend.setFlags(self._start_from_existing, self._safe)
-            self._backend.setWorkerCount(self._worker_count)
-            if self._backend.wininit() is False:
-                raise RuntimeError("CST 环境初始化失败")
+            self._service.initialize_run(self._request)
             self.stage_changed.emit("preparing")
-            if self._backend.setRunInfos() == 0:
-                raise RuntimeError("运行配置准备失败")
+            self._service.prepare_run()
             self.stage_changed.emit("running")
-            self._backend.starttask()
+            self._service.execute_run()
         except Exception as exc:
             self.failed.emit(str(exc))
         else:
@@ -90,14 +53,14 @@ class _BackendStopWorker(QObject):
     succeeded = pyqtSignal()
     failed = pyqtSignal(str)
 
-    def __init__(self, backend: GuiBackend):
+    def __init__(self, service: GuiApplicationService):
         super().__init__()
-        self._backend = backend
+        self._service = service
 
     @pyqtSlot()
     def execute(self) -> None:
         try:
-            self._backend.request_stop()
+            self._service.request_stop()
         except Exception as exc:
             self.failed.emit(str(exc))
         else:
@@ -125,9 +88,9 @@ class GuiRunController(QObject):
         ),
     }
 
-    def __init__(self, backend: GuiBackend):
+    def __init__(self, service: GuiApplicationService):
         super().__init__()
-        self.backend = backend
+        self.service = service
         self.state = RunState.IDLE
         self.inputs_ready = False
         self._thread: QThread | None = None
@@ -155,12 +118,12 @@ class GuiRunController(QObject):
             return False
 
         thread = QThread(self)
-        worker = _BackendRunWorker(
-            self.backend,
-            bool(start_from_existing),
-            bool(safe),
-            int(worker_count),
+        request = RunRequest(
+            start_from_existing=bool(start_from_existing),
+            safe_mode=bool(safe),
+            worker_count=int(worker_count),
         )
+        worker = _BackendRunWorker(self.service, request)
         worker.moveToThread(thread)
         thread.started.connect(worker.execute)
         worker.succeeded.connect(self._run_succeeded)
@@ -193,7 +156,7 @@ class GuiRunController(QObject):
             return False
 
         thread = QThread(self)
-        worker = _BackendStopWorker(self.backend)
+        worker = _BackendStopWorker(self.service)
         worker.moveToThread(thread)
         thread.started.connect(worker.execute)
         worker.succeeded.connect(thread.quit)

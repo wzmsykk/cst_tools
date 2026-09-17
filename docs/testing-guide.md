@@ -82,6 +82,20 @@ python -m pytest -q test/gui_entrypoint_test.py
 
 当前 Anaconda 构建会报告部分 MKL MPI/PGI/SYCL 可选 DLL 缺失；独立目录 smoke 已以退出码 0 通过，因此这些警告不属于 GUI 启动所需依赖。单文件包仍约 331.8 MB，后续可通过拆分 legacy 数值分析依赖进一步缩减。
 
+GUI P7 Application Service 边界测试：
+
+```powershell
+python -m pytest -q test/gui_application_service_test.py
+```
+
+该 Gate 验证稳定 GUI API 到 legacy `cst_tools_main` 的单点翻译、不可变运行请求、Worker 数量边界、初始化/准备失败归一化以及标准停止转发。可用以下命令确认 legacy 方法没有重新泄漏到窗口或控制器：
+
+```powershell
+rg -n "cst_tools_main|setProjectDir|setRunInfos|starttask" GUI -g "*.py"
+```
+
+匹配结果应只位于 `GUI/application_service.py`。
+
 ### 2. 定向协议测试
 
 ```powershell
@@ -220,3 +234,14 @@ P6 复用同一集成测试文件，并增加一次性 Worker 的缺失能力 fa
 P6.5 II 不增加新的 CST 工作流，而是收紧能力来源：Cold/Warm 基准显式将同一个 `HOM_PROFILE_V1` 传给 Workspace 和原生结果读取器；P5.5 多轴 Gate 同时用它校验任务、动态 R/Q 能力和原生对照结果。默认测试还使用变体 Profile 验证自定义 `.rd0` 路径、单位、结果分类和积分线路由，防止代码退回模块级 HOM 硬编码。真实回归继续使用前述 P5.5 命令。
 
 P7 将通用核心拆为 `project_profile.py`、`native_results.py` 和 `result_provider.py`。默认测试直接用基础 `ProjectProfile` 构建 Warm Worker，并验证通用严格标量读取和与物理类型无关的 Provider 选择。HOM 模块继续提供兼容入口和 R/Q 领域适配。P7 真实回归使用 P6.5 I 的缺模板定向命令与 P5.5 多轴命令；不需要新增 CST 工作流。
+
+## GUI 新后端迁移 Gate
+
+```powershell
+python -m pytest -q `
+  test/gui_application_service_test.py `
+  test/gui_fake_worker_flow_test.py `
+  test/gui_main_window_test.py
+```
+
+该 Gate 验证 GUI 默认装配新的 `CstApplicationBackend`、旧式注入 Engine 的兼容转换、Fake Worker 成功/失败/停止流程以及窗口状态语义。它不启动 CST。迁移后还必须运行完整默认测试；当前结果为 `131 passed, 12 deselected`。

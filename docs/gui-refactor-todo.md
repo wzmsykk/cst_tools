@@ -1,6 +1,6 @@
 # GUI 重构 TODO
 
-状态：P0–P6.5 已完成；当前实施记录
+状态：P0–P7 已完成；当前实施记录
 
 ## 目标与边界
 
@@ -118,6 +118,29 @@ GUI 重构先修复线程、状态和生命周期边界，再调整布局和交�
 - [x] 打包进程以退出码 0 结束，无需用户通过 UI 关闭。
 
 验证记录：源码与入口定向 Gate 为 39 passed；完整默认测试为 127 passed, 12 deselected。单文件产物大小为 331,751,465 bytes，SHA-256 为 `74148BEB43962CF645E8A57B4DB635D4D06F64977218E96AB10C367FCF8B40B8`。当前体积较大源于 legacy 算法生产路径直接依赖 NumPy、pandas、Matplotlib 和 SciPy；体积优化不阻塞 P6.5 功能 Gate。
+
+## P7：Application Service 边界
+
+- [x] GUI 定义稳定的 `GuiApplicationService` Protocol。
+- [x] 启动参数收敛为不可变 `RunRequest`，在边界验证 Worker 数量。
+- [x] 主窗口只使用面向 GUI 的 snake_case 操作，不导入 `base.py`。
+- [x] 运行控制器只负责状态机和线程，不再解释 legacy 返回值。
+- [x] Application Service 独占旧方法翻译和失败归一化。
+- [x] 保持现有生产 Engine、Manager、Worker 和 Python/VBA 协议不变。
+- [x] Application Service 使用独立单元测试覆盖配置、运行、停止和失败路径。
+
+实现记录：主窗口负责呈现和收集输入，控制器负责 RunState/QThread，Application Service 负责应用用例。P7 建立边界时保留旧后端适配器；该临时生产依赖已在 P8 移除。
+
+## P8：旧应用后端迁移
+
+- [x] 将生产编排实现从根目录 `base.py` 迁入 `csttool/application_backend.py`。
+- [x] 新后端公开稳定 snake_case 应用 API，GUI 不再导入旧入口。
+- [x] GUI 默认创建 `CstApplicationBackend`，旧式 Engine 仅通过私有兼容适配器注入。
+- [x] `base.cst_tools_main` 降为旧批处理脚本兼容壳，不再承载生产实现。
+- [x] 保持 Manager、Worker、算法和 Python/VBA 协议行为不变，避免一次迁移跨越两个高风险边界。
+- [x] 增加默认装配测试，并通过 Fake Worker 流程和完整回归。
+
+实现记录：新代码的依赖方向为 `GUI -> GuiApplicationService -> CstApplicationBackend -> Manager/Algorithm`。兼容适配器只服务尚未迁移的注入式旧 Engine 和测试替身；生产默认路径不再经过 `base.py`。定向测试为 `23 passed`，完整默认测试为 `131 passed, 12 deselected`。本阶段不把仅支持有界双任务 Gate 的 `protocol_warm_worker` 宣称为通用生产后端；其接入需单独的真实 CST Gate。
 
 ## 明确不做
 
