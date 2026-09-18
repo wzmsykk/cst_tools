@@ -413,19 +413,25 @@ class CSTManager:
             self._state = ManagerState.STOPPING
             slots = list(self._slots)
 
-        def stop_slot(slot: _WorkerSlot) -> None:
+        def stop_slot(slot: _WorkerSlot):
             try:
                 slot.worker.stop()
-            except Exception:
+            except Exception as exc:
                 self.logger.exception("Failed to stop CST worker %s", slot.worker_id)
+                return exc
             finally:
                 slot.state = WorkerState.DEAD
+            return None
 
         with ThreadPoolExecutor(
             max_workers=len(slots) or 1,
             thread_name_prefix="cst-stop",
         ) as stop_executor:
-            list(stop_executor.map(stop_slot, slots))
+            stop_errors = [
+                error
+                for error in stop_executor.map(stop_slot, slots)
+                if error is not None
+            ]
 
         self._executor.shutdown(wait=True, cancel_futures=True)
         self._clear_queue(self._task_queue)
@@ -434,6 +440,10 @@ class CSTManager:
             self._slots.clear()
             self._state = ManagerState.CLOSED
         self.logger.info("CSTManager stopped")
+        if stop_errors:
+            raise RuntimeError(
+                f"{len(stop_errors)} CST worker(s) did not stop cleanly"
+            ) from stop_errors[0]
 
     @staticmethod
     def _clear_queue(target: Queue) -> None:

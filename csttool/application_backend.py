@@ -11,6 +11,7 @@ from typing import Callable
 from install_compat import resource_path
 
 from csttool import cstmanager, globalconfmanager, logger, myAlgorithm_pop
+from csttool.managed_cstworker import ManagedCSTWorker
 from csttool import projectconfmanager
 
 
@@ -77,6 +78,7 @@ class CstApplicationBackend:
             Logger=self.logger,
         )
         self.alg = algorithm or myAlgorithm_pop.myAlg01(manager=None, params=None)
+        self._uses_default_manager = manager_factory is None
         self._manager_factory = manager_factory or cstmanager.CSTManager
 
         default_pps_path = resource_path("data/defaultPPS.json")
@@ -233,12 +235,16 @@ class CstApplicationBackend:
         if self.jm is not None:
             raise BackendLifecycleError("Manager 已存在")
         project_params = self.pconfman.getParamsList()
+        manager_options = {}
+        if self._uses_default_manager:
+            manager_options["worker_factory"] = ManagedCSTWorker.create
         self.jm = self._manager_factory(
             params=project_params,
             pconfm=self.pconfman,
             gconfm=self.gconfman,
             logger=self.logger,
             maxTask=self.worker_count,
+            **manager_options,
         )
         self._manager_stop_requested = False
         self.logger.info("JOB MANAGER 创建完成")

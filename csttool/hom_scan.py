@@ -215,8 +215,10 @@ class AdaptiveHomScanner:
         if len(validated) > 1:
             raise ValueError("single-mode solve returned more than one mode")
         for mode in validated:
-            if mode.mode_index < 1 or not math.isfinite(mode.frequency):
-                raise ValueError("invalid mode identity or frequency")
+            if mode.mode_index < 1:
+                raise ValueError("invalid mode identity")
+            if not math.isfinite(mode.frequency):
+                raise ValueError("mode frequency is non-finite")
             if not mode.values or any(
                 not math.isfinite(value) for value in mode.values.values()
             ):

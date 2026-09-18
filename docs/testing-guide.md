@@ -278,3 +278,39 @@ python -m pytest -q test/hom_scan_test.py
 该 Gate 验证每次只请求一个模式、命中后从该频率右侧微小容差继续、空窗口按窄窗口宽度前移、多模返回拒绝、有限重试、失败原因、原子 checkpoint、策略变更拒绝、Mode 1 后处理协议以及生产算法输出。
 
 该 Gate 不启动 CST。真实验收应使用 `hom-2022-v1` prepared 工程，覆盖普通相邻模式、间隔小于 0.1 MHz 的近邻模式和空窗口，并与人工窄区间 Cold 结果逐模比较。严格同频简并模式需要单独的局部多模探测；通过前不得宣称 P11 已证明真实扫描无漏模。
+
+## P12 GUI Managed Worker Gate
+
+```powershell
+python -m pytest -q test/managed_cstworker_test.py test/gui_fake_worker_flow_test.py
+```
+
+GUI 默认后端使用 `ManagedCSTWorker`，不再创建旧 `local_cstworker + worker.vb`。新 Worker 在一个 CST 会话中循环接收版本化 Task，逐任务执行参数更新、Rebuild、Solver、声明式运行时 VBA 后处理、Backup Flush、Completion/Ack；停止时使用 Stop Request/Ack 后 Save/Quit。单元 Gate 验证动态任务槽、复杂后处理编译、表达式参数和关闭失败传播。
+
+真实 CST Gate 必须另外验证多个连续任务、运行中关闭 GUI、正常完成和故意制造关闭超时。只有 Stop Ack、批处理退出码正常且无新增 CST/UI 进程残留时才算标准退出；强制清场必须使 Gate 失败。
+
+双任务真实 Gate：
+
+```powershell
+python -m pytest -q -m integration --run-cst `
+  --cst-exe "D:\Program Files (x86)\CST Studio Suite 2022\CST DESIGN ENVIRONMENT.exe" `
+  test/managed_cstworker_integration_test.py
+```
+
+当前实测为 `1 passed in 293.37s`。两个参数任务在同一 CST 会话内依次完成，运行时 Frequency 结果成功读取且不同；随后收到 Stop Ack，CST 以退出码 0 自然结束，没有使用强制清场。GUI 运行中关闭的真实端到端 Gate 和故意关闭超时 Gate 仍待补充。
+
+HOM 扫描另有可复现的概率化假 Worker：
+
+```powershell
+python -m pytest -q test/hom_probabilistic_fake_worker_test.py
+```
+
+它基于固定物理频谱和随机 seed，以可配置概率产生正常单模、空窗口、任务失败、重复边界频率、区间外结果、NaN/Inf 和错误的多模返回。定向场景使用预设事件序列，混合场景使用固定 seed，因此测试覆盖概率事件但不会产生随机失败。
+
+物理频谱可通过 `ProbabilisticHomWorker.from_csv(...)` 从 CST 派生 CSV 载入。默认测试样本取自 `D:\work\HOM_THRESHOLD\all_value_2996-2_ABSORB.csv` 和 `classified_hom.csv` 的真实近邻模式，测试本身使用仓库内最小样本，避免依赖开发机绝对路径。频率基准表 `classified_hom.csv` 的 SHA-256 为 `784274F7E61D8FAE172BF50B61AF685F32B67360F3FC1B6273B1BBFC01D8528F`；141 个模式覆盖 579.328346594951–3002.84867649957 MHz，平均相邻间距 17.3108594993187 MHz，平均密度 0.0577672067663282 模/MHz。间距分布高度不均匀：中位数 1.41670150278321 MHz，最小值 0.0120950619800624 MHz，不能用均匀随机频谱替代。
+
+CSV 假 Worker 保存每个模式的完整数值记录，并按声明式 PPS 的 `resultName`、`method` 和积分偏移返回结果。默认 HOM Gate 覆盖 Frequency、中心/5 mm/10 mm R/Q、Q-factor、Shunt Impedance 和 Total Loss；自定义结果名按 method 映射。CSV 无法提供的后处理项在 Worker 创建阶段明确失败，不使用固定值或零值代替。该模型只覆盖 CSV 已记录的物理量；任意轴、任意积分位置等动态后处理仍需真实 CST Gate 或包含相应字段的数据源。
+
+`ProbabilisticHomWorker.from_csv_randomized(..., model_seed=...)` 提供相似分布随机模型。它从真实相邻模式间距中有放回抽样，再缩放到原始频率范围，因此保持模式总数、频率上下界和平均密度；每个随机模式的后处理值按完整源数据行抽样，保留 Q、R/Q、Shunt Impedance、Total Loss 之间的联合关系。`model_seed` 只控制物理模型，普通 `seed` 仍独立控制协议/求解异常注入。
+
+随机模型 Gate 使用多个固定 `model_seed` 完整扫描各自生成的频谱，要求所有模式逐个找全，并要求每个模式恰好包含默认七项有限后处理值。外部完整表可用于扩大 seed 数量的压力验证，但不作为默认测试路径依赖。

@@ -70,8 +70,9 @@ native CST result -> Python-derived result -> optional runtime VBA
 | GUI P9 | 新后端内部 API、生命周期、异常和清理语义收口 | CLI/旧方法移至兼容壳；异常路径标准停止 Manager |
 | P10 | 生产算法替换旧 Manager API | 默认、TM020、WTC 使用 `CSTManager`、`SimulationTask`、`execute/run_batch` |
 | P11 | HOM 扫描完整性修复 | 窄区间逐个求解 Mode 1、微小容差推进、有限重试和原子 checkpoint |
+| P12 | GUI 生产 Worker 迁移 | 默认后端使用长驻版本化文件协议 Worker；Completion/Ack 栅栏，标准 Save/Quit，保留声明式运行时 VBA 后处理 |
 
-P11 已移除大区间多模饱和二分方案；默认 PPS 恢复为 `iModeNumber=1` 的非 `_All` 方法。严格同频简并模态仍需要专门的局部多模 Gate，当前不能宣称已覆盖。P11 尚未执行真实 CST 验收。
+P11 已移除大区间多模饱和二分方案；默认 PPS 恢复为 `iModeNumber=1` 的非 `_All` 方法。严格同频简并模态仍需要专门的局部多模 Gate，当前不能宣称已覆盖。P11 尚未执行真实 CST 扫描验收。P12 Managed Worker 双任务真实 Gate 已通过：同一 CST 会话连续完成两个任务，Completion/Ack 和 Stop Ack 正常，进程以退出码 0 结束且未强制清场。
 
 ## 4. `hom-2022-v1` Profile
 
