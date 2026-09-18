@@ -162,6 +162,13 @@ class CstApplicationBackend:
                 self.start_from_existing,
                 self.safe_mode,
             )
+            validate_postprocess = getattr(
+                self.alg,
+                "validate_postprocess_settings",
+                None,
+            )
+            if validate_postprocess is not None:
+                validate_postprocess(self.pconfman.getCurrPPSList())
             self.gconfman.printconf()
             self.logger.info("-----------------------------------")
             self._create_manager()

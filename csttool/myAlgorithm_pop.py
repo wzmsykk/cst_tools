@@ -1,13 +1,24 @@
 ﻿"""produce LHS sample"""
 import os
+import logging
+import hashlib
+import json
 from .myAlgorithm import myAlg
 
 import math
 import numpy as np
 from . import cstmanager
+from .hom_scan import (
+    AdaptiveHomScanner,
+    IncompleteScanError,
+    ModeResult,
+    ScanCheckpointStore,
+    ScanPolicy,
+)
 from . import yfunction
 import time
 import pandas as pd
+from pathlib import Path
 
 
 class myAlg01(myAlg):
@@ -79,6 +90,7 @@ class myAlg01(myAlg):
 
     def setJobManager(self, manager: cstmanager.SimulationManager):
         self.manager = manager
+        self.logger = getattr(manager, "logger", logging.getLogger(__name__))
         self.mode_location = str(manager.currProjectDir) + "\\result\\"
         self.relative_location = str(manager.currProjectDir) + "\\save\\csv\\"
         if not os.path.exists(self.relative_location):
@@ -110,6 +122,22 @@ class myAlg01(myAlg):
             "endfreq": self.end_frequency,
         }
         return d
+
+    def validate_postprocess_settings(self, settings):
+        if not settings:
+            raise ValueError("HOM single-mode scan requires postprocess settings")
+        frequency_steps = [
+            item for item in settings if item.get("resultName", "").casefold() == "frequency"
+        ]
+        if len(frequency_steps) != 1:
+            raise ValueError("HOM single-mode scan requires one frequency result")
+        for item in settings:
+            method = item.get("method")
+            params = item.get("params") or {}
+            if not isinstance(method, str) or method.endswith("_All"):
+                raise ValueError("HOM single-mode scan does not use _All methods")
+            if int(params.get("iModeNumber", 0)) != 1:
+                raise ValueError("HOM postprocess methods must target iModeNumber=1")
 
     def logCalcSettings(self):
         print(self.getEditableAttrs())
@@ -268,7 +296,7 @@ class myAlg01(myAlg):
         text = f.read()
         return float(text[140:])
 
-    def start(self):
+    def _legacy_start(self):
         if self.ready == False:
             print("CALCATION NOT READY, PLEASE CHECK SETTINGS.")
             print("IS THE JOBMANAGER SET?")
@@ -456,6 +484,181 @@ class myAlg01(myAlg):
         print(start_time - end_time)
         self.log.close()
         return 0
+
+    def _scan_policy(self):
+        initial_width = float(self.input_min[2]) - float(self.input_min[1])
+        return ScanPolicy(
+            start=float(self.input_min[1]),
+            initial_stop=float(self.input_min[2]),
+            stop=float(self.end_frequency),
+            window_width=min(float(self.delta_frequency), initial_width),
+            requested_modes=1,
+        )
+
+    def _mesh_settings(self, frequency):
+        accuracy = self.accu_list.loc[
+            (self.accu_list["f_down"] <= frequency)
+            & (self.accu_list["f_up"] > frequency),
+            "accuracy",
+        ]
+        cells = self.cell_list.loc[
+            (self.cell_list["f_down"] <= frequency)
+            & (self.cell_list["f_up"] > frequency),
+            "cell",
+        ]
+        if len(accuracy) != 1 or len(cells) != 1:
+            raise ValueError(f"no unique mesh policy for frequency {frequency}")
+        return float(accuracy.iloc[0]), float(cells.iloc[0])
+
+    def _extract_scan_modes(self, result_list):
+        if not result_list:
+            return []
+        values = {}
+        for item in result_list:
+            result_name = item.get("resultName")
+            if not isinstance(result_name, str) or not result_name:
+                raise ValueError("postprocess result has no resultName")
+            value = item.get("value")
+            if isinstance(value, dict):
+                if len(value) != 1:
+                    raise ValueError("single-mode result must contain exactly one value")
+                value = next(iter(value.values()))
+            params = item.get("params") or {}
+            if params and int(params.get("iModeNumber", 1)) != 1:
+                raise ValueError("single-mode result does not target mode 1")
+            if result_name in values:
+                raise ValueError(f"duplicate result {result_name!r}")
+            values[result_name] = float(value)
+
+        frequency_name = next(
+            (name for name in values if name.casefold() == "frequency"), None
+        )
+        if frequency_name is None:
+            raise ValueError("postprocess results do not contain frequency")
+        return [
+            ModeResult(
+                mode_index=1,
+                frequency=float(values[frequency_name]),
+                values=values,
+            )
+        ]
+
+    def _project_fingerprint(self):
+        project = getattr(self.manager, "cstProjPath", None)
+        if project is None:
+            fingerprint = {
+                "projectDirectory": str(Path(self.manager.currProjectDir).resolve())
+            }
+        else:
+            path = Path(project).resolve()
+            stat = path.stat()
+            fingerprint = {
+                "path": str(path),
+                "size": stat.st_size,
+                "mtimeNs": stat.st_mtime_ns,
+            }
+        project_config = getattr(self.manager, "pconfm", None)
+        if project_config is not None:
+            postprocess = project_config.getCurrPPSList()
+            encoded = json.dumps(
+                postprocess,
+                ensure_ascii=False,
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode("utf-8")
+            fingerprint["postprocessSha256"] = hashlib.sha256(encoded).hexdigest()
+        return fingerprint
+
+    def _write_scan_results(self, report):
+        rows = [
+            {"mode": scan_index, "solverMode": mode.mode_index, **mode.values}
+            for scan_index, mode in enumerate(
+                sorted(report.modes, key=lambda item: item.frequency),
+                start=1,
+            )
+        ]
+        destination = Path(self.relative_location) / "hom_scan_results.csv"
+        temporary = destination.with_suffix(".csv.tmp")
+        pd.DataFrame(rows).to_csv(temporary, index=False)
+        temporary.replace(destination)
+
+    def start(self):
+        if not self.ready:
+            raise RuntimeError("HOM scan is not ready")
+
+        policy = self._scan_policy()
+        scanner = AdaptiveHomScanner(policy)
+        checkpoint_store = ScanCheckpointStore(
+            Path(self.relative_location) / "hom_scan_checkpoint.json"
+        )
+        fingerprint = self._project_fingerprint()
+        report = None
+        pending = None
+        if self.continue_flag[0]:
+            if not checkpoint_store.path.exists():
+                raise FileNotFoundError(checkpoint_store.path)
+            report, pending = checkpoint_store.load(policy, fingerprint)
+            pending = list(report.failed) + pending
+            report.failed.clear()
+            report.failure_reasons.clear()
+
+        def save_checkpoint(current_report, current_pending):
+            checkpoint_store.save(
+                policy,
+                fingerprint,
+                current_report,
+                current_pending,
+            )
+            self._write_scan_results(current_report)
+
+        def solve(request):
+            accuracy, cells = self._mesh_settings(request.interval.lo)
+            values = [
+                request.requested_modes,
+                request.solve_lo,
+                request.solve_hi,
+                accuracy,
+                cells,
+            ]
+            job_name = (
+                f"hom_{request.interval.lo:g}_{request.interval.hi:g}"
+            )
+            result = self._execute_simulation(values, job_name, retry_count=1)
+            if result.get("TaskStatus") != "Success":
+                reason = result.get("FailureReport", "unknown CST failure")
+                raise RuntimeError(reason)
+            postprocess = result.get("PostProcessResult")
+            if not isinstance(postprocess, list):
+                raise ValueError("CST task returned no postprocess result list")
+            return self._extract_scan_modes(postprocess)
+
+        started = time.monotonic()
+        try:
+            final_report = scanner.run(
+                solve,
+                pending=pending,
+                report=report,
+                checkpoint=save_checkpoint,
+            )
+            save_checkpoint(final_report, [])
+            self.logger.info(
+                "HOM scan completed: modes=%d intervals=%d solver_calls=%d elapsed=%.3fs",
+                len(final_report.modes),
+                len(final_report.completed),
+                final_report.solver_calls,
+                time.monotonic() - started,
+            )
+            return final_report
+        except IncompleteScanError as exc:
+            self.logger.error(
+                "HOM scan incomplete: failed_intervals=%d solver_calls=%d",
+                len(exc.report.failed),
+                exc.report.solver_calls,
+            )
+            raise
+        finally:
+            if self.log is not None and not self.log.closed:
+                self.log.close()
 
 
 if __name__ == "__main__":

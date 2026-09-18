@@ -268,3 +268,13 @@ python -m pytest -q `
 ```
 
 该 Gate 使用只实现 `execute/run_batch` 的 Manager 替身验证默认算法已经脱离旧队列接口，同时覆盖并发顺序、失败重试、Worker 回收和应用后端清理。当前定向结果为 `14 passed`，完整默认测试为 `139 passed, 12 deselected`。真实 CST 的默认、TM020 和 WTC 路径仍需分别执行生产验收；默认测试不宣称底层 Worker 已切换到 P7 Warm 文件协议。
+
+## P11 HOM 扫描算法 Gate
+
+```powershell
+python -m pytest -q test/hom_scan_test.py
+```
+
+该 Gate 验证每次只请求一个模式、命中后从该频率右侧微小容差继续、空窗口按窄窗口宽度前移、多模返回拒绝、有限重试、失败原因、原子 checkpoint、策略变更拒绝、Mode 1 后处理协议以及生产算法输出。
+
+该 Gate 不启动 CST。真实验收应使用 `hom-2022-v1` prepared 工程，覆盖普通相邻模式、间隔小于 0.1 MHz 的近邻模式和空窗口，并与人工窄区间 Cold 结果逐模比较。严格同频简并模式需要单独的局部多模探测；通过前不得宣称 P11 已证明真实扫描无漏模。

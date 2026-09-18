@@ -1,7 +1,7 @@
 # CST Tools 当前状态与实施路线
 
-状态日期：2026-09-17
-当前基线提交：`f302c61 Modernize application backend lifecycle`（其后工作区实施 Manager API 替换，尚未提交）
+状态日期：2026-09-18
+当前基线提交：`0767649 Replace legacy manager calls with task API`（其后工作区实施 HOM 扫描算法修复，尚未提交）
 
 本文是项目当前状态的权威入口。历史设计文档仍保留其分析价值；若与本文或[最小 Python/VBA 协议 TODO](./minimal-python-vba-todo.md)冲突，以本文和已经通过的真实 CST Gate 为准。
 
@@ -69,8 +69,9 @@ native CST result -> Python-derived result -> optional runtime VBA
 | GUI P8 | 生产编排迁入 `csttool.application_backend`，GUI 默认切换新后端 | 旧 `base.cst_tools_main` 降为兼容入口；全量测试通过 |
 | GUI P9 | 新后端内部 API、生命周期、异常和清理语义收口 | CLI/旧方法移至兼容壳；异常路径标准停止 Manager |
 | P10 | 生产算法替换旧 Manager API | 默认、TM020、WTC 使用 `CSTManager`、`SimulationTask`、`execute/run_batch` |
+| P11 | HOM 扫描完整性修复 | 窄区间逐个求解 Mode 1、微小容差推进、有限重试和原子 checkpoint |
 
-当前默认测试基线为 `139 passed, 12 deselected`。协议 P7 缺模板 Gate 为 `1 passed in 127.38s`，真实多轴 Gate 为 `1 passed in 178.02s`；P10 Manager 替换定向测试为 `14 passed`。
+P11 已移除大区间多模饱和二分方案；默认 PPS 恢复为 `iModeNumber=1` 的非 `_All` 方法。严格同频简并模态仍需要专门的局部多模 Gate，当前不能宣称已覆盖。P11 尚未执行真实 CST 验收。
 
 ## 4. `hom-2022-v1` Profile
 
@@ -131,4 +132,5 @@ Profile 验证使用 CST 官方 `ResetTemplateIterator/GetNextTemplate`，比较
 - CSTManager 公共接口：[CSTManager API](./cstmanager-api.md)
 - CSTManager 设计：[CSTManager 设计文档](./cstmanager-design.md)
 - 应用后端 API 与生命周期：[CST Application Backend](./application-backend.md)
+- HOM 扫描算法：[HOM 自适应区间扫描](./hom-scan-algorithm.md)
 - 历史完整 ABI 提案：[现代跨语言 ABI 设计](./modern-cross-language-abi-design.md)
