@@ -169,17 +169,27 @@ class myAlg01(myAlg):
 
         return np.array(y).reshape(len(xs), self.dimension_output)
 
-    def _simulation_task(self, values, job_name, retry_count=0):
+    def _simulation_task(
+        self, values, job_name, retry_count=0, *, continue_from_snapshot=False
+    ):
         params = dict(zip(self.input_name, values))
         return cstmanager.SimulationTask(
             params=params,
             job_name=job_name,
             retry_count=retry_count,
+            continue_from_snapshot=continue_from_snapshot,
         )
 
-    def _execute_simulation(self, values, job_name, retry_count=0):
+    def _execute_simulation(
+        self, values, job_name, retry_count=0, *, continue_from_snapshot=False
+    ):
         return self.manager.execute(
-            self._simulation_task(values, job_name, retry_count)
+            self._simulation_task(
+                values,
+                job_name,
+                retry_count,
+                continue_from_snapshot=continue_from_snapshot,
+            )
         )
 
     def write_many(self, title, data):
@@ -604,17 +614,31 @@ class myAlg01(myAlg):
         if self.continue_flag[0]:
             if not checkpoint_store.path.exists():
                 raise FileNotFoundError(checkpoint_store.path)
-            report, pending = checkpoint_store.load(policy, fingerprint)
+            report, pending, resume_snapshot = checkpoint_store.load_with_snapshot(
+                policy, fingerprint
+            )
+            if resume_snapshot is not None:
+                restore_snapshot = getattr(
+                    self.manager, "restore_project_snapshot", None
+                )
+                if restore_snapshot is None:
+                    raise RuntimeError(
+                        "manager cannot restore the confirmed CST snapshot"
+                    )
+                restore_snapshot(resume_snapshot)
             pending = list(report.failed) + pending
             report.failed.clear()
             report.failure_reasons.clear()
 
         def save_checkpoint(current_report, current_pending):
+            get_snapshot = getattr(self.manager, "get_confirmed_snapshot", None)
+            snapshot = get_snapshot() if get_snapshot is not None else None
             checkpoint_store.save(
                 policy,
                 fingerprint,
                 current_report,
                 current_pending,
+                snapshot_path=snapshot,
             )
             self._write_scan_results(current_report)
 
@@ -630,7 +654,12 @@ class myAlg01(myAlg):
             job_name = (
                 f"hom_{request.interval.lo:g}_{request.interval.hi:g}"
             )
-            result = self._execute_simulation(values, job_name, retry_count=1)
+            result = self._execute_simulation(
+                values,
+                job_name,
+                retry_count=1,
+                continue_from_snapshot=True,
+            )
             if result.get("TaskStatus") != "Success":
                 reason = result.get("FailureReport", "unknown CST failure")
                 raise RuntimeError(reason)

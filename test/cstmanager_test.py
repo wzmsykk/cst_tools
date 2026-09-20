@@ -74,12 +74,14 @@ def manager_factory(tmp_path):
             "peak": 0,
             "lock": Lock(),
             "created": [],
+            "configs": [],
         }
         shared_outcomes = deque(outcomes)
 
         def worker_factory(worker_id, config, logger):
             worker = FakeWorker(worker_id, tracker, shared_outcomes)
             tracker["created"].append(worker)
+            tracker["configs"].append(dict(config))
             return worker
 
         manager = CSTManager(
@@ -136,6 +138,136 @@ def test_worker_is_recycled_after_job_limit(manager_factory):
     assert len(results) == 2
     assert len(tracker["created"]) == 2
     assert tracker["created"][0].stopped
+
+
+def test_worker_recycle_uses_its_last_confirmed_project_snapshot(tmp_path):
+    created = []
+    configs = []
+    snapshot = tmp_path / "result" / "task-1" / "project.cst"
+
+    class SnapshotWorker:
+        def __init__(self, worker_id):
+            self.ID = worker_id
+            self.stopped = False
+
+        def runWithParam(self, resultname, *, params):
+            snapshot.parent.mkdir(parents=True, exist_ok=True)
+            snapshot.write_bytes(b"confirmed")
+            return {
+                "TaskStatus": "Success",
+                "RunName": resultname,
+                "RunParameters": params,
+                "PostProcessResult": [],
+                "ProjectSnapshot": str(snapshot),
+            }
+
+        def stop(self):
+            self.stopped = True
+
+    def worker_factory(worker_id, config, _logger):
+        configs.append(dict(config))
+        worker = SnapshotWorker(worker_id)
+        created.append(worker)
+        return worker
+
+    manager = CSTManager(
+        FakeGlobalConfig(tmp_path),
+        FakeProjectConfig(tmp_path),
+        params=[],
+        maxTask=1,
+        worker_factory=worker_factory,
+        max_jobs_per_worker=1,
+    )
+    try:
+        manager.run_batch(
+            [
+                SimulationTask({}, "mode-8", continue_from_snapshot=True),
+                SimulationTask({}, "mode-9", continue_from_snapshot=True),
+            ]
+        )
+
+        assert len(created) == 2
+        assert created[0].stopped
+        assert Path(configs[1]["cstPath"]) == snapshot.resolve()
+        assert manager.get_confirmed_snapshot() == snapshot.resolve()
+    finally:
+        manager.stop()
+
+
+def test_standard_batch_recycle_starts_from_base_project(tmp_path):
+    configs = []
+    snapshot = tmp_path / "result" / "task-1" / "project.cst"
+
+    class SnapshotWorker(FakeWorker):
+        def runWithParam(self, resultname, *, params):
+            snapshot.parent.mkdir(parents=True, exist_ok=True)
+            snapshot.write_bytes(b"independent-task-snapshot")
+            result = super().runWithParam(resultname, params=params)
+            result["ProjectSnapshot"] = str(snapshot)
+            return result
+
+    def worker_factory(worker_id, config, _logger):
+        configs.append(dict(config))
+        return SnapshotWorker(
+            worker_id,
+            {"lock": Lock(), "active": 0, "peak": 0},
+            deque(),
+        )
+
+    manager = CSTManager(
+        FakeGlobalConfig(tmp_path),
+        FakeProjectConfig(tmp_path),
+        params=[],
+        maxTask=1,
+        worker_factory=worker_factory,
+        max_jobs_per_worker=1,
+    )
+    try:
+        manager.run_batch(
+            [SimulationTask({"x": 1}, "first"), SimulationTask({"x": 2}, "second")]
+        )
+
+        assert len(configs) == 2
+        assert Path(configs[1]["cstPath"]) == (tmp_path / "model.cst").resolve()
+        assert manager.get_confirmed_snapshot() is None
+    finally:
+        manager.stop()
+
+
+def test_explicit_snapshot_restore_rebuilds_idle_worker_pool(tmp_path):
+    created = []
+    configs = []
+    snapshot = tmp_path / "result" / "mode-8" / "project.cst"
+    snapshot.parent.mkdir(parents=True)
+    snapshot.write_bytes(b"confirmed")
+
+    def worker_factory(worker_id, config, _logger):
+        configs.append(dict(config))
+        worker = FakeWorker(
+            worker_id,
+            {"lock": Lock(), "active": 0, "peak": 0},
+            deque(),
+        )
+        created.append(worker)
+        return worker
+
+    manager = CSTManager(
+        FakeGlobalConfig(tmp_path),
+        FakeProjectConfig(tmp_path),
+        params=[],
+        maxTask=2,
+        worker_factory=worker_factory,
+    )
+    try:
+        manager.restore_project_snapshot(snapshot)
+
+        assert len(created) == 4
+        assert all(worker.stopped for worker in created[:2])
+        assert all(
+            Path(config["cstPath"]) == snapshot.resolve() for config in configs[2:]
+        )
+    finally:
+        manager.stop()
 
 
 def test_get_first_result_preserves_remaining_result_order(manager_factory):

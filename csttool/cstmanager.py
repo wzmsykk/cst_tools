@@ -45,6 +45,10 @@ class SimulationManager(Protocol):
 
     def run_batch(self, tasks: Iterable["SimulationTask"]) -> list[dict]: ...
 
+    def get_confirmed_snapshot(self) -> Path | None: ...
+
+    def restore_project_snapshot(self, snapshot: str | Path) -> None: ...
+
     def stop(self) -> None: ...
 
 
@@ -69,6 +73,7 @@ class SimulationTask:
     params: Mapping[str, Any]
     job_name: str
     retry_count: int = 0
+    continue_from_snapshot: bool = False
 
     def __post_init__(self) -> None:
         if not self.job_name:
@@ -89,6 +94,7 @@ class _WorkerSlot:
     worker: WorkerProtocol
     completed_jobs: int = 0
     state: WorkerState = WorkerState.ALIVE
+    confirmed_snapshot: Path | None = None
 
 
 WorkerFactory = Callable[[str, dict[str, Any], logging.Logger], WorkerProtocol]
@@ -145,6 +151,7 @@ class CSTManager:
         self._result_queue: Queue[tuple[int, dict]] = Queue()
         self._slots: list[_WorkerSlot] = []
         self._next_sequence = 0
+        self._confirmed_snapshot: Path | None = None
         self._executor = ThreadPoolExecutor(
             max_workers=maxTask,
             thread_name_prefix="cst-worker",
@@ -184,7 +191,9 @@ class CSTManager:
         with self._state_lock:
             return [slot.state.name for slot in self._slots]
 
-    def _worker_config(self, worker_id: str) -> dict[str, Any]:
+    def _worker_config(
+        self, worker_id: str, source_project: str | Path | None = None
+    ) -> dict[str, Any]:
         worker_dir = self.tempDir / f"worker_{worker_id}"
         worker_dir.mkdir(parents=True, exist_ok=True)
         return {
@@ -194,7 +203,7 @@ class CSTManager:
             "ProjectType": self.cstType,
             "cstPatternDir": str(self.cstPatternDir),
             "resultDir": str(self.resultDir),
-            "cstPath": str(self.cstProjPath),
+            "cstPath": str(source_project or self.cstProjPath),
             "paramList": self.paramList,
             "postProcess": self.pconfm.getCurrPPSList(),
             "runInBackground": True,
@@ -214,11 +223,13 @@ class CSTManager:
             logger=logger,
         )
 
-    def _create_worker(self, worker_id: str) -> WorkerProtocol:
+    def _create_worker(
+        self, worker_id: str, source_project: str | Path | None = None
+    ) -> WorkerProtocol:
         self.logger.debug("Creating CST worker %s", worker_id)
         return self._worker_factory(
             worker_id,
-            self._worker_config(worker_id),
+            self._worker_config(worker_id, source_project),
             self.logger,
         )
 
@@ -230,6 +241,66 @@ class CSTManager:
 
     def getResultDir(self) -> Path:
         return self.resultDir
+
+    def get_confirmed_snapshot(self) -> Path | None:
+        """Return the newest task snapshot accepted by this manager."""
+        with self._state_lock:
+            return self._confirmed_snapshot
+
+    @staticmethod
+    def _validated_snapshot(snapshot: str | Path) -> Path:
+        path = Path(snapshot).resolve()
+        if not path.is_file() or path.stat().st_size == 0:
+            raise FileNotFoundError(f"confirmed CST snapshot is unavailable: {path}")
+        return path
+
+    def restore_project_snapshot(self, snapshot: str | Path) -> None:
+        """Restart an idle pool from one previously confirmed project snapshot."""
+        source = self._validated_snapshot(snapshot)
+        with self._state_lock:
+            if self._state is not ManagerState.IDLE:
+                raise RuntimeError("CST snapshot can only be restored while manager is idle")
+            slots = list(self._slots)
+
+        replacements: list[_WorkerSlot] = []
+        try:
+            for slot in slots:
+                slot.worker.stop()
+                slot.state = WorkerState.DEAD
+            for slot in slots:
+                worker = self._create_worker(slot.worker_id, source)
+                replacements.append(
+                    _WorkerSlot(
+                        slot.worker_id,
+                        worker,
+                        confirmed_snapshot=source,
+                    )
+                )
+        except Exception:
+            for replacement in replacements:
+                try:
+                    replacement.worker.stop()
+                except Exception:
+                    self.logger.exception(
+                        "Failed to stop partially restored CST worker %s",
+                        replacement.worker_id,
+                    )
+            raise
+
+        accepted = False
+        with self._state_lock:
+            if self._state is ManagerState.IDLE:
+                self._slots = replacements
+                self._confirmed_snapshot = source
+                accepted = True
+        if not accepted:
+            for replacement in replacements:
+                try:
+                    replacement.worker.stop()
+                finally:
+                    replacement.state = WorkerState.DEAD
+            raise RuntimeError("CST manager stopped while restoring project snapshot")
+        self.logger.info("Restored CST worker pool from confirmed snapshot %s", source)
 
     def submit(self, task: SimulationTask) -> int:
         """Queue a task and return its monotonically increasing sequence ID."""
@@ -260,7 +331,9 @@ class CSTManager:
             SimulationTask(params=params, job_name=job_name, retry_count=retry_cnt)
         )
 
-    def _replace_worker(self, slot: _WorkerSlot) -> bool:
+    def _replace_worker(
+        self, slot: _WorkerSlot, *, continue_from_snapshot: bool = False
+    ) -> bool:
         slot.state = WorkerState.RESTARTING
         old_worker = slot.worker
         try:
@@ -274,7 +347,20 @@ class CSTManager:
                 return False
 
         try:
-            slot.worker = self._create_worker(slot.worker_id)
+            # Snapshot continuation is opt-in. Standard batch tasks are
+            # independent and must restart from the configured base project.
+            source = slot.confirmed_snapshot if continue_from_snapshot else None
+            if source is not None:
+                try:
+                    source = self._validated_snapshot(source)
+                except FileNotFoundError:
+                    self.logger.warning(
+                        "Confirmed snapshot disappeared; falling back to base project: %s",
+                        source,
+                    )
+                    source = None
+                    slot.confirmed_snapshot = None
+            slot.worker = self._create_worker(slot.worker_id, source)
         except Exception:
             slot.state = WorkerState.DEAD
             raise
@@ -317,6 +403,12 @@ class CSTManager:
                 result = self._exception_result(task, exc)
 
             if result.get("TaskStatus") != "Failure":
+                snapshot_value = result.get("ProjectSnapshot")
+                if snapshot_value and task.continue_from_snapshot:
+                    snapshot = self._validated_snapshot(snapshot_value)
+                    slot.confirmed_snapshot = snapshot
+                    with self._state_lock:
+                        self._confirmed_snapshot = snapshot
                 slot.completed_jobs += 1
                 return result
 
@@ -329,7 +421,10 @@ class CSTManager:
             )
             if self.stop_requested:
                 break
-            if not self._replace_worker(slot):
+            if not self._replace_worker(
+                slot,
+                continue_from_snapshot=task.continue_from_snapshot,
+            ):
                 break
 
         assert result is not None
@@ -349,7 +444,10 @@ class CSTManager:
                         slot.worker_id,
                         self.maxWorkerJobCountLimit,
                     )
-                    if not self._replace_worker(slot):
+                    if not self._replace_worker(
+                        slot,
+                        continue_from_snapshot=queued.task.continue_from_snapshot,
+                    ):
                         return
                 result = self._execute_task(slot, queued.task)
                 self._result_queue.put((queued.sequence, result))

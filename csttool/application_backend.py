@@ -58,7 +58,7 @@ class CstApplicationBackend:
     ) -> None:
         self._lifecycle_lock = threading.RLock()
         self.state = BackendState.CREATED
-        self.worker_count = 2
+        self.worker_count = 1
         self.start_from_existing = False
         self.safe_mode = False
         self.jm = None

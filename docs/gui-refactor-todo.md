@@ -49,7 +49,7 @@ GUI 重构先修复线程、状态和生命周期边界，再调整布局和交�
 - [x] Fake Worker 阻塞期间关闭窗口，验证 STOPPING、CSTManager.stop() 和全部 Worker 停止。
 - [x] Gate 不读取真实 CST 配置、不启动 CST，也不创建可见窗口。
 
-验证记录：Fake Worker GUI 全流程 Gate 为 3 passed；完整默认测试为 104 passed, 12 deselected。成功流程的并发峰值为 2，结果顺序为 band-1、band-2；失败和关闭流程最终 Manager 均为 CLOSED，所有创建的 Fake Worker 均收到 stop。
+验证记录：Fake Worker GUI 全流程 Gate 为 3 passed；完整默认测试为 104 passed, 12 deselected。默认值现为 1，另有显式选择 2 个 Worker 的 Gate 验证并发；GUI 成功流程结果顺序保持 band-1、band-2。失败和关闭流程最终 Manager 均为 CLOSED，所有创建的 Fake Worker 均收到 stop。
 
 ## P2.6：GUI 可调 Worker 并发数
 
@@ -59,7 +59,7 @@ GUI 重构先修复线程、状态和生命周期边界，再调整布局和交�
 - [x] Fake Worker Gate 验证选择 1 时只创建一个 Worker，实际并发峰值为 1。
 - [x] 不在 GUI 中复制 Manager 调度逻辑。
 
-验证记录：GUI 与 Fake Worker 定向测试为 18 passed。并发数从窗口经 GuiRunController、GuiBackend 传入 CSTManager；运行结束后控件重新启用。
+验证记录：GUI 与 Fake Worker 定向测试为 18 passed。Worker 数从窗口经 GuiRunController、GuiBackend 传入 CSTManager；当前默认值为 1，用户可显式调高，运行结束后控件重新启用。
 
 ## P3：配置对话框与数据模型
 

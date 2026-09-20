@@ -59,7 +59,7 @@ native CST result -> Python-derived result -> optional runtime VBA
 | GUI P1 | 显式 RunState、组合式 Worker、后台准备和集中状态渲染 | GUI `10 passed`；失败可重试、重复启动被拒绝 |
 | GUI P2 | 标准停止、非阻塞受控关闭、阶段与进度显示 | GUI `13 passed`；关闭等待全部线程结束 |
 | GUI P2.5 | 真实 GUI/Controller/Manager 配合 Fake Worker 的全流程 Gate | 成功、失败、运行中关闭三条流程通过 |
-| GUI P2.6 | GUI 可调 Worker 并发数，运行请求冻结配置并传入 Manager | 选择 1 时仅创建一个 Worker，并发峰值为 1 |
+| GUI P2.6 | GUI 可调 Worker 并发数，运行请求冻结配置并传入 Manager | 默认为 1；用户可按本机资源和许可证显式调高 |
 | GUI P3 | 类型化算法/PPS 设置、稳定 method key、正确 Qt 模型通知、版本化 JSON | 新旧 JSON 兼容；P3 与 GUI 定向测试通过 |
 | GUI P4 | 统一浅色工程工作台主题、语义操作样式和运行状态反馈 | 离屏渲染成功；主题与既有 GUI Gate 通过 |
 | GUI P5 | 固定坐标主窗口改为响应式双栏工作台 | 缩放布局与 UI 源文件编译 Gate 通过 |
@@ -76,12 +76,18 @@ native CST result -> Python-derived result -> optional runtime VBA
 | P14 | 可恢复 HOM 扫描会话 | 不可变 `scan_manifest.json`、协作式停止、禁止停止期派发/Worker 轮换、ACK 阶段 Stop、独立 Windows 进程组、`INTERRUPTED` 状态、残留会话自动发现及 GUI 恢复 | Pillbox“运行中停止→Save/Quit→新会话恢复完成”Gate 通过，`1 passed in 84.90s` |
 | P14.5 | CST 后台进度 | 增量 tail 每个 Worker 的 `cst.log`，解析 Mesh、Refinement、Eigenmode Pass 和局部百分比，经 Worker/Manager/Backend/Qt signal 显示；不使用 PIPE，不把 Pass 百分比称为总进度 | 真实 Pillbox 日志、频段身份、局部百分比及安全退出 Gate 通过，`1 passed in 56.95s` |
 | P15 | CST 后端版本切换 | 自动发现本机全部 CST 安装、GUI 显式选择并持久化、运行期冻结；Manifest 绑定版本和可执行文件 | 多版本发现/校验、后端状态门和 GUI 切换测试通过 |
+| P15.5 | HOM 多阶段异常恢复 | 真实 HOM 顺序求解 10 个 Mode 1 窄窗口结果；Mode 3 后安全暂停、Mode 7 控制器丢失、Mode 9 CST 进程树死亡并从 Mode 8 快照重算 | 10 个频率严格递增、7 项后处理齐全、两类恢复凭据正确、无交互式 CST 残留 |
+| P15.6 | 确认快照生产接力 | 成功结果发布 `ProjectSnapshot`；仅顺序 HOM 任务显式请求同槽快照接力；标准批量任务保持独立；HOM checkpoint schema 3 持久化并校验快照，续跑前由快照重建 Worker 池 | 单元 Gate 覆盖 Mode 8→9 轮换、标准批处理隔离、显式恢复、快照篡改拒绝和生产算法续跑 |
+| 标准模式解析 Gate | 四 Worker 批量改变 Pillbox 半径，按 TM010 解析模型优化至 500 MHz；注入 Worker 异常、Solver Failure 和重试耗尽后恢复 | 54 次任务、6 轮；229.48730469 mm、499.99509991 MHz；轮换始终回到基础工程，不启用快照接力 |
+| 标准模式真实 CST Gate | Gate 固定使用 1 个 Managed Worker；按真实 Frequency 优化 Pillbox 半径 | CST 2022 单 Worker：3 次求解、1 轮；230.8125 mm、499.792534459 MHz；标准退出且无残留进程 |
 
 P11 已移除大区间多模饱和二分方案；默认 PPS 恢复为 `iModeNumber=1` 的非 `_All` 方法。严格同频简并模态仍需要专门的局部多模 Gate，当前不能宣称已覆盖。P11 尚未执行完整频段的真实 CST 找全验收。P12 Managed Worker 双任务真实 Gate 已通过：同一 CST 会话连续完成两个任务，Completion/Ack 和 Stop Ack 正常，进程以退出码 0 结束且未强制清场。P14 已验证 Pillbox 的安全停止和新会话恢复生命周期，但不等同于复杂 HOM 工程 500–1000 MHz 全频段验收。
 
 P14 的普通“安全停止”在 Stop Ack 超时时只返回 `RECOVERY_REQUIRED`，不再自动终止 CST。GUI 的“恢复会话”会扫描项目运行目录中的 Managed Session，补齐遗留 Completion 的 ACK，并通过 Stop Request/Ack 完成 Save/Quit。强制结束已拆为显式 `emergency_terminate()`，调用后工程必须保持 `RECOVERY_REQUIRED`。
 
 异常恢复进一步区分两类会话：仍存活的 CST 必须完成 Stop Request → Completion ACK → StopAck → 进程退出；PID 已明确死亡的隔离 Worker 会话写入 `abandoned-dead` 恢复凭据，并从最后一个原子 checkpoint 重算未确认区间。所有会话收口后，`project.ini` 才从 `RECOVERY_REQUIRED` 持久化为 `INTERRUPTED`。存活但无响应的进程不会被恢复流程自动强杀。
+
+真实十模式 Gate 同时证明：安全暂停后应以最近一次成功任务生成的 `project.cst` 快照作为恢复输入，而不是重新复制最初 clean 工程；异常死亡后的 Worker 工程不可信，必须回退到死亡前最后一个已确认快照。该规则现已进入生产 Manager 和 HOM checkpoint，而不再只存在于 Gate 驱动代码。空窗口以 `frequency=-1` 明确识别并推进，不得作为模式写入 checkpoint。
 
 ## 4. `hom-2022-v1` Profile
 

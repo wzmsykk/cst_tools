@@ -243,7 +243,7 @@ def test_gui_success_flow_uses_real_manager_with_fake_workers(
     process_until(qapp, lambda: not window.controller.has_active_work)
 
     assert [item["RunName"] for item in backend.results] == ["band-1", "band-2"]
-    assert backend.tracker["peak"] == 2
+    assert backend.tracker["peak"] == 1
     assert backend.manager.state is ManagerState.CLOSED
     assert all(worker.stopped for worker in backend.workers)
     assert window.runProgressBar.value() == 4
@@ -254,15 +254,15 @@ def test_gui_selected_worker_count_controls_real_manager_pool(
     qapp, tmp_path, monkeypatch
 ):
     window, backend = make_window(qapp, tmp_path, monkeypatch)
-    window.workerCountSpinBox.setValue(1)
+    window.workerCountSpinBox.setValue(2)
 
     window.StartButton.click()
     process_until(qapp, lambda: window.controller.state is RunState.READY)
     process_until(qapp, lambda: not window.controller.has_active_work)
 
-    assert backend.worker_count == 1
-    assert len(backend.workers) == 1
-    assert backend.tracker["peak"] == 1
+    assert backend.worker_count == 2
+    assert len(backend.workers) == 2
+    assert backend.tracker["peak"] == 2
     window.close()
 
 

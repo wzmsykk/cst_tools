@@ -1,5 +1,6 @@
 import json
 import logging
+from pathlib import Path
 
 import pandas as pd
 import pytest
@@ -116,12 +117,57 @@ def test_checkpoint_is_atomic_and_rejects_changed_policy(tmp_path):
     store.save(policy, fingerprint, report, [ScanInterval(5.000001, 15.000001)])
     restored, pending = store.load(policy, fingerprint)
 
-    assert json.loads(path.read_text(encoding="utf-8"))["schemaVersion"] == 2
+    assert json.loads(path.read_text(encoding="utf-8"))["schemaVersion"] == 3
     assert restored.modes == report.modes
     assert pending == [ScanInterval(5.000001, 15.000001)]
     assert not path.with_suffix(".json.tmp").exists()
     with pytest.raises(ValueError, match="policy"):
         store.load(ScanPolicy(0, 10, 30), fingerprint)
+
+
+def test_checkpoint_restores_only_an_unchanged_confirmed_snapshot(tmp_path):
+    path = tmp_path / "checkpoint.json"
+    snapshot = tmp_path / "result" / "task-8" / "project.cst"
+    snapshot.parent.mkdir(parents=True)
+    snapshot.write_bytes(b"confirmed-mode-8")
+    store = ScanCheckpointStore(path)
+    policy = ScanPolicy(0, 10, 20)
+    report = ScanReport(modes=[mode(5)], solver_calls=1)
+    fingerprint = {"path": "model.cst", "size": 10}
+
+    store.save(policy, fingerprint, report, [], snapshot_path=snapshot)
+    restored, pending, restored_snapshot = store.load_with_snapshot(
+        policy, fingerprint
+    )
+
+    assert restored.modes == report.modes
+    assert pending == []
+    assert restored_snapshot == snapshot.resolve()
+
+    changed = bytearray(snapshot.read_bytes())
+    changed[0] ^= 0x01
+    snapshot.write_bytes(changed)
+    with pytest.raises(ValueError, match="missing or changed"):
+        store.load_with_snapshot(policy, fingerprint)
+
+
+def test_schema_two_checkpoint_remains_readable_without_snapshot(tmp_path):
+    path = tmp_path / "checkpoint.json"
+    store = ScanCheckpointStore(path)
+    policy = ScanPolicy(0, 10, 20)
+    report = ScanReport(modes=[mode(5)], solver_calls=1)
+    fingerprint = {"path": "model.cst", "size": 10}
+    store.save(policy, fingerprint, report, [])
+    document = json.loads(path.read_text(encoding="utf-8"))
+    document["schemaVersion"] = 2
+    document.pop("confirmedSnapshot")
+    path.write_text(json.dumps(document), encoding="utf-8")
+
+    restored, pending, snapshot = store.load_with_snapshot(policy, fingerprint)
+
+    assert restored.modes == report.modes
+    assert pending == []
+    assert snapshot is None
 
 
 def test_policy_rejects_multi_mode_requests():
@@ -198,6 +244,8 @@ class ScanManager:
         self.result_dir.mkdir()
         self.tasks = []
         self.physical_modes = [105.0, 114.0]
+        self.confirmed_snapshot = None
+        self.restored_snapshot = None
 
     def getResultDir(self):
         return self.result_dir
@@ -226,6 +274,13 @@ class ScanManager:
     def run_batch(self, tasks):
         return [self.execute(task) for task in tasks]
 
+    def get_confirmed_snapshot(self):
+        return self.confirmed_snapshot
+
+    def restore_project_snapshot(self, snapshot):
+        self.restored_snapshot = Path(snapshot).resolve()
+        self.confirmed_snapshot = self.restored_snapshot
+
     def stop(self):
         pass
 
@@ -247,6 +302,38 @@ def test_production_algorithm_writes_results_and_checkpoint(tmp_path):
     assert list(pd.read_csv(result_path)["mode"]) == [1, 2]
     assert list(pd.read_csv(result_path)["solverMode"]) == [1, 1]
     assert (tmp_path / "save" / "csv" / "hom_scan_checkpoint.json").exists()
+
+
+def test_production_algorithm_restores_confirmed_snapshot_before_resume(tmp_path):
+    manager = ScanManager(tmp_path)
+    manager.physical_modes = [114.0]
+    snapshot = tmp_path / "result" / "mode-8" / "project.cst"
+    snapshot.parent.mkdir(parents=True)
+    snapshot.write_bytes(b"confirmed-mode-8")
+    algorithm = myAlg01(manager=manager, params=[])
+    algorithm.setCSTParams([])
+    algorithm.setEditableAttrs(
+        {"fmin": 100, "fmax": 110, "endfreq": 120, "cflag": 1}
+    )
+    checkpoint = ScanCheckpointStore(
+        tmp_path / "save" / "csv" / "hom_scan_checkpoint.json"
+    )
+    checkpoint.save(
+        algorithm._scan_policy(),
+        algorithm._project_fingerprint(),
+        ScanReport(
+            modes=[mode(105.0)],
+            completed=[ScanInterval(100.0, 110.0)],
+            solver_calls=1,
+        ),
+        [ScanInterval(105.000001, 115.000001)],
+        snapshot_path=snapshot,
+    )
+
+    report = algorithm.start()
+
+    assert manager.restored_snapshot == snapshot.resolve()
+    assert [item.frequency for item in report.modes] == [105.0, 114.0]
 
 
 def test_scanner_stops_between_solves_and_preserves_pending_interval():

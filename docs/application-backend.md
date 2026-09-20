@@ -46,6 +46,7 @@ RUNNING -> STOPPING -> STOPPED
 - `STOPPED` 和 `FAILED` 可以重新选择输入并启动下一次运行。
 - CST 后端在初始化前冻结；运行中不能切换。选择会写入全局配置，工程预处理、Manager 与 Worker 因而使用同一个可执行文件。
 - HOM `scan_manifest.json` 记录 CST 版本和可执行文件路径；恢复时后端身份不同会被视为 Manifest 漂移，避免跨版本混跑。
+- 本机生产后端默认使用 1 个 Worker，避免无意中启动多个 CST 实例；用户可根据本机资源和许可证显式调高 `worker_count`。运行开始后该值被冻结。
 
 ## 异常恢复
 
@@ -53,11 +54,17 @@ RUNNING -> STOPPING -> STOPPED
 
 1. 扫描项目 `temp/worker_*/<session>`，读取协议状态、Worker 标记和 PID 存活状态；
 2. 对仍存活的会话只走协议恢复：发送 Stop Request、保存已有 Completion、补 ACK、等待 StopAck，并等待 CST 进程退出；
-3. 对 PID 已明确死亡的会话不伪造 StopAck，也不强杀其他进程；将隔离的 Worker 工程标为 `abandoned-dead`，后续从最后一个原子 HOM checkpoint 重算该区间；
+3. 进程存活检查覆盖 CST 启动器及其后代进程；仅当整棵进程树都已明确死亡时，才将隔离的 Worker 工程标为 `abandoned-dead`，后续从最后一个原子 HOM checkpoint 重算该区间；
 4. 每个已收口会话写入不可变语义的 `recovery.json`，记录标准退出或死亡放弃、任务 ID 和 Completion 状态；
 5. 只有所有会话都完成收口，项目状态才持久化为 `INTERRUPTED`，允许再次准备和从 checkpoint 继续。
 
+每个 Managed Worker 任务只有在 Completion 成功、`project.cst` 快照存在且后处理结果可读后，才把该快照返回给 Manager。Manager 将其记录为“最后确认快照”：Worker 轮换时优先从该快照建立工作副本；HOM checkpoint 同时保存相对路径、文件大小和 SHA-256。继续扫描时先校验快照未丢失、未变化，再用它重建整个 Worker 池。正在求解但没有得到 Python 确认的工程副本永远不会提升为恢复点；旧 schema 2 checkpoint 没有快照信息时仍可读取，但会明确回退到原始工程。
+
+快照接力是 `SimulationTask.continue_from_snapshot` 的显式能力，默认关闭。标准优化/参数扫描的批量任务相互独立，Worker 轮换始终从配置的基础工程启动，不会继承前一个参数点；只有顺序相关的 HOM 窄窗口任务开启该标志，并且自动轮换只能使用同一 Worker 槽自己的确认快照，不能跨并发 Worker 借用状态。
+
 存活但无响应、PID 无法确认、协议身份不匹配或 CST 在 StopAck 后仍未退出，均保持 `RECOVERY_REQUIRED`。普通恢复不会调用进程强杀；`emergency_terminate()` 仍是明确的最后手段。
+
+真实故障注入曾证明只结束启动器 PID 会遗留 `CST DESIGN ENVIRONMENT_AMD64.exe`。因此显式紧急终止在 Windows 上必须针对已记录 PID 的整棵进程树；父 PID 消失但子进程仍在时不得写入 `abandoned-dead`。
 
 ## 错误类型
 

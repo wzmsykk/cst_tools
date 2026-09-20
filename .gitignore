@@ -2,6 +2,7 @@
 .vscode/
 __pycache__/
 .pytest_cache/
+.pytest_tmp_*/
 build/
 dist/
 log/*

@@ -134,11 +134,11 @@ def test_backend_happy_path_has_explicit_lifecycle_and_cleanup():
     backend.select_project_directory("project")
     backend.select_cst_file("model.cst")
 
-    backend.initialize_run(True, False, 3)
+    backend.initialize_run(True, False, 1)
     assert backend.state is BackendState.INITIALIZED
     backend.prepare_run()
     assert backend.state is BackendState.PREPARED
-    assert manager_calls[0]["maxTask"] == 3
+    assert manager_calls[0]["maxTask"] == 1
 
     assert backend.execute_run() == "completed"
     assert backend.state is BackendState.STOPPED
@@ -161,6 +161,14 @@ def test_backend_rejects_invalid_operation_order():
         backend.update_algorithm_settings({"fmin": 600})
 
 
+def test_backend_accepts_multiple_workers_when_explicitly_requested():
+    backend, *_ = make_backend()
+
+    backend.initialize_run(False, False, 2)
+
+    assert backend.worker_count == 2
+
+
 def test_backend_switches_cst_only_while_configurable():
     backend, global_config, *_ = make_backend()
 
@@ -179,7 +187,7 @@ def test_backend_can_retry_after_initialization_failure():
         backend.initialize_run(False, False, 1)
     assert backend.state is BackendState.FAILED
 
-    backend.initialize_run(False, True, 2)
+    backend.initialize_run(False, True, 1)
     assert backend.state is BackendState.INITIALIZED
 
 

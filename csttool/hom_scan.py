@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
+import hashlib
 import json
 import math
 import os
@@ -250,7 +251,8 @@ class AdaptiveHomScanner:
 
 
 class ScanCheckpointStore:
-    SCHEMA_VERSION = 2
+    SCHEMA_VERSION = 3
+    COMPATIBLE_VERSIONS = {2, 3}
 
     def __init__(self, path: str | Path):
         self.path = Path(path)
@@ -261,12 +263,15 @@ class ScanCheckpointStore:
         project_fingerprint: dict,
         report: ScanReport,
         pending: list[ScanInterval],
+        snapshot_path: str | Path | None = None,
     ) -> None:
+        snapshot = self._encode_snapshot(snapshot_path)
         document = {
             "schemaVersion": self.SCHEMA_VERSION,
             "policy": asdict(policy),
             "projectFingerprint": project_fingerprint,
             "pending": [asdict(item) for item in pending],
+            "confirmedSnapshot": snapshot,
             "report": {
                 "modes": [asdict(item) for item in report.modes],
                 "completed": [asdict(item) for item in report.completed],
@@ -283,9 +288,31 @@ class ScanCheckpointStore:
         )
         os.replace(temporary, self.path)
 
-    def load(self, policy: ScanPolicy, project_fingerprint: dict):
+    def _encode_snapshot(self, snapshot_path: str | Path | None):
+        if snapshot_path is None:
+            return None
+        path = Path(snapshot_path).resolve()
+        if not path.is_file() or path.stat().st_size == 0:
+            raise ScanConfigurationError(
+                f"confirmed CST snapshot is unavailable: {path}"
+            )
+        return {
+            "path": os.path.relpath(path, self.path.parent.resolve()),
+            "size": path.stat().st_size,
+            "sha256": self._sha256(path),
+        }
+
+    @staticmethod
+    def _sha256(path: Path) -> str:
+        digest = hashlib.sha256()
+        with path.open("rb") as stream:
+            for block in iter(lambda: stream.read(1024 * 1024), b""):
+                digest.update(block)
+        return digest.hexdigest()
+
+    def _load_document(self, policy: ScanPolicy, project_fingerprint: dict):
         document = json.loads(self.path.read_text(encoding="utf-8"))
-        if document.get("schemaVersion") != self.SCHEMA_VERSION:
+        if document.get("schemaVersion") not in self.COMPATIBLE_VERSIONS:
             raise ScanConfigurationError("unsupported HOM checkpoint version")
         if document.get("policy") != asdict(policy):
             raise ScanConfigurationError("checkpoint scan policy does not match")
@@ -301,4 +328,26 @@ class ScanCheckpointStore:
             solver_calls=raw["solver_calls"],
         )
         pending = [ScanInterval(**item) for item in document["pending"]]
+        return document, report, pending
+
+    def load(self, policy: ScanPolicy, project_fingerprint: dict):
+        _, report, pending = self._load_document(policy, project_fingerprint)
         return report, pending
+
+    def load_with_snapshot(self, policy: ScanPolicy, project_fingerprint: dict):
+        document, report, pending = self._load_document(policy, project_fingerprint)
+        record = document.get("confirmedSnapshot")
+        if record is None:
+            return report, pending, None
+        if not isinstance(record, dict) or not isinstance(record.get("path"), str):
+            raise ScanConfigurationError("checkpoint snapshot metadata is invalid")
+        snapshot = (self.path.parent / record["path"]).resolve()
+        if (
+            not snapshot.is_file()
+            or snapshot.stat().st_size != record.get("size")
+            or self._sha256(snapshot) != record.get("sha256")
+        ):
+            raise ScanConfigurationError(
+                f"checkpoint CST snapshot is missing or changed: {snapshot}"
+            )
+        return report, pending, snapshot

@@ -174,7 +174,7 @@ class GuiRunController(QObject):
             self._transition(target)
 
     def start(
-        self, start_from_existing: bool, safe: bool, worker_count: int = 2
+        self, start_from_existing: bool, safe: bool, worker_count: int = 1
     ) -> bool:
         if not self.inputs_ready:
             return False

@@ -28,7 +28,7 @@ GUI P2.5 使用真实 `CSTManager` 和注入的 Fake Worker 运行完整界面�
 python -m pytest -q test/gui_fake_worker_flow_test.py
 ```
 
-该 Gate 通过界面按钮启动两个 Manager 任务，验证双 Worker 并发、结果顺序、Worker Failure 到 GUI FAILED 的传播，以及运行中关闭通过 `CSTManager.stop()` 停止全部 Fake Worker。它还验证 GUI 选择 1 个 Worker 后，真实 Manager 池只创建一个 Worker、并发峰值为 1。它不启动 CST。
+该 Gate 通过界面按钮启动两个 Manager 任务，验证默认 1 个 Worker 时的顺序处理、结果顺序、Worker Failure 到 GUI FAILED 的传播，以及运行中关闭通过 `CSTManager.stop()` 停止 Fake Worker。另一个用例显式选择 Worker 数，验证配置能够传入 Manager；多 Worker 并发由独立 Manager 测试覆盖。它不启动 CST。
 
 GUI P3 的类型配置、Qt 模型通知及新旧 JSON 兼容测试：
 
@@ -353,10 +353,85 @@ Request并等待 Stop Ack。标准停止超时测试要求 CST 进程未被 kill
 PID 是否仍存活。进程已死亡且没有 Stop Ack 时不会伪造 Stop Ack，而是为隔离的
 Worker 副本写入 `abandoned-dead` 恢复凭据，并从最后一个原子 checkpoint 重算。
 仍存活但无响应的进程继续保持 `RECOVERY_REQUIRED`，恢复流程不会自动 kill。
+进程判断覆盖启动器和 Windows 后代进程；显式紧急终止必须结束已记录 PID 的
+整棵进程树，不能只结束启动器并遗留 AMD64 求解进程。
 
 GUI 使用独立的 `RECOVERY_REQUIRED` 状态：选择项目时自动检查残留会话，显示待恢复
 数量，冻结工程、版本与运行配置并禁止启动。运行或标准停止异常后再次查询后端；恢复
 失败仍保留恢复按钮，全部会话收口并写回 `INTERRUPTED` 后才重新允许运行。
+
+真实故障注入 Gate：
+
+```powershell
+python -m pytest -q -s `
+  test/managed_pillbox_fault_recovery_integration_test.py `
+  -m integration --run-cst --cst-exe "<CST DESIGN ENVIRONMENT.exe>"
+```
+
+第一项在 Solver 阶段模拟 Python 控制器丢失，要求新恢复器补 Completion ACK、收到
+StopAck、等待整棵 CST 进程树退出并写入 `standard-stop`。第二项显式终止 CST 进程树，
+要求不伪造 StopAck、写入 `abandoned-dead`，且系统中无 CST 子进程残留。2026-09-20
+CST 2022 实测：`2 passed in 83.54s`。
+
+真实 HOM 十模式分阶段恢复 Gate：
+
+```powershell
+python -m pytest -q -s `
+  test/managed_hom_ten_modes_fault_resume_integration_test.py `
+  -m integration --run-cst --cst-exe "<CST DESIGN ENVIRONMENT.exe>"
+```
+
+Gate 每次只请求 Mode 1，并从已接受频率右侧继续：Mode 3 后执行用户安全暂停；
+Mode 7 在新 Solver 已产生日志后模拟控制器丢失并由协议恢复；Mode 8 后在 Mode 9
+Solver 中终止 CST 进程树，确认该次结果不进入 checkpoint，再从 Mode 8 的安全工程
+快照重算 Mode 9，最后完成 Mode 10。空窗口写入事件并按 50 MHz 推进。
+
+生产接力的快速 Gate 位于 `test/cstmanager_test.py` 与 `test/hom_scan_test.py`：成功任务
+的 `ProjectSnapshot` 必须成为同一 Worker 槽轮换时的输入；显式续跑必须先从 checkpoint
+中的确认快照重建 Worker 池；快照缺失或大小变化必须拒绝续跑。schema 2 checkpoint 保持
+可读并回退原始工程，schema 3 才携带确认快照。
+
+标准批处理 Pillbox 解析 Gate：
+
+```powershell
+python -m pytest -q test/pillbox_standard_batch_test.py
+```
+
+该 Gate 使用四个假 Worker 和真实 `CSTManager.run_batch`，批量改变半径 `R`。假 Worker
+按理想真空圆柱腔 TM010 解析式计算频率，优化器在 180–280 mm 内逐轮缩小搜索区间，
+目标为 500 MHz。参考解析半径为 229.48505567 mm；当前搜索在 54 次独立任务、6 轮后
+得到 229.48730469 mm 和 499.99509991 MHz。Gate 同时要求发生真实并发、Manager 保持
+提交顺序、Worker 轮换仍从基础 Pillbox 工程启动，并且标准任务不产生确认快照接力状态。
+
+同一测试文件还对标准模式执行确定性故障注入：一个半径任务首次直接抛出 Worker
+异常，另一个首次返回结构化 Solver Failure；两者都必须更换对应 Worker、从基础
+Pillbox 工程重启并在原任务上成功重试。永久 Solver Failure 在两次尝试后必须明确
+终止本轮优化，不能返回伪造最优值；解除故障后复用同一 Manager 再次运行必须恢复并
+收敛。所有重建 Worker 的 `cstPath` 都必须是基础工程，且全程不得产生 HOM 确认快照。
+
+真实 CST 标准批处理 Gate：
+
+```powershell
+python -m pytest -q -s test/pillbox_standard_batch_integration_test.py `
+  -m integration --run-cst `
+  --cst-exe "<CST DESIGN ENVIRONMENT.exe>"
+```
+
+该 Gate 使用单个真实 Managed CST Worker，批量 API 仍按提交顺序处理 `R`，只从 CST
+Frequency 后处理选择最优点。此前双 Worker 基线在 15 次求解、3 轮后得到
+`R=230.8125 mm`、`f=499.792534459 MHz`；默认 Worker 数调整为 1 后，Gate 使用该基线附近的
+230.5–231.125 mm 窄区间和 3 点批次重新验证。源工程 SHA-256 必须保持不变，Manager
+不得记录 HOM 确认快照，唯一 Worker 必须通过 Save/Quit 标准退出且不遗留 CST 进程。
+
+2026-09-20 CST 2022 单 Worker 实测：3 次顺序求解、1 轮得到
+`R=230.8125 mm`、`f=499.792534459 MHz`，距目标 `0.207465541 MHz`，耗时
+`431.66 s`；源工程未改变，标准退出且无 CST 残留进程。
+
+2026-09-20 CST 2022 实测频率为：502.882119、504.406888、513.492631、
+687.005013、711.590797、765.999982、771.852902、785.110237、785.686107、
+785.763052 MHz。10 个模式严格递增且各有 Frequency、Q、三条 R/Q、Shunt
+Impedance 和 Total Loss；恢复凭据分别为 `standard-stop/success` 与
+`abandoned-dead`，最终无交互式 CST 进程残留。
 
 ## P14.5 CST 输出进度 Gate
 

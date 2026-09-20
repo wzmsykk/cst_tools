@@ -252,8 +252,13 @@ class ManagedCSTWorker:
             atomic_publish(self.task_path, encode_task(task))
             completion = self._wait_completion(task)
             task_result_root = self.result_root / task.task_id
+            project_snapshot = task_result_root / "project.cst"
             try:
                 if completion.status is CompletionStatus.SUCCESS:
+                    if not project_snapshot.is_file() or project_snapshot.stat().st_size == 0:
+                        raise FileNotFoundError(
+                            f"CST task did not publish a project snapshot: {project_snapshot}"
+                        )
                     self.postprocess.setResultDir(task_result_root)
                     self.postprocess.setCSTRunResultDir(task_result_root / "project")
                     postprocess_result = self.postprocess.readAllResults()
@@ -281,6 +286,9 @@ class ManagedCSTWorker:
                 "RunName": resultname,
                 "RunParameters": dict(params),
                 "PostProcessResult": postprocess_result,
+                "ProjectSnapshot": (
+                    str(project_snapshot.resolve()) if status == "Success" else None
+                ),
             }
 
     @staticmethod
@@ -343,7 +351,17 @@ class ManagedCSTWorker:
         with self._lock:
             process = self._process
             if process is not None and process.poll() is None:
-                process.kill()
+                if os.name == "nt" and isinstance(getattr(process, "pid", None), int):
+                    completed = subprocess.run(
+                        ["taskkill", "/PID", str(process.pid), "/T", "/F"],
+                        stdout=subprocess.DEVNULL,
+                        stderr=subprocess.DEVNULL,
+                        check=False,
+                    )
+                    if completed.returncode != 0 and process.poll() is None:
+                        process.kill()
+                else:
+                    process.kill()
                 process.wait(timeout=30)
             self._close_log()
 

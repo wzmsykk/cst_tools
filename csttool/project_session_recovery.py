@@ -95,7 +95,7 @@ def _wait_for_process_exit(record: ManagedSessionRecord, timeout: float) -> None
         return
     deadline = time.monotonic() + timeout
     while time.monotonic() < deadline:
-        if not _process_is_alive(record.process_id):
+        if not _process_tree_is_alive(record.process_id):
             return
         time.sleep(0.1)
     raise TimeoutError(
@@ -130,6 +130,64 @@ def _process_is_alive(process_id: int) -> bool:
     return True
 
 
+def _windows_descendant_process_ids(process_id: int) -> set[int]:
+    """Return descendants using parent PIDs retained by the Windows snapshot."""
+    if os.name != "nt":
+        return set()
+    th32cs_snapprocess = 0x00000002
+    invalid_handle_value = ctypes.c_void_p(-1).value
+
+    class ProcessEntry32W(ctypes.Structure):
+        _fields_ = [
+            ("dwSize", ctypes.c_ulong),
+            ("cntUsage", ctypes.c_ulong),
+            ("th32ProcessID", ctypes.c_ulong),
+            ("th32DefaultHeapID", ctypes.c_void_p),
+            ("th32ModuleID", ctypes.c_ulong),
+            ("cntThreads", ctypes.c_ulong),
+            ("th32ParentProcessID", ctypes.c_ulong),
+            ("pcPriClassBase", ctypes.c_long),
+            ("dwFlags", ctypes.c_ulong),
+            ("szExeFile", ctypes.c_wchar * 260),
+        ]
+
+    kernel32 = ctypes.windll.kernel32
+    snapshot = kernel32.CreateToolhelp32Snapshot(th32cs_snapprocess, 0)
+    if snapshot == invalid_handle_value:
+        return set()
+    parents: dict[int, set[int]] = {}
+    try:
+        entry = ProcessEntry32W()
+        entry.dwSize = ctypes.sizeof(ProcessEntry32W)
+        success = kernel32.Process32FirstW(snapshot, ctypes.byref(entry))
+        while success:
+            parents.setdefault(int(entry.th32ParentProcessID), set()).add(
+                int(entry.th32ProcessID)
+            )
+            success = kernel32.Process32NextW(snapshot, ctypes.byref(entry))
+    finally:
+        kernel32.CloseHandle(snapshot)
+
+    descendants = set()
+    pending = list(parents.get(process_id, ()))
+    while pending:
+        child = pending.pop()
+        if child in descendants:
+            continue
+        descendants.add(child)
+        pending.extend(parents.get(child, ()))
+    return descendants
+
+
+def _process_tree_is_alive(process_id: int) -> bool:
+    if _process_is_alive(process_id):
+        return True
+    return any(
+        _process_is_alive(pid)
+        for pid in _windows_descendant_process_ids(process_id)
+    )
+
+
 def project_runtime_directory(project_directory: str | Path) -> Path:
     project_directory = Path(project_directory).resolve()
     config_path = project_directory / "project.ini"
@@ -161,7 +219,7 @@ def discover_managed_sessions(project_directory: str | Path) -> list[ManagedSess
             if pid_path.is_file():
                 try:
                     process_id = int(pid_path.read_text(encoding="ascii").strip())
-                    process_alive = _process_is_alive(process_id)
+                    process_alive = _process_tree_is_alive(process_id)
                 except (OSError, ValueError):
                     process_id = None
                     process_alive = None

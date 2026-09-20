@@ -78,7 +78,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.dirNameLineEdit.setPlaceholderText("选择用于保存任务和结果的项目目录")
         self.cstFilePathLineEdit.setReadOnly(True)
         self.cstFilePathLineEdit.setPlaceholderText("选择作为计算模板的 CST 工程文件")
-        self.workerCountSpinBox.setToolTip("同时运行的 CST 实例数量；资源不足时请降低")
+        self.workerCountSpinBox.setToolTip("默认 1 个 CST 实例；可按本机资源和许可证调高")
         self.cstBackendComboBox.setToolTip("选择启动 Worker 时使用的 CST 安装版本")
         self.refreshCstBackendsButton.setToolTip("重新扫描本机 CST 安装")
         self.StartButton.setToolTip("使用当前工程、算法与后处理设置启动任务")

@@ -149,7 +149,7 @@ class Ui_MainWindow(object):
         self.workerCountSpinBox = QtWidgets.QSpinBox(self.setupPanel)
         self.workerCountSpinBox.setMinimum(1)
         self.workerCountSpinBox.setMaximum(64)
-        self.workerCountSpinBox.setProperty("value", 2)
+        self.workerCountSpinBox.setProperty("value", 1)
         self.workerCountSpinBox.setObjectName("workerCountSpinBox")
         self.executionRow.addWidget(self.workerCountSpinBox)
         self.workerHintLabel = QtWidgets.QLabel(self.setupPanel)

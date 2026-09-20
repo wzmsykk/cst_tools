@@ -9,6 +9,7 @@ from csttool.project_session_recovery import (
     project_runtime_directory,
     recover_project_sessions,
 )
+from csttool import project_session_recovery
 from csttool.runtime_protocol import (
     Completion,
     CompletionStatus,
@@ -121,3 +122,20 @@ def test_live_unresponsive_session_is_not_killed_or_marked_recovered(
 
     assert not (root / "recovery.json").exists()
     assert (root / "worker.state").read_text(encoding="ascii") == "dispatched:task"
+
+
+def test_process_tree_remains_alive_when_launcher_exits_but_child_survives(
+    monkeypatch,
+):
+    monkeypatch.setattr(
+        project_session_recovery,
+        "_windows_descendant_process_ids",
+        lambda _pid: {222},
+    )
+    monkeypatch.setattr(
+        project_session_recovery,
+        "_process_is_alive",
+        lambda pid: pid == 222,
+    )
+
+    assert project_session_recovery._process_tree_is_alive(111)

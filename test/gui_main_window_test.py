@@ -391,11 +391,14 @@ def test_buttons_stay_locked_until_background_end_signal(qapp, monkeypatch, tmp_
     window.close()
 
 
-def test_worker_count_is_configurable_and_locked_during_run(
+def test_worker_count_defaults_to_one_is_configurable_and_locked_during_run(
     qapp, monkeypatch, tmp_path
 ):
     window, tool = make_window(qapp)
     choose_inputs(window, monkeypatch, tmp_path)
+    assert window.workerCountSpinBox.minimum() == 1
+    assert window.workerCountSpinBox.value() == 1
+    assert window.workerCountSpinBox.maximum() > 1
     window.workerCountSpinBox.setValue(3)
 
     window.run()
