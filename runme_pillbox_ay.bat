@@ -1,1 +1,0 @@
-python.exe .\base.py -p ".\project\pillbox_ay" -f ".\project\pillbox_ay\Pillbox_ay.cst"

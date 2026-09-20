@@ -1,1 +1,0 @@
-python.exe .\base.py -p ".\project\M1_ay"
