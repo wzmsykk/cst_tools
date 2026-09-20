@@ -1,9 +1,12 @@
 import logging
+import os
+import threading
 
 import pytest
 
 from csttool.cstmanager import CSTManager, ManagerState
 from csttool.managed_cstworker import ManagedCSTWorker
+from csttool.managed_cstworker import ManagedWorkerShutdownError
 from csttool.postprocess_cst import VBPostProcessor
 
 
@@ -56,6 +59,7 @@ def test_managed_worker_macro_is_dynamic_ack_gated_and_standard_exit(tmp_path):
     assert "CSTP_ReadStopRequest" in macro
     assert "Do\n" in macro
     assert "Save\n            Quit" in macro
+    assert "stopped-with-completion" in macro
     assert "EigenResult_Simple_output" in macro
     assert "EigenResult_Complex_output" in macro
     assert "%" not in macro
@@ -73,6 +77,90 @@ def test_expression_kind_comes_from_parameter_metadata_or_runtime_value():
     )
 
     assert names == frozenset({"expr", "dynamic"})
+
+
+def test_managed_worker_uses_non_activating_minimized_startup_on_windows():
+    worker = object.__new__(ManagedCSTWorker)
+    worker._run_in_background = True
+
+    options = worker._background_startup_options()
+
+    if os.name == "nt":
+        startupinfo = options["startupinfo"]
+        assert startupinfo.dwFlags & __import__("subprocess").STARTF_USESHOWWINDOW
+        assert startupinfo.wShowWindow == 7
+        assert options["creationflags"] & __import__(
+            "subprocess"
+        ).CREATE_NEW_PROCESS_GROUP
+    else:
+        assert options == {}
+
+
+def test_managed_worker_can_leave_cst_window_interactive():
+    worker = object.__new__(ManagedCSTWorker)
+    worker._run_in_background = False
+
+    options = worker._background_startup_options()
+    if os.name == "nt":
+        assert "startupinfo" not in options
+        assert options["creationflags"] & __import__(
+            "subprocess"
+        ).CREATE_NEW_PROCESS_GROUP
+    else:
+        assert options == {}
+
+
+def test_standard_stop_timeout_does_not_kill_cst(tmp_path):
+    class Process:
+        pid = 1
+
+        def __init__(self):
+            self.killed = False
+
+        def poll(self):
+            return None
+
+        def kill(self):
+            self.killed = True
+
+    worker = build_worker_shell(tmp_path)
+    worker.ID = "test"
+    worker._lock = threading.RLock()
+    worker._process = Process()
+    worker._stopping = False
+    worker.STOP_TIMEOUT = 0.01
+    worker.protocol = __import__(
+        "csttool.runtime_protocol", fromlist=["FileProtocol"]
+    ).FileProtocol(tmp_path / "protocol")
+
+    with pytest.raises(ManagedWorkerShutdownError, match="emergency termination"):
+        worker.stop()
+
+    assert not worker._process.killed
+
+
+def test_emergency_termination_is_explicit(tmp_path):
+    class Process:
+        def __init__(self):
+            self.killed = False
+
+        def poll(self):
+            return None if not self.killed else 1
+
+        def kill(self):
+            self.killed = True
+
+        def wait(self, timeout):
+            return 1
+
+    worker = build_worker_shell(tmp_path)
+    worker._lock = threading.RLock()
+    worker._process = Process()
+    worker._log_stream = None
+
+    worker.emergency_terminate()
+
+    assert worker._process.killed
 
 
 def test_ready_marker_is_invalidated_before_task_publication(tmp_path, monkeypatch):

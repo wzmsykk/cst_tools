@@ -6,15 +6,19 @@ from base import cst_tools_main
 from csttool.application_backend import (
     BackendInitializationError,
     BackendLifecycleError,
+    BackendPreparationError,
     BackendState,
     CstApplicationBackend,
 )
+from csttool.runtime_protocol import FileProtocol, new_session_id
 
 
 class FakeGlobalConfig:
     def __init__(self, checks=(True,)):
         self.checks = list(checks)
         self.saved = 0
+        self.installations = []
+        self.selected_installation = None
 
     def checkCSTENVConfig(self):
         return self.checks.pop(0)
@@ -24,6 +28,16 @@ class FakeGlobalConfig:
 
     def printconf(self):
         pass
+
+    def list_cst_installations(self):
+        return tuple(self.installations)
+
+    def get_selected_cst_installation(self):
+        return self.selected_installation
+
+    def select_cst_installation(self, version, executable):
+        self.selected_installation = (version, executable)
+        return self.selected_installation
 
 
 class FakeProjectConfig:
@@ -147,6 +161,17 @@ def test_backend_rejects_invalid_operation_order():
         backend.update_algorithm_settings({"fmin": 600})
 
 
+def test_backend_switches_cst_only_while_configurable():
+    backend, global_config, *_ = make_backend()
+
+    assert backend.select_cst_installation(2025, "cst.exe") == (2025, "cst.exe")
+    assert global_config.selected_installation == (2025, "cst.exe")
+
+    backend.initialize_run(False, False, 1)
+    with pytest.raises(BackendLifecycleError, match="select CST installation"):
+        backend.select_cst_installation(2022, "old.exe")
+
+
 def test_backend_can_retry_after_initialization_failure():
     backend, *_ = make_backend(checks=(False, True))
 
@@ -185,6 +210,44 @@ def test_stop_request_is_idempotent_with_execution_cleanup():
 
     assert backend.state is BackendState.STOPPING
     assert manager.stop_count == 1
+
+
+def test_prepare_detects_unclosed_managed_session(tmp_path):
+    backend, _global, project, manager, _calls = make_backend()
+    project.currProjectDir = tmp_path
+    session_id = new_session_id()
+    session_root = tmp_path / "temp" / "worker_0" / session_id
+    FileProtocol(session_root / "protocol")
+    (session_root / "worker.state").write_text("ready", encoding="ascii")
+    backend.initialize_run(False, False, 1)
+
+    with pytest.raises(BackendPreparationError, match="未闭合 CST 会话"):
+        backend.prepare_run()
+
+    assert backend.state is BackendState.RECOVERY_REQUIRED
+    assert manager.stop_count == 0
+
+
+def test_backend_progress_listener_failures_do_not_break_worker_updates():
+    backend, *_ = make_backend()
+    observed = []
+    backend.add_progress_listener(observed.append)
+    backend.add_progress_listener(lambda _event: (_ for _ in ()).throw(RuntimeError("ui")))
+
+    backend._publish_cst_progress("progress")
+
+    assert observed == ["progress"]
+
+
+def test_successful_recovery_persists_interrupted_project_state(tmp_path):
+    backend, _global, project, *_ = make_backend()
+    project.currProjectDir = tmp_path
+    backend._set_state(BackendState.RECOVERY_REQUIRED)
+
+    assert backend.recover_project_sessions() == []
+
+    assert backend.state is BackendState.INTERRUPTED
+    assert project.statuses[-1].name == "INTERRUPTED"
 
 
 def test_legacy_facade_translates_old_api_without_owning_execution_logic():

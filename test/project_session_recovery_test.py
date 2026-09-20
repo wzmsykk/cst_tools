@@ -1,0 +1,123 @@
+from threading import Thread
+import json
+import time
+
+import pytest
+
+from csttool.project_session_recovery import (
+    discover_managed_sessions,
+    project_runtime_directory,
+    recover_project_sessions,
+)
+from csttool.runtime_protocol import (
+    Completion,
+    CompletionStatus,
+    FileProtocol,
+    StopAcknowledge,
+    atomic_publish,
+    encode_completion,
+    encode_stop_ack,
+    new_session_id,
+)
+
+
+def _session(project, marker="dispatched:task"):
+    session_id = new_session_id()
+    root = project / "temp" / "worker_0" / session_id
+    protocol = FileProtocol(root / "protocol")
+    (root / "worker.state").write_text(marker, encoding="ascii")
+    return session_id, root, protocol
+
+
+def test_discovers_only_sessions_that_need_protocol_recovery(tmp_path):
+    project = tmp_path / "project"
+    project.mkdir()
+    active_id, _active_root, _active_protocol = _session(project)
+    stopped_id, stopped_root, stopped_protocol = _session(project, "stopped")
+    atomic_publish(
+        stopped_protocol.root / "stop.ack",
+        encode_stop_ack(StopAcknowledge(stopped_id)),
+    )
+
+    records = discover_managed_sessions(project)
+
+    assert project_runtime_directory(project) == project / "temp"
+    assert {item.session_id for item in records if item.needs_recovery} == {
+        active_id
+    }
+    assert stopped_root.is_dir()
+
+
+def test_project_recovery_stops_and_acks_an_active_session(tmp_path):
+    project = tmp_path / "project"
+    project.mkdir()
+    session_id, root, protocol = _session(project)
+    task_id = new_session_id()
+
+    def worker_side():
+        while not (protocol.root / "stop.request").exists():
+            time.sleep(0.01)
+        atomic_publish(
+            protocol.root / "current.completion",
+            encode_completion(
+                Completion(task_id, session_id, CompletionStatus.SUCCESS)
+            ),
+        )
+        while not (protocol.root / "current.ack").exists():
+            time.sleep(0.01)
+        atomic_publish(
+            protocol.root / "stop.ack",
+            encode_stop_ack(StopAcknowledge(session_id)),
+        )
+        (root / "worker.state").write_text(
+            "stopped-with-completion", encoding="ascii"
+        )
+
+    thread = Thread(target=worker_side)
+    thread.start()
+    recovered = recover_project_sessions(project, timeout_per_session=2)
+    thread.join(2)
+
+    assert [item.session_id for item in recovered] == [session_id]
+    assert not [
+        item for item in discover_managed_sessions(project) if item.needs_recovery
+    ]
+    assert not thread.is_alive()
+    receipt = json.loads((root / "recovery.json").read_text(encoding="utf-8"))
+    assert receipt["disposition"] == "standard-stop"
+    assert receipt["completion_task_id"] == task_id
+
+
+def test_dead_session_without_stop_ack_is_abandoned_for_checkpoint_replay(tmp_path):
+    project = tmp_path / "project"
+    project.mkdir()
+    session_id, root, _protocol = _session(project)
+    (root / "worker.pid").write_text("99999999", encoding="ascii")
+
+    recovered = recover_project_sessions(project, timeout_per_session=10)
+
+    assert [item.session_id for item in recovered] == [session_id]
+    assert (root / "worker.state").read_text(encoding="ascii") == "abandoned-dead"
+    receipt = (root / "recovery.json").read_text(encoding="utf-8")
+    assert '"disposition": "abandoned-dead"' in receipt
+    assert not [
+        item for item in discover_managed_sessions(project) if item.needs_recovery
+    ]
+
+
+def test_live_unresponsive_session_is_not_killed_or_marked_recovered(
+    tmp_path, monkeypatch
+):
+    project = tmp_path / "project"
+    project.mkdir()
+    session_id, root, _protocol = _session(project)
+    (root / "worker.pid").write_text("12345", encoding="ascii")
+    monkeypatch.setattr(
+        "csttool.project_session_recovery._process_is_alive", lambda _pid: True
+    )
+
+    with pytest.raises(RuntimeError, match=session_id):
+        recover_project_sessions(project, timeout_per_session=0.05)
+
+    assert not (root / "recovery.json").exists()
+    assert (root / "worker.state").read_text(encoding="ascii") == "dispatched:task"

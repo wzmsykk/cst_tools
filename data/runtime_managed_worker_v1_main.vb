@@ -68,6 +68,22 @@ Sub Main
 WaitForAck:
             acknowledged = False
             For i = 1 To 6000
+                If Dir("%STOP_REQUEST_PATH%") <> "" Then
+                    If Not CSTP_ReadStopRequest("%STOP_REQUEST_PATH%", "%SESSION_ID%", errorMessage) Then
+                        CSTPMW_WriteMarker "%MARKER_PATH%", "failure:" & errorMessage
+                        Exit Do
+                    End If
+                    If Not CSTP_WriteStopAck("%STOP_ACK_PATH%", "%SESSION_ID%", errorMessage) Then
+                        CSTPMW_WriteMarker "%MARKER_PATH%", "failure:" & errorMessage
+                        Exit Do
+                    End If
+                    ' Preserve task/completion files. Python can recover and ACK
+                    ' the completed result after this worker has safely exited.
+                    CSTPMW_WriteMarker "%MARKER_PATH%", "stopped-with-completion"
+                    Save
+                    Quit
+                    Exit Sub
+                End If
                 If Dir("%ACK_PATH%") <> "" Then
                     If Not CSTP_ReadAck("%ACK_PATH%", task.TaskId, task.SessionId, errorMessage) Then
                         CSTPMW_WriteMarker "%MARKER_PATH%", "failure:" & errorMessage

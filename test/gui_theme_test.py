@@ -22,7 +22,9 @@ def test_shared_theme_contains_interaction_and_state_styles(qapp):
     sheet = widget.styleSheet()
     assert sheet == APP_STYLE_SHEET
     assert 'QStatusBar[state="failed"]' in sheet
+    assert 'QLabel#stateBadge[state="running"]' in sheet
     assert 'QPushButton[visualRole="primary"]' in sheet
+    assert "QSplitter::handle:horizontal" in sheet
     assert "QPlainTextEdit" in sheet
 
 
@@ -55,16 +57,17 @@ def test_main_workspace_uses_responsive_layout_instead_of_fixed_geometry(qapp):
 
     main = QMainWindow()
     ui.setupUi(main)
-    main.resize(1120, 720)
+    main.resize(1200, 760)
     main.show()
     qapp.processEvents()
     wide_log_width = ui.logPanel.width()
-    main.resize(900, 600)
+    main.resize(920, 620)
     qapp.processEvents()
 
     assert ui.centralwidget.layout() is ui.pageLayout
     assert ui.setupPanel.layout() is ui.setupLayout
     assert ui.logPanel.layout() is ui.logPanelLayout
+    assert ui.workspaceSplitter.childrenCollapsible() is False
     assert wide_log_width > ui.logPanel.width()
     assert ui.logPanel.height() > 300
     main.close()

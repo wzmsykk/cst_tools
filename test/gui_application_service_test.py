@@ -89,6 +89,14 @@ def test_run_request_rejects_invalid_worker_count():
         RunRequest(False, False, 0)
 
 
+def test_legacy_service_reports_version_switching_as_unsupported():
+    service = CstApplicationService(LegacyEngine())
+
+    assert service.supports_cst_backend_selection is False
+    assert service.get_cst_installations() == ()
+    assert service.get_selected_cst_installation() is None
+
+
 def test_default_service_uses_new_application_backend(monkeypatch):
     backend = object.__new__(CstApplicationBackend)
     backend.logger = logging.getLogger("new-backend-test")

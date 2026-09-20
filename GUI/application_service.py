@@ -27,6 +27,12 @@ class GuiApplicationService(Protocol):
 
     def select_cst_file(self, path: str) -> None: ...
 
+    def get_cst_installations(self): ...
+
+    def get_selected_cst_installation(self): ...
+
+    def select_cst_installation(self, version: int, executable: str): ...
+
     def get_postprocess_settings(self): ...
 
     def update_postprocess_settings(self, values) -> None: ...
@@ -42,6 +48,14 @@ class GuiApplicationService(Protocol):
     def execute_run(self): ...
 
     def request_stop(self) -> None: ...
+
+    def recover_project_sessions(self): ...
+
+    def get_recovery_sessions(self): ...
+
+    def is_recovery_required(self) -> bool: ...
+
+    def add_progress_listener(self, listener) -> None: ...
 
 
 class _LegacyBackendAdapter:
@@ -60,6 +74,32 @@ class _LegacyBackendAdapter:
 
     def select_cst_file(self, path: str) -> None:
         self._engine.setCSTFilePath(path)
+
+    @property
+    def supports_cst_backend_selection(self) -> bool:
+        return all(
+            hasattr(self._engine, name)
+            for name in (
+                "get_cst_installations",
+                "get_selected_cst_installation",
+                "select_cst_installation",
+            )
+        )
+
+    def get_cst_installations(self):
+        if not self.supports_cst_backend_selection:
+            return ()
+        return self._engine.get_cst_installations()
+
+    def get_selected_cst_installation(self):
+        if not self.supports_cst_backend_selection:
+            return None
+        return self._engine.get_selected_cst_installation()
+
+    def select_cst_installation(self, version: int, executable: str):
+        if not self.supports_cst_backend_selection:
+            raise RuntimeError("当前后端不支持 CST 版本切换")
+        return self._engine.select_cst_installation(version, executable)
 
     def get_postprocess_settings(self):
         return self._engine.getCurrPostProcessList()
@@ -89,6 +129,27 @@ class _LegacyBackendAdapter:
     def request_stop(self) -> None:
         self._engine.request_stop()
 
+    def recover_project_sessions(self):
+        recovery = getattr(self._engine, "recover_project_sessions", None)
+        if recovery is None:
+            raise RuntimeError("当前后端不支持会话恢复")
+        return recovery()
+
+    def get_recovery_sessions(self):
+        inspect = getattr(self._engine, "get_recovery_sessions", None)
+        return inspect() if inspect is not None else ()
+
+    def is_recovery_required(self) -> bool:
+        inspect = getattr(self._engine, "is_recovery_required", None)
+        if inspect is not None:
+            return bool(inspect())
+        return bool(self.get_recovery_sessions())
+
+    def add_progress_listener(self, listener) -> None:
+        subscribe = getattr(self._engine, "add_progress_listener", None)
+        if subscribe is not None:
+            subscribe(listener)
+
 
 class CstApplicationService:
     """Stable GUI facade backed by the production application backend."""
@@ -109,6 +170,27 @@ class CstApplicationService:
 
     def select_cst_file(self, path: str) -> None:
         self._backend.select_cst_file(path)
+
+    @property
+    def supports_cst_backend_selection(self) -> bool:
+        value = getattr(self._backend, "supports_cst_backend_selection", None)
+        return bool(value) if value is not None else all(
+            hasattr(self._backend, name)
+            for name in (
+                "get_cst_installations",
+                "get_selected_cst_installation",
+                "select_cst_installation",
+            )
+        )
+
+    def get_cst_installations(self):
+        return self._backend.get_cst_installations()
+
+    def get_selected_cst_installation(self):
+        return self._backend.get_selected_cst_installation()
+
+    def select_cst_installation(self, version: int, executable: str):
+        return self._backend.select_cst_installation(version, executable)
 
     def get_postprocess_settings(self):
         return self._backend.get_postprocess_settings()
@@ -137,3 +219,21 @@ class CstApplicationService:
 
     def request_stop(self) -> None:
         self._backend.request_stop()
+
+    def recover_project_sessions(self):
+        return self._backend.recover_project_sessions()
+
+    def get_recovery_sessions(self):
+        inspect = getattr(self._backend, "get_recovery_sessions", None)
+        return inspect() if inspect is not None else ()
+
+    def is_recovery_required(self) -> bool:
+        inspect = getattr(self._backend, "is_recovery_required", None)
+        return bool(inspect()) if inspect is not None else bool(
+            self.get_recovery_sessions()
+        )
+
+    def add_progress_listener(self, listener) -> None:
+        subscribe = getattr(self._backend, "add_progress_listener", None)
+        if subscribe is not None:
+            subscribe(listener)

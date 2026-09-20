@@ -50,3 +50,13 @@ CST 返回多个模式时不静默截断，而将该区间判为失败；这可�
 4. 验证空窗口、任务失败和 checkpoint 恢复；
 5. 单独确认目标工程是否存在严格或近似简并模式；
 6. 正常完成、失败和用户停止时 CST 均标准退出。
+## 可恢复运行边界
+
+每次真实扫描在结果目录写入不可变 `scan_manifest.json`，包含源工程、prepared
+工程、prepared SHA-256、起止频率、初始窗口、模式数、Worker 数和后台策略。
+恢复时任一字段不一致都会拒绝继续，防止把检查点应用到另一个结构或频段。
+
+用户停止属于协作式停止：Manager 首先进入 `STOP_REQUESTED`，拒绝新任务并禁止
+Worker 轮换；已经进入 `EigenmodeSolver.Start` 的区间允许运行到安全点。该区间结果
+写入 checkpoint 后扫描抛出 `ScanInterrupted`，应用状态写为 `INTERRUPTED`，随后
+Worker 通过 Stop Request/Ack、Save 和 Quit 退出。紧急进程终止不属于普通停止。

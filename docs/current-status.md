@@ -1,7 +1,7 @@
 # CST Tools 当前状态与实施路线
 
-状态日期：2026-09-18
-当前基线提交：`0767649 Replace legacy manager calls with task API`（其后工作区实施 HOM 扫描算法修复，尚未提交）
+状态日期：2026-09-20
+当前基线提交：`a2664e6 Migrate GUI to managed CST worker`（其后工作区实施 GUI P13，尚未提交）
 
 本文是项目当前状态的权威入口。历史设计文档仍保留其分析价值；若与本文或[最小 Python/VBA 协议 TODO](./minimal-python-vba-todo.md)冲突，以本文和已经通过的真实 CST Gate 为准。
 
@@ -71,8 +71,17 @@ native CST result -> Python-derived result -> optional runtime VBA
 | P10 | 生产算法替换旧 Manager API | 默认、TM020、WTC 使用 `CSTManager`、`SimulationTask`、`execute/run_batch` |
 | P11 | HOM 扫描完整性修复 | 窄区间逐个求解 Mode 1、微小容差推进、有限重试和原子 checkpoint |
 | P12 | GUI 生产 Worker 迁移 | 默认后端使用长驻版本化文件协议 Worker；Completion/Ack 栅栏，标准 Save/Quit，保留声明式运行时 VBA 后处理 |
+| GUI P13 | 现代运行工作台 | 可调整双栏、状态徽标、阶段摘要、显式安全停止、日志治理与键盘焦点反馈；GUI Gate 45 passed |
+| P13.5 | CST 工程参数预处理 | 在独立工作副本中缺失时添加 `fmin/fmax/nmodes`，通过原子 History 步骤绑定 Solver，显式完成标记、Save/Quit，源工程保持不变 |
+| P14 | 可恢复 HOM 扫描会话 | 不可变 `scan_manifest.json`、协作式停止、禁止停止期派发/Worker 轮换、ACK 阶段 Stop、独立 Windows 进程组、`INTERRUPTED` 状态、残留会话自动发现及 GUI 恢复 | Pillbox“运行中停止→Save/Quit→新会话恢复完成”Gate 通过，`1 passed in 84.90s` |
+| P14.5 | CST 后台进度 | 增量 tail 每个 Worker 的 `cst.log`，解析 Mesh、Refinement、Eigenmode Pass 和局部百分比，经 Worker/Manager/Backend/Qt signal 显示；不使用 PIPE，不把 Pass 百分比称为总进度 | 真实 Pillbox 日志、频段身份、局部百分比及安全退出 Gate 通过，`1 passed in 56.95s` |
+| P15 | CST 后端版本切换 | 自动发现本机全部 CST 安装、GUI 显式选择并持久化、运行期冻结；Manifest 绑定版本和可执行文件 | 多版本发现/校验、后端状态门和 GUI 切换测试通过 |
 
-P11 已移除大区间多模饱和二分方案；默认 PPS 恢复为 `iModeNumber=1` 的非 `_All` 方法。严格同频简并模态仍需要专门的局部多模 Gate，当前不能宣称已覆盖。P11 尚未执行真实 CST 扫描验收。P12 Managed Worker 双任务真实 Gate 已通过：同一 CST 会话连续完成两个任务，Completion/Ack 和 Stop Ack 正常，进程以退出码 0 结束且未强制清场。
+P11 已移除大区间多模饱和二分方案；默认 PPS 恢复为 `iModeNumber=1` 的非 `_All` 方法。严格同频简并模态仍需要专门的局部多模 Gate，当前不能宣称已覆盖。P11 尚未执行完整频段的真实 CST 找全验收。P12 Managed Worker 双任务真实 Gate 已通过：同一 CST 会话连续完成两个任务，Completion/Ack 和 Stop Ack 正常，进程以退出码 0 结束且未强制清场。P14 已验证 Pillbox 的安全停止和新会话恢复生命周期，但不等同于复杂 HOM 工程 500–1000 MHz 全频段验收。
+
+P14 的普通“安全停止”在 Stop Ack 超时时只返回 `RECOVERY_REQUIRED`，不再自动终止 CST。GUI 的“恢复会话”会扫描项目运行目录中的 Managed Session，补齐遗留 Completion 的 ACK，并通过 Stop Request/Ack 完成 Save/Quit。强制结束已拆为显式 `emergency_terminate()`，调用后工程必须保持 `RECOVERY_REQUIRED`。
+
+异常恢复进一步区分两类会话：仍存活的 CST 必须完成 Stop Request → Completion ACK → StopAck → 进程退出；PID 已明确死亡的隔离 Worker 会话写入 `abandoned-dead` 恢复凭据，并从最后一个原子 checkpoint 重算未确认区间。所有会话收口后，`project.ini` 才从 `RECOVERY_REQUIRED` 持久化为 `INTERRUPTED`。存活但无响应的进程不会被恢复流程自动强杀。
 
 ## 4. `hom-2022-v1` Profile
 
@@ -105,7 +114,7 @@ Profile 验证使用 CST 官方 `ResetTemplateIterator/GetNextTemplate`，比较
 - `base.cst_tools_main` 仍作为旧脚本兼容入口，待外部调用方完成弃用；
 - 当前暂不扩展到 default、TM020、WTC、Pillbox 或复合 Enlarged/HOM Profile；
 - 没有自动安装 Result Template；
-- 没有通用 Profile Schema、Manifest、动态 capability negotiation 或多 Transport；
+- 已有 HOM 运行 Manifest；没有通用 Profile Schema、动态 capability negotiation 或多 Transport；
 - 没有完成 `cst_version` 只读核心的仓内提取和跨版本矩阵；
 - 没有建立 20–30 点以上的 Warm 性能、内存增长和失败率统计；
 - Shunt Impedance、Total Loss、Voltage 仍缺少原生/Python 派生等价性证明；

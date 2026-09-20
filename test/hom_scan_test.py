@@ -7,6 +7,7 @@ import pytest
 from csttool.hom_scan import (
     AdaptiveHomScanner,
     IncompleteScanError,
+    ScanInterrupted,
     ModeResult,
     ScanCheckpointStore,
     ScanInterval,
@@ -190,6 +191,8 @@ def test_algorithm_requires_mode_one_non_all_postprocess_configuration():
 class ScanManager:
     def __init__(self, root):
         self.currProjectDir = root
+        self.cstProjPath = root / "model.cst"
+        self.cstProjPath.write_bytes(b"fake-cst-project")
         self.logger = logging.getLogger("hom-scan-integration-test")
         self.result_dir = root / "result"
         self.result_dir.mkdir()
@@ -244,3 +247,19 @@ def test_production_algorithm_writes_results_and_checkpoint(tmp_path):
     assert list(pd.read_csv(result_path)["mode"]) == [1, 2]
     assert list(pd.read_csv(result_path)["solverMode"]) == [1, 1]
     assert (tmp_path / "save" / "csv" / "hom_scan_checkpoint.json").exists()
+
+
+def test_scanner_stops_between_solves_and_preserves_pending_interval():
+    policy = ScanPolicy(start=100, initial_stop=110, stop=130, window_width=10)
+    stop = False
+
+    def solve(_request):
+        nonlocal stop
+        stop = True
+        return [mode(105)]
+
+    with pytest.raises(ScanInterrupted) as raised:
+        AdaptiveHomScanner(policy).run(solve, should_stop=lambda: stop)
+
+    assert [item.frequency for item in raised.value.report.modes] == [105]
+    assert raised.value.pending == [ScanInterval(105.000001, 115.000001)]

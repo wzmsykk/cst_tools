@@ -4,13 +4,11 @@ import pathlib, shutil
 from enum import Enum
 from install_compat import resource_path
 import json
-import subprocess
 import hashlib
-import tempfile
 import logging
-import re
 from . import projectutil
 from . import preprocess_cst
+from .cst_preprocessor import CstProjectPreprocessor
 
 
 ###读取或生成ProjConf.ini文件
@@ -21,6 +19,10 @@ class TaskStatus(Enum):
     READY = 1
     RUNNING = 2
     DONE = 3
+    STOP_REQUESTED = 4
+    INTERRUPTED = 5
+    FAILED = 6
+    RECOVERY_REQUIRED = 7
 
 
 class ProjectStatusError(Exception):
@@ -183,7 +185,7 @@ class ProjectConfmanager(object):
                     self.logger.warning("发现异常结束,安全模式设置为ON,不会尝试修改")
                     self.logger.warning("结束")
                     raise ProjectStatusError("FLAG_SAFE=ON and status=RUNNING")
-            elif status == "DONE":
+            elif status in {"DONE", "INTERRUPTED"}:
                 # SAME AS READY
                 result = self.__checkAndRepairProject()
                 if result == False:
@@ -193,6 +195,10 @@ class ProjectConfmanager(object):
                 else:
                     self.savePPSSettings(self.currPPSList)
                 return self.__ready()
+            elif status in {"FAILED", "RECOVERY_REQUIRED", "STOP_REQUESTED"}:
+                raise ProjectStatusError(
+                    "project requires explicit recovery before execution: " + status
+                )
 
     def __savecfgobj(self, confobj, cfgfilename="project.ini", slient=False):
         cfgfilePath = self.currProjectDir / "project.ini"
@@ -390,89 +396,46 @@ class ProjectConfmanager(object):
         return vblines, newcstpath
 
     def __vbpreprocess_CST(self, confobj, projectDir, savejsonpath=None):
-
-
-        ### invoke a local cst worker to do this
-
-        if savejsonpath == None:
+        """Create and validate a prepared project without modifying its source."""
+        if savejsonpath is None:
             jsonpath = projectDir / self.paramsfilename
         else:
             jsonpath = pathlib.Path(savejsonpath)
             if not jsonpath.is_absolute():
                 jsonpath = projectDir / jsonpath
-        self.logger.info("正在从CST文件中读取参数列表。")
-        projectname = confobj["PROJECT"]["ProjectName"]
+
         td = pathlib.Path(confobj["DIRS"]["tempdir"])
-
-        if td.is_absolute():
-            td = confobj["DIRS"]["tempdir"]
-        else:
+        if not td.is_absolute():
             td = projectDir / td
-        if not td.exists():
-            td.mkdir()
-        tempfile.tempdir = str(td)
-        self.logger.info("tempdir为%s。" % tempfile.gettempdir())
-        tmp_bas = tempfile.NamedTemporaryFile(mode="w", suffix=".bas", delete=False)
-        tmp_txt = tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False)
-        tmp_cst = tempfile.NamedTemporaryFile(mode="wb", suffix=".cst", delete=False)
-        tmp_bas_name = tmp_bas.name
-        tmp_cst_name = tmp_cst.name
-        tmp_txt_name = tmp_txt.name
-        self.logger.info("临时文件生成成功。")
-        vbasrcpath = (
-            resource_path(self.gconf["BASE"]["datadir"]) / "readParamsT.vb"
-        )
-        vbadstpath = pathlib.Path(tempfile.gettempdir()) / tmp_bas_name
-        midfilepath = pathlib.Path(tempfile.gettempdir()) / tmp_txt_name
-
-        cstfilepath = (
+        source_project = (
             pathlib.Path(projectDir).absolute() / confobj["CST"]["CSTFilename"]
         )
-        tmpcstpath = pathlib.Path(tempfile.gettempdir()).absolute() / tmp_cst_name
-        # tmpcstfile
-        fcst = open(cstfilepath, "rb")
-        content = fcst.read()
-        tmp_cst.file.write(content)
-
-        tmp_cst.file.close()
-
-        file_1 = open(vbasrcpath, "r")
-        file_2 = tmp_bas.file
-        list1 = []
-        for line in file_1.readlines():
-            ssd = line
-            ssd = re.sub("%PARAMDSTPATH%", str(midfilepath).replace("\\", "\\\\"), ssd)
-            ssd = re.sub("%CSTPROJFILE%", str(tmpcstpath).replace("\\", "\\\\"), ssd)
-            list1.append(ssd)
-        file_1.close()
-        # list1, newcstpath = self.__gen_vblines_cstpreprocess(
-        #     str(tmpcstpath), str(midfilepath)
-        # )
-
-        for i in range(len(list1)):
-            file_2.write(list1[i])
-        file_2.close()
-
-        # command=
-
-        command = (
-            '"'
-            + self.gconf["CST"]["cstexepath"]
-            + '"'
-            + " -m "
-            + '"'
-            + str(vbadstpath)
-            + '"'
+        candidate = pathlib.Path(projectDir).absolute() / "processed.cst"
+        suffix = 1
+        while candidate.exists() or candidate == source_project:
+            candidate = pathlib.Path(projectDir).absolute() / f"processed_{suffix}.cst"
+            suffix += 1
+        macro_template = (
+            resource_path(self.gconf["BASE"]["datadir"])
+            / "preprocess_hom_parameters_v1.vb"
         )
-        with subprocess.Popen(
-            command, stdout=subprocess.PIPE, shell=True
-        ) as self.cstProcess:
-            for line in self.cstProcess.stdout:
-                self.logger.info(line)
-
-        projectutil.custom_ascii_2_json(midfilepath, jsonpath)
-        return  cstfilepath
-        pass
+        preprocessor = CstProjectPreprocessor(
+            self.gconf["CST"]["cstexepath"],
+            macro_template,
+            logger=self.logger,
+        )
+        result = preprocessor.preprocess(
+            source_project,
+            candidate,
+            jsonpath,
+            td,
+        )
+        self.logger.info(
+            "CST 工程参数预处理完成: %s (%d parameters)",
+            result.project_path,
+            len(result.parameters),
+        )
+        return result.project_path
 
     def __checkAndRepairProject(
         self, cfgfilename="project.ini", slient=False, force=True

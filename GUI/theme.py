@@ -29,15 +29,80 @@ QLabel#subtitleLabel {
     color: #667085;
     font-size: 10pt;
 }
-QLabel#sectionLabel {
+QLabel#sectionLabel,
+QLabel#projectSectionLabel,
+QLabel#cstSectionLabel,
+QLabel#configurationSectionLabel,
+QLabel#executionSectionLabel,
+QLabel#logHeaderLabel {
     color: #344054;
     font-size: 10pt;
     font-weight: 700;
 }
+QLabel#projectHelpLabel,
+QLabel#cstHelpLabel,
+QLabel#configurationHelpLabel,
+QLabel#workerHintLabel,
+QLabel#stateDetailLabel {
+    color: #667085;
+    font-size: 9pt;
+}
+QLabel#stateBadge {
+    color: #475467;
+    background-color: #e9eef4;
+    border: 1px solid #d0d9e5;
+    border-radius: 11px;
+    padding: 4px 12px;
+    font-size: 9pt;
+    font-weight: 700;
+    min-height: 18px;
+    max-height: 18px;
+}
+QLabel#stateBadge[state="ready"] {
+    color: #067647;
+    background-color: #ecfdf3;
+    border-color: #abefc6;
+}
+QLabel#stateBadge[state="running"], QLabel#stateBadge[state="stopping"] {
+    color: #075985;
+    background-color: #e1f2f6;
+    border-color: #9fd8e3;
+}
+QLabel#stateBadge[state="failed"] {
+    color: #b42318;
+    background-color: #fee4e2;
+    border-color: #fda29b;
+}
 QFrame#setupPanel, QFrame#logPanel {
     background-color: #ffffff;
     border: 1px solid #d8e1eb;
-    border-radius: 10px;
+    border-radius: 12px;
+}
+QFrame#runSummaryFrame {
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+}
+QFrame#runSummaryFrame[state="running"], QFrame#runSummaryFrame[state="stopping"] {
+    background-color: #f0f9fb;
+    border-color: #b9e1e8;
+}
+QFrame#runSummaryFrame[state="failed"] {
+    background-color: #fff7f6;
+    border-color: #fecdca;
+}
+QFrame#sectionDivider {
+    color: #e4eaf1;
+    max-height: 1px;
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+QSplitter::handle:horizontal {
+    width: 12px;
+    background: transparent;
+}
+QSplitter::handle:horizontal:hover {
+    background-color: #dceaf0;
 }
 QLineEdit, QSpinBox, QPlainTextEdit, QListView {
     background-color: #ffffff;
@@ -85,6 +150,10 @@ QPushButton:hover {
 }
 QPushButton:pressed {
     background-color: #d9edf3;
+}
+QPushButton:focus {
+    border: 2px solid #168aad;
+    padding: 6px 13px;
 }
 QPushButton:disabled {
     background-color: #e9eef4;
@@ -148,16 +217,19 @@ QStatusBar[state="failed"] {
 }
 QProgressBar {
     background-color: #d7e0ea;
-    border: 0;
-    border-radius: 5px;
+    border: 1px solid #cad5e1;
+    border-radius: 8px;
     min-width: 180px;
-    max-height: 10px;
+    min-height: 18px;
+    max-height: 18px;
     text-align: center;
-    color: transparent;
+    color: #344054;
+    font-size: 8pt;
+    font-weight: 600;
 }
 QProgressBar::chunk {
     background-color: #16a3b6;
-    border-radius: 5px;
+    border-radius: 7px;
 }
 QToolTip {
     background-color: #172033;

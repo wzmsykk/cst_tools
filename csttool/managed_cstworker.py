@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 import math
+import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -14,6 +15,7 @@ from typing import Any, Mapping
 from install_compat import resource_path
 
 from .postprocess_cst import VBPostProcessor
+from .cst_progress import CstLogProgressMonitor, CstLogProgressParser
 from .protocol_worker import _vb_string
 from .runtime_protocol import (
     Acknowledge,
@@ -59,10 +61,16 @@ class ManagedCSTWorker:
         self.project_path = self.root / "worker-input.cst"
         self.macro_path = self.root / "runtime_managed_worker_v1.bas"
         self.log_path = self.root / "cst.log"
+        self.pid_path = self.root / "worker.pid"
         self._lock = threading.RLock()
         self._stopping = False
         self._process: subprocess.Popen | None = None
         self._log_stream = None
+        self._run_in_background = bool(config.get("runInBackground", True))
+        self._last_window_check = 0.0
+        self._progress_callback = config.get("progressCallback")
+        self._active_task_context: dict[str, Any] = {}
+        self._progress_monitor: CstLogProgressMonitor | None = None
 
         self.root.mkdir(parents=True, exist_ok=True)
         self.result_root.mkdir(parents=True, exist_ok=True)
@@ -113,14 +121,81 @@ class ManagedCSTWorker:
             [str(self.executable), "-m", str(self.macro_path)],
             stdout=self._log_stream,
             stderr=subprocess.STDOUT,
+            **self._background_startup_options(),
         )
+        self.pid_path.write_text(str(self._process.pid), encoding="ascii")
+        if callable(self._progress_callback):
+            parser = CstLogProgressParser(self.ID, self._progress_context)
+            self._progress_monitor = CstLogProgressMonitor(
+                self.log_path, parser, self._progress_callback
+            )
+            self._progress_monitor.start()
         self._wait_for_marker("ready", self.START_TIMEOUT)
         self.logger.info("Managed CST worker %s started pid=%s", self.ID, self._process.pid)
+
+    def _background_startup_options(self) -> dict[str, Any]:
+        """Isolate console signals and optionally start CST minimized."""
+        if os.name != "nt":
+            return {}
+        options: dict[str, Any] = {
+            "creationflags": subprocess.CREATE_NEW_PROCESS_GROUP,
+        }
+        if not self._run_in_background:
+            return options
+        startupinfo = subprocess.STARTUPINFO()
+        startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+        # SW_SHOWMINNOACTIVE: minimized and does not activate the CST window.
+        startupinfo.wShowWindow = 7
+        options["startupinfo"] = startupinfo
+        return options
+
+    def _keep_window_minimized(self) -> None:
+        """Re-minimize visible CST windows that appear while a task is running."""
+        if (
+            not self._run_in_background
+            or os.name != "nt"
+            or self._process is None
+            or self._process.poll() is not None
+        ):
+            return
+        now = time.monotonic()
+        if now - self._last_window_check < 0.5:
+            return
+        self._last_window_check = now
+
+        try:
+            import ctypes
+
+            user32 = ctypes.windll.user32
+            target_pid = self._process.pid
+            callback_type = ctypes.WINFUNCTYPE(
+                ctypes.c_bool, ctypes.c_void_p, ctypes.c_void_p
+            )
+
+            def minimize(hwnd, _lparam):
+                process_id = ctypes.c_ulong()
+                user32.GetWindowThreadProcessId(hwnd, ctypes.byref(process_id))
+                if (
+                    process_id.value == target_pid
+                    and user32.IsWindowVisible(hwnd)
+                    and not user32.IsIconic(hwnd)
+                ):
+                    user32.ShowWindow(hwnd, 6)  # SW_MINIMIZE
+                return True
+
+            user32.EnumWindows(callback_type(minimize), 0)
+        except Exception:
+            self.logger.debug(
+                "Unable to enforce minimized CST window for worker %s",
+                self.ID,
+                exc_info=True,
+            )
 
     def _wait_for_marker(self, expected: str, timeout: float) -> None:
         deadline = time.monotonic() + timeout
         while time.monotonic() < deadline:
             self._ensure_running()
+            self._keep_window_minimized()
             if self.marker_path.exists():
                 marker = self.marker_path.read_text(encoding="ascii").strip()
                 if marker == expected:
@@ -146,6 +221,9 @@ class ManagedCSTWorker:
             or not self._is_number(value)
         )
 
+    def _progress_context(self) -> dict[str, Any]:
+        return dict(self._active_task_context)
+
     @staticmethod
     def _is_number(value: object) -> bool:
         try:
@@ -163,6 +241,11 @@ class ManagedCSTWorker:
                 params,
                 expression_names=self._expression_names(params),
             )
+            self._active_task_context = {
+                "task_id": task.task_id,
+                "interval_lo": self._progress_number(params.get("fmin")),
+                "interval_hi": self._progress_number(params.get("fmax")),
+            }
             self.marker_path.write_text(
                 f"dispatched:{task.task_id}", encoding="ascii"
             )
@@ -190,6 +273,7 @@ class ManagedCSTWorker:
                     encode_ack(Acknowledge(task.task_id, task.session_id)),
                 )
                 self._wait_for_marker("ready", self.START_TIMEOUT)
+                self._active_task_context = {}
             return {
                 "WorkerID": self.ID,
                 "TaskStatus": status,
@@ -199,10 +283,18 @@ class ManagedCSTWorker:
                 "PostProcessResult": postprocess_result,
             }
 
+    @staticmethod
+    def _progress_number(value):
+        try:
+            return float(value)
+        except (TypeError, ValueError):
+            return None
+
     def _wait_completion(self, task: Task):
         deadline = time.monotonic() + self.TASK_TIMEOUT
         while time.monotonic() < deadline:
             self._ensure_running()
+            self._keep_window_minimized()
             if self.completion_path.exists():
                 completion = decode_completion(
                     self.completion_path.read_text(encoding="utf-8")
@@ -239,15 +331,25 @@ class ManagedCSTWorker:
                     break
                 time.sleep(0.1)
 
+            if self._process.poll() is not None:
+                self._close_log()
+            raise ManagedWorkerShutdownError(
+                f"worker {self.ID} did not confirm standard Save/Quit; "
+                "explicit emergency termination is required"
+            )
+
+    def emergency_terminate(self) -> None:
+        """Explicit last resort; callers must mark the project for recovery."""
+        with self._lock:
             process = self._process
-            if process.poll() is None:
+            if process is not None and process.poll() is None:
                 process.kill()
                 process.wait(timeout=30)
             self._close_log()
-            raise ManagedWorkerShutdownError(
-                f"worker {self.ID} required forced termination; standard Save/Quit failed"
-            )
 
     def _close_log(self) -> None:
+        progress_monitor = getattr(self, "_progress_monitor", None)
+        if progress_monitor is not None:
+            progress_monitor.stop()
         if self._log_stream is not None and not self._log_stream.closed:
             self._log_stream.close()

@@ -51,6 +51,7 @@ class SimulationManager(Protocol):
 class ManagerState(Enum):
     IDLE = auto()
     RUNNING = auto()
+    STOP_REQUESTED = auto()
     STOPPING = auto()
     CLOSED = auto()
 
@@ -111,6 +112,7 @@ class CSTManager:
         *,
         worker_factory: WorkerFactory | None = None,
         max_jobs_per_worker: int = 10,
+        progress_callback=None,
     ) -> None:
         if maxTask < 1:
             raise ValueError("maxTask must be at least 1")
@@ -125,6 +127,7 @@ class CSTManager:
         self.maxParallelTasks = maxTask
         self.maxWorkerJobCountLimit = max_jobs_per_worker
         self._worker_factory = worker_factory or self._create_local_worker
+        self._progress_callback = progress_callback
 
         self.cstPatternDir = Path(resource_path(self.gconf["BASE"]["datadir"]))
         self.currProjectDir = Path(pconfm.currProjectDir).absolute()
@@ -162,6 +165,14 @@ class CSTManager:
         return self.state is not ManagerState.CLOSED
 
     @property
+    def stop_requested(self) -> bool:
+        return self.state in {
+            ManagerState.STOP_REQUESTED,
+            ManagerState.STOPPING,
+            ManagerState.CLOSED,
+        }
+
+    @property
     def cstWorkerList(self) -> list[WorkerProtocol]:
         """Compatibility view of the live workers."""
         with self._state_lock:
@@ -186,6 +197,8 @@ class CSTManager:
             "cstPath": str(self.cstProjPath),
             "paramList": self.paramList,
             "postProcess": self.pconfm.getCurrPPSList(),
+            "runInBackground": True,
+            "progressCallback": self._progress_callback,
         }
 
     @staticmethod
@@ -221,7 +234,11 @@ class CSTManager:
     def submit(self, task: SimulationTask) -> int:
         """Queue a task and return its monotonically increasing sequence ID."""
         with self._state_lock:
-            if self._state in {ManagerState.STOPPING, ManagerState.CLOSED}:
+            if self._state in {
+                ManagerState.STOP_REQUESTED,
+                ManagerState.STOPPING,
+                ManagerState.CLOSED,
+            }:
                 raise RuntimeError("CSTManager is shutting down or closed")
             sequence = self._next_sequence
             self._next_sequence += 1
@@ -243,7 +260,7 @@ class CSTManager:
             SimulationTask(params=params, job_name=job_name, retry_count=retry_cnt)
         )
 
-    def _replace_worker(self, slot: _WorkerSlot) -> None:
+    def _replace_worker(self, slot: _WorkerSlot) -> bool:
         slot.state = WorkerState.RESTARTING
         old_worker = slot.worker
         try:
@@ -251,14 +268,27 @@ class CSTManager:
         except Exception:
             self.logger.exception("Failed to stop CST worker %s", slot.worker_id)
 
+        with self._state_lock:
+            if self._state is not ManagerState.RUNNING:
+                slot.state = WorkerState.DEAD
+                return False
+
         try:
             slot.worker = self._create_worker(slot.worker_id)
         except Exception:
             slot.state = WorkerState.DEAD
             raise
         else:
+            with self._state_lock:
+                if self._state is not ManagerState.RUNNING:
+                    try:
+                        slot.worker.stop()
+                    finally:
+                        slot.state = WorkerState.DEAD
+                    return False
             slot.completed_jobs = 0
             slot.state = WorkerState.ALIVE
+            return True
 
     @staticmethod
     def _exception_result(task: SimulationTask, exc: Exception) -> dict[str, Any]:
@@ -297,7 +327,10 @@ class CSTManager:
                 attempt + 1,
                 task.retry_count + 1,
             )
-            self._replace_worker(slot)
+            if self.stop_requested:
+                break
+            if not self._replace_worker(slot):
+                break
 
         assert result is not None
         return result
@@ -316,7 +349,8 @@ class CSTManager:
                         slot.worker_id,
                         self.maxWorkerJobCountLimit,
                     )
-                    self._replace_worker(slot)
+                    if not self._replace_worker(slot):
+                        return
                 result = self._execute_task(slot, queued.task)
                 self._result_queue.put((queued.sequence, result))
             finally:
@@ -444,6 +478,37 @@ class CSTManager:
             raise RuntimeError(
                 f"{len(stop_errors)} CST worker(s) did not stop cleanly"
             ) from stop_errors[0]
+
+    def request_stop(self) -> None:
+        """Stop dispatching new work without terminating the active solver."""
+        with self._state_lock:
+            if self._state in {
+                ManagerState.STOP_REQUESTED,
+                ManagerState.STOPPING,
+                ManagerState.CLOSED,
+            }:
+                return
+            self._state = ManagerState.STOP_REQUESTED
+        self._clear_queue(self._task_queue)
+        self.logger.info("CSTManager accepted cooperative stop request")
+
+    def emergency_terminate(self) -> None:
+        """Explicitly terminate live workers after standard shutdown failed."""
+        with self._state_lock:
+            slots = list(self._slots)
+            self._state = ManagerState.STOPPING
+        for slot in slots:
+            terminate = getattr(slot.worker, "emergency_terminate", None)
+            if terminate is None:
+                raise RuntimeError(
+                    f"worker {slot.worker_id} has no emergency termination API"
+                )
+            terminate()
+            slot.state = WorkerState.DEAD
+        self._executor.shutdown(wait=False, cancel_futures=True)
+        with self._state_lock:
+            self._slots.clear()
+            self._state = ManagerState.CLOSED
 
     @staticmethod
     def _clear_queue(target: Queue) -> None:

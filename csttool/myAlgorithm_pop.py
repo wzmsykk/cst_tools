@@ -11,10 +11,12 @@ from . import cstmanager
 from .hom_scan import (
     AdaptiveHomScanner,
     IncompleteScanError,
+    ScanInterrupted,
     ModeResult,
     ScanCheckpointStore,
     ScanPolicy,
 )
+from .hom_run_manifest import HomRunManifest
 from . import yfunction
 import time
 import pandas as pd
@@ -587,6 +589,11 @@ class myAlg01(myAlg):
             raise RuntimeError("HOM scan is not ready")
 
         policy = self._scan_policy()
+        HomRunManifest.ensure(
+            Path(self.relative_location) / "scan_manifest.json",
+            self.manager,
+            policy,
+        )
         scanner = AdaptiveHomScanner(policy)
         checkpoint_store = ScanCheckpointStore(
             Path(self.relative_location) / "hom_scan_checkpoint.json"
@@ -639,6 +646,9 @@ class myAlg01(myAlg):
                 pending=pending,
                 report=report,
                 checkpoint=save_checkpoint,
+                should_stop=lambda: bool(
+                    getattr(self.manager, "stop_requested", False)
+                ),
             )
             save_checkpoint(final_report, [])
             self.logger.info(
@@ -649,6 +659,15 @@ class myAlg01(myAlg):
                 time.monotonic() - started,
             )
             return final_report
+        except ScanInterrupted as exc:
+            save_checkpoint(exc.report, exc.pending)
+            self.logger.info(
+                "HOM scan interrupted safely: modes=%d pending=%d solver_calls=%d",
+                len(exc.report.modes),
+                len(exc.pending),
+                exc.report.solver_calls,
+            )
+            raise
         except IncompleteScanError as exc:
             self.logger.error(
                 "HOM scan incomplete: failed_intervals=%d solver_calls=%d",

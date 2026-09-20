@@ -299,6 +299,16 @@ python -m pytest -q -m integration --run-cst `
 
 当前实测为 `1 passed in 293.37s`。两个参数任务在同一 CST 会话内依次完成，运行时 Frequency 结果成功读取且不同；随后收到 Stop Ack，CST 以退出码 0 自然结束，没有使用强制清场。GUI 运行中关闭的真实端到端 Gate 和故意关闭超时 Gate 仍待补充。
 
+## CST 工程参数预处理 Gate
+
+```powershell
+python -m pytest -q -m integration --run-cst `
+  --cst-exe "D:\Program Files (x86)\CST Studio Suite 2022\CST DESIGN ENVIRONMENT.exe" `
+  test/cst_preprocessor_integration_test.py
+```
+
+该 Gate 使用 CST 2022 打开临时工作副本，通过官方参数 API 在缺失时添加 `fmin`、`fmax`、`nmodes`，并以一个原子 `AddToHistory` 步骤将 Frequency Range、Frequency Target 和 Number of Modes 绑定到这些参数。宏随后立即执行一次 Rebuild，实际重放包含该步骤的完整 History List；只有 Rebuild、Save 和参数导出全部成功才返回 `SUCCESS`。Gate 要求 prepared 工程和参数清单存在，并验证源 `.cst` 的 SHA-256 不变。预处理器拒绝源/输出为同一路径或覆盖已有输出；Python 不直接修改 `.cst` 容器成员。
+
 HOM 扫描另有可复现的概率化假 Worker：
 
 ```powershell
@@ -314,3 +324,65 @@ CSV 假 Worker 保存每个模式的完整数值记录，并按声明式 PPS 的
 `ProbabilisticHomWorker.from_csv_randomized(..., model_seed=...)` 提供相似分布随机模型。它从真实相邻模式间距中有放回抽样，再缩放到原始频率范围，因此保持模式总数、频率上下界和平均密度；每个随机模式的后处理值按完整源数据行抽样，保留 Q、R/Q、Shunt Impedance、Total Loss 之间的联合关系。`model_seed` 只控制物理模型，普通 `seed` 仍独立控制协议/求解异常注入。
 
 随机模型 Gate 使用多个固定 `model_seed` 完整扫描各自生成的频谱，要求所有模式逐个找全，并要求每个模式恰好包含默认七项有限后处理值。外部完整表可用于扩大 seed 数量的压力验证，但不作为默认测试路径依赖。
+
+## P14 HOM 安全停止与恢复 Gate
+
+默认测试：
+
+```powershell
+python -m pytest -q `
+  test/hom_run_manifest_test.py `
+  test/hom_scan_test.py `
+  test/cstmanager_test.py `
+  test/managed_cstworker_test.py `
+  test/managed_session_recovery_test.py `
+  test/project_session_recovery_test.py
+```
+
+该 Gate 验证扫描工程、SHA-256、频段和 Worker 数进入不可变
+`scan_manifest.json`；停止后不再派发新区间或轮换 Worker；当前区间完成后原子保存
+checkpoint；VBA 在 `WaitForAck` 阶段也响应 Stop Request，并保留未消费的
+Completion；控制器可在重启后补 ACK。Windows 下 CST 使用独立进程组，普通
+`Ctrl+C` 不再直接传播给 CST。
+
+准备运行时会自动扫描项目 `temp/worker_*/<session>/protocol`。发现未闭合会话时
+进入 `RECOVERY_REQUIRED` 并阻止启动；GUI“恢复会话”在后台补 ACK、发送 Stop
+Request并等待 Stop Ack。标准停止超时测试要求 CST 进程未被 kill；只有显式调用
+`emergency_terminate()` 才允许结束进程，并且不得把项目标记为正常完成。
+每个新 Worker 同时保存 `worker.pid`；恢复器在 Windows 上通过只读进程句柄检查
+PID 是否仍存活。进程已死亡且没有 Stop Ack 时不会伪造 Stop Ack，而是为隔离的
+Worker 副本写入 `abandoned-dead` 恢复凭据，并从最后一个原子 checkpoint 重算。
+仍存活但无响应的进程继续保持 `RECOVERY_REQUIRED`，恢复流程不会自动 kill。
+
+GUI 使用独立的 `RECOVERY_REQUIRED` 状态：选择项目时自动检查残留会话，显示待恢复
+数量，冻结工程、版本与运行配置并禁止启动。运行或标准停止异常后再次查询后端；恢复
+失败仍保留恢复按钮，全部会话收口并写回 `INTERRUPTED` 后才重新允许运行。
+
+## P14.5 CST 输出进度 Gate
+
+```powershell
+python -m pytest -q test/cst_progress_test.py
+```
+
+Managed Worker继续把 stdout/stderr 直接写入无缓冲 `cst.log`，不使用可能阻塞 CST
+的 `PIPE`。独立监控线程只增量读取新增字节，并识别 Mesh、Refinement、
+`Eigenmodes, Pass N` 和 `[... ] N %`。重复百分比会去重，解码或回调异常不得影响
+求解。事件携带 Worker、Task 和 `fmin/fmax` 身份，经 Manager、Backend 和 Qt
+signal 更新 GUI。
+
+GUI 进度条固定标注“当前 CST 阶段”，因为 CST 在不同 Mesh/Solver Pass 中会重新
+从 0% 开始；它不是 HOM 全频段完成率。真实验证复用
+`managed_pillbox_stop_resume_integration_test.py`，并额外要求至少收到一个带
+500–550 MHz 身份的局部百分比事件。2026-09-20 实测：`1 passed in 56.95s`。
+
+真实 Pillbox 生命周期 Gate：
+
+```powershell
+python -m pytest -q -m integration --run-cst `
+  --cst-exe "D:\Program Files (x86)\CST Studio Suite 2022\CST DESIGN ENVIRONMENT.exe" `
+  test/managed_pillbox_stop_resume_integration_test.py
+```
+
+Gate 在第一会话任务运行期间发出安全停止，要求任务完成、结果 ACK、Stop Ack、
+Save/Quit 和退出码 0；随后创建新会话完成下一频段并再次标准退出。任何强制清场
+都会使 Gate 失败。2026-09-20 实测：`1 passed in 84.90s`。

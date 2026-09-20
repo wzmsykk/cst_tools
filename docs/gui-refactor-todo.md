@@ -1,6 +1,6 @@
 # GUI 重构 TODO
 
-状态：P0–P7 已完成；当前实施记录
+状态：P0–P13 已完成；当前实施记录
 
 ## 目标与边界
 
@@ -168,6 +168,30 @@ GUI 重构先修复线程、状态和生命周期边界，再调整布局和交�
 - [x] 保留 Manager 旧方法作为仓外兼容层，不在本阶段删除。
 
 实现记录：维护中的生产算法不再依赖 `addTask/startProcessing/getFullResults/runWithParam`。底层 Worker 仍使用经过验证的 Worker Protocol；有界双任务 Warm Worker 尚不能直接替换任意长度生产调度。P10 定向测试为 `14 passed`，完整默认测试为 `139 passed, 12 deselected`。
+
+## P13：现代运行工作台
+
+- [x] 主工作区改为用户可调整宽度的双栏 Splitter，最小尺寸下不重叠。
+- [x] 标题区增加中文状态徽标和操作说明，不再只依赖状态栏英文枚举。
+- [x] 运行区增加阶段摘要和可读进度，保留真实四阶段语义。
+- [x] 增加显式“安全停止”操作，复用既有标准停止状态机。
+- [x] 增加日志清理和 5000 行显示上限，避免长任务拖慢界面。
+- [x] 运行期间冻结继续运行、安全模式和 Worker 数量，保证本次请求配置一致。
+- [x] 增加键盘焦点、状态色和辅助文本样式，并保持高对比日志区域。
+
+实现记录：布局继续以 `ui_main.ui` 为唯一源文件，`ui_main.py` 由 PyQt 工具生成。业务边界仍为 `MainWindow -> GuiRunController -> GuiApplicationService`，没有把 Manager 或 Worker 逻辑放回界面。GUI 定向测试为 `45 passed`。
+
+## P15：UI 异常恢复状态
+
+- [x] 将 `RECOVERY_REQUIRED` 与普通 `FAILED` 分离，禁止在存在残留会话时直接重跑。
+- [x] 选择项目目录后立即只读检查 Managed CST 会话。
+- [x] 恢复按钮显示待恢复会话数量；恢复期间冻结配置和重复操作。
+- [x] 运行失败或标准停止失败后重新查询后端恢复状态。
+- [x] 恢复失败保持 `RECOVERY_REQUIRED`，允许用户再次恢复，不降级为普通失败。
+- [x] 会话检查自身异常时保守进入恢复状态，不误放行启动。
+- [x] 全部会话收口后才恢复输入和启动按钮。
+
+实现记录：UI 只展示并驱动后端恢复用例；协议 ACK、StopAck、PID 判断和 checkpoint 仍由应用后端负责。完整默认测试为 `211 passed, 15 deselected`。
 
 ## 明确不做
 

@@ -13,6 +13,11 @@ from install_compat import resource_path
 from csttool import cstmanager, globalconfmanager, logger, myAlgorithm_pop
 from csttool.managed_cstworker import ManagedCSTWorker
 from csttool import projectconfmanager
+from csttool.hom_scan import ScanInterrupted
+from csttool.project_session_recovery import (
+    discover_managed_sessions,
+    recover_project_sessions,
+)
 
 
 class BackendState(Enum):
@@ -22,6 +27,8 @@ class BackendState(Enum):
     RUNNING = auto()
     STOPPING = auto()
     STOPPED = auto()
+    INTERRUPTED = auto()
+    RECOVERY_REQUIRED = auto()
     FAILED = auto()
 
 
@@ -56,6 +63,7 @@ class CstApplicationBackend:
         self.safe_mode = False
         self.jm = None
         self._manager_stop_requested = False
+        self._progress_listeners = []
 
         if application_logger is None:
             timestamp = time.strftime("%Y-%m-%d-%H_%M_%S", time.localtime())
@@ -96,6 +104,19 @@ class CstApplicationBackend:
         self._require_configurable("select CST file")
         self.pconfman.assignInputCSTFilePath(path)
 
+    def get_cst_installations(self):
+        return self.gconfman.list_cst_installations()
+
+    def get_selected_cst_installation(self):
+        try:
+            return self.gconfman.get_selected_cst_installation()
+        except (FileNotFoundError, TypeError, ValueError):
+            return None
+
+    def select_cst_installation(self, version: int, executable: str):
+        self._require_configurable("select CST installation")
+        return self.gconfman.select_cst_installation(version, executable)
+
     def get_cst_file(self):
         return self.pconfman.currCSTFilePath
 
@@ -127,6 +148,8 @@ class CstApplicationBackend:
             "initialize run",
             BackendState.CREATED,
             BackendState.STOPPED,
+            BackendState.INTERRUPTED,
+            BackendState.RECOVERY_REQUIRED,
             BackendState.FAILED,
         )
         worker_count = int(worker_count)
@@ -164,6 +187,12 @@ class CstApplicationBackend:
                 self.start_from_existing,
                 self.safe_mode,
             )
+            unresolved = self.get_recovery_sessions()
+            if unresolved:
+                self._set_state(BackendState.RECOVERY_REQUIRED)
+                raise BackendPreparationError(
+                    f"发现 {len(unresolved)} 个未闭合 CST 会话，请先执行会话恢复"
+                )
             validate_postprocess = getattr(
                 self.alg,
                 "validate_postprocess_settings",
@@ -179,7 +208,8 @@ class CstApplicationBackend:
             self.alg.setCSTParams(algorithm_params)
         except Exception as exc:
             self.logger.exception("项目配置出错")
-            self._set_state(BackendState.FAILED)
+            if self.state is not BackendState.RECOVERY_REQUIRED:
+                self._set_state(BackendState.FAILED)
             self._stop_manager_once()
             self._clear_manager()
             if isinstance(exc, BackendPreparationError):
@@ -197,6 +227,17 @@ class CstApplicationBackend:
             if self.alg is None:
                 raise BackendLifecycleError("未指定计算方法")
             result = self.alg.start()
+        except ScanInterrupted as exc:
+            failure = exc
+            self._set_state(BackendState.INTERRUPTED)
+            raise
+        except KeyboardInterrupt as exc:
+            failure = exc
+            self._set_state(BackendState.INTERRUPTED)
+            manager = self.jm
+            if manager is not None and hasattr(manager, "request_stop"):
+                manager.request_stop()
+            raise
         except Exception as exc:
             failure = exc
             self._set_state(BackendState.FAILED)
@@ -205,29 +246,81 @@ class CstApplicationBackend:
             try:
                 self._stop_manager_once()
             except Exception:
-                self._set_state(BackendState.FAILED)
+                self._set_state(BackendState.RECOVERY_REQUIRED)
                 if failure is None:
                     raise
                 self.logger.exception("算法失败后的 Manager 清理也失败")
             finally:
                 self._clear_manager()
-                self._update_task_status(projectconfmanager.TaskStatus.DONE)
+                if self.state is BackendState.INTERRUPTED:
+                    self._update_task_status(
+                        projectconfmanager.TaskStatus.INTERRUPTED
+                    )
+                elif self.state is BackendState.FAILED:
+                    self._update_task_status(projectconfmanager.TaskStatus.FAILED)
+                elif self.state is BackendState.RECOVERY_REQUIRED:
+                    self._update_task_status(
+                        projectconfmanager.TaskStatus.RECOVERY_REQUIRED
+                    )
+                else:
+                    self._update_task_status(projectconfmanager.TaskStatus.DONE)
 
         self._set_state(BackendState.STOPPED)
         return result
 
     def request_stop(self) -> None:
+        accepted = False
         with self._lifecycle_lock:
             if self.jm is None:
                 self.logger.info("Stop requested before a manager was created")
                 return
             if self.state is BackendState.RUNNING:
                 self.state = BackendState.STOPPING
+                accepted = True
+        if accepted:
+            self._update_task_status(projectconfmanager.TaskStatus.STOP_REQUESTED)
         try:
-            self._stop_manager_once()
+            manager = self.jm
+            if manager is not None and hasattr(manager, "request_stop"):
+                manager.request_stop()
         except Exception:
-            self._set_state(BackendState.FAILED)
+            self._set_state(BackendState.RECOVERY_REQUIRED)
             raise
+
+    def get_recovery_sessions(self):
+        project_directory = self.get_project_directory()
+        if project_directory is None:
+            return []
+        return [
+            item
+            for item in discover_managed_sessions(project_directory)
+            if item.needs_recovery
+        ]
+
+    def is_recovery_required(self) -> bool:
+        return self.state is BackendState.RECOVERY_REQUIRED or bool(
+            self.get_recovery_sessions()
+        )
+
+    def recover_project_sessions(self):
+        self._require_configurable("recover project sessions")
+        project_directory = self.get_project_directory()
+        if project_directory is None:
+            raise BackendLifecycleError("project directory is not selected")
+        recovered = recover_project_sessions(project_directory)
+        self.logger.info("已恢复并关闭 %d 个 CST 会话", len(recovered))
+        self._update_task_status(projectconfmanager.TaskStatus.INTERRUPTED)
+        self._set_state(BackendState.INTERRUPTED)
+        return recovered
+
+    def emergency_terminate(self) -> None:
+        manager = self.jm
+        if manager is None or not hasattr(manager, "emergency_terminate"):
+            raise BackendLifecycleError("no managed CST session can be terminated")
+        manager.emergency_terminate()
+        self._manager_stop_requested = True
+        self._set_state(BackendState.RECOVERY_REQUIRED)
+        self._update_task_status(projectconfmanager.TaskStatus.RECOVERY_REQUIRED)
 
     def _create_manager(self) -> None:
         if not self.pconfman.isReady():
@@ -238,6 +331,7 @@ class CstApplicationBackend:
         manager_options = {}
         if self._uses_default_manager:
             manager_options["worker_factory"] = ManagedCSTWorker.create
+            manager_options["progress_callback"] = self._publish_cst_progress
         self.jm = self._manager_factory(
             params=project_params,
             pconfm=self.pconfman,
@@ -248,6 +342,25 @@ class CstApplicationBackend:
         )
         self._manager_stop_requested = False
         self.logger.info("JOB MANAGER 创建完成")
+
+    def add_progress_listener(self, listener) -> None:
+        with self._lifecycle_lock:
+            if listener not in self._progress_listeners:
+                self._progress_listeners.append(listener)
+
+    def remove_progress_listener(self, listener) -> None:
+        with self._lifecycle_lock:
+            if listener in self._progress_listeners:
+                self._progress_listeners.remove(listener)
+
+    def _publish_cst_progress(self, event) -> None:
+        with self._lifecycle_lock:
+            listeners = tuple(self._progress_listeners)
+        for listener in listeners:
+            try:
+                listener(event)
+            except Exception:
+                self.logger.debug("CST progress listener failed", exc_info=True)
 
     def _stop_manager_once(self) -> None:
         with self._lifecycle_lock:
@@ -270,6 +383,8 @@ class CstApplicationBackend:
             operation,
             BackendState.CREATED,
             BackendState.STOPPED,
+            BackendState.INTERRUPTED,
+            BackendState.RECOVERY_REQUIRED,
             BackendState.FAILED,
         )
 

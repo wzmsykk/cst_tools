@@ -20,6 +20,8 @@ GUI / CLI
 |---|---|---|
 | 选择项目目录 | `select_project_directory(path)` | CREATED、STOPPED、FAILED |
 | 选择 CST 文件 | `select_cst_file(path)` | CREATED、STOPPED、FAILED |
+| 枚举 CST 安装 | `get_cst_installations()` | 任意状态（只读） |
+| 读取/切换 CST 后端 | `get_selected_cst_installation()` / `select_cst_installation(version, executable)` | 切换仅允许可配置状态 |
 | 读取/更新后处理设置 | `get_postprocess_settings()` / `update_postprocess_settings(values)` | 更新仅允许可配置状态 |
 | 读取/更新算法设置 | `get_algorithm_settings()` / `update_algorithm_settings(values)` | 更新仅允许可配置状态 |
 | 初始化环境与运行选项 | `initialize_run(start_from_existing, safe_mode, worker_count)` | CREATED、STOPPED、FAILED |
@@ -42,6 +44,20 @@ RUNNING -> STOPPING -> STOPPED
 - 算法成功或失败都通过 `finally` 请求 Manager 标准停止并清除引用。
 - GUI 的停止线程和执行线程可能同时进入清理路径，因此 Manager 停止由一次性栅栏保护。
 - `STOPPED` 和 `FAILED` 可以重新选择输入并启动下一次运行。
+- CST 后端在初始化前冻结；运行中不能切换。选择会写入全局配置，工程预处理、Manager 与 Worker 因而使用同一个可执行文件。
+- HOM `scan_manifest.json` 记录 CST 版本和可执行文件路径；恢复时后端身份不同会被视为 Manifest 漂移，避免跨版本混跑。
+
+## 异常恢复
+
+恢复按以下顺序收口：
+
+1. 扫描项目 `temp/worker_*/<session>`，读取协议状态、Worker 标记和 PID 存活状态；
+2. 对仍存活的会话只走协议恢复：发送 Stop Request、保存已有 Completion、补 ACK、等待 StopAck，并等待 CST 进程退出；
+3. 对 PID 已明确死亡的会话不伪造 StopAck，也不强杀其他进程；将隔离的 Worker 工程标为 `abandoned-dead`，后续从最后一个原子 HOM checkpoint 重算该区间；
+4. 每个已收口会话写入不可变语义的 `recovery.json`，记录标准退出或死亡放弃、任务 ID 和 Completion 状态；
+5. 只有所有会话都完成收口，项目状态才持久化为 `INTERRUPTED`，允许再次准备和从 checkpoint 继续。
+
+存活但无响应、PID 无法确认、协议身份不匹配或 CST 在 StopAck 后仍未退出，均保持 `RECOVERY_REQUIRED`。普通恢复不会调用进程强杀；`emergency_terminate()` 仍是明确的最后手段。
 
 ## 错误类型
 

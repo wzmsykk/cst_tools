@@ -3,6 +3,12 @@ import os
 import pathlib
 import logging
 
+from csttool.cst_installations import (
+    CstInstallation,
+    discover_cst_installations,
+    validate_cst_installation,
+)
+
 class GlobalConfmanager(object):
     def __init__(self, configpath=r".\config\current.ini",Logger=None):
         self.projlist = []
@@ -84,8 +90,9 @@ class GlobalConfmanager(object):
         self.logger.info("检查全局配置开始.")
         cfg = self.conf
         self.logger.info("检查CST PATH.")
-        cstenvexepath = pathlib.Path(cfg["CST"]["cstexepath"])
-        if (not cstenvexepath.exists()) or (cstenvexepath.suffix.lower() != ".exe"):
+        try:
+            selected = self.get_selected_cst_installation()
+        except (FileNotFoundError, TypeError, ValueError):
             self.logger.warning("定义的cstexepath:%s不存在。" % cfg["CST"]["cstexepath"])
             self.logger.warning("尝试寻找cstexepath。")
             try:
@@ -100,14 +107,8 @@ class GlobalConfmanager(object):
         else:
             self.logger.info("检查CST PATH 成功.")
 
-        # 测试CST版本
+        # 版本不再设置上限；新版 CST 由安装路径和可执行文件共同校验。
         self.logger.info("检查CST 版本.")
-        if int(cfg["CST"]["cstver"]) < 2015 or int(cfg["CST"]["cstver"]) > 2022:
-            self.logger.warning("定义的cstver不正确(req:cstver>2015&&<=2022)。")
-            self.logger.warning("尝试从cstexepath寻找cstver。")
-            self.logger.error("功能未实现，请手动指定。")
-
-            result = False
         self.logger.debug("CST ENV PATH为%s" % cfg["CST"]["cstexepath"])
         self.logger.debug("CST 版本为%s" % cfg["CST"]["cstver"])
         self.logger.info("检查CST 版本 结束.")
@@ -128,28 +129,43 @@ class GlobalConfmanager(object):
 
     def findCSTenv(self=None):
         self.logger.info("寻找CSTenv开始")
-        ed1 = r":\Program Files (x86)\CST Studio Suite "
-        ed2 = r"\CST DESIGN ENVIRONMENT.exe"
-        for i in range(ord("C"), ord("Z")):
-            for j in range(2025, 2015,-1):
-                path = pathlib.Path(chr(i) + ed1 + str(j) + ed2)
-                print(path)
-                try:
-                    result = path.exists()
-                    if result:
-                        success = True
-                        CSTexepath = chr(i) + ed1 + str(j) + ed2
-                        CSTver = str(j)
-                        self.logger.info(
-                            "FOUND CST VERSION %s at %s" % (str(j), CSTexepath)
-                        )
-                        self.logger.info("寻找CSTenv结束")
-                        return CSTexepath, CSTver
-                except OSError:
-                    continue
+        installations = self.list_cst_installations()
+        if installations:
+            selected = installations[0]
+            self.logger.info(
+                "FOUND CST VERSION %s at %s", selected.version, selected.executable
+            )
+            self.logger.info("寻找CSTenv结束")
+            return str(selected.executable), str(selected.version)
         self.logger.info("CST ENV NOT FOUND")
         raise FileNotFoundError
-        return False
+
+    def list_cst_installations(self) -> tuple[CstInstallation, ...]:
+        section = self.conf["CST"]
+        configured = (section.get("cstver", ""), section.get("cstexepath", ""))
+        return discover_cst_installations(configured=configured)
+
+    def get_selected_cst_installation(self) -> CstInstallation:
+        section = self.conf["CST"]
+        return validate_cst_installation(
+            section.get("cstver", ""), section.get("cstexepath", "")
+        )
+
+    def select_cst_installation(
+        self, version: int | str, executable: str | pathlib.Path
+    ) -> CstInstallation:
+        selected = validate_cst_installation(version, executable)
+        self.conf["CST"]["cstver"] = str(selected.version)
+        self.conf["CST"]["cstexepath"] = str(selected.executable)
+        self.saveconf()
+        self.logger.info(
+            "已切换 CST 后端至 %s: %s", selected.version, selected.executable
+        )
+        return selected
+
+    # Compatibility for old callers.
+    def listCSTInstallations(self):
+        return self.list_cst_installations()
 
     def findSuperfishENV(self):
         sfdir = os.getenv("SFDir")

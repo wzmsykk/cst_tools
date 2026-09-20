@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections import deque
 import logging
 from pathlib import Path
-from threading import Lock
+from threading import Event, Lock, Thread
 from time import sleep
 
 import pytest
@@ -170,3 +170,59 @@ def test_invalid_configuration_is_rejected(tmp_path):
             params=[],
             maxTask=0,
         )
+
+
+def test_stop_request_prevents_worker_rotation_and_new_dispatch(tmp_path):
+    entered = Event()
+    release = Event()
+    created = []
+
+    class BlockingWorker(FakeWorker):
+        def runWithParam(self, resultname, *, params):
+            entered.set()
+            assert release.wait(5)
+            return {
+                "TaskStatus": "Success",
+                "RunName": resultname,
+                "RunParameters": params,
+                "PostProcessResult": None,
+            }
+
+    def worker_factory(worker_id, _config, _logger):
+        worker = BlockingWorker(
+            worker_id,
+            {"lock": Lock(), "active": 0, "peak": 0},
+            deque(),
+        )
+        created.append(worker)
+        return worker
+
+    manager = CSTManager(
+        FakeGlobalConfig(tmp_path),
+        FakeProjectConfig(tmp_path),
+        params=[],
+        maxTask=1,
+        max_jobs_per_worker=1,
+        worker_factory=worker_factory,
+    )
+    results = []
+    thread = Thread(
+        target=lambda: results.extend(
+            manager.run_batch(
+                [SimulationTask({}, "active"), SimulationTask({}, "must-not-run")]
+            )
+        )
+    )
+    thread.start()
+    assert entered.wait(2)
+
+    manager.request_stop()
+    assert manager.stop_requested
+    assert not created[0].stopped
+    release.set()
+    thread.join(5)
+
+    assert not thread.is_alive()
+    assert [item["RunName"] for item in results] == ["active"]
+    assert len(created) == 1
+    manager.stop()

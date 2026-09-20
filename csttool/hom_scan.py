@@ -21,6 +21,13 @@ class IncompleteScanError(RuntimeError):
         super().__init__(f"HOM scan has failed intervals: {failed}")
 
 
+class ScanInterrupted(RuntimeError):
+    def __init__(self, report: "ScanReport", pending: list["ScanInterval"]):
+        self.report = report
+        self.pending = pending
+        super().__init__("HOM scan stopped at a recoverable checkpoint")
+
+
 @dataclass(frozen=True, slots=True, order=True)
 class ScanInterval:
     lo: float
@@ -104,11 +111,15 @@ class AdaptiveHomScanner:
         pending: Iterable[ScanInterval] | None = None,
         report: ScanReport | None = None,
         checkpoint: CheckpointCallback | None = None,
+        should_stop: Callable[[], bool] | None = None,
     ) -> ScanReport:
         report = report or ScanReport()
         queue = list(pending if pending is not None else self.policy.initial_intervals())
 
         while queue:
+            if should_stop is not None and should_stop():
+                self._checkpoint(checkpoint, report, queue)
+                raise ScanInterrupted(report, list(queue))
             interval = queue.pop(0)
             if not interval.lo < interval.hi:
                 raise ScanConfigurationError("scan interval did not make progress")
@@ -172,6 +183,9 @@ class AdaptiveHomScanner:
                     raise ScanConfigurationError("scan interval did not make progress")
                 queue.insert(0, ScanInterval(next_lo, next_hi))
             self._checkpoint(checkpoint, report, queue)
+
+            if should_stop is not None and should_stop():
+                raise ScanInterrupted(report, list(queue))
 
         if report.failed:
             raise IncompleteScanError(report)
