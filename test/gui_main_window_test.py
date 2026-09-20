@@ -57,6 +57,8 @@ class FakeDialog(QObject):
 
 
 class FakeMainTool:
+    supports_cst_backend_selection = False
+
     def __init__(self):
         self.logger = logging.getLogger(f"gui-test-{id(self)}")
         self.logger.handlers.clear()
@@ -64,8 +66,8 @@ class FakeMainTool:
         self.project_dir = None
         self.cst_path = None
         self.start_count = 0
-        self.wininit_result = True
-        self.run_info_result = None
+        self.initialization_result = True
+        self.preparation_result = None
         self.run_gate = threading.Event()
         self.start_exception = None
         self.recovery_on_start_failure = False
@@ -76,31 +78,38 @@ class FakeMainTool:
         self.recovery_sessions = []
         self.recovery_exception = None
 
-    def getCurrPostProcessList(self):
+    def get_postprocess_settings(self):
         return []
 
-    def getAlgAttrs(self):
+    def get_cst_installations(self):
+        return ()
+
+    def get_selected_cst_installation(self):
+        return None
+
+    def select_cst_installation(self, version, executable):
+        raise RuntimeError("fixed test backend")
+
+    def get_algorithm_settings(self):
         return {}
 
-    def setProjectDir(self, path):
+    def select_project_directory(self, path):
         self.project_dir = path
 
-    def setCSTFilePath(self, path):
+    def select_cst_file(self, path):
         self.cst_path = path
 
-    def setFlags(self, ctn, safe):
-        self.flags = (ctn, safe)
-
-    def setWorkerCount(self, worker_count):
+    def initialize_run(self, resume, worker_count):
+        self.resume = bool(resume)
         self.worker_count = worker_count
+        if self.initialization_result is False:
+            raise RuntimeError("CST 环境初始化失败")
 
-    def wininit(self):
-        return self.wininit_result
+    def prepare_run(self):
+        if self.preparation_result == 0:
+            raise RuntimeError("运行配置准备失败")
 
-    def setRunInfos(self):
-        return self.run_info_result
-
-    def starttask(self):
+    def execute_run(self):
         self.start_count += 1
         if self.start_exception is not None:
             if self.recovery_on_start_failure:
@@ -128,14 +137,19 @@ class FakeMainTool:
     def is_recovery_required(self):
         return bool(self.recovery_sessions)
 
-    def setAlgAttrs(self, values):
+    def update_algorithm_settings(self, values):
         self.alg_values = values
 
-    def setCurrPostProcessList(self, values):
+    def update_postprocess_settings(self, values):
         self.pps_values = values
+
+    def add_progress_listener(self, listener):
+        self.progress_listener = listener
 
 
 class VersionedFakeMainTool(FakeMainTool):
+    supports_cst_backend_selection = True
+
     def __init__(self, tmp_path):
         super().__init__()
         self.installations = [
@@ -238,7 +252,7 @@ def test_selecting_cst_first_does_not_invent_project_directory(
     window.close()
 
 
-def test_recovery_button_works_with_only_project_directory(
+def test_recovery_button_is_disabled_without_a_residual_session(
     qapp, monkeypatch, tmp_path
 ):
     window, tool = make_window(qapp)
@@ -248,13 +262,8 @@ def test_recovery_button_works_with_only_project_directory(
     )
     window.read_dir()
 
-    assert window.RecoverButton.isEnabled()
-    window.RecoverButton.click()
-    process_until(qapp, lambda: tool.recovery_count == 1)
-    process_until(qapp, lambda: not window.controller.has_active_work)
-
-    assert window.controller.state is RunState.IDLE
-    assert "会话恢复完成：1 个" in window.logTextBox.widget.toPlainText()
+    assert not window.RecoverButton.isEnabled()
+    assert tool.recovery_count == 0
     window.close()
 
 
@@ -271,7 +280,7 @@ def test_pending_session_enters_sticky_recovery_state_and_blocks_run(
     window.read_dir()
 
     assert window.controller.state is RunState.RECOVERY_REQUIRED
-    assert window.RecoverButton.text() == "恢复会话 (2)"
+    assert window.RecoverButton.text() == "清理残留会话 (2)"
     assert window.RecoverButton.isEnabled()
     assert not window.StartButton.isEnabled()
     assert not window.selectProjectDirButton.isEnabled()
@@ -280,7 +289,7 @@ def test_pending_session_enters_sticky_recovery_state_and_blocks_run(
     process_until(qapp, lambda: tool.recovery_count == 1)
     process_until(qapp, lambda: not window.controller.has_active_work)
     assert window.controller.state is RunState.IDLE
-    assert window.RecoverButton.text() == "恢复会话"
+    assert window.RecoverButton.text() == "清理残留会话"
     window.close()
 
 
@@ -414,34 +423,39 @@ def test_worker_count_defaults_to_one_is_configurable_and_locked_during_run(
     window.close()
 
 
-def test_continue_and_safe_options_are_user_configurable(
+def test_continue_option_drives_project_and_algorithm_resume_with_safe_policy(
     qapp, monkeypatch, tmp_path
 ):
     window, tool = make_window(qapp)
-    choose_inputs(window, monkeypatch, tmp_path)
+    monkeypatch.setattr(
+        "GUI.main_window.QFileDialog.getExistingDirectory",
+        lambda *args, **kwargs: str(tmp_path),
+    )
+    window.read_dir()
+    assert not window.StartButton.isEnabled()
     assert window.checkBox_CTN.isEnabled()
-    assert window.checkBox_SAFE.isEnabled()
+    assert not hasattr(window, "checkBox_SAFE")
     window.checkBox_CTN.setChecked(True)
-    window.checkBox_SAFE.setChecked(True)
+    assert window.StartButton.isEnabled()
 
     window.run()
     process_until(qapp, lambda: tool.start_count == 1)
-    assert tool.flags == (True, True)
+    assert tool.resume is True
     tool.run_gate.set()
     process_until(qapp, lambda: not window.controller.has_active_work)
     window.close()
 
 
-@pytest.mark.parametrize(("stage", "result"), [("wininit", False), ("run_info", 0)])
+@pytest.mark.parametrize(("stage", "result"), [("initialize", False), ("prepare", 0)])
 def test_initialization_failure_does_not_start_worker(
     qapp, monkeypatch, tmp_path, stage, result
 ):
     window, tool = make_window(qapp)
     choose_inputs(window, monkeypatch, tmp_path)
-    if stage == "wininit":
-        tool.wininit_result = result
+    if stage == "initialize":
+        tool.initialization_result = result
     else:
-        tool.run_info_result = result
+        tool.preparation_result = result
 
     window.run()
 
@@ -554,7 +568,6 @@ def test_explicit_stop_button_requests_standard_stop(qapp, monkeypatch, tmp_path
     process_until(qapp, lambda: tool.start_count == 1)
     assert window.StopButton.isEnabled()
     assert not window.checkBox_CTN.isEnabled()
-    assert not window.checkBox_SAFE.isEnabled()
 
     window.StopButton.click()
     process_until(qapp, lambda: tool.stop_count == 1)

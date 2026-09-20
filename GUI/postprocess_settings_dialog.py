@@ -214,7 +214,7 @@ class AddPostProcessDialog(QDialog, Ui_AddComplexPostDialog):
         except (TypeError, ValueError) as exc:
             QMessageBox.warning(self, "后处理设置无效", str(exc))
             return
-        self.data = setting.to_legacy_dict()
+        self.data = setting.to_backend_payload()
         self._signal_data_updated.emit()
         super().accept()
 
@@ -358,7 +358,7 @@ class PostProcessSettingsDialog(QDialog, Ui_PostProcessSettingDialog):
         self._committed_settings = list(self.listModel.pps)
 
     def getPPSList(self):
-        return [item.to_legacy_dict() for item in self.listModel.pps]
+        return [item.to_backend_payload() for item in self.listModel.pps]
 
     def _report_error(self, title, error):
         if self.logger is not None:

@@ -45,6 +45,8 @@ class BackendPreparationError(RuntimeError):
 
 
 class CstApplicationBackend:
+    supports_cst_backend_selection = True
+
     """Coordinate configuration, algorithm execution, and Manager lifecycle."""
 
     def __init__(
@@ -59,8 +61,7 @@ class CstApplicationBackend:
         self._lifecycle_lock = threading.RLock()
         self.state = BackendState.CREATED
         self.worker_count = 1
-        self.start_from_existing = False
-        self.safe_mode = False
+        self.resume = False
         self.jm = None
         self._manager_stop_requested = False
         self._progress_listeners = []
@@ -140,8 +141,7 @@ class CstApplicationBackend:
 
     def initialize_run(
         self,
-        start_from_existing: bool,
-        safe_mode: bool,
+        resume: bool,
         worker_count: int,
     ) -> None:
         self._require_state(
@@ -156,13 +156,12 @@ class CstApplicationBackend:
         if worker_count < 1:
             raise ValueError("worker_count must be at least 1")
 
-        self.start_from_existing = bool(start_from_existing)
-        self.safe_mode = bool(safe_mode)
+        self.resume = bool(resume)
         self.worker_count = worker_count
+        self.alg.set_resume(self.resume)
         self.logger.info(
-            "BACKEND: start_from_existing=%s, safe_mode=%s, worker_count=%d",
-            self.start_from_existing,
-            self.safe_mode,
+            "BACKEND: resume=%s, worker_count=%d",
+            self.resume,
             self.worker_count,
         )
 
@@ -183,10 +182,7 @@ class CstApplicationBackend:
     def prepare_run(self) -> None:
         self._require_state("prepare run", BackendState.INITIALIZED)
         try:
-            self.pconfman.prepareProject(
-                self.start_from_existing,
-                self.safe_mode,
-            )
+            self.pconfman.prepareProject(self.resume)
             unresolved = self.get_recovery_sessions()
             if unresolved:
                 self._set_state(BackendState.RECOVERY_REQUIRED)

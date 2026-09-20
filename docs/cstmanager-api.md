@@ -17,7 +17,7 @@ from csttool.cstmanager import CSTManager, SimulationTask
 ```python
 from csttool import cstmanager
 
-manager = cstmanager.manager(...)
+manager = cstmanager.CSTManager(...)
 ```
 
 `manager` 是 `CSTManager` 的弃用兼容别名。仓内生产入口不得继续使用。

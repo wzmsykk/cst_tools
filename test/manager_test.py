@@ -4,7 +4,7 @@ import copy
 from pathlib import Path
 import unittest
 from csttool.cstworker import local_cstworker
-from csttool.cstmanager import manager
+from csttool.cstmanager import CSTManager
 from csttool.globalconfmanager import GlobalConfmanager
 from csttool.projectconfmanager import ProjectConfmanager
 from csttool.logger import Logger
@@ -31,8 +31,8 @@ class TestCSTManager(unittest.TestCase):
         tmpprojdir.mkdir(exist_ok=True)
         self.pconfman.assignProjectDir(tmpprojdir)
         self.pconfman.assignInputCSTFilePath(testdatapath / "Pillbox" / "Pillbox.cst")
-        self.pconfman.prepareProject(Safe=False)
-        self.cstm=manager(gconfm=self.gconfman,pconfm=self.pconfman,params=None)
+        self.pconfman.prepareProject()
+        self.cstm=CSTManager(gconfm=self.gconfman,pconfm=self.pconfman,params=None)
         return super().setUp()
     
     def test_emptymng(self):

@@ -118,7 +118,7 @@ class ProjectConfmanager(object):
         self.ready = True
         return self.ready
 
-    def prepareProject(self, startFromExisted=False, Safe=True):
+    def prepareProject(self, startFromExisted=False):
         # startFromExisted=True 从已有开始 不需要CST文件
         self.logger.info("准备项目文件")
         iProjectDir = self.currProjectDir
@@ -171,20 +171,8 @@ class ProjectConfmanager(object):
                     self.savePPSSettings(self.currPPSList)
                 return self.__ready()
             elif status == "RUNNING":
-                if not Safe:
-                    self.logger.warning("发现异常结束,尝试修复并继续")
-                    result = self.__checkAndRepairProject()
-                    if result == False:
-                        raise ProjectStatusError("FLAG_SAFE=OFF but REPAIR FAILED")
-                    if startFromExisted:
-                        self.setCurrPPSList(self.readPPSList())
-                    else:
-                        self.savePPSSettings(self.currPPSList)
-                    return self.__ready()
-                else:
-                    self.logger.warning("发现异常结束,安全模式设置为ON,不会尝试修改")
-                    self.logger.warning("结束")
-                    raise ProjectStatusError("FLAG_SAFE=ON and status=RUNNING")
+                self.logger.warning("项目状态仍为 RUNNING，必须先执行显式会话恢复")
+                raise ProjectStatusError("project status is RUNNING; recovery required")
             elif status in {"DONE", "INTERRUPTED"}:
                 # SAME AS READY
                 result = self.__checkAndRepairProject()

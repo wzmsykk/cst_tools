@@ -2,7 +2,6 @@ import logging
 
 import pytest
 
-from base import cst_tools_main
 from csttool.application_backend import (
     BackendInitializationError,
     BackendLifecycleError,
@@ -63,8 +62,8 @@ class FakeProjectConfig:
     def assignInputCSTFilePath(self, path):
         self.currCSTFilePath = path
 
-    def prepareProject(self, start_from_existing, safe_mode):
-        self.prepared_with = (start_from_existing, safe_mode)
+    def prepareProject(self, resume):
+        self.prepared_with = resume
         self.ready = True
 
     def isReady(self):
@@ -88,6 +87,9 @@ class FakeAlgorithm:
 
     def setEditableAttrs(self, values):
         self.attrs = values
+
+    def set_resume(self, resume):
+        self.resume = bool(resume)
 
     def setJobManager(self, manager):
         self.manager = manager
@@ -134,7 +136,7 @@ def test_backend_happy_path_has_explicit_lifecycle_and_cleanup():
     backend.select_project_directory("project")
     backend.select_cst_file("model.cst")
 
-    backend.initialize_run(True, False, 1)
+    backend.initialize_run(True, 1)
     assert backend.state is BackendState.INITIALIZED
     backend.prepare_run()
     assert backend.state is BackendState.PREPARED
@@ -145,7 +147,7 @@ def test_backend_happy_path_has_explicit_lifecycle_and_cleanup():
     assert backend.jm is None
     assert manager.stop_count == 1
     assert global_config.saved == 1
-    assert project.prepared_with == (True, False)
+    assert project.prepared_with is True
 
 
 def test_backend_rejects_invalid_operation_order():
@@ -154,9 +156,9 @@ def test_backend_rejects_invalid_operation_order():
     with pytest.raises(BackendLifecycleError, match="execute run"):
         backend.execute_run()
 
-    backend.initialize_run(False, False, 1)
+    backend.initialize_run(False, 1)
     with pytest.raises(BackendLifecycleError, match="initialize run"):
-        backend.initialize_run(False, False, 1)
+        backend.initialize_run(False, 1)
     with pytest.raises(BackendLifecycleError, match="update algorithm"):
         backend.update_algorithm_settings({"fmin": 600})
 
@@ -164,7 +166,7 @@ def test_backend_rejects_invalid_operation_order():
 def test_backend_accepts_multiple_workers_when_explicitly_requested():
     backend, *_ = make_backend()
 
-    backend.initialize_run(False, False, 2)
+    backend.initialize_run(False, 2)
 
     assert backend.worker_count == 2
 
@@ -175,7 +177,7 @@ def test_backend_switches_cst_only_while_configurable():
     assert backend.select_cst_installation(2025, "cst.exe") == (2025, "cst.exe")
     assert global_config.selected_installation == (2025, "cst.exe")
 
-    backend.initialize_run(False, False, 1)
+    backend.initialize_run(False, 1)
     with pytest.raises(BackendLifecycleError, match="select CST installation"):
         backend.select_cst_installation(2022, "old.exe")
 
@@ -184,17 +186,17 @@ def test_backend_can_retry_after_initialization_failure():
     backend, *_ = make_backend(checks=(False, True))
 
     with pytest.raises(BackendInitializationError):
-        backend.initialize_run(False, False, 1)
+        backend.initialize_run(False, 1)
     assert backend.state is BackendState.FAILED
 
-    backend.initialize_run(False, True, 1)
+    backend.initialize_run(False, 1)
     assert backend.state is BackendState.INITIALIZED
 
 
 def test_algorithm_failure_still_stops_and_clears_manager():
     algorithm = FakeAlgorithm(RuntimeError("solver failed"))
     backend, _, project, manager, _ = make_backend(algorithm=algorithm)
-    backend.initialize_run(False, False, 1)
+    backend.initialize_run(False, 1)
     backend.prepare_run()
 
     with pytest.raises(RuntimeError, match="solver failed"):
@@ -208,7 +210,7 @@ def test_algorithm_failure_still_stops_and_clears_manager():
 
 def test_stop_request_is_idempotent_with_execution_cleanup():
     backend, *_rest, manager, _calls = make_backend()
-    backend.initialize_run(False, False, 1)
+    backend.initialize_run(False, 1)
     backend.prepare_run()
     backend._set_state(BackendState.RUNNING)
 
@@ -227,7 +229,7 @@ def test_prepare_detects_unclosed_managed_session(tmp_path):
     session_root = tmp_path / "temp" / "worker_0" / session_id
     FileProtocol(session_root / "protocol")
     (session_root / "worker.state").write_text("ready", encoding="ascii")
-    backend.initialize_run(False, False, 1)
+    backend.initialize_run(False, 1)
 
     with pytest.raises(BackendPreparationError, match="未闭合 CST 会话"):
         backend.prepare_run()
@@ -256,27 +258,3 @@ def test_successful_recovery_persists_interrupted_project_state(tmp_path):
 
     assert backend.state is BackendState.INTERRUPTED
     assert project.statuses[-1].name == "INTERRUPTED"
-
-
-def test_legacy_facade_translates_old_api_without_owning_execution_logic():
-    global_config = FakeGlobalConfig()
-    project_config = FakeProjectConfig()
-    manager = FakeManager()
-    application = cst_tools_main(
-        global_config_manager=global_config,
-        project_config_manager=project_config,
-        algorithm=FakeAlgorithm(),
-        manager_factory=lambda **kwargs: manager,
-        application_logger=logging.getLogger("legacy-facade-test"),
-    )
-
-    application.setProjectDir("project")
-    application.setCSTFilePath("model.cst")
-    application.setFlags(True, False)
-    application.setWorkerCount(2)
-
-    assert application.wininit() is True
-    assert application.setRunInfos() is None
-    assert application.starttask() == "completed"
-    assert application.state is BackendState.STOPPED
-    assert manager.stop_count == 1

@@ -28,19 +28,25 @@ def pps(name="frequency", method="Frequency"):
 
 def test_algorithm_settings_are_typed_and_cross_validated():
     settings = AlgorithmSettings.from_mapping(
-        {"fmin": "500", "fmax": "700", "endfreq": "2500", "cfreq": "650", "cflag": 1}
+        {"fmin": "500", "fmax": "700", "endfreq": "2500"}
     )
-    assert settings.to_legacy_dict()["cflag"] == 1
+    assert settings.to_backend_payload() == {
+        "fmin": 500.0,
+        "fmax": 700.0,
+        "endfreq": 2500.0,
+    }
     with pytest.raises(ValueError, match="最低频率"):
         AlgorithmSettings.from_mapping(
-            {"fmin": 800, "fmax": 700, "endfreq": 2500, "cfreq": 650}
+            {"fmin": 800, "fmax": 700, "endfreq": 2500}
         )
 
 
 def test_algorithm_dialog_installs_numeric_validators_and_returns_copy(qapp):
     dialog = AlgorithmSettingsDialog()
-    dialog.setDefaultValues({"fmin": 500, "fmax": 700, "endfreq": 2500, "cfreq": 650})
+    dialog.setDefaultValues({"fmin": 500, "fmax": 700, "endfreq": 2500})
     assert dialog.fminLineEdit.validator() is not None
+    assert not hasattr(dialog, "continueCheckBox")
+    assert not hasattr(dialog, "continueFreqLineEdit")
     dialog.setValues()
     values = dialog.getValues()
     values["fmin"] = 1
@@ -52,7 +58,7 @@ def test_algorithm_dialog_validation_blocks_accept_and_cancel_restores_values(
 ):
     dialog = AlgorithmSettingsDialog()
     dialog.setDefaultValues(
-        {"fmin": 500, "fmax": 700, "endfreq": 2500, "cfreq": 650}
+        {"fmin": 500, "fmax": 700, "endfreq": 2500}
     )
     warnings = []
     monkeypatch.setattr(

@@ -17,12 +17,6 @@ class Ui_AlgoPopDialog(object):
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
         self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
         self.buttonBox.setObjectName("buttonBox")
-        self.continueCheckBox = QtWidgets.QCheckBox(AlgoPopDialog)
-        self.continueCheckBox.setGeometry(QtCore.QRect(40, 130, 281, 31))
-        self.continueCheckBox.setObjectName("continueCheckBox")
-        self.continueFreqLineEdit = QtWidgets.QLineEdit(AlgoPopDialog)
-        self.continueFreqLineEdit.setGeometry(QtCore.QRect(120, 160, 261, 31))
-        self.continueFreqLineEdit.setObjectName("continueFreqLineEdit")
         self.fminlabel = QtWidgets.QLabel(AlgoPopDialog)
         self.fminlabel.setGeometry(QtCore.QRect(40, 40, 71, 31))
         self.fminlabel.setObjectName("fminlabel")
@@ -59,7 +53,6 @@ class Ui_AlgoPopDialog(object):
     def retranslateUi(self, AlgoPopDialog):
         _translate = QtCore.QCoreApplication.translate
         AlgoPopDialog.setWindowTitle(_translate("AlgoPopDialog", "算法设置"))
-        self.continueCheckBox.setText(_translate("AlgoPopDialog", "从某一频率继续"))
         self.fminlabel.setText(_translate("AlgoPopDialog", "fmin"))
         self.fmaxlabel.setText(_translate("AlgoPopDialog", "fmax"))
         self.label.setText(_translate("AlgoPopDialog", "Mhz"))

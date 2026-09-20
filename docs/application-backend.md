@@ -8,7 +8,7 @@
 
 ```text
 GUI / CLI
-  -> Application Service / compatibility facade
+  -> Application Service
   -> CstApplicationBackend
   -> ProjectConfmanager / Algorithm / CSTManager
   -> Worker / VBA / CST
@@ -24,7 +24,7 @@ GUI / CLI
 | 读取/切换 CST 后端 | `get_selected_cst_installation()` / `select_cst_installation(version, executable)` | 切换仅允许可配置状态 |
 | 读取/更新后处理设置 | `get_postprocess_settings()` / `update_postprocess_settings(values)` | 更新仅允许可配置状态 |
 | 读取/更新算法设置 | `get_algorithm_settings()` / `update_algorithm_settings(values)` | 更新仅允许可配置状态 |
-| 初始化环境与运行选项 | `initialize_run(start_from_existing, safe_mode, worker_count)` | CREATED、STOPPED、FAILED |
+| 初始化环境与运行选项 | `initialize_run(resume, worker_count)` | CREATED、STOPPED、FAILED |
 | 准备工程、Manager 和算法 | `prepare_run()` | INITIALIZED |
 | 执行算法 | `execute_run()` | PREPARED |
 | 请求标准停止 | `request_stop()` | Manager 存在时有效；没有 Manager 时幂等返回 |
@@ -73,15 +73,12 @@ RUNNING -> STOPPING -> STOPPED
 - `BackendPreparationError`：工程、Manager 或算法准备失败；
 - 算法和 Manager 的运行时异常保留原异常，同时执行标准清理。
 
-## 兼容边界
+## 后端边界
 
-历史类 `base.cst_tools_main` 仅负责：
-
-- 旧 camelCase 方法名到新 API 的转换；
-- 旧的 `False`/`0` 失败返回值；
-- 命令行参数解析和进程退出码。
-
-新代码不得导入 `cst_tools_main`，也不得在 `CstApplicationBackend` 中重新加入 CLI、Qt 或旧方法名。GUI 对旧式测试替身的兼容集中在 `_LegacyBackendAdapter`，不属于生产默认路径。
+GUI、CLI 和测试替身必须直接实现现代 snake_case 后端协议。不再提供
+camelCase Engine 适配、`False`/`0` 错误码翻译、`safe_mode` 或算法参数中的
+`cflag/cfreq` 续算通道。根目录 `base.py` 是直接调用 `CstApplicationBackend`
+的现代 CLI，不再定义应用门面类。
 
 ## 当前边界
 

@@ -83,9 +83,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.refreshCstBackendsButton.setToolTip("重新扫描本机 CST 安装")
         self.StartButton.setToolTip("使用当前工程、算法与后处理设置启动任务")
         self.StopButton.setToolTip("请求 Worker 保存当前状态并通过标准流程退出")
-        self.RecoverButton.setToolTip("发现并恢复项目中未闭合的 Managed CST 会话")
-        self.checkBox_CTN.setToolTip("从已有 HOM 扫描检查点恢复未完成区间")
-        self.checkBox_SAFE.setToolTip("启用后端提供的安全运行策略")
+        self.RecoverButton.setToolTip("通过标准协议关闭项目中未闭合的 Managed CST 会话")
+        self.checkBox_CTN.setToolTip("使用已有项目、HOM 检查点和已确认安全快照继续未完成扫描")
         set_visual_role(self.StartButton, "primary")
         set_visual_role(self.StopButton, "danger")
         set_visual_role(self.RecoverButton, "quiet")
@@ -145,6 +144,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.selectCSTPathButton.clicked.connect(self.read_cst)
         self.refreshCstBackendsButton.clicked.connect(self.refreshCstBackends)
         self.cstBackendComboBox.currentIndexChanged.connect(self.selectCstBackend)
+        self.checkBox_CTN.toggled.connect(lambda _checked: self._sync_readiness())
         self.StartButton.clicked.connect(self.run)
         self.AlgSettingButton.clicked.connect(self.showCalcDialogBox)
         self.postProcessButton.clicked.connect(self.showPPSDialogBox)
@@ -250,8 +250,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self._sync_readiness()
 
     def _sync_readiness(self):
+        source_ready = bool(self.uiCSTFilePath) or self.checkBox_CTN.isChecked()
         self.controller.set_inputs_ready(
-            bool(self.uiProjectDir and self.uiCSTFilePath and self._cst_backend_ready)
+            bool(self.uiProjectDir and source_ready and self._cst_backend_ready)
         )
         self.renderRunState(self.controller.state)
 
@@ -259,7 +260,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.cstBackendComboBox.blockSignals(True)
         self.cstBackendComboBox.clear()
         if not self.service.supports_cst_backend_selection:
-            self.cstBackendComboBox.addItem("当前后端（兼容模式）", None)
+            self.cstBackendComboBox.addItem("当前固定后端", None)
             self.cstBackendComboBox.setEnabled(False)
             self.refreshCstBackendsButton.setEnabled(False)
             self._cst_backend_ready = True
@@ -344,7 +345,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.postProcessButton,
             self.workerCountSpinBox,
             self.checkBox_CTN,
-            self.checkBox_SAFE,
         ):
             widget.setEnabled(controls_enabled)
         backend_controls_enabled = (
@@ -362,6 +362,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.StopButton.setEnabled(state is RunState.RUNNING)
         self.RecoverButton.setEnabled(
             bool(self.uiProjectDir)
+            and (
+                bool(self.controller.recovery_count)
+                or state is RunState.RECOVERY_REQUIRED
+            )
             and state
             in {
                 RunState.IDLE,
@@ -371,9 +375,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             }
         )
         self.RecoverButton.setText(
-            f"恢复会话 ({self.controller.recovery_count})"
+            f"清理残留会话 ({self.controller.recovery_count})"
             if self.controller.recovery_count
-            else "恢复会话"
+            else "清理残留会话"
         )
         self.StartButton.setText("重新运行" if state is RunState.FAILED else "开始运行")
         badge, detail = STATE_PRESENTATION[state]
@@ -389,15 +393,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def requestRecovery(self):
         if self.controller.request_recovery():
-            self.logger.info("用户请求恢复项目中的残留 CST 会话")
+            self.logger.info("用户请求清理项目中的残留 CST 会话")
 
     def run(self):
-        if not self.uiProjectDir or not self.uiCSTFilePath:
-            self.logger.error("请先选择项目目录和 CST 文件")
+        ctn = self.checkBox_CTN.isChecked()
+        if not self.uiProjectDir or (not ctn and not self.uiCSTFilePath):
+            self.logger.error("新建运行需要项目目录和 CST 模板；继续运行只需已有项目")
             self._sync_readiness()
             return
-        ctn = self.checkBox_CTN.isChecked()
-        safe = self.checkBox_SAFE.isChecked()
         worker_count = self.workerCountSpinBox.value()
         settings = self.service.get_algorithm_settings()
         self.logger.info(
@@ -408,7 +411,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             settings.get("endfreq", settings.get("fmax", "?")),
             worker_count,
         )
-        if self.controller.start(ctn, safe, worker_count):
+        if self.controller.start(ctn, worker_count):
             self.logger.info("本次运行使用 %d 个 CST Worker", worker_count)
             self.logger.info("UI:STARTING WORK")
 

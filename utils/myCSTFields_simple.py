@@ -44,7 +44,7 @@ class MyCuts_Pillbox(object):
         self.struct_params_namelist = ["R", "L", "nmodes"]
         print(params)
         self.struct_params_valuelist = [230, 260, 10]
-        assert isinstance(manager, cstmanager.manager)
+        assert isinstance(manager, cstmanager.CSTManager)
         self.manager = manager
         # assert isinstance(manager.logger, logging.logger)
         self.logger = manager.logger

@@ -623,7 +623,3 @@ class CSTManager:
 
     def __exit__(self, exc_type, exc_value, traceback) -> None:
         self.stop()
-
-
-# Backward-compatible name used throughout the existing application.
-manager = CSTManager

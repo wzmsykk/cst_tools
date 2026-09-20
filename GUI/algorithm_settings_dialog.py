@@ -17,7 +17,6 @@ class AlgorithmSettingsDialog(QDialog, Ui_AlgoPopDialog):
         self.setWindowTitle("扫描与算法设置")
         self.fminLineEdit.setPlaceholderText("最低扫描频率")
         self.fmaxLineEdit.setPlaceholderText("最高扫描频率")
-        self.continueFreqLineEdit.setPlaceholderText("断点继续频率")
         self.maxFreqThresholdLineEdit.setPlaceholderText("扫描停止频率")
         self.logger = Logger
         self.data = dict()
@@ -28,7 +27,6 @@ class AlgorithmSettingsDialog(QDialog, Ui_AlgoPopDialog):
             self.fmaxLineEdit,
             self.fminLineEdit,
             self.maxFreqThresholdLineEdit,
-            self.continueFreqLineEdit,
         ):
             editor.setValidator(validator)
         self._install_responsive_layout()
@@ -56,13 +54,11 @@ class AlgorithmSettingsDialog(QDialog, Ui_AlgoPopDialog):
             fields.addWidget(unit, row, 2)
         fields.setColumnStretch(1, 1)
         layout.addLayout(fields)
-        layout.addWidget(self.continueCheckBox)
-        layout.addWidget(self.continueFreqLineEdit)
         layout.addStretch(1)
         layout.addWidget(self.buttonBox)
 
     def setDefaultValues(self, param_dict):
-        self.data = AlgorithmSettings.from_mapping(param_dict).to_legacy_dict()
+        self.data = AlgorithmSettings.from_mapping(param_dict).to_backend_payload()
         self._committed_data = dict(self.data)
         self._load_fields(self.data)
 
@@ -71,8 +67,6 @@ class AlgorithmSettingsDialog(QDialog, Ui_AlgoPopDialog):
         self.fmaxLineEdit.setText(str(self.data.get("fmax", 700)))
         self.fminLineEdit.setText(str(self.data.get("fmin", 500)))
         self.maxFreqThresholdLineEdit.setText(str(self.data.get("endfreq", 2500)))
-        self.continueFreqLineEdit.setText(str(self.data.get("cfreq", 650)))
-        self.continueCheckBox.setChecked(bool(self.data.get("cflag", 0)))
 
     def setValues(self):
         settings = AlgorithmSettings.from_mapping(
@@ -80,11 +74,9 @@ class AlgorithmSettingsDialog(QDialog, Ui_AlgoPopDialog):
                 "fmax": self.fmaxLineEdit.text(),
                 "fmin": self.fminLineEdit.text(),
                 "endfreq": self.maxFreqThresholdLineEdit.text(),
-                "cfreq": self.continueFreqLineEdit.text(),
-                "cflag": self.continueCheckBox.isChecked(),
             }
         )
-        self.data = settings.to_legacy_dict()
+        self.data = settings.to_backend_payload()
 
     def accept(self):
         try:

@@ -29,29 +29,6 @@
     <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
    </property>
   </widget>
-  <widget class="QCheckBox" name="continueCheckBox">
-   <property name="geometry">
-    <rect>
-     <x>40</x>
-     <y>130</y>
-     <width>281</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>从某一频率继续</string>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="continueFreqLineEdit">
-   <property name="geometry">
-    <rect>
-     <x>120</x>
-     <y>160</y>
-     <width>261</width>
-     <height>31</height>
-    </rect>
-   </property>
-  </widget>
   <widget class="QLabel" name="fminlabel">
    <property name="geometry">
     <rect>

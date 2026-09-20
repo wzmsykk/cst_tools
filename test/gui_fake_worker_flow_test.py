@@ -116,6 +116,8 @@ class FlowFakeWorker:
 
 
 class FakeWorkerGuiBackend:
+    supports_cst_backend_selection = False
+
     def __init__(self, root: Path, *, outcomes=(), blocked=False):
         self.logger = logging.getLogger(f"gui-fake-worker-{id(self)}")
         self.logger.handlers.clear()
@@ -136,34 +138,40 @@ class FakeWorkerGuiBackend:
         self.results = []
         self.worker_count = 2
 
-    def setProjectDir(self, path):
+    def select_project_directory(self, path):
         self.project_dir = path
 
-    def setCSTFilePath(self, path):
+    def select_cst_file(self, path):
         self.cst_path = path
 
-    def getCurrPostProcessList(self):
+    def get_postprocess_settings(self):
         return list(self.pps)
 
-    def setCurrPostProcessList(self, values):
+    def get_cst_installations(self):
+        return ()
+
+    def get_selected_cst_installation(self):
+        return None
+
+    def select_cst_installation(self, version, executable):
+        raise RuntimeError("fixed fake-worker backend")
+
+    def update_postprocess_settings(self, values):
         self.pps = list(values)
 
-    def getAlgAttrs(self):
+    def get_algorithm_settings(self):
         return dict(self.alg_attrs)
 
-    def setAlgAttrs(self, values):
+    def update_algorithm_settings(self, values):
         self.alg_attrs = dict(values)
 
-    def setFlags(self, start_from_existing, safe):
-        self.flags = (start_from_existing, safe)
-
-    def setWorkerCount(self, worker_count):
+    def initialize_run(self, resume, worker_count):
+        self.resume = bool(resume)
         self.worker_count = int(worker_count)
+        if not self.project_dir or (not self.resume and not self.cst_path):
+            raise RuntimeError("backend inputs are incomplete")
 
-    def wininit(self):
-        return bool(self.project_dir and self.cst_path)
-
-    def setRunInfos(self):
+    def prepare_run(self):
         root = Path(self.project_dir)
 
         def worker_factory(worker_id, config, logger):
@@ -182,7 +190,7 @@ class FakeWorkerGuiBackend:
             worker_factory=worker_factory,
         )
 
-    def starttask(self):
+    def execute_run(self):
         tasks = [
             SimulationTask({"fmin": 720, "fmax": 800}, "band-1"),
             SimulationTask({"fmin": 800, "fmax": 880}, "band-2"),
@@ -202,6 +210,18 @@ class FakeWorkerGuiBackend:
     def request_stop(self):
         if self.manager is not None:
             self.manager.stop()
+
+    def get_recovery_sessions(self):
+        return ()
+
+    def is_recovery_required(self):
+        return False
+
+    def recover_project_sessions(self):
+        return []
+
+    def add_progress_listener(self, listener):
+        self.progress_listener = listener
 
 
 def process_until(qapp, predicate, timeout=5):

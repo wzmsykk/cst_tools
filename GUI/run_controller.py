@@ -5,7 +5,7 @@ from __future__ import annotations
 from enum import Enum, auto
 
 from PyQt5.QtCore import QObject, QThread, pyqtSignal, pyqtSlot
-from GUI.application_service import GuiApplicationService, RunRequest
+from GUI.application_service import CstApplicationService, RunRequest
 from csttool.hom_scan import ScanInterrupted
 
 
@@ -31,7 +31,7 @@ class _BackendRunWorker(QObject):
 
     def __init__(
         self,
-        service: GuiApplicationService,
+        service: CstApplicationService,
         request: RunRequest,
     ):
         super().__init__()
@@ -59,7 +59,7 @@ class _BackendStopWorker(QObject):
     succeeded = pyqtSignal()
     failed = pyqtSignal(str)
 
-    def __init__(self, service: GuiApplicationService):
+    def __init__(self, service: CstApplicationService):
         super().__init__()
         self._service = service
 
@@ -77,7 +77,7 @@ class _BackendRecoveryWorker(QObject):
     succeeded = pyqtSignal(int)
     failed = pyqtSignal(str)
 
-    def __init__(self, service: GuiApplicationService):
+    def __init__(self, service: CstApplicationService):
         super().__init__()
         self._service = service
 
@@ -145,7 +145,7 @@ class GuiRunController(QObject):
         ),
     }
 
-    def __init__(self, service: GuiApplicationService):
+    def __init__(self, service: CstApplicationService):
         super().__init__()
         self.service = service
         self.state = RunState.IDLE
@@ -173,9 +173,7 @@ class GuiRunController(QObject):
         if self.state is not target:
             self._transition(target)
 
-    def start(
-        self, start_from_existing: bool, safe: bool, worker_count: int = 1
-    ) -> bool:
+    def start(self, resume: bool, worker_count: int = 1) -> bool:
         if not self.inputs_ready:
             return False
         if self.state not in {RunState.READY, RunState.FAILED}:
@@ -185,8 +183,7 @@ class GuiRunController(QObject):
 
         thread = QThread(self)
         request = RunRequest(
-            start_from_existing=bool(start_from_existing),
-            safe_mode=bool(safe),
+            resume=bool(resume),
             worker_count=int(worker_count),
         )
         worker = _BackendRunWorker(self.service, request)

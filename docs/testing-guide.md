@@ -88,13 +88,13 @@ GUI P7 Application Service 边界测试：
 python -m pytest -q test/gui_application_service_test.py
 ```
 
-该 Gate 验证稳定 GUI API 到 legacy `cst_tools_main` 的单点翻译、不可变运行请求、Worker 数量边界、初始化/准备失败归一化以及标准停止转发。可用以下命令确认 legacy 方法没有重新泄漏到窗口或控制器：
+该 Gate 验证 GUI Service 直接转发现代后端协议、不可变运行请求、Worker 数量边界和标准停止转发。可用以下命令确认旧 Engine API 没有重新泄漏：
 
 ```powershell
-rg -n "cst_tools_main|setProjectDir|setRunInfos|starttask" GUI -g "*.py"
+rg -n "cst_tools_main|setProjectDir|setRunInfos|starttask|_LegacyBackendAdapter" GUI -g "*.py"
 ```
 
-匹配结果应只位于 `GUI/application_service.py`。
+匹配结果应为空。
 
 ### 2. 定向协议测试
 

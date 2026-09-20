@@ -42,6 +42,12 @@ class myAlg(object):
     def start(self):
         pass
 
+    def set_resume(self, resume: bool) -> None:
+        if resume:
+            raise NotImplementedError(
+                f"{type(self).__name__} does not implement checkpoint resume"
+            )
+
 
 class myAlg02_POP(object):
     def __init__(self, manager, params, log_obj):

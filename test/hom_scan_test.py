@@ -290,7 +290,7 @@ def test_production_algorithm_writes_results_and_checkpoint(tmp_path):
     algorithm = myAlg01(manager=manager, params=[])
     algorithm.setCSTParams([])
     algorithm.setEditableAttrs(
-        {"fmin": 100, "fmax": 110, "endfreq": 120, "cflag": 0}
+        {"fmin": 100, "fmax": 110, "endfreq": 120}
     )
 
     report = algorithm.start()
@@ -313,8 +313,9 @@ def test_production_algorithm_restores_confirmed_snapshot_before_resume(tmp_path
     algorithm = myAlg01(manager=manager, params=[])
     algorithm.setCSTParams([])
     algorithm.setEditableAttrs(
-        {"fmin": 100, "fmax": 110, "endfreq": 120, "cflag": 1}
+        {"fmin": 100, "fmax": 110, "endfreq": 120}
     )
+    algorithm.set_resume(True)
     checkpoint = ScanCheckpointStore(
         tmp_path / "save" / "csv" / "hom_scan_checkpoint.json"
     )

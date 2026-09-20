@@ -65,9 +65,7 @@ native CST result -> Python-derived result -> optional runtime VBA
 | GUI P5 | 固定坐标主窗口改为响应式双栏工作台 | 缩放布局与 UI 源文件编译 Gate 通过 |
 | GUI P6 | 对话框事务、运行期冻结、已有项编辑、父子生命周期和明确源码命名 | GUI 功能 Gate 36 passed |
 | GUI P6.5 | 真实后端启动、可移植 PyInstaller 配置与独立目录打包 smoke | 打包程序退出码 0，无 CST/UI 残留 |
-| GUI P7 | Application Service 隔离 Qt、运行控制器与 legacy engine | GUI 中 legacy 调用仅保留在单一适配器 |
-| GUI P8 | 生产编排迁入 `csttool.application_backend`，GUI 默认切换新后端 | 旧 `base.cst_tools_main` 降为兼容入口；全量测试通过 |
-| GUI P9 | 新后端内部 API、生命周期、异常和清理语义收口 | CLI/旧方法移至兼容壳；异常路径标准停止 Manager |
+| GUI P7–P9 | Application Service、生产后端和生命周期收口 | GUI/CLI/测试替身均直接使用现代后端协议；旧 Engine 适配器和 `cst_tools_main` 门面已删除 |
 | P10 | 生产算法替换旧 Manager API | 默认、TM020、WTC 使用 `CSTManager`、`SimulationTask`、`execute/run_batch` |
 | P11 | HOM 扫描完整性修复 | 窄区间逐个求解 Mode 1、微小容差推进、有限重试和原子 checkpoint |
 | P12 | GUI 生产 Worker 迁移 | 默认后端使用长驻版本化文件协议 Worker；Completion/Ack 栅栏，标准 Save/Quit，保留声明式运行时 VBA 后处理 |
@@ -117,7 +115,7 @@ Profile 验证使用 CST 官方 `ResetTemplateIterator/GetNextTemplate`，比较
 ## 6. 尚未完成
 
 - `local_cstworker/worker.vb` 尚未迁移到当前最小文件协议；`CSTManager` 之上的维护中算法已使用现代任务 API；
-- `base.cst_tools_main` 仍作为旧脚本兼容入口，待外部调用方完成弃用；
+- GUI 和默认 CLI 已不再提供旧 Engine 兼容入口；
 - 当前暂不扩展到 default、TM020、WTC、Pillbox 或复合 Enlarged/HOM Profile；
 - 没有自动安装 Result Template；
 - 已有 HOM 运行 Manifest；没有通用 Profile Schema、动态 capability negotiation 或多 Transport；
@@ -132,7 +130,7 @@ Profile 验证使用 CST 官方 `ResetTemplateIterator/GetNextTemplate`，比较
 
 1. 用真实 CST 分别验证默认、TM020 和 WTC 的 `SimulationTask` 生产调用；
 2. 将 Profile/Warm Worker 泛化为可接受任意任务数的生产候选 Worker，再通过 `worker_factory` 接入 `CSTManager`；
-3. 盘点外部 `base.cst_tools_main` 与 Manager 弃用接口调用方；
+3. 将 WTC/TM020 独立优化入口收口为同一现代 Backend 工厂；
 4. 保留 HOM 专属 R/Q 薄适配层，不把物理量语义下沉到通用核心；
 5. 暂不做 Profile 序列化、Manifest、动态 capability negotiation、插件 ABI 或多 Profile 注册表。
 

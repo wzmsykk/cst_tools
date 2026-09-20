@@ -1,4 +1,4 @@
-"""Typed GUI configuration models with legacy serialization compatibility."""
+"""Typed GUI configuration models."""
 
 from __future__ import annotations
 
@@ -16,8 +16,6 @@ class AlgorithmSettings:
     fmin: float
     fmax: float
     endfreq: float
-    cfreq: float
-    cflag: bool
 
     @classmethod
     def from_mapping(cls, values: Mapping[str, Any]) -> "AlgorithmSettings":
@@ -25,24 +23,18 @@ class AlgorithmSettings:
             fmin=float(values.get("fmin", 500)),
             fmax=float(values.get("fmax", 700)),
             endfreq=float(values.get("endfreq", 2500)),
-            cfreq=float(values.get("cfreq", 650)),
-            cflag=bool(values.get("cflag", False)),
         )
         if settings.fmin >= settings.fmax:
             raise ValueError("最低频率必须小于最高频率")
         if settings.endfreq < settings.fmax:
             raise ValueError("扫描频率上限不能低于最高频率")
-        if settings.cflag and not settings.fmin <= settings.cfreq <= settings.endfreq:
-            raise ValueError("继续频率必须位于扫描频率范围内")
         return settings
 
-    def to_legacy_dict(self) -> dict[str, float | int]:
+    def to_backend_payload(self) -> dict[str, float]:
         return {
             "fmin": self.fmin,
             "fmax": self.fmax,
             "endfreq": self.endfreq,
-            "cfreq": self.cfreq,
-            "cflag": int(self.cflag),
         }
 
 
@@ -109,7 +101,7 @@ class PostProcessSetting:
     def display_text(self) -> str:
         return f"{self.result_name} — {postprocess_display_name(self.method)}"
 
-    def to_legacy_dict(self) -> dict[str, Any]:
+    def to_backend_payload(self) -> dict[str, Any]:
         return {
             "resultName": self.result_name,
             "method": self.method,
@@ -141,5 +133,5 @@ def encode_postprocess_document(
 ) -> dict[str, Any]:
     return {
         "schemaVersion": PPS_SCHEMA_VERSION,
-        "postProcesses": [item.to_legacy_dict() for item in settings],
+        "postProcesses": [item.to_backend_payload() for item in settings],
     }

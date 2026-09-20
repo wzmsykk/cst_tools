@@ -78,7 +78,7 @@ class myAlg01(myAlg):
         self.delta_frequency = 50
 
         self.end_frequency = 2500
-        self.continue_flag = [0, 3738.9532]  # [是否继续，上次做完的最后一次频率]
+        self.resume_requested = False
 
     def checkAndSetReady(self):
         if self.CSTparams is not None and self.manager is not None:
@@ -105,22 +105,19 @@ class myAlg01(myAlg):
         d = {
             "fmin": self.input_min[1],
             "fmax": self.input_min[2],
-            "cflag": self.continue_flag[0],
-            "cfreq": self.continue_flag[1],
         }
         d.update(dict)
         self.input_min[1] = d["fmin"]
         self.input_min[2] = d["fmax"]
-        self.continue_flag[0] = int(d["cflag"])
-        self.continue_flag[1] = d["cfreq"]
         self.end_frequency = d.get("endfreq", 2500)
+
+    def set_resume(self, resume: bool) -> None:
+        self.resume_requested = bool(resume)
 
     def getEditableAttrs(self):
         d = {
             "fmin": self.input_min[1],
             "fmax": self.input_min[2],
-            "cflag": self.continue_flag[0],
-            "cfreq": self.continue_flag[1],
             "endfreq": self.end_frequency,
         }
         return d
@@ -308,195 +305,6 @@ class myAlg01(myAlg):
         text = f.read()
         return float(text[140:])
 
-    def _legacy_start(self):
-        if self.ready == False:
-            print("CALCATION NOT READY, PLEASE CHECK SETTINGS.")
-            print("IS THE JOBMANAGER SET?")
-            return -1
-        self.logCalcSettings()
-        fmin = self.input_min[1]
-        fmax = self.input_min[2]
-        start_time = time.time()
-        sample = pd.DataFrame([self.input_min], columns=self.input_name)
-        samples = pd.DataFrame()
-
-        if self.continue_flag[0] == 0:
-            runresult = self._execute_simulation(
-                self.input_min,
-                "frequency"
-                + str(1000000)[1:]
-                + "_"
-                + str(fmin).replace(".", "-")
-                + "_"
-                + str(fmax),
-                retry_count=1,
-            )
-            if runresult["TaskStatus"] == "Success":
-                self.state_y0 = np.array(runresult["PostProcessResult"])
-                # sample = self.get_3_modes("frequency"+str(1000000)[1:]+"_"+str(fmin).replace(".", "-")+"_"+str(fmax)).iloc[0]
-                sample = self.get_3_modes_custom(self.state_y0).iloc[0]
-                samples = samples.append(sample)
-                self.write_many("all_value_" + str(fmin).replace(".", "-"), samples)
-                # fmin = np.float(sample["frequency"])
-                fmin = (
-                    math.ceil(np.float(sample["frequency"]) * 10) / 10
-                )  ## round up float to 1 decimals
-                fmax = math.floor(sample["frequency"]) + self.delta_frequency
-            elif runresult["TaskStatus"] == "Failure":
-                print("First Loop Failure")
-                return
-                pass
-
-        else:
-            self.continue_flag[0] = 0
-            fmin = self.continue_flag[1]
-            samples = pd.read_csv(
-                self.relative_location
-                + "all_value_"
-                + str(fmin).replace(".", "-")
-                + ".csv"
-            )
-            samples = samples.drop(["Unnamed: 0"], 1)
-
-            sample = samples.iloc[-1]
-            print("sample is:\n", sample)
-            # fmin = np.float(sample["frequency"])
-            fmin = (
-                math.ceil(np.float(sample["frequency"]) * 10) / 10
-            )  ## round up float to 1 decimals
-            fmax = math.floor(sample["frequency"]) + self.delta_frequency
-
-        while fmin < self.end_frequency:
-
-            satisfy_flag = False
-            while satisfy_flag == False:
-
-                self.input_min[1] = fmin
-                self.input_min[2] = fmax
-                print(self.accu_list)
-                print(
-                    (self.accu_list["f_down"] <= fmin)
-                    & (self.accu_list["f_up"] > fmin)
-                )
-                self.input_min[3] = float(
-                    self.accu_list.loc[
-                        (self.accu_list["f_down"] <= fmin)
-                        & (self.accu_list["f_up"] > fmin),
-                        "accuracy",
-                    ]
-                )
-                self.input_min[4] = float(
-                    self.cell_list.loc[
-                        (self.cell_list["f_down"] <= fmin)
-                        & (self.cell_list["f_up"] > fmin),
-                        "cell",
-                    ]
-                )
-                print("input is:", self.input_min)
-                runresult = self._execute_simulation(
-                    self.input_min,
-                    "frequency"
-                    + str(1000000)[1:]
-                    + "_"
-                    + str(fmin).replace(".", "-")
-                    + "_"
-                    + str(fmax),
-                    retry_count=1,
-                )
-                if runresult["TaskStatus"] == "Success":
-                    self.state_y0 = np.array(runresult["PostProcessResult"])
-                    sample = self.get_3_modes_custom(self.state_y0).iloc[0]
-                    print(
-                        "--------\nfmin_define:",
-                        fmin,
-                        "\nfmax_define:",
-                        fmax,
-                        "\nf_get:",
-                        sample["frequency"],
-                    )
-                elif runresult["TaskStatus"] == "Failure":
-                    print("Main Loop Failure Met max retry count")
-                    print("Skip this run.")
-                    print(
-                        self.log,
-                        "Skipped freq calc %f Mhz-%f Mhz because of failure\n"
-                        % (fmin, fmax),
-                        flush=True,
-                    )  ### OUTPUT TO LOG
-                    fmin = fmax
-                    fmax = fmax + self.delta_frequency  # 200MHZ
-                    print("Adjust New Fmin to %f" % fmin)
-                    print("Adjust New Fmax to %f" % fmax)
-
-                    continue
-
-                # sample = self.get_3_modes("frequency"+str(1000000)[1:]+"_"+str(fmin).replace(".", "-")+"_"+str(fmax)).iloc[0]
-
-                if sample["frequency"] == fmin:
-                    #                    try:
-                    #                        self.input_min[0] = 2
-                    #                        print("input is:",self.input_min)
-                    #                        self.state_y0 = np.array(self.w.runWithParam(self.input_name, self.input_min, "frequency"+str(1000000)[1:]+"_"+str(fmin).replace(".", "-")+"_"+str(fmax)+"_2mode"))
-                    #                        sample = self.get_3_modes("frequency"+str(1000000)[1:]+"_"+str(fmin).replace(".", "-")+"_"+str(fmax)+"_2mode")
-                    #                        if sample.loc[0,"frequency"] == fmin:
-                    #                            sample = sample.iloc[1]
-                    #                        else:
-                    #                            sample = sample.iloc[0]
-                    #                        self.input_min[0] = 1
-                    #                    except:
-                    self.input_min[1] = (
-                        float(math.ceil(sample["frequency"] * 10)) / 10
-                    )  ## round up float to 1 decimals
-                    runresult = self._execute_simulation(
-                        self.input_min,
-                        "frequency"
-                        + str(1000000)[1:]
-                        + "_"
-                        + str(self.input_min[1]).replace(".", "-")
-                        + "_"
-                        + str(fmax)
-                        + "_variate_",
-                    )
-                    while runresult["TaskStatus"] != "Success":
-                        print("Variate Loop Failure")
-                        fmax = math.floor(sample["frequency"]) + self.delta_frequency
-                        print("Adjust New Fmax to %f" % fmax)
-                        runresult = self._execute_simulation(
-                            self.input_min,
-                            "frequency"
-                            + str(1000000)[1:]
-                            + "_"
-                            + str(self.input_min[1]).replace(".", "-")
-                            + "_"
-                            + str(fmax)
-                            + "_variate_",
-                        )
-
-                    self.state_y0 = np.array(runresult["PostProcessResult"])
-                    sample = self.get_3_modes_custom(self.state_y0).iloc[0]
-
-                    # sample = self.get_3_modes("frequency"+str(1000000)[1:]+"_"+str(self.input_min[1]).replace(".", "-")+"_"+str(fmax)+"_variate").iloc[0]
-
-                if float(sample["frequency"]) < fmax:
-                    satisfy_flag = True
-                    print("judge:True")
-                else:
-                    fmax = math.floor(sample["frequency"]) + 20
-                    print("judge:False")
-            samples = samples.append(sample)
-            samples = samples.reset_index(drop=True)
-            self.write_many("all_value_" + str(fmin).replace(".", "-"), samples)
-            # fmin = np.float(sample["frequency"])
-            fmin = (
-                math.ceil(np.float(sample["frequency"]) * 10) / 10
-            )  ## round up float to 1 decimals
-            fmax = math.floor(sample["frequency"]) + self.delta_frequency
-
-        end_time = time.time()
-        print(start_time - end_time)
-        self.log.close()
-        return 0
-
     def _scan_policy(self):
         initial_width = float(self.input_min[2]) - float(self.input_min[1])
         return ScanPolicy(
@@ -611,7 +419,7 @@ class myAlg01(myAlg):
         fingerprint = self._project_fingerprint()
         report = None
         pending = None
-        if self.continue_flag[0]:
+        if self.resume_requested:
             if not checkpoint_store.path.exists():
                 raise FileNotFoundError(checkpoint_store.path)
             report, pending, resume_snapshot = checkpoint_store.load_with_snapshot(
