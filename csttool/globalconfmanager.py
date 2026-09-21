@@ -1,14 +1,22 @@
 import configparser
 import os
 import logging
+from dataclasses import replace
 from pathlib import Path
-import tempfile
+
+from csttool.configuration import (
+    GlobalSettings,
+    SuperfishSettings,
+    read_ini,
+    write_ini_atomic,
+)
 
 from csttool.cst_installations import (
     CstInstallation,
     discover_cst_installations,
     validate_cst_installation,
 )
+
 
 class GlobalConfigManager:
     def __init__(
@@ -33,104 +41,96 @@ class GlobalConfigManager:
         if not self.curr_global_cfg_path.exists():
             self.logger.warning("未找到curr_global_cfg.")
             self.logger.warning("使用default.")
-            self.conf.read(self.def_global_cfg_path)
+            self.conf = read_ini(self.def_global_cfg_path)
+            self.settings = GlobalSettings.from_parser(self.conf)
+            self.conf = self.settings.to_parser()
             self.saveconf()
         else:
             self.logger.info("找到curr_global_cfg:%s" % str(self.curr_global_cfg_path))
-            self.conf.read(
-                [self.def_global_cfg_path, self.curr_global_cfg_path],
-                encoding="utf-8",
+            default_settings = GlobalSettings.from_parser(
+                read_ini(self.def_global_cfg_path)
             )
-    
+            self.conf = read_ini(self.curr_global_cfg_path)
+            self.settings = GlobalSettings.from_parser(
+                self.conf, defaults=default_settings
+            )
+            self.conf = self.settings.to_parser()
+
     def printconf(self):
+        settings = self.settings
         self.logger.info("----------------------------------------------------------")
         self.logger.info("全局信息:")
-        self.logger.info("data目录:%s" % self._rstr2astr(self.conf["BASE"]["datadir"]))
-        self.logger.info("temp目录:%s" % self._rstr2astr(self.conf["BASE"]["tempdir"]))
-        self.logger.info("log目录:%s" % self._rstr2astr(self.conf["BASE"]["logdir"]))
-        self.logger.info(
-            "result目录:%s" % self._rstr2astr(self.conf["BASE"]["resultdir"])
-        )
-        self.logger.info("CST版本:%s" % self.conf["CST"]["cstver"])
-        self.logger.info("CSTEXE路径:%s" % self.conf["CST"]["cstexepath"])
-        self.logger.info("superfish版本:%s" % self.conf["superfish"]["version"])
-        self.logger.info("superfish路径:%s" % self.conf["superfish"]["dirpath"])
+        self.logger.info("data目录:%s", settings.directories.data.resolve())
+        self.logger.info("temp目录:%s", settings.directories.temp.resolve())
+        self.logger.info("log目录:%s", settings.directories.log.resolve())
+        self.logger.info("result目录:%s", settings.directories.result.resolve())
+        self.logger.info("CST版本:%s", settings.cst.version)
+        self.logger.info("CSTEXE路径:%s", settings.cst.executable or "")
+        self.logger.info("superfish版本:%s", settings.superfish.version)
+        self.logger.info("superfish路径:%s", settings.superfish.directory or "")
         self.logger.info("----------------------------------------------------------")
 
     def createEmptyGlobalConfigFile(self, savepath):
-        newconf = configparser.ConfigParser()
-        newconf.add_section("BASE")
-        newconf.set("BASE", "datadir", "./data")
-        newconf.set("BASE", "tempdir", "./temp")
-        newconf.set("BASE", "logdir", "./log")
-        newconf.set("BASE", "resultdir", "./result")
-        newconf.add_section("CST")
-        newconf.set("CST", "cstver", "")
-        newconf.set("CST", "cstexepath", "")
-        newconf.add_section("PROJECT")
-        newconf.set("PROJECT", "currprojdir", "")
-        newconf.add_section("superfish")
-        newconf.set("superfish", "dirpath", "")
-        newconf.set("superfish", "version", "")
+        newconf = GlobalSettings().to_parser()
         self.__saveconf(newconf, savepath)
         return savepath
 
-    def _rstr2astr(self, instr):  # _relative_path_str_to_abspath_str function
-        ostr = str(Path(instr).absolute())
-        return ostr
-
     def __saveconf(self, confobj, path):
-        path = Path(path)
-        path.parent.mkdir(parents=True, exist_ok=True)
-        with tempfile.NamedTemporaryFile(
-            "w", encoding="utf-8", dir=path.parent, delete=False
-        ) as stream:
-            confobj.write(stream)
-            temporary = Path(stream.name)
-        os.replace(temporary, path)
+        path = write_ini_atomic(path, confobj)
         self.logger.info("已保存全局配置文件于%s。" % str(path))
 
     def saveconf(self):
         """
         save current config into self.curr_global_cfg_path
         """
+        self.settings = GlobalSettings.from_parser(self.conf)
+        self.conf = self.settings.to_parser()
         self.__saveconf(self.conf, self.curr_global_cfg_path)
 
     def checkCSTENVConfig(self):
         # 测试CST环境位置
         result = True
         self.logger.info("检查全局配置开始.")
-        cfg = self.conf
+        self.settings = GlobalSettings.from_parser(self.conf)
+        cfg = self.settings
         self.logger.info("检查CST PATH.")
         try:
             selected = self.get_selected_cst_installation()
         except (FileNotFoundError, TypeError, ValueError):
-            self.logger.warning("定义的cstexepath:%s不存在。" % cfg["CST"]["cstexepath"])
+            self.logger.warning("定义的cstexepath:%s不存在。", cfg.cst.executable)
             self.logger.warning("尝试寻找cstexepath。")
             try:
-                cfg["CST"]["cstexepath"], cfg["CST"]["cstver"] = self.findCSTenv()
+                executable, version = self.findCSTenv()
+                self.settings = self.settings.with_cst(version, executable)
+                self.conf = self.settings.to_parser()
             except FileNotFoundError:
                 self.logger.error("未找到CST ENV PATH,请从config指定PATH")
                 self.logger.info("检查CST PATH 失败.")
                 result = False
             else:
-                self.logger.info("检查CST PATH 失败, 已使用自动寻找到的有效cst path作为代替.")
+                self.logger.info(
+                    "检查CST PATH 失败, 已使用自动寻找到的有效cst path作为代替."
+                )
 
         else:
             self.logger.info("检查CST PATH 成功.")
 
         # 版本不再设置上限；新版 CST 由安装路径和可执行文件共同校验。
         self.logger.info("检查CST 版本.")
-        self.logger.debug("CST ENV PATH为%s" % cfg["CST"]["cstexepath"])
-        self.logger.debug("CST 版本为%s" % cfg["CST"]["cstver"])
+        self.logger.debug("CST ENV PATH为%s", self.settings.cst.executable)
+        self.logger.debug("CST 版本为%s", self.settings.cst.version)
         self.logger.info("检查CST 版本 结束.")
         # 测试各个路径是否存在，若否则创建目录
         self.logger.info("检查各个路径是否存在.")
-        for names, dirs in cfg["BASE"].items():
-            pathobj = Path(dirs)
+        for names, pathobj in (
+            ("data", self.settings.directories.data),
+            ("temp", self.settings.directories.temp),
+            ("log", self.settings.directories.log),
+            ("result", self.settings.directories.result),
+        ):
             if not pathobj.exists():
                 pathobj.mkdir(parents=True, exist_ok=True)
-                self.logger.info("已建立%s于%s。" % (names, dirs))
+                self.logger.info("已建立%s于%s。", names, pathobj)
 
         self.logger.info("检查全局配置结束.")
         if result == False:
@@ -153,22 +153,26 @@ class GlobalConfigManager:
         raise FileNotFoundError
 
     def list_cst_installations(self) -> tuple[CstInstallation, ...]:
-        section = self.conf["CST"]
-        configured = (section.get("cstver", ""), section.get("cstexepath", ""))
+        configured = (
+            self.settings.cst.version,
+            str(self.settings.cst.executable or ""),
+        )
         return discover_cst_installations(configured=configured)
 
     def get_selected_cst_installation(self) -> CstInstallation:
-        section = self.conf["CST"]
         return validate_cst_installation(
-            section.get("cstver", ""), section.get("cstexepath", "")
+            self.settings.cst.version,
+            str(self.settings.cst.executable or ""),
         )
 
     def select_cst_installation(
         self, version: int | str, executable: str | Path
     ) -> CstInstallation:
         selected = validate_cst_installation(version, executable)
-        self.conf["CST"]["cstver"] = str(selected.version)
-        self.conf["CST"]["cstexepath"] = str(selected.executable)
+        self.settings = self.settings.with_cst(
+            str(selected.version), selected.executable
+        )
+        self.conf = self.settings.to_parser()
         self.saveconf()
         self.logger.info(
             "已切换 CST 后端至 %s: %s", selected.version, selected.executable
@@ -182,10 +186,15 @@ class GlobalConfigManager:
             return False
         else:
             self.logger.info("FOUND Poisson Superfish ENV at %s" % (sfdir))
-            self.conf.set("superfish", "dirpath", sfdir)
+            self.settings = replace(
+                self.settings,
+                superfish=SuperfishSettings(
+                    self.settings.superfish.version, Path(sfdir)
+                ),
+            )
+            self.conf = self.settings.to_parser()
             return True
 
 
 # Compatibility alias for callers using the historical spelling.
 GlobalConfmanager = GlobalConfigManager
-

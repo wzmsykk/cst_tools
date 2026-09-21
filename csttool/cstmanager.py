@@ -17,16 +17,15 @@ from threading import RLock
 from typing import Any, Callable, Iterable, Mapping, Protocol
 import time
 
+
 class WorkerProtocol(Protocol):
     """Worker operations required by the scheduler."""
 
     ID: str
 
-    def runWithParam(self, resultname: str, *, params: Mapping[str, Any]) -> dict:
-        ...
+    def runWithParam(self, resultname: str, *, params: Mapping[str, Any]) -> dict: ...
 
-    def stop(self) -> Any:
-        ...
+    def stop(self) -> Any: ...
 
 
 class SimulationManager(Protocol):
@@ -121,8 +120,10 @@ class CSTManager:
 
         self.logger = logger or logging.getLogger(__name__)
         self.pconfm = pconfm
-        self.gconf = gconfm.conf
-        self.pconf = pconfm.conf
+        self.global_settings = getattr(gconfm, "settings", None)
+        self.project_settings = getattr(pconfm, "settings", None)
+        self.gconf = gconfm.conf  # compatibility view
+        self.pconf = pconfm.conf  # compatibility view
         self.paramList = params
         self.maxParallelTasks = maxTask
         self.maxWorkerJobCountLimit = max_jobs_per_worker
@@ -130,12 +131,20 @@ class CSTManager:
         self._progress_callback = progress_callback
 
         self.currProjectDir = Path(pconfm.currProjectDir).absolute()
-        self.tempDir = self._project_path(self.pconf["DIRS"]["tempdir"])
-        self.resultDir = self._project_path(self.pconf["DIRS"]["resultdir"])
+        if self.project_settings is not None:
+            temp_path = self.project_settings.directories.temp
+            result_path = self.project_settings.directories.result
+            cst_filename = self.project_settings.cst_filename
+        else:
+            temp_path = self.pconf["DIRS"]["tempdir"]
+            result_path = self.pconf["DIRS"]["resultdir"]
+            cst_filename = self.pconf["CST"]["CSTFilename"]
+        self.tempDir = self._project_path(temp_path)
+        self.resultDir = self._project_path(result_path)
         self.tempDir.mkdir(parents=True, exist_ok=True)
         self.resultDir.mkdir(parents=True, exist_ok=True)
         self.taskFileDir = self.tempDir
-        self.cstProjPath = self.currProjectDir / self.pconf["CST"]["CSTFilename"]
+        self.cstProjPath = self.currProjectDir / cst_filename
 
         self._state = ManagerState.IDLE
         self._state_lock = RLock()
@@ -185,7 +194,11 @@ class CSTManager:
         return {
             "tempDir": str(worker_dir),
             "taskFileDir": str(worker_dir),
-            "CSTENVPATH": self.gconf["CST"]["cstexepath"],
+            "CSTENVPATH": str(
+                self.global_settings.cst.executable
+                if self.global_settings is not None
+                else self.gconf["CST"]["cstexepath"]
+            ),
             "resultDir": str(self.resultDir),
             "cstPath": str(source_project or self.cstProjPath),
             "paramList": self.paramList,
@@ -230,7 +243,9 @@ class CSTManager:
         source = self._validated_snapshot(snapshot)
         with self._state_lock:
             if self._state is not ManagerState.IDLE:
-                raise RuntimeError("CST snapshot can only be restored while manager is idle")
+                raise RuntimeError(
+                    "CST snapshot can only be restored while manager is idle"
+                )
             slots = list(self._slots)
 
         replacements: list[_WorkerSlot] = []
@@ -528,7 +543,9 @@ class CSTManager:
         with self._state_lock:
             self._slots.clear()
             self._state = ManagerState.CLOSED
-        self.logger.info("MANAGER_STOPPED workers=%d errors=%d", len(slots), len(stop_errors))
+        self.logger.info(
+            "MANAGER_STOPPED workers=%d errors=%d", len(slots), len(stop_errors)
+        )
         if stop_errors:
             raise RuntimeError(
                 f"{len(stop_errors)} CST worker(s) did not stop cleanly"

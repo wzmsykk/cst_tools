@@ -4,6 +4,7 @@ import logging
 import pytest
 
 from csttool.projectconfmanager import ProjectConfigManager, ProjectStatusError
+from csttool.configuration import ProjectSettings
 
 
 def _manager_with_config(config):
@@ -14,10 +15,7 @@ def _manager_with_config(config):
 
 
 def test_existing_project_rejects_fixed_mesh_drift():
-    config = configparser.ConfigParser()
-    config.add_section("MESH")
-    config.set("MESH", "Fixed", "True")
-    config.set("MESH", "CellsPerWavelength", "20")
+    config = ProjectSettings(name="mesh-test").to_parser()
     manager = _manager_with_config(config)
 
     manager._validate_fixed_mesh(20)

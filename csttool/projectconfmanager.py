@@ -2,13 +2,20 @@ import configparser
 import hashlib
 import json
 import logging
-import os
 from pathlib import Path
 import shutil
-import tempfile
+from dataclasses import replace
 from enum import Enum
 from install_compat import resource_path
 from .cst_preprocessor import CstProjectPreprocessor
+from .configuration import (
+    GlobalSettings,
+    ProjectSettings,
+    read_json,
+    read_ini,
+    write_ini_atomic,
+    write_json_atomic,
+)
 
 
 ###读取或生成ProjConf.ini文件
@@ -41,6 +48,16 @@ class ProjectConfigManager:
         else:
             self.logger = logging.getLogger(__name__)
         self.gconf = GlobalConfigManager.conf
+        self.global_settings = getattr(GlobalConfigManager, "settings", None)
+        if self.global_settings is None:
+            compatible = GlobalSettings().to_parser()
+            for section in self.gconf.sections():
+                if not compatible.has_section(section):
+                    compatible.add_section(section)
+                for key, value in self.gconf.items(section):
+                    compatible.set(section, key, value)
+            self.global_settings = GlobalSettings.from_parser(compatible)
+        self.settings: ProjectSettings | None = None
         self.inputCSTFilePath = None
         self.currProjectDir = None
         self.currCSTFilePath = None
@@ -93,13 +110,8 @@ class ProjectConfigManager:
         if not cfgpath.exists():
             self.logger.info("目录%s无旧config文件,无未完成任务。" % str(iDir))
             raise FileNotFoundError
-        tempconf = configparser.ConfigParser()
-        tempconf.read(cfgpath)
-        status = tempconf.get("TASK", "status")
-        if status == None:
-            raise ValueError
-        else:
-            return status
+        settings = ProjectSettings.from_parser(read_ini(cfgpath))
+        return settings.task_status
 
     def assignProjectDir(self, projectDir):
         self.setNotReady()  # changed Path so Not Ready
@@ -115,9 +127,7 @@ class ProjectConfigManager:
         self.ready = True
         return self.ready
 
-    def prepareProject(
-        self, startFromExisted=False, *, mesh_cells_per_wavelength=20
-    ):
+    def prepareProject(self, startFromExisted=False, *, mesh_cells_per_wavelength=20):
         # startFromExisted=True 从已有开始 不需要CST文件
         self.logger.info("准备项目文件")
         iProjectDir = self.currProjectDir
@@ -139,7 +149,10 @@ class ProjectConfigManager:
             self.logger.info("目录%s无旧文件" % str(iProjectDir))
             self.logger.info("尝试从project目录%s创建空白配置文件。" % str(iProjectDir))
             iConf = self.createNewEmptyProjectConfFile(iProjectDir)
-            iConf.set("MESH", "CellsPerWavelength", str(mesh_cells_per_wavelength))
+            iConf = replace(
+                ProjectSettings.from_parser(iConf),
+                cells_per_wavelength=int(mesh_cells_per_wavelength),
+            ).to_parser()
 
             # 复制输入CST文件到输出文件夹
             # 且自动预处理
@@ -151,11 +164,10 @@ class ProjectConfigManager:
                 )
             dstStrPath = shutil.copy2(src=str(iInputCSTFilePath), dst=str(dstPath))
             self.logger.info(
-                "已将输入CST文件%s复制到project目录%s。" % (str(iInputCSTFilePath), dstStrPath)
+                "已将输入CST文件%s复制到project目录%s。"
+                % (str(iInputCSTFilePath), dstStrPath)
             )
-            iConf = self.__autoPreProcess(
-                iConf, dstPath, mesh_cells_per_wavelength
-            )
+            iConf = self.__autoPreProcess(iConf, dstPath, mesh_cells_per_wavelength)
             self.__savecfgobj(iConf)
             self.conf = iConf
             self.savePPSSettings(self.currPPSList)
@@ -194,15 +206,12 @@ class ProjectConfigManager:
 
     def __savecfgobj(self, confobj, cfgfilename="project.ini", slient=False):
         cfgfilePath = self.currProjectDir / cfgfilename
-        with tempfile.NamedTemporaryFile(
-            "w",
-            encoding="utf-8",
-            dir=cfgfilePath.parent,
-            delete=False,
-        ) as stream:
-            confobj.write(stream)
-            temporary = Path(stream.name)
-        os.replace(temporary, cfgfilePath)
+        settings = ProjectSettings.from_parser(confobj)
+        normalized = settings.to_parser()
+        write_ini_atomic(cfgfilePath, normalized)
+        self.settings = settings
+        if confobj is self.conf:
+            self.conf = normalized
 
     def savecfg(self, cfgfilename="project.ini"):
         self.__savecfgobj(self.conf, cfgfilename)
@@ -214,9 +223,6 @@ class ProjectConfigManager:
         iProjectDir = Path(projectDir)
         cfgfilepath = iProjectDir / cfgfilename
         self.logger.info("开始创建配置文件%s于%s。" % (cfgfilename, str(cfgfilepath)))
-        newconf = configparser.ConfigParser()
-        newconf.clear()
-        cstfile = None
         currprojdir = iProjectDir
         avilprojname = currprojdir.name
 
@@ -229,96 +235,72 @@ class ProjectConfigManager:
             self.logger.info("未指定project名,使用为默认目录名%s" % avilprojname)
             currprojname = avilprojname
 
-        newconf.add_section("PROJECT")
-        newconf.set("PROJECT", "ProjectName", currprojname)
-        newconf.set("PROJECT", "ProjectDescription", "")
-        newconf.add_section("DIRS")
-        # 保存为相对路径
-
-        #############TO DO #####################
-
-        newconf.set("DIRS", "resultdir", "result")
-        newconf.set("DIRS", "tempdir", "temp")
-        newconf.add_section("CST")
-        newconf.set("CST", "CSTFilename", "")  # NEED TO BE FILLED IN LATER
-
-        # file_md5=self.genMD5FromCST(cstfile)
-        # newconf.set('CST','CSTFileMD5',file_md5.hexdigest())
-        newconf.set("CST", "CSTFileMD5", "")  # NEED BE FILLED IN
-
-        newconf.set("CST", "UseMpi", "False")
-        newconf.set("CST", "MpiNodeList", "")
-        newconf.set("CST", "UseRemoteCalculaton", "False")
-        newconf.set("CST", "DCMainControlAddress", "")
-        newconf.add_section("PARAMETERS")
-        newconf.set("PARAMETERS", "paramfile", self.paramsfilename)
-        newconf.set("PARAMETERS", "ppsfile", self.ppsfilename)
-        newconf.add_section("MESH")
-        newconf.set("MESH", "Fixed", "True")
-        newconf.set("MESH", "CellsPerWavelength", "20")
-        # newconf.set('PARAMETERS','paramfile','')
-        newconf.add_section("TASK")
-        newconf.set("TASK", "status", "READY")  # READY RUNNING DONE
+        newconf = ProjectSettings(name=currprojname).to_parser()
 
         self.logger.info("创建配置文件结束。")
         self.__savecfgobj(newconf, cfgfilename)
         return newconf
         # 保存配置文件
 
-    def __autoPreProcess(
-        self, confobj, cstFilePath, mesh_cells_per_wavelength=None
-    ):
+    def __autoPreProcess(self, confobj, cstFilePath, mesh_cells_per_wavelength=None):
         self.logger.info("根据输入的CST文件进行预处理且更新Config内容")
-        savejsonname = confobj.get("PARAMETERS", "paramfile")
-        confobj.set("CST", "CSTFilename", str(cstFilePath))
+        settings = ProjectSettings.from_parser(confobj)
+        savejsonname = settings.parameter_file
+        settings = replace(settings, cst_filename=Path(cstFilePath))
+        confobj = settings.to_parser()
         if mesh_cells_per_wavelength is None:
-            mesh_cells_per_wavelength = confobj.getint(
-                "MESH", "CellsPerWavelength", fallback=20
-            )
+            mesh_cells_per_wavelength = settings.cells_per_wavelength
         savednewcstpath = self._preprocess_cst_project(
             confobj,
             projectDir=self.currProjectDir,
             savejsonpath=savejsonname,
             mesh_cells_per_wavelength=mesh_cells_per_wavelength,
         )
-        confobj.set("CST", "CSTFilename", str(Path(savednewcstpath).name))
-        file_md5 = self.genMD5FromCST(savednewcstpath)
-        confobj.set("CST", "CSTFileMD5", file_md5.hexdigest())
+        project_digest = self.file_digest(savednewcstpath, "sha256")
+        confobj = replace(
+            settings,
+            cst_filename=Path(savednewcstpath).name,
+            project_digest=project_digest,
+            digest_algorithm="sha256",
+            cells_per_wavelength=int(mesh_cells_per_wavelength),
+        ).to_parser()
         self.logger.info("Config内容更新完成")
         return confobj
 
     def updateTaskStatus(self, taskstatus):
-        self.conf.set("TASK", "status", taskstatus.name)
+        settings = getattr(self, "settings", None) or ProjectSettings.from_parser(
+            self.conf
+        )
+        self.settings = replace(settings, task_status=taskstatus.name)
+        self.conf = self.settings.to_parser()
         self.__savecfgobj(self.conf)
         self.logger.info("PCM:项目状态已设为%s" % taskstatus.name)
         return taskstatus
 
     def printConfInfo(self, confobj, projectDir):
+        settings = ProjectSettings.from_parser(confobj)
         self.logger.info("项目信息:")
-        self.logger.info("ProjectName:%s" % confobj["PROJECT"]["ProjectName"])
+        self.logger.info("ProjectName:%s", settings.name)
+        self.logger.info("ProjectDescription:%s", settings.description)
+        self.logger.info("项目result目录:%s", settings.directories.result)
+        self.logger.info("项目temp目录:%s", settings.directories.temp)
+        self.logger.info("CST文件名:%s", settings.cst_filename)
         self.logger.info(
-            "ProjectDescription:%s" % confobj["PROJECT"]["ProjectDescription"]
+            "CST工程摘要(%s):%s",
+            settings.digest_algorithm,
+            settings.project_digest,
         )
-        self.logger.info("项目result目录:%s" % confobj["DIRS"]["resultdir"])
-        self.logger.info("项目temp目录:%s" % confobj["DIRS"]["tempdir"])
-        self.logger.info("CST文件名:%s" % confobj["CST"]["CSTFilename"])
-        self.logger.info("CSTFileMD5:%s" % confobj["CST"]["CSTFileMD5"])
-        self.logger.info("使用MPI:%s" % confobj["CST"]["UseMpi"])
-        self.logger.info("MPI节点文件:%s" % confobj["CST"]["MpiNodeList"])
-        self.logger.info(
-            "UseRemoteCalculaton:%s" % confobj["CST"]["UseRemoteCalculaton"]
-        )
-        self.logger.info(
-            "DCMainControlAddress:%s" % confobj["CST"]["DCMainControlAddress"]
-        )
-        self.logger.info("参数列表文件:%s" % confobj["PARAMETERS"]["paramfile"])
+        self.logger.info("使用MPI:%s", settings.use_mpi)
+        self.logger.info("MPI节点文件:%s", settings.mpi_node_list)
+        self.logger.info("使用远程计算:%s", settings.use_remote_calculation)
+        self.logger.info("控制器地址:%s", settings.dc_main_control_address)
+        self.logger.info("参数列表文件:%s", settings.parameter_file)
         self.printParamsInfo(confobj, projectDir)
 
     def printParamsInfo(self, confobj, projectDir):
 
-        paramfile = projectDir / confobj["PARAMETERS"]["paramfile"]
-        with Path(paramfile).open("r", encoding="utf-8") as stream:
-            pamlist = json.load(stream)
+        paramfile = projectDir / ProjectSettings.from_parser(confobj).parameter_file
+        pamlist = read_json(paramfile)
         print(pamlist)
 
     def getParamsList(self):
@@ -326,7 +308,7 @@ class ProjectConfigManager:
 
     def __getParamsList(self, confobj, projectDir, jsonpath=None):
         """从生成的json读取Model结构参数列表 read model parameters from json filepath
-            
+
         Parameters
         ----------
         jsonpath : string
@@ -337,18 +319,25 @@ class ProjectConfigManager:
 
         """
         if jsonpath == None:
-            paramfile = projectDir / confobj["PARAMETERS"]["paramfile"]
+            paramfile = projectDir / ProjectSettings.from_parser(confobj).parameter_file
         else:
             paramfile = jsonpath
-        with Path(paramfile).open("r", encoding="utf-8") as stream:
-            return json.load(stream)
+        return read_json(paramfile)
 
-    def genMD5FromCST(self, cstfilepath):
-        file_md5 = hashlib.md5()
+    def file_digest(self, cstfilepath, algorithm="sha256"):
+        digest = hashlib.new(algorithm)
         with Path(cstfilepath).open("rb") as stream:
             for block in iter(lambda: stream.read(1024 * 1024), b""):
-                file_md5.update(block)
-        return file_md5
+                digest.update(block)
+        return digest.hexdigest()
+
+    def genMD5FromCST(self, cstfilepath):
+        """Compatibility adapter for callers that still expect a hash object."""
+        digest = hashlib.md5()
+        with Path(cstfilepath).open("rb") as stream:
+            for block in iter(lambda: stream.read(1024 * 1024), b""):
+                digest.update(block)
+        return digest
 
     def _preprocess_cst_project(
         self,
@@ -359,6 +348,7 @@ class ProjectConfigManager:
         mesh_cells_per_wavelength=20,
     ):
         """Create and validate a prepared project without modifying its source."""
+        settings = ProjectSettings.from_parser(confobj)
         if savejsonpath is None:
             jsonpath = projectDir / self.paramsfilename
         else:
@@ -366,23 +356,21 @@ class ProjectConfigManager:
             if not jsonpath.is_absolute():
                 jsonpath = projectDir / jsonpath
 
-        td = Path(confobj["DIRS"]["tempdir"])
+        td = settings.directories.temp
         if not td.is_absolute():
             td = projectDir / td
-        source_project = (
-            Path(projectDir).absolute() / confobj["CST"]["CSTFilename"]
-        )
+        source_project = Path(projectDir).absolute() / settings.cst_filename
         candidate = Path(projectDir).absolute() / "processed.cst"
         suffix = 1
         while candidate.exists() or candidate == source_project:
             candidate = Path(projectDir).absolute() / f"processed_{suffix}.cst"
             suffix += 1
         macro_template = (
-            resource_path(self.gconf["BASE"]["datadir"])
+            resource_path(self.global_settings.directories.data)
             / "preprocess_hom_parameters_v1.vb"
         )
         preprocessor = CstProjectPreprocessor(
-            self.gconf["CST"]["cstexepath"],
+            self.global_settings.cst.executable,
             macro_template,
             logger=self.logger,
         )
@@ -401,12 +389,15 @@ class ProjectConfigManager:
         return result.project_path
 
     def _validate_fixed_mesh(self, requested_cells):
-        if not self.conf.has_section("MESH"):
+        if not (self.conf.has_section("mesh") or self.conf.has_section("MESH")):
             self.logger.warning(
                 "旧项目未记录固定网格设置；保持工程现状，不在恢复时修改 mesh"
             )
             return
-        configured_cells = self.conf.getint("MESH", "CellsPerWavelength")
+        settings = getattr(self, "settings", None) or ProjectSettings.from_parser(
+            self.conf
+        )
+        configured_cells = settings.cells_per_wavelength
         if configured_cells != int(requested_cells):
             raise ProjectStatusError(
                 "固定网格每波长单元数与已有项目不一致；请新建项目以更改 mesh"
@@ -429,10 +420,10 @@ class ProjectConfigManager:
             self.logger.error("未找到配置文件%s\n" % str(cfgpath))
             self.logger.info("测试项目配置文件存在 失败")
             result = False
-        self.conf.clear()
-        self.conf.read(cfgpath)
+        self.conf = read_ini(cfgpath)
+        self.settings = ProjectSettings.from_parser(self.conf)
         self.logger.info("测试CST模型文件是否存在")
-        cstfilepath = self.currProjectDir / self.conf["CST"]["CSTFilename"]
+        cstfilepath = self.currProjectDir / self.settings.cst_filename
         self.logger.debug("推测模型文件位于%s", str(cstfilepath))
         if cstfilepath.exists():
             self.logger.info("测试CST模型文件存在 通过")
@@ -441,24 +432,25 @@ class ProjectConfigManager:
             self.logger.error("未找到cst文件%s\n" % str(cstfilepath))
             self.logger.info("测试CST模型文件存在 失败")
             result = False
-        currCSTMD5 = self.genMD5FromCST(cstfilepath).hexdigest()
-        savedCSTMD5 = self.conf["CST"]["CSTFileMD5"]
-        self.logger.info("测试保存的参数列表与MD5是否与CST模型文件匹配")
-        paramjsonpath = self._rap2apo(self.conf["PARAMETERS"]["paramfile"])
-        ppsjsonpath = self._rap2apo(self.conf["PARAMETERS"]["ppsfile"])
-        if currCSTMD5 != savedCSTMD5:
+        current_digest = self.file_digest(cstfilepath, self.settings.digest_algorithm)
+        saved_digest = self.settings.project_digest
+        self.logger.info("测试参数列表与CST工程摘要是否匹配")
+        paramjsonpath = self._rap2apo(self.settings.parameter_file)
+        ppsjsonpath = self._rap2apo(self.settings.postprocess_file)
+        if current_digest != saved_digest:
             self.logger.warning(
-                "记录的CST文件MD5_%s与实际的MD5_%s不一致，已被修改" % (savedCSTMD5, currCSTMD5)
+                "记录的CST工程摘要%s与实际摘要%s不一致，已被修改",
+                saved_digest,
+                current_digest,
             )
 
-            self.logger.warning("重新生成参数列表并保存MD5n/y")
+            self.logger.warning("重新生成参数列表并保存工程摘要")
             self.logger.info("正在重新生成参数列表")
             self.conf = self.__autoPreProcess(self.conf, cstfilepath)
             # self.readParametersFromCST()
-            # self.conf["CST"]["CSTFileMD5"] = currCSTMD5
             self.__savecfgobj(self.conf)
-            self.logger.warning("已更新保存的MD5")
-            self.logger.info("测试MD5 通过")
+            self.logger.warning("已更新保存的工程摘要")
+            self.logger.info("工程摘要测试通过")
         elif not paramjsonpath.exists():
             self.logger.warning("参数列表文件_%s不存在" % str(paramjsonpath))
 
@@ -491,9 +483,9 @@ class ProjectConfigManager:
             self.logger.info("测试项目配置文件 失败")
             result = False
 
-        self.conf.clear()
-        self.conf.read(cfgpath)
-        cstfilepath = self.currProjectDir / self.conf["CST"]["CSTFilename"]
+        self.conf = read_ini(cfgpath)
+        self.settings = ProjectSettings.from_parser(self.conf)
+        cstfilepath = self.currProjectDir / self.settings.cst_filename
         self.logger.info("测试CST模型文件是否存在")
         self.logger.debug("推测模型文件位于%s", str(cstfilepath))
         if cstfilepath.exists():
@@ -503,22 +495,24 @@ class ProjectConfigManager:
             self.logger.error("未找到cst模型文件%s\n" % str(cstfilepath))
             self.logger.info("测试CST模型文件 失败")
             result = False
-        currCSTMD5 = self.genMD5FromCST(cstfilepath).hexdigest()
-        savedCSTMD5 = self.conf["CST"]["CSTFileMD5"]
-        self.logger.info("测试保存的MD5是否与CST模型文件匹配")
-        paramjsonpath = self._rap2apo(self.conf["PARAMETERS"]["paramfile"])
-        if currCSTMD5 != savedCSTMD5:
+        current_digest = self.file_digest(cstfilepath, self.settings.digest_algorithm)
+        saved_digest = self.settings.project_digest
+        self.logger.info("测试保存的工程摘要是否与CST模型文件匹配")
+        paramjsonpath = self._rap2apo(self.settings.parameter_file)
+        if current_digest != saved_digest:
             self.logger.warning(
-                "记录的CST文件MD5%s与实际的%s不一致，已被修改" % (savedCSTMD5, currCSTMD5)
+                "记录的CST工程摘要%s与实际的%s不一致，已被修改",
+                saved_digest,
+                current_digest,
             )
-            self.logger.info("测试MD5 失败")
+            self.logger.info("工程摘要测试失败")
             result = False
         elif not paramjsonpath.exists():
             self.logger.warning("参数列表文件_%s不存在" % str(paramjsonpath))
             result = False
         else:
-            self.logger.info("测试MD5 通过")
-        ppsjsonpath = self._rap2apo(self.conf["PARAMETERS"]["ppsfile"])
+            self.logger.info("工程摘要测试通过")
+        ppsjsonpath = self._rap2apo(self.settings.postprocess_file)
         if not ppsjsonpath.exists():
             self.logger.warning("后处理设置文件_%s不存在" % str(ppsjsonpath))
             result = False
@@ -534,13 +528,13 @@ class ProjectConfigManager:
         return ilist
 
     def readPPSList(self):
-        ppspath = self.currProjectDir / self.conf.get("PARAMETERS", "ppsfile")
+        settings = self.settings or ProjectSettings.from_parser(self.conf)
+        ppspath = self.currProjectDir / settings.postprocess_file
         return self.readPPSListFromFile(ppspath)
 
     def readPPSListFromFile(self, ppspath):
         try:
-            with Path(ppspath).open("r", encoding="utf-8") as stream:
-                result = json.load(stream)
+            result = read_json(ppspath)
             if not isinstance(result, list):
                 raise ValueError("postprocess configuration must be a list")
             return result
@@ -549,17 +543,10 @@ class ProjectConfigManager:
             return []
 
     def savePPSSettings(self, ppslist):
-        ppspath = self.currProjectDir / self.conf.get("PARAMETERS", "ppsfile")
+        settings = self.settings or ProjectSettings.from_parser(self.conf)
+        ppspath = self.currProjectDir / settings.postprocess_file
         try:
-            with tempfile.NamedTemporaryFile(
-                "w",
-                encoding="utf-8",
-                dir=ppspath.parent,
-                delete=False,
-            ) as stream:
-                json.dump(ppslist, stream, ensure_ascii=False, indent=4)
-                temporary = Path(stream.name)
-            os.replace(temporary, ppspath)
+            write_json_atomic(ppspath, ppslist)
             self.logger.info("后处理设定已保存至%s" % str(ppspath))
             return True
         except (OSError, TypeError, ValueError) as exc:
@@ -569,4 +556,3 @@ class ProjectConfigManager:
 
 # Compatibility alias for callers using the historical spelling.
 ProjectConfmanager = ProjectConfigManager
-

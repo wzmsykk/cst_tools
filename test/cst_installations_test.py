@@ -11,11 +11,7 @@ from csttool.globalconfmanager import GlobalConfmanager
 
 
 def make_installation(root, version):
-    executable = (
-        root
-        / f"CST Studio Suite {version}"
-        / "CST DESIGN ENVIRONMENT.exe"
-    )
+    executable = root / f"CST Studio Suite {version}" / "CST DESIGN ENVIRONMENT.exe"
     executable.parent.mkdir(parents=True)
     executable.touch()
     return executable
@@ -70,5 +66,5 @@ def test_global_config_accepts_new_versions_and_persists_selection(tmp_path):
     assert manager.checkCSTENVConfig() is True
     reloaded = configparser.ConfigParser()
     reloaded.read(config_path)
-    assert reloaded["CST"]["cstver"] == "2026"
-    assert reloaded["CST"]["cstexepath"] == str(new_executable.resolve())
+    assert reloaded["cst"]["version"] == "2026"
+    assert reloaded["cst"]["executable"] == str(new_executable.resolve())
