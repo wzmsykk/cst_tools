@@ -246,6 +246,16 @@ class ManagedCSTWorker:
                 "interval_lo": self._progress_number(params.get("fmin")),
                 "interval_hi": self._progress_number(params.get("fmax")),
             }
+            started_at = time.monotonic()
+            self.logger.info(
+                "WORKER_TASK_DISPATCH worker=%s session=%s task=%s job=%s fmin=%s fmax=%s",
+                self.ID,
+                self.session_id,
+                task.task_id,
+                resultname,
+                params.get("fmin"),
+                params.get("fmax"),
+            )
             self.marker_path.write_text(
                 f"dispatched:{task.task_id}", encoding="ascii"
             )
@@ -279,6 +289,15 @@ class ManagedCSTWorker:
                 )
                 self._wait_for_marker("ready", self.START_TIMEOUT)
                 self._active_task_context = {}
+            log_method = self.logger.info if status == "Success" else self.logger.error
+            log_method(
+                "WORKER_TASK_COMPLETE worker=%s task=%s status=%s elapsed_seconds=%.3f failure=%s",
+                self.ID,
+                task.task_id,
+                status,
+                time.monotonic() - started_at,
+                failure or "none",
+            )
             return {
                 "WorkerID": self.ID,
                 "TaskStatus": status,
@@ -324,6 +343,12 @@ class ManagedCSTWorker:
                 self._close_log()
                 return True
             self._stopping = True
+            self.logger.info(
+                "WORKER_STOP_REQUEST worker=%s session=%s pid=%s",
+                self.ID,
+                self.session_id,
+                getattr(self._process, "pid", None),
+            )
             if not self.stop_request_path.exists():
                 self.protocol.request_stop(self.session_id)
             deadline = time.monotonic() + self.STOP_TIMEOUT
@@ -334,6 +359,9 @@ class ManagedCSTWorker:
                     except subprocess.TimeoutExpired:
                         break
                     self._close_log()
+                    self.logger.info(
+                        "WORKER_STOPPED worker=%s session=%s", self.ID, self.session_id
+                    )
                     return True
                 if self._process.poll() is not None:
                     break

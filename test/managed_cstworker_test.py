@@ -12,6 +12,7 @@ from csttool.postprocess_cst import VBPostProcessor
 
 def build_worker_shell(tmp_path):
     worker = object.__new__(ManagedCSTWorker)
+    worker.logger = logging.getLogger("managed-worker-test")
     worker.project_path = tmp_path / "worker-input.cst"
     worker.session_id = "11111111-1111-4111-8111-111111111111"
     worker.task_path = tmp_path / "protocol" / "current.task"

@@ -130,3 +130,8 @@ class CstApplicationService:
 
     def add_progress_listener(self, listener) -> None:
         self._backend.add_progress_listener(listener)
+
+    def close_logging(self) -> None:
+        close = getattr(self._backend, "close_logging", None)
+        if close is not None:
+            close()

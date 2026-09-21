@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from enum import Enum, auto
+from datetime import datetime
 import os
 import threading
 import time
@@ -69,11 +70,14 @@ class CstApplicationBackend:
         self._project_run_lock = None
 
         if application_logger is None:
-            timestamp = time.strftime("%Y-%m-%d-%H_%M_%S", time.localtime())
+            timestamp = datetime.now().strftime("%Y-%m-%d-%H_%M_%S_%f")
             os.makedirs(r".\log", exist_ok=True)
             self.log_path = rf"log\base_{timestamp}.log"
-            self._log_owner = logger.Logger(self.log_path, level="debug")
-            self.logger = self._log_owner.getLogger()
+            self._log_owner = logger.ApplicationLogSession(
+                self.log_path,
+                level="debug",
+            )
+            self.logger = self._log_owner.logger
             self.logger.info("日志已输出到%s", self.log_path)
         else:
             self.log_path = None
@@ -162,7 +166,8 @@ class CstApplicationBackend:
         self.worker_count = worker_count
         self.alg.set_resume(self.resume)
         self.logger.info(
-            "BACKEND: resume=%s, worker_count=%d",
+            "RUN_INITIALIZE project=%s resume=%s workers=%d",
+            self.get_project_directory(),
             self.resume,
             self.worker_count,
         )
@@ -185,6 +190,7 @@ class CstApplicationBackend:
         self._require_state("prepare run", BackendState.INITIALIZED)
         try:
             self._acquire_project_run_lock()
+            self.logger.info("RUN_PREPARE project=%s", self.get_project_directory())
             self.pconfman.prepareProject(self.resume)
             unresolved = self.get_recovery_sessions()
             if unresolved:
@@ -218,12 +224,15 @@ class CstApplicationBackend:
                 raise
             raise BackendPreparationError("运行配置准备失败") from exc
         self._set_state(BackendState.PREPARED)
+        self.logger.info("RUN_PREPARED workers=%d", self.worker_count)
 
     def execute_run(self):
         self._require_state("execute run", BackendState.PREPARED)
         self._set_state(BackendState.RUNNING)
         failure = None
         result = None
+        started_at = time.monotonic()
+        self.logger.info("RUN_EXECUTE_START project=%s", self.get_project_directory())
         try:
             self._update_task_status(projectconfmanager.TaskStatus.RUNNING)
             if self.alg is None:
@@ -271,6 +280,10 @@ class CstApplicationBackend:
                     self._release_project_run_lock()
 
         self._set_state(BackendState.STOPPED)
+        self.logger.info(
+            "RUN_EXECUTE_DONE elapsed_seconds=%.3f",
+            time.monotonic() - started_at,
+        )
         return result
 
     def request_stop(self) -> None:
@@ -283,6 +296,7 @@ class CstApplicationBackend:
                 self.state = BackendState.STOPPING
                 accepted = True
         if accepted:
+            self.logger.info("RUN_STOP_REQUESTED project=%s", self.get_project_directory())
             self._update_task_status(projectconfmanager.TaskStatus.STOP_REQUESTED)
         try:
             manager = self.jm
@@ -319,6 +333,7 @@ class CstApplicationBackend:
         except BackendPreparationError as exc:
             raise BackendLifecycleError(str(exc)) from exc
         try:
+            self.logger.info("RECOVERY_START project=%s", project_directory)
             recovered = recover_project_sessions(project_directory)
         finally:
             self._release_project_run_lock()
@@ -398,14 +413,29 @@ class CstApplicationBackend:
         try:
             lease.acquire()
         except ProjectRunBusyError as exc:
+            self.logger.warning(
+                "PROJECT_LOCK_BUSY project=%s reason=%s", project_directory, exc
+            )
             raise BackendPreparationError(str(exc)) from exc
         self._project_run_lock = lease
+        self.logger.info(
+            "PROJECT_LOCK_ACQUIRED project=%s pid=%d",
+            project_directory,
+            lease.owner.process_id,
+        )
 
     def _release_project_run_lock(self) -> None:
         lease = self._project_run_lock
         self._project_run_lock = None
         if lease is not None:
             lease.release()
+            self.logger.info(
+                "PROJECT_LOCK_RELEASED project=%s", self.get_project_directory()
+            )
+
+    def close_logging(self) -> None:
+        if self._log_owner is not None:
+            self._log_owner.close()
 
     def _project_owned_elsewhere(self) -> bool:
         project_directory = self.get_project_directory()

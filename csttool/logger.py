@@ -1,68 +1,135 @@
+"""Application logging configuration built on the Python standard library."""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
 import logging
-from logging import handlers
+from logging.handlers import TimedRotatingFileHandler
+from pathlib import Path
+import os
+from uuid import uuid4
 
 
-class sys_print_obj(object):
-    def __init__(self):
-        pass
-
-    def info(self, str):
-        print("(info) %s", str)
-
-    def warning(self, str):
-        print("(warning) %s", str)
-
-    def debug(self, str):
-        print("(debug) %s", str)
-
-    def error(self, str):
-        print("(error) %s", str)
+DEFAULT_FORMAT = (
+    "%(asctime)s | %(levelname)-8s | %(threadName)s | %(name)s | %(message)s"
+)
 
 
-class P_Logger(object):
-    def __init__(self):
-        self.logger = sys_print_obj()
+def _coerce_level(level: str | int) -> int:
+    if isinstance(level, int):
+        return level
+    value = logging.getLevelName(str(level).upper())
+    if not isinstance(value, int):
+        raise ValueError(f"unknown logging level: {level!r}")
+    return value
 
-    
-class Logger(object):
-    level_relations = {
-        "debug": logging.DEBUG,
-        "info": logging.INFO,
-        "warning": logging.WARNING,
-        "error": logging.ERROR,
-        "crit": logging.CRITICAL,
-    }  # 日志级别关系映射
-    #%(pathname)s[line:%(lineno)d]
+
+@dataclass(frozen=True, slots=True)
+class LoggingConfig:
+    path: Path
+    level: str | int = logging.INFO
+    console: bool = True
+    when: str = "midnight"
+    backup_count: int = 7
+    format: str = DEFAULT_FORMAT
+
+
+class ApplicationLogSession:
+    """Own the handlers for one application logging session."""
+
     def __init__(
         self,
-        filename,
-        level="info",
-        when="D",
-        backCount=3,
-        fmt="%(asctime)s - %(levelname)s: %(message)s",
-        console=True,
-    ):
-        self.logger = logging.getLogger("main")
-        format_str = logging.Formatter(fmt)  # 设置日志格式
-        self.logger.setLevel(self.level_relations.get(level))  # 设置日志级别
-        self.console=console
-        sh = logging.StreamHandler()  # 往屏幕上输出W
-        sh.setFormatter(format_str)  # 设置屏幕上显示的格式
-        th = handlers.TimedRotatingFileHandler(
-            filename=filename, when=when, backupCount=backCount, encoding="utf-8"
-        )  # 往文件里写入#指定间隔时间自动生成文件的处理器
-        # 实例化TimedRotatingFileHandler
-        # interval是时间间隔，backupCount是备份文件的个数，如果超过这个个数，就会自动删除，when是间隔的时间单位，单位有以下几种：
-        # S 秒
-        # M 分
-        # H 小时、
-        # D 天、
-        # W 每星期（interval==0时代表星期一）
-        # midnight 每天凌晨
-        th.setFormatter(format_str)  # 设置文件里写入的格式
-        self.logger.addHandler(sh)  # 把对象加到logger里
-        if self.console:
-            self.logger.addHandler(th)
+        path: str | Path,
+        *,
+        level: str | int = "info",
+        console: bool = True,
+        when: str = "midnight",
+        backup_count: int = 7,
+        format_string: str = DEFAULT_FORMAT,
+        name: str | None = None,
+    ) -> None:
+        config = LoggingConfig(
+            path=Path(path),
+            level=level,
+            console=console,
+            when=when,
+            backup_count=backup_count,
+            format=format_string,
+        )
+        config.path.parent.mkdir(parents=True, exist_ok=True)
+        logger_name = name or f"cst_tools.session.{os.getpid()}.{uuid4().hex[:8]}"
+        self.logger = logging.getLogger(logger_name)
+        self.logger.setLevel(_coerce_level(config.level))
+        self.logger.propagate = False
+        self._handlers: list[logging.Handler] = []
 
-    def getLogger(self):
+        formatter = logging.Formatter(config.format)
+        file_handler = TimedRotatingFileHandler(
+            filename=config.path,
+            when=config.when,
+            backupCount=config.backup_count,
+            encoding="utf-8",
+            delay=True,
+        )
+        file_handler.setFormatter(formatter)
+        self._add_handler(file_handler)
+
+        if config.console:
+            console_handler = logging.StreamHandler()
+            console_handler.setFormatter(formatter)
+            self._add_handler(console_handler)
+
+        self._closed = False
+
+    def _add_handler(self, handler: logging.Handler) -> None:
+        handler.setLevel(self.logger.level)
+        self.logger.addHandler(handler)
+        self._handlers.append(handler)
+
+    def getLogger(self) -> logging.Logger:
         return self.logger
+
+    def close(self) -> None:
+        if self._closed:
+            return
+        for handler in self._handlers:
+            self.logger.removeHandler(handler)
+            handler.close()
+        self._handlers.clear()
+        self._closed = True
+
+    def __enter__(self) -> logging.Logger:
+        return self.logger
+
+    def __exit__(self, exc_type, exc_value, traceback) -> None:
+        self.close()
+
+
+class Logger(ApplicationLogSession):
+    """Compatibility adapter for the historical constructor and ``getLogger`` API."""
+
+    def __init__(
+        self,
+        filename: str | Path,
+        level: str | int = "info",
+        when: str = "midnight",
+        backCount: int = 7,
+        fmt: str = DEFAULT_FORMAT,
+        console: bool = True,
+        *,
+        name: str | None = None,
+    ) -> None:
+        super().__init__(
+            filename,
+            level=level,
+            console=console,
+            when=when,
+            backup_count=backCount,
+            format_string=fmt,
+            name=name,
+        )
+
+
+def get_logger(name: str) -> logging.Logger:
+    """Return a library logger without configuring global logging."""
+    return logging.getLogger(name)

@@ -16,6 +16,7 @@ from queue import Empty, Queue
 from threading import RLock
 from typing import Any, Callable, Iterable, Mapping, Protocol
 import warnings
+import time
 
 from install_compat import resource_path
 
@@ -157,6 +158,12 @@ class CSTManager:
             thread_name_prefix="cst-worker",
         )
         self._start_initial_workers()
+        self.logger.info(
+            "MANAGER_READY project=%s workers=%d max_jobs_per_worker=%d",
+            self.currProjectDir,
+            self.maxParallelTasks,
+            self.maxWorkerJobCountLimit,
+        )
 
     def _project_path(self, configured_path: str) -> Path:
         path = Path(configured_path)
@@ -314,6 +321,13 @@ class CSTManager:
             sequence = self._next_sequence
             self._next_sequence += 1
             self._task_queue.put(_QueuedTask(sequence, task))
+            self.logger.info(
+                "TASK_QUEUED sequence=%d job=%s retries=%d continue_snapshot=%s",
+                sequence,
+                task.job_name,
+                task.retry_count,
+                task.continue_from_snapshot,
+            )
             return sequence
 
     def addTask(self, params: Mapping[str, Any], job_name: str, retry_cnt: int = 0) -> int:
@@ -388,6 +402,8 @@ class CSTManager:
 
     def _execute_task(self, slot: _WorkerSlot, task: SimulationTask) -> dict:
         result: dict[str, Any] | None = None
+        started_at = time.monotonic()
+        self.logger.info("TASK_START worker=%s job=%s", slot.worker_id, task.job_name)
         for attempt in range(task.retry_count + 1):
             try:
                 result = slot.worker.runWithParam(
@@ -410,6 +426,14 @@ class CSTManager:
                     with self._state_lock:
                         self._confirmed_snapshot = snapshot
                 slot.completed_jobs += 1
+                self.logger.info(
+                    "TASK_DONE worker=%s job=%s status=%s attempt=%d elapsed_seconds=%.3f",
+                    slot.worker_id,
+                    task.job_name,
+                    result.get("TaskStatus", "Success"),
+                    attempt + 1,
+                    time.monotonic() - started_at,
+                )
                 return result
 
             self.logger.warning(
@@ -428,6 +452,13 @@ class CSTManager:
                 break
 
         assert result is not None
+        self.logger.error(
+            "TASK_DONE worker=%s job=%s status=Failure attempts=%d elapsed_seconds=%.3f",
+            slot.worker_id,
+            task.job_name,
+            task.retry_count + 1,
+            time.monotonic() - started_at,
+        )
         return result
 
     def _drain_tasks(self, slot: _WorkerSlot) -> None:
@@ -465,6 +496,7 @@ class CSTManager:
                 return
             self._state = ManagerState.RUNNING
             slots = [slot for slot in self._slots if slot.state is WorkerState.ALIVE]
+            queued_count = self._task_queue.qsize()
 
         if not slots:
             with self._state_lock:
@@ -472,6 +504,10 @@ class CSTManager:
             raise RuntimeError("No live CST workers are available")
 
         futures: list[Future[None]] = []
+        started_at = time.monotonic()
+        self.logger.info(
+            "BATCH_START tasks=%d live_workers=%d", queued_count, len(slots)
+        )
         try:
             futures = [self._executor.submit(self._drain_tasks, slot) for slot in slots]
             for future in futures:
@@ -480,6 +516,12 @@ class CSTManager:
             with self._state_lock:
                 if self._state is ManagerState.RUNNING:
                     self._state = ManagerState.IDLE
+            self.logger.info(
+                "BATCH_DONE tasks=%d elapsed_seconds=%.3f state=%s",
+                queued_count,
+                time.monotonic() - started_at,
+                self.state.name,
+            )
 
     def synchronize(self) -> None:
         """Compatibility no-op: ``startProcessing`` is already blocking."""
@@ -544,6 +586,7 @@ class CSTManager:
                 return
             self._state = ManagerState.STOPPING
             slots = list(self._slots)
+        self.logger.info("MANAGER_STOP_START workers=%d", len(slots))
 
         def stop_slot(slot: _WorkerSlot):
             try:
@@ -571,7 +614,7 @@ class CSTManager:
         with self._state_lock:
             self._slots.clear()
             self._state = ManagerState.CLOSED
-        self.logger.info("CSTManager stopped")
+        self.logger.info("MANAGER_STOPPED workers=%d errors=%d", len(slots), len(stop_errors))
         if stop_errors:
             raise RuntimeError(
                 f"{len(stop_errors)} CST worker(s) did not stop cleanly"

@@ -57,9 +57,15 @@ class QPlainTextEditLogger(logging.Handler):
         self.widget.setReadOnly(True)
         self._emitter = _LogEmitter()
         self._emitter.message.connect(self.widget.appendPlainText)
+        self.setFormatter(
+            logging.Formatter("%(asctime)s | %(levelname)s | %(message)s", "%H:%M:%S")
+        )
 
     def emit(self, record):
-        self._emitter.message.emit(self.format(record))
+        try:
+            self._emitter.message.emit(self.format(record))
+        except Exception:
+            self.handleError(record)
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -153,6 +159,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             return
         self.logger.info("主窗口被用户关闭")
         self.logger.removeHandler(self.logTextBox)
+        self.logTextBox.close()
+        self.service.close_logging()
         event.accept()
 
     def setSignalNSlots(self):
