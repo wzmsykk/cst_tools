@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>532</width>
-    <height>344</height>
+    <height>410</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -93,7 +93,7 @@
      <x>20</x>
      <y>100</y>
      <width>521</width>
-     <height>101</height>
+     <height>170</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -102,6 +102,16 @@
    <property name="frameShadow">
     <enum>QFrame::Raised</enum>
    </property>
+   <widget class="QLabel" name="axisLabel">
+    <property name="text">
+     <string>积分轴</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="axisComboBox">
+    <item><property name="text"><string>X 轴</string></property></item>
+    <item><property name="text"><string>Y 轴</string></property></item>
+    <item><property name="text"><string>Z 轴</string></property></item>
+   </widget>
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
@@ -176,6 +186,21 @@
       <height>31</height>
      </rect>
     </property>
+    <property name="text">
+     <string>mm</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="zoffsetLabel">
+    <property name="text">
+     <string>z offset</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="zoffsetEdit">
+    <property name="text">
+     <string>0</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="zoffsetUnitLabel">
     <property name="text">
      <string>mm</string>
     </property>

@@ -136,13 +136,18 @@ class AddPostProcessDialog(QDialog, Ui_AddComplexPostDialog):
         self.ModeIndexEdit.setValidator(QIntValidator(1, 999999, self))
         self.xoffsetEdit.setValidator(QDoubleValidator(self))
         self.yoffsetEdit.setValidator(QDoubleValidator(self))
+        self.zoffsetEdit.setValidator(QDoubleValidator(self))
+        for index, axis in enumerate(("x", "y", "z")):
+            self.axisComboBox.setItemData(index, axis)
+        self.axisComboBox.setCurrentIndex(2)
+        self.axisComboBox.currentIndexChanged.connect(self._sync_axis_offset)
         self.reset()
         self._install_responsive_layout()
         self.buttonBox.accepted.disconnect()
         self.buttonBox.accepted.connect(self.accept)
 
     def _install_responsive_layout(self):
-        self.setMinimumSize(520, 380)
+        self.setMinimumSize(520, 440)
         layout = QVBoxLayout(self)
         layout.setContentsMargins(26, 22, 26, 20)
         layout.setSpacing(14)
@@ -153,12 +158,17 @@ class AddPostProcessDialog(QDialog, Ui_AddComplexPostDialog):
         layout.addLayout(result_row)
         advanced = QGridLayout(self.AdvSettingframe)
         advanced.setContentsMargins(14, 12, 14, 12)
-        advanced.addWidget(self.label, 0, 0)
-        advanced.addWidget(self.xoffsetEdit, 0, 1)
-        advanced.addWidget(self.label_5, 0, 2)
-        advanced.addWidget(self.label_2, 1, 0)
-        advanced.addWidget(self.yoffsetEdit, 1, 1)
-        advanced.addWidget(self.label_6, 1, 2)
+        advanced.addWidget(self.axisLabel, 0, 0)
+        advanced.addWidget(self.axisComboBox, 0, 1, 1, 2)
+        advanced.addWidget(self.label, 1, 0)
+        advanced.addWidget(self.xoffsetEdit, 1, 1)
+        advanced.addWidget(self.label_5, 1, 2)
+        advanced.addWidget(self.label_2, 2, 0)
+        advanced.addWidget(self.yoffsetEdit, 2, 1)
+        advanced.addWidget(self.label_6, 2, 2)
+        advanced.addWidget(self.zoffsetLabel, 3, 0)
+        advanced.addWidget(self.zoffsetEdit, 3, 1)
+        advanced.addWidget(self.zoffsetUnitLabel, 3, 2)
         advanced.setColumnStretch(1, 1)
         layout.addWidget(self.AdvSettingframe)
         mode_row = QHBoxLayout()
@@ -175,12 +185,27 @@ class AddPostProcessDialog(QDialog, Ui_AddComplexPostDialog):
         self.data.clear()
         self.xoffsetEdit.setText("0")
         self.yoffsetEdit.setText("0")
+        self.zoffsetEdit.setText("0")
+        self.axisComboBox.setCurrentIndex(2)
         self.ModeIndexEdit.setText("1")
         self.resultNameEdit.setText("default")
 
     def setComplexMode(self, isComplex):
         self.complexMode = bool(isComplex)
         self.AdvSettingframe.setEnabled(self.complexMode)
+        self._sync_axis_offset()
+
+    def _sync_axis_offset(self):
+        axis = self.axisComboBox.currentData()
+        for name, editor in {
+            "x": self.xoffsetEdit,
+            "y": self.yoffsetEdit,
+            "z": self.zoffsetEdit,
+        }.items():
+            on_axis = name == axis
+            if on_axis:
+                editor.setText("0")
+            editor.setEnabled(self.complexMode and not on_axis)
 
     def setTargetPPS(self, ppsname=None):
         self.targetPPS = None if ppsname is None else str(ppsname)
@@ -196,12 +221,18 @@ class AddPostProcessDialog(QDialog, Ui_AddComplexPostDialog):
         self.ModeIndexEdit.setText(str(setting.params.get("iModeNumber", 1)))
         self.xoffsetEdit.setText(str(setting.params.get("xoffset", 0)))
         self.yoffsetEdit.setText(str(setting.params.get("yoffset", 0)))
+        self.zoffsetEdit.setText(str(setting.params.get("zoffset", 0)))
+        axis = str(setting.params.get("axis", "z")).lower()
+        self.axisComboBox.setCurrentIndex({"x": 0, "y": 1, "z": 2}[axis])
+        self._sync_axis_offset()
 
     def _build_setting(self):
         params = {"iModeNumber": int(self.ModeIndexEdit.text())}
         if self.complexMode:
+            params["axis"] = self.axisComboBox.currentData()
             params["xoffset"] = float(self.xoffsetEdit.text())
             params["yoffset"] = float(self.yoffsetEdit.text())
+            params["zoffset"] = float(self.zoffsetEdit.text())
         return PostProcessSetting.from_mapping(
             {
                 "resultName": self.resultNameEdit.text(),

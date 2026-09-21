@@ -90,16 +90,26 @@ class PostProcessSetting:
                 raise ValueError(f"{method} 的 Mode Index 必须是正整数")
         base = method[:-4] if method.endswith("_All") else method
         if base in {"R_over_Q", "Shunt_Impedance"}:
-            for key in ("xoffset", "yoffset"):
+            axis = str(normalized.get("axis", "z")).strip().lower()
+            if axis not in {"x", "y", "z"}:
+                raise ValueError(f"{method} 的积分轴必须是 X、Y 或 Z")
+            normalized["axis"] = axis
+            for key in ("xoffset", "yoffset", "zoffset"):
                 try:
-                    normalized[key] = float(normalized[key])
-                except (KeyError, TypeError, ValueError) as exc:
+                    normalized[key] = float(normalized.get(key, 0))
+                except (TypeError, ValueError) as exc:
                     raise ValueError(f"{method} 的 {key} 必须是数字") from exc
+            if normalized[f"{axis}offset"] != 0.0:
+                raise ValueError(f"{method} 沿积分轴 {axis.upper()} 的偏移必须为 0")
         return cls(result_name.strip(), str(method), normalized)
 
     @property
     def display_text(self) -> str:
-        return f"{self.result_name} — {postprocess_display_name(self.method)}"
+        label = postprocess_display_name(self.method)
+        base = self.method[:-4] if self.method.endswith("_All") else self.method
+        if base in {"R_over_Q", "Shunt_Impedance"}:
+            label = f"{label} [{self.params['axis'].upper()}轴]"
+        return f"{self.result_name} — {label}"
 
     def to_backend_payload(self) -> dict[str, Any]:
         return {

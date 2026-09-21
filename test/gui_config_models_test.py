@@ -14,7 +14,11 @@ from GUI.config_models import (
     decode_postprocess_document,
     encode_postprocess_document,
 )
-from GUI.postprocess_settings_dialog import PostProcessListModel, PostProcessSettingsDialog
+from GUI.postprocess_settings_dialog import (
+    AddPostProcessDialog,
+    PostProcessListModel,
+    PostProcessSettingsDialog,
+)
 
 
 @pytest.fixture(scope="module")
@@ -89,6 +93,65 @@ def test_postprocess_uses_stable_key_and_separate_display_name():
     )
     assert setting.method == "Shunt_Impedance"
     assert "Shunt Impedance" in setting.display_text
+    assert "Z轴" in setting.display_text
+
+
+@pytest.mark.parametrize(
+    ("axis", "offsets"),
+    [
+        ("x", {"xoffset": 0, "yoffset": 2, "zoffset": 3}),
+        ("y", {"xoffset": 1, "yoffset": 0, "zoffset": 3}),
+        ("z", {"xoffset": 1, "yoffset": 2, "zoffset": 0}),
+    ],
+)
+def test_complex_postprocess_accepts_xyz_integration_axes(axis, offsets):
+    setting = PostProcessSetting.from_mapping(
+        {
+            "resultName": f"roq_{axis}",
+            "method": "R_over_Q",
+            "params": {"iModeNumber": 1, "axis": axis.upper(), **offsets},
+        }
+    )
+    assert setting.params == {"iModeNumber": 1, "axis": axis, **offsets}
+
+
+def test_complex_postprocess_rejects_offset_along_integration_axis():
+    with pytest.raises(ValueError, match="沿积分轴 X"):
+        PostProcessSetting.from_mapping(
+            {
+                "resultName": "bad",
+                "method": "R_over_Q",
+                "params": {
+                    "iModeNumber": 1,
+                    "axis": "x",
+                    "xoffset": 1,
+                    "yoffset": 0,
+                    "zoffset": 0,
+                },
+            }
+        )
+
+
+def test_complex_postprocess_dialog_selects_axis_and_transverse_offsets(qapp):
+    dialog = AddPostProcessDialog()
+    dialog.setComplexMode(True)
+    dialog.setTargetPPS("R_over_Q")
+    dialog.resultNameEdit.setText("roq_x")
+    dialog.axisComboBox.setCurrentIndex(0)
+    dialog.yoffsetEdit.setText("2")
+    dialog.zoffsetEdit.setText("3")
+
+    assert not dialog.xoffsetEdit.isEnabled()
+    assert dialog.yoffsetEdit.isEnabled()
+    assert dialog.zoffsetEdit.isEnabled()
+    setting = dialog._build_setting()
+    assert setting.params == {
+        "iModeNumber": 1,
+        "axis": "x",
+        "xoffset": 0.0,
+        "yoffset": 2.0,
+        "zoffset": 3.0,
+    }
 
 
 def test_postprocess_model_emits_structural_row_signals(qapp):

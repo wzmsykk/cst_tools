@@ -112,6 +112,8 @@ Profile 验证使用 CST 官方 `ResetTemplateIterator/GetNextTemplate`，比较
 
 官方 `3D Eigenmode Result` 模板本身支持 x/y/z 积分轴，但当前 prepared HOM 工程只注册了 z 轴 0/5/10 mm 三条 R/Q 积分线。未注册的轴或位置继续由 `EigenResult_Complex` 在同一次求解结果上计算；求解后禁止通过工程参数变化驱动模板，因为 `Update Params` 会使结果失效。
 
+GUI 的复杂后处理设置可为 R/Q 和 Shunt Impedance 分别选择 X、Y、Z 积分轴，并输入三个坐标偏移。积分轴自身的偏移固定为 0，另外两个横向坐标可配置；旧 PPS 未声明轴时继续按 Z 轴解释。
+
 ## 6. 尚未完成
 
 - 旧 Worker、Pattern 和队列式 Manager API 已删除；生产只通过显式 Worker 工厂创建 Managed Worker；
