@@ -25,7 +25,6 @@ from typing import List, Set
 from utils.mode_util_sample import findTM020index
 from copy import deepcopy
 import logging
-from .logger import Logger
 
 
 class nsgaii_var:

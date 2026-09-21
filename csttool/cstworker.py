@@ -7,7 +7,6 @@ import hashlib
 import pathlib
 from . import worker
 from . import postprocess_cst,preprocess_cst
-from . import logger
 
 class local_cstworker(worker.worker):
     def __init__(self, id, workerconfig, logger=None, type="CST"):

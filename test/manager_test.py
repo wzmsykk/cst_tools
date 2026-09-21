@@ -7,7 +7,7 @@ from csttool.cstworker import local_cstworker
 from csttool.cstmanager import CSTManager
 from csttool.globalconfmanager import GlobalConfmanager
 from csttool.projectconfmanager import ProjectConfmanager
-from csttool.logger import Logger
+from csttool.logging_config import ApplicationLogSession
 import json
 import pytest
 
@@ -23,10 +23,10 @@ class TestData(unittest.TestCase):
         
 class TestCSTManager(unittest.TestCase):
     def setUp(self) -> None:
-        self.logf=Logger(outputpath / "testmg.log")
-        self.log=self.logf.getLogger()
-        self.gconfman = GlobalConfmanager(configpath=testdatapath / "testconfig.ini",Logger=self.log)
-        self.pconfman = ProjectConfmanager(GlobalConfigManager=self.gconfman,Logger=self.log)
+        self.logf = ApplicationLogSession(outputpath / "testmg.log")
+        self.log = self.logf.logger
+        self.gconfman = GlobalConfmanager(configpath=testdatapath / "testconfig.ini", logger=self.log)
+        self.pconfman = ProjectConfmanager(GlobalConfigManager=self.gconfman, logger=self.log)
         tmpprojdir=outputpath / "testman"
         tmpprojdir.mkdir(exist_ok=True)
         self.pconfman.assignProjectDir(tmpprojdir)
@@ -34,6 +34,10 @@ class TestCSTManager(unittest.TestCase):
         self.pconfman.prepareProject()
         self.cstm=CSTManager(gconfm=self.gconfman,pconfm=self.pconfman,params=None)
         return super().setUp()
+
+    def tearDown(self) -> None:
+        self.logf.close()
+        return super().tearDown()
     
     def test_emptymng(self):
         

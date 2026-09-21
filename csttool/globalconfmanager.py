@@ -10,10 +10,14 @@ from csttool.cst_installations import (
 )
 
 class GlobalConfmanager(object):
-    def __init__(self, configpath=r".\config\current.ini",Logger=None):
+    def __init__(
+        self,
+        configpath=r".\config\current.ini",
+        logger: logging.Logger | None = None,
+    ):
         self.projlist = []
-        if Logger is not None:
-            self.logger = Logger
+        if logger is not None:
+            self.logger = logger
         else:
             self.logger = logging.getLogger(__name__)
         self.conf = configparser.ConfigParser()

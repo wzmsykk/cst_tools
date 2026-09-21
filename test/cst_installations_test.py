@@ -61,7 +61,7 @@ def test_global_config_accepts_new_versions_and_persists_selection(tmp_path):
     config_path = tmp_path / "current.ini"
     write_config(config_path, old_executable, 2022)
     manager = GlobalConfmanager(
-        configpath=config_path, Logger=logging.getLogger("cst-install-test")
+        configpath=config_path, logger=logging.getLogger("cst-install-test")
     )
 
     selected = manager.select_cst_installation(2026, new_executable)

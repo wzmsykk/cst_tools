@@ -165,11 +165,10 @@ class myAlg01():
 
 if __name__ == "__main__":
     logfilepath = r"log\myalgtest.log"
-    import logger
-    glogger = logger.Logger(logfilepath, level="debug")
-    ilogger = glogger.getLogger()
-    isf=sfmanager.manager(workdir="./temp",sfenvpath=r"C:\LANL",logger=ilogger,maxTask=10)
-    callback=fnds_callback_create_Image_dump_fnds("./result")
-    myAlg=myAlg01(isf,logger=ilogger)
-    fin_pop=myAlg.start(callback)
+    from csttool.logging_config import ApplicationLogSession
+    with ApplicationLogSession(logfilepath, level="debug") as application_logger:
+        isf=sfmanager.manager(workdir="./temp",sfenvpath=r"C:\LANL",logger=application_logger,maxTask=10)
+        callback=fnds_callback_create_Image_dump_fnds("./result")
+        myAlg=myAlg01(isf,logger=application_logger)
+        fin_pop=myAlg.start(callback)
 

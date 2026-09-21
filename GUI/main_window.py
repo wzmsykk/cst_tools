@@ -124,7 +124,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.CalcDialogBox = calc_dialog or AlgorithmSettingsDialog(parent=self)
         self.PPSDialogBox = pps_dialog or PostProcessSettingsDialog(
-            Logger=self.logger, parent=self
+            logger=self.logger, parent=self
         )
         self.refreshCstBackends()
 

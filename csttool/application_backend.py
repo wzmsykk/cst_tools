@@ -11,7 +11,8 @@ from typing import Callable
 
 from install_compat import resource_path
 
-from csttool import cstmanager, globalconfmanager, logger, myAlgorithm_pop
+from csttool import cstmanager, globalconfmanager, myAlgorithm_pop
+from csttool.logging_config import ApplicationLogSession
 from csttool.managed_cstworker import ManagedCSTWorker
 from csttool import projectconfmanager
 from csttool.hom_scan import ScanInterrupted
@@ -73,7 +74,7 @@ class CstApplicationBackend:
             timestamp = datetime.now().strftime("%Y-%m-%d-%H_%M_%S_%f")
             os.makedirs(r".\log", exist_ok=True)
             self.log_path = rf"log\base_{timestamp}.log"
-            self._log_owner = logger.ApplicationLogSession(
+            self._log_owner = ApplicationLogSession(
                 self.log_path,
                 level="debug",
             )
@@ -86,11 +87,11 @@ class CstApplicationBackend:
 
         self.logger.info("数据路径%s", resource_path("."))
         self.gconfman = global_config_manager or globalconfmanager.GlobalConfmanager(
-            Logger=self.logger
+            logger=self.logger
         )
         self.pconfman = project_config_manager or projectconfmanager.ProjectConfmanager(
             GlobalConfigManager=self.gconfman,
-            Logger=self.logger,
+            logger=self.logger,
         )
         self.alg = algorithm or myAlgorithm_pop.myAlg01(manager=None, params=None)
         self._uses_default_manager = manager_factory is None

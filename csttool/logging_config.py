@@ -31,7 +31,7 @@ class LoggingConfig:
     console: bool = True
     when: str = "midnight"
     backup_count: int = 7
-    format: str = DEFAULT_FORMAT
+    format_string: str = DEFAULT_FORMAT
 
 
 class ApplicationLogSession:
@@ -54,7 +54,7 @@ class ApplicationLogSession:
             console=console,
             when=when,
             backup_count=backup_count,
-            format=format_string,
+            format_string=format_string,
         )
         config.path.parent.mkdir(parents=True, exist_ok=True)
         logger_name = name or f"cst_tools.session.{os.getpid()}.{uuid4().hex[:8]}"
@@ -63,7 +63,7 @@ class ApplicationLogSession:
         self.logger.propagate = False
         self._handlers: list[logging.Handler] = []
 
-        formatter = logging.Formatter(config.format)
+        formatter = logging.Formatter(config.format_string)
         file_handler = TimedRotatingFileHandler(
             filename=config.path,
             when=config.when,
@@ -86,9 +86,6 @@ class ApplicationLogSession:
         self.logger.addHandler(handler)
         self._handlers.append(handler)
 
-    def getLogger(self) -> logging.Logger:
-        return self.logger
-
     def close(self) -> None:
         if self._closed:
             return
@@ -103,33 +100,3 @@ class ApplicationLogSession:
 
     def __exit__(self, exc_type, exc_value, traceback) -> None:
         self.close()
-
-
-class Logger(ApplicationLogSession):
-    """Compatibility adapter for the historical constructor and ``getLogger`` API."""
-
-    def __init__(
-        self,
-        filename: str | Path,
-        level: str | int = "info",
-        when: str = "midnight",
-        backCount: int = 7,
-        fmt: str = DEFAULT_FORMAT,
-        console: bool = True,
-        *,
-        name: str | None = None,
-    ) -> None:
-        super().__init__(
-            filename,
-            level=level,
-            console=console,
-            when=when,
-            backup_count=backCount,
-            format_string=fmt,
-            name=name,
-        )
-
-
-def get_logger(name: str) -> logging.Logger:
-    """Return a library logger without configuring global logging."""
-    return logging.getLogger(name)

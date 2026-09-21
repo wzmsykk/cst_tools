@@ -1,3 +1,5 @@
+import logging
+
 from PyQt5.QtWidgets import QDialog, QGridLayout, QMessageBox, QVBoxLayout
 from GUI.ui_algo_pop import Ui_AlgoPopDialog
 from GUI.config_models import AlgorithmSettings
@@ -9,7 +11,7 @@ from PyQt5.QtGui import QDoubleValidator
 class AlgorithmSettingsDialog(QDialog, Ui_AlgoPopDialog):
     _signal_done = pyqtSignal()
 
-    def __init__(self, Logger=None, parent=None):
+    def __init__(self, logger: logging.Logger | None = None, parent=None):
         super().__init__(parent)
         self.setupUi(self)
         apply_theme(self)
@@ -18,7 +20,7 @@ class AlgorithmSettingsDialog(QDialog, Ui_AlgoPopDialog):
         self.fminLineEdit.setPlaceholderText("最低扫描频率")
         self.fmaxLineEdit.setPlaceholderText("最高扫描频率")
         self.maxFreqThresholdLineEdit.setPlaceholderText("扫描停止频率")
-        self.logger = Logger
+        self.logger = logger
         self.data = dict()
         self._committed_data = {}
         validator = QDoubleValidator(self)

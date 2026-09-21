@@ -31,10 +31,14 @@ class ProjectStatusError(Exception):
 
 
 class ProjectConfmanager(object):
-    def __init__(self, GlobalConfigManager=None, Logger=None):
+    def __init__(
+        self,
+        GlobalConfigManager=None,
+        logger: logging.Logger | None = None,
+    ):
         self.conf = configparser.ConfigParser()
-        if Logger is not None:
-            self.logger = Logger
+        if logger is not None:
+            self.logger = logger
         else:
             self.logger = logging.getLogger(__name__)
         self.gconf = GlobalConfigManager.conf

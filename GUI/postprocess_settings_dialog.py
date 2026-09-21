@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import logging
 from pathlib import Path
 
 from PyQt5.QtCore import QAbstractListModel, QModelIndex, Qt, pyqtSignal
@@ -222,14 +223,14 @@ class AddPostProcessDialog(QDialog, Ui_AddComplexPostDialog):
 class PostProcessSettingsDialog(QDialog, Ui_PostProcessSettingDialog):
     _signal_done = pyqtSignal()
 
-    def __init__(self, Logger=None, parent=None) -> None:
+    def __init__(self, logger: logging.Logger | None = None, parent=None) -> None:
         super().__init__(parent)
         self.setupUi(self)
         apply_theme(self)
         style_dialog_buttons(self.buttonBox)
         self.setWindowTitle("后处理结果设置")
         self.addDialog = AddPostProcessDialog(parent=self)
-        self.logger = Logger
+        self.logger = logger
         self.listModel = PostProcessListModel()
         self._committed_settings = []
         self._editing_row = None

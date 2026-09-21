@@ -3,8 +3,6 @@ from pathlib import Path
 from typing import Dict, Union, Optional
 from abc import ABCMeta, abstractmethod
 
-from .logger import Logger
-
 # 200
 # worker 输入X得到result的工具
 
@@ -16,11 +14,11 @@ class worker(metaclass=ABCMeta):
         self,
         id: int,
         config: Optional[Dict] = None,
-        logger: Optional[Logger] = None,
+        logger: Optional[logging.Logger] = None,
         type: str = "Test",
     ) -> None:
         if logger == None:
-            self.logger = logging.getLogger("main." + "worker_" + str(id))
+            self.logger = logging.getLogger(f"{__name__}.worker_{id}")
         else:
             self.logger = logger
         self.config = config
@@ -85,7 +83,7 @@ class worker(metaclass=ABCMeta):
    
 
 class testworker(worker):  # 测试用worker
-    def __init__(self, id: int, config: Optional[Dict] = None, logger: Optional[Logger] = None, type: str = "Test") -> None:
+    def __init__(self, id: int, config: Optional[Dict] = None, logger: Optional[logging.Logger] = None, type: str = "Test") -> None:
         super().__init__(id, config, logger, type)
 
     def runWithParam(self, resultname: str, *args, **kwargs) -> Dict:

@@ -3,10 +3,10 @@ from logging.handlers import TimedRotatingFileHandler
 
 import pytest
 
-from csttool.logger import ApplicationLogSession, DEFAULT_FORMAT, Logger
+from csttool.logging_config import ApplicationLogSession, DEFAULT_FORMAT
 
 
-def test_logger_creates_an_independent_rotating_file_session(tmp_path):
+def test_session_creates_an_independent_rotating_file_logger(tmp_path):
     first = ApplicationLogSession(
         tmp_path / "first.log", level="debug", console=False
     )
@@ -29,7 +29,7 @@ def test_logger_creates_an_independent_rotating_file_session(tmp_path):
     assert first.logger.handlers == []
 
 
-def test_logger_console_flag_only_controls_console_handler(tmp_path):
+def test_console_flag_only_controls_console_handler(tmp_path):
     owner = ApplicationLogSession(tmp_path / "app.log", console=True)
     try:
         assert len(owner.logger.handlers) == 2
@@ -41,17 +41,9 @@ def test_logger_console_flag_only_controls_console_handler(tmp_path):
         owner.close()
 
 
-def test_logger_rejects_unknown_level(tmp_path):
+def test_session_rejects_unknown_level(tmp_path):
     with pytest.raises(ValueError, match="unknown logging level"):
         ApplicationLogSession(tmp_path / "app.log", level="verbose")
-
-
-def test_legacy_logger_adapter_keeps_get_logger_api(tmp_path):
-    owner = Logger(tmp_path / "legacy.log", backCount=2, console=False)
-    try:
-        assert owner.getLogger() is owner.logger
-    finally:
-        owner.close()
 
 
 def test_default_format_contains_concurrency_context():
