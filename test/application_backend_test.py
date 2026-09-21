@@ -10,6 +10,7 @@ from csttool.application_backend import (
     CstApplicationBackend,
 )
 from csttool.runtime_protocol import FileProtocol, new_session_id
+from csttool.project_run_lock import ProjectRunLock
 
 
 class FakeGlobalConfig:
@@ -196,6 +197,7 @@ def test_backend_can_retry_after_initialization_failure():
 def test_algorithm_failure_still_stops_and_clears_manager():
     algorithm = FakeAlgorithm(RuntimeError("solver failed"))
     backend, _, project, manager, _ = make_backend(algorithm=algorithm)
+    backend.select_project_directory("project")
     backend.initialize_run(False, 1)
     backend.prepare_run()
 
@@ -208,8 +210,9 @@ def test_algorithm_failure_still_stops_and_clears_manager():
     assert len(project.statuses) == 2
 
 
-def test_stop_request_is_idempotent_with_execution_cleanup():
+def test_stop_request_is_idempotent_with_execution_cleanup(tmp_path):
     backend, *_rest, manager, _calls = make_backend()
+    backend.select_project_directory(tmp_path)
     backend.initialize_run(False, 1)
     backend.prepare_run()
     backend._set_state(BackendState.RUNNING)
@@ -236,6 +239,43 @@ def test_prepare_detects_unclosed_managed_session(tmp_path):
 
     assert backend.state is BackendState.RECOVERY_REQUIRED
     assert manager.stop_count == 0
+    assert ProjectRunLock.active_owner(tmp_path) is None
+
+
+def test_two_backend_instances_cannot_submit_the_same_project(tmp_path):
+    first, *_ = make_backend()
+    second, *_ = make_backend(checks=(True, True))
+    first.select_project_directory(tmp_path)
+    second.select_project_directory(tmp_path)
+
+    first.initialize_run(False, 1)
+    first.prepare_run()
+    second.initialize_run(False, 1)
+
+    assert second.get_recovery_sessions() == []
+    with pytest.raises(BackendPreparationError, match="另一个窗口"):
+        second.prepare_run()
+
+    assert first.execute_run() == "completed"
+    assert ProjectRunLock.active_owner(tmp_path) is None
+
+    second.initialize_run(False, 1)
+    second.prepare_run()
+    assert second.execute_run() == "completed"
+
+
+def test_recovery_cannot_stop_a_run_owned_by_another_window(tmp_path):
+    first, *_ = make_backend()
+    second, *_ = make_backend()
+    first.select_project_directory(tmp_path)
+    second.select_project_directory(tmp_path)
+    first.initialize_run(False, 1)
+    first.prepare_run()
+
+    with pytest.raises(BackendLifecycleError, match="另一个窗口"):
+        second.recover_project_sessions()
+
+    first.execute_run()
 
 
 def test_backend_progress_listener_failures_do_not_break_worker_updates():

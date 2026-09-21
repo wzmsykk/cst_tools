@@ -24,6 +24,7 @@ def test_shared_theme_contains_interaction_and_state_styles(qapp):
     assert 'QStatusBar[state="failed"]' in sheet
     assert 'QLabel#stateBadge[state="running"]' in sheet
     assert 'QPushButton[visualRole="primary"]' in sheet
+    assert "QPushButton#ResumeButton {" in sheet
     assert "QSplitter::handle:horizontal" in sheet
     assert "QPlainTextEdit" in sheet
 
@@ -51,17 +52,19 @@ def test_postprocess_dialog_marks_destructive_and_file_actions(qapp):
 
 
 def test_main_workspace_uses_responsive_layout_instead_of_fixed_geometry(qapp):
-    window = QWidget()
     ui = Ui_MainWindow()
     from PyQt5.QtWidgets import QMainWindow
 
     main = QMainWindow()
     ui.setupUi(main)
-    main.resize(1200, 760)
+    assert main.size().width() == 1480
+    assert main.size().height() == 920
+    assert main.minimumWidth() == 1040
+    assert main.minimumHeight() == 700
     main.show()
     qapp.processEvents()
     wide_log_width = ui.logPanel.width()
-    main.resize(920, 620)
+    main.resize(1040, 700)
     qapp.processEvents()
 
     assert ui.centralwidget.layout() is ui.pageLayout
@@ -70,4 +73,11 @@ def test_main_workspace_uses_responsive_layout_instead_of_fixed_geometry(qapp):
     assert ui.workspaceSplitter.childrenCollapsible() is False
     assert wide_log_width > ui.logPanel.width()
     assert ui.logPanel.height() > 300
+    assert ui.setupPanel.width() >= 500
+    assert ui.StartButton.geometry().bottom() <= ui.setupPanel.contentsRect().bottom()
+    assert ui.StartButton.text() == "开始新扫描"
+    assert ui.ResumeButton.text() == "继续未完成扫描"
+    assert not ui.ResumeButton.isCheckable()
+    assert ui.RecoverButton.width() >= 132
+    assert ui.StopButton.width() >= 110
     main.close()

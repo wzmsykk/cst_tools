@@ -18,6 +18,7 @@ from csttool.project_session_recovery import (
     discover_managed_sessions,
     recover_project_sessions,
 )
+from csttool.project_run_lock import ProjectRunBusyError, ProjectRunLock
 
 
 class BackendState(Enum):
@@ -65,6 +66,7 @@ class CstApplicationBackend:
         self.jm = None
         self._manager_stop_requested = False
         self._progress_listeners = []
+        self._project_run_lock = None
 
         if application_logger is None:
             timestamp = time.strftime("%Y-%m-%d-%H_%M_%S", time.localtime())
@@ -182,6 +184,7 @@ class CstApplicationBackend:
     def prepare_run(self) -> None:
         self._require_state("prepare run", BackendState.INITIALIZED)
         try:
+            self._acquire_project_run_lock()
             self.pconfman.prepareProject(self.resume)
             unresolved = self.get_recovery_sessions()
             if unresolved:
@@ -206,8 +209,11 @@ class CstApplicationBackend:
             self.logger.exception("项目配置出错")
             if self.state is not BackendState.RECOVERY_REQUIRED:
                 self._set_state(BackendState.FAILED)
-            self._stop_manager_once()
-            self._clear_manager()
+            try:
+                self._stop_manager_once()
+            finally:
+                self._clear_manager()
+                self._release_project_run_lock()
             if isinstance(exc, BackendPreparationError):
                 raise
             raise BackendPreparationError("运行配置准备失败") from exc
@@ -216,10 +222,10 @@ class CstApplicationBackend:
     def execute_run(self):
         self._require_state("execute run", BackendState.PREPARED)
         self._set_state(BackendState.RUNNING)
-        self._update_task_status(projectconfmanager.TaskStatus.RUNNING)
         failure = None
         result = None
         try:
+            self._update_task_status(projectconfmanager.TaskStatus.RUNNING)
             if self.alg is None:
                 raise BackendLifecycleError("未指定计算方法")
             result = self.alg.start()
@@ -248,18 +254,21 @@ class CstApplicationBackend:
                 self.logger.exception("算法失败后的 Manager 清理也失败")
             finally:
                 self._clear_manager()
-                if self.state is BackendState.INTERRUPTED:
-                    self._update_task_status(
-                        projectconfmanager.TaskStatus.INTERRUPTED
-                    )
-                elif self.state is BackendState.FAILED:
-                    self._update_task_status(projectconfmanager.TaskStatus.FAILED)
-                elif self.state is BackendState.RECOVERY_REQUIRED:
-                    self._update_task_status(
-                        projectconfmanager.TaskStatus.RECOVERY_REQUIRED
-                    )
-                else:
-                    self._update_task_status(projectconfmanager.TaskStatus.DONE)
+                try:
+                    if self.state is BackendState.INTERRUPTED:
+                        self._update_task_status(
+                            projectconfmanager.TaskStatus.INTERRUPTED
+                        )
+                    elif self.state is BackendState.FAILED:
+                        self._update_task_status(projectconfmanager.TaskStatus.FAILED)
+                    elif self.state is BackendState.RECOVERY_REQUIRED:
+                        self._update_task_status(
+                            projectconfmanager.TaskStatus.RECOVERY_REQUIRED
+                        )
+                    else:
+                        self._update_task_status(projectconfmanager.TaskStatus.DONE)
+                finally:
+                    self._release_project_run_lock()
 
         self._set_state(BackendState.STOPPED)
         return result
@@ -287,6 +296,8 @@ class CstApplicationBackend:
         project_directory = self.get_project_directory()
         if project_directory is None:
             return []
+        if self._project_owned_elsewhere():
+            return []
         return [
             item
             for item in discover_managed_sessions(project_directory)
@@ -303,7 +314,14 @@ class CstApplicationBackend:
         project_directory = self.get_project_directory()
         if project_directory is None:
             raise BackendLifecycleError("project directory is not selected")
-        recovered = recover_project_sessions(project_directory)
+        try:
+            self._acquire_project_run_lock()
+        except BackendPreparationError as exc:
+            raise BackendLifecycleError(str(exc)) from exc
+        try:
+            recovered = recover_project_sessions(project_directory)
+        finally:
+            self._release_project_run_lock()
         self.logger.info("已恢复并关闭 %d 个 CST 会话", len(recovered))
         self._update_task_status(projectconfmanager.TaskStatus.INTERRUPTED)
         self._set_state(BackendState.INTERRUPTED)
@@ -369,6 +387,34 @@ class CstApplicationBackend:
     def _clear_manager(self) -> None:
         with self._lifecycle_lock:
             self.jm = None
+
+    def _acquire_project_run_lock(self) -> None:
+        if self._project_run_lock is not None:
+            return
+        project_directory = self.get_project_directory()
+        if project_directory is None:
+            raise BackendPreparationError("尚未选择项目目录")
+        lease = ProjectRunLock(project_directory)
+        try:
+            lease.acquire()
+        except ProjectRunBusyError as exc:
+            raise BackendPreparationError(str(exc)) from exc
+        self._project_run_lock = lease
+
+    def _release_project_run_lock(self) -> None:
+        lease = self._project_run_lock
+        self._project_run_lock = None
+        if lease is not None:
+            lease.release()
+
+    def _project_owned_elsewhere(self) -> bool:
+        project_directory = self.get_project_directory()
+        if project_directory is None:
+            return False
+        return (
+            self._project_run_lock is None
+            and ProjectRunLock.active_owner(project_directory) is not None
+        )
 
     def _update_task_status(self, status) -> None:
         self.status = status

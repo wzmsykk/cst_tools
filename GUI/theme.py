@@ -182,6 +182,10 @@ QPushButton[visualRole="quiet"] {
     background-color: #eef3f8;
     border-color: #d6dee8;
 }
+QPushButton#ResumeButton {
+    background-color: #f8fafc;
+    border-color: #94a3b8;
+}
 QCheckBox {
     spacing: 8px;
     background: transparent;

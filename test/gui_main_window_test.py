@@ -288,8 +288,10 @@ def test_pending_session_enters_sticky_recovery_state_and_blocks_run(
     window.RecoverButton.click()
     process_until(qapp, lambda: tool.recovery_count == 1)
     process_until(qapp, lambda: not window.controller.has_active_work)
-    assert window.controller.state is RunState.IDLE
+    assert window.controller.state is RunState.READY
     assert window.RecoverButton.text() == "清理残留会话"
+    assert not window.StartButton.isEnabled()
+    assert window.ResumeButton.isEnabled()
     window.close()
 
 
@@ -423,7 +425,7 @@ def test_worker_count_defaults_to_one_is_configurable_and_locked_during_run(
     window.close()
 
 
-def test_continue_option_drives_project_and_algorithm_resume_with_safe_policy(
+def test_resume_button_starts_resume_directly_without_cst_template(
     qapp, monkeypatch, tmp_path
 ):
     window, tool = make_window(qapp)
@@ -433,14 +435,13 @@ def test_continue_option_drives_project_and_algorithm_resume_with_safe_policy(
     )
     window.read_dir()
     assert not window.StartButton.isEnabled()
-    assert window.checkBox_CTN.isEnabled()
+    assert window.ResumeButton.isEnabled()
     assert not hasattr(window, "checkBox_SAFE")
-    window.checkBox_CTN.setChecked(True)
-    assert window.StartButton.isEnabled()
-
-    window.run()
+    window.ResumeButton.click()
     process_until(qapp, lambda: tool.start_count == 1)
     assert tool.resume is True
+    assert not window.StartButton.isEnabled()
+    assert not window.ResumeButton.isEnabled()
     tool.run_gate.set()
     process_until(qapp, lambda: not window.controller.has_active_work)
     window.close()
@@ -567,7 +568,7 @@ def test_explicit_stop_button_requests_standard_stop(qapp, monkeypatch, tmp_path
     window.run()
     process_until(qapp, lambda: tool.start_count == 1)
     assert window.StopButton.isEnabled()
-    assert not window.checkBox_CTN.isEnabled()
+    assert not window.ResumeButton.isEnabled()
 
     window.StopButton.click()
     process_until(qapp, lambda: tool.stop_count == 1)
