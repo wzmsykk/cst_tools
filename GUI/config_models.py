@@ -11,11 +11,28 @@ from csttool.postprocess_cst import VBPostProcessor
 PPS_SCHEMA_VERSION = 1
 
 
+def _as_bool(value: Any) -> bool:
+    if isinstance(value, str):
+        normalized = value.strip().casefold()
+        if normalized in {"true", "1", "yes", "on"}:
+            return True
+        if normalized in {"false", "0", "no", "off", ""}:
+            return False
+        raise ValueError(f"无法识别布尔值: {value!r}")
+    return bool(value)
+
+
 @dataclass(frozen=True)
 class AlgorithmSettings:
     fmin: float
     fmax: float
     endfreq: float
+    mesh_cells_per_wavelength: int
+    mesh_convergence_enabled: bool
+    mesh_convergence_start: int
+    mesh_convergence_stop: int
+    mesh_convergence_step: int
+    mesh_convergence_tolerance: float
 
     @classmethod
     def from_mapping(cls, values: Mapping[str, Any]) -> "AlgorithmSettings":
@@ -23,11 +40,33 @@ class AlgorithmSettings:
             fmin=float(values.get("fmin", 500)),
             fmax=float(values.get("fmax", 700)),
             endfreq=float(values.get("endfreq", 2500)),
+            mesh_cells_per_wavelength=int(
+                values.get("mesh_cells_per_wavelength", 20)
+            ),
+            mesh_convergence_enabled=_as_bool(
+                values.get("mesh_convergence_enabled", False)
+            ),
+            mesh_convergence_start=int(values.get("mesh_convergence_start", 10)),
+            mesh_convergence_stop=int(values.get("mesh_convergence_stop", 30)),
+            mesh_convergence_step=int(values.get("mesh_convergence_step", 5)),
+            mesh_convergence_tolerance=float(
+                values.get("mesh_convergence_tolerance", 0.01)
+            ),
         )
         if settings.fmin >= settings.fmax:
             raise ValueError("最低频率必须小于最高频率")
         if settings.endfreq < settings.fmax:
             raise ValueError("扫描频率上限不能低于最高频率")
+        if settings.mesh_cells_per_wavelength < 1:
+            raise ValueError("每波长网格数必须是正整数")
+        if (
+            settings.mesh_convergence_start < 1
+            or settings.mesh_convergence_stop < settings.mesh_convergence_start
+            or settings.mesh_convergence_step < 1
+        ):
+            raise ValueError("Mesh 收敛范围必须是递增的正整数")
+        if not 0 < settings.mesh_convergence_tolerance < 1:
+            raise ValueError("Mesh 收敛容差必须在 0 和 1 之间")
         return settings
 
     def to_backend_payload(self) -> dict[str, float]:
@@ -35,6 +74,12 @@ class AlgorithmSettings:
             "fmin": self.fmin,
             "fmax": self.fmax,
             "endfreq": self.endfreq,
+            "mesh_cells_per_wavelength": self.mesh_cells_per_wavelength,
+            "mesh_convergence_enabled": self.mesh_convergence_enabled,
+            "mesh_convergence_start": self.mesh_convergence_start,
+            "mesh_convergence_stop": self.mesh_convergence_stop,
+            "mesh_convergence_step": self.mesh_convergence_step,
+            "mesh_convergence_tolerance": self.mesh_convergence_tolerance,
         }
 
 

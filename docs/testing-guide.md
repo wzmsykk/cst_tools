@@ -309,7 +309,9 @@ python -m pytest -q -m integration --run-cst `
   test/cst_preprocessor_integration_test.py
 ```
 
-该 Gate 使用 CST 2022 打开临时工作副本，通过官方参数 API 在缺失时添加 `fmin`、`fmax`、`nmodes`，并以一个原子 `AddToHistory` 步骤将 Frequency Range、Frequency Target 和 Number of Modes 绑定到这些参数。宏随后立即执行一次 Rebuild，实际重放包含该步骤的完整 History List；只有 Rebuild、Save 和参数导出全部成功才返回 `SUCCESS`。Gate 要求 prepared 工程和参数清单存在，并验证源 `.cst` 的 SHA-256 不变。预处理器拒绝源/输出为同一路径或覆盖已有输出；Python 不直接修改 `.cst` 容器成员。
+该 Gate 使用 CST 2022 打开临时工作副本，通过官方参数 API 添加 `fmin`、`fmax`、`nmodes`、`cell`，并以一个原子 `AddToHistory` 步骤绑定 Frequency Range、Frequency Target、Number of Modes 和四面体网格 `StepsPerWaveNear`，同时关闭四面体自适应网格。宏随后立即执行一次 Rebuild，实际重放包含该步骤的完整 History List；只有 Rebuild、Save 和参数导出全部成功才返回 `SUCCESS`。Gate 要求 prepared 工程和参数清单存在，并验证源 `.cst` 的 SHA-256 不变。预处理器拒绝源/输出为同一路径或覆盖已有输出；Python 不直接修改 `.cst` 容器成员。
+
+Mesh 收敛分析的快速测试使用纯 Python 假评估器验证相对变化、连续稳定判据、提前停止、未收敛和 CSV/JSON 输出。真实 CST 验证应选择“运行前执行 Mesh 收敛分析”，使用较短 Mesh 序列，确认每一级 CST 均最小化运行、Worker 标准退出，且正式工程采用报告中的推荐值。
 
 HOM 扫描另有可复现的概率化假 Worker：
 

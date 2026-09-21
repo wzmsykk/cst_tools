@@ -36,7 +36,7 @@ HOM_PROFILE_V1 = HomProjectProfile(
     profile_id="hom-2022-v1",
     cst_year=2022,
     source_project=Path("project") / "HOM analysis" / "HOM analysis_clean.cst",
-    mutable_parameters=frozenset({"fmin", "fmax"}),
+        mutable_parameters=frozenset({"fmin", "fmax"}),
     required_templates=tuple(
         ResultTemplateRequirement(name, "M0D", _TEMPLATE_NAME, _TEMPLATE_FOLDER)
         for name in (

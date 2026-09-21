@@ -433,11 +433,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         worker_count = self.workerCountSpinBox.value()
         settings = self.service.get_algorithm_settings()
         self.logger.info(
-            "运行确认: project=%s, cst=%s, fmin=%s MHz, stop=%s MHz, workers=%d, background=minimized",
+            "运行确认: project=%s, cst=%s, fmin=%s MHz, stop=%s MHz, fixed_mesh_cells=%s, mesh_convergence=%s, workers=%d, background=minimized",
             self.uiProjectDir,
             self.uiCSTFilePath,
             settings.get("fmin", "?"),
             settings.get("endfreq", settings.get("fmax", "?")),
+            settings.get("mesh_cells_per_wavelength", "?"),
+            settings.get("mesh_convergence_enabled", False),
             worker_count,
         )
         if self.controller.start(bool(resume), worker_count):

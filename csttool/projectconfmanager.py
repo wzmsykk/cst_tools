@@ -121,7 +121,9 @@ class ProjectConfmanager(object):
         self.ready = True
         return self.ready
 
-    def prepareProject(self, startFromExisted=False):
+    def prepareProject(
+        self, startFromExisted=False, *, mesh_cells_per_wavelength=20
+    ):
         # startFromExisted=True 从已有开始 不需要CST文件
         self.logger.info("准备项目文件")
         iProjectDir = self.currProjectDir
@@ -143,6 +145,7 @@ class ProjectConfmanager(object):
             self.logger.info("目录%s无旧文件" % str(iProjectDir))
             self.logger.info("尝试从project目录%s创建空白配置文件。" % str(iProjectDir))
             iConf = self.createNewEmptyProjectConfFile(iProjectDir)
+            iConf.set("MESH", "CellsPerWavelength", str(mesh_cells_per_wavelength))
 
             # 复制输入CST文件到输出文件夹
             # 且自动预处理
@@ -156,7 +159,9 @@ class ProjectConfmanager(object):
             self.logger.info(
                 "已将输入CST文件%s复制到project目录%s。" % (str(iInputCSTFilePath), dstStrPath)
             )
-            iConf = self.__autoPreProcess(iConf, dstPath)
+            iConf = self.__autoPreProcess(
+                iConf, dstPath, mesh_cells_per_wavelength
+            )
             self.__savecfgobj(iConf)
             self.conf = iConf
             self.savePPSSettings(self.currPPSList)
@@ -168,6 +173,7 @@ class ProjectConfmanager(object):
                 result = self.__checkProjectStatus()
                 if result == False:
                     raise ProjectStatusError
+                self._validate_fixed_mesh(mesh_cells_per_wavelength)
                 if startFromExisted:
                     self.setCurrPPSList(self.readPPSList())
                 else:
@@ -181,6 +187,7 @@ class ProjectConfmanager(object):
                 result = self.__checkAndRepairProject()
                 if result == False:
                     raise ProjectStatusError
+                self._validate_fixed_mesh(mesh_cells_per_wavelength)
                 if startFromExisted:
                     self.setCurrPPSList(self.readPPSList())
                 else:
@@ -246,6 +253,9 @@ class ProjectConfmanager(object):
         newconf.add_section("PARAMETERS")
         newconf.set("PARAMETERS", "paramfile", self.paramsfilename)
         newconf.set("PARAMETERS", "ppsfile", self.ppsfilename)
+        newconf.add_section("MESH")
+        newconf.set("MESH", "Fixed", "True")
+        newconf.set("MESH", "CellsPerWavelength", "20")
         # newconf.set('PARAMETERS','paramfile','')
         newconf.add_section("TASK")
         newconf.set("TASK", "status", "READY")  # READY RUNNING DONE
@@ -255,12 +265,21 @@ class ProjectConfmanager(object):
         return newconf
         # 保存配置文件
 
-    def __autoPreProcess(self, confobj, cstFilePath):
+    def __autoPreProcess(
+        self, confobj, cstFilePath, mesh_cells_per_wavelength=None
+    ):
         self.logger.info("根据输入的CST文件进行预处理且更新Config内容")
         savejsonname = confobj.get("PARAMETERS", "paramfile")
         confobj.set("CST", "CSTFilename", str(cstFilePath))
+        if mesh_cells_per_wavelength is None:
+            mesh_cells_per_wavelength = confobj.getint(
+                "MESH", "CellsPerWavelength", fallback=20
+            )
         savednewcstpath = self._preprocess_cst_project(
-            confobj, projectDir=self.currProjectDir, savejsonpath=savejsonname
+            confobj,
+            projectDir=self.currProjectDir,
+            savejsonpath=savejsonname,
+            mesh_cells_per_wavelength=mesh_cells_per_wavelength,
         )
         confobj.set("CST", "CSTFilename", str(pathlib.Path(savednewcstpath).name))
         file_md5 = self.genMD5FromCST(savednewcstpath)
@@ -339,7 +358,14 @@ class ProjectConfmanager(object):
         fp.close()
         return file_md5
 
-    def _preprocess_cst_project(self, confobj, projectDir, savejsonpath=None):
+    def _preprocess_cst_project(
+        self,
+        confobj,
+        projectDir,
+        savejsonpath=None,
+        *,
+        mesh_cells_per_wavelength=20,
+    ):
         """Create and validate a prepared project without modifying its source."""
         if savejsonpath is None:
             jsonpath = projectDir / self.paramsfilename
@@ -373,6 +399,7 @@ class ProjectConfmanager(object):
             candidate,
             jsonpath,
             td,
+            mesh_cells_per_wavelength=mesh_cells_per_wavelength,
         )
         self.logger.info(
             "CST 工程参数预处理完成: %s (%d parameters)",
@@ -380,6 +407,18 @@ class ProjectConfmanager(object):
             len(result.parameters),
         )
         return result.project_path
+
+    def _validate_fixed_mesh(self, requested_cells):
+        if not self.conf.has_section("MESH"):
+            self.logger.warning(
+                "旧项目未记录固定网格设置；保持工程现状，不在恢复时修改 mesh"
+            )
+            return
+        configured_cells = self.conf.getint("MESH", "CellsPerWavelength")
+        if configured_cells != int(requested_cells):
+            raise ProjectStatusError(
+                "固定网格每波长单元数与已有项目不一致；请新建项目以更改 mesh"
+            )
 
     def __checkAndRepairProject(
         self, cfgfilename="project.ini", slient=False, force=True

@@ -70,7 +70,7 @@ native CST result -> Python-derived result -> optional runtime VBA
 | P11 | HOM 扫描完整性修复 | 窄区间逐个求解 Mode 1、微小容差推进、有限重试和原子 checkpoint |
 | P12 | GUI 生产 Worker 迁移 | 默认后端使用长驻版本化文件协议 Worker；Completion/Ack 栅栏，标准 Save/Quit，保留声明式运行时 VBA 后处理 |
 | GUI P13 | 现代运行工作台 | 可调整双栏、状态徽标、阶段摘要、显式安全停止、日志治理与键盘焦点反馈；GUI Gate 45 passed |
-| P13.5 | CST 工程参数预处理 | 在独立工作副本中缺失时添加 `fmin/fmax/nmodes`，通过原子 History 步骤绑定 Solver，显式完成标记、Save/Quit，源工程保持不变 |
+| P13.5 | CST 工程参数预处理 | 在独立工作副本中添加 `fmin/fmax/nmodes/cell`，项目初始化时通过原子 History 步骤固定四面体 Mesh 并关闭自适应，显式完成标记、Save/Quit，源工程保持不变 |
 | P14 | 可恢复 HOM 扫描会话 | 不可变 `scan_manifest.json`、协作式停止、禁止停止期派发/Worker 轮换、ACK 阶段 Stop、独立 Windows 进程组、`INTERRUPTED` 状态、残留会话自动发现及 GUI 恢复 | Pillbox“运行中停止→Save/Quit→新会话恢复完成”Gate 通过，`1 passed in 84.90s` |
 | P14.5 | CST 后台进度 | 增量 tail 每个 Worker 的 `cst.log`，解析 Mesh、Refinement、Eigenmode Pass 和局部百分比，经 Worker/Manager/Backend/Qt signal 显示；不使用 PIPE，不把 Pass 百分比称为总进度 | 真实 Pillbox 日志、频段身份、局部百分比及安全退出 Gate 通过，`1 passed in 56.95s` |
 | P15 | CST 后端版本切换 | 自动发现本机全部 CST 安装、GUI 显式选择并持久化、运行期冻结；Manifest 绑定版本和可执行文件 | 多版本发现/校验、后端状态门和 GUI 切换测试通过 |
@@ -93,7 +93,7 @@ Profile 当前仅覆盖一个经过验证的 HOM 工程：
 
 - CST：2022；
 - prepared 工程：`project/HOM analysis/HOM analysis_clean.cst`；
-- Warm 任务允许修改：`fmin`、`fmax`；
+- Warm 任务只允许修改：`fmin`、`fmax`；`cell` 在项目初始化时固定，运行期不再修改；
 - 必需模板：Frequency、Q-Factor、R/Q 轴上、R/Q 5 mm、R/Q 10 mm；
 - 原生结果：上述五个 `Mode 1.rd0` 标量；
 - 动态 VBA：任意轴/任意位置 R/Q、Shunt Impedance、Total Loss、Voltage。
@@ -113,6 +113,12 @@ Profile 验证使用 CST 官方 `ResetTemplateIterator/GetNextTemplate`，比较
 官方 `3D Eigenmode Result` 模板本身支持 x/y/z 积分轴，但当前 prepared HOM 工程只注册了 z 轴 0/5/10 mm 三条 R/Q 积分线。未注册的轴或位置继续由 `EigenResult_Complex` 在同一次求解结果上计算；求解后禁止通过工程参数变化驱动模板，因为 `Update Params` 会使结果失效。
 
 GUI 的复杂后处理设置可为 R/Q 和 Shunt Impedance 分别选择 X、Y、Z 积分轴，并输入三个坐标偏移。积分轴自身的偏移固定为 0，另外两个横向坐标可配置；旧 PPS 未声明轴时继续按 Z 轴解释。
+
+GUI 暴露 HOM 四面体固定网格的 `mesh_cells_per_wavelength`。该值只在新项目预处理阶段写入 `cell`，History 同时设置 `MeshSettings.StepsPerWaveNear` 并关闭 `EigenmodeSolver.SetMeshAdaptationTet`；运行期任务不提交 mesh 参数。该值写入 `project.ini` 与 `scan_manifest.json`，恢复时变化会被拒绝，改 mesh 必须创建新项目。
+
+CST 工程预处理与正式 Warm Worker 均以不抢占焦点的最小化方式启动；预处理器可通过 `run_in_background=False` 显式切换为交互启动，默认保持后台。
+
+Mesh 收敛分析是新项目启动前的可选阶段。默认按 `10, 15, 20, 25, 30 cells/λ` 逐级建立临时工程，对同一频段的单模标量后处理结果计算相邻级别相对变化；所有结果低于默认 `1%` 容差且连续两个级别稳定时提前停止，并把该级 Mesh 自动用于正式项目。分析结果输出到项目目录下的 `mesh_convergence/mesh_convergence.json` 与 `.csv`；未在上限内收敛时不启动正式扫描，并保留报告供调整范围。
 
 ## 6. 尚未完成
 

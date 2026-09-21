@@ -211,7 +211,7 @@ P6.5/P7 已将同一 Profile 接入 Warm Worker、原生读取和 R/Q 路由，�
 - [x] 在参数更新和 Solver 前校验 `hom-2022-v1` 必需模板能力。
 - [ ] 评估自动安装 Result Template 的 Preparation Macro。
 - [ ] 将 Solver、frequency、mode count、Mesh 和 Boundary 建模为声明式目标状态。
-- [x] `hom-2022-v1` 固定 prepared 工程，仅允许 Warm 修改 `fmin/fmax`。
+- [x] `hom-2022-v1` 在项目初始化时写入固定四面体网格并关闭自适应；Warm 任务只修改 `fmin/fmax`，网格密度进入 Manifest 且恢复时不可漂移。
 - [ ] 记录每个参数化设置的结果失效、重新网格和 Warm 复用规则。
 - [ ] 对复合工程记录各 scope 的物理角色、依赖、数据交换和求解顺序。
 - [ ] 分 scope 声明 Solver、参数和结果能力。

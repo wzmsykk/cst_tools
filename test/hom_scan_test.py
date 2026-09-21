@@ -294,11 +294,36 @@ def test_production_algorithm_writes_results_and_checkpoint(tmp_path):
 
     assert [item.frequency for item in report.modes] == [105.0, 114.0]
     assert all(task.params["nmodes"] == 1 for task in manager.tasks)
+    assert all("accuracy" not in task.params for task in manager.tasks)
+    assert all("cell" not in task.params for task in manager.tasks)
     assert manager.tasks[1].params["fmax"] - manager.tasks[1].params["fmin"] == 10
     result_path = tmp_path / "save" / "csv" / "hom_scan_results.csv"
     assert list(pd.read_csv(result_path)["mode"]) == [1, 2]
     assert list(pd.read_csv(result_path)["solverMode"]) == [1, 1]
     assert (tmp_path / "save" / "csv" / "hom_scan_checkpoint.json").exists()
+
+
+def test_production_algorithm_records_fixed_mesh_without_runtime_mutation(tmp_path):
+    manager = ScanManager(tmp_path)
+    algorithm = myAlg01(manager=manager, params=[])
+    algorithm.setCSTParams([])
+    algorithm.setEditableAttrs(
+        {
+            "fmin": 100,
+            "fmax": 110,
+            "endfreq": 110,
+            "mesh_cells_per_wavelength": 28,
+        }
+    )
+
+    algorithm.start()
+
+    assert "accuracy" not in manager.tasks[0].params
+    assert "cell" not in manager.tasks[0].params
+    manifest = json.loads(
+        (tmp_path / "save" / "csv" / "scan_manifest.json").read_text()
+    )
+    assert manifest["mesh_cells_per_wavelength"] == 28
 
 
 def test_production_algorithm_restores_confirmed_snapshot_before_resume(tmp_path):

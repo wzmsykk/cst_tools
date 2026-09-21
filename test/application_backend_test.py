@@ -1,4 +1,5 @@
 import logging
+import json
 
 import pytest
 
@@ -63,8 +64,9 @@ class FakeProjectConfig:
     def assignInputCSTFilePath(self, path):
         self.currCSTFilePath = path
 
-    def prepareProject(self, resume):
+    def prepareProject(self, resume, *, mesh_cells_per_wavelength):
         self.prepared_with = resume
+        self.mesh_cells_per_wavelength = mesh_cells_per_wavelength
         self.ready = True
 
     def isReady(self):
@@ -84,7 +86,7 @@ class FakeAlgorithm:
         self.params = None
 
     def getEditableAttrs(self):
-        return {"fmin": 500}
+        return {"fmin": 500, "mesh_cells_per_wavelength": 20}
 
     def setEditableAttrs(self, values):
         self.attrs = values
@@ -149,6 +151,32 @@ def test_backend_happy_path_has_explicit_lifecycle_and_cleanup():
     assert manager.stop_count == 1
     assert global_config.saved == 1
     assert project.prepared_with is True
+    assert project.mesh_cells_per_wavelength == 20
+
+
+def test_backend_mesh_convergence_writes_report_and_returns_recommendation(tmp_path):
+    backend, *_ = make_backend()
+    backend.select_project_directory(str(tmp_path))
+    samples = {
+        10: {"Frequency": 500.0},
+        15: {"Frequency": 502.0},
+        20: {"Frequency": 502.5},
+    }
+    backend._mesh_convergence_evaluator = samples.__getitem__
+    settings = {
+        "mesh_convergence_start": 10,
+        "mesh_convergence_stop": 20,
+        "mesh_convergence_step": 5,
+        "mesh_convergence_tolerance": 0.01,
+    }
+
+    recommended = backend._run_mesh_convergence(settings)
+
+    assert recommended == 20
+    report_path = tmp_path / "mesh_convergence" / "mesh_convergence.json"
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    assert report["converged"] is True
+    assert report["recommended_cells_per_wavelength"] == 20
 
 
 def test_backend_rejects_invalid_operation_order():

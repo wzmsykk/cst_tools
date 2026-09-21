@@ -30,7 +30,9 @@ def _profile_inventory():
 def test_hom_profile_declares_only_validated_warm_mutations():
     assert HOM_PROFILE_V1.profile_id == "hom-2022-v1"
     assert HOM_PROFILE_V1.cst_year == 2022
-    assert HOM_PROFILE_V1.mutable_parameters == frozenset({"fmin", "fmax"})
+    assert HOM_PROFILE_V1.mutable_parameters == frozenset(
+        {"fmin", "fmax"}
+    )
 
     task = Task.create(new_session_id(), {"fmin": "720", "fmax": "800"})
     HOM_PROFILE_V1.validate_task(task)

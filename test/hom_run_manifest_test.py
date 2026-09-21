@@ -33,7 +33,12 @@ def test_manifest_records_exact_project_identity_and_rejects_drift(tmp_path):
     policy = ScanPolicy(500, 550, 1000)
     path = tmp_path / "scan_manifest.json"
 
-    manifest = HomRunManifest.ensure(path, manager, policy)
+    manifest = HomRunManifest.ensure(
+        path,
+        manager,
+        policy,
+        mesh_cells_per_wavelength=24,
+    )
 
     document = json.loads(path.read_text(encoding="utf-8"))
     assert document["source_project"] == str(source.resolve())
@@ -42,7 +47,28 @@ def test_manifest_records_exact_project_identity_and_rejects_drift(tmp_path):
     assert document["project_sha256"] == manifest.project_sha256
     assert document["cst_version"] == "2022"
     assert document["cst_executable"].endswith("CST DESIGN ENVIRONMENT.exe")
+    assert document["schema_version"] == 3
+    assert document["mesh_cells_per_wavelength"] == 24
 
     prepared.write_bytes(b"prepared-v2")
     with pytest.raises(ManifestMismatchError, match="does not match"):
-        HomRunManifest.ensure(path, manager, policy)
+        HomRunManifest.ensure(
+            path,
+            manager,
+            policy,
+            mesh_cells_per_wavelength=24,
+        )
+
+
+def test_manifest_rejects_mesh_setting_drift(tmp_path):
+    source = tmp_path / "source.cst"
+    prepared = tmp_path / "prepared.cst"
+    source.write_bytes(b"source")
+    prepared.write_bytes(b"prepared")
+    manager = _Manager(prepared, source)
+    policy = ScanPolicy(500, 550, 1000)
+    path = tmp_path / "scan_manifest.json"
+    HomRunManifest.ensure(path, manager, policy, mesh_cells_per_wavelength=20)
+
+    with pytest.raises(ManifestMismatchError, match="does not match"):
+        HomRunManifest.ensure(path, manager, policy, mesh_cells_per_wavelength=24)

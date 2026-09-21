@@ -38,6 +38,12 @@ def test_algorithm_settings_are_typed_and_cross_validated():
         "fmin": 500.0,
         "fmax": 700.0,
         "endfreq": 2500.0,
+        "mesh_cells_per_wavelength": 20,
+        "mesh_convergence_enabled": False,
+        "mesh_convergence_start": 10,
+        "mesh_convergence_stop": 30,
+        "mesh_convergence_step": 5,
+        "mesh_convergence_tolerance": 0.01,
     }
     with pytest.raises(ValueError, match="最低频率"):
         AlgorithmSettings.from_mapping(
@@ -55,6 +61,50 @@ def test_algorithm_dialog_installs_numeric_validators_and_returns_copy(qapp):
     values = dialog.getValues()
     values["fmin"] = 1
     assert dialog.getValues()["fmin"] == 500
+
+
+def test_algorithm_settings_include_validated_mesh_controls(qapp):
+    settings = AlgorithmSettings.from_mapping(
+        {
+            "fmin": 500,
+            "fmax": 700,
+            "endfreq": 2500,
+            "mesh_cells_per_wavelength": "24",
+        }
+    )
+    assert settings.mesh_cells_per_wavelength == 24
+
+    dialog = AlgorithmSettingsDialog()
+    dialog.setDefaultValues(settings.to_backend_payload())
+    assert dialog.meshCellsLineEdit.validator() is not None
+    assert dialog.getValues()["mesh_cells_per_wavelength"] == 24
+
+    with pytest.raises(ValueError, match="每波长网格数"):
+        AlgorithmSettings.from_mapping(
+            {"mesh_cells_per_wavelength": 0}
+        )
+
+
+def test_algorithm_dialog_exposes_optional_mesh_convergence_controls(qapp):
+    dialog = AlgorithmSettingsDialog()
+    dialog.setDefaultValues(
+        {
+            "fmin": 500,
+            "fmax": 700,
+            "endfreq": 2500,
+            "mesh_convergence_enabled": True,
+            "mesh_convergence_start": 12,
+            "mesh_convergence_stop": 32,
+            "mesh_convergence_step": 4,
+            "mesh_convergence_tolerance": 0.005,
+        }
+    )
+
+    assert dialog.meshConvergenceCheckBox.isChecked()
+    assert dialog.meshConvergenceStartSpinBox.value() == 12
+    assert dialog.meshConvergenceToleranceSpinBox.value() == 0.5
+    dialog.setValues()
+    assert dialog.getValues()["mesh_convergence_tolerance"] == 0.005
 
 
 def test_algorithm_dialog_validation_blocks_accept_and_cancel_restores_values(

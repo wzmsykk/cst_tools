@@ -17,6 +17,7 @@ from .hom_scan import (
     ScanPolicy,
 )
 from .hom_run_manifest import HomRunManifest
+from .mesh_convergence import MeshConvergenceSettings
 from . import yfunction
 import time
 import pandas as pd
@@ -47,8 +48,8 @@ class myAlg01(myAlg):
             self.setJobManager(manager)
         # self.results=result.result
 
-        self.input_name = ["nmodes", "fmin", "fmax", "accuracy", "cell"]
-        self.input_min = [1, 700, 800, 1e-5, 20]  ##初始值
+        self.input_name = ["nmodes", "fmin", "fmax"]
+        self.input_min = [1, 700, 800]  ##初始值
 
         self.csv_input_name = self.input_name + ["mode"]
 
@@ -63,14 +64,12 @@ class myAlg01(myAlg):
         ]
         self.output_name = None
         self.text_name = ["Frequency", "R_Q", "R_Q_5mm", "Q-Factor", "R_Q_10mm"]
-        self.accu_list = pd.DataFrame(
-            [[0, 1500, 1e-5], [1500, 4100, 1e-4]],
-            columns=["f_down", "f_up", "accuracy"],
-        )
-        self.cell_list = pd.DataFrame(
-            [[0, 1300, 20], [1300, 2000, 15], [2000, 4100, 10]],
-            columns=["f_down", "f_up", "cell"],
-        )
+        self.mesh_cells_per_wavelength = 20
+        self.mesh_convergence_enabled = False
+        self.mesh_convergence_start = 10
+        self.mesh_convergence_stop = 30
+        self.mesh_convergence_step = 5
+        self.mesh_convergence_tolerance = 0.01
 
         # self.dimension_input = len(self.input_name)
         # self.dimension_output = len(self.output_name)
@@ -110,6 +109,27 @@ class myAlg01(myAlg):
         self.input_min[1] = d["fmin"]
         self.input_min[2] = d["fmax"]
         self.end_frequency = d.get("endfreq", 2500)
+        self.mesh_cells_per_wavelength = int(
+            d.get("mesh_cells_per_wavelength", 20)
+        )
+        if self.mesh_cells_per_wavelength < 1:
+            raise ValueError("mesh_cells_per_wavelength must be positive")
+        self.mesh_convergence_enabled = bool(
+            d.get("mesh_convergence_enabled", False)
+        )
+        self.mesh_convergence_start = int(d.get("mesh_convergence_start", 10))
+        self.mesh_convergence_stop = int(d.get("mesh_convergence_stop", 30))
+        self.mesh_convergence_step = int(d.get("mesh_convergence_step", 5))
+        self.mesh_convergence_tolerance = float(
+            d.get("mesh_convergence_tolerance", 0.01)
+        )
+        MeshConvergenceSettings(
+            self.mesh_convergence_enabled,
+            self.mesh_convergence_start,
+            self.mesh_convergence_stop,
+            self.mesh_convergence_step,
+            self.mesh_convergence_tolerance,
+        )
 
     def set_resume(self, resume: bool) -> None:
         self.resume_requested = bool(resume)
@@ -119,6 +139,12 @@ class myAlg01(myAlg):
             "fmin": self.input_min[1],
             "fmax": self.input_min[2],
             "endfreq": self.end_frequency,
+            "mesh_cells_per_wavelength": self.mesh_cells_per_wavelength,
+            "mesh_convergence_enabled": self.mesh_convergence_enabled,
+            "mesh_convergence_start": self.mesh_convergence_start,
+            "mesh_convergence_stop": self.mesh_convergence_stop,
+            "mesh_convergence_step": self.mesh_convergence_step,
+            "mesh_convergence_tolerance": self.mesh_convergence_tolerance,
         }
         return d
 
@@ -315,21 +341,6 @@ class myAlg01(myAlg):
             requested_modes=1,
         )
 
-    def _mesh_settings(self, frequency):
-        accuracy = self.accu_list.loc[
-            (self.accu_list["f_down"] <= frequency)
-            & (self.accu_list["f_up"] > frequency),
-            "accuracy",
-        ]
-        cells = self.cell_list.loc[
-            (self.cell_list["f_down"] <= frequency)
-            & (self.cell_list["f_up"] > frequency),
-            "cell",
-        ]
-        if len(accuracy) != 1 or len(cells) != 1:
-            raise ValueError(f"no unique mesh policy for frequency {frequency}")
-        return float(accuracy.iloc[0]), float(cells.iloc[0])
-
     def _extract_scan_modes(self, result_list):
         if not result_list:
             return []
@@ -411,6 +422,7 @@ class myAlg01(myAlg):
             Path(self.relative_location) / "scan_manifest.json",
             self.manager,
             policy,
+            mesh_cells_per_wavelength=self.mesh_cells_per_wavelength,
         )
         scanner = AdaptiveHomScanner(policy)
         checkpoint_store = ScanCheckpointStore(
@@ -451,13 +463,10 @@ class myAlg01(myAlg):
             self._write_scan_results(current_report)
 
         def solve(request):
-            accuracy, cells = self._mesh_settings(request.interval.lo)
             values = [
                 request.requested_modes,
                 request.solve_lo,
                 request.solve_hi,
-                accuracy,
-                cells,
             ]
             job_name = (
                 f"hom_{request.interval.lo:g}_{request.interval.hi:g}"
@@ -545,17 +554,4 @@ if __name__ == "__main__":
     fmax = math.floor(sample["frequency"]) + alg.delta_frequency
     alg.input_min[1] = fmin
     alg.input_min[2] = fmax
-    print(alg.accu_list)
-    print((alg.accu_list["f_down"] <= fmin) & (alg.accu_list["f_up"] >= fmin))
-    alg.input_min[3] = float(
-        alg.accu_list.loc[
-            (alg.accu_list["f_down"] <= fmin) & (alg.accu_list["f_up"] >= fmin),
-            "accuracy",
-        ]
-    )
-    alg.input_min[4] = float(
-        alg.cell_list.loc[
-            (alg.cell_list["f_down"] <= fmin) & (alg.cell_list["f_up"] >= fmin), "cell"
-        ]
-    )
 

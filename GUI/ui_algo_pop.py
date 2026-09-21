@@ -44,6 +44,10 @@ class Ui_AlgoPopDialog(object):
         self.maxFreqThresholdLineEdit = QtWidgets.QLineEdit(AlgoPopDialog)
         self.maxFreqThresholdLineEdit.setGeometry(QtCore.QRect(120, 220, 261, 31))
         self.maxFreqThresholdLineEdit.setObjectName("maxFreqThresholdLineEdit")
+        self.meshCellsLabel = QtWidgets.QLabel(AlgoPopDialog)
+        self.meshCellsLabel.setObjectName("meshCellsLabel")
+        self.meshCellsLineEdit = QtWidgets.QLineEdit(AlgoPopDialog)
+        self.meshCellsLineEdit.setObjectName("meshCellsLineEdit")
 
         self.retranslateUi(AlgoPopDialog)
         self.buttonBox.accepted.connect(AlgoPopDialog.accept)
@@ -59,4 +63,6 @@ class Ui_AlgoPopDialog(object):
         self.label_2.setText(_translate("AlgoPopDialog", "Mhz"))
         self.dstFreqLabel.setText(_translate("AlgoPopDialog", "扫描频率上限"))
         self.label_3.setText(_translate("AlgoPopDialog", "Mhz"))
+        self.meshCellsLabel.setText(_translate("AlgoPopDialog", "固定网格：每波长单元数"))
+        self.meshCellsLineEdit.setText(_translate("AlgoPopDialog", "20"))
 

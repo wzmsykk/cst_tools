@@ -4,7 +4,10 @@ from __future__ import annotations
 
 from enum import Enum, auto
 from datetime import datetime
+import json
 import os
+from pathlib import Path
+import tempfile
 import threading
 import time
 from typing import Callable
@@ -16,6 +19,11 @@ from csttool.logging_config import ApplicationLogSession
 from csttool.managed_cstworker import ManagedCSTWorker
 from csttool import projectconfmanager
 from csttool.hom_scan import ScanInterrupted
+from csttool.mesh_convergence import (
+    MeshConvergenceAnalyzer,
+    MeshConvergenceSettings,
+    scalar_postprocess_values,
+)
 from csttool.project_session_recovery import (
     discover_managed_sessions,
     recover_project_sessions,
@@ -60,6 +68,7 @@ class CstApplicationBackend:
         algorithm=None,
         manager_factory: Callable[..., object] | None = None,
         application_logger=None,
+        mesh_convergence_evaluator=None,
     ) -> None:
         self._lifecycle_lock = threading.RLock()
         self.state = BackendState.CREATED
@@ -69,6 +78,7 @@ class CstApplicationBackend:
         self._manager_stop_requested = False
         self._progress_listeners = []
         self._project_run_lock = None
+        self._mesh_convergence_evaluator = mesh_convergence_evaluator
 
         if application_logger is None:
             timestamp = datetime.now().strftime("%Y-%m-%d-%H_%M_%S_%f")
@@ -126,7 +136,10 @@ class CstApplicationBackend:
         return self.gconfman.select_cst_installation(version, executable)
 
     def get_cst_file(self):
-        return self.pconfman.currCSTFilePath
+        return (
+            getattr(self.pconfman, "inputCSTFilePath", None)
+            or self.pconfman.currCSTFilePath
+        )
 
     def get_postprocess_settings(self):
         return self.pconfman.getCurrPPSList()
@@ -192,13 +205,7 @@ class CstApplicationBackend:
         try:
             self._acquire_project_run_lock()
             self.logger.info("RUN_PREPARE project=%s", self.get_project_directory())
-            self.pconfman.prepareProject(self.resume)
-            unresolved = self.get_recovery_sessions()
-            if unresolved:
-                self._set_state(BackendState.RECOVERY_REQUIRED)
-                raise BackendPreparationError(
-                    f"发现 {len(unresolved)} 个未闭合 CST 会话，请先执行会话恢复"
-                )
+            settings = self.alg.getEditableAttrs()
             validate_postprocess = getattr(
                 self.alg,
                 "validate_postprocess_settings",
@@ -206,6 +213,22 @@ class CstApplicationBackend:
             )
             if validate_postprocess is not None:
                 validate_postprocess(self.pconfman.getCurrPPSList())
+            if not self.resume and settings.get("mesh_convergence_enabled", False):
+                recommended = self._run_mesh_convergence(settings)
+                settings["mesh_cells_per_wavelength"] = recommended
+                self.alg.setEditableAttrs(settings)
+            self.pconfman.prepareProject(
+                self.resume,
+                mesh_cells_per_wavelength=settings[
+                    "mesh_cells_per_wavelength"
+                ],
+            )
+            unresolved = self.get_recovery_sessions()
+            if unresolved:
+                self._set_state(BackendState.RECOVERY_REQUIRED)
+                raise BackendPreparationError(
+                    f"发现 {len(unresolved)} 个未闭合 CST 会话，请先执行会话恢复"
+                )
             self.gconfman.printconf()
             self.logger.info("-----------------------------------")
             self._create_manager()
@@ -226,6 +249,114 @@ class CstApplicationBackend:
             raise BackendPreparationError("运行配置准备失败") from exc
         self._set_state(BackendState.PREPARED)
         self.logger.info("RUN_PREPARED workers=%d", self.worker_count)
+
+    def _run_mesh_convergence(self, settings) -> int:
+        convergence = MeshConvergenceSettings(
+            enabled=True,
+            start=int(settings["mesh_convergence_start"]),
+            stop=int(settings["mesh_convergence_stop"]),
+            step=int(settings["mesh_convergence_step"]),
+            tolerance=float(settings["mesh_convergence_tolerance"]),
+        )
+        output_directory = Path(self.get_project_directory()) / "mesh_convergence"
+        analyzer = MeshConvergenceAnalyzer(convergence)
+        self.logger.info(
+            "MESH_CONVERGENCE_START levels=%s tolerance=%g",
+            convergence.levels,
+            convergence.tolerance,
+        )
+        evaluator = self._mesh_convergence_evaluator
+        if evaluator is None:
+            evaluator = lambda level: self._evaluate_mesh_level(
+                level, settings, output_directory
+            )
+        try:
+            report = analyzer.run(evaluator)
+            json_path, csv_path = report.write(output_directory)
+        except Exception as exc:
+            output_directory.mkdir(parents=True, exist_ok=True)
+            (output_directory / "mesh_convergence_error.json").write_text(
+                json.dumps(
+                    {"error": str(exc), "settings": settings},
+                    ensure_ascii=False,
+                    indent=2,
+                ),
+                encoding="utf-8",
+            )
+            raise
+        self.logger.info(
+            "MESH_CONVERGENCE_RESULT converged=%s recommended=%s json=%s csv=%s",
+            report.converged,
+            report.recommended_cells_per_wavelength,
+            json_path,
+            csv_path,
+        )
+        if not report.converged:
+            raise BackendPreparationError(
+                "Mesh 在设定上限内未收敛；请查看 mesh_convergence 报告并提高上限"
+            )
+        return int(report.recommended_cells_per_wavelength)
+
+    def _evaluate_mesh_level(self, level, settings, output_directory):
+        source = self.get_cst_file()
+        if source is None:
+            raise BackendPreparationError("Mesh 收敛分析需要 CST 模板")
+        output_directory.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(
+            prefix=f"cells-{level}-", dir=output_directory
+        ) as temporary:
+            level_directory = Path(temporary)
+            config = projectconfmanager.ProjectConfmanager(
+                GlobalConfigManager=self.gconfman,
+                logger=self.logger,
+            )
+            config.assignProjectDir(level_directory)
+            config.assignInputCSTFilePath(source)
+            config.setCurrPPSList(self.pconfman.getCurrPPSList())
+            config.prepareProject(
+                False, mesh_cells_per_wavelength=level
+            )
+            manager_options = {}
+            if self._uses_default_manager:
+                manager_options["worker_factory"] = ManagedCSTWorker.create
+                manager_options["progress_callback"] = self._publish_cst_progress
+            manager = self._manager_factory(
+                params=config.getParamsList(),
+                pconfm=config,
+                gconfm=self.gconfman,
+                logger=self.logger,
+                maxTask=1,
+                **manager_options,
+            )
+            with self._lifecycle_lock:
+                self.jm = manager
+                self._manager_stop_requested = False
+            try:
+                result = manager.execute(
+                    cstmanager.SimulationTask(
+                        {
+                            "nmodes": 1,
+                            "fmin": settings["fmin"],
+                            "fmax": settings["fmax"],
+                        },
+                        f"mesh-convergence-{level}",
+                        retry_count=1,
+                    )
+                )
+                if result.get("TaskStatus") != "Success":
+                    raise RuntimeError(
+                        result.get("FailureReport", "Mesh 收敛 CST 任务失败")
+                    )
+                values = scalar_postprocess_values(result)
+                self.logger.info(
+                    "MESH_CONVERGENCE_POINT cells=%d values=%s", level, values
+                )
+                return values
+            finally:
+                try:
+                    self._stop_manager_once()
+                finally:
+                    self._clear_manager()
 
     def execute_run(self):
         self._require_state("execute run", BackendState.PREPARED)
@@ -293,7 +424,11 @@ class CstApplicationBackend:
             if self.jm is None:
                 self.logger.info("Stop requested before a manager was created")
                 return
-            if self.state is BackendState.RUNNING:
+            if self.state in {
+                BackendState.INITIALIZED,
+                BackendState.PREPARED,
+                BackendState.RUNNING,
+            }:
                 self.state = BackendState.STOPPING
                 accepted = True
         if accepted:

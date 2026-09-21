@@ -28,6 +28,7 @@ def test_cst_preprocessor_adds_hom_parameters_without_modifying_source(
         output,
         parameter_json,
         tmp_path / "runtime",
+        mesh_cells_per_wavelength=24,
     )
 
     after = hashlib.sha256(source.read_bytes()).hexdigest()
@@ -38,3 +39,4 @@ def test_cst_preprocessor_adds_hom_parameters_without_modifying_source(
     assert values["fmin"] == "400"
     assert values["fmax"] == "550"
     assert values["nmodes"] == "1"
+    assert values["cell"] == "24"

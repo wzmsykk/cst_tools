@@ -39,6 +39,11 @@ Sub EnsureHomParameters
     If Not DoesParameterExist("nmodes") Then
         StoreParameterWithDescription "nmodes", "1", "Number of eigenmodes"
     End If
+    If DoesParameterExist("cell") Then
+        StoreParameter "cell", "%MESHCELLSPERWAVELENGTH%"
+    Else
+        StoreParameterWithDescription "cell", "%MESHCELLSPERWAVELENGTH%", "Fixed tetrahedral cells per wavelength"
+    End If
 End Sub
 
 Sub BindHomSolverSettings
@@ -47,6 +52,11 @@ Sub BindHomSolverSettings
     history = history & "With EigenmodeSolver" & vbCrLf
     history = history & ".SetFrequencyTarget ""True"", ""fmin""" & vbCrLf
     history = history & ".SetNumberOfModes ""nmodes""" & vbCrLf
+    history = history & ".SetMeshAdaptationTet ""False""" & vbCrLf
+    history = history & "End With" & vbCrLf
+    history = history & "With MeshSettings" & vbCrLf
+    history = history & ".SetMeshType ""Tet""" & vbCrLf
+    history = history & ".Set ""StepsPerWaveNear"", ""cell""" & vbCrLf
     history = history & "End With" & vbCrLf
     AddToHistory "CST Tools: Bind HOM solver parameters", history
 End Sub

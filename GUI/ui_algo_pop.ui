@@ -137,6 +137,12 @@
     </rect>
    </property>
   </widget>
+  <widget class="QLabel" name="meshCellsLabel">
+   <property name="text"><string>固定网格：每波长单元数</string></property>
+  </widget>
+  <widget class="QLineEdit" name="meshCellsLineEdit">
+   <property name="text"><string>20</string></property>
+  </widget>
  </widget>
  <resources/>
  <connections>

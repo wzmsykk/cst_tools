@@ -42,7 +42,7 @@ class ModernManagerOnly:
 def test_algorithm_executes_named_parameter_mapping_through_simulation_task(tmp_path):
     manager = ModernManagerOnly(tmp_path)
     algorithm = myAlg01(manager=manager, params=[])
-    values = [1, 700, 800, 1e-5, 20]
+    values = [1, 700, 800]
 
     result = algorithm._execute_simulation(values, "band-1", retry_count=2)
 
@@ -53,8 +53,6 @@ def test_algorithm_executes_named_parameter_mapping_through_simulation_task(tmp_
                 "nmodes": 1,
                 "fmin": 700,
                 "fmax": 800,
-                "accuracy": 1e-5,
-                "cell": 20,
             },
             job_name="band-1",
             retry_count=2,

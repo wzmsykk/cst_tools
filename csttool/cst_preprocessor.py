@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import logging
+import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -13,7 +14,7 @@ from typing import Callable
 from csttool import projectutil
 
 
-REQUIRED_HOM_PARAMETERS = frozenset({"fmin", "fmax", "nmodes"})
+REQUIRED_HOM_PARAMETERS = frozenset({"fmin", "fmax", "nmodes", "cell"})
 
 
 class CstPreprocessError(RuntimeError):
@@ -37,12 +38,27 @@ class CstProjectPreprocessor:
         timeout: float = 180.0,
         runner: Callable = subprocess.run,
         logger: logging.Logger | None = None,
+        run_in_background: bool = True,
     ) -> None:
         self.executable = Path(executable)
         self.macro_template = Path(macro_template)
         self.timeout = float(timeout)
         self.runner = runner
         self.logger = logger or logging.getLogger(__name__)
+        self.run_in_background = bool(run_in_background)
+
+    def _startup_options(self) -> dict:
+        """Start CST minimized without activating its main window on Windows."""
+        if os.name != "nt":
+            return {}
+        options = {"creationflags": subprocess.CREATE_NEW_PROCESS_GROUP}
+        if not self.run_in_background:
+            return options
+        startupinfo = subprocess.STARTUPINFO()
+        startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+        startupinfo.wShowWindow = 7  # SW_SHOWMINNOACTIVE
+        options["startupinfo"] = startupinfo
+        return options
 
     @staticmethod
     def _vb_path(path: Path) -> str:
@@ -53,12 +69,14 @@ class CstProjectPreprocessor:
         project_path: Path,
         parameter_output: Path,
         status_output: Path,
+        mesh_cells_per_wavelength: int,
     ) -> str:
         source = self.macro_template.read_text(encoding="utf-8-sig")
         replacements = {
             "%CSTPROJFILE%": self._vb_path(project_path),
             "%PARAMDSTPATH%": self._vb_path(parameter_output),
             "%STATUSPATH%": self._vb_path(status_output),
+            "%MESHCELLSPERWAVELENGTH%": str(int(mesh_cells_per_wavelength)),
         }
         for marker, value in replacements.items():
             if marker not in source:
@@ -72,6 +90,8 @@ class CstProjectPreprocessor:
         output_project_path: str | Path,
         parameter_json_path: str | Path,
         temp_directory: str | Path,
+        *,
+        mesh_cells_per_wavelength: int = 20,
     ) -> CstPreprocessResult:
         source_project_path = Path(source_project_path).resolve()
         output_project_path = Path(output_project_path).resolve()
@@ -103,7 +123,12 @@ class CstProjectPreprocessor:
             status_output = working / "completion.txt"
             shutil.copy2(source_project_path, working_project)
             macro_path.write_text(
-                self.render_macro(working_project, parameter_output, status_output),
+                self.render_macro(
+                    working_project,
+                    parameter_output,
+                    status_output,
+                    mesh_cells_per_wavelength,
+                ),
                 encoding="utf-8",
             )
             command = [str(self.executable), "-m", str(macro_path)]
@@ -116,6 +141,7 @@ class CstProjectPreprocessor:
                     errors="replace",
                     timeout=self.timeout,
                     check=False,
+                    **self._startup_options(),
                 )
             except subprocess.TimeoutExpired as exc:
                 raise CstPreprocessError("CST 工程参数预处理超时") from exc

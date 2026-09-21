@@ -35,16 +35,23 @@ class HomRunManifest:
     background: bool
     cst_version: str = ""
     cst_executable: str = ""
+    mesh_cells_per_wavelength: int = 20
 
     @classmethod
-    def create(cls, manager, policy) -> "HomRunManifest":
+    def create(
+        cls,
+        manager,
+        policy,
+        *,
+        mesh_cells_per_wavelength: int = 20,
+    ) -> "HomRunManifest":
         prepared = Path(manager.cstProjPath).resolve()
         project_config = getattr(manager, "pconfm", None)
         source = getattr(project_config, "inputCSTFilePath", None) or prepared
         global_config = getattr(manager, "gconf", None)
         cst_section = global_config["CST"] if global_config is not None else {}
         return cls(
-            schema_version=2,
+            schema_version=3,
             source_project=str(Path(source).resolve()),
             prepared_project=str(prepared),
             project_sha256=file_sha256(prepared),
@@ -56,6 +63,7 @@ class HomRunManifest:
             background=True,
             cst_version=str(cst_section.get("cstver", "")),
             cst_executable=str(cst_section.get("cstexepath", "")),
+            mesh_cells_per_wavelength=int(mesh_cells_per_wavelength),
         )
 
     def write_once(self, path: str | Path) -> Path:
@@ -77,9 +85,20 @@ class HomRunManifest:
         return path
 
     @classmethod
-    def ensure(cls, path: str | Path, manager, policy) -> "HomRunManifest":
+    def ensure(
+        cls,
+        path: str | Path,
+        manager,
+        policy,
+        *,
+        mesh_cells_per_wavelength: int = 20,
+    ) -> "HomRunManifest":
         path = Path(path)
-        current = cls.create(manager, policy)
+        current = cls.create(
+            manager,
+            policy,
+            mesh_cells_per_wavelength=mesh_cells_per_wavelength,
+        )
         if path.exists():
             existing = cls(**json.loads(path.read_text(encoding="utf-8")))
             if getattr(getattr(manager, "pconfm", None), "inputCSTFilePath", None) is None:
