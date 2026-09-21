@@ -120,6 +120,8 @@ CST 工程预处理与正式 Warm Worker 均以不抢占焦点的最小化方式
 
 Mesh 收敛分析是新项目启动前的可选阶段。默认按 `10, 15, 20, 25, 30 cells/λ` 逐级建立临时工程，对同一频段的单模标量后处理结果计算相邻级别相对变化；所有结果低于默认 `1%` 容差且连续两个级别稳定时提前停止，并把该级 Mesh 自动用于正式项目。分析结果输出到项目目录下的 `mesh_convergence/mesh_convergence.json` 与 `.csv`；未在上限内收敛时不启动正式扫描，并保留报告供调整范围。
 
+配置层主类已采用 `GlobalConfigManager` 与 `ProjectConfigManager` 命名，旧名称仅作为兼容别名。全局 INI、项目 INI 和后处理 JSON 使用带编码的上下文管理与同目录原子替换；全局默认配置位于所选 `current.ini` 的同级目录，并作为缺失字段的默认层加载。
+
 ## 6. 尚未完成
 
 - 旧 Worker、Pattern 和队列式 Manager API 已删除；生产只通过显式 Worker 工厂创建 Managed Worker；

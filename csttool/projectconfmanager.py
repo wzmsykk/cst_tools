@@ -1,12 +1,13 @@
 import configparser
-import shutil, json
-import pathlib, shutil
+import hashlib
+import json
+import logging
+import os
+from pathlib import Path
+import shutil
+import tempfile
 from enum import Enum
 from install_compat import resource_path
-import json
-import hashlib
-import logging
-from . import projectutil
 from .cst_preprocessor import CstProjectPreprocessor
 
 
@@ -25,11 +26,10 @@ class TaskStatus(Enum):
 
 
 class ProjectStatusError(Exception):
-    def __init__(self, message):
-        self.meg = message
+    """The persisted project state cannot satisfy the requested operation."""
 
 
-class ProjectConfmanager(object):
+class ProjectConfigManager:
     def __init__(
         self,
         GlobalConfigManager=None,
@@ -57,18 +57,12 @@ class ProjectConfmanager(object):
         self.ready = False
         return self.ready
 
-    def __isCFGfileexist(self):
-        if self.currProjectDir != None:
-            if (self.currProjectDir / self.CFGfilename).exists():
-                return True
-        return False
-
     def _rap2apo(
         self, inpath
     ):  # relative or abs path to abspath object related to project dir as base dir
         if self.currProjectDir == None:
             raise AttributeError
-        op = pathlib.Path(inpath)
+        op = Path(inpath)
         if not op.is_absolute():
             op = self.currProjectDir / op
         return op
@@ -76,7 +70,7 @@ class ProjectConfmanager(object):
     def __isDirClean(self, projectDir):
         # new clean project output dir or existed int mid file
         # dir must exist
-        iDir = pathlib.Path(projectDir)
+        iDir = Path(projectDir)
         self.logger.info("尝试打开project目录%s。" % str(iDir))
         cfgfilename = self.CFGfilename
         cfgpath = iDir / cfgfilename
@@ -93,7 +87,7 @@ class ProjectConfmanager(object):
 
     def __getTaskStatus(self, projectDir):
         # 任务完成情况
-        iDir = pathlib.Path(projectDir)
+        iDir = Path(projectDir)
         cfgfilename = self.CFGfilename
         cfgpath = iDir / cfgfilename
         if not cfgpath.exists():
@@ -109,12 +103,12 @@ class ProjectConfmanager(object):
 
     def assignProjectDir(self, projectDir):
         self.setNotReady()  # changed Path so Not Ready
-        self.currProjectDir = pathlib.Path(projectDir).absolute()
+        self.currProjectDir = Path(projectDir).absolute()
         self.logger.info("PCM:currProjectDir 已设为%s" % self.currProjectDir)
 
     def assignInputCSTFilePath(self, CSTfilePath):
         self.setNotReady()
-        self.inputCSTFilePath = pathlib.Path(CSTfilePath).absolute()
+        self.inputCSTFilePath = Path(CSTfilePath).absolute()
         self.logger.info("PCM:inputCSTFilePath 已设为%s" % self.inputCSTFilePath)
 
     def __ready(self):
@@ -199,10 +193,16 @@ class ProjectConfmanager(object):
                 )
 
     def __savecfgobj(self, confobj, cfgfilename="project.ini", slient=False):
-        cfgfilePath = self.currProjectDir / "project.ini"
-        f = open(cfgfilePath, "w")
-        confobj.write(f)
-        f.close()
+        cfgfilePath = self.currProjectDir / cfgfilename
+        with tempfile.NamedTemporaryFile(
+            "w",
+            encoding="utf-8",
+            dir=cfgfilePath.parent,
+            delete=False,
+        ) as stream:
+            confobj.write(stream)
+            temporary = Path(stream.name)
+        os.replace(temporary, cfgfilePath)
 
     def savecfg(self, cfgfilename="project.ini"):
         self.__savecfgobj(self.conf, cfgfilename)
@@ -211,7 +211,7 @@ class ProjectConfmanager(object):
         self, projectDir="", cfgfilename="project.ini", projectname=None
     ):
         # Config内所有路径都是相对于projectDir这一文件夹
-        iProjectDir = pathlib.Path(projectDir)
+        iProjectDir = Path(projectDir)
         cfgfilepath = iProjectDir / cfgfilename
         self.logger.info("开始创建配置文件%s于%s。" % (cfgfilename, str(cfgfilepath)))
         newconf = configparser.ConfigParser()
@@ -281,14 +281,10 @@ class ProjectConfmanager(object):
             savejsonpath=savejsonname,
             mesh_cells_per_wavelength=mesh_cells_per_wavelength,
         )
-        confobj.set("CST", "CSTFilename", str(pathlib.Path(savednewcstpath).name))
+        confobj.set("CST", "CSTFilename", str(Path(savednewcstpath).name))
         file_md5 = self.genMD5FromCST(savednewcstpath)
         confobj.set("CST", "CSTFileMD5", file_md5.hexdigest())
         self.logger.info("Config内容更新完成")
-        return confobj
-
-    def __updateTaskStatusInConfObj(self, confobj, taskstatus):
-        confobj.set("TASK", "status", taskstatus.name)
         return confobj
 
     def updateTaskStatus(self, taskstatus):
@@ -316,15 +312,14 @@ class ProjectConfmanager(object):
             "DCMainControlAddress:%s" % confobj["CST"]["DCMainControlAddress"]
         )
         self.logger.info("参数列表文件:%s" % confobj["PARAMETERS"]["paramfile"])
-        self.printparams(confobj, projectDir)
+        self.printParamsInfo(confobj, projectDir)
 
     def printParamsInfo(self, confobj, projectDir):
 
         paramfile = projectDir / confobj["PARAMETERS"]["paramfile"]
-        f = open(paramfile, "r")
-        pamlist = json.load(f)
+        with Path(paramfile).open("r", encoding="utf-8") as stream:
+            pamlist = json.load(stream)
         print(pamlist)
-        f.close()
 
     def getParamsList(self):
         return self.__getParamsList(self.conf, self.currProjectDir)
@@ -345,17 +340,14 @@ class ProjectConfmanager(object):
             paramfile = projectDir / confobj["PARAMETERS"]["paramfile"]
         else:
             paramfile = jsonpath
-        f = open(paramfile, "r")
-        pamlist = json.load(f)
-        f.close()
-        return pamlist
+        with Path(paramfile).open("r", encoding="utf-8") as stream:
+            return json.load(stream)
 
     def genMD5FromCST(self, cstfilepath):
-        # 生成MD5
-        fp = open(cstfilepath, "rb")
-        dat = fp.read()
-        file_md5 = hashlib.md5(dat)
-        fp.close()
+        file_md5 = hashlib.md5()
+        with Path(cstfilepath).open("rb") as stream:
+            for block in iter(lambda: stream.read(1024 * 1024), b""):
+                file_md5.update(block)
         return file_md5
 
     def _preprocess_cst_project(
@@ -370,20 +362,20 @@ class ProjectConfmanager(object):
         if savejsonpath is None:
             jsonpath = projectDir / self.paramsfilename
         else:
-            jsonpath = pathlib.Path(savejsonpath)
+            jsonpath = Path(savejsonpath)
             if not jsonpath.is_absolute():
                 jsonpath = projectDir / jsonpath
 
-        td = pathlib.Path(confobj["DIRS"]["tempdir"])
+        td = Path(confobj["DIRS"]["tempdir"])
         if not td.is_absolute():
             td = projectDir / td
         source_project = (
-            pathlib.Path(projectDir).absolute() / confobj["CST"]["CSTFilename"]
+            Path(projectDir).absolute() / confobj["CST"]["CSTFilename"]
         )
-        candidate = pathlib.Path(projectDir).absolute() / "processed.cst"
+        candidate = Path(projectDir).absolute() / "processed.cst"
         suffix = 1
         while candidate.exists() or candidate == source_project:
-            candidate = pathlib.Path(projectDir).absolute() / f"processed_{suffix}.cst"
+            candidate = Path(projectDir).absolute() / f"processed_{suffix}.cst"
             suffix += 1
         macro_template = (
             resource_path(self.gconf["BASE"]["datadir"])
@@ -546,26 +538,35 @@ class ProjectConfmanager(object):
         return self.readPPSListFromFile(ppspath)
 
     def readPPSListFromFile(self, ppspath):
-        lst = []
-
         try:
-            fp = open(ppspath, "r")
-            lst = json.load(fp)
-            fp.close()
-            return lst
-        except:
-            self.logger.info("后处理设定读取失败")
-            return lst
+            with Path(ppspath).open("r", encoding="utf-8") as stream:
+                result = json.load(stream)
+            if not isinstance(result, list):
+                raise ValueError("postprocess configuration must be a list")
+            return result
+        except (OSError, json.JSONDecodeError, ValueError) as exc:
+            self.logger.warning("后处理设定读取失败: %s", exc)
+            return []
 
     def savePPSSettings(self, ppslist):
         ppspath = self.currProjectDir / self.conf.get("PARAMETERS", "ppsfile")
         try:
-            fp = open(ppspath, "w")
-            json.dump(ppslist, fp, indent=4)
-            fp.close()
+            with tempfile.NamedTemporaryFile(
+                "w",
+                encoding="utf-8",
+                dir=ppspath.parent,
+                delete=False,
+            ) as stream:
+                json.dump(ppslist, stream, ensure_ascii=False, indent=4)
+                temporary = Path(stream.name)
+            os.replace(temporary, ppspath)
             self.logger.info("后处理设定已保存至%s" % str(ppspath))
             return True
-        except:
-            self.logger.info("后处理设定保存失败")
+        except (OSError, TypeError, ValueError) as exc:
+            self.logger.error("后处理设定保存失败: %s", exc)
             return False
+
+
+# Compatibility alias for callers using the historical spelling.
+ProjectConfmanager = ProjectConfigManager
 

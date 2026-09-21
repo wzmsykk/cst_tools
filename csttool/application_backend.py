@@ -96,10 +96,10 @@ class CstApplicationBackend:
             self.logger = application_logger
 
         self.logger.info("数据路径%s", resource_path("."))
-        self.gconfman = global_config_manager or globalconfmanager.GlobalConfmanager(
+        self.gconfman = global_config_manager or globalconfmanager.GlobalConfigManager(
             logger=self.logger
         )
-        self.pconfman = project_config_manager or projectconfmanager.ProjectConfmanager(
+        self.pconfman = project_config_manager or projectconfmanager.ProjectConfigManager(
             GlobalConfigManager=self.gconfman,
             logger=self.logger,
         )
@@ -306,7 +306,7 @@ class CstApplicationBackend:
             prefix=f"cells-{level}-", dir=output_directory
         ) as temporary:
             level_directory = Path(temporary)
-            config = projectconfmanager.ProjectConfmanager(
+            config = projectconfmanager.ProjectConfigManager(
                 GlobalConfigManager=self.gconfman,
                 logger=self.logger,
             )

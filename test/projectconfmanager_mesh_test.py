@@ -3,11 +3,11 @@ import logging
 
 import pytest
 
-from csttool.projectconfmanager import ProjectConfmanager, ProjectStatusError
+from csttool.projectconfmanager import ProjectConfigManager, ProjectStatusError
 
 
 def _manager_with_config(config):
-    manager = object.__new__(ProjectConfmanager)
+    manager = object.__new__(ProjectConfigManager)
     manager.conf = config
     manager.logger = logging.getLogger("projectconfmanager-mesh-test")
     return manager

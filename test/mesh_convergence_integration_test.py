@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 from csttool.application_backend import CstApplicationBackend
-from csttool.projectconfmanager import ProjectConfmanager
+from csttool.projectconfmanager import ProjectConfigManager
 
 
 pytestmark = pytest.mark.integration
@@ -26,7 +26,7 @@ def test_real_pillbox_mesh_convergence_produces_report(
 ):
     root = Path(__file__).parents[1]
     global_config = _GlobalConfig(root, cst_executable)
-    project_config = ProjectConfmanager(
+    project_config = ProjectConfigManager(
         GlobalConfigManager=global_config,
         logger=logging.getLogger("mesh-convergence-integration"),
     )

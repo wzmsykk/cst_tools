@@ -1,7 +1,8 @@
 import configparser
 import os
-import pathlib
 import logging
+from pathlib import Path
+import tempfile
 
 from csttool.cst_installations import (
     CstInstallation,
@@ -9,7 +10,7 @@ from csttool.cst_installations import (
     validate_cst_installation,
 )
 
-class GlobalConfmanager(object):
+class GlobalConfigManager:
     def __init__(
         self,
         configpath=r".\config\current.ini",
@@ -21,11 +22,10 @@ class GlobalConfmanager(object):
         else:
             self.logger = logging.getLogger(__name__)
         self.conf = configparser.ConfigParser()
-        self.confdir = pathlib.Path(r".\config")
-        if not self.confdir.exists():
-            self.confdir.mkdir()
+        self.curr_global_cfg_path = Path(configpath)
+        self.confdir = self.curr_global_cfg_path.parent
+        self.confdir.mkdir(parents=True, exist_ok=True)
         self.def_global_cfg_path = self.confdir / "default.ini"
-        self.curr_global_cfg_path = pathlib.Path(configpath)
         ##Generate new default conf file
         if not self.def_global_cfg_path.exists():
             self.createEmptyGlobalConfigFile(self.def_global_cfg_path)
@@ -37,7 +37,10 @@ class GlobalConfmanager(object):
             self.saveconf()
         else:
             self.logger.info("找到curr_global_cfg:%s" % str(self.curr_global_cfg_path))
-            self.conf.read(self.curr_global_cfg_path)
+            self.conf.read(
+                [self.def_global_cfg_path, self.curr_global_cfg_path],
+                encoding="utf-8",
+            )
     
     def printconf(self):
         self.logger.info("----------------------------------------------------------")
@@ -73,14 +76,19 @@ class GlobalConfmanager(object):
         return savepath
 
     def _rstr2astr(self, instr):  # _relative_path_str_to_abspath_str function
-        ostr = str(pathlib.Path(instr).absolute())
+        ostr = str(Path(instr).absolute())
         return ostr
 
     def __saveconf(self, confobj, path):
-        f = open(path, "w")
-        confobj.write(f)
+        path = Path(path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with tempfile.NamedTemporaryFile(
+            "w", encoding="utf-8", dir=path.parent, delete=False
+        ) as stream:
+            confobj.write(stream)
+            temporary = Path(stream.name)
+        os.replace(temporary, path)
         self.logger.info("已保存全局配置文件于%s。" % str(path))
-        f.close()
 
     def saveconf(self):
         """
@@ -119,9 +127,9 @@ class GlobalConfmanager(object):
         # 测试各个路径是否存在，若否则创建目录
         self.logger.info("检查各个路径是否存在.")
         for names, dirs in cfg["BASE"].items():
-            pathobj = pathlib.Path(dirs)
+            pathobj = Path(dirs)
             if not pathobj.exists():
-                pathobj.mkdir()
+                pathobj.mkdir(parents=True, exist_ok=True)
                 self.logger.info("已建立%s于%s。" % (names, dirs))
 
         self.logger.info("检查全局配置结束.")
@@ -131,7 +139,7 @@ class GlobalConfmanager(object):
             self.logger.info("通过全局配置检测")
         return result
 
-    def findCSTenv(self=None):
+    def findCSTenv(self):
         self.logger.info("寻找CSTenv开始")
         installations = self.list_cst_installations()
         if installations:
@@ -156,7 +164,7 @@ class GlobalConfmanager(object):
         )
 
     def select_cst_installation(
-        self, version: int | str, executable: str | pathlib.Path
+        self, version: int | str, executable: str | Path
     ) -> CstInstallation:
         selected = validate_cst_installation(version, executable)
         self.conf["CST"]["cstver"] = str(selected.version)
@@ -176,4 +184,8 @@ class GlobalConfmanager(object):
             self.logger.info("FOUND Poisson Superfish ENV at %s" % (sfdir))
             self.conf.set("superfish", "dirpath", sfdir)
             return True
+
+
+# Compatibility alias for callers using the historical spelling.
+GlobalConfmanager = GlobalConfigManager
 
