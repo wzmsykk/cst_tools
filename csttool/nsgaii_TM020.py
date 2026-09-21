@@ -1,10 +1,5 @@
 """produce LHS sample"""
 
-###修改内容
-###runWithX 修改为 runWithParam 需要提供param_name_list 和 value_list 作为参数
-###addTask 同上
-###初值需要自己写，留空[]则为默认
-###
 import os, shutil
 from .myAlgorithm import myAlg
 from random import random, seed, shuffle, choices, sample
@@ -232,14 +227,14 @@ class myAlg_nsga(myAlg):
             "frequency",
             "R_divide_Q",
             "Q-factor",
-            "Shunt_Inpedence",
+            "Shunt_Impedance",
         ]
         self.mid_var_name = []
         self.object_name = [
             "frequency_offset",
             "R_divide_Q",
             "Q-factor",
-            "Shunt_Inpedence",
+            "Shunt_Impedance",
         ]
         self.constrainted_object_name = ["frequency"]
         ##### Freq Options
@@ -872,42 +867,6 @@ class myAlg_nsga(myAlg):
                 objarray.append(ABNORMAL_NUM)
             objarray[1] = -ABNORMAL_NUM
         return objarray, cindarray, rawarray
-
-    def start2(self):
-
-        # resultPath=self.manager.resultDir / "TestResult.json"
-
-        # params={"Leq":90,"Req":190}
-        # result=self.manager.runWithParam(params=params,job_name="test")
-        # print(result)
-        # params={"Leq":60,"Req":180}
-        # result=self.manager.runWithParam(params=params,job_name="test2")
-        # print(result)
-
-        # params1={"Leq":90,"Req":190}
-        # self.manager.addTask(params=params1,job_name="TEST01")
-        # params2={"Leq":60,"Req":180}
-        # self.manager.addTask(params=params2,job_name="TEST02")
-
-        # params1={"Leq":100,"Req":190}
-        # self.manager.addTask(params=params1,job_name="TEST03")
-        # params2={"Leq":60,"Req":160}
-        # self.manager.addTask(params=params2,job_name="TEST04")
-
-        # self.manager.startProcessing()
-        resultPath = r"F:\programs\cst_tools\test\TestResult.json"
-        fp = open(resultPath, "r")
-        results = json.load(fp)
-        pr = self.getTM020Result(results[0])
-        print(pr)
-        # results=self.manager.getFullResults()
-
-        # fp=open(resultPath,"w")
-        # json.dump(results,fp,indent=4)
-        # fp.close()
-
-        # print(results)
-        pass
 
     def dump_poplist(self, igen, poplist):
         fp = open(self.manager.resultDir / ("GEN_%d_Population.json" % igen), "w")

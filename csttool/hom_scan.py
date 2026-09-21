@@ -252,7 +252,6 @@ class AdaptiveHomScanner:
 
 class ScanCheckpointStore:
     SCHEMA_VERSION = 3
-    COMPATIBLE_VERSIONS = {2, 3}
 
     def __init__(self, path: str | Path):
         self.path = Path(path)
@@ -312,7 +311,7 @@ class ScanCheckpointStore:
 
     def _load_document(self, policy: ScanPolicy, project_fingerprint: dict):
         document = json.loads(self.path.read_text(encoding="utf-8"))
-        if document.get("schemaVersion") not in self.COMPATIBLE_VERSIONS:
+        if document.get("schemaVersion") != self.SCHEMA_VERSION:
             raise ScanConfigurationError("unsupported HOM checkpoint version")
         if document.get("policy") != asdict(policy):
             raise ScanConfigurationError("checkpoint scan policy does not match")

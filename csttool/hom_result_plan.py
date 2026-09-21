@@ -103,9 +103,6 @@ def _default_hom_profile() -> HomProjectProfile:
     return HOM_PROFILE_V1
 
 
-HOM_NATIVE_R_OVER_Q = native_r_over_q_for_profile(_default_hom_profile())
-
-
 def plan_hom_r_over_q(
     request: IntegrationLine,
     native_results: Mapping[IntegrationLine, str] | None = None,

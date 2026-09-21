@@ -246,8 +246,8 @@ class ProbabilisticHomWorker:
             return "Q-factor"
         if method == "Total_Loss":
             return "Total_Loss"
-        if method == "Shunt_Inpedence":
-            return "Shunt_Inpedence"
+        if method == "Shunt_Impedance":
+            return "Shunt_Impedance"
         if method == "R_over_Q":
             offsets = [
                 abs(float(params.get(name, 0.0)))
@@ -284,7 +284,7 @@ class ProbabilisticHomWorker:
             "R_divide_Q_5mm",
             "R_divide_Q_10mm",
             "Q-factor",
-            "Shunt_Inpedence",
+            "Shunt_Impedance",
             "Total_Loss",
         )
         return [

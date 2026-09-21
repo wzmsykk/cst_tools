@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from csttool.hom_native_results import read_hom_native_results
+from csttool.native_results import read_profile_native_results
 from csttool.hom_project_profile import HOM_PROFILE_V1
 from csttool.postprocess_cst import VBPostProcessor
 from csttool.protocol_hom_runtime_postprocess import (
@@ -55,7 +55,7 @@ def test_hom_runtime_r_over_q_uses_solved_fields_without_parameter_update(
                 worker, task, process, timeout=1800
             )
             assert completion.status is CompletionStatus.SUCCESS, completion
-            native = read_hom_native_results(
+            native = read_profile_native_results(
                 worker.snapshot_path.with_suffix(""), HOM_PROFILE_V1
             )
             runtime = {

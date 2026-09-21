@@ -191,7 +191,7 @@ class AddPostProcessDialog(QDialog, Ui_AddComplexPostDialog):
         self.reset()
         self.setTargetPPS(setting.method)
         base = setting.method[:-4] if setting.method.endswith("_All") else setting.method
-        self.setComplexMode(base in {"R_over_Q", "Shunt_Inpedence"})
+        self.setComplexMode(base in {"R_over_Q", "Shunt_Impedance"})
         self.resultNameEdit.setText(setting.result_name)
         self.ModeIndexEdit.setText(str(setting.params.get("iModeNumber", 1)))
         self.xoffsetEdit.setText(str(setting.params.get("xoffset", 0)))
@@ -303,7 +303,7 @@ class PostProcessSettingsDialog(QDialog, Ui_PostProcessSettingDialog):
             self.AddQButton_Enclosure: ("Q_Enclosure", False),
             self.AddQButton_Volume: ("Q_Volume", False),
             self.AddQButton_Surface: ("Q_Surface", False),
-            self.AddSIButton: ("Shunt_Inpedence", True),
+            self.AddSIButton: ("Shunt_Impedance", True),
             self.AddFreqButton: ("Frequency", False),
         }
         for button, (method, complex_mode) in actions.items():

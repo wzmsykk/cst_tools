@@ -7,9 +7,7 @@ from csttool.hom_project_profile import (
     ProfileValidationError,
     ResultTemplateRequirement,
 )
-from csttool.hom_native_results import HOM_NATIVE_SCALARS
 from csttool.hom_result_plan import (
-    HOM_NATIVE_R_OVER_Q,
     IntegrationLine,
     native_r_over_q_for_profile,
 )
@@ -55,13 +53,12 @@ def test_hom_profile_requires_exact_registered_template_identity():
 
 
 def test_native_readers_and_routing_are_derived_from_profile():
-    assert HOM_NATIVE_SCALARS is HOM_PROFILE_V1.native_scalars
-    assert HOM_NATIVE_R_OVER_Q == {
+    expected = {
         IntegrationLine("z"): "r_over_q",
         IntegrationLine("z", yoffset_mm=5): "r_over_q_offset_5mm",
         IntegrationLine("z", yoffset_mm=10): "r_over_q_offset_10mm",
     }
-    assert native_r_over_q_for_profile(HOM_PROFILE_V1) == HOM_NATIVE_R_OVER_Q
+    assert native_r_over_q_for_profile(HOM_PROFILE_V1) == expected
 
 
 def test_profile_can_represent_a_missing_required_template():

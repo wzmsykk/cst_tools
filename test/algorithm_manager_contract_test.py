@@ -5,7 +5,7 @@ from csttool.myAlgorithm_pop import myAlg01
 
 
 class ModernManagerOnly:
-    """Manager double intentionally exposing no legacy queue methods."""
+    """Manager double exposing only the supported structured task API."""
 
     def __init__(self, root: Path):
         self.currProjectDir = root

@@ -73,7 +73,7 @@ def _install_fixed_runtime_extension(
     extension = Path(
         resource_path("data/postprocess/EigenResult_Complex_All.vb")
     ).read_text(encoding="ascii")
-    marker = "' Independent one-shot Worker v1. This does not replace legacy worker.vb."
+    marker = "' Independent one-shot Worker v1."
     if marker not in macro:
         raise ValueError("one-shot worker marker is missing")
     macro = macro.replace(marker, extension + "\n\n" + marker, 1)

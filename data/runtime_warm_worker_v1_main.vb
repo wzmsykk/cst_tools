@@ -1,4 +1,4 @@
-' Bounded two-task Warm Worker v1. This does not replace legacy worker.vb.
+' Bounded two-task Warm Worker v1.
 Sub Main
     Dim errorMessage As String
     Dim i As Long

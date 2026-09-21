@@ -121,7 +121,9 @@ def test_batch_runs_concurrently_and_returns_submission_order(manager_factory):
 def test_failed_task_restarts_worker_and_retries(manager_factory):
     manager, tracker = manager_factory(workers=1, outcomes=["Failure", "Success"])
 
-    result = manager.runWithParam({"x": 1}, "retry-me", retry_cnt=1)
+    result = manager.execute(
+        SimulationTask({"x": 1}, "retry-me", retry_count=1)
+    )
 
     assert result["TaskStatus"] == "Success"
     assert len(tracker["created"]) == 2
@@ -270,17 +272,17 @@ def test_explicit_snapshot_restore_rebuilds_idle_worker_pool(tmp_path):
         manager.stop()
 
 
-def test_get_first_result_preserves_remaining_result_order(manager_factory):
+def test_run_batch_preserves_result_order(manager_factory):
     manager, _ = manager_factory(workers=2)
-    for value in range(3):
-        manager.addTask({"x": value}, f"job-{value}")
-    manager.startProcessing()
+    results = manager.run_batch(
+        [SimulationTask({"x": value}, f"job-{value}") for value in range(3)]
+    )
 
-    first = manager.getFirstResult()
-    remaining = manager.getFullResults()
-
-    assert first["RunName"] == "job-0"
-    assert [result["RunName"] for result in remaining] == ["job-1", "job-2"]
+    assert [result["RunName"] for result in results] == [
+        "job-0",
+        "job-1",
+        "job-2",
+    ]
 
 
 def test_context_manager_stops_every_worker(manager_factory):
@@ -301,6 +303,7 @@ def test_invalid_configuration_is_rejected(tmp_path):
             FakeProjectConfig(tmp_path),
             params=[],
             maxTask=0,
+            worker_factory=lambda *_args: None,
         )
 
 

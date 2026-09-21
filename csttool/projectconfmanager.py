@@ -7,7 +7,6 @@ import json
 import hashlib
 import logging
 from . import projectutil
-from . import preprocess_cst
 from .cst_preprocessor import CstProjectPreprocessor
 
 
@@ -225,7 +224,6 @@ class ProjectConfmanager(object):
 
         newconf.add_section("PROJECT")
         newconf.set("PROJECT", "ProjectName", currprojname)
-        newconf.set("PROJECT", "ProjectType", "default")
         newconf.set("PROJECT", "ProjectDescription", "")
         newconf.add_section("DIRS")
         # 保存为相对路径
@@ -261,7 +259,7 @@ class ProjectConfmanager(object):
         self.logger.info("根据输入的CST文件进行预处理且更新Config内容")
         savejsonname = confobj.get("PARAMETERS", "paramfile")
         confobj.set("CST", "CSTFilename", str(cstFilePath))
-        savednewcstpath = self.__vbpreprocess_CST(
+        savednewcstpath = self._preprocess_cst_project(
             confobj, projectDir=self.currProjectDir, savejsonpath=savejsonname
         )
         confobj.set("CST", "CSTFilename", str(pathlib.Path(savednewcstpath).name))
@@ -283,7 +281,6 @@ class ProjectConfmanager(object):
     def printConfInfo(self, confobj, projectDir):
         self.logger.info("项目信息:")
         self.logger.info("ProjectName:%s" % confobj["PROJECT"]["ProjectName"])
-        self.logger.info("ProjectType:%s" % confobj["PROJECT"]["ProjectType"])
         self.logger.info(
             "ProjectDescription:%s" % confobj["PROJECT"]["ProjectDescription"]
         )
@@ -342,52 +339,7 @@ class ProjectConfmanager(object):
         fp.close()
         return file_md5
 
-    def __gen_vblines_cstpreprocess(self, oldcstpath, midpath):  # 预处理
-        preps = preprocess_cst.vbpreprocess()
-        preps.setResultDir(self.currProjectDir)
-        pslist = []
-        prep0 = {
-            "method": "OpenFile",
-            "config": {
-                "resultName": "openfile_result",
-                "resultFilename": "openfile.txt",
-                "cstpath": str(oldcstpath),
-            },
-        }
-        pslist.append(prep0)
-        prep1 = {
-            "method": "Preparamize",
-            "config": {
-                "resultName": "preparamize_result",
-                "resultFilename": "paramr.txt",
-            },
-        }
-        pslist.append(prep1)
-        prep2 = {
-            "method": "Getparamlist",
-            "config": {
-                "resultName": "getparamlist_result",
-                "resultpath": str(midpath),
-            },
-        }
-        pslist.append(prep2)
-        newcstpath = self.currProjectDir / "processed.cst"
-        opath_str = str(newcstpath)
-        prep3 = {
-            "method": "SaveCSTProject",
-            "config": {
-                "resultName": "saveCSTProject_result",
-                "resultFilename": "savedcst.txt",
-                "outpath": opath_str,
-            },
-        }
-        pslist.append(prep3)
-        preps.appendPreProcessSteps(pslist)
-        vblines = preps.createPreProcessVBCodeLines(createMain=True)
-        # processedCSTFilePath = cstFilePath
-        return vblines, newcstpath
-
-    def __vbpreprocess_CST(self, confobj, projectDir, savejsonpath=None):
+    def _preprocess_cst_project(self, confobj, projectDir, savejsonpath=None):
         """Create and validate a prepared project without modifying its source."""
         if savejsonpath is None:
             jsonpath = projectDir / self.paramsfilename

@@ -151,7 +151,7 @@ def test_checkpoint_restores_only_an_unchanged_confirmed_snapshot(tmp_path):
         store.load_with_snapshot(policy, fingerprint)
 
 
-def test_schema_two_checkpoint_remains_readable_without_snapshot(tmp_path):
+def test_old_checkpoint_schema_is_rejected(tmp_path):
     path = tmp_path / "checkpoint.json"
     store = ScanCheckpointStore(path)
     policy = ScanPolicy(0, 10, 20)
@@ -159,15 +159,12 @@ def test_schema_two_checkpoint_remains_readable_without_snapshot(tmp_path):
     fingerprint = {"path": "model.cst", "size": 10}
     store.save(policy, fingerprint, report, [])
     document = json.loads(path.read_text(encoding="utf-8"))
-    document["schemaVersion"] = 2
+    document["schemaVersion"] = 1
     document.pop("confirmedSnapshot")
     path.write_text(json.dumps(document), encoding="utf-8")
 
-    restored, pending, snapshot = store.load_with_snapshot(policy, fingerprint)
-
-    assert restored.modes == report.modes
-    assert pending == []
-    assert snapshot is None
+    with pytest.raises(ValueError, match="unsupported HOM checkpoint version"):
+        store.load_with_snapshot(policy, fingerprint)
 
 
 def test_policy_rejects_multi_mode_requests():

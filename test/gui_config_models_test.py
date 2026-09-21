@@ -83,11 +83,11 @@ def test_postprocess_uses_stable_key_and_separate_display_name():
     setting = PostProcessSetting.from_mapping(
         {
             "resultName": "impedance",
-            "method": "Shunt_Inpedence",
+            "method": "Shunt_Impedance",
             "params": {"iModeNumber": 1, "xoffset": 0, "yoffset": 5},
         }
     )
-    assert setting.method == "Shunt_Inpedence"
+    assert setting.method == "Shunt_Impedance"
     assert "Shunt Impedance" in setting.display_text
 
 
@@ -109,9 +109,8 @@ def test_postprocess_model_rejects_duplicate_result_names(qapp):
         model.replace([pps(), pps()])
 
 
-def test_versioned_json_round_trip_and_legacy_list_compatibility():
-    legacy = [pps()]
-    decoded = decode_postprocess_document(legacy)
+def test_versioned_json_round_trip():
+    decoded = [PostProcessSetting.from_mapping(pps())]
     document = encode_postprocess_document(decoded)
     assert document["schemaVersion"] == 1
     assert decode_postprocess_document(json.loads(json.dumps(document))) == decoded
@@ -172,4 +171,6 @@ def test_invalid_postprocess_document_is_rejected():
             {"resultName": "x", "method": "UI label", "params": {}}
         )
     with pytest.raises(ValueError, match="重复"):
-        decode_postprocess_document([pps(), pps()])
+        decode_postprocess_document(
+            {"schemaVersion": 1, "postProcesses": [pps(), pps()]}
+        )

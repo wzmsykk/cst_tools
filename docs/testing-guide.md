@@ -119,7 +119,8 @@ python -m pytest -q -m integration --run-cst `
 
 也可以设置 `CST_TEST_EXE`，但仍必须传 `--run-cst`。
 
-真实测试只验证 WWB 协议 Codec：读取 Task、写 Completion、等待 Ack。它不打开工程、不运行 Solver，是接入生产 `worker.vb` 前的方言兼容 Gate。
+该历史 Contract Gate 只验证 WWB 协议 Codec：读取 Task、写 Completion、等待 Ack。
+它不打开工程、不运行 Solver；当前生产 Worker 已完成迁移，此测试仅用于防止协议方言回归。
 
 测试通过版本化 OLE ProgID（例如 `CSTStudio.Application.2022`）创建 CST，并持有 `studio.NewMWS` 返回的项目对象。Contract Macro 写出 `contract.result` 并返回后，外部控制器依次调用文档规定的 `Project.Quit` 和 `Application.Quit`，分别关闭项目和退出应用。只有控制器正常返回且本次测试新增的 CST 进程全部退出，测试才会通过。
 
@@ -157,7 +158,7 @@ workspace/
 - `data/runtime_protocol_v1.vb`：无入口的 Codec；
 - `data/runtime_protocol_contract_main.vb`：唯一测试入口。
 
-## 接入生产 Worker 前的 Gate
+## Worker 协议回归 Gate
 
 必须全部满足：
 
@@ -177,7 +178,8 @@ python -m pytest -q -m integration --run-cst `
   test/protocol_worker_integration_test.py
 ```
 
-联合回归可同时运行 `test/protocol_contract_integration_test.py` 和 `test/protocol_worker_integration_test.py`。P3 通过前后都不替换 legacy `data/worker.vb`。
+联合回归可同时运行 `test/protocol_contract_integration_test.py` 和 `test/protocol_worker_integration_test.py`。
+这里记录的一次性 Worker 是历史迁移 Gate；当前生产路径使用 `ManagedCSTWorker`，旧 `data/worker.vb` 已删除。
 
 P4 双任务 Warm Gate：
 

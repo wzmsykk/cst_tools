@@ -34,7 +34,7 @@ Manager 不负责：
 - 持久化任务队列；
 - 判断失败结果能否被业务接受。
 
-这些职责分别属于优化算法、`local_cstworker`、后处理模块或未来的分布式执行层。
+这些职责分别属于优化算法、显式注入的 Worker、后处理模块或未来的分布式执行层。
 
 ## 3. 组件
 
@@ -59,7 +59,7 @@ Worker 失败时替换槽位中的实例，而不是向列表不断追加新 Wor
 
 ### 3.4 `CSTManager`
 
-持有配置、队列、槽位和线程池，并提供现代批量 API 以及旧接口兼容层。
+持有配置、队列、槽位和线程池，并提供结构化批量 API。
 
 ### 3.5 `WorkerProtocol` 与 Worker 工厂
 
@@ -70,7 +70,7 @@ runWithParam(resultname, params=...)
 stop()
 ```
 
-默认工厂创建 `local_cstworker`。测试可以注入假 Worker，从而验证调度、重试和关闭行为，而不启动外部程序。
+Worker 工厂必须显式提供。生产后端注入 `ManagedCSTWorker.create`；测试注入假 Worker，从而验证调度、重试和关闭行为而不启动外部程序。
 
 ## 4. 数据流
 
@@ -99,7 +99,7 @@ CST Process 0   CST Process 1
 
 Manager 使用一个最大线程数等于 Worker 数量的 `ThreadPoolExecutor`。
 
-每次 `startProcessing()`：
+每次 `run_batch()`：
 
 1. 在状态锁内从 `IDLE` 转为 `RUNNING`；
 2. 为每个存活槽位提交一个队列消费循环；
@@ -110,13 +110,13 @@ Manager 使用一个最大线程数等于 Worker 数量的 `ThreadPoolExecutor`�
 
 不使用 `qsize()` 判断后再读取，因为二者之间存在竞争窗口。队列自身提供任务领取的同步保证。
 
-`startProcessing()` 有意保持阻塞，与现有优化算法“提交一代、等待一代、处理结果”的流程一致。
+`run_batch()` 有意保持阻塞，与现有优化算法“提交一代、等待一代、处理结果”的流程一致。
 
 ## 6. 顺序保证
 
 并发任务的实际完成顺序不确定。Manager 在任务入队时分配序号，并将 `(sequence, result)` 放入结果队列。
 
-`getFullResults()` 在返回前按序号排序，因此：
+`run_batch()` 在返回前按序号排序，因此：
 
 - 任务可以并发执行；
 - 调用方得到的结果仍与提交顺序一致；
@@ -127,7 +127,7 @@ Manager 使用一个最大线程数等于 Worker 数量的 `ThreadPoolExecutor`�
 Manager 状态机：
 
 ```text
-              startProcessing
+                run_batch
        ┌────────────────────────┐
        │                        ▼
      IDLE ◄────────────────── RUNNING
@@ -198,17 +198,11 @@ with CSTManager(...) as manager:
     manager.run_batch(tasks)
 ```
 
-## 11. 兼容策略
+## 11. API 策略
 
-仓内维护中算法已经切换到现代任务接口；旧外壳仅用于尚未盘点的外部调用方：
-
-- 正式类名为 `CSTManager`，保留 `manager` 别名；
-- 推荐 `SimulationTask`、`run_batch()` 和 `execute()`；
-- 暂时保留 `addTask()`、`startProcessing()` 和结果读取接口；
-- 对已知旧三参数 `addTask` 形式进行兼容，但发出弃用警告；
-- `synchronize()` 暂时保留为兼容操作。
-
-默认、TM020 和 WTC 已完成迁移。删除弃用接口仍需先确认仓外脚本以及 `utils/`、`unused/` 中的历史样例不再被使用。
+Manager 只公开 `SimulationTask`、`submit()`、`run_batch()` 和 `execute()`。
+Worker 工厂是必需依赖，不允许隐式回退到旧 `local_cstworker`。
+旧队列式 API、旧 Worker 和仓内历史样例已经删除。
 
 ## 12. 可测试性
 

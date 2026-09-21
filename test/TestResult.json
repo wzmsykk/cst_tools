@@ -44,7 +44,7 @@
             },
             {
                 "id": 2,
-                "resultName": "Shunt_Inpedence",
+                "resultName": "Shunt_Impedance",
                 "value": {
                     "ModeIndex 1": 8132717.1823408,
                     "ModeIndex 2": 0.0904203412621668,
@@ -260,7 +260,7 @@
             },
             {
                 "id": 2,
-                "resultName": "Shunt_Inpedence",
+                "resultName": "Shunt_Impedance",
                 "value": {
                     "ModeIndex 1": 5825610.74201344,
                     "ModeIndex 2": 59.0893997525985,
@@ -476,7 +476,7 @@
             },
             {
                 "id": 2,
-                "resultName": "Shunt_Inpedence",
+                "resultName": "Shunt_Impedance",
                 "value": {
                     "ModeIndex 1": 8266629.70907412,
                     "ModeIndex 2": 0.245867970739348,
@@ -692,7 +692,7 @@
             },
             {
                 "id": 2,
-                "resultName": "Shunt_Inpedence",
+                "resultName": "Shunt_Impedance",
                 "value": {
                     "ModeIndex 1": 6011259.58191843,
                     "ModeIndex 2": 101.48480741529,

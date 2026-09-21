@@ -40,7 +40,7 @@ class AlgorithmSettings:
 
 _DISPLAY_NAMES = {
     "R_over_Q": "R/Q",
-    "Shunt_Inpedence": "Shunt Impedance",
+    "Shunt_Impedance": "Shunt Impedance",
     "Q_Factor": "Q Factor",
     "Q_Ext": "External Q",
     "Total_Loss": "Total Loss",
@@ -89,7 +89,7 @@ class PostProcessSetting:
             if isinstance(mode, bool) or not isinstance(mode, int) or mode < 1:
                 raise ValueError(f"{method} 的 Mode Index 必须是正整数")
         base = method[:-4] if method.endswith("_All") else method
-        if base in {"R_over_Q", "Shunt_Inpedence"}:
+        if base in {"R_over_Q", "Shunt_Impedance"}:
             for key in ("xoffset", "yoffset"):
                 try:
                     normalized[key] = float(normalized[key])
@@ -110,15 +110,13 @@ class PostProcessSetting:
 
 
 def decode_postprocess_document(document: Any) -> list[PostProcessSetting]:
-    if isinstance(document, list):
-        entries = document
-    elif isinstance(document, Mapping):
+    if isinstance(document, Mapping):
         version = document.get("schemaVersion")
         if version != PPS_SCHEMA_VERSION:
             raise ValueError(f"不支持的后处理配置版本: {version!r}")
         entries = document.get("postProcesses")
     else:
-        raise ValueError("后处理配置必须是列表或版本化对象")
+        raise ValueError("后处理配置必须是版本化对象")
     if not isinstance(entries, Sequence) or isinstance(entries, (str, bytes)):
         raise ValueError("postProcesses 必须是列表")
     settings = [PostProcessSetting.from_mapping(item) for item in entries]

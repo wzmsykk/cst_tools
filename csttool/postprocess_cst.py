@@ -18,9 +18,8 @@ Readout = Callable[[str | None], Any]
 class VBPostProcessor:
     """Compile post-processing settings into VBA and read their results.
 
-    The public wrapper methods are retained for compatibility.  New metrics
-    should normally be added to one of the declarative registries instead of
-    copying another builder method.
+    Metrics are configured through the declarative registries and
+    :meth:`appendPostProcessSteps`.
     """
 
     _SIMPLE_METRICS = {
@@ -38,8 +37,8 @@ class VBPostProcessor:
     }
     _COMPLEX_METRICS = {
         "R_over_Q": ("R over Q", "ROQ"),
-        # Keep the historical spelling because it is part of the CST API call.
-        "Shunt_Inpedence": ("Shunt Inpedence", "SI"),
+        # CST's result query itself uses this vendor-defined misspelling.
+        "Shunt_Impedance": ("Shunt Inpedence", "SI"),
     }
 
     def __init__(self) -> None:
@@ -409,104 +408,3 @@ class VBPostProcessor:
         with input_path.open("r") as source:
             first_line = source.readline()
         return float(first_line) if first_line else None
-
-    # Compatibility wrappers used by the GUI and older scripts.
-    def R_over_Q_zaxis(self, iModeNumber, xoffset, yoffset, resultName):
-        self._add_complex_metric(
-            "R_over_Q", iModeNumber, IntegrationLine("z", xoffset, yoffset), resultName
-        )
-
-    def R_over_Q_zaxis_All(self, xoffset, yoffset, resultName):
-        self._add_complex_metric_all(
-            "R_over_Q", IntegrationLine("z", xoffset, yoffset), resultName
-        )
-
-    def Shunt_Inpedence_zaxis(self, iModeNumber, xoffset, yoffset, resultName):
-        self._add_complex_metric(
-            "Shunt_Inpedence",
-            iModeNumber,
-            IntegrationLine("z", xoffset, yoffset),
-            resultName,
-        )
-
-    def Shunt_Inpedence_zaxis_All(self, xoffset, yoffset, resultName):
-        self._add_complex_metric_all(
-            "Shunt_Inpedence", IntegrationLine("z", xoffset, yoffset), resultName
-        )
-
-    def R_over_Q_axis(
-        self, iModeNumber, axis, xoffset, yoffset, zoffset, resultName
-    ):
-        self._add_complex_metric(
-            "R_over_Q",
-            iModeNumber,
-            IntegrationLine(axis, xoffset, yoffset, zoffset),
-            resultName,
-        )
-
-    def R_over_Q_axis_All(self, axis, xoffset, yoffset, zoffset, resultName):
-        self._add_complex_metric_all(
-            "R_over_Q",
-            IntegrationLine(axis, xoffset, yoffset, zoffset),
-            resultName,
-        )
-
-    def Shunt_Inpedence_axis(
-        self, iModeNumber, axis, xoffset, yoffset, zoffset, resultName
-    ):
-        self._add_complex_metric(
-            "Shunt_Inpedence",
-            iModeNumber,
-            IntegrationLine(axis, xoffset, yoffset, zoffset),
-            resultName,
-        )
-
-    def Shunt_Inpedence_axis_All(
-        self, axis, xoffset, yoffset, zoffset, resultName
-    ):
-        self._add_complex_metric_all(
-            "Shunt_Inpedence",
-            IntegrationLine(axis, xoffset, yoffset, zoffset),
-            resultName,
-        )
-
-    def R_over_Q_zaxis_readout(self, resultFilename):
-        return self._read_scalar(resultFilename)
-
-    def Shunt_Inpedence_zaxis_readout(self, resultFilename):
-        return self._read_scalar(resultFilename)
-
-
-def _install_simple_compatibility_methods() -> None:
-    """Expose the historical per-metric methods without repeating their bodies."""
-
-    def make_single(method_name: str):
-        def single(self, iModeNumber, resultName):
-            self._add_simple_metric(method_name, iModeNumber, resultName)
-
-        single.__name__ = method_name
-        return single
-
-    def make_all(method_name: str):
-        def all_modes(self, resultName):
-            self._add_simple_metric_all(method_name, resultName)
-
-        all_modes.__name__ = f"{method_name}_All"
-        return all_modes
-
-    def scalar_readout(self, resultFilename):
-        return self._read_scalar(resultFilename)
-
-    for method_name in VBPostProcessor._SIMPLE_METRICS:
-        setattr(VBPostProcessor, method_name, make_single(method_name))
-        setattr(VBPostProcessor, f"{method_name}_All", make_all(method_name))
-        reader_name = f"{method_name}_readout"
-        reader = scalar_readout
-        reader.__name__ = reader_name
-        setattr(VBPostProcessor, reader_name, reader)
-
-
-_install_simple_compatibility_methods()
-
-# Historical class name retained for the current worker and GUI.
-vbpostprocess = VBPostProcessor

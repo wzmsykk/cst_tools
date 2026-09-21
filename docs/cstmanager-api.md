@@ -1,6 +1,6 @@
 # CSTManager API 与使用指南
 
-状态：当前生产调度接口。默认、TM020 和 WTC 维护中算法已使用结构化任务 API；P2.5–P7 的 Profile/Warm Worker 尚未替换底层 `local_cstworker`。
+状态：当前生产调度接口。Manager 只接受显式 Worker 工厂，不再提供旧 Worker 回退或队列式兼容 API。
 
 `CSTManager` 是优化算法与本地 CST 进程之间的批量任务调度器。它管理固定数量的 CST Worker，负责并发执行、失败重试、Worker 回收和结果汇总。
 
@@ -10,17 +10,8 @@
 
 ```python
 from csttool.cstmanager import CSTManager, SimulationTask
+from csttool.managed_cstworker import ManagedCSTWorker
 ```
-
-外部旧代码暂时仍可使用：
-
-```python
-from csttool import cstmanager
-
-manager = cstmanager.CSTManager(...)
-```
-
-`manager` 是 `CSTManager` 的弃用兼容别名。仓内生产入口不得继续使用。
 
 ## 创建 Manager
 
@@ -31,6 +22,7 @@ manager = CSTManager(
     params=project_parameters,
     logger=logger,
     maxTask=2,
+    worker_factory=ManagedCSTWorker.create,
     max_jobs_per_worker=10,
 )
 ```
@@ -44,12 +36,12 @@ manager = CSTManager(
 | `params` | CST 工程参数定义列表 |
 | `logger` | 可选的标准 `logging.Logger` |
 | `maxTask` | Worker 数量，也是最大并行任务数，默认为 2 |
-| `worker_factory` | 可选 Worker 工厂，主要用于测试或替换执行后端 |
+| `worker_factory` | 必需的 Worker 工厂；生产后端使用 `ManagedCSTWorker.create` |
 | `max_jobs_per_worker` | 单个 Worker 在强制重启前允许完成的任务数，默认为 10 |
 
 `maxTask` 和 `max_jobs_per_worker` 必须至少为 1。
 
-创建 Manager 会立即创建相应数量的 Worker。对于默认 Worker，这也意味着启动本地 CST 环境。
+创建 Manager 会立即通过显式工厂创建相应数量的 Worker。
 
 ## SimulationTask
 
@@ -82,7 +74,11 @@ tasks = [
     SimulationTask({"radius": 100.0}, "GEN_0_3", retry_count=1),
 ]
 
-with CSTManager(gconfm, pconfm, params, maxTask=2) as manager:
+with CSTManager(
+    gconfm, pconfm, params,
+    maxTask=2,
+    worker_factory=ManagedCSTWorker.create,
+) as manager:
     results = manager.run_batch(tasks)
 ```
 
@@ -98,7 +94,10 @@ with CSTManager(gconfm, pconfm, params, maxTask=2) as manager:
 ### 执行单个任务
 
 ```python
-with CSTManager(gconfm, pconfm, params) as manager:
+with CSTManager(
+    gconfm, pconfm, params,
+    worker_factory=ManagedCSTWorker.create,
+) as manager:
     result = manager.execute(
         SimulationTask(
             params={"radius": 100.0},
@@ -111,7 +110,10 @@ with CSTManager(gconfm, pconfm, params) as manager:
 ### 显式关闭
 
 ```python
-manager = CSTManager(gconfm, pconfm, params)
+manager = CSTManager(
+    gconfm, pconfm, params,
+    worker_factory=ManagedCSTWorker.create,
+)
 try:
     results = manager.run_batch(tasks)
 finally:
@@ -119,52 +121,6 @@ finally:
 ```
 
 优先使用 `with`。`stop()` 可以重复调用，第二次调用不会重复关闭资源。
-
-## 弃用兼容 API
-
-历史外部算法可以临时继续使用队列式接口：
-
-```python
-manager.addTask({"radius": 90.0}, "GEN_0_1")
-manager.addTask({"radius": 95.0}, "GEN_0_2", retry_cnt=1)
-
-manager.startProcessing()  # 阻塞到当前批次结束
-results = manager.getFullResults()
-```
-
-接口说明：
-
-### `addTask(params, job_name, retry_cnt=0) -> int`
-
-加入任务并返回单调递增的内部序号，不会立即运行任务。
-
-历史形式 `addTask(input_names, params, job_name)` 暂时兼容，但会产生 `DeprecationWarning`。仓内维护中算法已经迁移，不应新增任何调用。
-
-### `startProcessing() -> None`
-
-执行当前已入队任务并阻塞到执行完成。空队列调用会直接返回。
-
-同一个 Manager 不支持同时发起两个 `startProcessing()`；重复启动会抛出 `RuntimeError`。
-
-### `synchronize() -> None`
-
-为旧代码保留。由于 `startProcessing()` 已经阻塞，正常情况下无需再调用。
-
-### `getFullResults() -> list[dict]`
-
-取出当前保存的全部结果，按任务提交顺序排列。结果取出后不再保留。
-
-### `getFirstResult() -> dict`
-
-取出最早提交任务的结果，其他结果仍被保留。没有结果时抛出 `queue.Empty`。
-
-### `runWithParam(params, job_name, retry_cnt=0) -> dict`
-
-旧式单任务同步接口，等价于构造 `SimulationTask` 后调用 `execute()`。
-
-### `runWithx(x, job_name) -> dict`
-
-已弃用的旧接口。新代码应调用 `runWithParam()`。
 
 ## 结果格式
 
@@ -247,7 +203,7 @@ python -m pytest -m integration -o addopts=""
 ## 使用约束
 
 - Manager 和 Worker 均为本地进程内对象，任务队列不会持久化。
-- `startProcessing()` 是阻塞式批处理接口，不是后台服务。
+- `run_batch()` 是阻塞式批处理接口，不是后台服务。
 - 建议先完成一批任务，再提交下一批；不要依赖批次执行过程中追加任务的时序。
 - Manager 层尚未提供单任务取消或独立超时；实际仿真超时目前由 CST Worker 控制。
 - 默认测试使用假 Worker。发布前仍需在真实 CST 环境执行集成验收。

@@ -167,10 +167,6 @@ class GlobalConfmanager(object):
         )
         return selected
 
-    # Compatibility for old callers.
-    def listCSTInstallations(self):
-        return self.list_cst_installations()
-
     def findSuperfishENV(self):
         sfdir = os.getenv("SFDir")
         if sfdir is None:

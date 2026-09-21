@@ -192,7 +192,7 @@ def test_fake_worker_returns_every_requested_default_hom_postprocess():
             "R_divide_Q": 1.21790671001533e-07,
             "R_divide_Q_5mm": 0.493502635777098,
             "R_divide_Q_10mm": 1.99998909734014,
-            "Shunt_Inpedence": 2.21627953085607e-06,
+            "Shunt_Impedance": 2.21627953085607e-06,
             "Total_Loss": 314714344.652206,
             "Q-factor": 18.1974490544368,
         }
@@ -293,7 +293,7 @@ def test_randomized_csv_model_returns_jointly_sampled_postprocess_row():
             "R_divide_Q",
             "R_divide_Q_5mm",
             "R_divide_Q_10mm",
-            "Shunt_Inpedence",
+            "Shunt_Impedance",
             "Total_Loss",
             "Q-factor",
         ))
@@ -303,7 +303,7 @@ def test_randomized_csv_model_returns_jointly_sampled_postprocess_row():
         "R_divide_Q",
         "R_divide_Q_5mm",
         "R_divide_Q_10mm",
-        "Shunt_Inpedence",
+        "Shunt_Impedance",
         "Total_Loss",
         "Q-factor",
     ))
@@ -337,7 +337,7 @@ def test_randomized_csv_worker_full_scan_finds_every_generated_mode(model_seed):
             "R_divide_Q",
             "R_divide_Q_5mm",
             "R_divide_Q_10mm",
-            "Shunt_Inpedence",
+            "Shunt_Impedance",
             "Total_Loss",
             "Q-factor",
         }

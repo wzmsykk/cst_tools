@@ -1,4 +1,4 @@
-' Independent one-shot Worker v1. This does not replace legacy worker.vb.
+' Independent one-shot Worker v1.
 Sub Main
     Dim task As CSTP_Task
     Dim errorCode As String

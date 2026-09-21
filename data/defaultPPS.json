@@ -34,8 +34,8 @@
         }
     },
     {
-        "resultName": "Shunt_Inpedence",
-        "method": "Shunt_Inpedence",
+        "resultName": "Shunt_Impedance",
+        "method": "Shunt_Impedance",
         "params": {
             "iModeNumber": 1,
             "xoffset": 0.0,

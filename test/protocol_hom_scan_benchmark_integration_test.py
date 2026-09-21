@@ -10,7 +10,7 @@ from csttool.hom_project_profile import (
     HOM_PROFILE_V1,
     ResultTemplateRequirement,
 )
-from csttool.hom_native_results import read_hom_native_results
+from csttool.native_results import read_profile_native_results
 from csttool.protocol_hom_template_evaluation import read_result_template_inventory
 from csttool.protocol_warm_worker import prepare_warm_worker_workspace
 from csttool.protocol_worker import prepare_worker_workspace
@@ -49,7 +49,7 @@ def _run_cold(cst_executable, root, source, parameters):
         try:
             completion = wait_completion_or_controller_exit(workspace, task, process, timeout=1800)
             assert completion.status is CompletionStatus.SUCCESS, completion
-            native = read_hom_native_results(
+            native = read_profile_native_results(
                 workspace.snapshot_path.with_suffix(""), HOM_PROFILE_V1
             )
             workspace.protocol.acknowledge(completion)
@@ -86,7 +86,7 @@ def _run_warm(cst_executable, root, source, parameter_sets):
                 )
                 assert completion.status is CompletionStatus.SUCCESS, completion
                 values.append(
-                    read_hom_native_results(
+                    read_profile_native_results(
                         artifact.snapshot_path.with_suffix(""), HOM_PROFILE_V1
                     )
                 )

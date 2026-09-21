@@ -15,16 +15,10 @@ from pathlib import Path
 from queue import Empty, Queue
 from threading import RLock
 from typing import Any, Callable, Iterable, Mapping, Protocol
-import warnings
 import time
 
-from install_compat import resource_path
-
-from . import cstworker
-
-
 class WorkerProtocol(Protocol):
-    """The part of ``local_cstworker`` used by the scheduler."""
+    """Worker operations required by the scheduler."""
 
     ID: str
 
@@ -104,9 +98,8 @@ WorkerFactory = Callable[[str, dict[str, Any], logging.Logger], WorkerProtocol]
 class CSTManager:
     """Manage a bounded pool of replaceable local CST workers.
 
-    ``startProcessing`` remains blocking for compatibility with the existing
-    optimization algorithms.  New code can use :meth:`run_batch` or
-    :meth:`execute` instead.
+    Algorithms submit immutable tasks through :meth:`run_batch` or
+    :meth:`execute`.
     """
 
     def __init__(
@@ -117,7 +110,7 @@ class CSTManager:
         logger: logging.Logger | None = None,
         maxTask: int = 2,
         *,
-        worker_factory: WorkerFactory | None = None,
+        worker_factory: WorkerFactory,
         max_jobs_per_worker: int = 10,
         progress_callback=None,
     ) -> None:
@@ -133,10 +126,9 @@ class CSTManager:
         self.paramList = params
         self.maxParallelTasks = maxTask
         self.maxWorkerJobCountLimit = max_jobs_per_worker
-        self._worker_factory = worker_factory or self._create_local_worker
+        self._worker_factory = worker_factory
         self._progress_callback = progress_callback
 
-        self.cstPatternDir = Path(resource_path(self.gconf["BASE"]["datadir"]))
         self.currProjectDir = Path(pconfm.currProjectDir).absolute()
         self.tempDir = self._project_path(self.pconf["DIRS"]["tempdir"])
         self.resultDir = self._project_path(self.pconf["DIRS"]["resultdir"])
@@ -144,7 +136,6 @@ class CSTManager:
         self.resultDir.mkdir(parents=True, exist_ok=True)
         self.taskFileDir = self.tempDir
         self.cstProjPath = self.currProjectDir / self.pconf["CST"]["CSTFilename"]
-        self.cstType = self.pconf["PROJECT"]["ProjectType"]
 
         self._state = ManagerState.IDLE
         self._state_lock = RLock()
@@ -186,18 +177,6 @@ class CSTManager:
             ManagerState.CLOSED,
         }
 
-    @property
-    def cstWorkerList(self) -> list[WorkerProtocol]:
-        """Compatibility view of the live workers."""
-        with self._state_lock:
-            return [slot.worker for slot in self._slots]
-
-    @property
-    def cstWorkerStatus(self) -> list[str]:
-        """Compatibility view of worker states."""
-        with self._state_lock:
-            return [slot.state.name for slot in self._slots]
-
     def _worker_config(
         self, worker_id: str, source_project: str | Path | None = None
     ) -> dict[str, Any]:
@@ -207,8 +186,6 @@ class CSTManager:
             "tempDir": str(worker_dir),
             "taskFileDir": str(worker_dir),
             "CSTENVPATH": self.gconf["CST"]["cstexepath"],
-            "ProjectType": self.cstType,
-            "cstPatternDir": str(self.cstPatternDir),
             "resultDir": str(self.resultDir),
             "cstPath": str(source_project or self.cstProjPath),
             "paramList": self.paramList,
@@ -216,19 +193,6 @@ class CSTManager:
             "runInBackground": True,
             "progressCallback": self._progress_callback,
         }
-
-    @staticmethod
-    def _create_local_worker(
-        worker_id: str,
-        config: dict[str, Any],
-        logger: logging.Logger,
-    ) -> WorkerProtocol:
-        return cstworker.local_cstworker(
-            id=worker_id,
-            type="local",
-            workerconfig=config,
-            logger=logger,
-        )
 
     def _create_worker(
         self, worker_id: str, source_project: str | Path | None = None
@@ -244,7 +208,7 @@ class CSTManager:
         for index in range(self.maxParallelTasks):
             worker_id = str(index)
             self._slots.append(_WorkerSlot(worker_id, self._create_worker(worker_id)))
-            self.logger.info("Created cstworker. ID=%s", worker_id)
+            self.logger.info("WORKER_CREATED id=%s", worker_id)
 
     def getResultDir(self) -> Path:
         return self.resultDir
@@ -329,21 +293,6 @@ class CSTManager:
                 task.continue_from_snapshot,
             )
             return sequence
-
-    def addTask(self, params: Mapping[str, Any], job_name: str, retry_cnt: int = 0) -> int:
-        """Compatibility wrapper around :meth:`submit`."""
-        # A historical caller used addTask(input_names, params, job_name).
-        if not isinstance(job_name, str) and isinstance(retry_cnt, str):
-            warnings.warn(
-                "addTask(input_names, params, job_name) is deprecated; "
-                "use addTask(params, job_name)",
-                DeprecationWarning,
-                stacklevel=2,
-            )
-            params, job_name, retry_cnt = job_name, retry_cnt, 0
-        return self.submit(
-            SimulationTask(params=params, job_name=job_name, retry_count=retry_cnt)
-        )
 
     def _replace_worker(
         self, slot: _WorkerSlot, *, continue_from_snapshot: bool = False
@@ -485,7 +434,7 @@ class CSTManager:
             finally:
                 self._task_queue.task_done()
 
-    def startProcessing(self) -> None:
+    def _execute_queued_tasks(self) -> None:
         """Run every currently queued task and block until the batch finishes."""
         with self._state_lock:
             if self._state is ManagerState.CLOSED:
@@ -523,10 +472,6 @@ class CSTManager:
                 self.state.name,
             )
 
-    def synchronize(self) -> None:
-        """Compatibility no-op: ``startProcessing`` is already blocking."""
-        self._task_queue.join()
-
     def _drain_results(self) -> list[tuple[int, dict]]:
         collected: list[tuple[int, dict]] = []
         while True:
@@ -537,48 +482,17 @@ class CSTManager:
         collected.sort(key=lambda item: item[0])
         return collected
 
-    def getFullResults(self) -> list[dict]:
-        return [result for _, result in self._drain_results()]
-
-    def getFirstResult(self) -> dict:
-        collected = self._drain_results()
-        if not collected:
-            raise Empty("No CST results are available")
-        first, *remaining = collected
-        # Preserve any additional results for callers mixing the old APIs.
-        for item in remaining:
-            self._result_queue.put(item)
-        return first[1]
-
     def run_batch(self, tasks: Iterable[SimulationTask]) -> list[dict]:
         for task in tasks:
             self.submit(task)
-        self.startProcessing()
-        return self.getFullResults()
+        self._execute_queued_tasks()
+        return [result for _, result in self._drain_results()]
 
     def execute(self, task: SimulationTask) -> dict:
         results = self.run_batch([task])
         if not results:
             raise RuntimeError("CST task completed without a result")
         return results[0]
-
-    def runWithParam(
-        self,
-        params: Mapping[str, Any],
-        job_name: str,
-        retry_cnt: int = 0,
-    ) -> dict:
-        return self.execute(
-            SimulationTask(params=params, job_name=job_name, retry_count=retry_cnt)
-        )
-
-    def runWithx(self, x: Mapping[str, Any], job_name: str) -> dict:
-        warnings.warn(
-            "runWithx is deprecated; use runWithParam",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return self.runWithParam(params=x, job_name=job_name)
 
     def stop(self) -> None:
         with self._state_lock:

@@ -1,7 +1,7 @@
 # CST Tools 当前状态与实施路线
 
-状态日期：2026-09-20
-当前基线提交：`a2664e6 Migrate GUI to managed CST worker`（其后工作区实施 GUI P13，尚未提交）
+状态日期：2026-09-21
+当前基线提交：`4c6c5de Remove legacy logger compatibility layer`（其后工作区正在清理 legacy 功能）
 
 本文是项目当前状态的权威入口。历史设计文档仍保留其分析价值；若与本文或[最小 Python/VBA 协议 TODO](./minimal-python-vba-todo.md)冲突，以本文和已经通过的真实 CST Gate 为准。
 
@@ -16,7 +16,7 @@
 5. Project Profile 声明 prepared 工程、允许修改的参数、注册模板和结果能力；
 6. 不把 CST Result Template GUI 操作包装成运行期 ABI。
 
-当前实现是独立、安全、可验证的增量路径。GUI 已迁移到新的应用后端边界；底层生产 `CSTManager`、`worker.vb` 和算法执行链尚未切换到 P7 Profile/Warm 协议核心。
+GUI、默认 CLI、生产 `CSTManager` 和算法执行链均已切换到 Managed Worker 与结构化任务 API。旧 `local_cstworker/worker.vb` 路径已经删除。
 
 ## 2. 当前执行链
 
@@ -114,7 +114,7 @@ Profile 验证使用 CST 官方 `ResetTemplateIterator/GetNextTemplate`，比较
 
 ## 6. 尚未完成
 
-- `local_cstworker/worker.vb` 尚未迁移到当前最小文件协议；`CSTManager` 之上的维护中算法已使用现代任务 API；
+- 旧 Worker、Pattern 和队列式 Manager API 已删除；生产只通过显式 Worker 工厂创建 Managed Worker；
 - GUI 和默认 CLI 已不再提供旧 Engine 兼容入口；
 - 当前暂不扩展到 default、TM020、WTC、Pillbox 或复合 Enlarged/HOM Profile；
 - 没有自动安装 Result Template；
@@ -122,7 +122,7 @@ Profile 验证使用 CST 官方 `ResetTemplateIterator/GetNextTemplate`，比较
 - 没有完成 `cst_version` 只读核心的仓内提取和跨版本矩阵；
 - 没有建立 20–30 点以上的 Warm 性能、内存增长和失败率统计；
 - Shunt Impedance、Total Loss、Voltage 仍缺少原生/Python 派生等价性证明；
-- 旧 PPS、重复 Pattern 和生产 VB 尚未删除。
+- 运行时复杂后处理 VBA 仍按能力边界保留；旧 Worker、Pattern、队列式 Manager API 和旧 PPS 列表格式已经删除。
 
 这些项目不是 P6 的隐含组成部分。下一阶段只抽取已经由 HOM Gate 证明的通用核心，不以第二个 Profile 为前置条件，也不扩大为通用 ABI。
 

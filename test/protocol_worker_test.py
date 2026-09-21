@@ -22,4 +22,4 @@ def test_worker_workspace_is_independent_and_keeps_parameter_kinds(tmp_path):
     assert macro.lower().count("sub main") == 1
     assert "EigenmodeSolver.Start" in macro
     assert str(workspace.result_path) in macro
-    assert "legacy worker.vb" in macro
+    assert "Independent one-shot Worker v1" in macro

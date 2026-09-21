@@ -82,4 +82,6 @@ camelCase Engine 适配、`False`/`0` 错误码翻译、`safe_mode` 或算法参
 
 ## 当前边界
 
-P9 只现代化应用编排和生命周期，不改变 `CSTManager`、`myAlgorithm_pop`、`local_cstworker` 或 `worker.vb`。Profile/Warm 执行策略应作为后续生产候选路径接入，并先通过真实 CST Gate，再讨论替换默认 Manager。
+应用后端、`CSTManager` 和算法链统一使用 `ManagedCSTWorker` 与结构化批任务接口。
+旧 `local_cstworker`、`worker.vb`、Pattern 模板及 Manager camelCase 队列接口已经删除。
+Profile/Warm 执行策略属于当前生产路径；运行时 VBA 仅保留复杂、依赖当前场数据的后处理能力。

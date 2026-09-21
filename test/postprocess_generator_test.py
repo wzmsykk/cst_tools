@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from csttool.postprocess_cst import VBPostProcessor, vbpostprocess
+from csttool.postprocess_cst import VBPostProcessor
 
 
 DATA_DIR = Path(__file__).parents[1] / "data"
@@ -43,7 +43,7 @@ def test_tm020_generation_preserves_existing_calls_and_filenames():
         "ROQ_All_xoffset_0.000000_yoffset_0.000000_R_divide_Q.txt"
     )
     assert steps[2]["resultFilename"] == (
-        "SI_All_xoffset_0.000000_yoffset_0.000000_Shunt_Inpedence.txt"
+        "SI_All_xoffset_0.000000_yoffset_0.000000_Shunt_Impedance.txt"
     )
     assert steps[-1]["funcString"] == "ModeRec_All_output(outFullDir)\n"
 
@@ -120,14 +120,6 @@ def test_complex_pps_generation_supports_every_axis(axis, offsets, axis_number):
     assert f"_axis_{axis}_" in step["resultFilename"] or axis == "z"
 
 
-def test_historical_zaxis_wrapper_keeps_filename_contract():
-    processor = VBPostProcessor()
-    processor.R_over_Q_zaxis(1, 0, 5, "legacy")
-    assert processor.postProcessDocList[0]["resultFilename"] == (
-        "Mode_1_ROQ_xoffset_0.000000_yoffset_5.000000_legacy.txt"
-    )
-
-
 def test_scalar_and_all_mode_results_are_parsed(tmp_path):
     processor = VBPostProcessor()
     processor.setResultDir(tmp_path)
@@ -154,7 +146,3 @@ def test_scalar_and_all_mode_results_are_parsed(tmp_path):
 
     assert results[0]["value"] == 500.25
     assert results[1]["value"] == {"ModeIndex 1": 500.25, "ModeIndex 2": 700.5}
-
-
-def test_historical_class_name_is_preserved():
-    assert vbpostprocess is VBPostProcessor

@@ -13,8 +13,8 @@
         }
     },
     {
-        "resultName": "Shunt_Inpedence",
-        "method": "Shunt_Inpedence_All",
+        "resultName": "Shunt_Impedance",
+        "method": "Shunt_Impedance_All",
         "params": {
             "xoffset": 0.0,
             "yoffset": 0.0

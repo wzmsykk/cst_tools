@@ -1,4 +1,4 @@
-﻿"""produce LHS sample"""
+"""produce LHS sample"""
 import os
 import logging
 import hashlib
@@ -58,7 +58,7 @@ class myAlg01(myAlg):
             "R_divide_Q_5mm",
             "R_divide_Q_10mm",
             "Q-factor",
-            "Shunt_Inpedence",
+            "Shunt_Impedance",
             "Total_Loss",
         ]
         self.output_name = None
@@ -518,10 +518,10 @@ class myAlg01(myAlg):
 
 
 if __name__ == "__main__":
-    from postprocess_cst import vbpostprocess
+    from .postprocess_cst import VBPostProcessor
     from pathlib import Path
 
-    vbp = vbpostprocess()
+    vbp = VBPostProcessor()
     import json
 
     fp = open("template/defaultPPS.json", "r")

@@ -24,7 +24,7 @@ class NativeRoverQCapability:
 
 @dataclass(frozen=True, slots=True)
 class HomProjectProfile(ProjectProfile):
-    """Compatibility extension carrying HOM-specific R/Q routing metadata."""
+    """HOM specialization carrying R/Q routing metadata."""
 
     native_r_over_q: tuple[NativeRoverQCapability, ...]
 

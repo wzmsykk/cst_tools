@@ -3,41 +3,11 @@ import json
 import pytest
 
 from csttool.projectutil import (
-    convert_cst_parameters_to_legacy,
     convert_json_params_to_list,
     custom_ascii_2_json,
     getParamsList,
     is_number,
 )
-
-
-def test_convert_cst_parameters_preserves_expression_and_value():
-    converted = convert_cst_parameters_to_legacy([
-        {"name": "C1", "expr": "L/2", "value": "750", "descr": "derived length"},
-        {"name": "L", "expr": "1500", "value": "1500", "descr": "base length"},
-    ])
-
-    assert converted[0] == {
-        "id": 0,
-        "name": "C1",
-        "value": "L/2",
-        "type": "expression",
-        "fixed": True,
-        "description": "derived length",
-        "expr": "L/2",
-        "evaluated_value": "750",
-    }
-    assert converted[1]["value"] == "1500"
-    assert converted[1]["fixed"] is False
-    assert converted[1]["evaluated_value"] == "1500"
-
-
-def test_convert_cst_parameters_rejects_duplicate_names():
-    with pytest.raises(ValueError, match="duplicate CST parameter"):
-        convert_cst_parameters_to_legacy([
-            {"name": "L", "expr": "1", "value": "1"},
-            {"name": "L", "expr": "2", "value": "2"},
-        ])
 
 
 @pytest.mark.parametrize(
