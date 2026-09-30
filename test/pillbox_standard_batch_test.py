@@ -16,20 +16,13 @@ from csttool.pillbox_analytic import (
 
 class _GlobalConfig:
     def __init__(self, root: Path):
-        self.conf = {
-            "BASE": {"datadir": str(root / "data")},
-            "CST": {"cstexepath": str(root / "cst.exe")},
-        }
+        self.settings = GlobalSettings().with_cst("2022", str(root / "cst.exe"))
 
 
 class _ProjectConfig:
     def __init__(self, root: Path):
         self.currProjectDir = root
-        self.conf = {
-            "DIRS": {"tempdir": "temp", "resultdir": "result"},
-            "CST": {"CSTFilename": "Pillbox.cst"},
-            "PROJECT": {"ProjectType": "pillbox-analytic"},
-        }
+        self.settings = ProjectSettings(name="test-project", cst_filename=Path("Pillbox.cst"))
 
     def get_postprocess_settings(self):
         return []
@@ -231,3 +224,4 @@ def test_standard_batch_can_restart_after_retry_exhaustion(tmp_path):
         source == (tmp_path / "Pillbox.cst").resolve()
         for source in tracker["sources"]
     )
+from csttool.configuration import GlobalSettings, ProjectSettings

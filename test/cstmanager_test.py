@@ -13,20 +13,13 @@ from csttool.cstmanager import CSTManager, ManagerState, SimulationTask
 
 class FakeGlobalConfig:
     def __init__(self, root: Path):
-        self.conf = {
-            "BASE": {"datadir": str(root / "data")},
-            "CST": {"cstexepath": str(root / "cst.exe")},
-        }
+        self.settings = GlobalSettings().with_cst("2022", str(root / "cst.exe"))
 
 
 class FakeProjectConfig:
     def __init__(self, root: Path):
         self.currProjectDir = root
-        self.conf = {
-            "DIRS": {"tempdir": "temp", "resultdir": "result"},
-            "CST": {"CSTFilename": "model.cst"},
-            "PROJECT": {"ProjectType": "default"},
-        }
+        self.settings = ProjectSettings(name="test-project", cst_filename=Path("model.cst"))
 
     def get_postprocess_settings(self):
         return []
@@ -118,7 +111,8 @@ def test_batch_runs_concurrently_and_returns_submission_order(manager_factory):
     assert manager.state is ManagerState.IDLE
 
 
-def test_failed_task_restarts_worker_and_retries(manager_factory):
+def test_failed_task_restarts_worker_and_retries(manager_factory, caplog):
+    caplog.set_level(logging.INFO)
     manager, tracker = manager_factory(workers=1, outcomes=["Failure", "Success"])
 
     result = manager.execute(
@@ -128,6 +122,12 @@ def test_failed_task_restarts_worker_and_retries(manager_factory):
     assert result["TaskStatus"] == "Success"
     assert len(tracker["created"]) == 2
     assert tracker["created"][0].stopped
+    messages = [record.getMessage() for record in caplog.records]
+    start = next(i for i, message in enumerate(messages) if "WORKER_RESTART_START" in message)
+    done = next(i for i, message in enumerate(messages) if "WORKER_RESTART_DONE" in message)
+    success = next(i for i, message in enumerate(messages) if "TASK_DONE" in message and "status=Success" in message)
+    assert start < done < success
+    assert len({record.run_id for record in caplog.records if hasattr(record, "run_id")}) == 1
 
 
 def test_worker_is_recycled_after_job_limit(manager_factory):
@@ -361,3 +361,4 @@ def test_stop_request_prevents_worker_rotation_and_new_dispatch(tmp_path):
     assert [item["RunName"] for item in results] == ["active"]
     assert len(created) == 1
     manager.stop()
+from csttool.configuration import GlobalSettings, ProjectSettings

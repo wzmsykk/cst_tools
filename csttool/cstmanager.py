@@ -8,41 +8,18 @@ is injectable so the scheduler can be tested without starting CST.
 from __future__ import annotations
 
 from concurrent.futures import Future, ThreadPoolExecutor
-import configparser
 from dataclasses import dataclass, field
 from enum import Enum, auto
 import logging
 from pathlib import Path
 from queue import Empty, Queue
 from threading import RLock
-from types import SimpleNamespace
 from typing import Any, Callable, Iterable, Mapping, Protocol
 import time
+from uuid import uuid4
 
 from .configuration import GlobalSettings, ProjectSettings
-
-
-def _configuration_parser(value) -> configparser.ConfigParser:
-    """Normalize legacy mapping test/adaptor input at the manager boundary."""
-
-    if isinstance(value, configparser.ConfigParser):
-        return value
-    parser = configparser.ConfigParser()
-    parser.read_dict(value)
-    return parser
-
-
-def _legacy_project_settings(value):
-    """Convert the former minimal manager mapping into a typed view."""
-
-    parser = _configuration_parser(value)
-    return SimpleNamespace(
-        directories=SimpleNamespace(
-            temp=Path(parser.get("DIRS", "tempdir")),
-            result=Path(parser.get("DIRS", "resultdir")),
-        ),
-        cst_filename=parser.get("CST", "CSTFilename"),
-    )
+from .logging_config import ContextLogger
 
 
 class WorkerProtocol(Protocol):
@@ -148,19 +125,12 @@ class CSTManager:
 
         self.logger = logger or logging.getLogger(__name__)
         self.pconfm = pconfm
-        self.global_settings = getattr(gconfm, "settings", None)
-        if self.global_settings is None:
-            self.global_settings = GlobalSettings.from_parser(
-                _configuration_parser(gconfm.conf)
-            )
-        self.project_settings = getattr(pconfm, "settings", None)
-        if self.project_settings is None:
-            try:
-                self.project_settings = ProjectSettings.from_parser(
-                    _configuration_parser(pconfm.conf)
-                )
-            except (KeyError, configparser.Error, ValueError):
-                self.project_settings = _legacy_project_settings(pconfm.conf)
+        self.global_settings = gconfm.settings
+        self.project_settings = pconfm.settings
+        if not isinstance(self.global_settings, GlobalSettings):
+            raise TypeError("global configuration requires GlobalSettings")
+        if not isinstance(self.project_settings, ProjectSettings):
+            raise TypeError("project configuration requires prepared ProjectSettings")
         self.paramList = params
         self.maxParallelTasks = maxTask
         self.maxWorkerJobCountLimit = max_jobs_per_worker
@@ -168,6 +138,10 @@ class CSTManager:
         self._progress_callback = progress_callback
 
         self.currProjectDir = Path(pconfm.currProjectDir).absolute()
+        if not isinstance(self.logger, ContextLogger):
+            self.logger = ContextLogger(self.logger, {
+                "run_id": uuid4().hex, "project": self.currProjectDir,
+            })
         temp_path = self.project_settings.directories.temp
         result_path = self.project_settings.directories.result
         cst_filename = self.project_settings.cst_filename
@@ -191,11 +165,10 @@ class CSTManager:
         )
         self._start_initial_workers()
         self.logger.info(
-            "MANAGER_READY project=%s workers=%d max_jobs_per_worker=%d",
+            "Manager 已就绪 | MANAGER_READY project=%s workers=%d max_jobs_per_worker=%d",
             self.currProjectDir,
             self.maxParallelTasks,
-            self.maxWorkerJobCountLimit,
-        )
+            self.maxWorkerJobCountLimit, extra={"event": "MANAGER_READY", "phase": "lifecycle", "project": self.currProjectDir, "workers": self.maxParallelTasks, "max_jobs_per_worker": self.maxWorkerJobCountLimit})
 
     def _project_path(self, configured_path: str) -> Path:
         path = Path(configured_path)
@@ -240,7 +213,7 @@ class CSTManager:
     def _create_worker(
         self, worker_id: str, source_project: str | Path | None = None
     ) -> WorkerProtocol:
-        self.logger.debug("Creating CST worker %s", worker_id)
+        self.logger.debug("创建 Worker | worker=%s project=%s", worker_id, self.currProjectDir)
         return self._worker_factory(
             worker_id,
             self._worker_config(worker_id, source_project),
@@ -251,7 +224,7 @@ class CSTManager:
         for index in range(self.maxParallelTasks):
             worker_id = str(index)
             self._slots.append(_WorkerSlot(worker_id, self._create_worker(worker_id)))
-            self.logger.info("WORKER_CREATED id=%s", worker_id)
+            self.logger.debug("Worker 已创建 | WORKER_CREATED worker=%s project=%s", worker_id, self.currProjectDir, extra={"event": "WORKER_CREATED", "phase": "lifecycle", "worker": worker_id, "project": self.currProjectDir})
 
     @property
     def result_directory(self) -> Path:
@@ -317,7 +290,7 @@ class CSTManager:
                 finally:
                     replacement.state = WorkerState.DEAD
             raise RuntimeError("CST manager stopped while restoring project snapshot")
-        self.logger.info("Restored CST worker pool from confirmed snapshot %s", source)
+        self.logger.info("Worker 池已恢复 | project=%s snapshot=%s", self.currProjectDir, source)
 
     def submit(self, task: SimulationTask) -> int:
         """Queue a task and return its monotonically increasing sequence ID."""
@@ -332,27 +305,28 @@ class CSTManager:
             self._next_sequence += 1
             self._task_queue.put(_QueuedTask(sequence, task))
             self.logger.info(
-                "TASK_QUEUED sequence=%d job=%s retries=%d continue_snapshot=%s",
+                "任务已入队 | TASK_QUEUED sequence=%d job=%s retries=%d continue_snapshot=%s",
                 sequence,
                 task.job_name,
                 task.retry_count,
-                task.continue_from_snapshot,
-            )
+                task.continue_from_snapshot, extra={"event": "TASK_QUEUED", "phase": "solve", "sequence": sequence, "job": task.job_name, "retries": task.retry_count, "continue_snapshot": task.continue_from_snapshot})
             return sequence
 
     def _replace_worker(
         self, slot: _WorkerSlot, *, continue_from_snapshot: bool = False
     ) -> bool:
         slot.state = WorkerState.RESTARTING
+        self.logger.info("Worker 重建开始 | WORKER_RESTART_START worker=%s continue_snapshot=%s", slot.worker_id, continue_from_snapshot, extra={"event": "WORKER_RESTART_START", "phase": "restart", "worker": slot.worker_id, "continue_snapshot": continue_from_snapshot})
         old_worker = slot.worker
         try:
             old_worker.stop()
         except Exception:
-            self.logger.exception("Failed to stop CST worker %s", slot.worker_id)
+            self.logger.exception("Worker 关闭失败 | worker=%s project=%s", slot.worker_id, self.currProjectDir)
 
         with self._state_lock:
             if self._state is not ManagerState.RUNNING:
                 slot.state = WorkerState.DEAD
+                self.logger.info("Worker 重建取消 | WORKER_RESTART_CANCELLED worker=%s reason=stop_requested", slot.worker_id, extra={"event": "WORKER_RESTART_CANCELLED", "phase": "restart", "worker": slot.worker_id})
                 return False
 
         try:
@@ -372,6 +346,7 @@ class CSTManager:
             slot.worker = self._create_worker(slot.worker_id, source)
         except Exception:
             slot.state = WorkerState.DEAD
+            self.logger.exception("Worker 重建失败 | WORKER_RESTART_FAILED worker=%s", slot.worker_id, extra={"event": "WORKER_RESTART_FAILED", "phase": "restart", "worker": slot.worker_id})
             raise
         else:
             with self._state_lock:
@@ -380,9 +355,11 @@ class CSTManager:
                         slot.worker.stop()
                     finally:
                         slot.state = WorkerState.DEAD
+                        self.logger.info("Worker 重建后已停止 | WORKER_RESTART_CANCELLED worker=%s reason=stop_requested", slot.worker_id, extra={"event": "WORKER_RESTART_CANCELLED", "phase": "restart", "worker": slot.worker_id})
                     return False
             slot.completed_jobs = 0
             slot.state = WorkerState.ALIVE
+            self.logger.info("Worker 重建完成 | WORKER_RESTART_DONE worker=%s source=%s", slot.worker_id, source or self.cstProjPath, extra={"event": "WORKER_RESTART_DONE", "phase": "restart", "worker": slot.worker_id, "source": source or self.cstProjPath})
             return True
 
     @staticmethod
@@ -398,7 +375,7 @@ class CSTManager:
     def _execute_task(self, slot: _WorkerSlot, task: SimulationTask) -> dict:
         result: dict[str, Any] | None = None
         started_at = time.monotonic()
-        self.logger.info("TASK_START worker=%s job=%s", slot.worker_id, task.job_name)
+        self.logger.info("任务开始 | TASK_START worker=%s job=%s project=%s", slot.worker_id, task.job_name, self.currProjectDir, extra={"event": "TASK_START", "phase": "solve", "worker": slot.worker_id, "job": task.job_name, "project": self.currProjectDir})
         for attempt in range(task.retry_count + 1):
             try:
                 result = slot.worker.run_task(
@@ -407,9 +384,11 @@ class CSTManager:
                 )
             except Exception as exc:
                 self.logger.exception(
-                    "Worker %s raised while running %s",
+                    "Worker 执行异常 | worker=%s job=%s project=%s attempt=%d",
                     slot.worker_id,
                     task.job_name,
+                    self.currProjectDir,
+                    attempt + 1,
                 )
                 result = self._exception_result(task, exc)
 
@@ -422,21 +401,21 @@ class CSTManager:
                         self._confirmed_snapshot = snapshot
                 slot.completed_jobs += 1
                 self.logger.info(
-                    "TASK_DONE worker=%s job=%s status=%s attempt=%d elapsed_seconds=%.3f",
+                    "任务结束 | TASK_DONE worker=%s job=%s status=%s attempt=%d elapsed_seconds=%.3f",
                     slot.worker_id,
                     task.job_name,
                     result.get("TaskStatus", "Success"),
                     attempt + 1,
-                    time.monotonic() - started_at,
-                )
+                    time.monotonic() - started_at, extra={"event": "TASK_DONE", "phase": "solve", "worker": slot.worker_id, "job": task.job_name, "status": result.get("TaskStatus", "Success"), "attempt": attempt + 1, "elapsed_seconds": time.monotonic() - started_at})
                 return result
 
             self.logger.warning(
-                "Worker %s failed task %s (attempt %d/%d); restarting",
+                "任务失败，准备检查停止状态并重建 Worker | worker=%s job=%s attempt=%d max_attempts=%d reason=%s",
                 slot.worker_id,
                 task.job_name,
                 attempt + 1,
                 task.retry_count + 1,
+                result.get("FailureReport", "未提供失败原因"),
             )
             if self.stop_requested:
                 break
@@ -447,13 +426,13 @@ class CSTManager:
                 break
 
         assert result is not None
+        self.logger.error("任务已放弃 | TASK_ABANDONED worker=%s job=%s reason=%s stop_requested=%s", slot.worker_id, task.job_name, result.get("FailureReport", "retry_exhausted"), self.stop_requested, extra={"event": "TASK_ABANDONED", "phase": "solve", "worker": slot.worker_id, "job": task.job_name, "reason": result.get("FailureReport", "retry_exhausted"), "stop_requested": self.stop_requested})
         self.logger.error(
-            "TASK_DONE worker=%s job=%s status=Failure attempts=%d elapsed_seconds=%.3f",
+            "任务结束 | TASK_DONE worker=%s job=%s status=Failure attempts=%d elapsed_seconds=%.3f",
             slot.worker_id,
             task.job_name,
             task.retry_count + 1,
-            time.monotonic() - started_at,
-        )
+            time.monotonic() - started_at, extra={"event": "TASK_DONE", "phase": "solve", "worker": slot.worker_id, "job": task.job_name, "attempts": task.retry_count + 1, "elapsed_seconds": time.monotonic() - started_at})
         return result
 
     def _drain_tasks(self, slot: _WorkerSlot) -> None:
@@ -546,13 +525,13 @@ class CSTManager:
                 return
             self._state = ManagerState.STOPPING
             slots = list(self._slots)
-        self.logger.info("MANAGER_STOP_START workers=%d", len(slots))
+            self.logger.info("开始关闭 Worker 池 | MANAGER_STOP_START workers=%d", len(slots), extra={"event": "MANAGER_STOP_START", "phase": "shutdown", "workers": len(slots)})
 
         def stop_slot(slot: _WorkerSlot):
             try:
                 slot.worker.stop()
             except Exception as exc:
-                self.logger.exception("Failed to stop CST worker %s", slot.worker_id)
+                self.logger.exception("Worker 关闭失败 | worker=%s project=%s", slot.worker_id, self.currProjectDir)
                 return exc
             finally:
                 slot.state = WorkerState.DEAD
@@ -575,8 +554,7 @@ class CSTManager:
             self._slots.clear()
             self._state = ManagerState.CLOSED
         self.logger.info(
-            "MANAGER_STOPPED workers=%d errors=%d", len(slots), len(stop_errors)
-        )
+            "MANAGER_STOPPED workers=%d errors=%d", len(slots), len(stop_errors), extra={"event": "MANAGER_STOPPED", "phase": "shutdown", "workers": len(slots), "errors": len(stop_errors)})
         if stop_errors:
             raise RuntimeError(
                 f"{len(stop_errors)} CST worker(s) did not stop cleanly"
@@ -593,7 +571,7 @@ class CSTManager:
                 return
             self._state = ManagerState.STOP_REQUESTED
         self._clear_queue(self._task_queue)
-        self.logger.info("CSTManager accepted cooperative stop request")
+        self.logger.info("Manager 已接受安全停止请求 | project=%s", self.currProjectDir)
 
     def emergency_terminate(self) -> None:
         """Explicitly terminate live workers after standard shutdown failed."""

@@ -42,22 +42,15 @@ class ProjectConfigManager:
         GlobalConfigManager=None,
         logger: logging.Logger | None = None,
     ):
-        self.conf = configparser.ConfigParser()
+        self.settings: ProjectSettings | None = None
+        self._mesh_recorded = False
         if logger is not None:
             self.logger = logger
         else:
             self.logger = logging.getLogger(__name__)
-        self.gconf = GlobalConfigManager.conf
-        self.global_settings = getattr(GlobalConfigManager, "settings", None)
-        if self.global_settings is None:
-            compatible = GlobalSettings().to_parser()
-            for section in self.gconf.sections():
-                if not compatible.has_section(section):
-                    compatible.add_section(section)
-                for key, value in self.gconf.items(section):
-                    compatible.set(section, key, value)
-            self.global_settings = GlobalSettings.from_parser(compatible)
-        self.settings: ProjectSettings | None = None
+        self.global_settings = GlobalConfigManager.settings
+        if not isinstance(self.global_settings, GlobalSettings):
+            raise TypeError("global configuration requires GlobalSettings")
         self.inputCSTFilePath = None
         self.currProjectDir = None
         self.currCSTFilePath = None
@@ -69,6 +62,16 @@ class ProjectConfigManager:
 
     def is_ready(self):
         return self.ready
+
+    @property
+    def conf(self):
+        """Serialize current settings; mutations require assigning the parser back."""
+        return self.settings.to_parser() if self.settings else configparser.ConfigParser()
+
+    @conf.setter
+    def conf(self, parser):
+        self.settings = ProjectSettings.from_parser(parser)
+        self._mesh_recorded = parser.has_section("mesh") or parser.has_section("MESH")
 
     @property
     def postprocess_settings(self):
@@ -92,18 +95,18 @@ class ProjectConfigManager:
         # new clean project output dir or existed int mid file
         # dir must exist
         iDir = Path(projectDir)
-        self.logger.info("尝试打开project目录%s。" % str(iDir))
+        self.logger.debug("尝试打开project目录%s。" % str(iDir))
         cfgfilename = self.CFGfilename
         cfgpath = iDir / cfgfilename
         if not iDir.exists():
             raise FileNotFoundError  # dir must exist
         if not any(iDir.iterdir()):
-            self.logger.info("目录%s为空。" % str(iDir))
+            self.logger.debug("目录%s为空。" % str(iDir))
             return True
         if not cfgpath.exists():
-            self.logger.info("目录%s无旧config文件。" % str(iDir))
+            self.logger.debug("目录%s无旧config文件。" % str(iDir))
             return True
-        self.logger.info("目录%s存在已有文件。" % str(iDir))
+        self.logger.debug("目录%s存在已有文件。" % str(iDir))
         return False
 
     def __getTaskStatus(self, projectDir):
@@ -112,7 +115,7 @@ class ProjectConfigManager:
         cfgfilename = self.CFGfilename
         cfgpath = iDir / cfgfilename
         if not cfgpath.exists():
-            self.logger.info("目录%s无旧config文件,无未完成任务。" % str(iDir))
+            self.logger.debug("目录%s无旧config文件,无未完成任务。" % str(iDir))
             raise FileNotFoundError
         settings = ProjectSettings.from_parser(read_ini(cfgpath))
         return settings.task_status
@@ -120,12 +123,12 @@ class ProjectConfigManager:
     def select_project_directory(self, projectDir):
         self.setNotReady()  # changed Path so Not Ready
         self.currProjectDir = Path(projectDir).absolute()
-        self.logger.info("PCM:currProjectDir 已设为%s" % self.currProjectDir)
+        self.logger.debug("项目目录已选择 | project=%s", self.currProjectDir)
 
     def select_input_project(self, CSTfilePath):
         self.setNotReady()
         self.inputCSTFilePath = Path(CSTfilePath).absolute()
-        self.logger.info("PCM:inputCSTFilePath 已设为%s" % self.inputCSTFilePath)
+        self.logger.debug("输入工程已选择 | project=%s source=%s", self.currProjectDir, self.inputCSTFilePath)
 
     def __ready(self):
         self.ready = True
@@ -133,7 +136,7 @@ class ProjectConfigManager:
 
     def prepare_project(self, startFromExisted=False, *, mesh_cells_per_wavelength=20):
         # startFromExisted=True 从已有开始 不需要CST文件
-        self.logger.info("准备项目文件")
+        self.logger.info("准备项目 | project=%s source=%s resume=%s mesh_cells=%s", self.currProjectDir, self.inputCSTFilePath, startFromExisted, mesh_cells_per_wavelength)
         iProjectDir = self.currProjectDir
         iInputCSTFilePath = self.inputCSTFilePath
         if iProjectDir == None or not iProjectDir.exists():
@@ -148,10 +151,10 @@ class ProjectConfigManager:
 
         if dirClean:
             if startFromExisted:
-                self.logger.info("尝试从空白目录继续")
+                self.logger.debug("尝试从空白目录继续")
                 raise ProjectStatusError("尝试从空白目录继续")
-            self.logger.info("目录%s无旧文件" % str(iProjectDir))
-            self.logger.info("尝试从project目录%s创建空白配置文件。" % str(iProjectDir))
+            self.logger.debug("目录%s无旧文件" % str(iProjectDir))
+            self.logger.debug("尝试从project目录%s创建空白配置文件。" % str(iProjectDir))
             iConf = self.createNewEmptyProjectConfFile(iProjectDir)
             iConf = replace(
                 ProjectSettings.from_parser(iConf),
@@ -177,7 +180,7 @@ class ProjectConfigManager:
             self.savePPSSettings(self.currPPSList)
             return self.__ready()
         else:
-            self.logger.info("目录%s有旧文件" % str(iProjectDir))
+            self.logger.debug("目录%s有旧文件" % str(iProjectDir))
             status = self.__getTaskStatus(iProjectDir)  # [READY RUNNING DONE]
             if status == "READY":
                 result = self.__checkProjectStatus()
@@ -214,8 +217,6 @@ class ProjectConfigManager:
         normalized = settings.to_parser()
         write_ini_atomic(cfgfilePath, normalized)
         self.settings = settings
-        if confobj is self.conf:
-            self.conf = normalized
 
     def savecfg(self, cfgfilename="project.ini"):
         self.__savecfgobj(self.conf, cfgfilename)
@@ -232,16 +233,16 @@ class ProjectConfigManager:
 
         currprojname = None
         if projectname != None:
-            self.logger.info("使用指定的project名%s" % projectname)
+            self.logger.debug("使用指定的project名%s" % projectname)
             currprojname = projectname
 
         else:
-            self.logger.info("未指定project名,使用为默认目录名%s" % avilprojname)
+            self.logger.debug("未指定project名,使用为默认目录名%s" % avilprojname)
             currprojname = avilprojname
 
         newconf = ProjectSettings(name=currprojname).to_parser()
 
-        self.logger.info("创建配置文件结束。")
+        self.logger.debug("创建配置文件结束。")
         self.__savecfgobj(newconf, cfgfilename)
         return newconf
         # 保存配置文件
@@ -268,7 +269,7 @@ class ProjectConfigManager:
             digest_algorithm="sha256",
             cells_per_wavelength=int(mesh_cells_per_wavelength),
         ).to_parser()
-        self.logger.info("Config内容更新完成")
+        self.logger.debug("Config内容更新完成")
         return confobj
 
     def update_task_status(self, taskstatus):
@@ -278,34 +279,34 @@ class ProjectConfigManager:
         self.settings = replace(settings, task_status=taskstatus.name)
         self.conf = self.settings.to_parser()
         self.__savecfgobj(self.conf)
-        self.logger.info("PCM:项目状态已设为%s" % taskstatus.name)
+        self.logger.info("项目状态已更新 | project=%s status=%s", self.currProjectDir, taskstatus.name)
         return taskstatus
 
     def printConfInfo(self, confobj, projectDir):
         settings = ProjectSettings.from_parser(confobj)
-        self.logger.info("项目信息:")
-        self.logger.info("ProjectName:%s", settings.name)
-        self.logger.info("ProjectDescription:%s", settings.description)
-        self.logger.info("项目result目录:%s", settings.directories.result)
-        self.logger.info("项目temp目录:%s", settings.directories.temp)
-        self.logger.info("CST文件名:%s", settings.cst_filename)
+        self.logger.debug("项目信息:")
+        self.logger.debug("ProjectName:%s", settings.name)
+        self.logger.debug("ProjectDescription:%s", settings.description)
+        self.logger.debug("项目result目录:%s", settings.directories.result)
+        self.logger.debug("项目temp目录:%s", settings.directories.temp)
+        self.logger.debug("CST文件名:%s", settings.cst_filename)
         self.logger.info(
             "CST工程摘要(%s):%s",
             settings.digest_algorithm,
             settings.project_digest,
         )
-        self.logger.info("使用MPI:%s", settings.use_mpi)
-        self.logger.info("MPI节点文件:%s", settings.mpi_node_list)
+        self.logger.debug("使用MPI:%s", settings.use_mpi)
+        self.logger.debug("MPI节点文件:%s", settings.mpi_node_list)
         self.logger.info("使用远程计算:%s", settings.use_remote_calculation)
-        self.logger.info("控制器地址:%s", settings.dc_main_control_address)
-        self.logger.info("参数列表文件:%s", settings.parameter_file)
+        self.logger.debug("控制器地址:%s", settings.dc_main_control_address)
+        self.logger.debug("参数列表文件:%s", settings.parameter_file)
         self.printParamsInfo(confobj, projectDir)
 
     def printParamsInfo(self, confobj, projectDir):
 
         paramfile = projectDir / ProjectSettings.from_parser(confobj).parameter_file
         pamlist = read_json(paramfile)
-        print(pamlist)
+        self.logger.debug("项目参数已读取 | project=%s count=%d", projectDir, len(pamlist))
 
     def get_parameters(self):
         return self.__get_parameters(self.conf, self.currProjectDir)
@@ -385,7 +386,7 @@ class ProjectConfigManager:
         return result.project_path
 
     def _validate_fixed_mesh(self, requested_cells):
-        if not (self.conf.has_section("mesh") or self.conf.has_section("MESH")):
+        if not self._mesh_recorded:
             self.logger.warning(
                 "旧项目未记录固定网格设置；保持工程现状，不在恢复时修改 mesh"
             )
@@ -406,31 +407,31 @@ class ProjectConfigManager:
         cfgpath = self.currProjectDir / cfgfilename
         cstfileflag = False
         cfgfileflag = False
-        self.logger.info("检测并更新项目配置文件")
-        self.logger.info("测试项目配置文件是否存在")
+        self.logger.debug("检测并更新项目配置文件")
+        self.logger.debug("测试项目配置文件是否存在")
         self.logger.debug("推测项目配置文件位于%s", str(cfgpath))
         if cfgpath.exists():
-            self.logger.info("测试项目配置文件存在 通过")
+            self.logger.debug("测试项目配置文件存在 通过")
             cfgfileflag = True
         else:
             self.logger.error("未找到配置文件%s\n" % str(cfgpath))
-            self.logger.info("测试项目配置文件存在 失败")
+            self.logger.debug("测试项目配置文件存在 失败")
             result = False
         self.conf = read_ini(cfgpath)
         self.settings = ProjectSettings.from_parser(self.conf)
-        self.logger.info("测试CST模型文件是否存在")
+        self.logger.debug("测试CST模型文件是否存在")
         cstfilepath = self.currProjectDir / self.settings.cst_filename
         self.logger.debug("推测模型文件位于%s", str(cstfilepath))
         if cstfilepath.exists():
-            self.logger.info("测试CST模型文件存在 通过")
+            self.logger.debug("测试CST模型文件存在 通过")
             cstfileflag = True
         else:
             self.logger.error("未找到cst文件%s\n" % str(cstfilepath))
-            self.logger.info("测试CST模型文件存在 失败")
+            self.logger.debug("测试CST模型文件存在 失败")
             result = False
         current_digest = self.file_digest(cstfilepath, self.settings.digest_algorithm)
         saved_digest = self.settings.project_digest
-        self.logger.info("测试参数列表与CST工程摘要是否匹配")
+        self.logger.debug("测试参数列表与CST工程摘要是否匹配")
         paramjsonpath = self._rap2apo(self.settings.parameter_file)
         ppsjsonpath = self._rap2apo(self.settings.postprocess_file)
         if current_digest != saved_digest:
@@ -445,20 +446,20 @@ class ProjectConfigManager:
             self.conf = self.__autoPreProcess(self.conf, cstfilepath)
             # self.readParametersFromCST()
             self.__savecfgobj(self.conf)
-            self.logger.warning("已更新保存的工程摘要")
-            self.logger.info("工程摘要测试通过")
+            self.logger.info("工程摘要与参数已恢复 | project=%s", self.currProjectDir)
+            self.logger.debug("工程摘要测试通过")
         elif not paramjsonpath.exists():
             self.logger.warning("参数列表文件_%s不存在" % str(paramjsonpath))
 
             self.logger.warning("重新生成并保存参数列表")
             self.conf = self.__autoPreProcess(self.conf, cstfilepath)
             # self.readParametersFromCST(paramjsonpath)
-            self.__savecfgobj()
+            self.__savecfgobj(self.conf)
         if not ppsjsonpath.exists():
-            self.logger.warning("后处理设置文件_%s不存在" % str(paramjsonpath))
+            self.logger.warning("后处理配置缺失，正在恢复 | project=%s path=%s", self.currProjectDir, ppsjsonpath)
             self.logger.warning("重新生成并保存参数列表")
             self.savePPSSettings(self.currPPSList)
-        self.logger.info("%s检测并更新项目配置文件结束\n" % cfgfilename)
+        self.logger.debug("%s检测并更新项目配置文件结束\n" % cfgfilename)
         return result
 
     def __checkProjectStatus(
@@ -468,32 +469,32 @@ class ProjectConfigManager:
         cfgpath = self.currProjectDir / cfgfilename
         cstfileflag = False
         cfgfileflag = False
-        self.logger.info("检测项目配置文件正确性")
-        self.logger.info("测试项目配置文件是否存在")
+        self.logger.debug("检测项目配置文件正确性")
+        self.logger.debug("测试项目配置文件是否存在")
         self.logger.debug("推测项目配置文件位于%s", str(cfgpath))
         if cfgpath.exists():
             cfgfileflag = True
-            self.logger.info("测试项目配置文件 通过")
+            self.logger.debug("测试项目配置文件 通过")
         else:
             self.logger.error("未找到项目配置文件%s\n" % str(cfgpath))
-            self.logger.info("测试项目配置文件 失败")
+            self.logger.debug("测试项目配置文件 失败")
             result = False
 
         self.conf = read_ini(cfgpath)
         self.settings = ProjectSettings.from_parser(self.conf)
         cstfilepath = self.currProjectDir / self.settings.cst_filename
-        self.logger.info("测试CST模型文件是否存在")
+        self.logger.debug("测试CST模型文件是否存在")
         self.logger.debug("推测模型文件位于%s", str(cstfilepath))
         if cstfilepath.exists():
             cstfileflag = True
-            self.logger.info("测试CST模型文件 通过")
+            self.logger.debug("测试CST模型文件 通过")
         else:
             self.logger.error("未找到cst模型文件%s\n" % str(cstfilepath))
-            self.logger.info("测试CST模型文件 失败")
+            self.logger.debug("测试CST模型文件 失败")
             result = False
         current_digest = self.file_digest(cstfilepath, self.settings.digest_algorithm)
         saved_digest = self.settings.project_digest
-        self.logger.info("测试保存的工程摘要是否与CST模型文件匹配")
+        self.logger.debug("测试保存的工程摘要是否与CST模型文件匹配")
         paramjsonpath = self._rap2apo(self.settings.parameter_file)
         if current_digest != saved_digest:
             self.logger.warning(
@@ -501,18 +502,18 @@ class ProjectConfigManager:
                 saved_digest,
                 current_digest,
             )
-            self.logger.info("工程摘要测试失败")
+            self.logger.debug("工程摘要测试失败")
             result = False
         elif not paramjsonpath.exists():
             self.logger.warning("参数列表文件_%s不存在" % str(paramjsonpath))
             result = False
         else:
-            self.logger.info("工程摘要测试通过")
+            self.logger.debug("工程摘要测试通过")
         ppsjsonpath = self._rap2apo(self.settings.postprocess_file)
         if not ppsjsonpath.exists():
             self.logger.warning("后处理设置文件_%s不存在" % str(ppsjsonpath))
             result = False
-        self.logger.info("%s检测项目配置文件结束\n" % cfgfilename)
+        self.logger.debug("%s检测项目配置文件结束\n" % cfgfilename)
 
         return result
 
@@ -535,7 +536,7 @@ class ProjectConfigManager:
                 raise ValueError("postprocess configuration must be a list")
             return result
         except (OSError, json.JSONDecodeError, ValueError) as exc:
-            self.logger.warning("后处理设定读取失败: %s", exc)
+            self.logger.warning("后处理配置读取失败，返回空配置 | project=%s path=%s reason=%s", self.currProjectDir, ppspath, exc)
             return []
 
     def savePPSSettings(self, ppslist):
@@ -543,8 +544,8 @@ class ProjectConfigManager:
         ppspath = self.currProjectDir / settings.postprocess_file
         try:
             write_json_atomic(ppspath, ppslist)
-            self.logger.info("后处理设定已保存至%s" % str(ppspath))
+            self.logger.debug("后处理配置已保存 | project=%s path=%s count=%d", self.currProjectDir, ppspath, len(ppslist))
             return True
         except (OSError, TypeError, ValueError) as exc:
-            self.logger.error("后处理设定保存失败: %s", exc)
+            self.logger.error("后处理配置保存失败 | project=%s path=%s reason=%s", self.currProjectDir, ppspath, exc)
             return False

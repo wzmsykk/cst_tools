@@ -17,6 +17,7 @@ from install_compat import resource_path
 from .postprocess_cst import CstPostProcessor
 from .cst_progress import CstLogProgressMonitor, CstLogProgressParser
 from .vb_codec import quote_vb_string
+from .logging_config import ContextLogger
 from .runtime_protocol import (
     Acknowledge,
     CompletionStatus,
@@ -44,6 +45,9 @@ class ManagedCSTWorker:
         self.logger = logger or logging.getLogger(__name__)
         worker_root = Path(config["taskFileDir"]).resolve()
         self.session_id = new_session_id()
+        self.logger = ContextLogger(self.logger, {
+            "worker": worker_id, "session": self.session_id,
+        })
         self.root = worker_root / self.session_id
         self.result_root = Path(config["resultDir"]).resolve() / f"worker_{worker_id}"
         self.source_project = Path(config["cstPath"]).resolve()
@@ -131,7 +135,7 @@ class ManagedCSTWorker:
             )
             self._progress_monitor.start()
         self._wait_for_marker("ready", self.START_TIMEOUT)
-        self.logger.info("Managed CST worker %s started pid=%s", self.ID, self._process.pid)
+        self.logger.info("CST 进程已启动 | worker=%s session=%s pid=%s project=%s", self.ID, self.session_id, self._process.pid, self.source_project)
 
     def _background_startup_options(self) -> dict[str, Any]:
         """Isolate console signals and optionally start CST minimized."""
@@ -248,19 +252,24 @@ class ManagedCSTWorker:
             }
             started_at = time.monotonic()
             self.logger.info(
-                "WORKER_TASK_DISPATCH worker=%s session=%s task=%s job=%s fmin=%s fmax=%s",
+                "任务已发送给 CST | WORKER_TASK_DISPATCH worker=%s session=%s task=%s job=%s fmin=%s fmax=%s",
                 self.ID,
                 self.session_id,
                 task.task_id,
                 result_name,
                 params.get("fmin"),
-                params.get("fmax"),
-            )
+                params.get("fmax"), extra={"event": "WORKER_TASK_DISPATCH", "phase": "solve", "worker": self.ID, "session": self.session_id, "task": task.task_id, "job": result_name, "fmin": params.get("fmin"), "fmax": params.get("fmax")})
             self.marker_path.write_text(
                 f"dispatched:{task.task_id}", encoding="ascii"
             )
             atomic_publish(self.task_path, encode_task(task))
-            completion = self._wait_completion(task)
+            try:
+                completion = self._wait_completion(task)
+            except Exception:
+                self.logger.exception("等待 CST 完成失败 | CST_COMPLETION_FAILED task=%s job=%s", task.task_id, result_name, extra={"event": "CST_COMPLETION_FAILED", "phase": "solve", "task": task.task_id, "job": result_name})
+                self._active_task_context = {}
+                raise
+            self.logger.debug("收到 CST 完成标记 | CST_COMPLETION task=%s job=%s status=%s", task.task_id, result_name, completion.status.value, extra={"event": "CST_COMPLETION", "phase": "solve", "task": task.task_id, "job": result_name, "status": completion.status.value})
             task_result_root = self.result_root / task.task_id
             project_snapshot = task_result_root / "project.cst"
             try:
@@ -272,6 +281,7 @@ class ManagedCSTWorker:
                     self.postprocess.set_result_directory(task_result_root)
                     self.postprocess.set_cst_run_result_directory(task_result_root / "project")
                     postprocess_result = self.postprocess.read_all_results()
+                    self.logger.debug("后处理结果读取完成 | RESULT_READ_DONE task=%s job=%s results=%d snapshot=%s", task.task_id, result_name, len(postprocess_result), project_snapshot, extra={"event": "RESULT_READ_DONE", "phase": "readout", "task": task.task_id, "job": result_name, "results": len(postprocess_result), "snapshot": project_snapshot})
                     status = "Success"
                     failure = None
                 else:
@@ -279,25 +289,33 @@ class ManagedCSTWorker:
                     status = "Failure"
                     failure = f"{completion.error_code.value}: {completion.error_message}"
             except Exception as exc:
+                self.logger.exception("后处理结果读取失败 | RESULT_READ_FAILED task=%s job=%s", task.task_id, result_name, extra={"event": "RESULT_READ_FAILED", "phase": "readout", "task": task.task_id, "job": result_name})
                 postprocess_result = None
                 status = "Failure"
                 failure = f"RESULT_READ_FAILED: {type(exc).__name__}: {exc}"
             finally:
-                atomic_publish(
-                    self.ack_path,
-                    encode_ack(Acknowledge(task.task_id, task.session_id)),
-                )
-                self._wait_for_marker("ready", self.START_TIMEOUT)
-                self._active_task_context = {}
+                try:
+                    atomic_publish(
+                        self.ack_path,
+                        encode_ack(Acknowledge(task.task_id, task.session_id)),
+                    )
+                    self.logger.debug("任务 Ack 已发布 | TASK_ACK_PUBLISHED task=%s job=%s", task.task_id, result_name, extra={"event": "TASK_ACK_PUBLISHED", "phase": "ack", "task": task.task_id, "job": result_name})
+                    self._wait_for_marker("ready", self.START_TIMEOUT)
+                    self.logger.debug("CST 已回到就绪状态 | TASK_ACK_READY task=%s job=%s", task.task_id, result_name, extra={"event": "TASK_ACK_READY", "phase": "ack", "task": task.task_id, "job": result_name})
+                except Exception:
+                    self.logger.exception("任务确认阶段失败 | TASK_ACK_FAILED task=%s job=%s", task.task_id, result_name, extra={"event": "TASK_ACK_FAILED", "phase": "ack", "task": task.task_id, "job": result_name})
+                    raise
+                finally:
+                    self._active_task_context = {}
             log_method = self.logger.info if status == "Success" else self.logger.error
             log_method(
-                "WORKER_TASK_COMPLETE worker=%s task=%s status=%s elapsed_seconds=%.3f failure=%s",
+                "CST 任务结束 | WORKER_TASK_COMPLETE worker=%s task=%s status=%s elapsed_seconds=%.3f failure=%s job=%s",
                 self.ID,
                 task.task_id,
                 status,
                 time.monotonic() - started_at,
                 failure or "none",
-            )
+                result_name, extra={"event": "WORKER_TASK_COMPLETE", "phase": "solve", "worker": self.ID, "task": task.task_id, "status": status, "elapsed_seconds": time.monotonic() - started_at, "failure": failure or "none", "job": result_name})
             return {
                 "WorkerID": self.ID,
                 "TaskStatus": status,
@@ -340,15 +358,15 @@ class ManagedCSTWorker:
             if self._process is None:
                 return True
             if self._process.poll() is not None:
+                self.logger.debug("CST 进程已结束，无需重复退出 | WORKER_ALREADY_EXITED worker=%s session=%s returncode=%s", self.ID, self.session_id, self._process.poll(), extra={"event": "WORKER_ALREADY_EXITED", "phase": "readout", "worker": self.ID, "session": self.session_id, "returncode": self._process.poll()})
                 self._close_log()
                 return True
             self._stopping = True
             self.logger.info(
-                "WORKER_STOP_REQUEST worker=%s session=%s pid=%s",
+                "请求 CST 标准退出 | WORKER_STOP_REQUEST worker=%s session=%s pid=%s",
                 self.ID,
                 self.session_id,
-                getattr(self._process, "pid", None),
-            )
+                getattr(self._process, "pid", None), extra={"event": "WORKER_STOP_REQUEST", "phase": "shutdown", "worker": self.ID, "session": self.session_id, "pid": getattr(self._process, "pid", None)})
             if not self.stop_request_path.exists():
                 self.protocol.request_stop(self.session_id)
             deadline = time.monotonic() + self.STOP_TIMEOUT
@@ -360,8 +378,7 @@ class ManagedCSTWorker:
                         break
                     self._close_log()
                     self.logger.info(
-                        "WORKER_STOPPED worker=%s session=%s", self.ID, self.session_id
-                    )
+                        "CST 已确认停止并退出 | WORKER_STOPPED worker=%s session=%s", self.ID, self.session_id, extra={"event": "WORKER_STOPPED", "phase": "shutdown", "worker": self.ID, "session": self.session_id})
                     return True
                 if self._process.poll() is not None:
                     break
@@ -369,6 +386,7 @@ class ManagedCSTWorker:
 
             if self._process.poll() is not None:
                 self._close_log()
+            self.logger.error("CST 标准退出未获确认，需要会话恢复 | WORKER_STOP_FAILED worker=%s session=%s returncode=%s process_alive=%s timeout_seconds=%s", self.ID, self.session_id, self._process.poll(), self._process.poll() is None, self.STOP_TIMEOUT, extra={"event": "WORKER_STOP_FAILED", "phase": "shutdown", "worker": self.ID, "session": self.session_id, "returncode": self._process.poll(), "process_alive": self._process.poll() is None, "timeout_seconds": self.STOP_TIMEOUT})
             raise ManagedWorkerShutdownError(
                 f"worker {self.ID} did not confirm standard Save/Quit; "
                 "explicit emergency termination is required"

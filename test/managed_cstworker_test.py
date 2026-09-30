@@ -1,4 +1,5 @@
 import logging
+from pathlib import Path
 import os
 import threading
 
@@ -111,7 +112,7 @@ def test_managed_worker_can_leave_cst_window_interactive():
         assert options == {}
 
 
-def test_standard_stop_timeout_does_not_kill_cst(tmp_path):
+def test_standard_stop_timeout_does_not_kill_cst(tmp_path, caplog):
     class Process:
         pid = 1
 
@@ -138,6 +139,49 @@ def test_standard_stop_timeout_does_not_kill_cst(tmp_path):
         worker.stop()
 
     assert not worker._process.killed
+    assert "WORKER_STOP_FAILED" in caplog.text
+    assert "WORKER_STOPPED" not in caplog.text
+
+
+@pytest.mark.parametrize("ack_fails", [False, True])
+def test_task_logs_results_before_ack_and_only_completes_after_ready(tmp_path, monkeypatch, caplog, ack_fails):
+    from types import SimpleNamespace
+    from csttool.runtime_protocol import CompletionStatus
+
+    worker = build_worker_shell(tmp_path)
+    worker.ID = "test"
+    worker._lock = threading.RLock()
+    worker._stopping = False
+    worker.parameter_definitions = ()
+    worker.TASK_TIMEOUT = 1
+    calls = []
+
+    def wait_marker(*args):
+        calls.append(args)
+        if ack_fails and len(calls) == 2:
+            raise TimeoutError("ready timeout")
+
+    def complete(task):
+        snapshot = worker.result_root / task.task_id / "project.cst"
+        snapshot.parent.mkdir(parents=True)
+        snapshot.write_bytes(b"snapshot")
+        return SimpleNamespace(status=CompletionStatus.SUCCESS)
+
+    monkeypatch.setattr(worker, "_wait_for_marker", wait_marker)
+    monkeypatch.setattr(worker, "_wait_completion", complete)
+    monkeypatch.setattr(worker.postprocess, "read_all_results", lambda: [])
+    caplog.set_level(logging.DEBUG)
+    if ack_fails:
+        with pytest.raises(TimeoutError):
+            worker.run_task("mode-1", params={})
+        assert "TASK_ACK_FAILED" in caplog.text
+        assert "WORKER_TASK_COMPLETE" not in caplog.text
+    else:
+        worker.run_task("mode-1", params={})
+        events = ["CST_COMPLETION ", "RESULT_READ_DONE", "TASK_ACK_PUBLISHED", "TASK_ACK_READY", "WORKER_TASK_COMPLETE"]
+        offsets = [caplog.text.index(event) for event in events]
+        assert offsets == sorted(offsets)
+    assert worker._active_task_context == {}
 
 
 def test_emergency_termination_is_explicit(tmp_path):
@@ -189,20 +233,13 @@ def test_ready_marker_is_invalidated_before_task_publication(tmp_path, monkeypat
 
 class _Global:
     def __init__(self, root):
-        self.conf = {
-            "BASE": {"datadir": str(root / "data")},
-            "CST": {"cstexepath": str(root / "cst.exe")},
-        }
+        self.settings = GlobalSettings().with_cst("2022", str(root / "cst.exe"))
 
 
 class _Project:
     def __init__(self, root):
         self.currProjectDir = root
-        self.conf = {
-            "DIRS": {"tempdir": "temp", "resultdir": "result"},
-            "CST": {"CSTFilename": "model.cst"},
-            "PROJECT": {"ProjectType": "default"},
-        }
+        self.settings = ProjectSettings(name="test-project", cst_filename=Path("model.cst"))
 
     def get_postprocess_settings(self):
         return []
@@ -230,3 +267,4 @@ def test_manager_propagates_worker_shutdown_failure_after_closing(tmp_path):
         manager.stop()
 
     assert manager.state is ManagerState.CLOSED
+from csttool.configuration import GlobalSettings, ProjectSettings

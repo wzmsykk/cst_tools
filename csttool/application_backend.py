@@ -11,11 +11,12 @@ import tempfile
 import threading
 import time
 from typing import Callable
+from uuid import uuid4
 
 from install_compat import resource_path
 
 from csttool import cstmanager, globalconfmanager, myAlgorithm_pop
-from csttool.logging_config import ApplicationLogSession
+from csttool.logging_config import ApplicationLogSession, ContextLogger
 from csttool.managed_cstworker import ManagedCSTWorker
 from csttool import projectconfmanager
 from csttool.hom_scan import ScanInterrupted
@@ -95,7 +96,9 @@ class CstApplicationBackend:
             self._log_owner = None
             self.logger = application_logger
 
-        self.logger.info("数据路径%s", resource_path("."))
+        self._base_logger = self.logger
+        self.run_id = None
+        self.logger.debug("运行资源目录 | path=%s", resource_path("."))
         self.gconfman = global_config_manager or globalconfmanager.GlobalConfigManager(
             logger=self.logger
         )
@@ -157,7 +160,7 @@ class CstApplicationBackend:
     def update_algorithm_settings(self, values) -> None:
         self._require_configurable("update algorithm settings")
         self.alg.set_editable_attributes(values)
-        self.logger.info("ALG参数设置完毕")
+        self.logger.info("算法设置已更新 | project=%s algorithm=%s", self.get_project_directory(), type(self.alg).__name__)
 
     def initialize_run(
         self,
@@ -178,33 +181,41 @@ class CstApplicationBackend:
 
         self.resume = bool(resume)
         self.worker_count = worker_count
+        self.run_id = uuid4().hex
+        self.logger = ContextLogger(self._base_logger, {
+            "run_id": self.run_id,
+            "project": self.get_project_directory(),
+        })
+        self.gconfman.logger = self.logger
+        self.pconfman.logger = self.logger
         self.alg.set_resume(self.resume)
         self.logger.info(
-            "RUN_INITIALIZE project=%s resume=%s workers=%d",
+            "初始化运行 | RUN_INITIALIZE project=%s resume=%s workers=%d",
             self.get_project_directory(),
             self.resume,
-            self.worker_count,
-        )
+            self.worker_count, extra={"event": "RUN_INITIALIZE", "phase": "lifecycle", "project": self.get_project_directory(), "resume": self.resume, "workers": self.worker_count})
 
         try:
             if self.gconfman.validate_environment() is False:
                 raise BackendInitializationError("CST 环境初始化失败")
             self.gconfman.saveconf()
         except BackendInitializationError:
+            self.logger.exception("运行初始化失败 | state=FAILED")
             self._set_state(BackendState.FAILED)
             raise
         except Exception as exc:
             self._set_state(BackendState.FAILED)
+            self.logger.exception("运行初始化失败 | state=FAILED")
             raise BackendInitializationError("CST 环境初始化失败") from exc
 
-        self.logger.info("开始使用project目录:%s", self.get_project_directory())
+        self.logger.debug("项目已选择 | project=%s", self.get_project_directory())
         self._set_state(BackendState.INITIALIZED)
 
     def prepare_run(self) -> None:
         self._require_state("prepare run", BackendState.INITIALIZED)
         try:
             self._acquire_project_run_lock()
-            self.logger.info("RUN_PREPARE project=%s", self.get_project_directory())
+            self.logger.info("准备运行 | RUN_PREPARE project=%s", self.get_project_directory(), extra={"event": "RUN_PREPARE", "phase": "lifecycle", "project": self.get_project_directory()})
             settings = self.alg.get_editable_attributes()
             validate_postprocess = getattr(
                 self.alg,
@@ -230,13 +241,13 @@ class CstApplicationBackend:
                     f"发现 {len(unresolved)} 个未闭合 CST 会话，请先执行会话恢复"
                 )
             self.gconfman.printconf()
-            self.logger.info("-----------------------------------")
+            self.logger.debug("项目配置校验完成 | project=%s", self.get_project_directory())
             self._create_manager()
             algorithm_params = self.pconfman.get_parameters()
             self.alg.set_job_manager(self.jm)
             self.alg.set_cst_parameters(algorithm_params)
         except Exception as exc:
-            self.logger.exception("项目配置出错")
+            self.logger.exception("运行准备失败 | project=%s resume=%s", self.get_project_directory(), self.resume)
             if self.state is not BackendState.RECOVERY_REQUIRED:
                 self._set_state(BackendState.FAILED)
             try:
@@ -248,7 +259,7 @@ class CstApplicationBackend:
                 raise
             raise BackendPreparationError("运行配置准备失败") from exc
         self._set_state(BackendState.PREPARED)
-        self.logger.info("RUN_PREPARED workers=%d", self.worker_count)
+        self.logger.info("运行已就绪 | RUN_PREPARED project=%s workers=%d", self.get_project_directory(), self.worker_count, extra={"event": "RUN_PREPARED", "phase": "lifecycle", "project": self.get_project_directory(), "workers": self.worker_count})
 
     def _run_mesh_convergence(self, settings) -> int:
         convergence = MeshConvergenceSettings(
@@ -261,10 +272,9 @@ class CstApplicationBackend:
         output_directory = Path(self.get_project_directory()) / "mesh_convergence"
         analyzer = MeshConvergenceAnalyzer(convergence)
         self.logger.info(
-            "MESH_CONVERGENCE_START levels=%s tolerance=%g",
+            "开始网格收敛分析 | MESH_CONVERGENCE_START levels=%s tolerance=%g",
             convergence.levels,
-            convergence.tolerance,
-        )
+            convergence.tolerance, extra={"event": "MESH_CONVERGENCE_START", "phase": "lifecycle", "levels": convergence.levels, "tolerance": convergence.tolerance})
         evaluator = self._mesh_convergence_evaluator
         if evaluator is None:
             evaluator = lambda level: self._evaluate_mesh_level(
@@ -285,12 +295,11 @@ class CstApplicationBackend:
             )
             raise
         self.logger.info(
-            "MESH_CONVERGENCE_RESULT converged=%s recommended=%s json=%s csv=%s",
+            "网格收敛分析完成 | MESH_CONVERGENCE_RESULT converged=%s recommended=%s json=%s csv=%s",
             report.converged,
             report.recommended_cells_per_wavelength,
             json_path,
-            csv_path,
-        )
+            csv_path, extra={"event": "MESH_CONVERGENCE_RESULT", "phase": "lifecycle", "converged": report.converged, "recommended": report.recommended_cells_per_wavelength, "json": json_path, "csv": csv_path})
         if not report.converged:
             raise BackendPreparationError(
                 "Mesh 在设定上限内未收敛；请查看 mesh_convergence 报告并提高上限"
@@ -349,8 +358,7 @@ class CstApplicationBackend:
                     )
                 values = scalar_postprocess_values(result)
                 self.logger.info(
-                    "MESH_CONVERGENCE_POINT cells=%d values=%s", level, values
-                )
+                    "网格采样完成 | MESH_CONVERGENCE_POINT cells=%d values=%s", level, values, extra={"event": "MESH_CONVERGENCE_POINT", "phase": "lifecycle", "cells": level, "values": values})
                 return values
             finally:
                 try:
@@ -364,7 +372,7 @@ class CstApplicationBackend:
         failure = None
         result = None
         started_at = time.monotonic()
-        self.logger.info("RUN_EXECUTE_START project=%s", self.get_project_directory())
+        self.logger.info("运行开始 | RUN_EXECUTE_START project=%s", self.get_project_directory(), extra={"event": "RUN_EXECUTE_START", "phase": "lifecycle", "project": self.get_project_directory()})
         try:
             self._update_task_status(projectconfmanager.TaskStatus.RUNNING)
             if self.alg is None:
@@ -392,7 +400,7 @@ class CstApplicationBackend:
                 self._set_state(BackendState.RECOVERY_REQUIRED)
                 if failure is None:
                     raise
-                self.logger.exception("算法失败后的 Manager 清理也失败")
+                self.logger.exception("运行失败后关闭 Worker 失败，需要会话恢复 | project=%s", self.get_project_directory())
             finally:
                 self._clear_manager()
                 try:
@@ -413,16 +421,15 @@ class CstApplicationBackend:
 
         self._set_state(BackendState.STOPPED)
         self.logger.info(
-            "RUN_EXECUTE_DONE elapsed_seconds=%.3f",
-            time.monotonic() - started_at,
-        )
+            "运行完成 | RUN_EXECUTE_DONE elapsed_seconds=%.3f",
+            time.monotonic() - started_at, extra={"event": "RUN_EXECUTE_DONE", "phase": "lifecycle", "elapsed_seconds": time.monotonic() - started_at})
         return result
 
     def request_stop(self) -> None:
         accepted = False
         with self._lifecycle_lock:
             if self.jm is None:
-                self.logger.info("Stop requested before a manager was created")
+                self.logger.debug("停止请求无需执行：Manager 尚未创建 | project=%s", self.get_project_directory())
                 return
             if self.state in {
                 BackendState.INITIALIZED,
@@ -432,7 +439,7 @@ class CstApplicationBackend:
                 self.state = BackendState.STOPPING
                 accepted = True
         if accepted:
-            self.logger.info("RUN_STOP_REQUESTED project=%s", self.get_project_directory())
+            self.logger.info("请求安全停止 | RUN_STOP_REQUESTED project=%s", self.get_project_directory(), extra={"event": "RUN_STOP_REQUESTED", "phase": "shutdown", "project": self.get_project_directory()})
             self._update_task_status(projectconfmanager.TaskStatus.STOP_REQUESTED)
         try:
             manager = self.jm
@@ -469,11 +476,14 @@ class CstApplicationBackend:
         except BackendPreparationError as exc:
             raise BackendLifecycleError(str(exc)) from exc
         try:
-            self.logger.info("RECOVERY_START project=%s", project_directory)
+            self.logger.info("开始会话恢复 | RECOVERY_START project=%s", project_directory, extra={"event": "RECOVERY_START", "phase": "recovery", "project": project_directory})
             recovered = recover_project_sessions(project_directory)
+        except Exception:
+            self.logger.exception("会话恢复失败 | project=%s status=RECOVERY_REQUIRED", project_directory, extra={"event": "RECOVERY_REQUIRED", "phase": "recovery", "project": project_directory})
+            raise
         finally:
             self._release_project_run_lock()
-        self.logger.info("已恢复并关闭 %d 个 CST 会话", len(recovered))
+        self.logger.info("会话恢复完成 | project=%s closed_sessions=%d", project_directory, len(recovered))
         self._update_task_status(projectconfmanager.TaskStatus.INTERRUPTED)
         self._set_state(BackendState.INTERRUPTED)
         return recovered
@@ -506,7 +516,7 @@ class CstApplicationBackend:
             **manager_options,
         )
         self._manager_stop_requested = False
-        self.logger.info("JOB MANAGER 创建完成")
+        self.logger.debug("Manager 已创建 | project=%s workers=%d", self.get_project_directory(), self.worker_count)
 
     def add_progress_listener(self, listener) -> None:
         with self._lifecycle_lock:
@@ -550,15 +560,13 @@ class CstApplicationBackend:
             lease.acquire()
         except ProjectRunBusyError as exc:
             self.logger.warning(
-                "PROJECT_LOCK_BUSY project=%s reason=%s", project_directory, exc
-            )
+                "项目已被其他运行占用 | PROJECT_LOCK_BUSY project=%s reason=%s", project_directory, exc, extra={"event": "PROJECT_LOCK_BUSY", "phase": "lifecycle", "project": project_directory, "reason": exc})
             raise BackendPreparationError(str(exc)) from exc
         self._project_run_lock = lease
         self.logger.info(
-            "PROJECT_LOCK_ACQUIRED project=%s pid=%d",
+            "已取得项目运行锁 | PROJECT_LOCK_ACQUIRED project=%s pid=%d",
             project_directory,
-            lease.owner.process_id,
-        )
+            lease.owner.process_id, extra={"event": "PROJECT_LOCK_ACQUIRED", "phase": "lifecycle", "project": project_directory, "pid": lease.owner.process_id})
 
     def _release_project_run_lock(self) -> None:
         lease = self._project_run_lock
@@ -566,8 +574,7 @@ class CstApplicationBackend:
         if lease is not None:
             lease.release()
             self.logger.info(
-                "PROJECT_LOCK_RELEASED project=%s", self.get_project_directory()
-            )
+                "已释放项目运行锁 | PROJECT_LOCK_RELEASED project=%s", self.get_project_directory(), extra={"event": "PROJECT_LOCK_RELEASED", "phase": "lifecycle", "project": self.get_project_directory()})
 
     def close_logging(self) -> None:
         if self._log_owner is not None:

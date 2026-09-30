@@ -23,6 +23,7 @@ class _GlobalConfig:
         self.conf = configparser.ConfigParser()
         self.conf["BASE"] = {"datadir": str(root / "data")}
         self.conf["CST"] = {"cstexepath": "", "cstver": ""}
+        self.settings = GlobalSettings.from_parser(self.conf)
 
 
 def test_config_manager_exposes_modern_names():

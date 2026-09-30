@@ -4,6 +4,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import logging
+import json
+from datetime import datetime, timezone
+import subprocess
 from logging.handlers import TimedRotatingFileHandler
 from pathlib import Path
 import os
@@ -11,8 +14,82 @@ from uuid import uuid4
 
 
 DEFAULT_FORMAT = (
-    "%(asctime)s | %(levelname)-8s | %(threadName)s | %(name)s | %(message)s"
+    "%(asctime)s | %(levelname)-8s | %(threadName)s | %(name)s | %(message)s "
+    "| source=%(pathname)s:%(lineno)d function=%(funcName)s record_id=%(record_id)s"
 )
+
+
+class RecordIdentity(logging.Filter):
+    def filter(self, record):
+        if not hasattr(record, "record_id"):
+            record.record_id = uuid4().hex
+        return True
+
+
+def _code_version():
+    root = Path(__file__).resolve().parent.parent
+    try:
+        revision = subprocess.run(["git", "rev-parse", "HEAD"], cwd=root,
+                                  capture_output=True, text=True, timeout=2, check=True).stdout.strip()
+        dirty = bool(subprocess.run(["git", "status", "--porcelain", "--untracked-files=no"],
+                                    cwd=root, capture_output=True, text=True, timeout=2, check=True).stdout.strip())
+        return {"revision": revision, "dirty": dirty}
+    except (OSError, subprocess.SubprocessError):
+        return {"revision": None, "dirty": None}
+
+
+class JsonLineFormatter(logging.Formatter):
+    def __init__(self, code_version):
+        super().__init__()
+        self.code_version = code_version
+
+    def format(self, record):
+        error = None
+        if record.exc_info:
+            error = {
+                "type": record.exc_info[0].__name__,
+                "message": str(record.exc_info[1]),
+                "traceback": self.formatException(record.exc_info),
+            }
+        fields = {key: value for key, value in record.__dict__.items()
+                  if key not in logging.makeLogRecord({}).__dict__
+                  and key not in {"message", "asctime", "exc_text", "record_id"}}
+        payload = {
+            "schema_version": 1,
+            "timestamp": datetime.fromtimestamp(record.created, timezone.utc).isoformat(),
+            "record_id": record.record_id,
+            "level": record.levelname,
+            "logger": record.name,
+            "thread": record.threadName,
+            "process": record.process,
+            "message": record.getMessage(),
+            "event": fields.pop("event", None),
+            "phase": fields.pop("phase", None),
+            "artifacts": fields.pop("artifacts", {
+                key: fields[key] for key in ("snapshot", "path", "json", "csv") if key in fields
+            }),
+            "source": {"file": record.pathname, "line": record.lineno, "function": record.funcName},
+            "code": self.code_version,
+            "context": fields,
+            "error": error,
+        }
+        return json.dumps(payload, ensure_ascii=False, default=str)
+
+
+class ContextLogger(logging.LoggerAdapter):
+    """Attach correlation fields to records and plain-text messages."""
+
+    def log(self, level, msg, *args, **kwargs):
+        if self.isEnabledFor(level):
+            kwargs["stacklevel"] = kwargs.get("stacklevel", 1) + 1
+            # Format before appending paths: a literal '%' in a project name
+            # must not become an unintended logging format placeholder.
+            super().log(level, msg % args if args else msg, **kwargs)
+
+    def process(self, msg, kwargs):
+        kwargs["extra"] = {**kwargs.get("extra", {}), **self.extra}
+        context = " ".join(f"{key}={value}" for key, value in self.extra.items())
+        return f"{msg} | {context}", kwargs
 
 
 def _coerce_level(level: str | int) -> int:
@@ -62,6 +139,11 @@ class ApplicationLogSession:
         self.logger.setLevel(_coerce_level(config.level))
         self.logger.propagate = False
         self._handlers: list[logging.Handler] = []
+        self.path = config.path
+        self.jsonl_path = config.path.with_suffix(".jsonl")
+        if self.jsonl_path == self.path:
+            self.jsonl_path = config.path.with_name(config.path.name + ".jsonl")
+        identity = RecordIdentity()
 
         formatter = logging.Formatter(config.format_string)
         file_handler = TimedRotatingFileHandler(
@@ -72,11 +154,21 @@ class ApplicationLogSession:
             delay=True,
         )
         file_handler.setFormatter(formatter)
+        file_handler.addFilter(identity)
         self._add_handler(file_handler)
+
+        json_handler = TimedRotatingFileHandler(
+            filename=self.jsonl_path, when=config.when, backupCount=config.backup_count,
+            encoding="utf-8", delay=True,
+        )
+        json_handler.setFormatter(JsonLineFormatter(_code_version()))
+        json_handler.addFilter(identity)
+        self._add_handler(json_handler)
 
         if config.console:
             console_handler = logging.StreamHandler()
             console_handler.setFormatter(formatter)
+            console_handler.addFilter(identity)
             self._add_handler(console_handler)
 
         self._closed = False

@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from install_compat import resource_path
-from utils.mode_util_sample import allModesResult
+from . import postprocess_readers
 
 from .hom_result_plan import IntegrationLine
 
@@ -332,18 +332,7 @@ class CstPostProcessor:
 
     @staticmethod
     def readFile(path) -> dict[str, str] | None:
-        input_path = Path(path)
-        if not input_path.exists():
-            return None
-        values: dict[str, str] = {}
-        nonempty = [
-            line.strip()
-            for line in input_path.read_text(encoding="utf-8").splitlines()
-            if line.strip()
-        ]
-        for index in range(0, len(nonempty) - 1, 2):
-            values[nonempty[index]] = nonempty[index + 1]
-        return values
+        return postprocess_readers.read_key_values(path)
 
     def _result_path(self, filename: str | None) -> Path:
         if self.resultDir is None:
@@ -353,22 +342,10 @@ class CstPostProcessor:
         return self.resultDir / filename
 
     def _read_scalar(self, filename: str | None) -> float:
-        path = self._result_path(filename)
-        values = self.readFile(path)
-        if values is None:
-            raise FileNotFoundError(path)
-        return float(values["value"])
+        return postprocess_readers.read_scalar(self._result_path(filename))
 
     def EigenResult_All_readout(self, filename: str | None) -> dict[str, float]:
-        path = self._result_path(filename)
-        values = self.readFile(path)
-        if values is None:
-            raise FileNotFoundError(path)
-        return {
-            key: float(value)
-            for key, value in values.items()
-            if "ModeIndex" in key
-        }
+        return postprocess_readers.read_all_modes(self._result_path(filename))
 
     def Mode_Rec(self, resultName) -> None:
         self._register(
@@ -382,7 +359,7 @@ class CstPostProcessor:
     def Mode_Rec_readout(self, resultFilename):
         if self.resultDir is None:
             raise RuntimeError("resultDir has not been configured")
-        return allModesResult(self.resultDir)
+        return postprocess_readers.read_mode_recognition(self.resultDir)
 
     def Direct_PPS_0D(self, resultName) -> None:
         self._register(
@@ -402,9 +379,4 @@ class CstPostProcessor:
 
     @staticmethod
     def cst0dreadout(path):
-        input_path = Path(path)
-        if not input_path.exists():
-            raise FileNotFoundError(input_path)
-        with input_path.open("r") as source:
-            first_line = source.readline()
-        return float(first_line) if first_line else None
+        return postprocess_readers.read_native_0d(path)

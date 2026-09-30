@@ -449,6 +449,7 @@ class HomScanAlgorithm(Algorithm):
             pending = list(report.failed) + pending
             report.failed.clear()
             report.failure_reasons.clear()
+            self.logger.info("HOM 检查点已恢复 | HOM_RESUMED modes=%d pending=%d snapshot=%s", len(report.modes), len(pending), resume_snapshot, extra={"event": "HOM_RESUMED", "phase": "lifecycle", "modes": len(report.modes), "pending": len(pending), "snapshot": resume_snapshot})
 
         def save_checkpoint(current_report, current_pending):
             get_snapshot = getattr(self.manager, "get_confirmed_snapshot", None)
@@ -461,8 +462,10 @@ class HomScanAlgorithm(Algorithm):
                 snapshot_path=snapshot,
             )
             self._write_scan_results(current_report)
+            self.logger.debug("HOM 检查点已保存 | HOM_CHECKPOINT modes=%d pending=%d path=%s snapshot=%s", len(current_report.modes), len(current_pending), checkpoint_store.path, snapshot, extra={"event": "HOM_CHECKPOINT", "phase": "lifecycle", "modes": len(current_report.modes), "pending": len(current_pending), "path": checkpoint_store.path, "snapshot": snapshot})
 
         def solve(request):
+            self.logger.debug("HOM 区间求解 | HOM_INTERVAL lo=%g hi=%g solve_lo=%g solve_hi=%g", request.interval.lo, request.interval.hi, request.solve_lo, request.solve_hi, extra={"event": "HOM_INTERVAL", "phase": "lifecycle", "lo": request.interval.lo, "hi": request.interval.hi, "solve_lo": request.solve_lo, "solve_hi": request.solve_hi})
             values = [
                 request.requested_modes,
                 request.solve_lo,
@@ -498,27 +501,30 @@ class HomScanAlgorithm(Algorithm):
             )
             save_checkpoint(final_report, [])
             self.logger.info(
-                "HOM scan completed: modes=%d intervals=%d solver_calls=%d elapsed=%.3fs",
+                "HOM 扫描完成 | modes=%d intervals=%d solver_calls=%d elapsed_seconds=%.3f project=%s",
                 len(final_report.modes),
                 len(final_report.completed),
                 final_report.solver_calls,
                 time.monotonic() - started,
+                self.manager.currProjectDir,
             )
             return final_report
         except ScanInterrupted as exc:
             save_checkpoint(exc.report, exc.pending)
             self.logger.info(
-                "HOM scan interrupted safely: modes=%d pending=%d solver_calls=%d",
+                "HOM 扫描已暂停，检查点已保存 | modes=%d pending=%d solver_calls=%d project=%s",
                 len(exc.report.modes),
                 len(exc.pending),
                 exc.report.solver_calls,
+                self.manager.currProjectDir,
             )
             raise
         except IncompleteScanError as exc:
             self.logger.error(
-                "HOM scan incomplete: failed_intervals=%d solver_calls=%d",
+                "HOM 扫描未完成 | failed_intervals=%d solver_calls=%d project=%s",
                 len(exc.report.failed),
                 exc.report.solver_calls,
+                self.manager.currProjectDir,
             )
             raise
         finally:

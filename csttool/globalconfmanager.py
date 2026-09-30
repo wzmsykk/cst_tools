@@ -29,7 +29,7 @@ class GlobalConfigManager:
             self.logger = logger
         else:
             self.logger = logging.getLogger(__name__)
-        self.conf = configparser.ConfigParser()
+        self.settings = GlobalSettings()
         self.curr_global_cfg_path = Path(configpath)
         self.confdir = self.curr_global_cfg_path.parent
         self.confdir.mkdir(parents=True, exist_ok=True)
@@ -39,8 +39,8 @@ class GlobalConfigManager:
             self.createEmptyGlobalConfigFile(self.def_global_cfg_path)
 
         if not self.curr_global_cfg_path.exists():
-            self.logger.warning("未找到curr_global_cfg.")
-            self.logger.warning("使用default.")
+            self.logger.info("全局配置不存在，采用默认配置 | path=%s defaults=%s", self.curr_global_cfg_path, self.def_global_cfg_path)
+            self.logger.debug("读取默认配置 | path=%s", self.def_global_cfg_path)
             self.conf = read_ini(self.def_global_cfg_path)
             self.settings = GlobalSettings.from_parser(self.conf)
             self.conf = self.settings.to_parser()
@@ -50,25 +50,33 @@ class GlobalConfigManager:
             default_settings = GlobalSettings.from_parser(
                 read_ini(self.def_global_cfg_path)
             )
-            self.conf = read_ini(self.curr_global_cfg_path)
             self.settings = GlobalSettings.from_parser(
-                self.conf, defaults=default_settings
+                read_ini(self.curr_global_cfg_path), defaults=default_settings
             )
             self.conf = self.settings.to_parser()
 
+    @property
+    def conf(self):
+        """Return a serialized copy of the authoritative typed settings."""
+        return self.settings.to_parser()
+
+    @conf.setter
+    def conf(self, parser):
+        self.settings = GlobalSettings.from_parser(parser)
+
     def printconf(self):
         settings = self.settings
-        self.logger.info("----------------------------------------------------------")
-        self.logger.info("全局信息:")
-        self.logger.info("data目录:%s", settings.directories.data.resolve())
-        self.logger.info("temp目录:%s", settings.directories.temp.resolve())
-        self.logger.info("log目录:%s", settings.directories.log.resolve())
-        self.logger.info("result目录:%s", settings.directories.result.resolve())
-        self.logger.info("CST版本:%s", settings.cst.version)
-        self.logger.info("CSTEXE路径:%s", settings.cst.executable or "")
-        self.logger.info("superfish版本:%s", settings.superfish.version)
-        self.logger.info("superfish路径:%s", settings.superfish.directory or "")
-        self.logger.info("----------------------------------------------------------")
+        self.logger.debug("----------------------------------------------------------")
+        self.logger.debug("全局信息:")
+        self.logger.debug("data目录:%s", settings.directories.data.resolve())
+        self.logger.debug("temp目录:%s", settings.directories.temp.resolve())
+        self.logger.debug("log目录:%s", settings.directories.log.resolve())
+        self.logger.debug("result目录:%s", settings.directories.result.resolve())
+        self.logger.debug("CST版本:%s", settings.cst.version)
+        self.logger.debug("CSTEXE路径:%s", settings.cst.executable or "")
+        self.logger.debug("superfish版本:%s", settings.superfish.version)
+        self.logger.debug("superfish路径:%s", settings.superfish.directory or "")
+        self.logger.debug("----------------------------------------------------------")
 
     def createEmptyGlobalConfigFile(self, savepath):
         newconf = GlobalSettings().to_parser()
@@ -77,51 +85,49 @@ class GlobalConfigManager:
 
     def __saveconf(self, confobj, path):
         path = write_ini_atomic(path, confobj)
-        self.logger.info("已保存全局配置文件于%s。" % str(path))
+        self.logger.debug("全局配置已保存 | path=%s", path)
 
     def saveconf(self):
         """
         save current config into self.curr_global_cfg_path
         """
-        self.settings = GlobalSettings.from_parser(self.conf)
         self.conf = self.settings.to_parser()
         self.__saveconf(self.conf, self.curr_global_cfg_path)
 
     def validate_environment(self):
         # 测试CST环境位置
         result = True
-        self.logger.info("检查全局配置开始.")
-        self.settings = GlobalSettings.from_parser(self.conf)
+        self.logger.debug("检查全局配置开始.")
         cfg = self.settings
-        self.logger.info("检查CST PATH.")
+        self.logger.debug("检查CST PATH.")
         try:
             selected = self.get_selected_cst_installation()
         except (FileNotFoundError, TypeError, ValueError):
-            self.logger.warning("定义的cstexepath:%s不存在。", cfg.cst.executable)
-            self.logger.warning("尝试寻找cstexepath。")
+            self.logger.warning("CST 安装配置无效，正在自动查找 | executable=%s version=%s", cfg.cst.executable, cfg.cst.version)
+            self.logger.debug("查找可用 CST 安装")
             try:
                 executable, version = self.findCSTenv()
                 self.settings = self.settings.with_cst(version, executable)
                 self.conf = self.settings.to_parser()
             except FileNotFoundError:
-                self.logger.error("未找到CST ENV PATH,请从config指定PATH")
-                self.logger.info("检查CST PATH 失败.")
+                self.logger.error("未找到可用 CST 安装，请选择有效的可执行文件 | config=%s", self.curr_global_cfg_path)
+                self.logger.debug("检查CST PATH 失败.")
                 result = False
             else:
                 self.logger.info(
-                    "检查CST PATH 失败, 已使用自动寻找到的有效cst path作为代替."
+                    "CST 安装已自动选择 | executable=%s version=%s", self.settings.cst.executable, self.settings.cst.version
                 )
 
         else:
-            self.logger.info("检查CST PATH 成功.")
+            self.logger.debug("检查CST PATH 成功.")
 
         # 版本不再设置上限；新版 CST 由安装路径和可执行文件共同校验。
-        self.logger.info("检查CST 版本.")
+        self.logger.debug("检查CST 版本.")
         self.logger.debug("CST ENV PATH为%s", self.settings.cst.executable)
         self.logger.debug("CST 版本为%s", self.settings.cst.version)
-        self.logger.info("检查CST 版本 结束.")
+        self.logger.debug("检查CST 版本 结束.")
         # 测试各个路径是否存在，若否则创建目录
-        self.logger.info("检查各个路径是否存在.")
+        self.logger.debug("检查各个路径是否存在.")
         for names, pathobj in (
             ("data", self.settings.directories.data),
             ("temp", self.settings.directories.temp),
@@ -132,22 +138,22 @@ class GlobalConfigManager:
                 pathobj.mkdir(parents=True, exist_ok=True)
                 self.logger.info("已建立%s于%s。", names, pathobj)
 
-        self.logger.info("检查全局配置结束.")
+        self.logger.debug("检查全局配置结束.")
         if result == False:
-            self.logger.info("未通过全局配置检测")
+            self.logger.error("CST 环境校验失败 | config=%s", self.curr_global_cfg_path)
         else:
-            self.logger.info("通过全局配置检测")
+            self.logger.info("CST 环境已就绪 | version=%s executable=%s", self.settings.cst.version, self.settings.cst.executable)
         return result
 
     def findCSTenv(self):
-        self.logger.info("寻找CSTenv开始")
+        self.logger.debug("寻找CSTenv开始")
         installations = self.list_cst_installations()
         if installations:
             selected = installations[0]
             self.logger.info(
                 "FOUND CST VERSION %s at %s", selected.version, selected.executable
             )
-            self.logger.info("寻找CSTenv结束")
+            self.logger.debug("寻找CSTenv结束")
             return str(selected.executable), str(selected.version)
         self.logger.info("CST ENV NOT FOUND")
         raise FileNotFoundError

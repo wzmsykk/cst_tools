@@ -22,20 +22,13 @@ pytestmark = pytest.mark.integration
 
 class _GlobalConfig:
     def __init__(self, root: Path, executable: Path):
-        self.conf = {
-            "BASE": {"datadir": str(root / "data")},
-            "CST": {"cstexepath": str(executable)},
-        }
+        self.settings = GlobalSettings().with_cst("2022", str(executable))
 
 
 class _ProjectConfig:
     def __init__(self, root: Path):
         self.currProjectDir = root
-        self.conf = {
-            "DIRS": {"tempdir": "temp", "resultdir": "result"},
-            "CST": {"CSTFilename": "Pillbox.cst"},
-            "PROJECT": {"ProjectType": "pillbox-real-standard-batch"},
-        }
+        self.settings = ProjectSettings(name="test-project", cst_filename=Path("Pillbox.cst"))
 
     def get_postprocess_settings(self):
         return [
@@ -123,3 +116,4 @@ def test_real_cst_standard_batch_optimizes_pillbox_radius_to_500_mhz(
     assert _sha256(source) == source_hash
     assert stop_error is None, f"standard Manager did not stop cleanly: {stop_error}"
     assert not residual, f"standard batch left CST processes: {residual}"
+from csttool.configuration import GlobalSettings, ProjectSettings

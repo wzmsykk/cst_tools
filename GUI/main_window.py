@@ -120,7 +120,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.controller = controller or GuiRunController(self.service)
         self.logger = self.service.logger
         self.logger.addHandler(self.logTextBox)
-        self.logger.info("使用PyQt5图形窗口运行模式")
+        self.logger.debug("GUI 已初始化")
 
         self.CalcDialogBox = calc_dialog or AlgorithmSettingsDialog(parent=self)
         self.PPSDialogBox = pps_dialog or PostProcessSettingsDialog(
@@ -153,11 +153,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def closeEvent(self, event):
         if self.controller.has_active_work:
             self._close_pending = True
-            self.logger.info("主窗口关闭请求：等待后台任务标准停止")
+            self.logger.info("窗口等待关闭：正在安全停止后台任务")
             self.controller.request_stop()
             event.ignore()
             return
-        self.logger.info("主窗口被用户关闭")
+        self.logger.info("窗口已关闭")
         self.logger.removeHandler(self.logTextBox)
         self.logTextBox.close()
         self.service.close_logging()
@@ -203,7 +203,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.service.update_postprocess_settings(self.PPSDialogBox.getPPSList())
 
     def onRunError(self, message):
-        self.logger.error("后台任务失败: %s", message)
+        self.logger.error("后台运行失败 | reason=%s", message)
         self.stateDetailLabel.setText(message)
         self.statusbar.showMessage(f"运行失败：{message}")
 
@@ -443,6 +443,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             worker_count,
         )
         if self.controller.start(bool(resume), worker_count):
-            self.logger.info("本次运行使用 %d 个 CST Worker", worker_count)
-            self.logger.info("UI:STARTING WORK")
+            self.logger.debug("GUI Worker 数量已确认 | workers=%d", worker_count)
+            self.logger.info("GUI 已提交运行请求 | workers=%d", worker_count)
 

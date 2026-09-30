@@ -61,20 +61,13 @@ class FakeDialog(QObject):
 
 class FakeGlobalConfig:
     def __init__(self, root: Path):
-        self.conf = {
-            "BASE": {"datadir": str(root / "data")},
-            "CST": {"cstexepath": str(root / "fake-cst.exe")},
-        }
+        self.settings = GlobalSettings().with_cst("2022", str(root / "fake-cst.exe"))
 
 
 class FakeProjectConfig:
     def __init__(self, root: Path, pps):
         self.currProjectDir = root
-        self.conf = {
-            "DIRS": {"tempdir": "temp", "resultdir": "result"},
-            "CST": {"CSTFilename": "input.cst"},
-            "PROJECT": {"ProjectType": "fake-gui"},
-        }
+        self.settings = ProjectSettings(name="test-project", cst_filename=Path("input.cst"))
         self._pps = pps
 
     def get_postprocess_settings(self):
@@ -319,3 +312,4 @@ def test_gui_close_flow_stops_real_manager_and_fake_workers(
     process_until(qapp, lambda: not window._close_pending)
     assert backend.manager.state is ManagerState.CLOSED
     assert all(worker.stopped for worker in backend.workers)
+from csttool.configuration import GlobalSettings, ProjectSettings

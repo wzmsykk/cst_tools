@@ -24,7 +24,9 @@ def test_existing_project_rejects_fixed_mesh_drift():
 
 
 def test_legacy_project_without_mesh_metadata_is_left_unchanged(caplog):
-    manager = _manager_with_config(configparser.ConfigParser())
+    config = ProjectSettings(name="legacy-mesh-test").to_parser()
+    config.remove_section("mesh")
+    manager = _manager_with_config(config)
 
     with caplog.at_level(logging.WARNING):
         manager._validate_fixed_mesh(24)
