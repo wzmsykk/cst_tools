@@ -21,7 +21,7 @@ class FakeGlobalConfig:
         self.installations = []
         self.selected_installation = None
 
-    def checkCSTENVConfig(self):
+    def validate_environment(self):
         return self.checks.pop(0)
 
     def saveconf(self):
@@ -49,33 +49,33 @@ class FakeProjectConfig:
         self.ready = False
         self.statuses = []
 
-    def readPPSListFromFile(self, path):
+    def read_postprocess_settings(self, path):
         return [{"resultName": "frequency"}]
 
-    def setCurrPPSList(self, values):
+    def set_postprocess_settings(self, values):
         self.pps = values
 
-    def getCurrPPSList(self):
+    def get_postprocess_settings(self):
         return self.pps
 
-    def assignProjectDir(self, path):
+    def select_project_directory(self, path):
         self.currProjectDir = path
 
-    def assignInputCSTFilePath(self, path):
+    def select_input_project(self, path):
         self.currCSTFilePath = path
 
-    def prepareProject(self, resume, *, mesh_cells_per_wavelength):
+    def prepare_project(self, resume, *, mesh_cells_per_wavelength):
         self.prepared_with = resume
         self.mesh_cells_per_wavelength = mesh_cells_per_wavelength
         self.ready = True
 
-    def isReady(self):
+    def is_ready(self):
         return self.ready
 
-    def getParamsList(self):
+    def get_parameters(self):
         return [{"name": "fmin"}]
 
-    def updateTaskStatus(self, status):
+    def update_task_status(self, status):
         self.statuses.append(status)
 
 
@@ -85,19 +85,19 @@ class FakeAlgorithm:
         self.manager = None
         self.params = None
 
-    def getEditableAttrs(self):
+    def get_editable_attributes(self):
         return {"fmin": 500, "mesh_cells_per_wavelength": 20}
 
-    def setEditableAttrs(self, values):
+    def set_editable_attributes(self, values):
         self.attrs = values
 
     def set_resume(self, resume):
         self.resume = bool(resume)
 
-    def setJobManager(self, manager):
+    def set_job_manager(self, manager):
         self.manager = manager
 
-    def setCSTParams(self, params):
+    def set_cst_parameters(self, params):
         self.params = params
 
     def start(self):

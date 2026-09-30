@@ -7,7 +7,7 @@ import pytest
 from csttool.cstmanager import CSTManager, ManagerState
 from csttool.managed_cstworker import ManagedCSTWorker
 from csttool.managed_cstworker import ManagedWorkerShutdownError
-from csttool.postprocess_cst import VBPostProcessor
+from csttool.postprocess_cst import CstPostProcessor
 
 
 def build_worker_shell(tmp_path):
@@ -23,8 +23,8 @@ def build_worker_shell(tmp_path):
     worker.stop_ack_path = tmp_path / "protocol" / "stop.ack"
     worker.result_root = tmp_path / "results"
     worker.macro_path = tmp_path / "runtime_managed_worker_v1.bas"
-    worker.postprocess = VBPostProcessor()
-    worker.postprocess.appendPostProcessSteps(
+    worker.postprocess = CstPostProcessor()
+    worker.postprocess.configure(
         [
             {
                 "resultName": "frequency",
@@ -182,7 +182,7 @@ def test_ready_marker_is_invalidated_before_task_publication(tmp_path, monkeypat
     monkeypatch.setattr(worker, "_wait_completion", lambda task: (_ for _ in ()).throw(RuntimeError("stop")))
 
     with pytest.raises(RuntimeError, match="stop"):
-        worker.runWithParam("task", params={"x": 1})
+        worker.run_task("task", params={"x": 1})
 
     assert observed[0].startswith("dispatched:")
 
@@ -204,12 +204,12 @@ class _Project:
             "PROJECT": {"ProjectType": "default"},
         }
 
-    def getCurrPPSList(self):
+    def get_postprocess_settings(self):
         return []
 
 
 class _BadStopWorker:
-    def runWithParam(self, resultname, *, params):
+    def run_task(self, resultname, *, params):
         raise AssertionError("not used")
 
     def stop(self):

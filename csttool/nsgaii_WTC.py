@@ -1,7 +1,7 @@
 """produce LHS sample"""
 
 import os, shutil
-from .myAlgorithm import myAlg
+from .myAlgorithm import Algorithm
 from random import random, seed, shuffle, choices, sample
 from math import inf, sqrt, floor
 from time import sleep
@@ -137,7 +137,7 @@ class nsgaii_var:
         return hash(self.id)
 
 
-class myAlg_nsga(myAlg):
+class WtcNsgaAlgorithm(Algorithm):
     def __init__(self, manager: cstmanager.SimulationManager = None, params=None, logger=None):
         super().__init__(manager, params)
         self.debug = True
@@ -160,7 +160,7 @@ class myAlg_nsga(myAlg):
         ##WORKER
         self.manager = None
         if manager is not None:
-            self.setJobManager(manager)
+            self.set_job_manager(manager)
 
         # self.results=result.result
 
@@ -836,25 +836,45 @@ class myAlg_nsga(myAlg):
             ### GEN DONE
         return poplist
 
-    def checkAndSetReady(self):
+    def get_editable_attributes(self):
+        return {
+            "population_size": self.popsize,
+            "generations": self.generation,
+            "mesh_cells_per_wavelength": getattr(self, "mesh_cells_per_wavelength", 20),
+        }
+
+    def set_editable_attributes(self, values):
+        settings = self.get_editable_attributes()
+        unknown = set(values) - set(settings)
+        if unknown:
+            raise ValueError(f"Unsupported optimizer settings: {sorted(unknown)}")
+        settings.update(values)
+        parsed = {key: int(value) for key, value in settings.items()}
+        if any(value < 1 for value in parsed.values()):
+            raise ValueError("Optimizer settings must be positive integers")
+        self.popsize = parsed["population_size"]
+        self.generation = parsed["generations"]
+        self.mesh_cells_per_wavelength = parsed["mesh_cells_per_wavelength"]
+
+    def check_and_set_ready(self):
         if self.CSTparams is not None and self.manager is not None:
             self.ready = True
         else:
             self.ready = False
 
-    def setCSTParams(self, params):
+    def set_cst_parameters(self, params):
         self.CSTparams = params
-        self.checkAndSetReady()
+        self.check_and_set_ready()
 
-    def setJobManager(self, manager: cstmanager.SimulationManager):
+    def set_job_manager(self, manager: cstmanager.SimulationManager):
         self.manager = manager
         self.relative_location = str(manager.currProjectDir) + "\\save\\"
         if not os.path.exists(self.relative_location):
             os.makedirs(self.relative_location)
-        self.checkAndSetReady()
+        self.check_and_set_ready()
 
     def logCalcSettings(self):
-        print(self.getEditableAttrs())
+        print(self.get_editable_attributes())
         pass
 
     def getPPSResult(self, runresult):

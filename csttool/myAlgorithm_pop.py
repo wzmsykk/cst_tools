@@ -3,7 +3,7 @@ import os
 import logging
 import hashlib
 import json
-from .myAlgorithm import myAlg
+from .myAlgorithm import Algorithm
 
 import math
 import numpy as np
@@ -24,7 +24,7 @@ import pandas as pd
 from pathlib import Path
 
 
-class myAlg01(myAlg):
+class HomScanAlgorithm(Algorithm):
     def __init__(self, manager: cstmanager.SimulationManager = None, params=None):
         super().__init__(manager, params)
         self.parameter_range = 0
@@ -45,7 +45,7 @@ class myAlg01(myAlg):
         ##OTHERS
         self.manager = None
         if manager is not None:
-            self.setJobManager(manager)
+            self.set_job_manager(manager)
         # self.results=result.result
 
         self.input_name = ["nmodes", "fmin", "fmax"]
@@ -79,28 +79,28 @@ class myAlg01(myAlg):
         self.end_frequency = 2500
         self.resume_requested = False
 
-    def checkAndSetReady(self):
+    def check_and_set_ready(self):
         if self.CSTparams is not None and self.manager is not None:
             self.ready = True
         else:
             self.ready = False
 
-    def setCSTParams(self, params):
+    def set_cst_parameters(self, params):
         self.CSTparams = params
-        self.checkAndSetReady()
+        self.check_and_set_ready()
 
-    def setJobManager(self, manager: cstmanager.SimulationManager):
+    def set_job_manager(self, manager: cstmanager.SimulationManager):
         self.manager = manager
         self.logger = getattr(manager, "logger", logging.getLogger(__name__))
         self.mode_location = str(manager.currProjectDir) + "\\result\\"
         self.relative_location = str(manager.currProjectDir) + "\\save\\csv\\"
         if not os.path.exists(self.relative_location):
             os.makedirs(self.relative_location)
-        logpath = os.path.join(manager.getResultDir(), "result.log")
+        logpath = os.path.join(manager.result_directory, "result.log")
         self.log = open(logpath, "w")
-        self.checkAndSetReady()
+        self.check_and_set_ready()
 
-    def setEditableAttrs(self, dict):
+    def set_editable_attributes(self, dict):
         d = {
             "fmin": self.input_min[1],
             "fmax": self.input_min[2],
@@ -134,7 +134,7 @@ class myAlg01(myAlg):
     def set_resume(self, resume: bool) -> None:
         self.resume_requested = bool(resume)
 
-    def getEditableAttrs(self):
+    def get_editable_attributes(self):
         d = {
             "fmin": self.input_min[1],
             "fmax": self.input_min[2],
@@ -165,7 +165,7 @@ class myAlg01(myAlg):
                 raise ValueError("HOM postprocess methods must target iModeNumber=1")
 
     def logCalcSettings(self):
-        print(self.getEditableAttrs())
+        print(self.get_editable_attributes())
         pass
 
     def get_y_trans_r_aprallel(self, xs, run_count):
@@ -390,7 +390,7 @@ class myAlg01(myAlg):
             }
         project_config = getattr(self.manager, "pconfm", None)
         if project_config is not None:
-            postprocess = project_config.getCurrPPSList()
+            postprocess = project_config.get_postprocess_settings()
             encoded = json.dumps(
                 postprocess,
                 ensure_ascii=False,
@@ -524,34 +524,4 @@ class myAlg01(myAlg):
         finally:
             if self.log is not None and not self.log.closed:
                 self.log.close()
-
-
-if __name__ == "__main__":
-    from .postprocess_cst import VBPostProcessor
-    from pathlib import Path
-
-    vbp = VBPostProcessor()
-    import json
-
-    fp = open("template/defaultPPS.json", "r")
-    r = json.load(fp)
-
-    vbp.appendPostProcessSteps(r)
-    fp = open("temp/a.txt", "w")
-    ilist = vbp.createPostProcessVBCodeLines()
-    for line in ilist:
-        fp.write(line)
-    fp.close()
-    dir = Path(r"project\HOM analysis\result\frequency000000_700_800")
-    vbp.setResultDir(dir)
-
-    cc = vbp.readAllResults()
-    print(cc)
-    alg = myAlg01()
-    sample = alg.get_3_modes_custom(cc).iloc[0]
-    print(sample)
-    fmin = float(sample["frequency"])
-    fmax = math.floor(sample["frequency"]) + alg.delta_frequency
-    alg.input_min[1] = fmin
-    alg.input_min[2] = fmax
 

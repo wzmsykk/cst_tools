@@ -43,10 +43,10 @@ def test_managed_worker_runs_repeated_tasks_and_standardly_exits(
             },
         )
 
-        first = worker.runWithParam(
+        first = worker.run_task(
             "first", params={"R": "229", "L": "R + 30"}
         )
-        second = worker.runWithParam(
+        second = worker.run_task(
             "second", params={"R": "230", "L": "R + 29"}
         )
 

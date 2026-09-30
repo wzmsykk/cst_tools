@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from csttool.postprocess_cst import VBPostProcessor
+from csttool.postprocess_cst import CstPostProcessor
 from csttool.protocol_worker import prepare_worker_workspace
 from csttool.runtime_protocol import CompletionStatus, Task, new_session_id
 from test.cst_integration_support import (
@@ -40,7 +40,7 @@ def test_worker_v1_solves_reads_native_rd0_then_acknowledges(cst_executable):
         try:
             completion = wait_completion_or_controller_exit(workspace, task, process, timeout=300)
             assert completion.status is CompletionStatus.SUCCESS, completion
-            frequency = VBPostProcessor.cst0dreadout(workspace.result_path)
+            frequency = CstPostProcessor.cst0dreadout(workspace.result_path)
             assert frequency is not None and math.isfinite(frequency) and frequency > 0
             workspace.protocol.acknowledge(completion)
             deadline = time.monotonic() + 60

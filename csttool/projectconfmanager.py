@@ -67,8 +67,12 @@ class ProjectConfigManager:
         self.currPPSList = []
         self.ready = False
 
-    def isReady(self):
+    def is_ready(self):
         return self.ready
+
+    @property
+    def postprocess_settings(self):
+        return self.currPPSList
 
     def setNotReady(self):
         self.ready = False
@@ -113,12 +117,12 @@ class ProjectConfigManager:
         settings = ProjectSettings.from_parser(read_ini(cfgpath))
         return settings.task_status
 
-    def assignProjectDir(self, projectDir):
+    def select_project_directory(self, projectDir):
         self.setNotReady()  # changed Path so Not Ready
         self.currProjectDir = Path(projectDir).absolute()
         self.logger.info("PCM:currProjectDir 已设为%s" % self.currProjectDir)
 
-    def assignInputCSTFilePath(self, CSTfilePath):
+    def select_input_project(self, CSTfilePath):
         self.setNotReady()
         self.inputCSTFilePath = Path(CSTfilePath).absolute()
         self.logger.info("PCM:inputCSTFilePath 已设为%s" % self.inputCSTFilePath)
@@ -127,7 +131,7 @@ class ProjectConfigManager:
         self.ready = True
         return self.ready
 
-    def prepareProject(self, startFromExisted=False, *, mesh_cells_per_wavelength=20):
+    def prepare_project(self, startFromExisted=False, *, mesh_cells_per_wavelength=20):
         # startFromExisted=True 从已有开始 不需要CST文件
         self.logger.info("准备项目文件")
         iProjectDir = self.currProjectDir
@@ -181,7 +185,7 @@ class ProjectConfigManager:
                     raise ProjectStatusError
                 self._validate_fixed_mesh(mesh_cells_per_wavelength)
                 if startFromExisted:
-                    self.setCurrPPSList(self.readPPSList())
+                    self.set_postprocess_settings(self.readPPSList())
                 else:
                     self.savePPSSettings(self.currPPSList)
                 return self.__ready()
@@ -195,7 +199,7 @@ class ProjectConfigManager:
                     raise ProjectStatusError
                 self._validate_fixed_mesh(mesh_cells_per_wavelength)
                 if startFromExisted:
-                    self.setCurrPPSList(self.readPPSList())
+                    self.set_postprocess_settings(self.readPPSList())
                 else:
                     self.savePPSSettings(self.currPPSList)
                 return self.__ready()
@@ -267,7 +271,7 @@ class ProjectConfigManager:
         self.logger.info("Config内容更新完成")
         return confobj
 
-    def updateTaskStatus(self, taskstatus):
+    def update_task_status(self, taskstatus):
         settings = getattr(self, "settings", None) or ProjectSettings.from_parser(
             self.conf
         )
@@ -303,10 +307,10 @@ class ProjectConfigManager:
         pamlist = read_json(paramfile)
         print(pamlist)
 
-    def getParamsList(self):
-        return self.__getParamsList(self.conf, self.currProjectDir)
+    def get_parameters(self):
+        return self.__get_parameters(self.conf, self.currProjectDir)
 
-    def __getParamsList(self, confobj, projectDir, jsonpath=None):
+    def __get_parameters(self, confobj, projectDir, jsonpath=None):
         """从生成的json读取Model结构参数列表 read model parameters from json filepath
 
         Parameters
@@ -330,14 +334,6 @@ class ProjectConfigManager:
             for block in iter(lambda: stream.read(1024 * 1024), b""):
                 digest.update(block)
         return digest.hexdigest()
-
-    def genMD5FromCST(self, cstfilepath):
-        """Compatibility adapter for callers that still expect a hash object."""
-        digest = hashlib.md5()
-        with Path(cstfilepath).open("rb") as stream:
-            for block in iter(lambda: stream.read(1024 * 1024), b""):
-                digest.update(block)
-        return digest
 
     def _preprocess_cst_project(
         self,
@@ -520,19 +516,19 @@ class ProjectConfigManager:
 
         return result
 
-    def getCurrPPSList(self):
+    def get_postprocess_settings(self):
         return self.currPPSList
 
-    def setCurrPPSList(self, ilist):
+    def set_postprocess_settings(self, ilist):
         self.currPPSList = ilist
         return ilist
 
     def readPPSList(self):
         settings = self.settings or ProjectSettings.from_parser(self.conf)
         ppspath = self.currProjectDir / settings.postprocess_file
-        return self.readPPSListFromFile(ppspath)
+        return self.read_postprocess_settings(ppspath)
 
-    def readPPSListFromFile(self, ppspath):
+    def read_postprocess_settings(self, ppspath):
         try:
             result = read_json(ppspath)
             if not isinstance(result, list):
@@ -552,7 +548,3 @@ class ProjectConfigManager:
         except (OSError, TypeError, ValueError) as exc:
             self.logger.error("后处理设定保存失败: %s", exc)
             return False
-
-
-# Compatibility alias for callers using the historical spelling.
-ProjectConfmanager = ProjectConfigManager

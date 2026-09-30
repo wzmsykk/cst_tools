@@ -45,7 +45,7 @@ def _run_one_then_stop(worker, lo, hi):
     def run():
         try:
             result_box.append(
-                worker.runWithParam(
+                worker.run_task(
                     f"pillbox_{lo:g}_{hi:g}",
                     params={"nmodes": 1, "fmin": lo, "fmax": hi},
                 )

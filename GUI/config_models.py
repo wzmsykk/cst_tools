@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Mapping, Sequence
 
-from csttool.postprocess_cst import VBPostProcessor
+from csttool.postprocess_cst import CstPostProcessor
 
 
 PPS_SCHEMA_VERSION = 1
@@ -123,7 +123,7 @@ class PostProcessSetting:
         params = value.get("params", {})
         if not isinstance(result_name, str) or not result_name.strip():
             raise ValueError("后处理结果名称不能为空")
-        if method not in VBPostProcessor.supported_methods():
+        if method not in CstPostProcessor.supported_methods():
             raise ValueError(f"不支持的后处理方法: {method!r}")
         if not isinstance(params, Mapping):
             raise ValueError("后处理 params 必须是对象")

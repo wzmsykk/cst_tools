@@ -77,7 +77,7 @@ class FakeProjectConfig:
         }
         self._pps = pps
 
-    def getCurrPPSList(self):
+    def get_postprocess_settings(self):
         return list(self._pps)
 
 
@@ -89,7 +89,7 @@ class FlowFakeWorker:
         self._release = release
         self.stopped = False
 
-    def runWithParam(self, resultname, *, params):
+    def run_task(self, resultname, *, params):
         with self._tracker["lock"]:
             self._tracker["calls"].append((resultname, dict(params)))
             self._tracker["active"] += 1

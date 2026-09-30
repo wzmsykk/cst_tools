@@ -15,7 +15,7 @@ from csttool.hom_scan import (
     ScanPolicy,
     ScanReport,
 )
-from csttool.myAlgorithm_pop import myAlg01
+from csttool.myAlgorithm_pop import HomScanAlgorithm
 
 
 def mode(frequency):
@@ -173,7 +173,7 @@ def test_policy_rejects_multi_mode_requests():
 
 
 def test_algorithm_reads_single_mode_postprocess_results():
-    algorithm = myAlg01()
+    algorithm = HomScanAlgorithm()
     raw = [
         {
             "resultName": "frequency",
@@ -194,7 +194,7 @@ def test_algorithm_reads_single_mode_postprocess_results():
 
 
 def test_algorithm_requires_mode_one_non_all_postprocess_configuration():
-    algorithm = myAlg01()
+    algorithm = HomScanAlgorithm()
     algorithm.validate_postprocess_settings(
         [
             {
@@ -244,7 +244,8 @@ class ScanManager:
         self.confirmed_snapshot = None
         self.restored_snapshot = None
 
-    def getResultDir(self):
+    @property
+    def result_directory(self):
         return self.result_dir
 
     def execute(self, task):
@@ -284,9 +285,9 @@ class ScanManager:
 
 def test_production_algorithm_writes_results_and_checkpoint(tmp_path):
     manager = ScanManager(tmp_path)
-    algorithm = myAlg01(manager=manager, params=[])
-    algorithm.setCSTParams([])
-    algorithm.setEditableAttrs(
+    algorithm = HomScanAlgorithm(manager=manager, params=[])
+    algorithm.set_cst_parameters([])
+    algorithm.set_editable_attributes(
         {"fmin": 100, "fmax": 110, "endfreq": 120}
     )
 
@@ -305,9 +306,9 @@ def test_production_algorithm_writes_results_and_checkpoint(tmp_path):
 
 def test_production_algorithm_records_fixed_mesh_without_runtime_mutation(tmp_path):
     manager = ScanManager(tmp_path)
-    algorithm = myAlg01(manager=manager, params=[])
-    algorithm.setCSTParams([])
-    algorithm.setEditableAttrs(
+    algorithm = HomScanAlgorithm(manager=manager, params=[])
+    algorithm.set_cst_parameters([])
+    algorithm.set_editable_attributes(
         {
             "fmin": 100,
             "fmax": 110,
@@ -332,9 +333,9 @@ def test_production_algorithm_restores_confirmed_snapshot_before_resume(tmp_path
     snapshot = tmp_path / "result" / "mode-8" / "project.cst"
     snapshot.parent.mkdir(parents=True)
     snapshot.write_bytes(b"confirmed-mode-8")
-    algorithm = myAlg01(manager=manager, params=[])
-    algorithm.setCSTParams([])
-    algorithm.setEditableAttrs(
+    algorithm = HomScanAlgorithm(manager=manager, params=[])
+    algorithm.set_cst_parameters([])
+    algorithm.set_editable_attributes(
         {"fmin": 100, "fmax": 110, "endfreq": 120}
     )
     algorithm.set_resume(True)

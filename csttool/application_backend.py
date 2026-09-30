@@ -103,24 +103,24 @@ class CstApplicationBackend:
             GlobalConfigManager=self.gconfman,
             logger=self.logger,
         )
-        self.alg = algorithm or myAlgorithm_pop.myAlg01(manager=None, params=None)
+        self.alg = algorithm or myAlgorithm_pop.HomScanAlgorithm(manager=None, params=None)
         self._uses_default_manager = manager_factory is None
         self._manager_factory = manager_factory or cstmanager.CSTManager
 
         default_pps_path = resource_path("data/defaultPPS.json")
-        default_pps = self.pconfman.readPPSListFromFile(default_pps_path)
-        self.pconfman.setCurrPPSList(default_pps)
+        default_pps = self.pconfman.read_postprocess_settings(default_pps_path)
+        self.pconfman.set_postprocess_settings(default_pps)
 
     def select_project_directory(self, path: str) -> None:
         self._require_configurable("select project directory")
-        self.pconfman.assignProjectDir(path)
+        self.pconfman.select_project_directory(path)
 
     def get_project_directory(self):
         return self.pconfman.currProjectDir
 
     def select_cst_file(self, path: str) -> None:
         self._require_configurable("select CST file")
-        self.pconfman.assignInputCSTFilePath(path)
+        self.pconfman.select_input_project(path)
 
     def get_cst_installations(self):
         return self.gconfman.list_cst_installations()
@@ -142,21 +142,21 @@ class CstApplicationBackend:
         )
 
     def get_postprocess_settings(self):
-        return self.pconfman.getCurrPPSList()
+        return self.pconfman.get_postprocess_settings()
 
     def update_postprocess_settings(self, values) -> None:
         self._require_configurable("update postprocess settings")
-        self.pconfman.setCurrPPSList(values)
+        self.pconfman.set_postprocess_settings(values)
 
     def read_postprocess_settings(self, path):
-        return self.pconfman.readPPSListFromFile(path)
+        return self.pconfman.read_postprocess_settings(path)
 
     def get_algorithm_settings(self):
-        return self.alg.getEditableAttrs()
+        return self.alg.get_editable_attributes()
 
     def update_algorithm_settings(self, values) -> None:
         self._require_configurable("update algorithm settings")
-        self.alg.setEditableAttrs(values)
+        self.alg.set_editable_attributes(values)
         self.logger.info("ALG参数设置完毕")
 
     def initialize_run(
@@ -187,7 +187,7 @@ class CstApplicationBackend:
         )
 
         try:
-            if self.gconfman.checkCSTENVConfig() is False:
+            if self.gconfman.validate_environment() is False:
                 raise BackendInitializationError("CST 环境初始化失败")
             self.gconfman.saveconf()
         except BackendInitializationError:
@@ -205,19 +205,19 @@ class CstApplicationBackend:
         try:
             self._acquire_project_run_lock()
             self.logger.info("RUN_PREPARE project=%s", self.get_project_directory())
-            settings = self.alg.getEditableAttrs()
+            settings = self.alg.get_editable_attributes()
             validate_postprocess = getattr(
                 self.alg,
                 "validate_postprocess_settings",
                 None,
             )
             if validate_postprocess is not None:
-                validate_postprocess(self.pconfman.getCurrPPSList())
+                validate_postprocess(self.pconfman.get_postprocess_settings())
             if not self.resume and settings.get("mesh_convergence_enabled", False):
                 recommended = self._run_mesh_convergence(settings)
                 settings["mesh_cells_per_wavelength"] = recommended
-                self.alg.setEditableAttrs(settings)
-            self.pconfman.prepareProject(
+                self.alg.set_editable_attributes(settings)
+            self.pconfman.prepare_project(
                 self.resume,
                 mesh_cells_per_wavelength=settings[
                     "mesh_cells_per_wavelength"
@@ -232,9 +232,9 @@ class CstApplicationBackend:
             self.gconfman.printconf()
             self.logger.info("-----------------------------------")
             self._create_manager()
-            algorithm_params = self.pconfman.getParamsList()
-            self.alg.setJobManager(self.jm)
-            self.alg.setCSTParams(algorithm_params)
+            algorithm_params = self.pconfman.get_parameters()
+            self.alg.set_job_manager(self.jm)
+            self.alg.set_cst_parameters(algorithm_params)
         except Exception as exc:
             self.logger.exception("项目配置出错")
             if self.state is not BackendState.RECOVERY_REQUIRED:
@@ -310,10 +310,10 @@ class CstApplicationBackend:
                 GlobalConfigManager=self.gconfman,
                 logger=self.logger,
             )
-            config.assignProjectDir(level_directory)
-            config.assignInputCSTFilePath(source)
-            config.setCurrPPSList(self.pconfman.getCurrPPSList())
-            config.prepareProject(
+            config.select_project_directory(level_directory)
+            config.select_input_project(source)
+            config.set_postprocess_settings(self.pconfman.get_postprocess_settings())
+            config.prepare_project(
                 False, mesh_cells_per_wavelength=level
             )
             manager_options = {}
@@ -321,7 +321,7 @@ class CstApplicationBackend:
                 manager_options["worker_factory"] = ManagedCSTWorker.create
                 manager_options["progress_callback"] = self._publish_cst_progress
             manager = self._manager_factory(
-                params=config.getParamsList(),
+                params=config.get_parameters(),
                 pconfm=config,
                 gconfm=self.gconfman,
                 logger=self.logger,
@@ -488,11 +488,11 @@ class CstApplicationBackend:
         self._update_task_status(projectconfmanager.TaskStatus.RECOVERY_REQUIRED)
 
     def _create_manager(self) -> None:
-        if not self.pconfman.isReady():
+        if not self.pconfman.is_ready():
             raise BackendPreparationError("pconfman 未准备完成")
         if self.jm is not None:
             raise BackendLifecycleError("Manager 已存在")
-        project_params = self.pconfman.getParamsList()
+        project_params = self.pconfman.get_parameters()
         manager_options = {}
         if self._uses_default_manager:
             manager_options["worker_factory"] = ManagedCSTWorker.create
@@ -584,7 +584,7 @@ class CstApplicationBackend:
 
     def _update_task_status(self, status) -> None:
         self.status = status
-        self.pconfman.updateTaskStatus(status)
+        self.pconfman.update_task_status(status)
 
     def _require_configurable(self, operation: str) -> None:
         self._require_state(

@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from csttool.postprocess_cst import VBPostProcessor
+from csttool.postprocess_cst import CstPostProcessor
 from csttool.protocol_warm_worker import prepare_warm_worker_workspace
 from csttool.runtime_protocol import CompletionStatus, Task, new_session_id
 from test.cst_integration_support import (
@@ -58,14 +58,14 @@ def test_warm_worker_runs_two_ack_gated_tasks_then_stops(cst_executable):
         try:
             first = wait_completion_or_controller_exit(workspace, tasks[0], process, timeout=300)
             assert first.status is CompletionStatus.SUCCESS, first
-            first_value = VBPostProcessor.cst0dreadout(workspace.tasks[0].result_path)
+            first_value = CstPostProcessor.cst0dreadout(workspace.tasks[0].result_path)
             time.sleep(1)
             assert workspace.protocol.read_completion(tasks[1]) is None
             workspace.protocol.acknowledge(first)
 
             second = wait_completion_or_controller_exit(workspace, tasks[1], process, timeout=300)
             assert second.status is CompletionStatus.SUCCESS, second
-            second_value = VBPostProcessor.cst0dreadout(workspace.tasks[1].result_path)
+            second_value = CstPostProcessor.cst0dreadout(workspace.tasks[1].result_path)
             assert all(math.isfinite(value) and value > 0 for value in (first_value, second_value))
             assert first_value != second_value
             assert workspace.tasks[0].result_path.exists()

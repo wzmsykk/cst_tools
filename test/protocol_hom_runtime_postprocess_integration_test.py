@@ -7,7 +7,7 @@ import pytest
 
 from csttool.native_results import read_profile_native_results
 from csttool.hom_project_profile import HOM_PROFILE_V1
-from csttool.postprocess_cst import VBPostProcessor
+from csttool.postprocess_cst import CstPostProcessor
 from csttool.protocol_hom_runtime_postprocess import (
     prepare_hom_runtime_postprocess_workspace,
 )
@@ -26,7 +26,7 @@ RESULT_NAME = "Frequency (Multiple Modes)/Mode 1"
 
 
 def _read_runtime_scalar(path):
-    values = VBPostProcessor.readFile(path)
+    values = CstPostProcessor.readFile(path)
     assert values is not None
     return float(values["value"]), values
 

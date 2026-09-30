@@ -15,11 +15,11 @@ from .hom_result_plan import IntegrationLine
 Readout = Callable[[str | None], Any]
 
 
-class VBPostProcessor:
+class CstPostProcessor:
     """Compile post-processing settings into VBA and read their results.
 
     Metrics are configured through the declarative registries and
-    :meth:`appendPostProcessSteps`.
+    :meth:`configure`.
     """
 
     _SIMPLE_METRICS = {
@@ -48,10 +48,10 @@ class VBPostProcessor:
         self.postProcessDocList: list[dict[str, Any]] = []
         self.postProcessID = 0
 
-    def setResultDir(self, result_dir) -> None:
+    def set_result_directory(self, result_dir) -> None:
         self.resultDir = Path(result_dir)
 
-    def setCSTRunResultDir(self, result_dir) -> None:
+    def set_cst_run_result_directory(self, result_dir) -> None:
         self.cstRunResultDir = Path(result_dir)
 
     def reset(self) -> None:
@@ -71,7 +71,7 @@ class VBPostProcessor:
             "Direct_PPS_0D",
         ])
 
-    def appendPostProcessSteps(self, settings: Sequence[Mapping[str, Any]]) -> None:
+    def configure(self, settings: Sequence[Mapping[str, Any]]) -> None:
         for index, setting in enumerate(settings):
             if not isinstance(setting, Mapping):
                 raise TypeError(f"PPS entry {index} must be a mapping")
@@ -299,7 +299,7 @@ class VBPostProcessor:
             f"{result_name}.txt"
         )
 
-    def createPostProcessVBCodeLines(self) -> list[str]:
+    def render_vb(self) -> list[str]:
         lines: list[str] = []
         imports = dict.fromkeys(
             doc["import"] for doc in self.postProcessDocList if doc["import"]
@@ -317,7 +317,7 @@ class VBPostProcessor:
         lines.append("End Sub\n")
         return lines
 
-    def readAllResults(self) -> list[dict[str, Any]]:
+    def read_all_results(self) -> list[dict[str, Any]]:
         results = []
         for doc in self.postProcessDocList:
             results.append(

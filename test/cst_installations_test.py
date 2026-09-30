@@ -7,7 +7,7 @@ from csttool.cst_installations import (
     discover_cst_installations,
     validate_cst_installation,
 )
-from csttool.globalconfmanager import GlobalConfmanager
+from csttool.globalconfmanager import GlobalConfigManager
 
 
 def make_installation(root, version):
@@ -56,14 +56,14 @@ def test_global_config_accepts_new_versions_and_persists_selection(tmp_path):
     new_executable = make_installation(tmp_path / "new", 2026)
     config_path = tmp_path / "current.ini"
     write_config(config_path, old_executable, 2022)
-    manager = GlobalConfmanager(
+    manager = GlobalConfigManager(
         configpath=config_path, logger=logging.getLogger("cst-install-test")
     )
 
     selected = manager.select_cst_installation(2026, new_executable)
 
     assert selected.version == 2026
-    assert manager.checkCSTENVConfig() is True
+    assert manager.validate_environment() is True
     reloaded = configparser.ConfigParser()
     reloaded.read(config_path)
     assert reloaded["cst"]["version"] == "2026"

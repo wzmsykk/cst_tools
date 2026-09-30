@@ -31,7 +31,7 @@ class _ProjectConfig:
             "PROJECT": {"ProjectType": "pillbox-analytic"},
         }
 
-    def getCurrPPSList(self):
+    def get_postprocess_settings(self):
         return []
 
 
@@ -42,7 +42,7 @@ class _AnalyticPillboxWorker:
         self.tracker = tracker
         self.stopped = False
 
-    def runWithParam(self, resultname, *, params):
+    def run_task(self, resultname, *, params):
         with self.tracker["lock"]:
             self.tracker["active"] += 1
             self.tracker["peak"] = max(
@@ -123,7 +123,7 @@ def test_pillbox_analytic_model_rejects_invalid_radius(invalid):
 
 
 class _FaultInjectingPillboxWorker(_AnalyticPillboxWorker):
-    def runWithParam(self, resultname, *, params):
+    def run_task(self, resultname, *, params):
         radius = float(params["R"])
         key = round(radius, 9)
         with self.tracker["lock"]:
@@ -145,7 +145,7 @@ class _FaultInjectingPillboxWorker(_AnalyticPillboxWorker):
                 "PostProcessResult": None,
             }
         self.tracker["events"].append(("success", key, attempt, self.ID))
-        return super().runWithParam(resultname, params=params)
+        return super().run_task(resultname, params=params)
 
 
 def _fault_test_manager(tmp_path, faults):

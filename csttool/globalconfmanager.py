@@ -87,7 +87,7 @@ class GlobalConfigManager:
         self.conf = self.settings.to_parser()
         self.__saveconf(self.conf, self.curr_global_cfg_path)
 
-    def checkCSTENVConfig(self):
+    def validate_environment(self):
         # 测试CST环境位置
         result = True
         self.logger.info("检查全局配置开始.")
@@ -194,7 +194,3 @@ class GlobalConfigManager:
             )
             self.conf = self.settings.to_parser()
             return True
-
-
-# Compatibility alias for callers using the historical spelling.
-GlobalConfmanager = GlobalConfigManager

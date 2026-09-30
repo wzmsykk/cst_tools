@@ -37,7 +37,7 @@ class _ProjectConfig:
             "PROJECT": {"ProjectType": "pillbox-real-standard-batch"},
         }
 
-    def getCurrPPSList(self):
+    def get_postprocess_settings(self):
         return [
             {
                 "resultName": "frequency",

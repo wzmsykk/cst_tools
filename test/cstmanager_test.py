@@ -28,7 +28,7 @@ class FakeProjectConfig:
             "PROJECT": {"ProjectType": "default"},
         }
 
-    def getCurrPPSList(self):
+    def get_postprocess_settings(self):
         return []
 
 
@@ -39,7 +39,7 @@ class FakeWorker:
         self.outcomes = outcomes
         self.stopped = False
 
-    def runWithParam(self, resultname, *, params):
+    def run_task(self, resultname, *, params):
         with self.tracker["lock"]:
             self.tracker["active"] += 1
             self.tracker["peak"] = max(
@@ -152,7 +152,7 @@ def test_worker_recycle_uses_its_last_confirmed_project_snapshot(tmp_path):
             self.ID = worker_id
             self.stopped = False
 
-        def runWithParam(self, resultname, *, params):
+        def run_task(self, resultname, *, params):
             snapshot.parent.mkdir(parents=True, exist_ok=True)
             snapshot.write_bytes(b"confirmed")
             return {
@@ -201,10 +201,10 @@ def test_standard_batch_recycle_starts_from_base_project(tmp_path):
     snapshot = tmp_path / "result" / "task-1" / "project.cst"
 
     class SnapshotWorker(FakeWorker):
-        def runWithParam(self, resultname, *, params):
+        def run_task(self, resultname, *, params):
             snapshot.parent.mkdir(parents=True, exist_ok=True)
             snapshot.write_bytes(b"independent-task-snapshot")
-            result = super().runWithParam(resultname, params=params)
+            result = super().run_task(resultname, params=params)
             result["ProjectSnapshot"] = str(snapshot)
             return result
 
@@ -313,7 +313,7 @@ def test_stop_request_prevents_worker_rotation_and_new_dispatch(tmp_path):
     created = []
 
     class BlockingWorker(FakeWorker):
-        def runWithParam(self, resultname, *, params):
+        def run_task(self, resultname, *, params):
             entered.set()
             assert release.wait(5)
             return {

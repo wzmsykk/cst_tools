@@ -317,7 +317,7 @@ class ProbabilisticHomWorker:
         weights = tuple(self._probabilities[item] for item in outcomes)
         return self._rng.choices(outcomes, weights=weights, k=1)[0]
 
-    def runWithParam(self, resultname, *, params):
+    def run_task(self, resultname, *, params):
         params = dict(params)
         lo = float(params["fmin"])
         hi = float(params["fmax"])

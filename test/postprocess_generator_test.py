@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from csttool.postprocess_cst import VBPostProcessor
+from csttool.postprocess_cst import CstPostProcessor
 
 
 DATA_DIR = Path(__file__).parents[1] / "data"
@@ -18,10 +18,10 @@ def load_settings(name):
     [("defaultPPS.json", 7), ("TM020PPS.json", 6), ("WTCPPS.json", 11)],
 )
 def test_shipped_pps_configs_compile(config_name, expected_steps):
-    processor = VBPostProcessor()
+    processor = CstPostProcessor()
 
-    processor.appendPostProcessSteps(load_settings(config_name))
-    generated = "".join(processor.createPostProcessVBCodeLines())
+    processor.configure(load_settings(config_name))
+    generated = "".join(processor.render_vb())
 
     assert len(processor.postProcessDocList) == expected_steps
     assert generated.count("Sub CustomPostProcess") == 1
@@ -29,8 +29,8 @@ def test_shipped_pps_configs_compile(config_name, expected_steps):
 
 
 def test_tm020_generation_preserves_existing_calls_and_filenames():
-    processor = VBPostProcessor()
-    processor.appendPostProcessSteps(load_settings("TM020PPS.json"))
+    processor = CstPostProcessor()
+    processor.configure(load_settings("TM020PPS.json"))
 
     steps = processor.postProcessDocList
 
@@ -49,10 +49,10 @@ def test_tm020_generation_preserves_existing_calls_and_filenames():
 
 
 def test_vba_imports_are_deduplicated_in_first_use_order():
-    processor = VBPostProcessor()
-    processor.appendPostProcessSteps(load_settings("TM020PPS.json"))
+    processor = CstPostProcessor()
+    processor.configure(load_settings("TM020PPS.json"))
 
-    generated = "".join(processor.createPostProcessVBCodeLines())
+    generated = "".join(processor.render_vb())
 
     assert generated.count("Function EigenResult_Simple(") == 1
     assert generated.count("Const lib_rundef") == 1
@@ -62,14 +62,14 @@ def test_vba_imports_are_deduplicated_in_first_use_order():
 
 
 def test_duplicate_output_names_get_unique_filenames():
-    processor = VBPostProcessor()
+    processor = CstPostProcessor()
     setting = {
         "method": "Frequency",
         "resultName": "frequency",
         "params": {"iModeNumber": 1},
     }
 
-    processor.appendPostProcessSteps([setting, setting, setting])
+    processor.configure([setting, setting, setting])
 
     assert processor.getUsedFileNameList() == [
         "Mode_1_Frequency_frequency.txt",
@@ -79,14 +79,14 @@ def test_duplicate_output_names_get_unique_filenames():
 
 
 def test_unknown_method_and_missing_parameter_fail_early():
-    processor = VBPostProcessor()
+    processor = CstPostProcessor()
 
     with pytest.raises(ValueError, match="Unsupported PPS method"):
-        processor.appendPostProcessSteps(
+        processor.configure(
             [{"method": "Unknown", "resultName": "x", "params": {}}]
         )
     with pytest.raises(ValueError, match="iModeNumber"):
-        processor.appendPostProcessSteps(
+        processor.configure(
             [{"method": "Frequency", "resultName": "x", "params": {}}]
         )
 
@@ -100,8 +100,8 @@ def test_unknown_method_and_missing_parameter_fail_early():
     ],
 )
 def test_complex_pps_generation_supports_every_axis(axis, offsets, axis_number):
-    processor = VBPostProcessor()
-    processor.appendPostProcessSteps(
+    processor = CstPostProcessor()
+    processor.configure(
         [
             {
                 "method": "R_over_Q",
@@ -121,9 +121,9 @@ def test_complex_pps_generation_supports_every_axis(axis, offsets, axis_number):
 
 
 def test_scalar_and_all_mode_results_are_parsed(tmp_path):
-    processor = VBPostProcessor()
-    processor.setResultDir(tmp_path)
-    processor.appendPostProcessSteps(
+    processor = CstPostProcessor()
+    processor.set_result_directory(tmp_path)
+    processor.configure(
         [
             {
                 "method": "Frequency",
@@ -142,7 +142,7 @@ def test_scalar_and_all_mode_results_are_parsed(tmp_path):
         encoding="utf-8",
     )
 
-    results = processor.readAllResults()
+    results = processor.read_all_results()
 
     assert results[0]["value"] == 500.25
     assert results[1]["value"] == {"ModeIndex 1": 500.25, "ModeIndex 2": 700.5}

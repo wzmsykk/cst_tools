@@ -157,7 +157,7 @@ class CstProjectPreprocessor:
             if not parameter_output.is_file():
                 raise CstPreprocessError("CST 工程参数预处理未导出参数清单")
             projectutil.custom_ascii_2_json(parameter_output, parameter_json_path)
-            parameters = tuple(projectutil.getParamsList(parameter_json_path))
+            parameters = tuple(projectutil.get_parameters(parameter_json_path))
             names = {item["name"] for item in parameters}
             missing = REQUIRED_HOM_PARAMETERS - names
             if missing:

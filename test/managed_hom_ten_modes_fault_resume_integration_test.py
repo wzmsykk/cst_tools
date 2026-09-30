@@ -71,7 +71,7 @@ def _result_values(result: dict) -> dict[str, float]:
 
 
 def _run_next(worker: ManagedCSTWorker, lo: float) -> dict:
-    result = worker.runWithParam(
+    result = worker.run_task(
         f"hom_from_{lo:.6f}", params={"fmin": lo, "fmax": lo + 50.0}
     )
     return _result_values(result)
@@ -100,11 +100,11 @@ def _wait_solver(worker, log_offset: int, timeout=120):
 
 
 def _read_recovered_task(worker, task: Task) -> dict[str, float]:
-    worker.postprocess.setResultDir(worker.result_root / task.task_id)
-    worker.postprocess.setCSTRunResultDir(worker.result_root / task.task_id / "project")
+    worker.postprocess.set_result_directory(worker.result_root / task.task_id)
+    worker.postprocess.set_cst_run_result_directory(worker.result_root / task.task_id / "project")
     return {
         item["resultName"]: float(item["value"])
-        for item in worker.postprocess.readAllResults()
+        for item in worker.postprocess.read_all_results()
     }
 
 

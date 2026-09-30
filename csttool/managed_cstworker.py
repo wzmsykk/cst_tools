@@ -14,9 +14,9 @@ from typing import Any, Mapping
 
 from install_compat import resource_path
 
-from .postprocess_cst import VBPostProcessor
+from .postprocess_cst import CstPostProcessor
 from .cst_progress import CstLogProgressMonitor, CstLogProgressParser
-from .protocol_worker import _vb_string
+from .vb_codec import quote_vb_string
 from .runtime_protocol import (
     Acknowledge,
     CompletionStatus,
@@ -49,8 +49,8 @@ class ManagedCSTWorker:
         self.source_project = Path(config["cstPath"]).resolve()
         self.executable = Path(config["CSTENVPATH"]).resolve()
         self.parameter_definitions = tuple(config["paramList"])
-        self.postprocess = VBPostProcessor()
-        self.postprocess.appendPostProcessSteps(config.get("postProcess", ()))
+        self.postprocess = CstPostProcessor()
+        self.postprocess.configure(config.get("postProcess", ()))
         self.protocol = FileProtocol(self.root / "protocol")
         self.task_path = self.protocol.root / "current.task"
         self.completion_path = self.protocol.root / "current.completion"
@@ -90,19 +90,19 @@ class ManagedCSTWorker:
             encoding="utf-8"
         )
         replacements = {
-            "%PROJECT_PATH%": _vb_string(self.project_path),
+            "%PROJECT_PATH%": quote_vb_string(self.project_path),
             "%SESSION_ID%": self.session_id,
-            "%TASK_PATH%": _vb_string(self.task_path),
-            "%COMPLETION_PATH%": _vb_string(self.completion_path),
-            "%ACK_PATH%": _vb_string(self.ack_path),
-            "%MARKER_PATH%": _vb_string(self.marker_path),
-            "%STOP_REQUEST_PATH%": _vb_string(self.stop_request_path),
-            "%STOP_ACK_PATH%": _vb_string(self.stop_ack_path),
-            "%RESULT_ROOT%": _vb_string(str(self.result_root) + "\\"),
+            "%TASK_PATH%": quote_vb_string(self.task_path),
+            "%COMPLETION_PATH%": quote_vb_string(self.completion_path),
+            "%ACK_PATH%": quote_vb_string(self.ack_path),
+            "%MARKER_PATH%": quote_vb_string(self.marker_path),
+            "%STOP_REQUEST_PATH%": quote_vb_string(self.stop_request_path),
+            "%STOP_ACK_PATH%": quote_vb_string(self.stop_ack_path),
+            "%RESULT_ROOT%": quote_vb_string(str(self.result_root) + "\\"),
         }
         for placeholder, value in replacements.items():
             main = main.replace(placeholder, value)
-        generated = "".join(self.postprocess.createPostProcessVBCodeLines())
+        generated = "".join(self.postprocess.render_vb())
         output = (
             "'#Language \"WWB-COM\"\n\nOption Explicit\n\n"
             + codec
@@ -231,7 +231,7 @@ class ManagedCSTWorker:
         except (TypeError, ValueError):
             return False
 
-    def runWithParam(self, resultname: str, *, params: Mapping[str, Any]) -> dict:
+    def run_task(self, result_name: str, *, params: Mapping[str, Any]) -> dict:
         with self._lock:
             if self._stopping:
                 raise RuntimeError("managed CST worker is stopping")
@@ -252,7 +252,7 @@ class ManagedCSTWorker:
                 self.ID,
                 self.session_id,
                 task.task_id,
-                resultname,
+                result_name,
                 params.get("fmin"),
                 params.get("fmax"),
             )
@@ -269,9 +269,9 @@ class ManagedCSTWorker:
                         raise FileNotFoundError(
                             f"CST task did not publish a project snapshot: {project_snapshot}"
                         )
-                    self.postprocess.setResultDir(task_result_root)
-                    self.postprocess.setCSTRunResultDir(task_result_root / "project")
-                    postprocess_result = self.postprocess.readAllResults()
+                    self.postprocess.set_result_directory(task_result_root)
+                    self.postprocess.set_cst_run_result_directory(task_result_root / "project")
+                    postprocess_result = self.postprocess.read_all_results()
                     status = "Success"
                     failure = None
                 else:
@@ -302,7 +302,7 @@ class ManagedCSTWorker:
                 "WorkerID": self.ID,
                 "TaskStatus": status,
                 "FailureReport": failure,
-                "RunName": resultname,
+                "RunName": result_name,
                 "RunParameters": dict(params),
                 "PostProcessResult": postprocess_result,
                 "ProjectSnapshot": (

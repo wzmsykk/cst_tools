@@ -8,14 +8,41 @@ is injectable so the scheduler can be tested without starting CST.
 from __future__ import annotations
 
 from concurrent.futures import Future, ThreadPoolExecutor
+import configparser
 from dataclasses import dataclass, field
 from enum import Enum, auto
 import logging
 from pathlib import Path
 from queue import Empty, Queue
 from threading import RLock
+from types import SimpleNamespace
 from typing import Any, Callable, Iterable, Mapping, Protocol
 import time
+
+from .configuration import GlobalSettings, ProjectSettings
+
+
+def _configuration_parser(value) -> configparser.ConfigParser:
+    """Normalize legacy mapping test/adaptor input at the manager boundary."""
+
+    if isinstance(value, configparser.ConfigParser):
+        return value
+    parser = configparser.ConfigParser()
+    parser.read_dict(value)
+    return parser
+
+
+def _legacy_project_settings(value):
+    """Convert the former minimal manager mapping into a typed view."""
+
+    parser = _configuration_parser(value)
+    return SimpleNamespace(
+        directories=SimpleNamespace(
+            temp=Path(parser.get("DIRS", "tempdir")),
+            result=Path(parser.get("DIRS", "resultdir")),
+        ),
+        cst_filename=parser.get("CST", "CSTFilename"),
+    )
 
 
 class WorkerProtocol(Protocol):
@@ -23,7 +50,7 @@ class WorkerProtocol(Protocol):
 
     ID: str
 
-    def runWithParam(self, resultname: str, *, params: Mapping[str, Any]) -> dict: ...
+    def run_task(self, result_name: str, *, params: Mapping[str, Any]) -> dict: ...
 
     def stop(self) -> Any: ...
 
@@ -33,7 +60,8 @@ class SimulationManager(Protocol):
 
     currProjectDir: Path
 
-    def getResultDir(self) -> Path: ...
+    @property
+    def result_directory(self) -> Path: ...
 
     def execute(self, task: "SimulationTask") -> dict: ...
 
@@ -121,9 +149,18 @@ class CSTManager:
         self.logger = logger or logging.getLogger(__name__)
         self.pconfm = pconfm
         self.global_settings = getattr(gconfm, "settings", None)
+        if self.global_settings is None:
+            self.global_settings = GlobalSettings.from_parser(
+                _configuration_parser(gconfm.conf)
+            )
         self.project_settings = getattr(pconfm, "settings", None)
-        self.gconf = gconfm.conf  # compatibility view
-        self.pconf = pconfm.conf  # compatibility view
+        if self.project_settings is None:
+            try:
+                self.project_settings = ProjectSettings.from_parser(
+                    _configuration_parser(pconfm.conf)
+                )
+            except (KeyError, configparser.Error, ValueError):
+                self.project_settings = _legacy_project_settings(pconfm.conf)
         self.paramList = params
         self.maxParallelTasks = maxTask
         self.maxWorkerJobCountLimit = max_jobs_per_worker
@@ -131,14 +168,9 @@ class CSTManager:
         self._progress_callback = progress_callback
 
         self.currProjectDir = Path(pconfm.currProjectDir).absolute()
-        if self.project_settings is not None:
-            temp_path = self.project_settings.directories.temp
-            result_path = self.project_settings.directories.result
-            cst_filename = self.project_settings.cst_filename
-        else:
-            temp_path = self.pconf["DIRS"]["tempdir"]
-            result_path = self.pconf["DIRS"]["resultdir"]
-            cst_filename = self.pconf["CST"]["CSTFilename"]
+        temp_path = self.project_settings.directories.temp
+        result_path = self.project_settings.directories.result
+        cst_filename = self.project_settings.cst_filename
         self.tempDir = self._project_path(temp_path)
         self.resultDir = self._project_path(result_path)
         self.tempDir.mkdir(parents=True, exist_ok=True)
@@ -196,13 +228,11 @@ class CSTManager:
             "taskFileDir": str(worker_dir),
             "CSTENVPATH": str(
                 self.global_settings.cst.executable
-                if self.global_settings is not None
-                else self.gconf["CST"]["cstexepath"]
             ),
             "resultDir": str(self.resultDir),
             "cstPath": str(source_project or self.cstProjPath),
             "paramList": self.paramList,
-            "postProcess": self.pconfm.getCurrPPSList(),
+            "postProcess": self.pconfm.get_postprocess_settings(),
             "runInBackground": True,
             "progressCallback": self._progress_callback,
         }
@@ -223,7 +253,8 @@ class CSTManager:
             self._slots.append(_WorkerSlot(worker_id, self._create_worker(worker_id)))
             self.logger.info("WORKER_CREATED id=%s", worker_id)
 
-    def getResultDir(self) -> Path:
+    @property
+    def result_directory(self) -> Path:
         return self.resultDir
 
     def get_confirmed_snapshot(self) -> Path | None:
@@ -370,8 +401,8 @@ class CSTManager:
         self.logger.info("TASK_START worker=%s job=%s", slot.worker_id, task.job_name)
         for attempt in range(task.retry_count + 1):
             try:
-                result = slot.worker.runWithParam(
-                    resultname=task.job_name,
+                result = slot.worker.run_task(
+                    task.job_name,
                     params=task.params,
                 )
             except Exception as exc:

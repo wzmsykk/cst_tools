@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from csttool.cstmanager import SimulationTask
-from csttool.myAlgorithm_pop import myAlg01
+from csttool.myAlgorithm_pop import HomScanAlgorithm
 
 
 class ModernManagerOnly:
@@ -14,7 +14,8 @@ class ModernManagerOnly:
         self.executed = []
         self.batches = []
 
-    def getResultDir(self):
+    @property
+    def result_directory(self):
         return self.result_dir
 
     def execute(self, task):
@@ -41,7 +42,7 @@ class ModernManagerOnly:
 
 def test_algorithm_executes_named_parameter_mapping_through_simulation_task(tmp_path):
     manager = ModernManagerOnly(tmp_path)
-    algorithm = myAlg01(manager=manager, params=[])
+    algorithm = HomScanAlgorithm(manager=manager, params=[])
     values = [1, 700, 800]
 
     result = algorithm._execute_simulation(values, "band-1", retry_count=2)
@@ -62,7 +63,7 @@ def test_algorithm_executes_named_parameter_mapping_through_simulation_task(tmp_
 
 def test_algorithm_parallel_path_uses_run_batch_in_submission_order(tmp_path):
     manager = ModernManagerOnly(tmp_path)
-    algorithm = myAlg01(manager=manager, params=[])
+    algorithm = HomScanAlgorithm(manager=manager, params=[])
     algorithm.dimension_output = 1
 
     values = algorithm.get_y_trans_r_aprallel(

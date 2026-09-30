@@ -58,7 +58,7 @@ def custom_ascii_2_json(asciipath, savejsonpath):
     pass
 
 
-def getParamsList(jsonpath):
+def get_parameters(jsonpath):
     paramfile = jsonpath
     f = open(paramfile, "r")
     pamlist = json.load(f)

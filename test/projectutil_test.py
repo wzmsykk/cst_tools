@@ -5,7 +5,7 @@ import pytest
 from csttool.projectutil import (
     convert_json_params_to_list,
     custom_ascii_2_json,
-    getParamsList,
+    get_parameters,
     is_number,
 )
 
@@ -35,7 +35,7 @@ def test_ascii_parameter_conversion_round_trip(tmp_path):
 
     custom_ascii_2_json(source, destination)
 
-    params = getParamsList(destination)
+    params = get_parameters(destination)
     assert params == [
         {
             "id": 0,

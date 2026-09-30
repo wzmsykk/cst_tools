@@ -51,7 +51,7 @@ def test_managed_pillbox_solves_and_reads_five_modes(cst_executable, tmp_path):
             },
         )
 
-        result = worker.runWithParam(
+        result = worker.run_task(
             "pillbox-five-modes",
             params={"nmodes": 5, "fmin": 400, "fmax": 1200},
         )

@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from csttool.globalconfmanager import GlobalConfigManager, GlobalConfmanager
+from csttool.globalconfmanager import GlobalConfigManager
 from csttool.configuration import (
     CONFIG_SCHEMA_VERSION,
     ConfigurationError,
@@ -14,7 +14,6 @@ from csttool.configuration import (
 )
 from csttool.projectconfmanager import (
     ProjectConfigManager,
-    ProjectConfmanager,
     ProjectStatusError,
 )
 
@@ -26,9 +25,9 @@ class _GlobalConfig:
         self.conf["CST"] = {"cstexepath": "", "cstver": ""}
 
 
-def test_modern_config_manager_names_keep_legacy_aliases():
-    assert GlobalConfmanager is GlobalConfigManager
-    assert ProjectConfmanager is ProjectConfigManager
+def test_config_manager_exposes_modern_names():
+    assert GlobalConfigManager.__name__ == "GlobalConfigManager"
+    assert ProjectConfigManager.__name__ == "ProjectConfigManager"
     assert str(ProjectStatusError("invalid state")) == "invalid state"
 
 
@@ -97,7 +96,7 @@ def test_project_config_and_postprocess_files_use_roundtrip_io(tmp_path):
         GlobalConfigManager=_GlobalConfig(tmp_path),
         logger=logging.getLogger("project-config-test"),
     )
-    manager.assignProjectDir(tmp_path)
+    manager.select_project_directory(tmp_path)
     manager.conf = manager.createNewEmptyProjectConfFile(tmp_path)
     values = [{"resultName": "frequency", "method": "Frequency", "params": {}}]
 
