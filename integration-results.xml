@@ -1,0 +1,1594 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="17" skipped="0" tests="17" time="34.885" timestamp="2026-09-30T12:31:23.290454" hostname="LAPTOP-JMVDV92E"><testcase classname="test.cst_preprocessor_integration_test" name="test_cst_preprocessor_adds_hom_parameters_without_modifying_source" time="23.744"><failure message="csttool.cst_preprocessor.CstPreprocessError: CST 工程参数预处理异常退出: 5">cst_executable = WindowsPath('D:/Program Files (x86)/CST Studio Suite 2022/CST DESIGN ENVIRONMENT.exe')
+tmp_path = WindowsPath('C:/Users/ykk48/AppData/Local/Temp/pytest-of-ykk48/pytest-32/test_cst_preprocessor_adds_hom0')
+
+    def test_cst_preprocessor_adds_hom_parameters_without_modifying_source(
+        cst_executable,
+        tmp_path,
+    ):
+        root = Path(__file__).parents[1]
+        source = root / "model" / "Pillbox_2015.cst"
+        output = tmp_path / "prepared.cst"
+        parameter_json = tmp_path / "params.json"
+        before = hashlib.sha256(source.read_bytes()).hexdigest()
+    
+        result = CstProjectPreprocessor(
+            cst_executable,
+            root / "data" / "preprocess_hom_parameters_v1.vb",
+            timeout=180,
+&gt;       ).preprocess(
+            source,
+            output,
+            parameter_json,
+            tmp_path / "runtime",
+            mesh_cells_per_wavelength=24,
+        )
+
+test\cst_preprocessor_integration_test.py:26: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;csttool.cst_preprocessor.CstProjectPreprocessor object at 0x00000227052C2F00&gt;
+source_project_path = WindowsPath('D:/work/cst_tools/model/Pillbox_2015.cst')
+output_project_path = WindowsPath('C:/Users/ykk48/AppData/Local/Temp/pytest-of-ykk48/pytest-32/test_cst_preprocessor_adds_hom0/prepared.cst')
+parameter_json_path = WindowsPath('C:/Users/ykk48/AppData/Local/Temp/pytest-of-ykk48/pytest-32/test_cst_preprocessor_adds_hom0/params.json')
+temp_directory = WindowsPath('C:/Users/ykk48/AppData/Local/Temp/pytest-of-ykk48/pytest-32/test_cst_preprocessor_adds_hom0/runtime')
+
+    def preprocess(
+        self,
+        source_project_path: str | Path,
+        output_project_path: str | Path,
+        parameter_json_path: str | Path,
+        temp_directory: str | Path,
+        *,
+        mesh_cells_per_wavelength: int = 20,
+    ) -&gt; CstPreprocessResult:
+        source_project_path = Path(source_project_path).resolve()
+        output_project_path = Path(output_project_path).resolve()
+        parameter_json_path = Path(parameter_json_path).resolve()
+        temp_directory = Path(temp_directory).resolve()
+        if (
+            source_project_path.suffix.casefold() != ".cst"
+            or not source_project_path.is_file()
+        ):
+            raise FileNotFoundError(source_project_path)
+        if output_project_path.suffix.casefold() != ".cst":
+            raise ValueError("prepared project path must use the .cst suffix")
+        if source_project_path == output_project_path:
+            raise ValueError("preprocessing requires a distinct output project path")
+        if output_project_path.exists():
+            raise FileExistsError(output_project_path)
+        if not self.executable.is_file():
+            raise FileNotFoundError(self.executable)
+        temp_directory.mkdir(parents=True, exist_ok=True)
+        parameter_json_path.parent.mkdir(parents=True, exist_ok=True)
+    
+        with tempfile.TemporaryDirectory(
+            prefix="cst-preprocess-", dir=temp_directory
+        ) as working:
+            working = Path(working)
+            macro_path = working / "preprocess.bas"
+            working_project = working / source_project_path.name
+            parameter_output = working / "parameters.txt"
+            status_output = working / "completion.txt"
+            shutil.copy2(source_project_path, working_project)
+            macro_path.write_text(
+                self.render_macro(
+                    working_project,
+                    parameter_output,
+                    status_output,
+                    mesh_cells_per_wavelength,
+                ),
+                encoding="utf-8",
+            )
+            command = [str(self.executable), "-m", str(macro_path)]
+            self.logger.info("启动 CST 工程参数预处理: %s", source_project_path)
+            try:
+                completed = self.runner(
+                    command,
+                    capture_output=True,
+                    text=True,
+                    errors="replace",
+                    timeout=self.timeout,
+                    check=False,
+                    **self._startup_options(),
+                )
+            except subprocess.TimeoutExpired as exc:
+                raise CstPreprocessError("CST 工程参数预处理超时") from exc
+            if completed.returncode != 0:
+&gt;               raise CstPreprocessError(
+                    f"CST 工程参数预处理异常退出: {completed.returncode}"
+                )
+E               csttool.cst_preprocessor.CstPreprocessError: CST 工程参数预处理异常退出: 5
+
+csttool\cst_preprocessor.py:149: CstPreprocessError</failure></testcase><testcase classname="test.managed_cstworker_integration_test" name="test_managed_worker_runs_repeated_tasks_and_standardly_exits" time="0.632"><failure message="subprocess.CalledProcessError: Command '['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', 'Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,Name | ConvertTo-Json -Compress']' returned non-zero exit status 1.">cst_executable = WindowsPath('D:/Program Files (x86)/CST Studio Suite 2022/CST DESIGN ENVIRONMENT.exe')
+tmp_path = WindowsPath('C:/Users/ykk48/AppData/Local/Temp/pytest-of-ykk48/pytest-32/test_managed_worker_runs_repea0')
+
+    def test_managed_worker_runs_repeated_tasks_and_standardly_exits(
+        cst_executable, tmp_path
+    ):
+        source = Path(__file__).parent / "data" / "Pillbox" / "Pillbox.cst"
+        root = tmp_path / "managed-worker"
+&gt;       baseline = cst_processes(windows_process_snapshot())
+
+test\managed_cstworker_integration_test.py:21: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+test\cst_integration_support.py:12: in windows_process_snapshot
+    completed = subprocess.run(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+input = None, capture_output = True, timeout = None, check = True
+popenargs = (['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', 'Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,Name | ConvertTo-Json -Compress'],)
+kwargs = {'stderr': -1, 'stdout': -1, 'text': True}
+process = &lt;Popen: returncode: 1 args: ['powershell.exe', '-NoProfile', '-NonInteractiv...&gt;
+stdout = ''
+stderr = 'Get-CimInstance : 鎷掔粷璁块棶 \nAt line:1 char:1\n+ Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcess ...+ FullyQualifiedErrorId : HRESULT 0x80041003,Microsoft.Management.Infrastructure.CimCmdlets.GetCimInstanceCommand\n \n'
+retcode = 1
+
+    def run(*popenargs,
+            input=None, capture_output=False, timeout=None, check=False, **kwargs):
+        """Run command with arguments and return a CompletedProcess instance.
+    
+        The returned instance will have attributes args, returncode, stdout and
+        stderr. By default, stdout and stderr are not captured, and those attributes
+        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+        or pass capture_output=True to capture both.
+    
+        If check is True and the exit code was non-zero, it raises a
+        CalledProcessError. The CalledProcessError object will have the return code
+        in the returncode attribute, and output &amp; stderr attributes if those streams
+        were captured.
+    
+        If timeout is given, and the process takes too long, a TimeoutExpired
+        exception will be raised.
+    
+        There is an optional argument "input", allowing you to
+        pass bytes or a string to the subprocess's stdin.  If you use this argument
+        you may not also use the Popen constructor's "stdin" argument, as
+        it will be used internally.
+    
+        By default, all communication is in bytes, and therefore any "input" should
+        be bytes, and the stdout and stderr will be bytes. If in text mode, any
+        "input" should be a string, and stdout and stderr will be strings decoded
+        according to locale encoding, or by "encoding" if set. Text mode is
+        triggered by setting any of text, encoding, errors or universal_newlines.
+    
+        The other arguments are the same as for the Popen constructor.
+        """
+        if input is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used.')
+            kwargs['stdin'] = PIPE
+    
+        if capture_output:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr arguments may not be used '
+                                 'with capture_output.')
+            kwargs['stdout'] = PIPE
+            kwargs['stderr'] = PIPE
+    
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except TimeoutExpired as exc:
+                process.kill()
+                if _mswindows:
+                    # Windows accumulates the output in a single blocking
+                    # read() call run on child threads, with the timeout
+                    # being done in a join() on those threads.  communicate()
+                    # _after_ kill() is required to collect that and add it
+                    # to the exception.
+                    exc.stdout, exc.stderr = process.communicate()
+                else:
+                    # POSIX _communicate already populated the output so
+                    # far into the TimeoutExpired exception.
+                    process.wait()
+                raise
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+            retcode = process.poll()
+            if check and retcode:
+&gt;               raise CalledProcessError(retcode, process.args,
+                                         output=stdout, stderr=stderr)
+E               subprocess.CalledProcessError: Command '['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', 'Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,Name | ConvertTo-Json -Compress']' returned non-zero exit status 1.
+
+d:\Users\ykk48\anaconda3\Lib\subprocess.py:571: CalledProcessError</failure></testcase><testcase classname="test.managed_hom_ten_modes_fault_resume_integration_test" name="test_hom_runs_ten_ordered_modes_across_three_fault_recovery_paths" time="0.591"><failure message="subprocess.CalledProcessError: Command '['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', 'Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,Name | ConvertTo-Json -Compress']' returned non-zero exit status 1.">cst_executable = WindowsPath('D:/Program Files (x86)/CST Studio Suite 2022/CST DESIGN ENVIRONMENT.exe')
+tmp_path = WindowsPath('C:/Users/ykk48/AppData/Local/Temp/pytest-of-ykk48/pytest-32/test_hom_runs_ten_ordered_mode0')
+
+    def test_hom_runs_ten_ordered_modes_across_three_fault_recovery_paths(
+        cst_executable, tmp_path
+    ):
+        project = tmp_path / "hom-ten-mode-recovery"
+        checkpoint = project / "hom_ten_modes_checkpoint.json"
+&gt;       baseline = cst_processes(windows_process_snapshot())
+
+test\managed_hom_ten_modes_fault_resume_integration_test.py:125: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+test\cst_integration_support.py:12: in windows_process_snapshot
+    completed = subprocess.run(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+input = None, capture_output = True, timeout = None, check = True
+popenargs = (['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', 'Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,Name | ConvertTo-Json -Compress'],)
+kwargs = {'stderr': -1, 'stdout': -1, 'text': True}
+process = &lt;Popen: returncode: 1 args: ['powershell.exe', '-NoProfile', '-NonInteractiv...&gt;
+stdout = ''
+stderr = 'Get-CimInstance : 鎷掔粷璁块棶 \nAt line:1 char:1\n+ Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcess ...+ FullyQualifiedErrorId : HRESULT 0x80041003,Microsoft.Management.Infrastructure.CimCmdlets.GetCimInstanceCommand\n \n'
+retcode = 1
+
+    def run(*popenargs,
+            input=None, capture_output=False, timeout=None, check=False, **kwargs):
+        """Run command with arguments and return a CompletedProcess instance.
+    
+        The returned instance will have attributes args, returncode, stdout and
+        stderr. By default, stdout and stderr are not captured, and those attributes
+        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+        or pass capture_output=True to capture both.
+    
+        If check is True and the exit code was non-zero, it raises a
+        CalledProcessError. The CalledProcessError object will have the return code
+        in the returncode attribute, and output &amp; stderr attributes if those streams
+        were captured.
+    
+        If timeout is given, and the process takes too long, a TimeoutExpired
+        exception will be raised.
+    
+        There is an optional argument "input", allowing you to
+        pass bytes or a string to the subprocess's stdin.  If you use this argument
+        you may not also use the Popen constructor's "stdin" argument, as
+        it will be used internally.
+    
+        By default, all communication is in bytes, and therefore any "input" should
+        be bytes, and the stdout and stderr will be bytes. If in text mode, any
+        "input" should be a string, and stdout and stderr will be strings decoded
+        according to locale encoding, or by "encoding" if set. Text mode is
+        triggered by setting any of text, encoding, errors or universal_newlines.
+    
+        The other arguments are the same as for the Popen constructor.
+        """
+        if input is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used.')
+            kwargs['stdin'] = PIPE
+    
+        if capture_output:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr arguments may not be used '
+                                 'with capture_output.')
+            kwargs['stdout'] = PIPE
+            kwargs['stderr'] = PIPE
+    
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except TimeoutExpired as exc:
+                process.kill()
+                if _mswindows:
+                    # Windows accumulates the output in a single blocking
+                    # read() call run on child threads, with the timeout
+                    # being done in a join() on those threads.  communicate()
+                    # _after_ kill() is required to collect that and add it
+                    # to the exception.
+                    exc.stdout, exc.stderr = process.communicate()
+                else:
+                    # POSIX _communicate already populated the output so
+                    # far into the TimeoutExpired exception.
+                    process.wait()
+                raise
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+            retcode = process.poll()
+            if check and retcode:
+&gt;               raise CalledProcessError(retcode, process.args,
+                                         output=stdout, stderr=stderr)
+E               subprocess.CalledProcessError: Command '['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', 'Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,Name | ConvertTo-Json -Compress']' returned non-zero exit status 1.
+
+d:\Users\ykk48\anaconda3\Lib\subprocess.py:571: CalledProcessError</failure></testcase><testcase classname="test.managed_pillbox_fault_recovery_integration_test" name="test_controller_loss_is_recovered_through_standard_protocol" time="0.574"><failure message="subprocess.CalledProcessError: Command '['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', 'Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,Name | ConvertTo-Json -Compress']' returned non-zero exit status 1.">cst_executable = WindowsPath('D:/Program Files (x86)/CST Studio Suite 2022/CST DESIGN ENVIRONMENT.exe')
+tmp_path = WindowsPath('C:/Users/ykk48/AppData/Local/Temp/pytest-of-ykk48/pytest-32/test_controller_loss_is_recove0')
+
+    def test_controller_loss_is_recovered_through_standard_protocol(
+        cst_executable, tmp_path
+    ):
+        project = tmp_path / "controller-loss"
+&gt;       baseline = cst_processes(windows_process_snapshot())
+
+test\managed_pillbox_fault_recovery_integration_test.py:72: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+test\cst_integration_support.py:12: in windows_process_snapshot
+    completed = subprocess.run(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+input = None, capture_output = True, timeout = None, check = True
+popenargs = (['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', 'Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,Name | ConvertTo-Json -Compress'],)
+kwargs = {'stderr': -1, 'stdout': -1, 'text': True}
+process = &lt;Popen: returncode: 1 args: ['powershell.exe', '-NoProfile', '-NonInteractiv...&gt;
+stdout = ''
+stderr = 'Get-CimInstance : 鎷掔粷璁块棶 \nAt line:1 char:1\n+ Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcess ...+ FullyQualifiedErrorId : HRESULT 0x80041003,Microsoft.Management.Infrastructure.CimCmdlets.GetCimInstanceCommand\n \n'
+retcode = 1
+
+    def run(*popenargs,
+            input=None, capture_output=False, timeout=None, check=False, **kwargs):
+        """Run command with arguments and return a CompletedProcess instance.
+    
+        The returned instance will have attributes args, returncode, stdout and
+        stderr. By default, stdout and stderr are not captured, and those attributes
+        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+        or pass capture_output=True to capture both.
+    
+        If check is True and the exit code was non-zero, it raises a
+        CalledProcessError. The CalledProcessError object will have the return code
+        in the returncode attribute, and output &amp; stderr attributes if those streams
+        were captured.
+    
+        If timeout is given, and the process takes too long, a TimeoutExpired
+        exception will be raised.
+    
+        There is an optional argument "input", allowing you to
+        pass bytes or a string to the subprocess's stdin.  If you use this argument
+        you may not also use the Popen constructor's "stdin" argument, as
+        it will be used internally.
+    
+        By default, all communication is in bytes, and therefore any "input" should
+        be bytes, and the stdout and stderr will be bytes. If in text mode, any
+        "input" should be a string, and stdout and stderr will be strings decoded
+        according to locale encoding, or by "encoding" if set. Text mode is
+        triggered by setting any of text, encoding, errors or universal_newlines.
+    
+        The other arguments are the same as for the Popen constructor.
+        """
+        if input is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used.')
+            kwargs['stdin'] = PIPE
+    
+        if capture_output:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr arguments may not be used '
+                                 'with capture_output.')
+            kwargs['stdout'] = PIPE
+            kwargs['stderr'] = PIPE
+    
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except TimeoutExpired as exc:
+                process.kill()
+                if _mswindows:
+                    # Windows accumulates the output in a single blocking
+                    # read() call run on child threads, with the timeout
+                    # being done in a join() on those threads.  communicate()
+                    # _after_ kill() is required to collect that and add it
+                    # to the exception.
+                    exc.stdout, exc.stderr = process.communicate()
+                else:
+                    # POSIX _communicate already populated the output so
+                    # far into the TimeoutExpired exception.
+                    process.wait()
+                raise
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+            retcode = process.poll()
+            if check and retcode:
+&gt;               raise CalledProcessError(retcode, process.args,
+                                         output=stdout, stderr=stderr)
+E               subprocess.CalledProcessError: Command '['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', 'Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,Name | ConvertTo-Json -Compress']' returned non-zero exit status 1.
+
+d:\Users\ykk48\anaconda3\Lib\subprocess.py:571: CalledProcessError</failure></testcase><testcase classname="test.managed_pillbox_fault_recovery_integration_test" name="test_dead_cst_is_abandoned_without_forging_standard_exit" time="0.558"><failure message="subprocess.CalledProcessError: Command '['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', 'Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,Name | ConvertTo-Json -Compress']' returned non-zero exit status 1.">cst_executable = WindowsPath('D:/Program Files (x86)/CST Studio Suite 2022/CST DESIGN ENVIRONMENT.exe')
+tmp_path = WindowsPath('C:/Users/ykk48/AppData/Local/Temp/pytest-of-ykk48/pytest-32/test_dead_cst_is_abandoned_wit0')
+
+    def test_dead_cst_is_abandoned_without_forging_standard_exit(
+        cst_executable, tmp_path
+    ):
+        project = tmp_path / "dead-cst"
+&gt;       baseline = cst_processes(windows_process_snapshot())
+
+test\managed_pillbox_fault_recovery_integration_test.py:105: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+test\cst_integration_support.py:12: in windows_process_snapshot
+    completed = subprocess.run(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+input = None, capture_output = True, timeout = None, check = True
+popenargs = (['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', 'Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,Name | ConvertTo-Json -Compress'],)
+kwargs = {'stderr': -1, 'stdout': -1, 'text': True}
+process = &lt;Popen: returncode: 1 args: ['powershell.exe', '-NoProfile', '-NonInteractiv...&gt;
+stdout = ''
+stderr = 'Get-CimInstance : 鎷掔粷璁块棶 \nAt line:1 char:1\n+ Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcess ...+ FullyQualifiedErrorId : HRESULT 0x80041003,Microsoft.Management.Infrastructure.CimCmdlets.GetCimInstanceCommand\n \n'
+retcode = 1
+
+    def run(*popenargs,
+            input=None, capture_output=False, timeout=None, check=False, **kwargs):
+        """Run command with arguments and return a CompletedProcess instance.
+    
+        The returned instance will have attributes args, returncode, stdout and
+        stderr. By default, stdout and stderr are not captured, and those attributes
+        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+        or pass capture_output=True to capture both.
+    
+        If check is True and the exit code was non-zero, it raises a
+        CalledProcessError. The CalledProcessError object will have the return code
+        in the returncode attribute, and output &amp; stderr attributes if those streams
+        were captured.
+    
+        If timeout is given, and the process takes too long, a TimeoutExpired
+        exception will be raised.
+    
+        There is an optional argument "input", allowing you to
+        pass bytes or a string to the subprocess's stdin.  If you use this argument
+        you may not also use the Popen constructor's "stdin" argument, as
+        it will be used internally.
+    
+        By default, all communication is in bytes, and therefore any "input" should
+        be bytes, and the stdout and stderr will be bytes. If in text mode, any
+        "input" should be a string, and stdout and stderr will be strings decoded
+        according to locale encoding, or by "encoding" if set. Text mode is
+        triggered by setting any of text, encoding, errors or universal_newlines.
+    
+        The other arguments are the same as for the Popen constructor.
+        """
+        if input is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used.')
+            kwargs['stdin'] = PIPE
+    
+        if capture_output:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr arguments may not be used '
+                                 'with capture_output.')
+            kwargs['stdout'] = PIPE
+            kwargs['stderr'] = PIPE
+    
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except TimeoutExpired as exc:
+                process.kill()
+                if _mswindows:
+                    # Windows accumulates the output in a single blocking
+                    # read() call run on child threads, with the timeout
+                    # being done in a join() on those threads.  communicate()
+                    # _after_ kill() is required to collect that and add it
+                    # to the exception.
+                    exc.stdout, exc.stderr = process.communicate()
+                else:
+                    # POSIX _communicate already populated the output so
+                    # far into the TimeoutExpired exception.
+                    process.wait()
+                raise
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+            retcode = process.poll()
+            if check and retcode:
+&gt;               raise CalledProcessError(retcode, process.args,
+                                         output=stdout, stderr=stderr)
+E               subprocess.CalledProcessError: Command '['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', 'Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,Name | ConvertTo-Json -Compress']' returned non-zero exit status 1.
+
+d:\Users\ykk48\anaconda3\Lib\subprocess.py:571: CalledProcessError</failure></testcase><testcase classname="test.managed_pillbox_five_modes_integration_test" name="test_managed_pillbox_solves_and_reads_five_modes" time="0.566"><failure message="subprocess.CalledProcessError: Command '['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', 'Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,Name | ConvertTo-Json -Compress']' returned non-zero exit status 1.">cst_executable = WindowsPath('D:/Program Files (x86)/CST Studio Suite 2022/CST DESIGN ENVIRONMENT.exe')
+tmp_path = WindowsPath('C:/Users/ykk48/AppData/Local/Temp/pytest-of-ykk48/pytest-32/test_managed_pillbox_solves_an0')
+
+    def test_managed_pillbox_solves_and_reads_five_modes(cst_executable, tmp_path):
+        source = Path(__file__).parent / "data" / "Pillbox" / "Pillbox.cst"
+        source_hash = _sha256(source)
+        root = tmp_path / "pillbox-five-modes"
+&gt;       baseline = cst_processes(windows_process_snapshot())
+
+test\managed_pillbox_five_modes_integration_test.py:26: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+test\cst_integration_support.py:12: in windows_process_snapshot
+    completed = subprocess.run(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+input = None, capture_output = True, timeout = None, check = True
+popenargs = (['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', 'Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,Name | ConvertTo-Json -Compress'],)
+kwargs = {'stderr': -1, 'stdout': -1, 'text': True}
+process = &lt;Popen: returncode: 1 args: ['powershell.exe', '-NoProfile', '-NonInteractiv...&gt;
+stdout = ''
+stderr = 'Get-CimInstance : 鎷掔粷璁块棶 \nAt line:1 char:1\n+ Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcess ...+ FullyQualifiedErrorId : HRESULT 0x80041003,Microsoft.Management.Infrastructure.CimCmdlets.GetCimInstanceCommand\n \n'
+retcode = 1
+
+    def run(*popenargs,
+            input=None, capture_output=False, timeout=None, check=False, **kwargs):
+        """Run command with arguments and return a CompletedProcess instance.
+    
+        The returned instance will have attributes args, returncode, stdout and
+        stderr. By default, stdout and stderr are not captured, and those attributes
+        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+        or pass capture_output=True to capture both.
+    
+        If check is True and the exit code was non-zero, it raises a
+        CalledProcessError. The CalledProcessError object will have the return code
+        in the returncode attribute, and output &amp; stderr attributes if those streams
+        were captured.
+    
+        If timeout is given, and the process takes too long, a TimeoutExpired
+        exception will be raised.
+    
+        There is an optional argument "input", allowing you to
+        pass bytes or a string to the subprocess's stdin.  If you use this argument
+        you may not also use the Popen constructor's "stdin" argument, as
+        it will be used internally.
+    
+        By default, all communication is in bytes, and therefore any "input" should
+        be bytes, and the stdout and stderr will be bytes. If in text mode, any
+        "input" should be a string, and stdout and stderr will be strings decoded
+        according to locale encoding, or by "encoding" if set. Text mode is
+        triggered by setting any of text, encoding, errors or universal_newlines.
+    
+        The other arguments are the same as for the Popen constructor.
+        """
+        if input is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used.')
+            kwargs['stdin'] = PIPE
+    
+        if capture_output:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr arguments may not be used '
+                                 'with capture_output.')
+            kwargs['stdout'] = PIPE
+            kwargs['stderr'] = PIPE
+    
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except TimeoutExpired as exc:
+                process.kill()
+                if _mswindows:
+                    # Windows accumulates the output in a single blocking
+                    # read() call run on child threads, with the timeout
+                    # being done in a join() on those threads.  communicate()
+                    # _after_ kill() is required to collect that and add it
+                    # to the exception.
+                    exc.stdout, exc.stderr = process.communicate()
+                else:
+                    # POSIX _communicate already populated the output so
+                    # far into the TimeoutExpired exception.
+                    process.wait()
+                raise
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+            retcode = process.poll()
+            if check and retcode:
+&gt;               raise CalledProcessError(retcode, process.args,
+                                         output=stdout, stderr=stderr)
+E               subprocess.CalledProcessError: Command '['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', 'Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,Name | ConvertTo-Json -Compress']' returned non-zero exit status 1.
+
+d:\Users\ykk48\anaconda3\Lib\subprocess.py:571: CalledProcessError</failure></testcase><testcase classname="test.managed_pillbox_stop_resume_integration_test" name="test_pillbox_managed_worker_stops_safely_then_resumes_in_new_session" time="0.586"><failure message="subprocess.CalledProcessError: Command '['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', 'Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,Name | ConvertTo-Json -Compress']' returned non-zero exit status 1.">cst_executable = WindowsPath('D:/Program Files (x86)/CST Studio Suite 2022/CST DESIGN ENVIRONMENT.exe')
+tmp_path = WindowsPath('C:/Users/ykk48/AppData/Local/Temp/pytest-of-ykk48/pytest-32/test_pillbox_managed_worker_st0')
+
+    def test_pillbox_managed_worker_stops_safely_then_resumes_in_new_session(
+        cst_executable, tmp_path
+    ):
+&gt;       baseline = cst_processes(windows_process_snapshot())
+
+test\managed_pillbox_stop_resume_integration_test.py:82: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+test\cst_integration_support.py:12: in windows_process_snapshot
+    completed = subprocess.run(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+input = None, capture_output = True, timeout = None, check = True
+popenargs = (['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', 'Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,Name | ConvertTo-Json -Compress'],)
+kwargs = {'stderr': -1, 'stdout': -1, 'text': True}
+process = &lt;Popen: returncode: 1 args: ['powershell.exe', '-NoProfile', '-NonInteractiv...&gt;
+stdout = ''
+stderr = 'Get-CimInstance : 鎷掔粷璁块棶 \nAt line:1 char:1\n+ Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcess ...+ FullyQualifiedErrorId : HRESULT 0x80041003,Microsoft.Management.Infrastructure.CimCmdlets.GetCimInstanceCommand\n \n'
+retcode = 1
+
+    def run(*popenargs,
+            input=None, capture_output=False, timeout=None, check=False, **kwargs):
+        """Run command with arguments and return a CompletedProcess instance.
+    
+        The returned instance will have attributes args, returncode, stdout and
+        stderr. By default, stdout and stderr are not captured, and those attributes
+        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+        or pass capture_output=True to capture both.
+    
+        If check is True and the exit code was non-zero, it raises a
+        CalledProcessError. The CalledProcessError object will have the return code
+        in the returncode attribute, and output &amp; stderr attributes if those streams
+        were captured.
+    
+        If timeout is given, and the process takes too long, a TimeoutExpired
+        exception will be raised.
+    
+        There is an optional argument "input", allowing you to
+        pass bytes or a string to the subprocess's stdin.  If you use this argument
+        you may not also use the Popen constructor's "stdin" argument, as
+        it will be used internally.
+    
+        By default, all communication is in bytes, and therefore any "input" should
+        be bytes, and the stdout and stderr will be bytes. If in text mode, any
+        "input" should be a string, and stdout and stderr will be strings decoded
+        according to locale encoding, or by "encoding" if set. Text mode is
+        triggered by setting any of text, encoding, errors or universal_newlines.
+    
+        The other arguments are the same as for the Popen constructor.
+        """
+        if input is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used.')
+            kwargs['stdin'] = PIPE
+    
+        if capture_output:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr arguments may not be used '
+                                 'with capture_output.')
+            kwargs['stdout'] = PIPE
+            kwargs['stderr'] = PIPE
+    
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except TimeoutExpired as exc:
+                process.kill()
+                if _mswindows:
+                    # Windows accumulates the output in a single blocking
+                    # read() call run on child threads, with the timeout
+                    # being done in a join() on those threads.  communicate()
+                    # _after_ kill() is required to collect that and add it
+                    # to the exception.
+                    exc.stdout, exc.stderr = process.communicate()
+                else:
+                    # POSIX _communicate already populated the output so
+                    # far into the TimeoutExpired exception.
+                    process.wait()
+                raise
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+            retcode = process.poll()
+            if check and retcode:
+&gt;               raise CalledProcessError(retcode, process.args,
+                                         output=stdout, stderr=stderr)
+E               subprocess.CalledProcessError: Command '['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', 'Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,Name | ConvertTo-Json -Compress']' returned non-zero exit status 1.
+
+d:\Users\ykk48\anaconda3\Lib\subprocess.py:571: CalledProcessError</failure></testcase><testcase classname="test.mesh_convergence_integration_test" name="test_real_pillbox_mesh_convergence_produces_report" time="0.005"><failure message="AttributeError: '_GlobalConfig' object has no attribute 'settings'">cst_executable = WindowsPath('D:/Program Files (x86)/CST Studio Suite 2022/CST DESIGN ENVIRONMENT.exe')
+tmp_path = WindowsPath('C:/Users/ykk48/AppData/Local/Temp/pytest-of-ykk48/pytest-32/test_real_pillbox_mesh_converg0')
+
+    def test_real_pillbox_mesh_convergence_produces_report(
+        cst_executable, tmp_path
+    ):
+        root = Path(__file__).parents[1]
+        global_config = _GlobalConfig(root, cst_executable)
+&gt;       project_config = ProjectConfigManager(
+            GlobalConfigManager=global_config,
+            logger=logging.getLogger("mesh-convergence-integration"),
+        )
+
+test\mesh_convergence_integration_test.py:29: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;csttool.projectconfmanager.ProjectConfigManager object at 0x0000022705395B80&gt;
+GlobalConfigManager = &lt;test.mesh_convergence_integration_test._GlobalConfig object at 0x0000022705395A30&gt;
+logger = &lt;Logger mesh-convergence-integration (WARNING)&gt;
+
+    def __init__(
+        self,
+        GlobalConfigManager=None,
+        logger: logging.Logger | None = None,
+    ):
+        self.settings: ProjectSettings | None = None
+        self._mesh_recorded = False
+        if logger is not None:
+            self.logger = logger
+        else:
+            self.logger = logging.getLogger(__name__)
+&gt;       self.global_settings = GlobalConfigManager.settings
+E       AttributeError: '_GlobalConfig' object has no attribute 'settings'
+
+csttool\projectconfmanager.py:51: AttributeError</failure></testcase><testcase classname="test.pillbox_standard_batch_integration_test" name="test_real_cst_standard_batch_optimizes_pillbox_radius_to_500_mhz" time="0.585"><failure message="subprocess.CalledProcessError: Command '['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', 'Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,Name | ConvertTo-Json -Compress']' returned non-zero exit status 1.">cst_executable = WindowsPath('D:/Program Files (x86)/CST Studio Suite 2022/CST DESIGN ENVIRONMENT.exe')
+tmp_path = WindowsPath('C:/Users/ykk48/AppData/Local/Temp/pytest-of-ykk48/pytest-32/test_real_cst_standard_batch_o0')
+
+    def test_real_cst_standard_batch_optimizes_pillbox_radius_to_500_mhz(
+        cst_executable, tmp_path
+    ):
+        source = Path(__file__).parent / "data" / "Pillbox" / "Pillbox.cst"
+        source_hash = _sha256(source)
+        project = tmp_path / "pillbox-standard-real"
+        project.mkdir()
+        shutil.copy2(source, project / "Pillbox.cst")
+&gt;       baseline = cst_processes(windows_process_snapshot())
+
+test\pillbox_standard_batch_integration_test.py:70: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+test\cst_integration_support.py:12: in windows_process_snapshot
+    completed = subprocess.run(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+input = None, capture_output = True, timeout = None, check = True
+popenargs = (['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', 'Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,Name | ConvertTo-Json -Compress'],)
+kwargs = {'stderr': -1, 'stdout': -1, 'text': True}
+process = &lt;Popen: returncode: 1 args: ['powershell.exe', '-NoProfile', '-NonInteractiv...&gt;
+stdout = ''
+stderr = 'Get-CimInstance : 鎷掔粷璁块棶 \nAt line:1 char:1\n+ Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcess ...+ FullyQualifiedErrorId : HRESULT 0x80041003,Microsoft.Management.Infrastructure.CimCmdlets.GetCimInstanceCommand\n \n'
+retcode = 1
+
+    def run(*popenargs,
+            input=None, capture_output=False, timeout=None, check=False, **kwargs):
+        """Run command with arguments and return a CompletedProcess instance.
+    
+        The returned instance will have attributes args, returncode, stdout and
+        stderr. By default, stdout and stderr are not captured, and those attributes
+        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+        or pass capture_output=True to capture both.
+    
+        If check is True and the exit code was non-zero, it raises a
+        CalledProcessError. The CalledProcessError object will have the return code
+        in the returncode attribute, and output &amp; stderr attributes if those streams
+        were captured.
+    
+        If timeout is given, and the process takes too long, a TimeoutExpired
+        exception will be raised.
+    
+        There is an optional argument "input", allowing you to
+        pass bytes or a string to the subprocess's stdin.  If you use this argument
+        you may not also use the Popen constructor's "stdin" argument, as
+        it will be used internally.
+    
+        By default, all communication is in bytes, and therefore any "input" should
+        be bytes, and the stdout and stderr will be bytes. If in text mode, any
+        "input" should be a string, and stdout and stderr will be strings decoded
+        according to locale encoding, or by "encoding" if set. Text mode is
+        triggered by setting any of text, encoding, errors or universal_newlines.
+    
+        The other arguments are the same as for the Popen constructor.
+        """
+        if input is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used.')
+            kwargs['stdin'] = PIPE
+    
+        if capture_output:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr arguments may not be used '
+                                 'with capture_output.')
+            kwargs['stdout'] = PIPE
+            kwargs['stderr'] = PIPE
+    
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except TimeoutExpired as exc:
+                process.kill()
+                if _mswindows:
+                    # Windows accumulates the output in a single blocking
+                    # read() call run on child threads, with the timeout
+                    # being done in a join() on those threads.  communicate()
+                    # _after_ kill() is required to collect that and add it
+                    # to the exception.
+                    exc.stdout, exc.stderr = process.communicate()
+                else:
+                    # POSIX _communicate already populated the output so
+                    # far into the TimeoutExpired exception.
+                    process.wait()
+                raise
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+            retcode = process.poll()
+            if check and retcode:
+&gt;               raise CalledProcessError(retcode, process.args,
+                                         output=stdout, stderr=stderr)
+E               subprocess.CalledProcessError: Command '['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', 'Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,Name | ConvertTo-Json -Compress']' returned non-zero exit status 1.
+
+d:\Users\ykk48\anaconda3\Lib\subprocess.py:571: CalledProcessError</failure></testcase><testcase classname="test.protocol_contract_integration_test" name="test_cst_wwb_executes_protocol_golden_contract" time="0.608"><failure message="subprocess.CalledProcessError: Command '['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', 'Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,Name | ConvertTo-Json -Compress']' returned non-zero exit status 1.">cst_executable = WindowsPath('D:/Program Files (x86)/CST Studio Suite 2022/CST DESIGN ENVIRONMENT.exe')
+tmp_path = WindowsPath('C:/Users/ykk48/AppData/Local/Temp/pytest-of-ykk48/pytest-32/test_cst_wwb_executes_protocol0')
+
+    def test_cst_wwb_executes_protocol_golden_contract(cst_executable, tmp_path):
+        session_id = new_session_id()
+        task = Task.create(
+            session_id,
+            {"Rx": "90.0", "L": "2 * Rx = L"},
+            expression_names=frozenset({"L"}),
+        )
+        workspace = prepare_contract_workspace(tmp_path, task)
+        log_path = tmp_path / "cst-contract.log"
+&gt;       baseline = _cst_processes(_windows_process_snapshot())
+
+test\protocol_contract_integration_test.py:127: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+test\protocol_contract_integration_test.py:27: in _windows_process_snapshot
+    completed = subprocess.run(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+input = None, capture_output = True, timeout = None, check = True
+popenargs = (['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', 'Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,Name | ConvertTo-Json -Compress'],)
+kwargs = {'stderr': -1, 'stdout': -1, 'text': True}
+process = &lt;Popen: returncode: 1 args: ['powershell.exe', '-NoProfile', '-NonInteractiv...&gt;
+stdout = ''
+stderr = 'Get-CimInstance : 鎷掔粷璁块棶 \nAt line:1 char:1\n+ Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcess ...+ FullyQualifiedErrorId : HRESULT 0x80041003,Microsoft.Management.Infrastructure.CimCmdlets.GetCimInstanceCommand\n \n'
+retcode = 1
+
+    def run(*popenargs,
+            input=None, capture_output=False, timeout=None, check=False, **kwargs):
+        """Run command with arguments and return a CompletedProcess instance.
+    
+        The returned instance will have attributes args, returncode, stdout and
+        stderr. By default, stdout and stderr are not captured, and those attributes
+        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+        or pass capture_output=True to capture both.
+    
+        If check is True and the exit code was non-zero, it raises a
+        CalledProcessError. The CalledProcessError object will have the return code
+        in the returncode attribute, and output &amp; stderr attributes if those streams
+        were captured.
+    
+        If timeout is given, and the process takes too long, a TimeoutExpired
+        exception will be raised.
+    
+        There is an optional argument "input", allowing you to
+        pass bytes or a string to the subprocess's stdin.  If you use this argument
+        you may not also use the Popen constructor's "stdin" argument, as
+        it will be used internally.
+    
+        By default, all communication is in bytes, and therefore any "input" should
+        be bytes, and the stdout and stderr will be bytes. If in text mode, any
+        "input" should be a string, and stdout and stderr will be strings decoded
+        according to locale encoding, or by "encoding" if set. Text mode is
+        triggered by setting any of text, encoding, errors or universal_newlines.
+    
+        The other arguments are the same as for the Popen constructor.
+        """
+        if input is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used.')
+            kwargs['stdin'] = PIPE
+    
+        if capture_output:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr arguments may not be used '
+                                 'with capture_output.')
+            kwargs['stdout'] = PIPE
+            kwargs['stderr'] = PIPE
+    
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except TimeoutExpired as exc:
+                process.kill()
+                if _mswindows:
+                    # Windows accumulates the output in a single blocking
+                    # read() call run on child threads, with the timeout
+                    # being done in a join() on those threads.  communicate()
+                    # _after_ kill() is required to collect that and add it
+                    # to the exception.
+                    exc.stdout, exc.stderr = process.communicate()
+                else:
+                    # POSIX _communicate already populated the output so
+                    # far into the TimeoutExpired exception.
+                    process.wait()
+                raise
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+            retcode = process.poll()
+            if check and retcode:
+&gt;               raise CalledProcessError(retcode, process.args,
+                                         output=stdout, stderr=stderr)
+E               subprocess.CalledProcessError: Command '['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', 'Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,Name | ConvertTo-Json -Compress']' returned non-zero exit status 1.
+
+d:\Users\ykk48\anaconda3\Lib\subprocess.py:571: CalledProcessError</failure></testcase><testcase classname="test.protocol_hom_runtime_postprocess_integration_test" name="test_hom_runtime_r_over_q_uses_solved_fields_without_parameter_update" time="0.622"><failure message="subprocess.CalledProcessError: Command '['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', 'Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,Name | ConvertTo-Json -Compress']' returned non-zero exit status 1.">cst_executable = WindowsPath('D:/Program Files (x86)/CST Studio Suite 2022/CST DESIGN ENVIRONMENT.exe')
+
+    def test_hom_runtime_r_over_q_uses_solved_fields_without_parameter_update(
+        cst_executable,
+    ):
+        source = Path(__file__).parent.parent / HOM_PROFILE_V1.source_project
+        root = Path.cwd() / ".pytest_cache" / "cst-p5-5" / new_session_id()[:8]
+        session_id = new_session_id()
+        task = Task.create(session_id, {"fmin": "720", "fmax": "800"})
+        workspace = prepare_hom_runtime_postprocess_workspace(
+            root, task, source, result_name=RESULT_NAME, profile=HOM_PROFILE_V1
+        )
+        worker = workspace.worker
+&gt;       baseline = cst_processes(windows_process_snapshot())
+
+test\protocol_hom_runtime_postprocess_integration_test.py:45: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+test\cst_integration_support.py:12: in windows_process_snapshot
+    completed = subprocess.run(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+input = None, capture_output = True, timeout = None, check = True
+popenargs = (['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', 'Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,Name | ConvertTo-Json -Compress'],)
+kwargs = {'stderr': -1, 'stdout': -1, 'text': True}
+process = &lt;Popen: returncode: 1 args: ['powershell.exe', '-NoProfile', '-NonInteractiv...&gt;
+stdout = ''
+stderr = 'Get-CimInstance : 鎷掔粷璁块棶 \nAt line:1 char:1\n+ Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcess ...+ FullyQualifiedErrorId : HRESULT 0x80041003,Microsoft.Management.Infrastructure.CimCmdlets.GetCimInstanceCommand\n \n'
+retcode = 1
+
+    def run(*popenargs,
+            input=None, capture_output=False, timeout=None, check=False, **kwargs):
+        """Run command with arguments and return a CompletedProcess instance.
+    
+        The returned instance will have attributes args, returncode, stdout and
+        stderr. By default, stdout and stderr are not captured, and those attributes
+        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+        or pass capture_output=True to capture both.
+    
+        If check is True and the exit code was non-zero, it raises a
+        CalledProcessError. The CalledProcessError object will have the return code
+        in the returncode attribute, and output &amp; stderr attributes if those streams
+        were captured.
+    
+        If timeout is given, and the process takes too long, a TimeoutExpired
+        exception will be raised.
+    
+        There is an optional argument "input", allowing you to
+        pass bytes or a string to the subprocess's stdin.  If you use this argument
+        you may not also use the Popen constructor's "stdin" argument, as
+        it will be used internally.
+    
+        By default, all communication is in bytes, and therefore any "input" should
+        be bytes, and the stdout and stderr will be bytes. If in text mode, any
+        "input" should be a string, and stdout and stderr will be strings decoded
+        according to locale encoding, or by "encoding" if set. Text mode is
+        triggered by setting any of text, encoding, errors or universal_newlines.
+    
+        The other arguments are the same as for the Popen constructor.
+        """
+        if input is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used.')
+            kwargs['stdin'] = PIPE
+    
+        if capture_output:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr arguments may not be used '
+                                 'with capture_output.')
+            kwargs['stdout'] = PIPE
+            kwargs['stderr'] = PIPE
+    
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except TimeoutExpired as exc:
+                process.kill()
+                if _mswindows:
+                    # Windows accumulates the output in a single blocking
+                    # read() call run on child threads, with the timeout
+                    # being done in a join() on those threads.  communicate()
+                    # _after_ kill() is required to collect that and add it
+                    # to the exception.
+                    exc.stdout, exc.stderr = process.communicate()
+                else:
+                    # POSIX _communicate already populated the output so
+                    # far into the TimeoutExpired exception.
+                    process.wait()
+                raise
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+            retcode = process.poll()
+            if check and retcode:
+&gt;               raise CalledProcessError(retcode, process.args,
+                                         output=stdout, stderr=stderr)
+E               subprocess.CalledProcessError: Command '['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', 'Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,Name | ConvertTo-Json -Compress']' returned non-zero exit status 1.
+
+d:\Users\ykk48\anaconda3\Lib\subprocess.py:571: CalledProcessError</failure></testcase><testcase classname="test.protocol_hom_scan_benchmark_integration_test" name="test_fixed_hom_structure_warm_frequency_scan_is_faster_and_consistent" time="0.601"><failure message="subprocess.CalledProcessError: Command '['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', 'Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,Name | ConvertTo-Json -Compress']' returned non-zero exit status 1.">cst_executable = WindowsPath('D:/Program Files (x86)/CST Studio Suite 2022/CST DESIGN ENVIRONMENT.exe')
+
+    def test_fixed_hom_structure_warm_frequency_scan_is_faster_and_consistent(cst_executable):
+        source = Path(__file__).parent.parent / HOM_PROFILE_V1.source_project
+        parameter_sets = (
+            {"fmin": "720", "fmax": "800"},
+            {"fmin": "800", "fmax": "880"},
+        )
+        root = Path.cwd() / ".pytest_cache" / "cst-p4-5" / new_session_id()[:8]
+        root.mkdir(parents=True)
+    
+        cold = [
+&gt;           _run_cold(cst_executable, root / f"cold-{index}", source, parameters)
+            for index, parameters in enumerate(parameter_sets)
+        ]
+
+test\protocol_hom_scan_benchmark_integration_test.py:133: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+test\protocol_hom_scan_benchmark_integration_test.py:41: in _run_cold
+    baseline = cst_processes(windows_process_snapshot())
+test\cst_integration_support.py:12: in windows_process_snapshot
+    completed = subprocess.run(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+input = None, capture_output = True, timeout = None, check = True
+popenargs = (['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', 'Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,Name | ConvertTo-Json -Compress'],)
+kwargs = {'stderr': -1, 'stdout': -1, 'text': True}
+process = &lt;Popen: returncode: 1 args: ['powershell.exe', '-NoProfile', '-NonInteractiv...&gt;
+stdout = ''
+stderr = 'Get-CimInstance : 鎷掔粷璁块棶 \nAt line:1 char:1\n+ Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcess ...+ FullyQualifiedErrorId : HRESULT 0x80041003,Microsoft.Management.Infrastructure.CimCmdlets.GetCimInstanceCommand\n \n'
+retcode = 1
+
+    def run(*popenargs,
+            input=None, capture_output=False, timeout=None, check=False, **kwargs):
+        """Run command with arguments and return a CompletedProcess instance.
+    
+        The returned instance will have attributes args, returncode, stdout and
+        stderr. By default, stdout and stderr are not captured, and those attributes
+        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+        or pass capture_output=True to capture both.
+    
+        If check is True and the exit code was non-zero, it raises a
+        CalledProcessError. The CalledProcessError object will have the return code
+        in the returncode attribute, and output &amp; stderr attributes if those streams
+        were captured.
+    
+        If timeout is given, and the process takes too long, a TimeoutExpired
+        exception will be raised.
+    
+        There is an optional argument "input", allowing you to
+        pass bytes or a string to the subprocess's stdin.  If you use this argument
+        you may not also use the Popen constructor's "stdin" argument, as
+        it will be used internally.
+    
+        By default, all communication is in bytes, and therefore any "input" should
+        be bytes, and the stdout and stderr will be bytes. If in text mode, any
+        "input" should be a string, and stdout and stderr will be strings decoded
+        according to locale encoding, or by "encoding" if set. Text mode is
+        triggered by setting any of text, encoding, errors or universal_newlines.
+    
+        The other arguments are the same as for the Popen constructor.
+        """
+        if input is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used.')
+            kwargs['stdin'] = PIPE
+    
+        if capture_output:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr arguments may not be used '
+                                 'with capture_output.')
+            kwargs['stdout'] = PIPE
+            kwargs['stderr'] = PIPE
+    
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except TimeoutExpired as exc:
+                process.kill()
+                if _mswindows:
+                    # Windows accumulates the output in a single blocking
+                    # read() call run on child threads, with the timeout
+                    # being done in a join() on those threads.  communicate()
+                    # _after_ kill() is required to collect that and add it
+                    # to the exception.
+                    exc.stdout, exc.stderr = process.communicate()
+                else:
+                    # POSIX _communicate already populated the output so
+                    # far into the TimeoutExpired exception.
+                    process.wait()
+                raise
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+            retcode = process.poll()
+            if check and retcode:
+&gt;               raise CalledProcessError(retcode, process.args,
+                                         output=stdout, stderr=stderr)
+E               subprocess.CalledProcessError: Command '['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', 'Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,Name | ConvertTo-Json -Compress']' returned non-zero exit status 1.
+
+d:\Users\ykk48\anaconda3\Lib\subprocess.py:571: CalledProcessError</failure></testcase><testcase classname="test.protocol_hom_scan_benchmark_integration_test" name="test_missing_hom_profile_template_stops_warm_session_before_first_solver" time="0.622"><failure message="subprocess.CalledProcessError: Command '['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', 'Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,Name | ConvertTo-Json -Compress']' returned non-zero exit status 1.">cst_executable = WindowsPath('D:/Program Files (x86)/CST Studio Suite 2022/CST DESIGN ENVIRONMENT.exe')
+
+    def test_missing_hom_profile_template_stops_warm_session_before_first_solver(
+        cst_executable,
+    ):
+        source = Path(__file__).parent.parent / HOM_PROFILE_V1.source_project
+        missing = ResultTemplateRequirement(
+            "P6.5 deliberately missing",
+            "M0D",
+            "3D Eigenmode Result",
+            "2D and 3D Field Results",
+        )
+        profile = replace(
+            HOM_PROFILE_V1,
+            profile_id="hom-warm-missing-gate",
+            required_templates=(*HOM_PROFILE_V1.required_templates, missing),
+        )
+        session_id = new_session_id()
+        tasks = (
+            Task.create(session_id, {"fmin": "720", "fmax": "800"}),
+            Task.create(session_id, {"fmin": "800", "fmax": "880"}),
+        )
+        root = Path.cwd() / ".pytest_cache" / "cst-p6-5-missing" / session_id[:8]
+        workspace = prepare_warm_worker_workspace(
+            root, tasks, source, result_name=RESULT_NAME, profile=profile
+        )
+&gt;       baseline = cst_processes(windows_process_snapshot())
+
+test\protocol_hom_scan_benchmark_integration_test.py:182: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+test\cst_integration_support.py:12: in windows_process_snapshot
+    completed = subprocess.run(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+input = None, capture_output = True, timeout = None, check = True
+popenargs = (['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', 'Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,Name | ConvertTo-Json -Compress'],)
+kwargs = {'stderr': -1, 'stdout': -1, 'text': True}
+process = &lt;Popen: returncode: 1 args: ['powershell.exe', '-NoProfile', '-NonInteractiv...&gt;
+stdout = ''
+stderr = 'Get-CimInstance : 鎷掔粷璁块棶 \nAt line:1 char:1\n+ Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcess ...+ FullyQualifiedErrorId : HRESULT 0x80041003,Microsoft.Management.Infrastructure.CimCmdlets.GetCimInstanceCommand\n \n'
+retcode = 1
+
+    def run(*popenargs,
+            input=None, capture_output=False, timeout=None, check=False, **kwargs):
+        """Run command with arguments and return a CompletedProcess instance.
+    
+        The returned instance will have attributes args, returncode, stdout and
+        stderr. By default, stdout and stderr are not captured, and those attributes
+        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+        or pass capture_output=True to capture both.
+    
+        If check is True and the exit code was non-zero, it raises a
+        CalledProcessError. The CalledProcessError object will have the return code
+        in the returncode attribute, and output &amp; stderr attributes if those streams
+        were captured.
+    
+        If timeout is given, and the process takes too long, a TimeoutExpired
+        exception will be raised.
+    
+        There is an optional argument "input", allowing you to
+        pass bytes or a string to the subprocess's stdin.  If you use this argument
+        you may not also use the Popen constructor's "stdin" argument, as
+        it will be used internally.
+    
+        By default, all communication is in bytes, and therefore any "input" should
+        be bytes, and the stdout and stderr will be bytes. If in text mode, any
+        "input" should be a string, and stdout and stderr will be strings decoded
+        according to locale encoding, or by "encoding" if set. Text mode is
+        triggered by setting any of text, encoding, errors or universal_newlines.
+    
+        The other arguments are the same as for the Popen constructor.
+        """
+        if input is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used.')
+            kwargs['stdin'] = PIPE
+    
+        if capture_output:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr arguments may not be used '
+                                 'with capture_output.')
+            kwargs['stdout'] = PIPE
+            kwargs['stderr'] = PIPE
+    
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except TimeoutExpired as exc:
+                process.kill()
+                if _mswindows:
+                    # Windows accumulates the output in a single blocking
+                    # read() call run on child threads, with the timeout
+                    # being done in a join() on those threads.  communicate()
+                    # _after_ kill() is required to collect that and add it
+                    # to the exception.
+                    exc.stdout, exc.stderr = process.communicate()
+                else:
+                    # POSIX _communicate already populated the output so
+                    # far into the TimeoutExpired exception.
+                    process.wait()
+                raise
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+            retcode = process.poll()
+            if check and retcode:
+&gt;               raise CalledProcessError(retcode, process.args,
+                                         output=stdout, stderr=stderr)
+E               subprocess.CalledProcessError: Command '['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', 'Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,Name | ConvertTo-Json -Compress']' returned non-zero exit status 1.
+
+d:\Users\ykk48\anaconda3\Lib\subprocess.py:571: CalledProcessError</failure></testcase><testcase classname="test.protocol_hom_template_evaluation_integration_test" name="test_registered_templates_can_be_inventoried_and_evaluated_for_current_run" time="0.607"><failure message="subprocess.CalledProcessError: Command '['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', 'Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,Name | ConvertTo-Json -Compress']' returned non-zero exit status 1.">cst_executable = WindowsPath('D:/Program Files (x86)/CST Studio Suite 2022/CST DESIGN ENVIRONMENT.exe')
+
+    def test_registered_templates_can_be_inventoried_and_evaluated_for_current_run(
+        cst_executable,
+    ):
+        source = Path(__file__).parent.parent / HOM_PROFILE_V1.source_project
+        assert str(HOM_PROFILE_V1.cst_year) in str(cst_executable)
+        root = Path.cwd() / ".pytest_cache" / "cst-p5-6" / new_session_id()[:8]
+        task = Task.create(new_session_id(), {"fmin": "720", "fmax": "800"})
+        workspace = prepare_hom_template_evaluation_workspace(
+            root, task, source, result_name=RESULT_NAME
+        )
+        worker = workspace.worker
+&gt;       baseline = cst_processes(windows_process_snapshot())
+
+test\protocol_hom_template_evaluation_integration_test.py:53: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+test\cst_integration_support.py:12: in windows_process_snapshot
+    completed = subprocess.run(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+input = None, capture_output = True, timeout = None, check = True
+popenargs = (['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', 'Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,Name | ConvertTo-Json -Compress'],)
+kwargs = {'stderr': -1, 'stdout': -1, 'text': True}
+process = &lt;Popen: returncode: 1 args: ['powershell.exe', '-NoProfile', '-NonInteractiv...&gt;
+stdout = ''
+stderr = 'Get-CimInstance : 鎷掔粷璁块棶 \nAt line:1 char:1\n+ Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcess ...+ FullyQualifiedErrorId : HRESULT 0x80041003,Microsoft.Management.Infrastructure.CimCmdlets.GetCimInstanceCommand\n \n'
+retcode = 1
+
+    def run(*popenargs,
+            input=None, capture_output=False, timeout=None, check=False, **kwargs):
+        """Run command with arguments and return a CompletedProcess instance.
+    
+        The returned instance will have attributes args, returncode, stdout and
+        stderr. By default, stdout and stderr are not captured, and those attributes
+        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+        or pass capture_output=True to capture both.
+    
+        If check is True and the exit code was non-zero, it raises a
+        CalledProcessError. The CalledProcessError object will have the return code
+        in the returncode attribute, and output &amp; stderr attributes if those streams
+        were captured.
+    
+        If timeout is given, and the process takes too long, a TimeoutExpired
+        exception will be raised.
+    
+        There is an optional argument "input", allowing you to
+        pass bytes or a string to the subprocess's stdin.  If you use this argument
+        you may not also use the Popen constructor's "stdin" argument, as
+        it will be used internally.
+    
+        By default, all communication is in bytes, and therefore any "input" should
+        be bytes, and the stdout and stderr will be bytes. If in text mode, any
+        "input" should be a string, and stdout and stderr will be strings decoded
+        according to locale encoding, or by "encoding" if set. Text mode is
+        triggered by setting any of text, encoding, errors or universal_newlines.
+    
+        The other arguments are the same as for the Popen constructor.
+        """
+        if input is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used.')
+            kwargs['stdin'] = PIPE
+    
+        if capture_output:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr arguments may not be used '
+                                 'with capture_output.')
+            kwargs['stdout'] = PIPE
+            kwargs['stderr'] = PIPE
+    
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except TimeoutExpired as exc:
+                process.kill()
+                if _mswindows:
+                    # Windows accumulates the output in a single blocking
+                    # read() call run on child threads, with the timeout
+                    # being done in a join() on those threads.  communicate()
+                    # _after_ kill() is required to collect that and add it
+                    # to the exception.
+                    exc.stdout, exc.stderr = process.communicate()
+                else:
+                    # POSIX _communicate already populated the output so
+                    # far into the TimeoutExpired exception.
+                    process.wait()
+                raise
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+            retcode = process.poll()
+            if check and retcode:
+&gt;               raise CalledProcessError(retcode, process.args,
+                                         output=stdout, stderr=stderr)
+E               subprocess.CalledProcessError: Command '['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', 'Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,Name | ConvertTo-Json -Compress']' returned non-zero exit status 1.
+
+d:\Users\ykk48\anaconda3\Lib\subprocess.py:571: CalledProcessError</failure></testcase><testcase classname="test.protocol_hom_template_evaluation_integration_test" name="test_missing_profile_template_fails_before_solver_and_exits_cleanly" time="0.616"><failure message="subprocess.CalledProcessError: Command '['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', 'Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,Name | ConvertTo-Json -Compress']' returned non-zero exit status 1.">cst_executable = WindowsPath('D:/Program Files (x86)/CST Studio Suite 2022/CST DESIGN ENVIRONMENT.exe')
+
+    def test_missing_profile_template_fails_before_solver_and_exits_cleanly(cst_executable):
+        source = Path(__file__).parent.parent / HOM_PROFILE_V1.source_project
+        missing = ResultTemplateRequirement(
+            "P6 deliberately missing",
+            "M0D",
+            "3D Eigenmode Result",
+            "2D and 3D Field Results",
+        )
+        profile = replace(
+            HOM_PROFILE_V1,
+            profile_id="hom-missing-gate",
+            required_templates=(*HOM_PROFILE_V1.required_templates, missing),
+        )
+        root = Path.cwd() / ".pytest_cache" / "cst-p6-missing" / new_session_id()[:8]
+        task = Task.create(new_session_id(), {"fmin": "720", "fmax": "800"})
+        workspace = prepare_hom_template_evaluation_workspace(
+            root, task, source, result_name=RESULT_NAME, profile=profile
+        )
+        worker = workspace.worker
+&gt;       baseline = cst_processes(windows_process_snapshot())
+
+test\protocol_hom_template_evaluation_integration_test.py:119: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+test\cst_integration_support.py:12: in windows_process_snapshot
+    completed = subprocess.run(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+input = None, capture_output = True, timeout = None, check = True
+popenargs = (['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', 'Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,Name | ConvertTo-Json -Compress'],)
+kwargs = {'stderr': -1, 'stdout': -1, 'text': True}
+process = &lt;Popen: returncode: 1 args: ['powershell.exe', '-NoProfile', '-NonInteractiv...&gt;
+stdout = ''
+stderr = 'Get-CimInstance : 鎷掔粷璁块棶 \nAt line:1 char:1\n+ Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcess ...+ FullyQualifiedErrorId : HRESULT 0x80041003,Microsoft.Management.Infrastructure.CimCmdlets.GetCimInstanceCommand\n \n'
+retcode = 1
+
+    def run(*popenargs,
+            input=None, capture_output=False, timeout=None, check=False, **kwargs):
+        """Run command with arguments and return a CompletedProcess instance.
+    
+        The returned instance will have attributes args, returncode, stdout and
+        stderr. By default, stdout and stderr are not captured, and those attributes
+        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+        or pass capture_output=True to capture both.
+    
+        If check is True and the exit code was non-zero, it raises a
+        CalledProcessError. The CalledProcessError object will have the return code
+        in the returncode attribute, and output &amp; stderr attributes if those streams
+        were captured.
+    
+        If timeout is given, and the process takes too long, a TimeoutExpired
+        exception will be raised.
+    
+        There is an optional argument "input", allowing you to
+        pass bytes or a string to the subprocess's stdin.  If you use this argument
+        you may not also use the Popen constructor's "stdin" argument, as
+        it will be used internally.
+    
+        By default, all communication is in bytes, and therefore any "input" should
+        be bytes, and the stdout and stderr will be bytes. If in text mode, any
+        "input" should be a string, and stdout and stderr will be strings decoded
+        according to locale encoding, or by "encoding" if set. Text mode is
+        triggered by setting any of text, encoding, errors or universal_newlines.
+    
+        The other arguments are the same as for the Popen constructor.
+        """
+        if input is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used.')
+            kwargs['stdin'] = PIPE
+    
+        if capture_output:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr arguments may not be used '
+                                 'with capture_output.')
+            kwargs['stdout'] = PIPE
+            kwargs['stderr'] = PIPE
+    
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except TimeoutExpired as exc:
+                process.kill()
+                if _mswindows:
+                    # Windows accumulates the output in a single blocking
+                    # read() call run on child threads, with the timeout
+                    # being done in a join() on those threads.  communicate()
+                    # _after_ kill() is required to collect that and add it
+                    # to the exception.
+                    exc.stdout, exc.stderr = process.communicate()
+                else:
+                    # POSIX _communicate already populated the output so
+                    # far into the TimeoutExpired exception.
+                    process.wait()
+                raise
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+            retcode = process.poll()
+            if check and retcode:
+&gt;               raise CalledProcessError(retcode, process.args,
+                                         output=stdout, stderr=stderr)
+E               subprocess.CalledProcessError: Command '['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', 'Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,Name | ConvertTo-Json -Compress']' returned non-zero exit status 1.
+
+d:\Users\ykk48\anaconda3\Lib\subprocess.py:571: CalledProcessError</failure></testcase><testcase classname="test.protocol_warm_worker_integration_test" name="test_warm_worker_runs_two_ack_gated_tasks_then_stops" time="0.618"><failure message="subprocess.CalledProcessError: Command '['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', 'Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,Name | ConvertTo-Json -Compress']' returned non-zero exit status 1.">cst_executable = WindowsPath('D:/Program Files (x86)/CST Studio Suite 2022/CST DESIGN ENVIRONMENT.exe')
+
+    def test_warm_worker_runs_two_ack_gated_tasks_then_stops(cst_executable):
+        session_id = new_session_id()
+        tasks = (
+            Task.create(session_id, {"R": "229", "L": "R + 30"}, expression_names=frozenset({"L"})),
+            Task.create(session_id, {"R": "230", "L": "R + 29"}, expression_names=frozenset({"L"})),
+        )
+        source = Path(__file__).parent / "data" / "Pillbox" / "Pillbox.cst"
+        root = Path.cwd() / ".pytest_cache" / "cst-p4" / session_id[:8]
+        workspace = prepare_warm_worker_workspace(
+            root, tasks, source, result_name="Frequency (Multiple Modes)/Mode 1"
+        )
+        log_path = root / "cst-warm-worker-v1.log"
+&gt;       baseline = cst_processes(windows_process_snapshot())
+
+test\protocol_warm_worker_integration_test.py:50: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+test\cst_integration_support.py:12: in windows_process_snapshot
+    completed = subprocess.run(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+input = None, capture_output = True, timeout = None, check = True
+popenargs = (['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', 'Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,Name | ConvertTo-Json -Compress'],)
+kwargs = {'stderr': -1, 'stdout': -1, 'text': True}
+process = &lt;Popen: returncode: 1 args: ['powershell.exe', '-NoProfile', '-NonInteractiv...&gt;
+stdout = ''
+stderr = 'Get-CimInstance : 鎷掔粷璁块棶 \nAt line:1 char:1\n+ Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcess ...+ FullyQualifiedErrorId : HRESULT 0x80041003,Microsoft.Management.Infrastructure.CimCmdlets.GetCimInstanceCommand\n \n'
+retcode = 1
+
+    def run(*popenargs,
+            input=None, capture_output=False, timeout=None, check=False, **kwargs):
+        """Run command with arguments and return a CompletedProcess instance.
+    
+        The returned instance will have attributes args, returncode, stdout and
+        stderr. By default, stdout and stderr are not captured, and those attributes
+        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+        or pass capture_output=True to capture both.
+    
+        If check is True and the exit code was non-zero, it raises a
+        CalledProcessError. The CalledProcessError object will have the return code
+        in the returncode attribute, and output &amp; stderr attributes if those streams
+        were captured.
+    
+        If timeout is given, and the process takes too long, a TimeoutExpired
+        exception will be raised.
+    
+        There is an optional argument "input", allowing you to
+        pass bytes or a string to the subprocess's stdin.  If you use this argument
+        you may not also use the Popen constructor's "stdin" argument, as
+        it will be used internally.
+    
+        By default, all communication is in bytes, and therefore any "input" should
+        be bytes, and the stdout and stderr will be bytes. If in text mode, any
+        "input" should be a string, and stdout and stderr will be strings decoded
+        according to locale encoding, or by "encoding" if set. Text mode is
+        triggered by setting any of text, encoding, errors or universal_newlines.
+    
+        The other arguments are the same as for the Popen constructor.
+        """
+        if input is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used.')
+            kwargs['stdin'] = PIPE
+    
+        if capture_output:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr arguments may not be used '
+                                 'with capture_output.')
+            kwargs['stdout'] = PIPE
+            kwargs['stderr'] = PIPE
+    
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except TimeoutExpired as exc:
+                process.kill()
+                if _mswindows:
+                    # Windows accumulates the output in a single blocking
+                    # read() call run on child threads, with the timeout
+                    # being done in a join() on those threads.  communicate()
+                    # _after_ kill() is required to collect that and add it
+                    # to the exception.
+                    exc.stdout, exc.stderr = process.communicate()
+                else:
+                    # POSIX _communicate already populated the output so
+                    # far into the TimeoutExpired exception.
+                    process.wait()
+                raise
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+            retcode = process.poll()
+            if check and retcode:
+&gt;               raise CalledProcessError(retcode, process.args,
+                                         output=stdout, stderr=stderr)
+E               subprocess.CalledProcessError: Command '['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', 'Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,Name | ConvertTo-Json -Compress']' returned non-zero exit status 1.
+
+d:\Users\ykk48\anaconda3\Lib\subprocess.py:571: CalledProcessError</failure></testcase><testcase classname="test.protocol_worker_integration_test" name="test_worker_v1_solves_reads_native_rd0_then_acknowledges" time="0.595"><failure message="subprocess.CalledProcessError: Command '['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', 'Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,Name | ConvertTo-Json -Compress']' returned non-zero exit status 1.">cst_executable = WindowsPath('D:/Program Files (x86)/CST Studio Suite 2022/CST DESIGN ENVIRONMENT.exe')
+
+    def test_worker_v1_solves_reads_native_rd0_then_acknowledges(cst_executable):
+        task = Task.create(
+            new_session_id(), {"nmodes": "1", "L": "R + 30"},
+            expression_names=frozenset({"L"}),
+        )
+        source_project = Path(__file__).parent / "data" / "Pillbox" / "Pillbox.cst"
+        workspace_root = Path.cwd() / ".pytest_cache" / "cst-p3" / task.task_id[:8]
+        workspace = prepare_worker_workspace(
+            workspace_root, task, source_project,
+            result_name="Frequency (Multiple Modes)/Mode 1",
+        )
+        log_path = workspace.root / "cst-worker-v1.log"
+&gt;       baseline = cst_processes(windows_process_snapshot())
+
+test\protocol_worker_integration_test.py:33: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+test\cst_integration_support.py:12: in windows_process_snapshot
+    completed = subprocess.run(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+input = None, capture_output = True, timeout = None, check = True
+popenargs = (['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', 'Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,Name | ConvertTo-Json -Compress'],)
+kwargs = {'stderr': -1, 'stdout': -1, 'text': True}
+process = &lt;Popen: returncode: 1 args: ['powershell.exe', '-NoProfile', '-NonInteractiv...&gt;
+stdout = ''
+stderr = 'Get-CimInstance : 鎷掔粷璁块棶 \nAt line:1 char:1\n+ Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcess ...+ FullyQualifiedErrorId : HRESULT 0x80041003,Microsoft.Management.Infrastructure.CimCmdlets.GetCimInstanceCommand\n \n'
+retcode = 1
+
+    def run(*popenargs,
+            input=None, capture_output=False, timeout=None, check=False, **kwargs):
+        """Run command with arguments and return a CompletedProcess instance.
+    
+        The returned instance will have attributes args, returncode, stdout and
+        stderr. By default, stdout and stderr are not captured, and those attributes
+        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+        or pass capture_output=True to capture both.
+    
+        If check is True and the exit code was non-zero, it raises a
+        CalledProcessError. The CalledProcessError object will have the return code
+        in the returncode attribute, and output &amp; stderr attributes if those streams
+        were captured.
+    
+        If timeout is given, and the process takes too long, a TimeoutExpired
+        exception will be raised.
+    
+        There is an optional argument "input", allowing you to
+        pass bytes or a string to the subprocess's stdin.  If you use this argument
+        you may not also use the Popen constructor's "stdin" argument, as
+        it will be used internally.
+    
+        By default, all communication is in bytes, and therefore any "input" should
+        be bytes, and the stdout and stderr will be bytes. If in text mode, any
+        "input" should be a string, and stdout and stderr will be strings decoded
+        according to locale encoding, or by "encoding" if set. Text mode is
+        triggered by setting any of text, encoding, errors or universal_newlines.
+    
+        The other arguments are the same as for the Popen constructor.
+        """
+        if input is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used.')
+            kwargs['stdin'] = PIPE
+    
+        if capture_output:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr arguments may not be used '
+                                 'with capture_output.')
+            kwargs['stdout'] = PIPE
+            kwargs['stderr'] = PIPE
+    
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except TimeoutExpired as exc:
+                process.kill()
+                if _mswindows:
+                    # Windows accumulates the output in a single blocking
+                    # read() call run on child threads, with the timeout
+                    # being done in a join() on those threads.  communicate()
+                    # _after_ kill() is required to collect that and add it
+                    # to the exception.
+                    exc.stdout, exc.stderr = process.communicate()
+                else:
+                    # POSIX _communicate already populated the output so
+                    # far into the TimeoutExpired exception.
+                    process.wait()
+                raise
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+            retcode = process.poll()
+            if check and retcode:
+&gt;               raise CalledProcessError(retcode, process.args,
+                                         output=stdout, stderr=stderr)
+E               subprocess.CalledProcessError: Command '['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', 'Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,Name | ConvertTo-Json -Compress']' returned non-zero exit status 1.
+
+d:\Users\ykk48\anaconda3\Lib\subprocess.py:571: CalledProcessError</failure></testcase></testsuite></testsuites>

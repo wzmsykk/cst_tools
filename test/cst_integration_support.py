@@ -34,6 +34,14 @@ def new_cst_processes(baseline):
 
 
 def force_cleanup(process, baseline):
+    # Construction can fail before the caller receives a worker/process.
+    # Preserve that exception; never kill unrelated new CST processes here.
+    if process is None:
+        return {}
+    # Construction can fail before the caller receives a worker/process.
+    # Preserve that exception; never kill unrelated new CST processes here.
+    if process is None:
+        return {}
     forced = new_cst_processes(baseline)
     for pid in forced:
         subprocess.run(["taskkill.exe", "/PID", str(pid), "/T", "/F"],

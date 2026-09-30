@@ -77,6 +77,17 @@ class ProjectConfigManager:
     def postprocess_settings(self):
         return self.currPPSList
 
+    def _load_settings(self, path):
+        parser = read_ini(path)
+        self.settings = ProjectSettings.from_parser(parser)
+        self._mesh_recorded = any(parser.has_section(name) for name in ("mesh", "MESH"))
+        return self.settings
+
+    def _require_settings(self):
+        if self.settings is None:
+            raise ProjectStatusError("project settings are not prepared")
+        return self.settings
+
     def setNotReady(self):
         self.ready = False
         return self.ready
@@ -157,9 +168,9 @@ class ProjectConfigManager:
             self.logger.debug("尝试从project目录%s创建空白配置文件。" % str(iProjectDir))
             iConf = self.createNewEmptyProjectConfFile(iProjectDir)
             iConf = replace(
-                ProjectSettings.from_parser(iConf),
+                iConf,
                 cells_per_wavelength=int(mesh_cells_per_wavelength),
-            ).to_parser()
+            )
 
             # 复制输入CST文件到输出文件夹
             # 且自动预处理
@@ -176,7 +187,8 @@ class ProjectConfigManager:
             )
             iConf = self.__autoPreProcess(iConf, dstPath, mesh_cells_per_wavelength)
             self.__savecfgobj(iConf)
-            self.conf = iConf
+            self.settings = iConf
+            self._mesh_recorded = True
             self.savePPSSettings(self.currPPSList)
             return self.__ready()
         else:
@@ -210,10 +222,14 @@ class ProjectConfigManager:
                 raise ProjectStatusError(
                     "project requires explicit recovery before execution: " + status
                 )
+            else:
+                raise ProjectStatusError(f"unsupported project task status: {status}")
 
     def __savecfgobj(self, confobj, cfgfilename="project.ini", slient=False):
         cfgfilePath = self.currProjectDir / cfgfilename
-        settings = confobj if isinstance(confobj, ProjectSettings) else ProjectSettings.from_parser(confobj)
+        settings = confobj
+        if not isinstance(settings, ProjectSettings):
+            raise TypeError("project persistence requires ProjectSettings")
         normalized = settings.to_parser()
         write_ini_atomic(cfgfilePath, normalized)
         self.settings = settings
@@ -240,7 +256,7 @@ class ProjectConfigManager:
             self.logger.debug("未指定project名,使用为默认目录名%s" % avilprojname)
             currprojname = avilprojname
 
-        newconf = ProjectSettings(name=currprojname).to_parser()
+        newconf = ProjectSettings(name=currprojname)
 
         self.logger.debug("创建配置文件结束。")
         self.__savecfgobj(newconf, cfgfilename)
@@ -249,10 +265,10 @@ class ProjectConfigManager:
 
     def __autoPreProcess(self, confobj, cstFilePath, mesh_cells_per_wavelength=None):
         self.logger.info("根据输入的CST文件进行预处理且更新Config内容")
-        settings = ProjectSettings.from_parser(confobj)
+        settings = confobj
         savejsonname = settings.parameter_file
         settings = replace(settings, cst_filename=Path(cstFilePath))
-        confobj = settings.to_parser()
+        confobj = settings
         if mesh_cells_per_wavelength is None:
             mesh_cells_per_wavelength = settings.cells_per_wavelength
         savednewcstpath = self._preprocess_cst_project(
@@ -264,11 +280,11 @@ class ProjectConfigManager:
         project_digest = self.file_digest(savednewcstpath, "sha256")
         confobj = replace(
             settings,
-            cst_filename=Path(savednewcstpath).name,
+            cst_filename=Path(Path(savednewcstpath).name),
             project_digest=project_digest,
             digest_algorithm="sha256",
             cells_per_wavelength=int(mesh_cells_per_wavelength),
-        ).to_parser()
+        )
         self.logger.debug("Config内容更新完成")
         return confobj
 
@@ -282,7 +298,7 @@ class ProjectConfigManager:
         return taskstatus
 
     def printConfInfo(self, confobj, projectDir):
-        settings = ProjectSettings.from_parser(confobj)
+        settings = confobj
         self.logger.debug("项目信息:")
         self.logger.debug("ProjectName:%s", settings.name)
         self.logger.debug("ProjectDescription:%s", settings.description)
@@ -303,7 +319,7 @@ class ProjectConfigManager:
 
     def printParamsInfo(self, confobj, projectDir):
 
-        paramfile = projectDir / ProjectSettings.from_parser(confobj).parameter_file
+        paramfile = projectDir / confobj.parameter_file
         pamlist = read_json(paramfile)
         self.logger.debug("项目参数已读取 | project=%s count=%d", projectDir, len(pamlist))
 
@@ -325,7 +341,7 @@ class ProjectConfigManager:
 
         """
         if jsonpath == None:
-            paramfile = projectDir / ProjectSettings.from_parser(confobj).parameter_file
+            paramfile = projectDir / confobj.parameter_file
         else:
             paramfile = jsonpath
         return read_json(paramfile)
@@ -346,7 +362,7 @@ class ProjectConfigManager:
         mesh_cells_per_wavelength=20,
     ):
         """Create and validate a prepared project without modifying its source."""
-        settings = ProjectSettings.from_parser(confobj)
+        settings = confobj
         if savejsonpath is None:
             jsonpath = projectDir / self.paramsfilename
         else:
@@ -392,9 +408,7 @@ class ProjectConfigManager:
                 "旧项目未记录固定网格设置；保持工程现状，不在恢复时修改 mesh"
             )
             return
-        settings = getattr(self, "settings", None) or ProjectSettings.from_parser(
-            self.conf
-        )
+        settings = self._require_settings()
         configured_cells = settings.cells_per_wavelength
         if configured_cells != int(requested_cells):
             raise ProjectStatusError(
@@ -417,9 +431,12 @@ class ProjectConfigManager:
         else:
             self.logger.error("未找到配置文件%s\n" % str(cfgpath))
             self.logger.debug("测试项目配置文件存在 失败")
-            result = False
-        self.conf = read_ini(cfgpath)
+            return False
+        self._load_settings(cfgpath)
         self.logger.debug("测试CST模型文件是否存在")
+        if self.settings.cst_filename is None:
+            self.logger.error("项目配置未记录 CST 模型文件 | project=%s", self.currProjectDir)
+            return False
         cstfilepath = self.currProjectDir / self.settings.cst_filename
         self.logger.debug("推测模型文件位于%s", str(cstfilepath))
         if cstfilepath.exists():
@@ -428,7 +445,7 @@ class ProjectConfigManager:
         else:
             self.logger.error("未找到cst文件%s\n" % str(cstfilepath))
             self.logger.debug("测试CST模型文件存在 失败")
-            result = False
+            return False
         current_digest = self.file_digest(cstfilepath, self.settings.digest_algorithm)
         saved_digest = self.settings.project_digest
         self.logger.debug("测试参数列表与CST工程摘要是否匹配")
@@ -443,18 +460,18 @@ class ProjectConfigManager:
 
             self.logger.warning("重新生成参数列表并保存工程摘要")
             self.logger.info("正在重新生成参数列表")
-            self.conf = self.__autoPreProcess(self.conf, cstfilepath)
+            self.settings = self.__autoPreProcess(self.settings, cstfilepath)
             # self.readParametersFromCST()
-            self.__savecfgobj(self.conf)
+            self.__savecfgobj(self.settings)
             self.logger.info("工程摘要与参数已恢复 | project=%s", self.currProjectDir)
             self.logger.debug("工程摘要测试通过")
         elif not paramjsonpath.exists():
             self.logger.warning("参数列表文件_%s不存在" % str(paramjsonpath))
 
             self.logger.warning("重新生成并保存参数列表")
-            self.conf = self.__autoPreProcess(self.conf, cstfilepath)
+            self.settings = self.__autoPreProcess(self.settings, cstfilepath)
             # self.readParametersFromCST(paramjsonpath)
-            self.__savecfgobj(self.conf)
+            self.__savecfgobj(self.settings)
         if not ppsjsonpath.exists():
             self.logger.warning("后处理配置缺失，正在恢复 | project=%s path=%s", self.currProjectDir, ppsjsonpath)
             self.logger.warning("重新生成并保存参数列表")
@@ -478,9 +495,12 @@ class ProjectConfigManager:
         else:
             self.logger.error("未找到项目配置文件%s\n" % str(cfgpath))
             self.logger.debug("测试项目配置文件 失败")
-            result = False
+            return False
 
-        self.conf = read_ini(cfgpath)
+        self._load_settings(cfgpath)
+        if self.settings.cst_filename is None:
+            self.logger.error("项目配置未记录 CST 模型文件 | project=%s", self.currProjectDir)
+            return False
         cstfilepath = self.currProjectDir / self.settings.cst_filename
         self.logger.debug("测试CST模型文件是否存在")
         self.logger.debug("推测模型文件位于%s", str(cstfilepath))
@@ -490,7 +510,7 @@ class ProjectConfigManager:
         else:
             self.logger.error("未找到cst模型文件%s\n" % str(cstfilepath))
             self.logger.debug("测试CST模型文件 失败")
-            result = False
+            return False
         current_digest = self.file_digest(cstfilepath, self.settings.digest_algorithm)
         saved_digest = self.settings.project_digest
         self.logger.debug("测试保存的工程摘要是否与CST模型文件匹配")
@@ -524,7 +544,7 @@ class ProjectConfigManager:
         return ilist
 
     def readPPSList(self):
-        settings = self.settings or ProjectSettings.from_parser(self.conf)
+        settings = self._require_settings()
         ppspath = self.currProjectDir / settings.postprocess_file
         return self.read_postprocess_settings(ppspath)
 
@@ -539,7 +559,7 @@ class ProjectConfigManager:
             return []
 
     def savePPSSettings(self, ppslist):
-        settings = self.settings or ProjectSettings.from_parser(self.conf)
+        settings = self._require_settings()
         ppspath = self.currProjectDir / settings.postprocess_file
         try:
             write_json_atomic(ppspath, ppslist)

@@ -6,6 +6,7 @@ import pytest
 
 from csttool.application_backend import CstApplicationBackend
 from csttool.projectconfmanager import ProjectConfigManager
+from csttool.configuration import GlobalSettings
 
 
 pytestmark = pytest.mark.integration
@@ -19,6 +20,7 @@ class _GlobalConfig:
             "cstexepath": str(executable),
             "cstver": "2022",
         }
+        self.settings = GlobalSettings.from_parser(self.conf)
 
 
 def test_real_pillbox_mesh_convergence_produces_report(

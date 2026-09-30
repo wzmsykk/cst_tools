@@ -19,7 +19,7 @@ from .cst_progress import CstLogProgressMonitor, CstLogProgressParser
 from .vb_codec import quote_vb_string
 from .logging_config import ContextLogger
 from .worker_models import WorkerConfig, SimulationResult
-from .diagnostics import write_run_manifest
+from .diagnostics import archive_task, write_run_manifest, write_failure_report
 from .runtime_protocol import (
     Acknowledge,
     CompletionStatus,
@@ -28,7 +28,6 @@ from .runtime_protocol import (
     atomic_publish,
     decode_completion,
     encode_ack,
-    encode_task,
     new_session_id,
 )
 
@@ -95,7 +94,37 @@ class ManagedCSTWorker:
                          extra={"event": "WORKER_DIAGNOSTICS", "phase": "prepare", "artifacts": {**artifacts, "manifest": manifest}})
         shutil.copy2(self.source_project, self.project_path)
         self._build_macro()
-        self._start()
+        try:
+            self._start()
+        except Exception:
+            # Keep PID/protocol files for explicit recovery; never replace
+            # the startup error with a cleanup exception or force-kill CST.
+            self._diagnose_failure("startup")
+            try:
+                self._close_log()
+            except Exception:
+                self.logger.exception("启动失败后的资源关闭失败", extra={"event": "WORKER_CLEANUP_FAILED", "phase": "shutdown"})
+            self.logger.exception("CST 启动失败，保留会话供恢复", extra={
+                "event": "WORKER_START_FAILED", "phase": "prepare",
+                "artifacts": {"session_root": self.root, "cst_log": self.log_path},
+            })
+            raise
+
+    def _diagnose_failure(self, phase):
+        try:
+            path = write_failure_report(self.root, phase=phase,
+                process=getattr(self, '_process', None),
+                context={"worker": self.ID, "session": self.session_id,
+                         **getattr(self, '_active_task_context', {})},
+                paths={name: getattr(self, name, None) for name in (
+                    'log_path', 'marker_path', 'task_path', 'completion_path',
+                    'ack_path', 'stop_request_path', 'stop_ack_path')})
+            self.logger.error("CST 失败诊断已保存 | phase=%s path=%s", phase, path,
+                              extra={"event": "WORKER_FAILURE_DIAGNOSTICS", "phase": phase,
+                                     "artifacts": {"failure_report": path}})
+        except Exception:
+            self.logger.exception("失败诊断收集失败，保留原始异常", extra={
+                "event": "WORKER_DIAGNOSTICS_FAILED", "phase": phase})
 
     @classmethod
     def create(cls, worker_id, config, logger):
@@ -260,6 +289,7 @@ class ManagedCSTWorker:
                 params,
                 expression_names=self._expression_names(params),
             )
+            payload = archive_task(self.root, task, result_name)
             self._active_task_context = {
                 "task_id": task.task_id,
                 "interval_lo": self._progress_number(params.get("fmin")),
@@ -277,10 +307,11 @@ class ManagedCSTWorker:
             self.marker_path.write_text(
                 f"dispatched:{task.task_id}", encoding="ascii"
             )
-            atomic_publish(self.task_path, encode_task(task))
+            atomic_publish(self.task_path, payload)
             try:
                 completion = self._wait_completion(task)
             except Exception:
+                self._diagnose_failure("completion")
                 self.logger.exception("等待 CST 完成失败 | CST_COMPLETION_FAILED task=%s job=%s", task.task_id, result_name, extra={"event": "CST_COMPLETION_FAILED", "phase": "solve", "task": task.task_id, "job": result_name})
                 self._active_task_context = {}
                 raise
@@ -318,6 +349,7 @@ class ManagedCSTWorker:
                     self._wait_for_marker("ready", self.START_TIMEOUT)
                     self.logger.debug("CST 已回到就绪状态 | TASK_ACK_READY task=%s job=%s", task.task_id, result_name, extra={"event": "TASK_ACK_READY", "phase": "ack", "task": task.task_id, "job": result_name})
                 except Exception:
+                    self._diagnose_failure("ack")
                     self.logger.exception("任务确认阶段失败 | TASK_ACK_FAILED task=%s job=%s", task.task_id, result_name, extra={"event": "TASK_ACK_FAILED", "phase": "ack", "task": task.task_id, "job": result_name})
                     raise
                 finally:
@@ -344,10 +376,20 @@ class ManagedCSTWorker:
             return None
 
     def _wait_completion(self, task: Task):
-        deadline = time.monotonic() + self.TASK_TIMEOUT
+        started = time.monotonic()
+        deadline = started + self.TASK_TIMEOUT
+        next_report = started + 30.0
         while time.monotonic() < deadline:
             self._ensure_running()
             self._keep_window_minimized()
+            if time.monotonic() >= next_report:
+                elapsed = time.monotonic() - started
+                log_size = self.log_path.stat().st_size if self.log_path.exists() else None
+                self.logger.info("等待 CST 完成 | task=%s elapsed_seconds=%.1f log_bytes=%s", task.task_id, elapsed, log_size,
+                    extra={"event": "CST_WAIT_PROGRESS", "phase": "solve", "task": task.task_id,
+                           "elapsed_seconds": elapsed, "log_bytes": log_size,
+                           "timeout_seconds": self.TASK_TIMEOUT})
+                next_report = time.monotonic() + 30.0
             if self.completion_path.exists():
                 completion = decode_completion(
                     self.completion_path.read_text(encoding="utf-8")
@@ -394,6 +436,7 @@ class ManagedCSTWorker:
 
             if self._process.poll() is not None:
                 self._close_log()
+            self._diagnose_failure("shutdown")
             self.logger.error("CST 标准退出未获确认，需要会话恢复 | WORKER_STOP_FAILED worker=%s session=%s returncode=%s process_alive=%s timeout_seconds=%s", self.ID, self.session_id, self._process.poll(), self._process.poll() is None, self.STOP_TIMEOUT, extra={"event": "WORKER_STOP_FAILED", "phase": "shutdown", "worker": self.ID, "session": self.session_id, "returncode": self._process.poll(), "process_alive": self._process.poll() is None, "timeout_seconds": self.STOP_TIMEOUT})
             raise ManagedWorkerShutdownError(
                 f"worker {self.ID} did not confirm standard Save/Quit; "

@@ -14,6 +14,7 @@ from csttool.postprocess_cst import CstPostProcessor
 def build_worker_shell(tmp_path):
     worker = object.__new__(ManagedCSTWorker)
     worker.logger = logging.getLogger("managed-worker-test")
+    worker.root = tmp_path
     worker.project_path = tmp_path / "worker-input.cst"
     worker.session_id = "11111111-1111-4111-8111-111111111111"
     worker.task_path = tmp_path / "protocol" / "current.task"
@@ -46,6 +47,22 @@ def build_worker_shell(tmp_path):
         ]
     )
     return worker
+
+
+def test_archive_failure_does_not_dispatch_task(tmp_path, monkeypatch):
+    worker = build_worker_shell(tmp_path)
+    worker._lock = threading.RLock()
+    worker._stopping = False
+    worker.parameter_definitions = ()
+    worker.marker_path.write_text('ready', encoding='ascii')
+    monkeypatch.setattr(worker, '_wait_for_marker', lambda *args: None)
+    def fail_archive(*args):
+        raise OSError('archive unavailable')
+    monkeypatch.setattr('csttool.managed_cstworker.archive_task', fail_archive)
+    with pytest.raises(OSError, match='archive unavailable'):
+        worker.run_task('mode-1', params={})
+    assert worker.marker_path.read_text(encoding='ascii') == 'ready'
+    assert not worker.task_path.exists()
 
 
 def test_managed_worker_macro_is_dynamic_ack_gated_and_standard_exit(tmp_path):

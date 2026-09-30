@@ -1,0 +1,451 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="10" failures="7" skipped="0" tests="17" time="93.125" timestamp="2026-09-30T12:32:31.167899" hostname="LAPTOP-JMVDV92E"><testcase classname="test.cst_preprocessor_integration_test" name="test_cst_preprocessor_adds_hom_parameters_without_modifying_source" time="0.005"><error message="failed on setup with &quot;PermissionError: [WinError 5] 拒绝访问。: 'C:\\Users\\ykk48\\AppData\\Local\\Temp\\pytest-of-ykk48'&quot;">self = WindowsPath('C:/Users/ykk48/AppData/Local/Temp/pytest-of-ykk48')
+
+    def iterdir(self):
+        """Yield path objects of the directory contents.
+    
+        The children are yielded in arbitrary order, and the
+        special entries '.' and '..' are not included.
+        """
+&gt;       for name in os.listdir(self):
+E       PermissionError: [WinError 5] 拒绝访问。: 'C:\\Users\\ykk48\\AppData\\Local\\Temp\\pytest-of-ykk48'
+
+D:\Users\ykk48\anaconda3\Lib\pathlib.py:1056: PermissionError</error></testcase><testcase classname="test.managed_cstworker_integration_test" name="test_managed_worker_runs_repeated_tasks_and_standardly_exits" time="0.002"><error message="failed on setup with &quot;PermissionError: [WinError 5] 拒绝访问。: 'C:\\Users\\ykk48\\AppData\\Local\\Temp\\pytest-of-ykk48'&quot;">self = WindowsPath('C:/Users/ykk48/AppData/Local/Temp/pytest-of-ykk48')
+
+    def iterdir(self):
+        """Yield path objects of the directory contents.
+    
+        The children are yielded in arbitrary order, and the
+        special entries '.' and '..' are not included.
+        """
+&gt;       for name in os.listdir(self):
+E       PermissionError: [WinError 5] 拒绝访问。: 'C:\\Users\\ykk48\\AppData\\Local\\Temp\\pytest-of-ykk48'
+
+D:\Users\ykk48\anaconda3\Lib\pathlib.py:1056: PermissionError</error></testcase><testcase classname="test.managed_hom_ten_modes_fault_resume_integration_test" name="test_hom_runs_ten_ordered_modes_across_three_fault_recovery_paths" time="0.002"><error message="failed on setup with &quot;PermissionError: [WinError 5] 拒绝访问。: 'C:\\Users\\ykk48\\AppData\\Local\\Temp\\pytest-of-ykk48'&quot;">self = WindowsPath('C:/Users/ykk48/AppData/Local/Temp/pytest-of-ykk48')
+
+    def iterdir(self):
+        """Yield path objects of the directory contents.
+    
+        The children are yielded in arbitrary order, and the
+        special entries '.' and '..' are not included.
+        """
+&gt;       for name in os.listdir(self):
+E       PermissionError: [WinError 5] 拒绝访问。: 'C:\\Users\\ykk48\\AppData\\Local\\Temp\\pytest-of-ykk48'
+
+D:\Users\ykk48\anaconda3\Lib\pathlib.py:1056: PermissionError</error></testcase><testcase classname="test.managed_pillbox_fault_recovery_integration_test" name="test_controller_loss_is_recovered_through_standard_protocol" time="0.002"><error message="failed on setup with &quot;PermissionError: [WinError 5] 拒绝访问。: 'C:\\Users\\ykk48\\AppData\\Local\\Temp\\pytest-of-ykk48'&quot;">self = WindowsPath('C:/Users/ykk48/AppData/Local/Temp/pytest-of-ykk48')
+
+    def iterdir(self):
+        """Yield path objects of the directory contents.
+    
+        The children are yielded in arbitrary order, and the
+        special entries '.' and '..' are not included.
+        """
+&gt;       for name in os.listdir(self):
+E       PermissionError: [WinError 5] 拒绝访问。: 'C:\\Users\\ykk48\\AppData\\Local\\Temp\\pytest-of-ykk48'
+
+D:\Users\ykk48\anaconda3\Lib\pathlib.py:1056: PermissionError</error></testcase><testcase classname="test.managed_pillbox_fault_recovery_integration_test" name="test_dead_cst_is_abandoned_without_forging_standard_exit" time="0.003"><error message="failed on setup with &quot;PermissionError: [WinError 5] 拒绝访问。: 'C:\\Users\\ykk48\\AppData\\Local\\Temp\\pytest-of-ykk48'&quot;">self = WindowsPath('C:/Users/ykk48/AppData/Local/Temp/pytest-of-ykk48')
+
+    def iterdir(self):
+        """Yield path objects of the directory contents.
+    
+        The children are yielded in arbitrary order, and the
+        special entries '.' and '..' are not included.
+        """
+&gt;       for name in os.listdir(self):
+E       PermissionError: [WinError 5] 拒绝访问。: 'C:\\Users\\ykk48\\AppData\\Local\\Temp\\pytest-of-ykk48'
+
+D:\Users\ykk48\anaconda3\Lib\pathlib.py:1056: PermissionError</error></testcase><testcase classname="test.managed_pillbox_five_modes_integration_test" name="test_managed_pillbox_solves_and_reads_five_modes" time="0.002"><error message="failed on setup with &quot;PermissionError: [WinError 5] 拒绝访问。: 'C:\\Users\\ykk48\\AppData\\Local\\Temp\\pytest-of-ykk48'&quot;">self = WindowsPath('C:/Users/ykk48/AppData/Local/Temp/pytest-of-ykk48')
+
+    def iterdir(self):
+        """Yield path objects of the directory contents.
+    
+        The children are yielded in arbitrary order, and the
+        special entries '.' and '..' are not included.
+        """
+&gt;       for name in os.listdir(self):
+E       PermissionError: [WinError 5] 拒绝访问。: 'C:\\Users\\ykk48\\AppData\\Local\\Temp\\pytest-of-ykk48'
+
+D:\Users\ykk48\anaconda3\Lib\pathlib.py:1056: PermissionError</error></testcase><testcase classname="test.managed_pillbox_stop_resume_integration_test" name="test_pillbox_managed_worker_stops_safely_then_resumes_in_new_session" time="0.002"><error message="failed on setup with &quot;PermissionError: [WinError 5] 拒绝访问。: 'C:\\Users\\ykk48\\AppData\\Local\\Temp\\pytest-of-ykk48'&quot;">self = WindowsPath('C:/Users/ykk48/AppData/Local/Temp/pytest-of-ykk48')
+
+    def iterdir(self):
+        """Yield path objects of the directory contents.
+    
+        The children are yielded in arbitrary order, and the
+        special entries '.' and '..' are not included.
+        """
+&gt;       for name in os.listdir(self):
+E       PermissionError: [WinError 5] 拒绝访问。: 'C:\\Users\\ykk48\\AppData\\Local\\Temp\\pytest-of-ykk48'
+
+D:\Users\ykk48\anaconda3\Lib\pathlib.py:1056: PermissionError</error></testcase><testcase classname="test.mesh_convergence_integration_test" name="test_real_pillbox_mesh_convergence_produces_report" time="0.002"><error message="failed on setup with &quot;PermissionError: [WinError 5] 拒绝访问。: 'C:\\Users\\ykk48\\AppData\\Local\\Temp\\pytest-of-ykk48'&quot;">self = WindowsPath('C:/Users/ykk48/AppData/Local/Temp/pytest-of-ykk48')
+
+    def iterdir(self):
+        """Yield path objects of the directory contents.
+    
+        The children are yielded in arbitrary order, and the
+        special entries '.' and '..' are not included.
+        """
+&gt;       for name in os.listdir(self):
+E       PermissionError: [WinError 5] 拒绝访问。: 'C:\\Users\\ykk48\\AppData\\Local\\Temp\\pytest-of-ykk48'
+
+D:\Users\ykk48\anaconda3\Lib\pathlib.py:1056: PermissionError</error></testcase><testcase classname="test.pillbox_standard_batch_integration_test" name="test_real_cst_standard_batch_optimizes_pillbox_radius_to_500_mhz" time="0.002"><error message="failed on setup with &quot;PermissionError: [WinError 5] 拒绝访问。: 'C:\\Users\\ykk48\\AppData\\Local\\Temp\\pytest-of-ykk48'&quot;">self = WindowsPath('C:/Users/ykk48/AppData/Local/Temp/pytest-of-ykk48')
+
+    def iterdir(self):
+        """Yield path objects of the directory contents.
+    
+        The children are yielded in arbitrary order, and the
+        special entries '.' and '..' are not included.
+        """
+&gt;       for name in os.listdir(self):
+E       PermissionError: [WinError 5] 拒绝访问。: 'C:\\Users\\ykk48\\AppData\\Local\\Temp\\pytest-of-ykk48'
+
+D:\Users\ykk48\anaconda3\Lib\pathlib.py:1056: PermissionError</error></testcase><testcase classname="test.protocol_contract_integration_test" name="test_cst_wwb_executes_protocol_golden_contract" time="0.002"><error message="failed on setup with &quot;PermissionError: [WinError 5] 拒绝访问。: 'C:\\Users\\ykk48\\AppData\\Local\\Temp\\pytest-of-ykk48'&quot;">self = WindowsPath('C:/Users/ykk48/AppData/Local/Temp/pytest-of-ykk48')
+
+    def iterdir(self):
+        """Yield path objects of the directory contents.
+    
+        The children are yielded in arbitrary order, and the
+        special entries '.' and '..' are not included.
+        """
+&gt;       for name in os.listdir(self):
+E       PermissionError: [WinError 5] 拒绝访问。: 'C:\\Users\\ykk48\\AppData\\Local\\Temp\\pytest-of-ykk48'
+
+D:\Users\ykk48\anaconda3\Lib\pathlib.py:1056: PermissionError</error></testcase><testcase classname="test.protocol_hom_runtime_postprocess_integration_test" name="test_hom_runtime_r_over_q_uses_solved_fields_without_parameter_update" time="13.848"><failure message="AssertionError: CST OLE controller exited before writing Completion; return code=3221225477">cst_executable = WindowsPath('D:/Program Files (x86)/CST Studio Suite 2022/CST DESIGN ENVIRONMENT.exe')
+
+    def test_hom_runtime_r_over_q_uses_solved_fields_without_parameter_update(
+        cst_executable,
+    ):
+        source = Path(__file__).parent.parent / HOM_PROFILE_V1.source_project
+        root = Path.cwd() / ".pytest_cache" / "cst-p5-5" / new_session_id()[:8]
+        session_id = new_session_id()
+        task = Task.create(session_id, {"fmin": "720", "fmax": "800"})
+        workspace = prepare_hom_runtime_postprocess_workspace(
+            root, task, source, result_name=RESULT_NAME, profile=HOM_PROFILE_V1
+        )
+        worker = workspace.worker
+        baseline = cst_processes(windows_process_snapshot())
+        with (root / "cst-p5-5.log").open("wb") as log:
+            process = subprocess.Popen(
+                [str(cst_executable), "-m", str(worker.macro_path)],
+                stdout=log,
+                stderr=subprocess.STDOUT,
+            )
+            forced = {}
+            try:
+&gt;               completion = wait_completion_or_controller_exit(
+                    worker, task, process, timeout=1800
+                )
+
+test\protocol_hom_runtime_postprocess_integration_test.py:54: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+workspace = WorkerWorkspace(root=WindowsPath('D:/work/cst_tools/.pytest_cache/cst-p5-5/1c2dc3f3'), protocol=&lt;csttool.runtime_proto...f3/runtime_worker_v1.bas'), marker_path=WindowsPath('D:/work/cst_tools/.pytest_cache/cst-p5-5/1c2dc3f3/worker.result'))
+task = Task(task_id='b717cc12-1905-45e0-b5fc-5624ee320a13', session_id='564bdbac-3e22-425e-98d7-5ca09d1a38a7', parameters=(Pa...RAL: 'literal'&gt;, value='720'), ParameterAssignment(name='fmax', kind=&lt;ParameterKind.LITERAL: 'literal'&gt;, value='800')))
+process = &lt;Popen: returncode: 3221225477 args: ['D:\\Program Files (x86)\\CST Studio S...&gt;
+timeout = 1800
+
+    def wait_completion_or_controller_exit(workspace, task, process, timeout):
+        deadline = time.monotonic() + timeout
+        while True:
+            completion = workspace.protocol.read_completion(task)
+            if completion is not None:
+                return completion
+            if process.poll() is not None:
+&gt;               raise AssertionError(
+                    "CST OLE controller exited before writing Completion; "
+                    f"return code={process.returncode}"
+                )
+E               AssertionError: CST OLE controller exited before writing Completion; return code=3221225477
+
+test\cst_integration_support.py:68: AssertionError</failure></testcase><testcase classname="test.protocol_hom_scan_benchmark_integration_test" name="test_fixed_hom_structure_warm_frequency_scan_is_faster_and_consistent" time="13.294"><failure message="AssertionError: CST OLE controller exited before writing Completion; return code=3221225477">cst_executable = WindowsPath('D:/Program Files (x86)/CST Studio Suite 2022/CST DESIGN ENVIRONMENT.exe')
+
+    def test_fixed_hom_structure_warm_frequency_scan_is_faster_and_consistent(cst_executable):
+        source = Path(__file__).parent.parent / HOM_PROFILE_V1.source_project
+        parameter_sets = (
+            {"fmin": "720", "fmax": "800"},
+            {"fmin": "800", "fmax": "880"},
+        )
+        root = Path.cwd() / ".pytest_cache" / "cst-p4-5" / new_session_id()[:8]
+        root.mkdir(parents=True)
+    
+        cold = [
+&gt;           _run_cold(cst_executable, root / f"cold-{index}", source, parameters)
+            for index, parameters in enumerate(parameter_sets)
+        ]
+
+test\protocol_hom_scan_benchmark_integration_test.py:133: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+test\protocol_hom_scan_benchmark_integration_test.py:50: in _run_cold
+    completion = wait_completion_or_controller_exit(workspace, task, process, timeout=1800)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+workspace = WorkerWorkspace(root=WindowsPath('D:/work/cst_tools/.pytest_cache/cst-p4-5/be06278c/cold-0'), protocol=&lt;csttool.runtim...ime_worker_v1.bas'), marker_path=WindowsPath('D:/work/cst_tools/.pytest_cache/cst-p4-5/be06278c/cold-0/worker.result'))
+task = Task(task_id='0b1eaf4e-2ac1-493f-a2fe-8d4979f9fd9d', session_id='57249f9e-39af-447a-9d4d-e4052cc619b7', parameters=(Pa...RAL: 'literal'&gt;, value='720'), ParameterAssignment(name='fmax', kind=&lt;ParameterKind.LITERAL: 'literal'&gt;, value='800')))
+process = &lt;Popen: returncode: 3221225477 args: ['D:\\Program Files (x86)\\CST Studio S...&gt;
+timeout = 1800
+
+    def wait_completion_or_controller_exit(workspace, task, process, timeout):
+        deadline = time.monotonic() + timeout
+        while True:
+            completion = workspace.protocol.read_completion(task)
+            if completion is not None:
+                return completion
+            if process.poll() is not None:
+&gt;               raise AssertionError(
+                    "CST OLE controller exited before writing Completion; "
+                    f"return code={process.returncode}"
+                )
+E               AssertionError: CST OLE controller exited before writing Completion; return code=3221225477
+
+test\cst_integration_support.py:68: AssertionError</failure></testcase><testcase classname="test.protocol_hom_scan_benchmark_integration_test" name="test_missing_hom_profile_template_stops_warm_session_before_first_solver" time="12.983"><failure message="AssertionError: CST OLE controller exited before writing Completion; return code=3221225477">cst_executable = WindowsPath('D:/Program Files (x86)/CST Studio Suite 2022/CST DESIGN ENVIRONMENT.exe')
+
+    def test_missing_hom_profile_template_stops_warm_session_before_first_solver(
+        cst_executable,
+    ):
+        source = Path(__file__).parent.parent / HOM_PROFILE_V1.source_project
+        missing = ResultTemplateRequirement(
+            "P6.5 deliberately missing",
+            "M0D",
+            "3D Eigenmode Result",
+            "2D and 3D Field Results",
+        )
+        profile = replace(
+            HOM_PROFILE_V1,
+            profile_id="hom-warm-missing-gate",
+            required_templates=(*HOM_PROFILE_V1.required_templates, missing),
+        )
+        session_id = new_session_id()
+        tasks = (
+            Task.create(session_id, {"fmin": "720", "fmax": "800"}),
+            Task.create(session_id, {"fmin": "800", "fmax": "880"}),
+        )
+        root = Path.cwd() / ".pytest_cache" / "cst-p6-5-missing" / session_id[:8]
+        workspace = prepare_warm_worker_workspace(
+            root, tasks, source, result_name=RESULT_NAME, profile=profile
+        )
+        baseline = cst_processes(windows_process_snapshot())
+        with (root / "cst-p6-5-missing.log").open("wb") as log:
+            process = subprocess.Popen(
+                [str(cst_executable), "-m", str(workspace.macro_path)],
+                stdout=log,
+                stderr=subprocess.STDOUT,
+            )
+            forced = {}
+            try:
+&gt;               completion = wait_completion_or_controller_exit(
+                    workspace, tasks[0], process, timeout=300
+                )
+
+test\protocol_hom_scan_benchmark_integration_test.py:191: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+workspace = WarmWorkerWorkspace(root=WindowsPath('D:/work/cst_tools/.pytest_cache/cst-p6-5-missing/cca4c567'), protocol=&lt;csttool.r... profile_inventory_path=WindowsPath('D:/work/cst_tools/.pytest_cache/cst-p6-5-missing/cca4c567/profile-templates.tsv'))
+task = Task(task_id='6e35dcc7-55f6-418f-affa-4e71df3ef106', session_id='cca4c567-3a5b-4dd8-bf7a-a1955201f057', parameters=(Pa...RAL: 'literal'&gt;, value='720'), ParameterAssignment(name='fmax', kind=&lt;ParameterKind.LITERAL: 'literal'&gt;, value='800')))
+process = &lt;Popen: returncode: 3221225477 args: ['D:\\Program Files (x86)\\CST Studio S...&gt;
+timeout = 300
+
+    def wait_completion_or_controller_exit(workspace, task, process, timeout):
+        deadline = time.monotonic() + timeout
+        while True:
+            completion = workspace.protocol.read_completion(task)
+            if completion is not None:
+                return completion
+            if process.poll() is not None:
+&gt;               raise AssertionError(
+                    "CST OLE controller exited before writing Completion; "
+                    f"return code={process.returncode}"
+                )
+E               AssertionError: CST OLE controller exited before writing Completion; return code=3221225477
+
+test\cst_integration_support.py:68: AssertionError</failure></testcase><testcase classname="test.protocol_hom_template_evaluation_integration_test" name="test_registered_templates_can_be_inventoried_and_evaluated_for_current_run" time="13.493"><failure message="AssertionError: CST OLE controller exited before writing Completion; return code=3221225477">cst_executable = WindowsPath('D:/Program Files (x86)/CST Studio Suite 2022/CST DESIGN ENVIRONMENT.exe')
+
+    def test_registered_templates_can_be_inventoried_and_evaluated_for_current_run(
+        cst_executable,
+    ):
+        source = Path(__file__).parent.parent / HOM_PROFILE_V1.source_project
+        assert str(HOM_PROFILE_V1.cst_year) in str(cst_executable)
+        root = Path.cwd() / ".pytest_cache" / "cst-p5-6" / new_session_id()[:8]
+        task = Task.create(new_session_id(), {"fmin": "720", "fmax": "800"})
+        workspace = prepare_hom_template_evaluation_workspace(
+            root, task, source, result_name=RESULT_NAME
+        )
+        worker = workspace.worker
+        baseline = cst_processes(windows_process_snapshot())
+        with (root / "cst-p5-6.log").open("wb") as log:
+            process = subprocess.Popen(
+                [str(cst_executable), "-m", str(worker.macro_path)],
+                stdout=log,
+                stderr=subprocess.STDOUT,
+            )
+            forced = {}
+            try:
+&gt;               completion = wait_completion_or_controller_exit(
+                    worker, task, process, timeout=1800
+                )
+
+test\protocol_hom_template_evaluation_integration_test.py:62: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+workspace = WorkerWorkspace(root=WindowsPath('D:/work/cst_tools/.pytest_cache/cst-p5-6/f814c5a7'), protocol=&lt;csttool.runtime_proto...a7/runtime_worker_v1.bas'), marker_path=WindowsPath('D:/work/cst_tools/.pytest_cache/cst-p5-6/f814c5a7/worker.result'))
+task = Task(task_id='9191aff2-3e76-4fcc-812a-6afed510ed22', session_id='fab37f83-efa0-4d69-93d8-0ede307244b8', parameters=(Pa...RAL: 'literal'&gt;, value='720'), ParameterAssignment(name='fmax', kind=&lt;ParameterKind.LITERAL: 'literal'&gt;, value='800')))
+process = &lt;Popen: returncode: 3221225477 args: ['D:\\Program Files (x86)\\CST Studio S...&gt;
+timeout = 1800
+
+    def wait_completion_or_controller_exit(workspace, task, process, timeout):
+        deadline = time.monotonic() + timeout
+        while True:
+            completion = workspace.protocol.read_completion(task)
+            if completion is not None:
+                return completion
+            if process.poll() is not None:
+&gt;               raise AssertionError(
+                    "CST OLE controller exited before writing Completion; "
+                    f"return code={process.returncode}"
+                )
+E               AssertionError: CST OLE controller exited before writing Completion; return code=3221225477
+
+test\cst_integration_support.py:68: AssertionError</failure></testcase><testcase classname="test.protocol_hom_template_evaluation_integration_test" name="test_missing_profile_template_fails_before_solver_and_exits_cleanly" time="12.130"><failure message="AssertionError: CST OLE controller exited before writing Completion; return code=3221225477">cst_executable = WindowsPath('D:/Program Files (x86)/CST Studio Suite 2022/CST DESIGN ENVIRONMENT.exe')
+
+    def test_missing_profile_template_fails_before_solver_and_exits_cleanly(cst_executable):
+        source = Path(__file__).parent.parent / HOM_PROFILE_V1.source_project
+        missing = ResultTemplateRequirement(
+            "P6 deliberately missing",
+            "M0D",
+            "3D Eigenmode Result",
+            "2D and 3D Field Results",
+        )
+        profile = replace(
+            HOM_PROFILE_V1,
+            profile_id="hom-missing-gate",
+            required_templates=(*HOM_PROFILE_V1.required_templates, missing),
+        )
+        root = Path.cwd() / ".pytest_cache" / "cst-p6-missing" / new_session_id()[:8]
+        task = Task.create(new_session_id(), {"fmin": "720", "fmax": "800"})
+        workspace = prepare_hom_template_evaluation_workspace(
+            root, task, source, result_name=RESULT_NAME, profile=profile
+        )
+        worker = workspace.worker
+        baseline = cst_processes(windows_process_snapshot())
+        with (root / "cst-p6-missing.log").open("wb") as log:
+            process = subprocess.Popen(
+                [str(cst_executable), "-m", str(worker.macro_path)],
+                stdout=log,
+                stderr=subprocess.STDOUT,
+            )
+            forced = {}
+            try:
+&gt;               completion = wait_completion_or_controller_exit(
+                    worker, task, process, timeout=300
+                )
+
+test\protocol_hom_template_evaluation_integration_test.py:128: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+workspace = WorkerWorkspace(root=WindowsPath('D:/work/cst_tools/.pytest_cache/cst-p6-missing/8f515055'), protocol=&lt;csttool.runtime...time_worker_v1.bas'), marker_path=WindowsPath('D:/work/cst_tools/.pytest_cache/cst-p6-missing/8f515055/worker.result'))
+task = Task(task_id='3656f0df-a59c-473e-b860-9fbdd7847635', session_id='b49c00ca-facb-4beb-a841-816e33075724', parameters=(Pa...RAL: 'literal'&gt;, value='720'), ParameterAssignment(name='fmax', kind=&lt;ParameterKind.LITERAL: 'literal'&gt;, value='800')))
+process = &lt;Popen: returncode: 3221225477 args: ['D:\\Program Files (x86)\\CST Studio S...&gt;
+timeout = 300
+
+    def wait_completion_or_controller_exit(workspace, task, process, timeout):
+        deadline = time.monotonic() + timeout
+        while True:
+            completion = workspace.protocol.read_completion(task)
+            if completion is not None:
+                return completion
+            if process.poll() is not None:
+&gt;               raise AssertionError(
+                    "CST OLE controller exited before writing Completion; "
+                    f"return code={process.returncode}"
+                )
+E               AssertionError: CST OLE controller exited before writing Completion; return code=3221225477
+
+test\cst_integration_support.py:68: AssertionError</failure></testcase><testcase classname="test.protocol_warm_worker_integration_test" name="test_warm_worker_runs_two_ack_gated_tasks_then_stops" time="12.365"><failure message="AssertionError: CST OLE controller exited before writing Completion; return code=3221225477">cst_executable = WindowsPath('D:/Program Files (x86)/CST Studio Suite 2022/CST DESIGN ENVIRONMENT.exe')
+
+    def test_warm_worker_runs_two_ack_gated_tasks_then_stops(cst_executable):
+        session_id = new_session_id()
+        tasks = (
+            Task.create(session_id, {"R": "229", "L": "R + 30"}, expression_names=frozenset({"L"})),
+            Task.create(session_id, {"R": "230", "L": "R + 29"}, expression_names=frozenset({"L"})),
+        )
+        source = Path(__file__).parent / "data" / "Pillbox" / "Pillbox.cst"
+        root = Path.cwd() / ".pytest_cache" / "cst-p4" / session_id[:8]
+        workspace = prepare_warm_worker_workspace(
+            root, tasks, source, result_name="Frequency (Multiple Modes)/Mode 1"
+        )
+        log_path = root / "cst-warm-worker-v1.log"
+        baseline = cst_processes(windows_process_snapshot())
+    
+        with log_path.open("wb") as log:
+            process = subprocess.Popen(
+                [str(cst_executable), "-m", str(workspace.macro_path)],
+                stdout=log, stderr=subprocess.STDOUT,
+            )
+            forced_cleanup = {}
+            try:
+&gt;               first = wait_completion_or_controller_exit(workspace, tasks[0], process, timeout=300)
+
+test\protocol_warm_worker_integration_test.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+workspace = WarmWorkerWorkspace(root=WindowsPath('D:/work/cst_tools/.pytest_cache/cst-p4/325abd4b'), protocol=&lt;csttool.runtime_pro...ack_path=WindowsPath('D:/work/cst_tools/.pytest_cache/cst-p4/325abd4b/protocol/stop.ack'), profile_inventory_path=None)
+task = Task(task_id='073c7320-9c0f-4a34-9d53-d402364c0735', session_id='325abd4b-b43b-4aa0-92b3-a268acd5c3e7', parameters=(Pa...literal'&gt;, value='229'), ParameterAssignment(name='L', kind=&lt;ParameterKind.EXPRESSION: 'expression'&gt;, value='R + 30')))
+process = &lt;Popen: returncode: 3221225477 args: ['D:\\Program Files (x86)\\CST Studio S...&gt;
+timeout = 300
+
+    def wait_completion_or_controller_exit(workspace, task, process, timeout):
+        deadline = time.monotonic() + timeout
+        while True:
+            completion = workspace.protocol.read_completion(task)
+            if completion is not None:
+                return completion
+            if process.poll() is not None:
+&gt;               raise AssertionError(
+                    "CST OLE controller exited before writing Completion; "
+                    f"return code={process.returncode}"
+                )
+E               AssertionError: CST OLE controller exited before writing Completion; return code=3221225477
+
+test\cst_integration_support.py:68: AssertionError</failure></testcase><testcase classname="test.protocol_worker_integration_test" name="test_worker_v1_solves_reads_native_rd0_then_acknowledges" time="12.928"><failure message="AssertionError: CST OLE controller exited before writing Completion; return code=3221225477">cst_executable = WindowsPath('D:/Program Files (x86)/CST Studio Suite 2022/CST DESIGN ENVIRONMENT.exe')
+
+    def test_worker_v1_solves_reads_native_rd0_then_acknowledges(cst_executable):
+        task = Task.create(
+            new_session_id(), {"nmodes": "1", "L": "R + 30"},
+            expression_names=frozenset({"L"}),
+        )
+        source_project = Path(__file__).parent / "data" / "Pillbox" / "Pillbox.cst"
+        workspace_root = Path.cwd() / ".pytest_cache" / "cst-p3" / task.task_id[:8]
+        workspace = prepare_worker_workspace(
+            workspace_root, task, source_project,
+            result_name="Frequency (Multiple Modes)/Mode 1",
+        )
+        log_path = workspace.root / "cst-worker-v1.log"
+        baseline = cst_processes(windows_process_snapshot())
+        with log_path.open("wb") as log:
+            process = subprocess.Popen(
+                [str(cst_executable), "-m", str(workspace.macro_path)],
+                stdout=log, stderr=subprocess.STDOUT,
+            )
+            forced_cleanup = {}
+            try:
+&gt;               completion = wait_completion_or_controller_exit(workspace, task, process, timeout=300)
+
+test\protocol_worker_integration_test.py:41: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+workspace = WorkerWorkspace(root=WindowsPath('D:/work/cst_tools/.pytest_cache/cst-p3/7e61849e'), protocol=&lt;csttool.runtime_protoco...849e/runtime_worker_v1.bas'), marker_path=WindowsPath('D:/work/cst_tools/.pytest_cache/cst-p3/7e61849e/worker.result'))
+task = Task(task_id='7e61849e-e969-4f53-9e5f-97bd471e2bee', session_id='3508d2fb-a2a5-4064-a464-d5b1f06721bc', parameters=(Pa... 'literal'&gt;, value='1'), ParameterAssignment(name='L', kind=&lt;ParameterKind.EXPRESSION: 'expression'&gt;, value='R + 30')))
+process = &lt;Popen: returncode: 3221225477 args: ['D:\\Program Files (x86)\\CST Studio S...&gt;
+timeout = 300
+
+    def wait_completion_or_controller_exit(workspace, task, process, timeout):
+        deadline = time.monotonic() + timeout
+        while True:
+            completion = workspace.protocol.read_completion(task)
+            if completion is not None:
+                return completion
+            if process.poll() is not None:
+&gt;               raise AssertionError(
+                    "CST OLE controller exited before writing Completion; "
+                    f"return code={process.returncode}"
+                )
+E               AssertionError: CST OLE controller exited before writing Completion; return code=3221225477
+
+test\cst_integration_support.py:68: AssertionError</failure></testcase></testsuite></testsuites>

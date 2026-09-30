@@ -98,7 +98,7 @@ def test_project_config_and_postprocess_files_use_roundtrip_io(tmp_path):
         logger=logging.getLogger("project-config-test"),
     )
     manager.select_project_directory(tmp_path)
-    manager.conf = manager.createNewEmptyProjectConfFile(tmp_path)
+    manager.settings = manager.createNewEmptyProjectConfFile(tmp_path)
     values = [{"resultName": "frequency", "method": "Frequency", "params": {}}]
 
     assert manager.savePPSSettings(values) is True
@@ -107,6 +107,40 @@ def test_project_config_and_postprocess_files_use_roundtrip_io(tmp_path):
 
     (tmp_path / manager.ppsfilename).write_text("not-json", encoding="utf-8")
     assert manager.readPPSList() == []
+
+
+def test_new_project_pipeline_keeps_typed_settings(tmp_path, monkeypatch):
+    destination = tmp_path / 'project'
+    destination.mkdir()
+    source = tmp_path / 'source.cst'
+    source.write_bytes(b'model')
+    manager = ProjectConfigManager(GlobalConfigManager=_GlobalConfig(tmp_path))
+    manager.select_project_directory(destination)
+    manager.select_input_project(source)
+    observed = []
+
+    def preprocess(settings, projectDir, savejsonpath, **kwargs):
+        assert isinstance(settings, ProjectSettings)
+        observed.append(settings)
+        (projectDir / savejsonpath).write_text('[]', encoding='utf-8')
+        return projectDir / settings.cst_filename
+
+    monkeypatch.setattr(manager, '_preprocess_cst_project', preprocess)
+    assert manager.prepare_project(mesh_cells_per_wavelength=25)
+    assert manager.settings.cells_per_wavelength == 25
+    assert manager.settings.cst_filename == Path('source.cst')
+    assert len(observed) == 1
+    assert ProjectSettings.from_parser(read_ini(destination / 'project.ini')) == manager.settings
+
+
+@pytest.mark.parametrize('repair', [False, True])
+def test_missing_project_file_is_validation_failure(tmp_path, repair):
+    manager = ProjectConfigManager(GlobalConfigManager=_GlobalConfig(tmp_path))
+    manager.select_project_directory(tmp_path)
+    manager.createNewEmptyProjectConfFile(tmp_path)
+    check = (manager._ProjectConfigManager__checkAndRepairProject if repair
+             else manager._ProjectConfigManager__checkProjectStatus)
+    assert check() is False
 
 
 def test_annotated_configuration_templates_match_typed_schema():

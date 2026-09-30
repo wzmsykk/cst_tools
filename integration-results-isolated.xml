@@ -1,0 +1,1129 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="17" skipped="0" tests="17" time="210.374" timestamp="2026-09-30T12:35:26.063900" hostname="LAPTOP-JMVDV92E"><testcase classname="test.cst_preprocessor_integration_test" name="test_cst_preprocessor_adds_hom_parameters_without_modifying_source" time="10.531"><failure message="csttool.cst_preprocessor.CstPreprocessError: CST 工程参数预处理异常退出: 3221225477">cst_executable = WindowsPath('D:/Program Files (x86)/CST Studio Suite 2022/CST DESIGN ENVIRONMENT.exe')
+tmp_path = WindowsPath('D:/work/cst_tools/.pytest_cache/integration-full-20260930-01/test_cst_preprocessor_adds_hom0')
+
+    def test_cst_preprocessor_adds_hom_parameters_without_modifying_source(
+        cst_executable,
+        tmp_path,
+    ):
+        root = Path(__file__).parents[1]
+        source = root / "model" / "Pillbox_2015.cst"
+        output = tmp_path / "prepared.cst"
+        parameter_json = tmp_path / "params.json"
+        before = hashlib.sha256(source.read_bytes()).hexdigest()
+    
+        result = CstProjectPreprocessor(
+            cst_executable,
+            root / "data" / "preprocess_hom_parameters_v1.vb",
+            timeout=180,
+&gt;       ).preprocess(
+            source,
+            output,
+            parameter_json,
+            tmp_path / "runtime",
+            mesh_cells_per_wavelength=24,
+        )
+
+test\cst_preprocessor_integration_test.py:26: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;csttool.cst_preprocessor.CstProjectPreprocessor object at 0x000001F5CEBC7680&gt;
+source_project_path = WindowsPath('D:/work/cst_tools/model/Pillbox_2015.cst')
+output_project_path = WindowsPath('D:/work/cst_tools/.pytest_cache/integration-full-20260930-01/test_cst_preprocessor_adds_hom0/prepared.cst')
+parameter_json_path = WindowsPath('D:/work/cst_tools/.pytest_cache/integration-full-20260930-01/test_cst_preprocessor_adds_hom0/params.json')
+temp_directory = WindowsPath('D:/work/cst_tools/.pytest_cache/integration-full-20260930-01/test_cst_preprocessor_adds_hom0/runtime')
+
+    def preprocess(
+        self,
+        source_project_path: str | Path,
+        output_project_path: str | Path,
+        parameter_json_path: str | Path,
+        temp_directory: str | Path,
+        *,
+        mesh_cells_per_wavelength: int = 20,
+    ) -&gt; CstPreprocessResult:
+        source_project_path = Path(source_project_path).resolve()
+        output_project_path = Path(output_project_path).resolve()
+        parameter_json_path = Path(parameter_json_path).resolve()
+        temp_directory = Path(temp_directory).resolve()
+        if (
+            source_project_path.suffix.casefold() != ".cst"
+            or not source_project_path.is_file()
+        ):
+            raise FileNotFoundError(source_project_path)
+        if output_project_path.suffix.casefold() != ".cst":
+            raise ValueError("prepared project path must use the .cst suffix")
+        if source_project_path == output_project_path:
+            raise ValueError("preprocessing requires a distinct output project path")
+        if output_project_path.exists():
+            raise FileExistsError(output_project_path)
+        if not self.executable.is_file():
+            raise FileNotFoundError(self.executable)
+        temp_directory.mkdir(parents=True, exist_ok=True)
+        parameter_json_path.parent.mkdir(parents=True, exist_ok=True)
+    
+        with tempfile.TemporaryDirectory(
+            prefix="cst-preprocess-", dir=temp_directory
+        ) as working:
+            working = Path(working)
+            macro_path = working / "preprocess.bas"
+            working_project = working / source_project_path.name
+            parameter_output = working / "parameters.txt"
+            status_output = working / "completion.txt"
+            shutil.copy2(source_project_path, working_project)
+            macro_path.write_text(
+                self.render_macro(
+                    working_project,
+                    parameter_output,
+                    status_output,
+                    mesh_cells_per_wavelength,
+                ),
+                encoding="utf-8",
+            )
+            command = [str(self.executable), "-m", str(macro_path)]
+            self.logger.info("启动 CST 工程参数预处理: %s", source_project_path)
+            try:
+                completed = self.runner(
+                    command,
+                    capture_output=True,
+                    text=True,
+                    errors="replace",
+                    timeout=self.timeout,
+                    check=False,
+                    **self._startup_options(),
+                )
+            except subprocess.TimeoutExpired as exc:
+                raise CstPreprocessError("CST 工程参数预处理超时") from exc
+            if completed.returncode != 0:
+&gt;               raise CstPreprocessError(
+                    f"CST 工程参数预处理异常退出: {completed.returncode}"
+                )
+E               csttool.cst_preprocessor.CstPreprocessError: CST 工程参数预处理异常退出: 3221225477
+
+csttool\cst_preprocessor.py:149: CstPreprocessError</failure></testcase><testcase classname="test.managed_cstworker_integration_test" name="test_managed_worker_runs_repeated_tasks_and_standardly_exits" time="13.188"><failure message="AttributeError: 'NoneType' object has no attribute 'poll'">cst_executable = WindowsPath('D:/Program Files (x86)/CST Studio Suite 2022/CST DESIGN ENVIRONMENT.exe')
+tmp_path = WindowsPath('D:/work/cst_tools/.pytest_cache/integration-full-20260930-01/test_managed_worker_runs_repea0')
+
+    def test_managed_worker_runs_repeated_tasks_and_standardly_exits(
+        cst_executable, tmp_path
+    ):
+        source = Path(__file__).parent / "data" / "Pillbox" / "Pillbox.cst"
+        root = tmp_path / "managed-worker"
+        baseline = cst_processes(windows_process_snapshot())
+        worker = None
+        forced_cleanup = {}
+        try:
+&gt;           worker = ManagedCSTWorker(
+                "gate",
+                {
+                    "taskFileDir": str(root / "worker"),
+                    "resultDir": str(root / "results"),
+                    "cstPath": str(source),
+                    "CSTENVPATH": str(cst_executable),
+                    "paramList": [
+                        {"name": "R", "type": "double"},
+                        {"name": "L", "type": "expression"},
+                    ],
+                    "postProcess": [
+                        {
+                            "resultName": "frequency",
+                            "method": "Frequency",
+                            "params": {"iModeNumber": 1},
+                        }
+                    ],
+                },
+            )
+
+test\managed_cstworker_integration_test.py:25: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+csttool\managed_cstworker.py:97: in __init__
+    self._start()
+csttool\managed_cstworker.py:151: in _start
+    self._wait_for_marker("ready", self.START_TIMEOUT)
+csttool\managed_cstworker.py:215: in _wait_for_marker
+    self._ensure_running()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;csttool.managed_cstworker.ManagedCSTWorker object at 0x000001F5CE267320&gt;
+
+    def _ensure_running(self) -&gt; None:
+        if self._process is None:
+            raise RuntimeError("managed CST worker has not started")
+        code = self._process.poll()
+        if code is not None:
+&gt;           raise RuntimeError(f"managed CST worker exited with code {code}")
+E           RuntimeError: managed CST worker exited with code 3221225477
+
+csttool\managed_cstworker.py:231: RuntimeError
+
+During handling of the above exception, another exception occurred:
+
+cst_executable = WindowsPath('D:/Program Files (x86)/CST Studio Suite 2022/CST DESIGN ENVIRONMENT.exe')
+tmp_path = WindowsPath('D:/work/cst_tools/.pytest_cache/integration-full-20260930-01/test_managed_worker_runs_repea0')
+
+    def test_managed_worker_runs_repeated_tasks_and_standardly_exits(
+        cst_executable, tmp_path
+    ):
+        source = Path(__file__).parent / "data" / "Pillbox" / "Pillbox.cst"
+        root = tmp_path / "managed-worker"
+        baseline = cst_processes(windows_process_snapshot())
+        worker = None
+        forced_cleanup = {}
+        try:
+            worker = ManagedCSTWorker(
+                "gate",
+                {
+                    "taskFileDir": str(root / "worker"),
+                    "resultDir": str(root / "results"),
+                    "cstPath": str(source),
+                    "CSTENVPATH": str(cst_executable),
+                    "paramList": [
+                        {"name": "R", "type": "double"},
+                        {"name": "L", "type": "expression"},
+                    ],
+                    "postProcess": [
+                        {
+                            "resultName": "frequency",
+                            "method": "Frequency",
+                            "params": {"iModeNumber": 1},
+                        }
+                    ],
+                },
+            )
+    
+            first = worker.run_task(
+                "first", params={"R": "229", "L": "R + 30"}
+            )
+            second = worker.run_task(
+                "second", params={"R": "230", "L": "R + 29"}
+            )
+    
+            assert first["TaskStatus"] == "Success", first
+            assert second["TaskStatus"] == "Success", second
+            first_frequency = first["PostProcessResult"][0]["value"]
+            second_frequency = second["PostProcessResult"][0]["value"]
+            assert first_frequency &gt; 0
+            assert second_frequency &gt; 0
+            assert first_frequency != second_frequency
+            assert worker.stop()
+            assert worker.protocol.read_stop_ack(worker.session_id) is not None
+            assert worker._process.returncode == 0
+        finally:
+            process = worker._process if worker is not None else None
+&gt;           forced_cleanup = force_cleanup(process, baseline)
+
+test\managed_cstworker_integration_test.py:65: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+process = None
+baseline = {5748: 'CSTDCMainController_AMD64.exe', 5756: 'CSTDCSolverServer_AMD64.exe', 11488: 'cstd.exe', 48048: 'CST DESIGN ENVIRONMENT_AMD64.exe'}
+
+    def force_cleanup(process, baseline):
+        forced = new_cst_processes(baseline)
+        for pid in forced:
+            subprocess.run(["taskkill.exe", "/PID", str(pid), "/T", "/F"],
+                           check=False, capture_output=True)
+&gt;       if process.poll() is None:
+E       AttributeError: 'NoneType' object has no attribute 'poll'
+
+test\cst_integration_support.py:41: AttributeError</failure></testcase><testcase classname="test.managed_hom_ten_modes_fault_resume_integration_test" name="test_hom_runs_ten_ordered_modes_across_three_fault_recovery_paths" time="12.908"><failure message="RuntimeError: managed CST worker exited with code 3221225477">cst_executable = WindowsPath('D:/Program Files (x86)/CST Studio Suite 2022/CST DESIGN ENVIRONMENT.exe')
+tmp_path = WindowsPath('D:/work/cst_tools/.pytest_cache/integration-full-20260930-01/test_hom_runs_ten_ordered_mode0')
+
+    def test_hom_runs_ten_ordered_modes_across_three_fault_recovery_paths(
+        cst_executable, tmp_path
+    ):
+        project = tmp_path / "hom-ten-mode-recovery"
+        checkpoint = project / "hom_ten_modes_checkpoint.json"
+        baseline = cst_processes(windows_process_snapshot())
+        workers = []
+        modes = []
+        events = []
+        next_lo = 500.0
+        forced = {}
+    
+        def accept(values):
+            nonlocal next_lo
+            frequency = values["frequency"]
+            assert not modes or frequency &gt; modes[-1]["frequency"]
+            modes.append({"index": len(modes) + 1, **values})
+            next_lo = frequency + 1e-6
+            _atomic_checkpoint(checkpoint, modes, events)
+            print(f"accepted HOM mode {len(modes)}: {frequency:.9f} MHz", flush=True)
+    
+        def solve_and_accept(worker):
+            nonlocal next_lo
+            for _ in range(20):
+                lo = next_lo
+                values = _run_next(worker, lo)
+                if values["frequency"] &gt; 0:
+                    accept(values)
+                    return
+                events.append({"reason": "empty-window", "lo": lo, "hi": lo + 50.0})
+                next_lo = lo + 50.0
+                _atomic_checkpoint(checkpoint, modes, events)
+                print(f"empty HOM window: {lo:.6f}-{lo + 50.0:.6f} MHz", flush=True)
+            pytest.fail("too many consecutive empty HOM windows")
+    
+        try:
+            seed_root_value = os.environ.get("HOM_TEN_MODE_RECOVERY_SEED")
+            resumed_from_seed = bool(seed_root_value)
+            if seed_root_value:
+                seed_root = Path(seed_root_value)
+                seed_document = json.loads(
+                    (seed_root / "hom_ten_modes_checkpoint.json").read_text(
+                        encoding="utf-8"
+                    )
+                )
+                modes.extend(seed_document["modes"])
+                events.extend(seed_document["events"])
+                assert len(modes) == 6
+                next_lo = modes[-1]["frequency"] + 1e-6
+                seed_snapshots = sorted(
+                    (seed_root / "result" / "worker_1").rglob("project.cst"),
+                    key=lambda path: path.stat().st_mtime_ns,
+                )
+                assert seed_snapshots
+                first_snapshot = seed_snapshots[-1]
+                _atomic_checkpoint(checkpoint, modes, events)
+                print("resumed test harness from six-mode atomic checkpoint", flush=True)
+            else:
+&gt;               first = ManagedCSTWorker("0", _config(project, "0", cst_executable))
+
+test\managed_hom_ten_modes_fault_resume_integration_test.py:178: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+csttool\managed_cstworker.py:97: in __init__
+    self._start()
+csttool\managed_cstworker.py:151: in _start
+    self._wait_for_marker("ready", self.START_TIMEOUT)
+csttool\managed_cstworker.py:215: in _wait_for_marker
+    self._ensure_running()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;csttool.managed_cstworker.ManagedCSTWorker object at 0x000001F5CEB10860&gt;
+
+    def _ensure_running(self) -&gt; None:
+        if self._process is None:
+            raise RuntimeError("managed CST worker has not started")
+        code = self._process.poll()
+        if code is not None:
+&gt;           raise RuntimeError(f"managed CST worker exited with code {code}")
+E           RuntimeError: managed CST worker exited with code 3221225477
+
+csttool\managed_cstworker.py:231: RuntimeError</failure></testcase><testcase classname="test.managed_pillbox_fault_recovery_integration_test" name="test_controller_loss_is_recovered_through_standard_protocol" time="13.548"><failure message="AttributeError: 'NoneType' object has no attribute 'poll'">cst_executable = WindowsPath('D:/Program Files (x86)/CST Studio Suite 2022/CST DESIGN ENVIRONMENT.exe')
+tmp_path = WindowsPath('D:/work/cst_tools/.pytest_cache/integration-full-20260930-01/test_controller_loss_is_recove0')
+
+    def test_controller_loss_is_recovered_through_standard_protocol(
+        cst_executable, tmp_path
+    ):
+        project = tmp_path / "controller-loss"
+        baseline = cst_processes(windows_process_snapshot())
+        worker = None
+        forced_cleanup = {}
+        try:
+&gt;           worker = ManagedCSTWorker("0", _config(project, cst_executable))
+
+test\managed_pillbox_fault_recovery_integration_test.py:76: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+csttool\managed_cstworker.py:97: in __init__
+    self._start()
+csttool\managed_cstworker.py:151: in _start
+    self._wait_for_marker("ready", self.START_TIMEOUT)
+csttool\managed_cstworker.py:215: in _wait_for_marker
+    self._ensure_running()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;csttool.managed_cstworker.ManagedCSTWorker object at 0x000001F5CEC4BBF0&gt;
+
+    def _ensure_running(self) -&gt; None:
+        if self._process is None:
+            raise RuntimeError("managed CST worker has not started")
+        code = self._process.poll()
+        if code is not None:
+&gt;           raise RuntimeError(f"managed CST worker exited with code {code}")
+E           RuntimeError: managed CST worker exited with code 3221225477
+
+csttool\managed_cstworker.py:231: RuntimeError
+
+During handling of the above exception, another exception occurred:
+
+cst_executable = WindowsPath('D:/Program Files (x86)/CST Studio Suite 2022/CST DESIGN ENVIRONMENT.exe')
+tmp_path = WindowsPath('D:/work/cst_tools/.pytest_cache/integration-full-20260930-01/test_controller_loss_is_recove0')
+
+    def test_controller_loss_is_recovered_through_standard_protocol(
+        cst_executable, tmp_path
+    ):
+        project = tmp_path / "controller-loss"
+        baseline = cst_processes(windows_process_snapshot())
+        worker = None
+        forced_cleanup = {}
+        try:
+            worker = ManagedCSTWorker("0", _config(project, cst_executable))
+            task = _dispatch_without_controller(worker)
+            _wait_until_solver_started(worker)
+    
+            recovered = recover_project_sessions(project, timeout_per_session=300)
+    
+            assert [item.session_id for item in recovered] == [worker.session_id]
+            receipt = json.loads(
+                (worker.root / "recovery.json").read_text(encoding="utf-8")
+            )
+            assert receipt["disposition"] == "standard-stop"
+            assert receipt["completion_task_id"] == task.task_id
+            assert worker.protocol.read_stop_ack(worker.session_id) is not None
+            assert worker._process.poll() == 0
+            assert not [
+                item for item in discover_managed_sessions(project) if item.needs_recovery
+            ]
+            worker._close_log()
+        finally:
+            process = worker._process if worker is not None else None
+&gt;           forced_cleanup = force_cleanup(process, baseline)
+
+test\managed_pillbox_fault_recovery_integration_test.py:96: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+process = None
+baseline = {5748: 'CSTDCMainController_AMD64.exe', 5756: 'CSTDCSolverServer_AMD64.exe', 11488: 'cstd.exe', 48048: 'CST DESIGN ENVIRONMENT_AMD64.exe'}
+
+    def force_cleanup(process, baseline):
+        forced = new_cst_processes(baseline)
+        for pid in forced:
+            subprocess.run(["taskkill.exe", "/PID", str(pid), "/T", "/F"],
+                           check=False, capture_output=True)
+&gt;       if process.poll() is None:
+E       AttributeError: 'NoneType' object has no attribute 'poll'
+
+test\cst_integration_support.py:41: AttributeError</failure></testcase><testcase classname="test.managed_pillbox_fault_recovery_integration_test" name="test_dead_cst_is_abandoned_without_forging_standard_exit" time="13.839"><failure message="AttributeError: 'NoneType' object has no attribute 'poll'">cst_executable = WindowsPath('D:/Program Files (x86)/CST Studio Suite 2022/CST DESIGN ENVIRONMENT.exe')
+tmp_path = WindowsPath('D:/work/cst_tools/.pytest_cache/integration-full-20260930-01/test_dead_cst_is_abandoned_wit0')
+
+    def test_dead_cst_is_abandoned_without_forging_standard_exit(
+        cst_executable, tmp_path
+    ):
+        project = tmp_path / "dead-cst"
+        baseline = cst_processes(windows_process_snapshot())
+        worker = None
+        forced_cleanup = {}
+        try:
+&gt;           worker = ManagedCSTWorker("0", _config(project, cst_executable))
+
+test\managed_pillbox_fault_recovery_integration_test.py:109: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+csttool\managed_cstworker.py:97: in __init__
+    self._start()
+csttool\managed_cstworker.py:151: in _start
+    self._wait_for_marker("ready", self.START_TIMEOUT)
+csttool\managed_cstworker.py:215: in _wait_for_marker
+    self._ensure_running()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;csttool.managed_cstworker.ManagedCSTWorker object at 0x000001F5CEC4AFF0&gt;
+
+    def _ensure_running(self) -&gt; None:
+        if self._process is None:
+            raise RuntimeError("managed CST worker has not started")
+        code = self._process.poll()
+        if code is not None:
+&gt;           raise RuntimeError(f"managed CST worker exited with code {code}")
+E           RuntimeError: managed CST worker exited with code 3221225477
+
+csttool\managed_cstworker.py:231: RuntimeError
+
+During handling of the above exception, another exception occurred:
+
+cst_executable = WindowsPath('D:/Program Files (x86)/CST Studio Suite 2022/CST DESIGN ENVIRONMENT.exe')
+tmp_path = WindowsPath('D:/work/cst_tools/.pytest_cache/integration-full-20260930-01/test_dead_cst_is_abandoned_wit0')
+
+    def test_dead_cst_is_abandoned_without_forging_standard_exit(
+        cst_executable, tmp_path
+    ):
+        project = tmp_path / "dead-cst"
+        baseline = cst_processes(windows_process_snapshot())
+        worker = None
+        forced_cleanup = {}
+        try:
+            worker = ManagedCSTWorker("0", _config(project, cst_executable))
+            _dispatch_without_controller(worker)
+            _wait_until_solver_started(worker)
+            injected_pid = worker._process.pid
+    
+            worker.emergency_terminate()
+            assert worker._process.pid == injected_pid
+            assert worker._process.poll() is not None
+            assert worker.protocol.read_stop_ack(worker.session_id) is None
+    
+            recovered = recover_project_sessions(project, timeout_per_session=30)
+    
+            assert [item.session_id for item in recovered] == [worker.session_id]
+            receipt = json.loads(
+                (worker.root / "recovery.json").read_text(encoding="utf-8")
+            )
+            assert receipt["disposition"] == "abandoned-dead"
+            assert worker.protocol.read_stop_ack(worker.session_id) is None
+            assert worker.marker_path.read_text(encoding="ascii") == "abandoned-dead"
+            assert not [
+                item for item in discover_managed_sessions(project) if item.needs_recovery
+            ]
+        finally:
+            process = worker._process if worker is not None else None
+&gt;           forced_cleanup = force_cleanup(process, baseline)
+
+test\managed_pillbox_fault_recovery_integration_test.py:133: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+process = None
+baseline = {5748: 'CSTDCMainController_AMD64.exe', 5756: 'CSTDCSolverServer_AMD64.exe', 11488: 'cstd.exe', 48048: 'CST DESIGN ENVIRONMENT_AMD64.exe'}
+
+    def force_cleanup(process, baseline):
+        forced = new_cst_processes(baseline)
+        for pid in forced:
+            subprocess.run(["taskkill.exe", "/PID", str(pid), "/T", "/F"],
+                           check=False, capture_output=True)
+&gt;       if process.poll() is None:
+E       AttributeError: 'NoneType' object has no attribute 'poll'
+
+test\cst_integration_support.py:41: AttributeError</failure></testcase><testcase classname="test.managed_pillbox_five_modes_integration_test" name="test_managed_pillbox_solves_and_reads_five_modes" time="14.093"><failure message="AttributeError: 'NoneType' object has no attribute 'poll'">cst_executable = WindowsPath('D:/Program Files (x86)/CST Studio Suite 2022/CST DESIGN ENVIRONMENT.exe')
+tmp_path = WindowsPath('D:/work/cst_tools/.pytest_cache/integration-full-20260930-01/test_managed_pillbox_solves_an0')
+
+    def test_managed_pillbox_solves_and_reads_five_modes(cst_executable, tmp_path):
+        source = Path(__file__).parent / "data" / "Pillbox" / "Pillbox.cst"
+        source_hash = _sha256(source)
+        root = tmp_path / "pillbox-five-modes"
+        baseline = cst_processes(windows_process_snapshot())
+        worker = None
+        forced_cleanup = {}
+        try:
+&gt;           worker = ManagedCSTWorker(
+                "five-modes",
+                {
+                    "taskFileDir": str(root / "worker"),
+                    "resultDir": str(root / "results"),
+                    "cstPath": str(source),
+                    "CSTENVPATH": str(cst_executable),
+                    "runInBackground": True,
+                    "paramList": [
+                        {"name": "nmodes", "type": "double"},
+                        {"name": "fmin", "type": "double"},
+                        {"name": "fmax", "type": "double"},
+                    ],
+                    "postProcess": [
+                        {
+                            "resultName": f"frequency_mode_{mode}",
+                            "method": "Frequency",
+                            "params": {"iModeNumber": mode},
+                        }
+                        for mode in range(1, 6)
+                    ],
+                },
+            )
+
+test\managed_pillbox_five_modes_integration_test.py:30: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+csttool\managed_cstworker.py:97: in __init__
+    self._start()
+csttool\managed_cstworker.py:151: in _start
+    self._wait_for_marker("ready", self.START_TIMEOUT)
+csttool\managed_cstworker.py:215: in _wait_for_marker
+    self._ensure_running()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;csttool.managed_cstworker.ManagedCSTWorker object at 0x000001F5CECF61E0&gt;
+
+    def _ensure_running(self) -&gt; None:
+        if self._process is None:
+            raise RuntimeError("managed CST worker has not started")
+        code = self._process.poll()
+        if code is not None:
+&gt;           raise RuntimeError(f"managed CST worker exited with code {code}")
+E           RuntimeError: managed CST worker exited with code 3221225477
+
+csttool\managed_cstworker.py:231: RuntimeError
+
+During handling of the above exception, another exception occurred:
+
+cst_executable = WindowsPath('D:/Program Files (x86)/CST Studio Suite 2022/CST DESIGN ENVIRONMENT.exe')
+tmp_path = WindowsPath('D:/work/cst_tools/.pytest_cache/integration-full-20260930-01/test_managed_pillbox_solves_an0')
+
+    def test_managed_pillbox_solves_and_reads_five_modes(cst_executable, tmp_path):
+        source = Path(__file__).parent / "data" / "Pillbox" / "Pillbox.cst"
+        source_hash = _sha256(source)
+        root = tmp_path / "pillbox-five-modes"
+        baseline = cst_processes(windows_process_snapshot())
+        worker = None
+        forced_cleanup = {}
+        try:
+            worker = ManagedCSTWorker(
+                "five-modes",
+                {
+                    "taskFileDir": str(root / "worker"),
+                    "resultDir": str(root / "results"),
+                    "cstPath": str(source),
+                    "CSTENVPATH": str(cst_executable),
+                    "runInBackground": True,
+                    "paramList": [
+                        {"name": "nmodes", "type": "double"},
+                        {"name": "fmin", "type": "double"},
+                        {"name": "fmax", "type": "double"},
+                    ],
+                    "postProcess": [
+                        {
+                            "resultName": f"frequency_mode_{mode}",
+                            "method": "Frequency",
+                            "params": {"iModeNumber": mode},
+                        }
+                        for mode in range(1, 6)
+                    ],
+                },
+            )
+    
+            result = worker.run_task(
+                "pillbox-five-modes",
+                params={"nmodes": 5, "fmin": 400, "fmax": 1200},
+            )
+    
+            assert result["TaskStatus"] == "Success", result
+            values = [item["value"] for item in result["PostProcessResult"]]
+            assert len(values) == 5
+            assert all(math.isfinite(value) and value &gt; 0 for value in values)
+            assert values == sorted(values)
+            assert len(set(values)) == 5
+            assert worker.stop()
+            assert worker.protocol.read_stop_ack(worker.session_id) is not None
+            assert worker._process.returncode == 0
+        finally:
+            process = worker._process if worker is not None else None
+&gt;           forced_cleanup = force_cleanup(process, baseline)
+
+test\managed_pillbox_five_modes_integration_test.py:70: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+process = None
+baseline = {5748: 'CSTDCMainController_AMD64.exe', 5756: 'CSTDCSolverServer_AMD64.exe', 11488: 'cstd.exe', 48048: 'CST DESIGN ENVIRONMENT_AMD64.exe'}
+
+    def force_cleanup(process, baseline):
+        forced = new_cst_processes(baseline)
+        for pid in forced:
+            subprocess.run(["taskkill.exe", "/PID", str(pid), "/T", "/F"],
+                           check=False, capture_output=True)
+&gt;       if process.poll() is None:
+E       AttributeError: 'NoneType' object has no attribute 'poll'
+
+test\cst_integration_support.py:41: AttributeError</failure></testcase><testcase classname="test.managed_pillbox_stop_resume_integration_test" name="test_pillbox_managed_worker_stops_safely_then_resumes_in_new_session" time="12.390"><failure message="RuntimeError: managed CST worker exited with code 3221225477">cst_executable = WindowsPath('D:/Program Files (x86)/CST Studio Suite 2022/CST DESIGN ENVIRONMENT.exe')
+tmp_path = WindowsPath('D:/work/cst_tools/.pytest_cache/integration-full-20260930-01/test_pillbox_managed_worker_st0')
+
+    def test_pillbox_managed_worker_stops_safely_then_resumes_in_new_session(
+        cst_executable, tmp_path
+    ):
+        baseline = cst_processes(windows_process_snapshot())
+        workers = []
+        forced = {}
+        progress = []
+        try:
+&gt;           first = ManagedCSTWorker(
+                "stop", _config(tmp_path / "first", cst_executable, progress.append)
+            )
+
+test\managed_pillbox_stop_resume_integration_test.py:87: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+csttool\managed_cstworker.py:97: in __init__
+    self._start()
+csttool\managed_cstworker.py:151: in _start
+    self._wait_for_marker("ready", self.START_TIMEOUT)
+csttool\managed_cstworker.py:215: in _wait_for_marker
+    self._ensure_running()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;csttool.managed_cstworker.ManagedCSTWorker object at 0x000001F5CEC49AC0&gt;
+
+    def _ensure_running(self) -&gt; None:
+        if self._process is None:
+            raise RuntimeError("managed CST worker has not started")
+        code = self._process.poll()
+        if code is not None:
+&gt;           raise RuntimeError(f"managed CST worker exited with code {code}")
+E           RuntimeError: managed CST worker exited with code 3221225477
+
+csttool\managed_cstworker.py:231: RuntimeError</failure></testcase><testcase classname="test.mesh_convergence_integration_test" name="test_real_pillbox_mesh_convergence_produces_report" time="0.005"><failure message="AttributeError: '_GlobalConfig' object has no attribute 'settings'">cst_executable = WindowsPath('D:/Program Files (x86)/CST Studio Suite 2022/CST DESIGN ENVIRONMENT.exe')
+tmp_path = WindowsPath('D:/work/cst_tools/.pytest_cache/integration-full-20260930-01/test_real_pillbox_mesh_converg0')
+
+    def test_real_pillbox_mesh_convergence_produces_report(
+        cst_executable, tmp_path
+    ):
+        root = Path(__file__).parents[1]
+        global_config = _GlobalConfig(root, cst_executable)
+&gt;       project_config = ProjectConfigManager(
+            GlobalConfigManager=global_config,
+            logger=logging.getLogger("mesh-convergence-integration"),
+        )
+
+test\mesh_convergence_integration_test.py:29: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;csttool.projectconfmanager.ProjectConfigManager object at 0x000001F5CEC4ABA0&gt;
+GlobalConfigManager = &lt;test.mesh_convergence_integration_test._GlobalConfig object at 0x000001F5CEC48680&gt;
+logger = &lt;Logger mesh-convergence-integration (WARNING)&gt;
+
+    def __init__(
+        self,
+        GlobalConfigManager=None,
+        logger: logging.Logger | None = None,
+    ):
+        self.settings: ProjectSettings | None = None
+        self._mesh_recorded = False
+        if logger is not None:
+            self.logger = logger
+        else:
+            self.logger = logging.getLogger(__name__)
+&gt;       self.global_settings = GlobalConfigManager.settings
+E       AttributeError: '_GlobalConfig' object has no attribute 'settings'
+
+csttool\projectconfmanager.py:51: AttributeError</failure></testcase><testcase classname="test.pillbox_standard_batch_integration_test" name="test_real_cst_standard_batch_optimizes_pillbox_radius_to_500_mhz" time="14.046"><failure message="RuntimeError: managed CST worker exited with code 3221225477">cst_executable = WindowsPath('D:/Program Files (x86)/CST Studio Suite 2022/CST DESIGN ENVIRONMENT.exe')
+tmp_path = WindowsPath('D:/work/cst_tools/.pytest_cache/integration-full-20260930-01/test_real_cst_standard_batch_o0')
+
+    def test_real_cst_standard_batch_optimizes_pillbox_radius_to_500_mhz(
+        cst_executable, tmp_path
+    ):
+        source = Path(__file__).parent / "data" / "Pillbox" / "Pillbox.cst"
+        source_hash = _sha256(source)
+        project = tmp_path / "pillbox-standard-real"
+        project.mkdir()
+        shutil.copy2(source, project / "Pillbox.cst")
+        baseline = cst_processes(windows_process_snapshot())
+        manager = None
+        stop_error = None
+        residual = {}
+        try:
+&gt;           manager = CSTManager(
+                _GlobalConfig(project, cst_executable),
+                _ProjectConfig(project),
+                params=[{"name": "R", "type": "double"}],
+                logger=logging.getLogger("pillbox-real-standard-batch"),
+                maxTask=1,
+                worker_factory=ManagedCSTWorker.create,
+                max_jobs_per_worker=100,
+            )
+
+test\pillbox_standard_batch_integration_test.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+csttool\cstmanager.py:167: in __init__
+    self._start_initial_workers()
+csttool\cstmanager.py:223: in _start_initial_workers
+    self._slots.append(_WorkerSlot(worker_id, self._create_worker(worker_id)))
+csttool\cstmanager.py:214: in _create_worker
+    return self._worker_factory(
+csttool\managed_cstworker.py:101: in create
+    return cls(worker_id, config, logger)
+csttool\managed_cstworker.py:97: in __init__
+    self._start()
+csttool\managed_cstworker.py:151: in _start
+    self._wait_for_marker("ready", self.START_TIMEOUT)
+csttool\managed_cstworker.py:215: in _wait_for_marker
+    self._ensure_running()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;csttool.managed_cstworker.ManagedCSTWorker object at 0x000001F5CECF4B30&gt;
+
+    def _ensure_running(self) -&gt; None:
+        if self._process is None:
+            raise RuntimeError("managed CST worker has not started")
+        code = self._process.poll()
+        if code is not None:
+&gt;           raise RuntimeError(f"managed CST worker exited with code {code}")
+E           RuntimeError: managed CST worker exited with code 3221225477
+
+csttool\managed_cstworker.py:231: RuntimeError</failure></testcase><testcase classname="test.protocol_contract_integration_test" name="test_cst_wwb_executes_protocol_golden_contract" time="13.418"><failure message="AssertionError: CST OLE controller exited before writing Completion; return code=1">cst_executable = WindowsPath('D:/Program Files (x86)/CST Studio Suite 2022/CST DESIGN ENVIRONMENT.exe')
+tmp_path = WindowsPath('D:/work/cst_tools/.pytest_cache/integration-full-20260930-01/test_cst_wwb_executes_protocol0')
+
+    def test_cst_wwb_executes_protocol_golden_contract(cst_executable, tmp_path):
+        session_id = new_session_id()
+        task = Task.create(
+            session_id,
+            {"Rx": "90.0", "L": "2 * Rx = L"},
+            expression_names=frozenset({"L"}),
+        )
+        workspace = prepare_contract_workspace(tmp_path, task)
+        log_path = tmp_path / "cst-contract.log"
+        baseline = _cst_processes(_windows_process_snapshot())
+        controller = Path(__file__).parent / "support" / "run_cst_contract.ps1"
+    
+        with log_path.open("wb") as log:
+            process = subprocess.Popen(
+                [
+                    "powershell.exe",
+                    "-NoProfile",
+                    "-NonInteractive",
+                    "-File",
+                    str(controller),
+                    "-ProgId",
+                    _versioned_progid(cst_executable),
+                    "-MacroPath",
+                    str(workspace.macro_path),
+                ],
+                stdout=log,
+                stderr=subprocess.STDOUT,
+            )
+            forced_cleanup = {}
+            try:
+&gt;               completion = _wait_completion_or_controller_exit(
+                    workspace, task, process, timeout=60
+                )
+
+test\protocol_contract_integration_test.py:148: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+workspace = ContractWorkspace(root=WindowsPath('D:/work/cst_tools/.pytest_cache/integration-full-20260930-01/test_cst_wwb_executes...wsPath('D:/work/cst_tools/.pytest_cache/integration-full-20260930-01/test_cst_wwb_executes_protocol0/contract.result'))
+task = Task(task_id='5e17452b-6339-4b26-a40a-9eff6e0e17ea', session_id='a3fdf689-69b7-4fe4-aabc-3a884a4a230f', parameters=(Pa...al'&gt;, value='90.0'), ParameterAssignment(name='L', kind=&lt;ParameterKind.EXPRESSION: 'expression'&gt;, value='2 * Rx = L')))
+process = &lt;Popen: returncode: 1 args: ['powershell.exe', '-NoProfile', '-NonInteractiv...&gt;
+timeout = 60
+
+    def _wait_completion_or_controller_exit(workspace, task, process, timeout=60):
+        deadline = time.monotonic() + timeout
+        while True:
+            completion = workspace.protocol.read_completion(task)
+            if completion is not None:
+                return completion
+            if process.poll() is not None:
+&gt;               raise AssertionError(
+                    "CST OLE controller exited before writing Completion; "
+                    f"return code={process.returncode}"
+                )
+E               AssertionError: CST OLE controller exited before writing Completion; return code=1
+
+test\protocol_contract_integration_test.py:99: AssertionError</failure></testcase><testcase classname="test.protocol_hom_runtime_postprocess_integration_test" name="test_hom_runtime_r_over_q_uses_solved_fields_without_parameter_update" time="12.890"><failure message="AssertionError: CST OLE controller exited before writing Completion; return code=3221225477">cst_executable = WindowsPath('D:/Program Files (x86)/CST Studio Suite 2022/CST DESIGN ENVIRONMENT.exe')
+
+    def test_hom_runtime_r_over_q_uses_solved_fields_without_parameter_update(
+        cst_executable,
+    ):
+        source = Path(__file__).parent.parent / HOM_PROFILE_V1.source_project
+        root = Path.cwd() / ".pytest_cache" / "cst-p5-5" / new_session_id()[:8]
+        session_id = new_session_id()
+        task = Task.create(session_id, {"fmin": "720", "fmax": "800"})
+        workspace = prepare_hom_runtime_postprocess_workspace(
+            root, task, source, result_name=RESULT_NAME, profile=HOM_PROFILE_V1
+        )
+        worker = workspace.worker
+        baseline = cst_processes(windows_process_snapshot())
+        with (root / "cst-p5-5.log").open("wb") as log:
+            process = subprocess.Popen(
+                [str(cst_executable), "-m", str(worker.macro_path)],
+                stdout=log,
+                stderr=subprocess.STDOUT,
+            )
+            forced = {}
+            try:
+&gt;               completion = wait_completion_or_controller_exit(
+                    worker, task, process, timeout=1800
+                )
+
+test\protocol_hom_runtime_postprocess_integration_test.py:54: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+workspace = WorkerWorkspace(root=WindowsPath('D:/work/cst_tools/.pytest_cache/cst-p5-5/c09c7172'), protocol=&lt;csttool.runtime_proto...72/runtime_worker_v1.bas'), marker_path=WindowsPath('D:/work/cst_tools/.pytest_cache/cst-p5-5/c09c7172/worker.result'))
+task = Task(task_id='bfe44706-c2f6-47ef-a870-ae22830e085b', session_id='9adff42e-7bd2-4a8f-8571-f4cfc9225473', parameters=(Pa...RAL: 'literal'&gt;, value='720'), ParameterAssignment(name='fmax', kind=&lt;ParameterKind.LITERAL: 'literal'&gt;, value='800')))
+process = &lt;Popen: returncode: 3221225477 args: ['D:\\Program Files (x86)\\CST Studio S...&gt;
+timeout = 1800
+
+    def wait_completion_or_controller_exit(workspace, task, process, timeout):
+        deadline = time.monotonic() + timeout
+        while True:
+            completion = workspace.protocol.read_completion(task)
+            if completion is not None:
+                return completion
+            if process.poll() is not None:
+&gt;               raise AssertionError(
+                    "CST OLE controller exited before writing Completion; "
+                    f"return code={process.returncode}"
+                )
+E               AssertionError: CST OLE controller exited before writing Completion; return code=3221225477
+
+test\cst_integration_support.py:68: AssertionError</failure></testcase><testcase classname="test.protocol_hom_scan_benchmark_integration_test" name="test_fixed_hom_structure_warm_frequency_scan_is_faster_and_consistent" time="12.677"><failure message="AssertionError: CST OLE controller exited before writing Completion; return code=3221225477">cst_executable = WindowsPath('D:/Program Files (x86)/CST Studio Suite 2022/CST DESIGN ENVIRONMENT.exe')
+
+    def test_fixed_hom_structure_warm_frequency_scan_is_faster_and_consistent(cst_executable):
+        source = Path(__file__).parent.parent / HOM_PROFILE_V1.source_project
+        parameter_sets = (
+            {"fmin": "720", "fmax": "800"},
+            {"fmin": "800", "fmax": "880"},
+        )
+        root = Path.cwd() / ".pytest_cache" / "cst-p4-5" / new_session_id()[:8]
+        root.mkdir(parents=True)
+    
+        cold = [
+&gt;           _run_cold(cst_executable, root / f"cold-{index}", source, parameters)
+            for index, parameters in enumerate(parameter_sets)
+        ]
+
+test\protocol_hom_scan_benchmark_integration_test.py:133: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+test\protocol_hom_scan_benchmark_integration_test.py:50: in _run_cold
+    completion = wait_completion_or_controller_exit(workspace, task, process, timeout=1800)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+workspace = WorkerWorkspace(root=WindowsPath('D:/work/cst_tools/.pytest_cache/cst-p4-5/3e17a696/cold-0'), protocol=&lt;csttool.runtim...ime_worker_v1.bas'), marker_path=WindowsPath('D:/work/cst_tools/.pytest_cache/cst-p4-5/3e17a696/cold-0/worker.result'))
+task = Task(task_id='4dc51f27-3d4d-49a6-b8f1-933a06477b69', session_id='545477d6-ff22-492a-b16a-596992695b36', parameters=(Pa...RAL: 'literal'&gt;, value='720'), ParameterAssignment(name='fmax', kind=&lt;ParameterKind.LITERAL: 'literal'&gt;, value='800')))
+process = &lt;Popen: returncode: 3221225477 args: ['D:\\Program Files (x86)\\CST Studio S...&gt;
+timeout = 1800
+
+    def wait_completion_or_controller_exit(workspace, task, process, timeout):
+        deadline = time.monotonic() + timeout
+        while True:
+            completion = workspace.protocol.read_completion(task)
+            if completion is not None:
+                return completion
+            if process.poll() is not None:
+&gt;               raise AssertionError(
+                    "CST OLE controller exited before writing Completion; "
+                    f"return code={process.returncode}"
+                )
+E               AssertionError: CST OLE controller exited before writing Completion; return code=3221225477
+
+test\cst_integration_support.py:68: AssertionError</failure></testcase><testcase classname="test.protocol_hom_scan_benchmark_integration_test" name="test_missing_hom_profile_template_stops_warm_session_before_first_solver" time="13.372"><failure message="AssertionError: CST OLE controller exited before writing Completion; return code=3221225477">cst_executable = WindowsPath('D:/Program Files (x86)/CST Studio Suite 2022/CST DESIGN ENVIRONMENT.exe')
+
+    def test_missing_hom_profile_template_stops_warm_session_before_first_solver(
+        cst_executable,
+    ):
+        source = Path(__file__).parent.parent / HOM_PROFILE_V1.source_project
+        missing = ResultTemplateRequirement(
+            "P6.5 deliberately missing",
+            "M0D",
+            "3D Eigenmode Result",
+            "2D and 3D Field Results",
+        )
+        profile = replace(
+            HOM_PROFILE_V1,
+            profile_id="hom-warm-missing-gate",
+            required_templates=(*HOM_PROFILE_V1.required_templates, missing),
+        )
+        session_id = new_session_id()
+        tasks = (
+            Task.create(session_id, {"fmin": "720", "fmax": "800"}),
+            Task.create(session_id, {"fmin": "800", "fmax": "880"}),
+        )
+        root = Path.cwd() / ".pytest_cache" / "cst-p6-5-missing" / session_id[:8]
+        workspace = prepare_warm_worker_workspace(
+            root, tasks, source, result_name=RESULT_NAME, profile=profile
+        )
+        baseline = cst_processes(windows_process_snapshot())
+        with (root / "cst-p6-5-missing.log").open("wb") as log:
+            process = subprocess.Popen(
+                [str(cst_executable), "-m", str(workspace.macro_path)],
+                stdout=log,
+                stderr=subprocess.STDOUT,
+            )
+            forced = {}
+            try:
+&gt;               completion = wait_completion_or_controller_exit(
+                    workspace, tasks[0], process, timeout=300
+                )
+
+test\protocol_hom_scan_benchmark_integration_test.py:191: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+workspace = WarmWorkerWorkspace(root=WindowsPath('D:/work/cst_tools/.pytest_cache/cst-p6-5-missing/2321e39b'), protocol=&lt;csttool.r... profile_inventory_path=WindowsPath('D:/work/cst_tools/.pytest_cache/cst-p6-5-missing/2321e39b/profile-templates.tsv'))
+task = Task(task_id='7831723a-65e3-4bd1-aef6-c97173e3387f', session_id='2321e39b-4bf5-4ed2-af86-9a87f3acfa7a', parameters=(Pa...RAL: 'literal'&gt;, value='720'), ParameterAssignment(name='fmax', kind=&lt;ParameterKind.LITERAL: 'literal'&gt;, value='800')))
+process = &lt;Popen: returncode: 3221225477 args: ['D:\\Program Files (x86)\\CST Studio S...&gt;
+timeout = 300
+
+    def wait_completion_or_controller_exit(workspace, task, process, timeout):
+        deadline = time.monotonic() + timeout
+        while True:
+            completion = workspace.protocol.read_completion(task)
+            if completion is not None:
+                return completion
+            if process.poll() is not None:
+&gt;               raise AssertionError(
+                    "CST OLE controller exited before writing Completion; "
+                    f"return code={process.returncode}"
+                )
+E               AssertionError: CST OLE controller exited before writing Completion; return code=3221225477
+
+test\cst_integration_support.py:68: AssertionError</failure></testcase><testcase classname="test.protocol_hom_template_evaluation_integration_test" name="test_registered_templates_can_be_inventoried_and_evaluated_for_current_run" time="12.211"><failure message="AssertionError: CST OLE controller exited before writing Completion; return code=3221225477">cst_executable = WindowsPath('D:/Program Files (x86)/CST Studio Suite 2022/CST DESIGN ENVIRONMENT.exe')
+
+    def test_registered_templates_can_be_inventoried_and_evaluated_for_current_run(
+        cst_executable,
+    ):
+        source = Path(__file__).parent.parent / HOM_PROFILE_V1.source_project
+        assert str(HOM_PROFILE_V1.cst_year) in str(cst_executable)
+        root = Path.cwd() / ".pytest_cache" / "cst-p5-6" / new_session_id()[:8]
+        task = Task.create(new_session_id(), {"fmin": "720", "fmax": "800"})
+        workspace = prepare_hom_template_evaluation_workspace(
+            root, task, source, result_name=RESULT_NAME
+        )
+        worker = workspace.worker
+        baseline = cst_processes(windows_process_snapshot())
+        with (root / "cst-p5-6.log").open("wb") as log:
+            process = subprocess.Popen(
+                [str(cst_executable), "-m", str(worker.macro_path)],
+                stdout=log,
+                stderr=subprocess.STDOUT,
+            )
+            forced = {}
+            try:
+&gt;               completion = wait_completion_or_controller_exit(
+                    worker, task, process, timeout=1800
+                )
+
+test\protocol_hom_template_evaluation_integration_test.py:62: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+workspace = WorkerWorkspace(root=WindowsPath('D:/work/cst_tools/.pytest_cache/cst-p5-6/d8d8f71f'), protocol=&lt;csttool.runtime_proto...1f/runtime_worker_v1.bas'), marker_path=WindowsPath('D:/work/cst_tools/.pytest_cache/cst-p5-6/d8d8f71f/worker.result'))
+task = Task(task_id='4451cfd6-1161-4213-ae1b-065b7ba55bb9', session_id='c044fba2-9815-4f69-b676-1a42b96d9a04', parameters=(Pa...RAL: 'literal'&gt;, value='720'), ParameterAssignment(name='fmax', kind=&lt;ParameterKind.LITERAL: 'literal'&gt;, value='800')))
+process = &lt;Popen: returncode: 3221225477 args: ['D:\\Program Files (x86)\\CST Studio S...&gt;
+timeout = 1800
+
+    def wait_completion_or_controller_exit(workspace, task, process, timeout):
+        deadline = time.monotonic() + timeout
+        while True:
+            completion = workspace.protocol.read_completion(task)
+            if completion is not None:
+                return completion
+            if process.poll() is not None:
+&gt;               raise AssertionError(
+                    "CST OLE controller exited before writing Completion; "
+                    f"return code={process.returncode}"
+                )
+E               AssertionError: CST OLE controller exited before writing Completion; return code=3221225477
+
+test\cst_integration_support.py:68: AssertionError</failure></testcase><testcase classname="test.protocol_hom_template_evaluation_integration_test" name="test_missing_profile_template_fails_before_solver_and_exits_cleanly" time="12.751"><failure message="AssertionError: CST OLE controller exited before writing Completion; return code=3221225477">cst_executable = WindowsPath('D:/Program Files (x86)/CST Studio Suite 2022/CST DESIGN ENVIRONMENT.exe')
+
+    def test_missing_profile_template_fails_before_solver_and_exits_cleanly(cst_executable):
+        source = Path(__file__).parent.parent / HOM_PROFILE_V1.source_project
+        missing = ResultTemplateRequirement(
+            "P6 deliberately missing",
+            "M0D",
+            "3D Eigenmode Result",
+            "2D and 3D Field Results",
+        )
+        profile = replace(
+            HOM_PROFILE_V1,
+            profile_id="hom-missing-gate",
+            required_templates=(*HOM_PROFILE_V1.required_templates, missing),
+        )
+        root = Path.cwd() / ".pytest_cache" / "cst-p6-missing" / new_session_id()[:8]
+        task = Task.create(new_session_id(), {"fmin": "720", "fmax": "800"})
+        workspace = prepare_hom_template_evaluation_workspace(
+            root, task, source, result_name=RESULT_NAME, profile=profile
+        )
+        worker = workspace.worker
+        baseline = cst_processes(windows_process_snapshot())
+        with (root / "cst-p6-missing.log").open("wb") as log:
+            process = subprocess.Popen(
+                [str(cst_executable), "-m", str(worker.macro_path)],
+                stdout=log,
+                stderr=subprocess.STDOUT,
+            )
+            forced = {}
+            try:
+&gt;               completion = wait_completion_or_controller_exit(
+                    worker, task, process, timeout=300
+                )
+
+test\protocol_hom_template_evaluation_integration_test.py:128: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+workspace = WorkerWorkspace(root=WindowsPath('D:/work/cst_tools/.pytest_cache/cst-p6-missing/3cb0d90e'), protocol=&lt;csttool.runtime...time_worker_v1.bas'), marker_path=WindowsPath('D:/work/cst_tools/.pytest_cache/cst-p6-missing/3cb0d90e/worker.result'))
+task = Task(task_id='a4fad53a-1ab5-4c4d-94f8-40197f0adecb', session_id='2e1bcf16-c679-40eb-90dc-378531446f33', parameters=(Pa...RAL: 'literal'&gt;, value='720'), ParameterAssignment(name='fmax', kind=&lt;ParameterKind.LITERAL: 'literal'&gt;, value='800')))
+process = &lt;Popen: returncode: 3221225477 args: ['D:\\Program Files (x86)\\CST Studio S...&gt;
+timeout = 300
+
+    def wait_completion_or_controller_exit(workspace, task, process, timeout):
+        deadline = time.monotonic() + timeout
+        while True:
+            completion = workspace.protocol.read_completion(task)
+            if completion is not None:
+                return completion
+            if process.poll() is not None:
+&gt;               raise AssertionError(
+                    "CST OLE controller exited before writing Completion; "
+                    f"return code={process.returncode}"
+                )
+E               AssertionError: CST OLE controller exited before writing Completion; return code=3221225477
+
+test\cst_integration_support.py:68: AssertionError</failure></testcase><testcase classname="test.protocol_warm_worker_integration_test" name="test_warm_worker_runs_two_ack_gated_tasks_then_stops" time="13.516"><failure message="AssertionError: CST OLE controller exited before writing Completion; return code=3221225477">cst_executable = WindowsPath('D:/Program Files (x86)/CST Studio Suite 2022/CST DESIGN ENVIRONMENT.exe')
+
+    def test_warm_worker_runs_two_ack_gated_tasks_then_stops(cst_executable):
+        session_id = new_session_id()
+        tasks = (
+            Task.create(session_id, {"R": "229", "L": "R + 30"}, expression_names=frozenset({"L"})),
+            Task.create(session_id, {"R": "230", "L": "R + 29"}, expression_names=frozenset({"L"})),
+        )
+        source = Path(__file__).parent / "data" / "Pillbox" / "Pillbox.cst"
+        root = Path.cwd() / ".pytest_cache" / "cst-p4" / session_id[:8]
+        workspace = prepare_warm_worker_workspace(
+            root, tasks, source, result_name="Frequency (Multiple Modes)/Mode 1"
+        )
+        log_path = root / "cst-warm-worker-v1.log"
+        baseline = cst_processes(windows_process_snapshot())
+    
+        with log_path.open("wb") as log:
+            process = subprocess.Popen(
+                [str(cst_executable), "-m", str(workspace.macro_path)],
+                stdout=log, stderr=subprocess.STDOUT,
+            )
+            forced_cleanup = {}
+            try:
+&gt;               first = wait_completion_or_controller_exit(workspace, tasks[0], process, timeout=300)
+
+test\protocol_warm_worker_integration_test.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+workspace = WarmWorkerWorkspace(root=WindowsPath('D:/work/cst_tools/.pytest_cache/cst-p4/568b765f'), protocol=&lt;csttool.runtime_pro...ack_path=WindowsPath('D:/work/cst_tools/.pytest_cache/cst-p4/568b765f/protocol/stop.ack'), profile_inventory_path=None)
+task = Task(task_id='d917a949-f16d-4234-b796-5b984d1b68f4', session_id='568b765f-fcf8-4b97-a121-d0f8f731d174', parameters=(Pa...literal'&gt;, value='229'), ParameterAssignment(name='L', kind=&lt;ParameterKind.EXPRESSION: 'expression'&gt;, value='R + 30')))
+process = &lt;Popen: returncode: 3221225477 args: ['D:\\Program Files (x86)\\CST Studio S...&gt;
+timeout = 300
+
+    def wait_completion_or_controller_exit(workspace, task, process, timeout):
+        deadline = time.monotonic() + timeout
+        while True:
+            completion = workspace.protocol.read_completion(task)
+            if completion is not None:
+                return completion
+            if process.poll() is not None:
+&gt;               raise AssertionError(
+                    "CST OLE controller exited before writing Completion; "
+                    f"return code={process.returncode}"
+                )
+E               AssertionError: CST OLE controller exited before writing Completion; return code=3221225477
+
+test\cst_integration_support.py:68: AssertionError</failure></testcase><testcase classname="test.protocol_worker_integration_test" name="test_worker_v1_solves_reads_native_rd0_then_acknowledges" time="12.860"><failure message="AssertionError: CST OLE controller exited before writing Completion; return code=3221225477">cst_executable = WindowsPath('D:/Program Files (x86)/CST Studio Suite 2022/CST DESIGN ENVIRONMENT.exe')
+
+    def test_worker_v1_solves_reads_native_rd0_then_acknowledges(cst_executable):
+        task = Task.create(
+            new_session_id(), {"nmodes": "1", "L": "R + 30"},
+            expression_names=frozenset({"L"}),
+        )
+        source_project = Path(__file__).parent / "data" / "Pillbox" / "Pillbox.cst"
+        workspace_root = Path.cwd() / ".pytest_cache" / "cst-p3" / task.task_id[:8]
+        workspace = prepare_worker_workspace(
+            workspace_root, task, source_project,
+            result_name="Frequency (Multiple Modes)/Mode 1",
+        )
+        log_path = workspace.root / "cst-worker-v1.log"
+        baseline = cst_processes(windows_process_snapshot())
+        with log_path.open("wb") as log:
+            process = subprocess.Popen(
+                [str(cst_executable), "-m", str(workspace.macro_path)],
+                stdout=log, stderr=subprocess.STDOUT,
+            )
+            forced_cleanup = {}
+            try:
+&gt;               completion = wait_completion_or_controller_exit(workspace, task, process, timeout=300)
+
+test\protocol_worker_integration_test.py:41: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+workspace = WorkerWorkspace(root=WindowsPath('D:/work/cst_tools/.pytest_cache/cst-p3/574b1415'), protocol=&lt;csttool.runtime_protoco...1415/runtime_worker_v1.bas'), marker_path=WindowsPath('D:/work/cst_tools/.pytest_cache/cst-p3/574b1415/worker.result'))
+task = Task(task_id='574b1415-bb36-433f-8c87-b3182b8cb5c7', session_id='51434777-88e6-4268-bac7-9a2f37dad6ac', parameters=(Pa... 'literal'&gt;, value='1'), ParameterAssignment(name='L', kind=&lt;ParameterKind.EXPRESSION: 'expression'&gt;, value='R + 30')))
+process = &lt;Popen: returncode: 3221225477 args: ['D:\\Program Files (x86)\\CST Studio S...&gt;
+timeout = 300
+
+    def wait_completion_or_controller_exit(workspace, task, process, timeout):
+        deadline = time.monotonic() + timeout
+        while True:
+            completion = workspace.protocol.read_completion(task)
+            if completion is not None:
+                return completion
+            if process.poll() is not None:
+&gt;               raise AssertionError(
+                    "CST OLE controller exited before writing Completion; "
+                    f"return code={process.returncode}"
+                )
+E               AssertionError: CST OLE controller exited before writing Completion; return code=3221225477
+
+test\cst_integration_support.py:68: AssertionError</failure></testcase></testsuite></testsuites>

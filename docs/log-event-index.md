@@ -24,6 +24,11 @@
 | `MANAGER_READY` | `csttool/cstmanager.py` |
 | `WORKER_CREATED` | `csttool/cstmanager.py` |
 | `WORKER_DIAGNOSTICS` | `csttool/managed_cstworker.py` |
+| `WORKER_START_FAILED` | `csttool/managed_cstworker.py` |
+| `WORKER_CLEANUP_FAILED` | `csttool/managed_cstworker.py` |
+| `WORKER_FAILURE_DIAGNOSTICS` | `csttool/managed_cstworker.py` |
+| `WORKER_DIAGNOSTICS_FAILED` | `csttool/managed_cstworker.py` |
+| `CST_WAIT_PROGRESS` | `csttool/managed_cstworker.py` |
 | `TASK_QUEUED` | `csttool/cstmanager.py` |
 | `WORKER_RESTART_START` | `csttool/cstmanager.py` |
 | `WORKER_RESTART_CANCELLED` | `csttool/cstmanager.py` |
