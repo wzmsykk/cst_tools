@@ -46,6 +46,11 @@ Sub Main
     stage = "solver"
     CSTPW_WriteMarker "%MARKER_PATH%", "stage:solver"
     solveStart = Timer
+    For i = 0 To task.ParameterCount - 1
+        If LCase(task.Parameters(i).Name) = "nmodes" Then
+            EigenmodeSolver.SetNumberOfModes "nmodes"
+        End If
+    Next i
     EigenmodeSolver.Start
     solveSeconds = CSTPW_Elapsed(solveStart, Timer)
 

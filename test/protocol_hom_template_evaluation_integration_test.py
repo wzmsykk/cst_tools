@@ -1,3 +1,4 @@
+from csttool.cst_process_env import cst_process_environment
 from dataclasses import replace
 import json
 import subprocess
@@ -54,7 +55,7 @@ def test_registered_templates_can_be_inventoried_and_evaluated_for_current_run(
     with (root / "cst-p5-6.log").open("wb") as log:
         process = subprocess.Popen(
             [str(cst_executable), "-m", str(worker.macro_path)],
-            stdout=log,
+            env=cst_process_environment(), stdout=log,
             stderr=subprocess.STDOUT,
         )
         forced = {}
@@ -120,7 +121,7 @@ def test_missing_profile_template_fails_before_solver_and_exits_cleanly(cst_exec
     with (root / "cst-p6-missing.log").open("wb") as log:
         process = subprocess.Popen(
             [str(cst_executable), "-m", str(worker.macro_path)],
-            stdout=log,
+            env=cst_process_environment(), stdout=log,
             stderr=subprocess.STDOUT,
         )
         forced = {}

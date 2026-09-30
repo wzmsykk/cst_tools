@@ -1,3 +1,4 @@
+from csttool.cst_process_env import cst_process_environment
 import json
 import re
 import subprocess
@@ -140,7 +141,7 @@ def test_cst_wwb_executes_protocol_golden_contract(cst_executable, tmp_path):
                 "-MacroPath",
                 str(workspace.macro_path),
             ],
-            stdout=log,
+            env=cst_process_environment(), stdout=log,
             stderr=subprocess.STDOUT,
         )
         forced_cleanup = {}

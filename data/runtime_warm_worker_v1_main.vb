@@ -75,6 +75,11 @@ Private Function CSTPWW_RunTask(ByVal taskPath As String, ByVal completionPath A
 
     stage = "solver"
     solveStart = Timer
+    For i = 0 To task.ParameterCount - 1
+        If LCase(task.Parameters(i).Name) = "nmodes" Then
+            EigenmodeSolver.SetNumberOfModes "nmodes"
+        End If
+    Next i
     EigenmodeSolver.Start
     solveSeconds = CSTPWW_Elapsed(solveStart, Timer)
 

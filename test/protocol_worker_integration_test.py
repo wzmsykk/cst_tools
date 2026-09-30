@@ -1,3 +1,4 @@
+from csttool.cst_process_env import cst_process_environment
 import math
 import subprocess
 import time
@@ -34,7 +35,7 @@ def test_worker_v1_solves_reads_native_rd0_then_acknowledges(cst_executable):
     with log_path.open("wb") as log:
         process = subprocess.Popen(
             [str(cst_executable), "-m", str(workspace.macro_path)],
-            stdout=log, stderr=subprocess.STDOUT,
+            env=cst_process_environment(), stdout=log, stderr=subprocess.STDOUT,
         )
         forced_cleanup = {}
         try:

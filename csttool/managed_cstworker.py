@@ -19,6 +19,7 @@ from .cst_progress import CstLogProgressMonitor, CstLogProgressParser
 from .vb_codec import quote_vb_string
 from .logging_config import ContextLogger
 from .worker_models import WorkerConfig, SimulationResult
+from .cst_process_env import cst_process_environment
 from .diagnostics import archive_task, write_run_manifest, write_failure_report
 from .runtime_protocol import (
     Acknowledge,
@@ -167,6 +168,7 @@ class ManagedCSTWorker:
         self._log_stream = self.log_path.open("wb", buffering=0)
         self._process = subprocess.Popen(
             [str(self.executable), "-m", str(self.macro_path)],
+            env=cst_process_environment(),
             stdout=self._log_stream,
             stderr=subprocess.STDOUT,
             **self._background_startup_options(),

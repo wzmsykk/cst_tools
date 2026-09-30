@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="15.292" timestamp="2026-09-30T16:22:34.940185" hostname="LAPTOP-JMVDV92E"><testcase classname="test.worker_startup_context_integration_test" name="test_identical_worker_startup_inside_pytest" time="13.692"><failure message="AssertionError: [{'case': 'normal', 'elapsed': 11.875, 'error': 'RuntimeError: managed CST worker exited with code 3221225477', 'qt_qpa_platform': 'offscreen', ...}]&#10;assert 1 == 2&#10; +  where 1 = len([{'case': 'normal', 'elapsed': 11.875, 'error': 'RuntimeError: managed CST worker exited with code 3221225477', 'qt_qpa_platform': 'offscreen', ...}])">cst_executable = WindowsPath('D:/Program Files (x86)/CST Studio Suite 2022/CST DESIGN ENVIRONMENT.exe')
+
+    def test_identical_worker_startup_inside_pytest(cst_executable):
+        reports = run_comparison(cst_executable)
+&gt;       assert len(reports) == 2, reports
+E       AssertionError: [{'case': 'normal', 'elapsed': 11.875, 'error': 'RuntimeError: managed CST worker exited with code 3221225477', 'qt_qpa_platform': 'offscreen', ...}]
+E       assert 1 == 2
+E        +  where 1 = len([{'case': 'normal', 'elapsed': 11.875, 'error': 'RuntimeError: managed CST worker exited with code 3221225477', 'qt_qpa_platform': 'offscreen', ...}])
+
+test\worker_startup_context_integration_test.py:10: AssertionError</failure></testcase></testsuite></testsuites>

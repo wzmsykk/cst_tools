@@ -23,6 +23,12 @@
 
 ### 2026-09-30 集成失败修复与复核
 
+- 最终全量复核（Qt 子进程环境隔离修复后）：19 passed，267 deselected，2762.56 秒；报告 `integration-qt-fixed-all-gates.xml`。此前“全量待重跑”的记录为历史阶段结论，现由本结果更新。本次验收针对 CST 2022.5 与测试工程，不包含早期残留会话的清理。
+
+- 已通过对照定位启动崩溃触发条件：GUI 测试收集时设置 `QT_QPA_PLATFORM=offscreen`，CST 继承后在 ready 前发生 `0xc0000005`；完整收集时仅去掉该变量，Worker 正常启动/停止。
+- 新增 `cst_process_environment()`，以环境副本移除 `QT_QPA_PLATFORM`、`QT_QPA_PLATFORM_PLUGIN_PATH`、`QT_PLUGIN_PATH`（Windows 下键名大小写不敏感）。接入生产预处理、Managed Worker 以及直接启动 CST/COM 的集成入口；父进程 GUI 设置、PATH、许可证变量不变，不修改系统全局环境。
+- 修复后完整 pytest 收集下的启动复核：1 passed，36.35 秒（`integration-qt-env-fix.xml`）；父进程仍为 offscreen，正常与最小化子进程均 Ready、Stop Ack、退出码 0 且无新增残留。普通回归 267 passed，19 deselected（新增两个启动对照集成用例）。尚未重跑全部求解验收。
+
 - 最新分项真实复核：Worker 重复任务及标准退出 1 passed（262.05 秒，`integration-worker-event-check.xml`）；工程预处理及源工程保护 1 passed（20.51 秒，`integration-preprocess-event-check.xml`）。分项通过不代表整组 17 项通过，亦不证明间歇性启动崩溃已消除。
 
 - 后续修复 Windows 事件采集：显式 UTF-8、稳定 `windows_events` 对象（status/events/error），无匹配事件返回成功空列表；进程失败保留退出码及 stdout/stderr 尾部，不再只保存 `CalledProcessError` 字符串。现场查询已成功读取 CST/QtitanBase1 崩溃记录；普通回归 265 passed。
@@ -45,3 +51,10 @@
 - 真实 CST 的失败、恢复、无 UI 残留和安全退出仍需单独集成验收；普通 pytest 通过不代表上述验收通过。
 - 历史设计文档可能保留旧文件名作为当时记录；当前实现位置以源码与事件索引为准。
 - `utils` 保持不变。
+
+## HOM 单次模式数量约束
+
+- 常规 HOM 扫描保持 `nmodes=1`；十模式故障恢复测试累计十次有效结果，不再继承源工程的模式数量。正常提交、失联提交及快照恢复后的任务均显式携带 `nmodes=1`。
+- 三种运行时 worker 在 Rebuild 后、求解前，将任务中显式提供的 `nmodes` 绑定到 EigenmodeSolver，防止只更新参数而求解器仍沿用原工程设置。未指定时保留工程设置；五模式专项测试继续使用 5，不全局覆盖为 1。
+- 新增模式数量契约测试；真实 CST 运行验收需单独记录，不以此前集成测试通过代替本次修改的验收。
+- 本次验证：非集成测试 271 passed / 19 deselected；真实 CST 2022 Pillbox 停止与快照恢复测试 1 passed（81.73 秒），报告 `integration-nmodes-single-stop-resume.xml`。十模式完整故障恢复及其他 worker 的真实集成测试尚未针对本次改动重跑。

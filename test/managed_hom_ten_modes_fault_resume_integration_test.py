@@ -47,6 +47,7 @@ def _config(
         "CSTENVPATH": str(cst_executable),
         "runInBackground": True,
         "paramList": [
+            {"name": "nmodes", "type": "double"},
             {"name": "fmin", "type": "double"},
             {"name": "fmax", "type": "double"},
         ],
@@ -72,14 +73,19 @@ def _result_values(result: dict) -> dict[str, float]:
 
 def _run_next(worker: ManagedCSTWorker, lo: float) -> dict:
     result = worker.run_task(
-        f"hom_from_{lo:.6f}", params={"fmin": lo, "fmax": lo + 50.0}
+        f"hom_from_{lo:.6f}", params=_single_mode_parameters(lo)
     )
     return _result_values(result)
 
 
+def _single_mode_parameters(lo: float) -> dict:
+    # Ten modes are accumulated across solves, never requested in one solve.
+    return {"nmodes": 1, "fmin": lo, "fmax": lo + 50.0}
+
+
 def _dispatch_next_without_controller(worker, lo: float) -> tuple[Task, int]:
     log_offset = worker.log_path.stat().st_size
-    task = Task.create(worker.session_id, {"fmin": lo, "fmax": lo + 50.0})
+    task = Task.create(worker.session_id, _single_mode_parameters(lo))
     worker.marker_path.write_text(f"dispatched:{task.task_id}", encoding="ascii")
     atomic_publish(worker.task_path, encode_task(task))
     return task, log_offset

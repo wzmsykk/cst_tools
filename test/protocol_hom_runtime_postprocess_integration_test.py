@@ -1,3 +1,4 @@
+from csttool.cst_process_env import cst_process_environment
 import json
 import math
 import subprocess
@@ -46,7 +47,7 @@ def test_hom_runtime_r_over_q_uses_solved_fields_without_parameter_update(
     with (root / "cst-p5-5.log").open("wb") as log:
         process = subprocess.Popen(
             [str(cst_executable), "-m", str(worker.macro_path)],
-            stdout=log,
+            env=cst_process_environment(), stdout=log,
             stderr=subprocess.STDOUT,
         )
         forced = {}

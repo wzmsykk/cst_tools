@@ -8,6 +8,7 @@ import os
 from pathlib import Path
 import shutil
 import subprocess
+from .cst_process_env import cst_process_environment
 import tempfile
 from typing import Callable
 
@@ -136,6 +137,7 @@ class CstProjectPreprocessor:
             try:
                 completed = self.runner(
                     command,
+                    env=cst_process_environment(),
                     capture_output=True,
                     text=True,
                     errors="replace",

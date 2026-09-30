@@ -51,6 +51,11 @@ Sub Main
             End If
 
             stage = "solver"
+            For i = 0 To task.ParameterCount - 1
+                If LCase(task.Parameters(i).Name) = "nmodes" Then
+                    EigenmodeSolver.SetNumberOfModes "nmodes"
+                End If
+            Next i
             EigenmodeSolver.Start
 
             stage = "postprocess"

@@ -1,3 +1,4 @@
+from csttool.cst_process_env import cst_process_environment
 from dataclasses import replace
 import json
 import subprocess
@@ -43,7 +44,7 @@ def _run_cold(cst_executable, root, source, parameters):
     with (root / "cst-cold.log").open("wb") as log:
         process = subprocess.Popen(
             [str(cst_executable), "-m", str(workspace.macro_path)],
-            stdout=log, stderr=subprocess.STDOUT,
+            env=cst_process_environment(), stdout=log, stderr=subprocess.STDOUT,
         )
         forced = {}
         try:
@@ -76,7 +77,7 @@ def _run_warm(cst_executable, root, source, parameter_sets):
     with (root / "cst-warm.log").open("wb") as log:
         process = subprocess.Popen(
             [str(cst_executable), "-m", str(workspace.macro_path)],
-            stdout=log, stderr=subprocess.STDOUT,
+            env=cst_process_environment(), stdout=log, stderr=subprocess.STDOUT,
         )
         forced = {}
         try:
@@ -183,7 +184,7 @@ def test_missing_hom_profile_template_stops_warm_session_before_first_solver(
     with (root / "cst-p6-5-missing.log").open("wb") as log:
         process = subprocess.Popen(
             [str(cst_executable), "-m", str(workspace.macro_path)],
-            stdout=log,
+            env=cst_process_environment(), stdout=log,
             stderr=subprocess.STDOUT,
         )
         forced = {}
