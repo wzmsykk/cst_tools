@@ -74,7 +74,7 @@ def manager_factory(tmp_path):
         def worker_factory(worker_id, config, logger):
             worker = FakeWorker(worker_id, tracker, shared_outcomes)
             tracker["created"].append(worker)
-            tracker["configs"].append(dict(config))
+            tracker["configs"].append(config)
             return worker
 
         manager = CSTManager(
@@ -167,7 +167,7 @@ def test_worker_recycle_uses_its_last_confirmed_project_snapshot(tmp_path):
             self.stopped = True
 
     def worker_factory(worker_id, config, _logger):
-        configs.append(dict(config))
+        configs.append(config)
         worker = SnapshotWorker(worker_id)
         created.append(worker)
         return worker
@@ -190,7 +190,7 @@ def test_worker_recycle_uses_its_last_confirmed_project_snapshot(tmp_path):
 
         assert len(created) == 2
         assert created[0].stopped
-        assert Path(configs[1]["cstPath"]) == snapshot.resolve()
+        assert Path(configs[1].project_path) == snapshot.resolve()
         assert manager.get_confirmed_snapshot() == snapshot.resolve()
     finally:
         manager.stop()
@@ -209,7 +209,7 @@ def test_standard_batch_recycle_starts_from_base_project(tmp_path):
             return result
 
     def worker_factory(worker_id, config, _logger):
-        configs.append(dict(config))
+        configs.append(config)
         return SnapshotWorker(
             worker_id,
             {"lock": Lock(), "active": 0, "peak": 0},
@@ -230,7 +230,7 @@ def test_standard_batch_recycle_starts_from_base_project(tmp_path):
         )
 
         assert len(configs) == 2
-        assert Path(configs[1]["cstPath"]) == (tmp_path / "model.cst").resolve()
+        assert Path(configs[1].project_path) == (tmp_path / "model.cst").resolve()
         assert manager.get_confirmed_snapshot() is None
     finally:
         manager.stop()
@@ -244,7 +244,7 @@ def test_explicit_snapshot_restore_rebuilds_idle_worker_pool(tmp_path):
     snapshot.write_bytes(b"confirmed")
 
     def worker_factory(worker_id, config, _logger):
-        configs.append(dict(config))
+        configs.append(config)
         worker = FakeWorker(
             worker_id,
             {"lock": Lock(), "active": 0, "peak": 0},
@@ -266,7 +266,7 @@ def test_explicit_snapshot_restore_rebuilds_idle_worker_pool(tmp_path):
         assert len(created) == 4
         assert all(worker.stopped for worker in created[:2])
         assert all(
-            Path(config["cstPath"]) == snapshot.resolve() for config in configs[2:]
+            Path(config.project_path) == snapshot.resolve() for config in configs[2:]
         )
     finally:
         manager.stop()

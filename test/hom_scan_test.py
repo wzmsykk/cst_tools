@@ -15,7 +15,7 @@ from csttool.hom_scan import (
     ScanPolicy,
     ScanReport,
 )
-from csttool.myAlgorithm_pop import HomScanAlgorithm
+from csttool.hom_scan_algorithm import HomScanAlgorithm
 
 
 def mode(frequency):

@@ -20,6 +20,7 @@ from uuid import uuid4
 
 from .configuration import GlobalSettings, ProjectSettings
 from .logging_config import ContextLogger
+from .worker_models import WorkerConfig, SimulationResult
 
 
 class WorkerProtocol(Protocol):
@@ -27,7 +28,7 @@ class WorkerProtocol(Protocol):
 
     ID: str
 
-    def run_task(self, result_name: str, *, params: Mapping[str, Any]) -> dict: ...
+    def run_task(self, result_name: str, *, params: Mapping[str, Any]) -> SimulationResult | dict: ...
 
     def stop(self) -> Any: ...
 
@@ -96,7 +97,7 @@ class _WorkerSlot:
     confirmed_snapshot: Path | None = None
 
 
-WorkerFactory = Callable[[str, dict[str, Any], logging.Logger], WorkerProtocol]
+WorkerFactory = Callable[[str, WorkerConfig, logging.Logger], WorkerProtocol]
 
 
 class CSTManager:
@@ -193,22 +194,18 @@ class CSTManager:
 
     def _worker_config(
         self, worker_id: str, source_project: str | Path | None = None
-    ) -> dict[str, Any]:
+    ) -> WorkerConfig:
         worker_dir = self.tempDir / f"worker_{worker_id}"
         worker_dir.mkdir(parents=True, exist_ok=True)
-        return {
-            "tempDir": str(worker_dir),
-            "taskFileDir": str(worker_dir),
-            "CSTENVPATH": str(
-                self.global_settings.cst.executable
-            ),
-            "resultDir": str(self.resultDir),
-            "cstPath": str(source_project or self.cstProjPath),
-            "paramList": self.paramList,
-            "postProcess": self.pconfm.get_postprocess_settings(),
-            "runInBackground": True,
-            "progressCallback": self._progress_callback,
-        }
+        return WorkerConfig(
+            task_directory=worker_dir,
+            result_directory=self.resultDir,
+            executable=self.global_settings.cst.executable,
+            project_path=Path(source_project or self.cstProjPath),
+            parameters=tuple(self.paramList),
+            postprocess=tuple(self.pconfm.get_postprocess_settings()),
+            progress_callback=self._progress_callback,
+        )
 
     def _create_worker(
         self, worker_id: str, source_project: str | Path | None = None
@@ -382,6 +379,8 @@ class CSTManager:
                     task.job_name,
                     params=task.params,
                 )
+                if isinstance(result, SimulationResult):
+                    result = result.to_mapping()
             except Exception as exc:
                 self.logger.exception(
                     "Worker 执行异常 | worker=%s job=%s project=%s attempt=%d",

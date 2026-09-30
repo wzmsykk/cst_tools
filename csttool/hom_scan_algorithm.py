@@ -1,9 +1,9 @@
-"""produce LHS sample"""
+"""Sequential HOM scanning, checkpoints and result export."""
 import os
 import logging
 import hashlib
 import json
-from .myAlgorithm import Algorithm
+from .algorithm import Algorithm
 
 import math
 import numpy as np

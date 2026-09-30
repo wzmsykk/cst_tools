@@ -18,6 +18,8 @@ from .postprocess_cst import CstPostProcessor
 from .cst_progress import CstLogProgressMonitor, CstLogProgressParser
 from .vb_codec import quote_vb_string
 from .logging_config import ContextLogger
+from .worker_models import WorkerConfig, SimulationResult
+from .diagnostics import write_run_manifest
 from .runtime_protocol import (
     Acknowledge,
     CompletionStatus,
@@ -40,21 +42,23 @@ class ManagedCSTWorker:
     TASK_TIMEOUT = 1200.0
     STOP_TIMEOUT = 120.0
 
-    def __init__(self, worker_id: str, config: Mapping[str, Any], logger=None):
+    def __init__(self, worker_id: str, config: WorkerConfig, logger=None):
+        if isinstance(config, Mapping):
+            config = WorkerConfig.from_mapping(config)
         self.ID = worker_id
         self.logger = logger or logging.getLogger(__name__)
-        worker_root = Path(config["taskFileDir"]).resolve()
+        worker_root = config.task_directory.resolve()
         self.session_id = new_session_id()
         self.logger = ContextLogger(self.logger, {
             "worker": worker_id, "session": self.session_id,
         })
         self.root = worker_root / self.session_id
-        self.result_root = Path(config["resultDir"]).resolve() / f"worker_{worker_id}"
-        self.source_project = Path(config["cstPath"]).resolve()
-        self.executable = Path(config["CSTENVPATH"]).resolve()
-        self.parameter_definitions = tuple(config["paramList"])
+        self.result_root = config.result_directory.resolve() / f"worker_{worker_id}"
+        self.source_project = config.project_path.resolve()
+        self.executable = config.executable.resolve()
+        self.parameter_definitions = tuple(config.parameters)
         self.postprocess = CstPostProcessor()
-        self.postprocess.configure(config.get("postProcess", ()))
+        self.postprocess.configure(config.postprocess)
         self.protocol = FileProtocol(self.root / "protocol")
         self.task_path = self.protocol.root / "current.task"
         self.completion_path = self.protocol.root / "current.completion"
@@ -70,14 +74,25 @@ class ManagedCSTWorker:
         self._stopping = False
         self._process: subprocess.Popen | None = None
         self._log_stream = None
-        self._run_in_background = bool(config.get("runInBackground", True))
+        self._run_in_background = config.background
         self._last_window_check = 0.0
-        self._progress_callback = config.get("progressCallback")
+        self._progress_callback = config.progress_callback
         self._active_task_context: dict[str, Any] = {}
         self._progress_monitor: CstLogProgressMonitor | None = None
 
         self.root.mkdir(parents=True, exist_ok=True)
         self.result_root.mkdir(parents=True, exist_ok=True)
+        artifacts = {
+            "cst_log": self.log_path, "macro": self.macro_path,
+            "project": self.project_path, "task": self.task_path,
+            "completion": self.completion_path, "ack": self.ack_path,
+            "state": self.marker_path, "stop_request": self.stop_request_path,
+            "stop_ack": self.stop_ack_path, "results": self.result_root,
+        }
+        manifest = write_run_manifest(self.root / "diagnostics.json", config, artifacts,
+                                      context={"worker": worker_id, "session": self.session_id})
+        self.logger.info("Worker 诊断入口已保存 | WORKER_DIAGNOSTICS path=%s", manifest,
+                         extra={"event": "WORKER_DIAGNOSTICS", "phase": "prepare", "artifacts": {**artifacts, "manifest": manifest}})
         shutil.copy2(self.source_project, self.project_path)
         self._build_macro()
         self._start()
@@ -235,7 +250,7 @@ class ManagedCSTWorker:
         except (TypeError, ValueError):
             return False
 
-    def run_task(self, result_name: str, *, params: Mapping[str, Any]) -> dict:
+    def run_task(self, result_name: str, *, params: Mapping[str, Any]) -> SimulationResult:
         with self._lock:
             if self._stopping:
                 raise RuntimeError("managed CST worker is stopping")
@@ -316,17 +331,10 @@ class ManagedCSTWorker:
                 time.monotonic() - started_at,
                 failure or "none",
                 result_name, extra={"event": "WORKER_TASK_COMPLETE", "phase": "solve", "worker": self.ID, "task": task.task_id, "status": status, "elapsed_seconds": time.monotonic() - started_at, "failure": failure or "none", "job": result_name})
-            return {
-                "WorkerID": self.ID,
-                "TaskStatus": status,
-                "FailureReport": failure,
-                "RunName": result_name,
-                "RunParameters": dict(params),
-                "PostProcessResult": postprocess_result,
-                "ProjectSnapshot": (
-                    str(project_snapshot.resolve()) if status == "Success" else None
-                ),
-            }
+            return SimulationResult(
+                self.ID, status, result_name, dict(params), postprocess_result,
+                failure, project_snapshot.resolve() if status == "Success" else None,
+            )
 
     @staticmethod
     def _progress_number(value):

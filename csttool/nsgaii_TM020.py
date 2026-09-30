@@ -1,7 +1,7 @@
 """produce LHS sample"""
 
 import os, shutil
-from .myAlgorithm import Algorithm
+from .algorithm import Algorithm
 from random import random, seed, shuffle, choices, sample
 from math import inf, sqrt, floor
 from time import sleep

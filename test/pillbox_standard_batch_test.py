@@ -31,7 +31,7 @@ class _ProjectConfig:
 class _AnalyticPillboxWorker:
     def __init__(self, worker_id, config, tracker):
         self.ID = worker_id
-        self.source_project = Path(config["cstPath"])
+        self.source_project = config.project_path
         self.tracker = tracker
         self.stopped = False
 
@@ -70,7 +70,7 @@ def test_standard_manager_batch_optimizes_pillbox_radius_to_500_mhz(tmp_path):
     worker_sources = deque()
 
     def worker_factory(worker_id, config, _logger):
-        worker_sources.append(Path(config["cstPath"]).resolve())
+        worker_sources.append(config.project_path.resolve())
         worker = _AnalyticPillboxWorker(worker_id, config, tracker)
         workers.append(worker)
         return worker
@@ -155,7 +155,7 @@ def _fault_test_manager(tmp_path, faults):
     }
 
     def worker_factory(worker_id, config, _logger):
-        tracker["sources"].append(Path(config["cstPath"]).resolve())
+        tracker["sources"].append(config.project_path.resolve())
         worker = _FaultInjectingPillboxWorker(worker_id, config, tracker)
         tracker["workers"].append(worker)
         return worker

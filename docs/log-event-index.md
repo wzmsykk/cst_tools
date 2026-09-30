@@ -12,6 +12,9 @@
 | `MESH_CONVERGENCE_POINT` | `csttool/application_backend.py` |
 | `RUN_EXECUTE_START` | `csttool/application_backend.py` |
 | `RUN_EXECUTE_DONE` | `csttool/application_backend.py` |
+| `RUN_EXECUTE_FAILED` | `csttool/application_backend.py` |
+| `RUN_INTERRUPTED` | `csttool/application_backend.py` |
+| `RUN_SHUTDOWN_FAILED` | `csttool/application_backend.py` |
 | `RUN_STOP_REQUESTED` | `csttool/application_backend.py` |
 | `RECOVERY_START` | `csttool/application_backend.py` |
 | `RECOVERY_REQUIRED` | `csttool/application_backend.py` |
@@ -20,6 +23,7 @@
 | `PROJECT_LOCK_RELEASED` | `csttool/application_backend.py` |
 | `MANAGER_READY` | `csttool/cstmanager.py` |
 | `WORKER_CREATED` | `csttool/cstmanager.py` |
+| `WORKER_DIAGNOSTICS` | `csttool/managed_cstworker.py` |
 | `TASK_QUEUED` | `csttool/cstmanager.py` |
 | `WORKER_RESTART_START` | `csttool/cstmanager.py` |
 | `WORKER_RESTART_CANCELLED` | `csttool/cstmanager.py` |
@@ -43,7 +47,6 @@
 | `WORKER_STOP_REQUEST` | `csttool/managed_cstworker.py` |
 | `WORKER_STOPPED` | `csttool/managed_cstworker.py` |
 | `WORKER_STOP_FAILED` | `csttool/managed_cstworker.py` |
-| `HOM_RESUMED` | `csttool/myAlgorithm_pop.py` |
-| `HOM_CHECKPOINT` | `csttool/myAlgorithm_pop.py` |
-| `HOM_INTERVAL` | `csttool/myAlgorithm_pop.py` |
-
+| `HOM_RESUMED` | `csttool/hom_scan_algorithm.py` |
+| `HOM_CHECKPOINT` | `csttool/hom_scan_algorithm.py` |
+| `HOM_INTERVAL` | `csttool/hom_scan_algorithm.py` |

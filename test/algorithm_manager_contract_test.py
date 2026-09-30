@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from csttool.cstmanager import SimulationTask
-from csttool.myAlgorithm_pop import HomScanAlgorithm
+from csttool.hom_scan_algorithm import HomScanAlgorithm
 
 
 class ModernManagerOnly:

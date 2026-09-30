@@ -4,7 +4,7 @@ import json
 import pytest
 
 from csttool.hom_scan import AdaptiveHomScanner, IncompleteScanError, ScanPolicy
-from csttool.myAlgorithm_pop import HomScanAlgorithm
+from csttool.hom_scan_algorithm import HomScanAlgorithm
 from test.support.hom_fake_worker import (
     EmpiricalHomSpectrum,
     HomFakeOutcome,

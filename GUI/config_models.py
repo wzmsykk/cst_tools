@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from typing import Any, Mapping, Sequence
 
 from csttool.postprocess_cst import CstPostProcessor
+from csttool.postprocess_metrics import METRICS, uses_integration_line
 
 
 PPS_SCHEMA_VERSION = 1
@@ -84,18 +85,7 @@ class AlgorithmSettings:
 
 
 _DISPLAY_NAMES = {
-    "R_over_Q": "R/Q",
-    "Shunt_Impedance": "Shunt Impedance",
-    "Q_Factor": "Q Factor",
-    "Q_Ext": "External Q",
-    "Total_Loss": "Total Loss",
-    "Loss_Enclosure": "Enclosure Loss",
-    "Loss_Volume": "Volume Loss",
-    "Loss_Surface": "Surface Loss",
-    "Q_Enclosure": "Enclosure Q",
-    "Q_Volume": "Volume Q",
-    "Q_Surface": "Surface Q",
-    "Total_Energy": "Total Energy",
+    **{name: metric.label for name, metric in METRICS.items()},
     "Frequency": "Frequency",
     "ModeRec_All": "All-mode Record",
     "Direct_PPS_0D": "CST 0D Result",
@@ -134,7 +124,7 @@ class PostProcessSetting:
             if isinstance(mode, bool) or not isinstance(mode, int) or mode < 1:
                 raise ValueError(f"{method} 的 Mode Index 必须是正整数")
         base = method[:-4] if method.endswith("_All") else method
-        if base in {"R_over_Q", "Shunt_Impedance"}:
+        if uses_integration_line(method):
             axis = str(normalized.get("axis", "z")).strip().lower()
             if axis not in {"x", "y", "z"}:
                 raise ValueError(f"{method} 的积分轴必须是 X、Y 或 Z")
@@ -152,7 +142,7 @@ class PostProcessSetting:
     def display_text(self) -> str:
         label = postprocess_display_name(self.method)
         base = self.method[:-4] if self.method.endswith("_All") else self.method
-        if base in {"R_over_Q", "Shunt_Impedance"}:
+        if uses_integration_line(self.method):
             label = f"{label} [{self.params['axis'].upper()}轴]"
         return f"{self.result_name} — {label}"
 

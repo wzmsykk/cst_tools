@@ -15,7 +15,7 @@ from uuid import uuid4
 
 from install_compat import resource_path
 
-from csttool import cstmanager, globalconfmanager, myAlgorithm_pop
+from csttool import cstmanager, globalconfmanager, hom_scan_algorithm
 from csttool.logging_config import ApplicationLogSession, ContextLogger
 from csttool.managed_cstworker import ManagedCSTWorker
 from csttool import projectconfmanager
@@ -106,7 +106,7 @@ class CstApplicationBackend:
             GlobalConfigManager=self.gconfman,
             logger=self.logger,
         )
-        self.alg = algorithm or myAlgorithm_pop.HomScanAlgorithm(manager=None, params=None)
+        self.alg = algorithm or hom_scan_algorithm.HomScanAlgorithm(manager=None, params=None)
         self._uses_default_manager = manager_factory is None
         self._manager_factory = manager_factory or cstmanager.CSTManager
 
@@ -380,10 +380,12 @@ class CstApplicationBackend:
             result = self.alg.start()
         except ScanInterrupted as exc:
             failure = exc
+            self.logger.warning("运行已中断，可从安全快照继续", extra={"event": "RUN_INTERRUPTED", "phase": "execute", "reason": str(exc)})
             self._set_state(BackendState.INTERRUPTED)
             raise
         except KeyboardInterrupt as exc:
             failure = exc
+            self.logger.warning("用户中断运行，开始安全停止", extra={"event": "RUN_INTERRUPTED", "phase": "execute"})
             self._set_state(BackendState.INTERRUPTED)
             manager = self.jm
             if manager is not None and hasattr(manager, "request_stop"):
@@ -391,6 +393,7 @@ class CstApplicationBackend:
             raise
         except Exception as exc:
             failure = exc
+            self.logger.exception("运行失败，开始安全停止", extra={"event": "RUN_EXECUTE_FAILED", "phase": "execute"})
             self._set_state(BackendState.FAILED)
             raise
         finally:
@@ -398,6 +401,7 @@ class CstApplicationBackend:
                 self._stop_manager_once()
             except Exception:
                 self._set_state(BackendState.RECOVERY_REQUIRED)
+                self.logger.exception("安全停止失败，需要恢复会话", extra={"event": "RUN_SHUTDOWN_FAILED", "phase": "shutdown"})
                 if failure is None:
                     raise
                 self.logger.exception("运行失败后关闭 Worker 失败，需要会话恢复 | project=%s", self.get_project_directory())

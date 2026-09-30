@@ -10,6 +10,7 @@ from install_compat import resource_path
 from . import postprocess_readers
 
 from .hom_result_plan import IntegrationLine
+from .postprocess_metrics import METRICS
 
 
 Readout = Callable[[str | None], Any]
@@ -22,24 +23,10 @@ class CstPostProcessor:
     :meth:`configure`.
     """
 
-    _SIMPLE_METRICS = {
-        "Q_Factor": ("Q-Factor", "Q_Factor"),
-        "Q_Ext": ("Q_Ext", "Q_Ext"),
-        "Frequency": ("Frequency", "Frequency"),
-        "Total_Loss": ("Total Loss", "Total_Loss"),
-        "Loss_Enclosure": ("Loss_Enclosure", "Loss_Enclosure"),
-        "Loss_Volume": ("Loss_Volume", "Loss_Volume"),
-        "Loss_Surface": ("Loss_Surface", "Loss_Surface"),
-        "Q_Enclosure": ("Q_Enclosure", "Q_Enclosure"),
-        "Q_Volume": ("Q_Volume", "Q_Volume"),
-        "Q_Surface": ("Q_Surface", "Q_Surface"),
-        "Total_Energy": ("Total Energy", "Total_Energy"),
-    }
-    _COMPLEX_METRICS = {
-        "R_over_Q": ("R over Q", "ROQ"),
-        # CST's result query itself uses this vendor-defined misspelling.
-        "Shunt_Impedance": ("Shunt Inpedence", "SI"),
-    }
+    _SIMPLE_METRICS = {name: (metric.query, metric.token)
+                       for name, metric in METRICS.items() if not metric.integration_line}
+    _COMPLEX_METRICS = {name: (metric.query, metric.token)
+                        for name, metric in METRICS.items() if metric.integration_line}
 
     def __init__(self) -> None:
         self.resultDir: Path | None = None

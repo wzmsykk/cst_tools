@@ -213,13 +213,13 @@ class ProjectConfigManager:
 
     def __savecfgobj(self, confobj, cfgfilename="project.ini", slient=False):
         cfgfilePath = self.currProjectDir / cfgfilename
-        settings = ProjectSettings.from_parser(confobj)
+        settings = confobj if isinstance(confobj, ProjectSettings) else ProjectSettings.from_parser(confobj)
         normalized = settings.to_parser()
         write_ini_atomic(cfgfilePath, normalized)
         self.settings = settings
 
     def savecfg(self, cfgfilename="project.ini"):
-        self.__savecfgobj(self.conf, cfgfilename)
+        self.__savecfgobj(self.settings, cfgfilename)
 
     def createNewEmptyProjectConfFile(
         self, projectDir="", cfgfilename="project.ini", projectname=None
@@ -273,12 +273,11 @@ class ProjectConfigManager:
         return confobj
 
     def update_task_status(self, taskstatus):
-        settings = getattr(self, "settings", None) or ProjectSettings.from_parser(
-            self.conf
-        )
+        settings = self.settings
+        if settings is None:
+            raise ProjectStatusError("project settings are not prepared")
         self.settings = replace(settings, task_status=taskstatus.name)
-        self.conf = self.settings.to_parser()
-        self.__savecfgobj(self.conf)
+        self.__savecfgobj(self.settings)
         self.logger.info("项目状态已更新 | project=%s status=%s", self.currProjectDir, taskstatus.name)
         return taskstatus
 
@@ -309,7 +308,9 @@ class ProjectConfigManager:
         self.logger.debug("项目参数已读取 | project=%s count=%d", projectDir, len(pamlist))
 
     def get_parameters(self):
-        return self.__get_parameters(self.conf, self.currProjectDir)
+        if self.settings is None:
+            raise ProjectStatusError("project settings are not prepared")
+        return read_json(self.currProjectDir / self.settings.parameter_file)
 
     def __get_parameters(self, confobj, projectDir, jsonpath=None):
         """从生成的json读取Model结构参数列表 read model parameters from json filepath
@@ -418,7 +419,6 @@ class ProjectConfigManager:
             self.logger.debug("测试项目配置文件存在 失败")
             result = False
         self.conf = read_ini(cfgpath)
-        self.settings = ProjectSettings.from_parser(self.conf)
         self.logger.debug("测试CST模型文件是否存在")
         cstfilepath = self.currProjectDir / self.settings.cst_filename
         self.logger.debug("推测模型文件位于%s", str(cstfilepath))
@@ -481,7 +481,6 @@ class ProjectConfigManager:
             result = False
 
         self.conf = read_ini(cfgpath)
-        self.settings = ProjectSettings.from_parser(self.conf)
         cstfilepath = self.currProjectDir / self.settings.cst_filename
         self.logger.debug("测试CST模型文件是否存在")
         self.logger.debug("推测模型文件位于%s", str(cstfilepath))
