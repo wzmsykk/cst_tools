@@ -4,12 +4,12 @@ import json
 import logging
 from pathlib import Path
 import shutil
+import stat
 from dataclasses import replace
 from enum import Enum
 from install_compat import resource_path
 from .cst_preprocessor import CstProjectPreprocessor
 from .configuration import (
-    GlobalSettings,
     ProjectSettings,
     read_json,
     read_ini,
@@ -47,16 +47,8 @@ class ProjectConfigManager:
             self.logger = logger
         else:
             self.logger = logging.getLogger(__name__)
-        self.gconf = GlobalConfigManager.conf
-        self.global_settings = getattr(GlobalConfigManager, "settings", None)
-        if self.global_settings is None:
-            compatible = GlobalSettings().to_parser()
-            for section in self.gconf.sections():
-                if not compatible.has_section(section):
-                    compatible.add_section(section)
-                for key, value in self.gconf.items(section):
-                    compatible.set(section, key, value)
-            self.global_settings = GlobalSettings.from_parser(compatible)
+        self._global_config_manager = GlobalConfigManager
+        self.global_settings = GlobalConfigManager.settings
         self.settings: ProjectSettings | None = None
         self.inputCSTFilePath = None
         self.currProjectDir = None
@@ -129,6 +121,7 @@ class ProjectConfigManager:
 
     def prepareProject(self, startFromExisted=False, *, mesh_cells_per_wavelength=20):
         # startFromExisted=True 从已有开始 不需要CST文件
+        self.setNotReady()
         self.logger.info("准备项目文件")
         iProjectDir = self.currProjectDir
         iInputCSTFilePath = self.inputCSTFilePath
@@ -139,6 +132,10 @@ class ProjectConfigManager:
             if iInputCSTFilePath == None or not iInputCSTFilePath.exists():
                 self.logger.error("未找到输入CST文件%s。" % str(iInputCSTFilePath))
                 raise FileNotFoundError
+            input_mode = iInputCSTFilePath.stat().st_mode
+            if not input_mode & stat.S_IWRITE:
+                iInputCSTFilePath.chmod(input_mode | stat.S_IWRITE)
+                self.logger.info("已清除输入 CST 文件的只读属性：%s", iInputCSTFilePath)
         dirClean = self.__isDirClean(iProjectDir)
         iConf = None
 
@@ -148,9 +145,10 @@ class ProjectConfigManager:
                 raise ProjectStatusError("尝试从空白目录继续")
             self.logger.info("目录%s无旧文件" % str(iProjectDir))
             self.logger.info("尝试从project目录%s创建空白配置文件。" % str(iProjectDir))
-            iConf = self.createNewEmptyProjectConfFile(iProjectDir)
-            iConf = replace(
-                ProjectSettings.from_parser(iConf),
+            # Publish project.ini only after preprocessing succeeds. An empty
+            # READY configuration would make the next attempt look like a resume.
+            iConf = ProjectSettings(
+                name=iProjectDir.name,
                 cells_per_wavelength=int(mesh_cells_per_wavelength),
             ).to_parser()
 
@@ -348,6 +346,8 @@ class ProjectConfigManager:
         mesh_cells_per_wavelength=20,
     ):
         """Create and validate a prepared project without modifying its source."""
+        # Installation selection replaces the immutable global settings object.
+        self.global_settings = self._global_config_manager.settings
         settings = ProjectSettings.from_parser(confobj)
         if savejsonpath is None:
             jsonpath = projectDir / self.paramsfilename
@@ -423,7 +423,7 @@ class ProjectConfigManager:
         self.conf = read_ini(cfgpath)
         self.settings = ProjectSettings.from_parser(self.conf)
         self.logger.info("测试CST模型文件是否存在")
-        cstfilepath = self.currProjectDir / self.settings.cst_filename
+        cstfilepath = self._require_cst_project_file(cfgpath)
         self.logger.debug("推测模型文件位于%s", str(cstfilepath))
         if cstfilepath.exists():
             self.logger.info("测试CST模型文件存在 通过")
@@ -457,13 +457,26 @@ class ProjectConfigManager:
             self.logger.warning("重新生成并保存参数列表")
             self.conf = self.__autoPreProcess(self.conf, cstfilepath)
             # self.readParametersFromCST(paramjsonpath)
-            self.__savecfgobj()
+            self.__savecfgobj(self.conf)
         if not ppsjsonpath.exists():
             self.logger.warning("后处理设置文件_%s不存在" % str(paramjsonpath))
             self.logger.warning("重新生成并保存参数列表")
             self.savePPSSettings(self.currPPSList)
         self.logger.info("%s检测并更新项目配置文件结束\n" % cfgfilename)
         return result
+
+    def _require_cst_project_file(self, cfgpath):
+        if self.settings.cst_filename is None:
+            raise ProjectStatusError(
+                f"项目配置 {cfgpath} 缺少 CST 模型文件名（[cst] project_file）；"
+                "项目可能尚未完成预处理。请使用原始 CST 文件在新的项目目录重新创建项目。"
+            )
+        cstfilepath = self.currProjectDir / self.settings.cst_filename
+        if not cstfilepath.is_file():
+            raise ProjectStatusError(
+                f"项目配置 {cfgpath} 指定的 CST 模型文件不存在或不是文件：{cstfilepath}"
+            )
+        return cstfilepath
 
     def __checkProjectStatus(
         self, cfgfilename="project.ini", slient=False, force=False
@@ -485,7 +498,7 @@ class ProjectConfigManager:
 
         self.conf = read_ini(cfgpath)
         self.settings = ProjectSettings.from_parser(self.conf)
-        cstfilepath = self.currProjectDir / self.settings.cst_filename
+        cstfilepath = self._require_cst_project_file(cfgpath)
         self.logger.info("测试CST模型文件是否存在")
         self.logger.debug("推测模型文件位于%s", str(cstfilepath))
         if cstfilepath.exists():

@@ -6,6 +6,7 @@ from time import sleep
 
 import pytest
 
+from csttool.configuration import CstBackendSettings, GlobalSettings, ProjectSettings
 from csttool.cstmanager import CSTManager
 from csttool.pillbox_analytic import (
     PillboxRadiusBatchOptimizer,
@@ -16,20 +17,13 @@ from csttool.pillbox_analytic import (
 
 class _GlobalConfig:
     def __init__(self, root: Path):
-        self.conf = {
-            "BASE": {"datadir": str(root / "data")},
-            "CST": {"cstexepath": str(root / "cst.exe")},
-        }
+        self.settings = GlobalSettings(cst=CstBackendSettings(executable=root / "cst.exe"))
 
 
 class _ProjectConfig:
     def __init__(self, root: Path):
         self.currProjectDir = root
-        self.conf = {
-            "DIRS": {"tempdir": "temp", "resultdir": "result"},
-            "CST": {"CSTFilename": "Pillbox.cst"},
-            "PROJECT": {"ProjectType": "pillbox-analytic"},
-        }
+        self.settings = ProjectSettings(name="pillbox-analytic", cst_filename=Path("Pillbox.cst"))
 
     def getCurrPPSList(self):
         return []

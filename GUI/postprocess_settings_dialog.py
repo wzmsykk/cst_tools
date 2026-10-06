@@ -10,12 +10,14 @@ from PyQt5.QtCore import QAbstractListModel, QModelIndex, Qt, pyqtSignal
 from PyQt5.QtGui import QDoubleValidator, QIntValidator
 from PyQt5.QtWidgets import (
     QDialog,
+    QComboBox,
     QFileDialog,
     QGridLayout,
     QHBoxLayout,
     QLabel,
     QListView,
     QMessageBox,
+    QPushButton,
     QVBoxLayout,
 )
 
@@ -112,6 +114,21 @@ class PostProcessListModel(QAbstractListModel):
         )
         return True
 
+    def set_integration_axis(self, axis):
+        axis = str(axis).strip().lower()
+        if axis not in {"x", "y", "z"}:
+            raise ValueError("积分轴必须是 X、Y 或 Z")
+        updates = []
+        for row, setting in enumerate(self.pps):
+            base = setting.method.removesuffix("_All")
+            if base in {"R_over_Q", "Shunt_Impedance"}:
+                payload = setting.to_backend_payload()
+                payload["params"]["axis"] = axis
+                updates.append((row, PostProcessSetting.from_mapping(payload)))
+        for row, setting in updates:
+            self.replaceRow(row, setting)
+        return len(updates)
+
     @staticmethod
     def _ensure_unique(settings):
         names = [item.result_name for item in settings]
@@ -196,16 +213,12 @@ class AddPostProcessDialog(QDialog, Ui_AddComplexPostDialog):
         self._sync_axis_offset()
 
     def _sync_axis_offset(self):
-        axis = self.axisComboBox.currentData()
         for name, editor in {
             "x": self.xoffsetEdit,
             "y": self.yoffsetEdit,
             "z": self.zoffsetEdit,
         }.items():
-            on_axis = name == axis
-            if on_axis:
-                editor.setText("0")
-            editor.setEnabled(self.complexMode and not on_axis)
+            editor.setEnabled(self.complexMode)
 
     def setTargetPPS(self, ppsname=None):
         self.targetPPS = None if ppsname is None else str(ppsname)
@@ -291,6 +304,23 @@ class PostProcessSettingsDialog(QDialog, Ui_PostProcessSettingDialog):
         list_column.addWidget(QLabel("已配置结果", self))
         list_column.addWidget(self.listView, 1)
         list_column.addWidget(self.DeleteButton)
+        axis_row = QHBoxLayout()
+        axis_row.addWidget(QLabel("统一积分轴", self))
+        self.batchAxisComboBox = QComboBox(self)
+        self.batchAxisComboBox.setObjectName("batchAxisComboBox")
+        for axis in ("x", "y", "z"):
+            self.batchAxisComboBox.addItem(f"{axis.upper()} 轴", axis)
+        self.batchAxisComboBox.setCurrentIndex(2)
+        axis_row.addWidget(self.batchAxisComboBox)
+        self.ApplyAxisButton = QPushButton("统一修改", self)
+        self.ApplyAxisButton.setAutoDefault(False)
+        self.ApplyAxisButton.setObjectName("ApplyAxisButton")
+        self.ApplyAxisButton.setToolTip("修改全部 R/Q 和分流阻抗的积分轴，保留所有偏移值")
+        axis_row.addWidget(self.ApplyAxisButton)
+        list_column.addLayout(axis_row)
+        self.batchAxisStatusLabel = QLabel("适用于全部 R/Q 和分流阻抗结果", self)
+        self.batchAxisStatusLabel.setWordWrap(True)
+        list_column.addWidget(self.batchAxisStatusLabel)
         content.addLayout(list_column, 1)
         actions = QVBoxLayout()
         actions.addWidget(QLabel("添加结果", self))
@@ -342,6 +372,7 @@ class PostProcessSettingsDialog(QDialog, Ui_PostProcessSettingDialog):
                 lambda _checked=False, m=method, c=complex_mode: self.showAddDialog(m, c)
             )
         self.DeleteButton.clicked.connect(self.deleteItem)
+        self.ApplyAxisButton.clicked.connect(self.applyIntegrationAxis)
         self.SaveJsonButton.clicked.connect(self.savePPSJson)
         self.LoadJsonButton.clicked.connect(self.loadPPSJson)
         self.addDialog._signal_data_updated.connect(self.addItem)
@@ -381,6 +412,14 @@ class PostProcessSettingsDialog(QDialog, Ui_PostProcessSettingDialog):
 
     def deleteItem(self):
         self.listModel.removeRow(self.listView.currentIndex().row())
+
+    def applyIntegrationAxis(self):
+        axis = self.batchAxisComboBox.currentData()
+        count = self.listModel.set_integration_axis(axis)
+        self.batchAxisStatusLabel.setText(
+            f"已将 {count} 项结果统一为 {axis.upper()} 轴，偏移值保持不变"
+            if count else "没有可修改的 R/Q 或分流阻抗结果"
+        )
 
     def clearAll(self):
         self.listModel.clear()

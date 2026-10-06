@@ -94,8 +94,7 @@ def test_r_over_q_routing_rejects_two_capability_sources():
 def test_integration_axis_and_offsets_are_validated():
     with pytest.raises(ValueError, match="x, y, or z"):
         IntegrationLine("bad")
-    with pytest.raises(ValueError, match="along the integration axis"):
-        IntegrationLine("x", xoffset_mm=1)
+    assert IntegrationLine("x", xoffset_mm=1).xoffset_mm == 1
     with pytest.raises(ValueError, match="resolved numeric"):
         integration_line_from_template_settings(
             {"coordinates": "0", "maxrange": "1", "v1": "parameter_name"}

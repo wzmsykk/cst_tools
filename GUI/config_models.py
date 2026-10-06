@@ -144,8 +144,6 @@ class PostProcessSetting:
                     normalized[key] = float(normalized.get(key, 0))
                 except (TypeError, ValueError) as exc:
                     raise ValueError(f"{method} 的 {key} 必须是数字") from exc
-            if normalized[f"{axis}offset"] != 0.0:
-                raise ValueError(f"{method} 沿积分轴 {axis.upper()} 的偏移必须为 0")
         return cls(result_name.strip(), str(method), normalized)
 
     @property

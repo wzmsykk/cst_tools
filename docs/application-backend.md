@@ -85,3 +85,9 @@ camelCase Engine 适配、`False`/`0` 错误码翻译、`safe_mode` 或算法参
 应用后端、`CSTManager` 和算法链统一使用 `ManagedCSTWorker` 与结构化批任务接口。
 旧 `local_cstworker`、`worker.vb`、Pattern 模板及 Manager camelCase 队列接口已经删除。
 Profile/Warm 执行策略属于当前生产路径；运行时 VBA 仅保留复杂、依赖当前场数据的后处理能力。
+
+2026-10-06 配置迁移复查：移除 Manager 和运行清单对旧 INI 字典的回退；生产路径和
+测试替身统一提供 `GlobalSettings`/`ProjectSettings`。旧 INI 只由配置加载器迁移。
+会话恢复使用相同加载器读取 runtime 目录，支持新配置中的自定义相对路径和绝对路径。
+预处理在每次启动时读取最新全局设置，成功后才发布项目配置；算法异常保留完整堆栈。
+这次复查不替代真实 CST 的求解和停止验收，复杂后处理仍使用受管 Worker 内的声明式 VBA。

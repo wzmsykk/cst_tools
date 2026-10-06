@@ -383,6 +383,7 @@ class CstApplicationBackend:
             raise
         except Exception as exc:
             failure = exc
+            self.logger.exception("算法执行失败")
             self._set_state(BackendState.FAILED)
             raise
         finally:

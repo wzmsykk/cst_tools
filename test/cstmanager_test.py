@@ -8,25 +8,19 @@ from time import sleep
 
 import pytest
 
+from csttool.configuration import CstBackendSettings, GlobalSettings, ProjectSettings
 from csttool.cstmanager import CSTManager, ManagerState, SimulationTask
 
 
 class FakeGlobalConfig:
     def __init__(self, root: Path):
-        self.conf = {
-            "BASE": {"datadir": str(root / "data")},
-            "CST": {"cstexepath": str(root / "cst.exe")},
-        }
+        self.settings = GlobalSettings(cst=CstBackendSettings(executable=root / "cst.exe"))
 
 
 class FakeProjectConfig:
     def __init__(self, root: Path):
         self.currProjectDir = root
-        self.conf = {
-            "DIRS": {"tempdir": "temp", "resultdir": "result"},
-            "CST": {"CSTFilename": "model.cst"},
-            "PROJECT": {"ProjectType": "default"},
-        }
+        self.settings = ProjectSettings(name="default", cst_filename=Path("model.cst"))
 
     def getCurrPPSList(self):
         return []
@@ -305,6 +299,51 @@ def test_invalid_configuration_is_rejected(tmp_path):
             maxTask=0,
             worker_factory=lambda *_args: None,
         )
+
+
+def test_production_configuration_drives_worker_and_manifest(tmp_path):
+    from csttool.globalconfmanager import GlobalConfigManager
+    from csttool.projectconfmanager import ProjectConfigManager
+    from csttool.configuration import ProjectDirectorySettings, write_ini_atomic
+    from csttool.hom_run_manifest import HomRunManifest
+    from csttool.hom_scan import ScanPolicy
+
+    global_config = GlobalConfigManager(tmp_path / "config" / "current.ini")
+    global_config.settings = GlobalSettings(cst=CstBackendSettings("2025", tmp_path / "cst.exe"))
+    project = tmp_path / "project"
+    project.mkdir()
+    (project / "model.cst").write_bytes(b"prepared")
+    (project / "params.json").write_text("[]", encoding="utf-8")
+    (project / "pps.json").write_text("[]", encoding="utf-8")
+    project_config = ProjectConfigManager(global_config)
+    project_config.assignProjectDir(project)
+    settings = ProjectSettings(
+        name="production", cst_filename=Path("model.cst"),
+        project_digest=project_config.file_digest(project / "model.cst"),
+        directories=ProjectDirectorySettings(temp=Path("custom-temp"), result=Path("custom-result")),
+    )
+    write_ini_atomic(project / "project.ini", settings.to_parser())
+    assert project_config.prepareProject(startFromExisted=True)
+    configs = []
+
+    class Worker:
+        def stop(self):
+            pass
+
+    def factory(worker_id, config, logger):
+        configs.append(config)
+        return Worker()
+
+    with CSTManager(global_config, project_config, params=[], worker_factory=factory) as manager:
+        manifest = HomRunManifest.create(manager, ScanPolicy(500, 550, 1000))
+        assert not hasattr(manager, "gconf")
+        assert not hasattr(manager, "pconf")
+        assert manifest.cst_version == "2025"
+        assert manifest.cst_executable == str(tmp_path / "cst.exe")
+        assert configs[0]["CSTENVPATH"] == manifest.cst_executable
+        assert Path(configs[0]["cstPath"]) == project / "model.cst"
+        assert Path(configs[0]["resultDir"]) == project / "custom-result"
+        assert Path(configs[0]["taskFileDir"]).parent == project / "custom-temp"
 
 
 def test_stop_request_prevents_worker_rotation_and_new_dispatch(tmp_path):

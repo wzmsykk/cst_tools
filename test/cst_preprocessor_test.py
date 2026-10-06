@@ -1,6 +1,7 @@
 from pathlib import Path
 import os
 import re
+import stat
 import subprocess
 
 import pytest
@@ -68,13 +69,16 @@ def test_preprocessor_can_explicitly_leave_cst_interactive(tmp_path):
         assert options == {}
 
 
+@pytest.mark.parametrize("readonly", [False, True])
 def test_preprocessor_creates_distinct_prepared_project_and_parameter_manifest(
-    tmp_path,
+    tmp_path, readonly,
 ):
     executable = tmp_path / "cst.exe"
     executable.write_bytes(b"fake")
     source_project = tmp_path / "source.cst"
     source_project.write_bytes(b"original-project")
+    if readonly:
+        source_project.chmod(source_project.stat().st_mode & ~stat.S_IWRITE)
     output_project = tmp_path / "prepared.cst"
     parameter_json = tmp_path / "params.json"
 
@@ -87,6 +91,7 @@ def test_preprocessor_creates_distinct_prepared_project_and_parameter_manifest(
         status_output = _macro_path(macro, "statusFilePath")
         working_project = _macro_path(macro, "cstProjectPath")
         assert working_project != source_project
+        assert working_project.stat().st_mode & stat.S_IWRITE
         status_output.write_text("SUCCESS\n", encoding="utf-8")
         parameter_output.write_text(
             "parameters\nproject\n4\n"
@@ -112,6 +117,7 @@ def test_preprocessor_creates_distinct_prepared_project_and_parameter_manifest(
 
     assert source_project.read_bytes() == b"original-project"
     assert output_project.read_bytes() == b"original-project"
+    assert output_project.stat().st_mode & stat.S_IWRITE
     assert result.project_path == output_project
     assert [item["name"] for item in result.parameters] == [
         "fmin",

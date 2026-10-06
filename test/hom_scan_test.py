@@ -233,6 +233,8 @@ def test_algorithm_requires_mode_one_non_all_postprocess_configuration():
 
 class ScanManager:
     def __init__(self, root):
+        from csttool.configuration import GlobalSettings
+        self.global_settings = GlobalSettings()
         self.currProjectDir = root
         self.cstProjPath = root / "model.cst"
         self.cstProjPath.write_bytes(b"fake-cst-project")

@@ -1,9 +1,11 @@
 import logging
 import os
 import threading
+from pathlib import Path
 
 import pytest
 
+from csttool.configuration import CstBackendSettings, GlobalSettings, ProjectSettings
 from csttool.cstmanager import CSTManager, ManagerState
 from csttool.managed_cstworker import ManagedCSTWorker
 from csttool.managed_cstworker import ManagedWorkerShutdownError
@@ -189,20 +191,13 @@ def test_ready_marker_is_invalidated_before_task_publication(tmp_path, monkeypat
 
 class _Global:
     def __init__(self, root):
-        self.conf = {
-            "BASE": {"datadir": str(root / "data")},
-            "CST": {"cstexepath": str(root / "cst.exe")},
-        }
+        self.settings = GlobalSettings(cst=CstBackendSettings(executable=root / "cst.exe"))
 
 
 class _Project:
     def __init__(self, root):
         self.currProjectDir = root
-        self.conf = {
-            "DIRS": {"tempdir": "temp", "resultdir": "result"},
-            "CST": {"CSTFilename": "model.cst"},
-            "PROJECT": {"ProjectType": "default"},
-        }
+        self.settings = ProjectSettings(name="default", cst_filename=Path("model.cst"))
 
     def getCurrPPSList(self):
         return []

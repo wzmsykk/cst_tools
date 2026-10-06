@@ -7,6 +7,7 @@ import time
 
 import pytest
 
+from csttool.configuration import CstBackendSettings, GlobalSettings, ProjectSettings
 from csttool.cstmanager import CSTManager
 from csttool.managed_cstworker import ManagedCSTWorker
 from csttool.pillbox_analytic import PillboxRadiusBatchOptimizer
@@ -22,20 +23,13 @@ pytestmark = pytest.mark.integration
 
 class _GlobalConfig:
     def __init__(self, root: Path, executable: Path):
-        self.conf = {
-            "BASE": {"datadir": str(root / "data")},
-            "CST": {"cstexepath": str(executable)},
-        }
+        self.settings = GlobalSettings(cst=CstBackendSettings(executable=executable))
 
 
 class _ProjectConfig:
     def __init__(self, root: Path):
         self.currProjectDir = root
-        self.conf = {
-            "DIRS": {"tempdir": "temp", "resultdir": "result"},
-            "CST": {"CSTFilename": "Pillbox.cst"},
-            "PROJECT": {"ProjectType": "pillbox-real-standard-batch"},
-        }
+        self.settings = ProjectSettings(name="pillbox-real-standard-batch", cst_filename=Path("Pillbox.cst"))
 
     def getCurrPPSList(self):
         return [

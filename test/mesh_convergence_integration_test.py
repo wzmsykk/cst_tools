@@ -1,4 +1,3 @@
-import configparser
 import logging
 from pathlib import Path
 
@@ -6,6 +5,7 @@ import pytest
 
 from csttool.application_backend import CstApplicationBackend
 from csttool.projectconfmanager import ProjectConfigManager
+from csttool.configuration import CstBackendSettings, DirectorySettings, GlobalSettings
 
 
 pytestmark = pytest.mark.integration
@@ -13,12 +13,10 @@ pytestmark = pytest.mark.integration
 
 class _GlobalConfig:
     def __init__(self, root, executable):
-        self.conf = configparser.ConfigParser()
-        self.conf["BASE"] = {"datadir": str(root / "data")}
-        self.conf["CST"] = {
-            "cstexepath": str(executable),
-            "cstver": "2022",
-        }
+        self.settings = GlobalSettings(
+            directories=DirectorySettings(data=root / "data"),
+            cst=CstBackendSettings("2022", executable),
+        )
 
 
 def test_real_pillbox_mesh_convergence_produces_report(

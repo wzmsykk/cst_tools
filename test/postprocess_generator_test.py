@@ -94,9 +94,9 @@ def test_unknown_method_and_missing_parameter_fail_early():
 @pytest.mark.parametrize(
     ("axis", "offsets", "axis_number"),
     [
-        ("x", {"xoffset": 0, "yoffset": 2, "zoffset": 3}, 1),
-        ("y", {"xoffset": 1, "yoffset": 0, "zoffset": 3}, 2),
-        ("z", {"xoffset": 1, "yoffset": 2, "zoffset": 0}, 3),
+        ("x", {"xoffset": 1, "yoffset": 2, "zoffset": 3}, 1),
+        ("y", {"xoffset": 1, "yoffset": 2, "zoffset": 3}, 2),
+        ("z", {"xoffset": 1, "yoffset": 2, "zoffset": 3}, 3),
     ],
 )
 def test_complex_pps_generation_supports_every_axis(axis, offsets, axis_number):
@@ -113,6 +113,9 @@ def test_complex_pps_generation_supports_every_axis(axis, offsets, axis_number):
 
     step = processor.postProcessDocList[0]
     assert step["params"]["axis"] == axis
+    for key, value in offsets.items():
+        assert step["params"][key] == value
+    assert f'{axis_number},1,2,3,' in step["funcString"]
     assert (
         f'EigenResult_Complex_output(1,"R over Q",{axis_number},'
         in step["funcString"]

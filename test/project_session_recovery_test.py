@@ -10,6 +10,7 @@ from csttool.project_session_recovery import (
     recover_project_sessions,
 )
 from csttool import project_session_recovery
+from csttool.configuration import ProjectDirectorySettings, ProjectSettings, write_ini_atomic
 from csttool.runtime_protocol import (
     Completion,
     CompletionStatus,
@@ -47,6 +48,33 @@ def test_discovers_only_sessions_that_need_protocol_recovery(tmp_path):
         active_id
     }
     assert stopped_root.is_dir()
+
+
+@pytest.mark.parametrize("legacy", [False, True])
+@pytest.mark.parametrize("absolute", [False, True])
+def test_session_discovery_uses_migrated_runtime_directory(tmp_path, legacy, absolute):
+    project = tmp_path / "project"
+    project.mkdir()
+    configured = tmp_path / "custom-runtime" if absolute else "custom-runtime"
+    settings = ProjectSettings(
+        name="recovery", directories=ProjectDirectorySettings(temp=configured)
+    )
+    parser = settings.to_parser()
+    if legacy:
+        parser.remove_section("paths")
+        parser["DIRS"] = {"tempdir": str(configured), "resultdir": "result"}
+    write_ini_atomic(project / "project.ini", parser)
+    runtime = tmp_path / "custom-runtime" if absolute else project / "custom-runtime"
+    session_id = new_session_id()
+    root = runtime / "worker_0" / session_id
+    FileProtocol(root / "protocol")
+    (root / "worker.state").write_text("dispatched:task", encoding="ascii")
+
+    assert project_runtime_directory(project) == runtime
+    records = discover_managed_sessions(project)
+    assert len(records) == 1
+    assert records[0].session_id == session_id
+    assert records[0].needs_recovery
 
 
 def test_project_recovery_stops_and_acks_an_active_session(tmp_path):

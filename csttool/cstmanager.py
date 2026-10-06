@@ -120,10 +120,8 @@ class CSTManager:
 
         self.logger = logger or logging.getLogger(__name__)
         self.pconfm = pconfm
-        self.global_settings = getattr(gconfm, "settings", None)
-        self.project_settings = getattr(pconfm, "settings", None)
-        self.gconf = gconfm.conf  # compatibility view
-        self.pconf = pconfm.conf  # compatibility view
+        self.global_settings = gconfm.settings
+        self.project_settings = pconfm.settings
         self.paramList = params
         self.maxParallelTasks = maxTask
         self.maxWorkerJobCountLimit = max_jobs_per_worker
@@ -131,14 +129,13 @@ class CSTManager:
         self._progress_callback = progress_callback
 
         self.currProjectDir = Path(pconfm.currProjectDir).absolute()
-        if self.project_settings is not None:
-            temp_path = self.project_settings.directories.temp
-            result_path = self.project_settings.directories.result
-            cst_filename = self.project_settings.cst_filename
-        else:
-            temp_path = self.pconf["DIRS"]["tempdir"]
-            result_path = self.pconf["DIRS"]["resultdir"]
-            cst_filename = self.pconf["CST"]["CSTFilename"]
+        temp_path = self.project_settings.directories.temp
+        result_path = self.project_settings.directories.result
+        cst_filename = self.project_settings.cst_filename
+        if cst_filename is None:
+            raise ValueError("prepared project settings require a CST model filename")
+        if self.global_settings.cst.executable is None:
+            raise ValueError("global settings require a CST executable")
         self.tempDir = self._project_path(temp_path)
         self.resultDir = self._project_path(result_path)
         self.tempDir.mkdir(parents=True, exist_ok=True)
@@ -194,11 +191,7 @@ class CSTManager:
         return {
             "tempDir": str(worker_dir),
             "taskFileDir": str(worker_dir),
-            "CSTENVPATH": str(
-                self.global_settings.cst.executable
-                if self.global_settings is not None
-                else self.gconf["CST"]["cstexepath"]
-            ),
+            "CSTENVPATH": str(self.global_settings.cst.executable),
             "resultDir": str(self.resultDir),
             "cstPath": str(source_project or self.cstProjPath),
             "paramList": self.paramList,

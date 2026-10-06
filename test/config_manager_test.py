@@ -1,6 +1,9 @@
 import configparser
 import logging
+import stat
+from dataclasses import replace
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -11,6 +14,7 @@ from csttool.configuration import (
     GlobalSettings,
     ProjectSettings,
     read_ini,
+    write_ini_atomic,
 )
 from csttool.projectconfmanager import (
     ProjectConfigManager,
@@ -21,9 +25,7 @@ from csttool.projectconfmanager import (
 
 class _GlobalConfig:
     def __init__(self, root):
-        self.conf = configparser.ConfigParser()
-        self.conf["BASE"] = {"datadir": str(root / "data")}
-        self.conf["CST"] = {"cstexepath": "", "cstver": ""}
+        self.settings = GlobalSettings()
 
 
 def test_modern_config_manager_names_keep_legacy_aliases():
@@ -123,3 +125,70 @@ def test_annotated_configuration_templates_match_typed_schema():
     assert project_settings.schema_version == CONFIG_SCHEMA_VERSION
     assert project_settings.cells_per_wavelength == 20
     assert project_settings.digest_algorithm == "sha256"
+
+
+@pytest.mark.parametrize("status", ["READY", "DONE", "INTERRUPTED"])
+@pytest.mark.parametrize("filename", [None, Path("missing.cst"), Path("directory.cst")])
+def test_existing_project_requires_model_file(tmp_path, status, filename):
+    manager = ProjectConfigManager(_GlobalConfig(tmp_path))
+    manager.assignProjectDir(tmp_path)
+    (tmp_path / "directory.cst").mkdir()
+    write_ini_atomic(tmp_path / "project.ini", ProjectSettings(
+        name="invalid", task_status=status, cst_filename=filename
+    ).to_parser())
+    before = (tmp_path / "project.ini").read_bytes()
+    manager.ready = True
+
+    with pytest.raises(ProjectStatusError, match="CST 模型文件"):
+        manager.prepareProject(startFromExisted=True)
+
+    assert not manager.isReady()
+    assert (tmp_path / "project.ini").read_bytes() == before
+
+
+def test_preprocess_failure_can_retry_with_current_installation(tmp_path, monkeypatch):
+    global_config = _GlobalConfig(tmp_path)
+    global_config.settings = GlobalSettings()
+    manager = ProjectConfigManager(global_config)
+    project = tmp_path / "project"
+    project.mkdir()
+    source = tmp_path / "source.cst"
+    source.write_bytes(b"original model")
+    source.chmod(source.stat().st_mode & ~stat.S_IWRITE)
+    manager.assignProjectDir(project)
+    manager.assignInputCSTFilePath(source)
+    selected = Path("selected-cst.exe")
+    global_config.settings = replace(global_config.settings, cst=replace(
+        global_config.settings.cst, executable=selected
+    ))
+    attempts = []
+
+    class Preprocessor:
+        def __init__(self, executable, *args, **kwargs):
+            assert executable == selected
+
+        def preprocess(self, source_project, candidate, jsonpath, td, **kwargs):
+            assert not (project / "project.ini").exists()
+            assert source.stat().st_mode & stat.S_IWRITE
+            assert source_project.stat().st_mode & stat.S_IWRITE
+            attempts.append(kwargs["mesh_cells_per_wavelength"])
+            if len(attempts) == 1:
+                raise RuntimeError("preprocessing failed")
+            candidate.write_bytes(b"prepared model")
+            jsonpath.write_text("[]", encoding="utf-8")
+            return SimpleNamespace(project_path=candidate, parameters=[])
+
+    monkeypatch.setattr("csttool.projectconfmanager.CstProjectPreprocessor", Preprocessor)
+    with pytest.raises(RuntimeError, match="preprocessing failed"):
+        manager.prepareProject(mesh_cells_per_wavelength=10)
+    assert not manager.isReady()
+    assert not (project / "project.ini").exists()
+
+    assert manager.prepareProject(mesh_cells_per_wavelength=10)
+    saved = ProjectSettings.from_parser(read_ini(project / "project.ini"))
+    assert saved.cst_filename == Path("processed.cst")
+    assert saved.cells_per_wavelength == 10
+    assert saved.project_digest == manager.file_digest(project / "processed.cst")
+    assert source.read_bytes() == b"original model"
+    assert attempts == [10, 10]
+    assert manager.prepareProject(startFromExisted=True, mesh_cells_per_wavelength=10)

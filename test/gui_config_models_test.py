@@ -165,9 +165,8 @@ def test_complex_postprocess_accepts_xyz_integration_axes(axis, offsets):
     assert setting.params == {"iModeNumber": 1, "axis": axis, **offsets}
 
 
-def test_complex_postprocess_rejects_offset_along_integration_axis():
-    with pytest.raises(ValueError, match="沿积分轴 X"):
-        PostProcessSetting.from_mapping(
+def test_complex_postprocess_preserves_offset_along_integration_axis():
+    setting = PostProcessSetting.from_mapping(
             {
                 "resultName": "bad",
                 "method": "R_over_Q",
@@ -179,7 +178,8 @@ def test_complex_postprocess_rejects_offset_along_integration_axis():
                     "zoffset": 0,
                 },
             }
-        )
+    )
+    assert setting.params["xoffset"] == 1.0
 
 
 def test_complex_postprocess_dialog_selects_axis_and_transverse_offsets(qapp):
@@ -191,7 +191,7 @@ def test_complex_postprocess_dialog_selects_axis_and_transverse_offsets(qapp):
     dialog.yoffsetEdit.setText("2")
     dialog.zoffsetEdit.setText("3")
 
-    assert not dialog.xoffsetEdit.isEnabled()
+    assert dialog.xoffsetEdit.isEnabled()
     assert dialog.yoffsetEdit.isEnabled()
     assert dialog.zoffsetEdit.isEnabled()
     setting = dialog._build_setting()
@@ -262,6 +262,55 @@ def test_existing_postprocess_item_can_be_edited(qapp):
     dialog.addItem()
     assert dialog.getPPSList()[0]["resultName"] == "new"
     assert len(changed) == 1
+
+
+@pytest.mark.parametrize("axis", ["x", "y", "z"])
+def test_batch_integration_axis_updates_complex_results_and_can_cancel(qapp, axis):
+    dialog = PostProcessSettingsDialog()
+    original_axis = "y" if axis == "z" else "z"
+    entries = [pps("frequency")]
+    for method in ("R_over_Q", "Shunt_Impedance", "R_over_Q_All", "Shunt_Impedance_All"):
+        entry = pps(method, method)
+        entry["params"].update({
+            "axis": original_axis,
+            "xoffset": 2.0,
+            "yoffset": 3.0,
+            "zoffset": 4.0,
+        })
+        entry["params"][f"{original_axis}offset"] = 0.0
+        entries.append(entry)
+    dialog.setPPSList(entries)
+    original = dialog.getPPSList()
+    changed = QSignalSpy(dialog.listModel.dataChanged)
+    dialog.batchAxisComboBox.setCurrentIndex(dialog.batchAxisComboBox.findData(axis))
+    dialog.ApplyAxisButton.click()
+
+    updated = dialog.getPPSList()
+    assert updated[0] == original[0]
+    assert len(changed) == 4
+    for before, after in zip(original[1:], updated[1:]):
+        assert after["method"] == before["method"]
+        assert after["resultName"] == before["resultName"]
+        assert after["params"] == {**before["params"], "axis": axis}
+    assert "4 项" in dialog.batchAxisStatusLabel.text()
+    document = encode_postprocess_document(dialog.listModel.pps)
+    assert [item.to_backend_payload() for item in decode_postprocess_document(document)] == updated
+    dialog.reject()
+    assert dialog.getPPSList() == original
+    dialog.ApplyAxisButton.click()
+    dialog.accept()
+    dialog.reject()
+    assert dialog.getPPSList() == updated
+
+
+def test_batch_integration_axis_with_no_applicable_results(qapp):
+    dialog = PostProcessSettingsDialog()
+    dialog.setPPSList([pps()])
+    dialog.ApplyAxisButton.click()
+    assert dialog.getPPSList() == [pps()]
+    assert "没有可修改" in dialog.batchAxisStatusLabel.text()
+    with pytest.raises(ValueError, match="积分轴"):
+        dialog.listModel.set_integration_axis("invalid")
 
 
 def test_settings_dialogs_have_parent_lifecycle_and_responsive_layouts(qapp):

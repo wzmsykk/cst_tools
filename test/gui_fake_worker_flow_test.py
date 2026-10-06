@@ -16,6 +16,7 @@ from PyQt5.QtWidgets import QApplication
 
 from GUI.main_window import MainWindow
 from GUI.run_controller import RunState
+from csttool.configuration import CstBackendSettings, GlobalSettings, ProjectSettings
 from csttool.cstmanager import CSTManager, ManagerState, SimulationTask
 
 
@@ -61,20 +62,13 @@ class FakeDialog(QObject):
 
 class FakeGlobalConfig:
     def __init__(self, root: Path):
-        self.conf = {
-            "BASE": {"datadir": str(root / "data")},
-            "CST": {"cstexepath": str(root / "fake-cst.exe")},
-        }
+        self.settings = GlobalSettings(cst=CstBackendSettings(executable=root / "fake-cst.exe"))
 
 
 class FakeProjectConfig:
     def __init__(self, root: Path, pps):
         self.currProjectDir = root
-        self.conf = {
-            "DIRS": {"tempdir": "temp", "resultdir": "result"},
-            "CST": {"CSTFilename": "input.cst"},
-            "PROJECT": {"ProjectType": "fake-gui"},
-        }
+        self.settings = ProjectSettings(name="fake-gui", cst_filename=Path("input.cst"))
         self._pps = pps
 
     def getCurrPPSList(self):
