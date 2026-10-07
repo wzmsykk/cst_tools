@@ -91,3 +91,10 @@ Profile/Warm 执行策略属于当前生产路径；运行时 VBA 仅保留复�
 会话恢复使用相同加载器读取 runtime 目录，支持新配置中的自定义相对路径和绝对路径。
 预处理在每次启动时读取最新全局设置，成功后才发布项目配置；算法异常保留完整堆栈。
 这次复查不替代真实 CST 的求解和停止验收，复杂后处理仍使用受管 Worker 内的声明式 VBA。
+
+任务结果在 Completion/Ack 完成且 Worker 返回 ready 后，使用任务名称、单模频率和
+完整 Task ID 命名目录；CST Backup 文件使用任务名称和频率命名，同名配套目录同步改名。
+每个目录包含 `task_result.json`，记录原始任务参数、协议身份、后处理值和存档文件名。
+HOM 汇总 CSV 的 `taskName/taskId/projectSnapshot/resultDirectory` 将模态关联到任务存档；
+路径相对于项目根目录。关联信息写入 checkpoint，恢复时随模态一起加载。旧 checkpoint
+没有这些可选字段时仍可读取；旧存档无需改名。命名失败会恢复原路径并记录警告。

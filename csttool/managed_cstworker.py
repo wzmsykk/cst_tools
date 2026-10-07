@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 import math
 import os
+import re
 from pathlib import Path
 import shutil
 import subprocess
@@ -15,6 +16,7 @@ from typing import Any, Mapping
 from install_compat import resource_path
 
 from .postprocess_cst import VBPostProcessor
+from .configuration import write_json_atomic
 from .cst_progress import CstLogProgressMonitor, CstLogProgressParser
 from .protocol_worker import _vb_string
 from .runtime_protocol import (
@@ -289,6 +291,12 @@ class ManagedCSTWorker:
                 )
                 self._wait_for_marker("ready", self.START_TIMEOUT)
                 self._active_task_context = {}
+            if status == "Success":
+                task_result_root, project_snapshot = self._name_result_archive(
+                    task, resultname, task_result_root, postprocess_result
+                )
+                self.postprocess.setResultDir(task_result_root)
+                self.postprocess.setCSTRunResultDir(project_snapshot.with_suffix(""))
             log_method = self.logger.info if status == "Success" else self.logger.error
             log_method(
                 "WORKER_TASK_COMPLETE worker=%s task=%s status=%s elapsed_seconds=%.3f failure=%s",
@@ -304,11 +312,69 @@ class ManagedCSTWorker:
                 "FailureReport": failure,
                 "RunName": resultname,
                 "RunParameters": dict(params),
+                "TaskID": task.task_id,
+                "ResultDirectory": str(task_result_root.resolve()),
                 "PostProcessResult": postprocess_result,
                 "ProjectSnapshot": (
                     str(project_snapshot.resolve()) if status == "Success" else None
                 ),
             }
+
+    def _name_result_archive(self, task, resultname, directory, postprocess):
+        """Name a confirmed Backup and its CST companion directory together."""
+        label = re.sub(r'[<>:"/\\|?*\x00-\x1f]', "_", str(resultname)).strip(" .")[:40]
+        label = label or "task"
+        frequencies = []
+        for item in postprocess or ():
+            if str(item.get("resultName", "")).casefold() == "frequency":
+                value = item.get("value")
+                candidates = value.values() if isinstance(value, dict) else (value,)
+                for candidate in candidates:
+                    number = self._progress_number(candidate)
+                    if number is not None and math.isfinite(number):
+                        frequencies.append(number)
+        if len(frequencies) == 1:
+            label += f"__f_{frequencies[0]:.6f}MHz"
+        # Full protocol identity prevents repeated jobs/retries from colliding.
+        destination = self.result_root / f"{label}__{task.task_id}"
+        snapshot_name = f"{label}.cst"
+        original = directory / "project.cst"
+        companion = directory / "project"
+        renamed = directory / snapshot_name
+        renamed_companion = renamed.with_suffix("")
+        root = self.result_root.resolve()
+        if directory.resolve().parent != root or destination.resolve().parent != root:
+            raise ValueError("result archive must stay within the worker result directory")
+        moved = []
+        try:
+            if destination.exists():
+                raise FileExistsError(destination)
+            if original != renamed:
+                original.rename(renamed)
+                moved.append((renamed, original))
+            if companion.exists() and companion != renamed_companion:
+                companion.rename(renamed_companion)
+                moved.append((renamed_companion, companion))
+            directory.rename(destination)
+        except OSError:
+            for current, previous in reversed(moved):
+                current.rename(previous)
+            self.logger.warning("无法重命名结果存档，保留原路径：%s", directory, exc_info=True)
+            destination, snapshot_name = directory, "project.cst"
+        snapshot = destination / snapshot_name
+        try:
+            write_json_atomic(destination / "task_result.json", {
+                "schemaVersion": 1,
+                "taskId": task.task_id,
+                "sessionId": task.session_id,
+                "taskName": resultname,
+                "parameters": {item.name: item.value for item in task.parameters},
+                "projectSnapshot": snapshot_name,
+                "postprocess": postprocess,
+            })
+        except (OSError, TypeError, ValueError):
+            self.logger.warning("无法保存存档结果索引：%s", destination, exc_info=True)
+        return destination, snapshot
 
     @staticmethod
     def _progress_number(value):

@@ -63,6 +63,108 @@ def test_empty_interval_advances_by_one_narrow_window():
     ]
 
 
+def test_returned_frequency_above_window_is_recomputed_before_acceptance(caplog):
+    policy = ScanPolicy(774.079327547941, 824.079327547941, 900, window_width=50)
+    returned = 833.416152639007
+    requests = []
+
+    def solve(request):
+        requests.append(request)
+        return [mode(returned)] if request.solve_lo < returned else []
+
+    with caplog.at_level(logging.INFO):
+        report = AdaptiveHomScanner(policy).run(solve)
+    assert [item.frequency for item in report.modes] == [returned]
+    assert requests[1].solve_lo == requests[0].solve_lo
+    assert requests[0].solve_hi < returned < requests[1].solve_hi
+    assert all(request.solve_hi <= policy.stop for request in requests)
+    assert requests[2].solve_hi - requests[2].solve_lo == pytest.approx(50)
+    assert "HOM_WINDOW_EXPAND" in caplog.text
+    assert caplog.text.count("HOM_MODE_ACCEPTED") == 1
+
+
+def test_next_mode_above_global_stop_ends_normally(caplog):
+    with caplog.at_level(logging.INFO):
+        report = AdaptiveHomScanner(ScanPolicy(0, 10, 20)).run(lambda request: [mode(21)])
+    assert report.solver_calls == 2
+    assert not report.modes
+    assert not report.failed
+    assert "HOM_SCAN_LIMIT_REACHED" in caplog.text
+    assert "HOM_MODE_ACCEPTED" not in caplog.text
+
+
+def test_frequency_below_lower_bound_fails_with_reason():
+    with pytest.raises(IncompleteScanError, match="below the search lower bound") as captured:
+        AdaptiveHomScanner(ScanPolicy(0, 10, 20)).run(lambda request: [mode(-1)])
+    assert captured.value.report.solver_calls == 2
+    assert not captured.value.report.modes
+    assert not captured.value.report.empty
+
+
+def test_repeated_window_overshoot_is_bounded():
+    calls = []
+
+    def solve(request):
+        calls.append(request)
+        return [mode(request.solve_hi + 1)]
+
+    with pytest.raises(IncompleteScanError, match="confirmation required") as captured:
+        AdaptiveHomScanner(ScanPolicy(0, 10, 20)).run(solve)
+    assert len(calls) == captured.value.report.solver_calls == 2
+    assert captured.value.report.failed == [calls[-1].interval]
+    assert not captured.value.report.modes
+
+
+def test_window_retry_uses_only_recomputed_frequency_values_and_snapshot():
+    first = ModeResult(1, 15.0, {"frequency": 15.0, "Q-factor": 10}, project_snapshot="first.cst")
+    confirmed = ModeResult(1, 14.9, {"frequency": 14.9, "Q-factor": 20}, project_snapshot="confirmed.cst")
+    calls = []
+
+    def solve(request):
+        calls.append(request)
+        if len(calls) == 1:
+            return [first]
+        return [confirmed] if request.solve_lo < confirmed.frequency else []
+
+    report = AdaptiveHomScanner(ScanPolicy(0, 10, 20)).run(solve)
+    assert report.modes == [confirmed]
+    assert calls[2].solve_lo == pytest.approx(14.900001)
+    assert report.modes[0].values["Q-factor"] == 20
+    assert report.modes[0].project_snapshot == "confirmed.cst"
+
+
+def test_scan_logs_confirmed_frequency_results_and_archive(caplog):
+    result = ModeResult(1, 5.0, {"frequency": 5.0, "R_divide_Q": 1.23e-7, "Q-factor": 757.065},
+                        project_snapshot="result/hom/snapshot.cst", task_name="hom_0_10", task_id="task-1")
+    with caplog.at_level(logging.INFO):
+        AdaptiveHomScanner(ScanPolicy(0, 10, 10)).run(
+            lambda request: [result] if request.solve_lo < 5 else []
+        )
+    accepted = next(record.message for record in caplog.records if "HOM_MODE_ACCEPTED" in record.message)
+    assert "频率=5 MHz" in accepted
+    assert "R_divide_Q=1.23e-07" in accepted
+    assert "Q-factor=757.065" in accepted
+    assert "任务=hom_0_10" in accepted
+    assert "存档=result/hom/snapshot.cst" in accepted
+    assert "HOM_INTERVAL_EMPTY" in caplog.text
+
+
+def test_stop_before_confirmation_keeps_expanded_window_pending():
+    stopped = False
+
+    def solve(request):
+        nonlocal stopped
+        stopped = True
+        return [mode(15)]
+
+    with pytest.raises(ScanInterrupted) as captured:
+        AdaptiveHomScanner(ScanPolicy(0, 10, 20)).run(solve, should_stop=lambda: stopped)
+    assert captured.value.report.solver_calls == 1
+    assert not captured.value.report.modes
+    assert captured.value.pending[0].lo == 0
+    assert captured.value.pending[0].hi > 15
+
+
 def test_multi_mode_result_is_rejected_instead_of_silently_truncated():
     policy = ScanPolicy(0, 10, 10, max_interval_attempts=1)
 
@@ -303,6 +405,36 @@ def test_production_algorithm_writes_results_and_checkpoint(tmp_path):
     assert list(pd.read_csv(result_path)["mode"]) == [1, 2]
     assert list(pd.read_csv(result_path)["solverMode"]) == [1, 1]
     assert (tmp_path / "save" / "csv" / "hom_scan_checkpoint.json").exists()
+
+
+def test_scan_results_and_checkpoint_keep_per_mode_archive_mapping(tmp_path):
+    class ArchiveManager(ScanManager):
+        def execute(self, task):
+            result = super().execute(task)
+            snapshot = self.result_dir / task.job_name / f"{task.job_name}.cst"
+            snapshot.parent.mkdir(parents=True, exist_ok=True)
+            snapshot.write_bytes(task.job_name.encode("ascii"))
+            result.update({"ProjectSnapshot": str(snapshot), "RunName": task.job_name, "TaskID": str(len(self.tasks))})
+            return result
+
+    manager = ArchiveManager(tmp_path)
+    algorithm = myAlg01(manager=manager, params=[])
+    algorithm.setCSTParams([])
+    algorithm.setEditableAttrs({"fmin": 100, "fmax": 110, "endfreq": 120})
+    report = algorithm.start()
+    destination = tmp_path / "save" / "csv" / "hom_scan_results.csv"
+    rows = pd.read_csv(destination, dtype={"taskId": str})
+    assert rows["frequency"].tolist() == [105.0, 114.0]
+    for row, mode in zip(rows.to_dict("records"), report.modes):
+        snapshot = tmp_path / row["projectSnapshot"]
+        assert snapshot.read_bytes() == row["taskName"].encode("ascii")
+        assert row["taskId"] == mode.task_id
+        assert snapshot.parent == tmp_path / row["resultDirectory"]
+    checkpoint = ScanCheckpointStore(destination.with_name("hom_scan_checkpoint.json"))
+    restored, pending = checkpoint.load(algorithm._scan_policy(), algorithm._project_fingerprint())
+    assert pending == []
+    assert restored.modes == report.modes
+    assert destination.with_name("hom_scan_results_README.txt").exists()
 
 
 def test_production_algorithm_records_fixed_mesh_without_runtime_mutation(tmp_path):

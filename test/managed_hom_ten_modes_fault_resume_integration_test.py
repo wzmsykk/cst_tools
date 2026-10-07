@@ -110,7 +110,7 @@ def _read_recovered_task(worker, task: Task) -> dict[str, float]:
 
 def _latest_snapshot(worker: ManagedCSTWorker) -> Path:
     snapshots = sorted(
-        worker.result_root.glob("*/project.cst"),
+        worker.result_root.glob("*/*.cst"),
         key=lambda path: path.stat().st_mtime_ns,
     )
     assert snapshots, "completed HOM task did not create a project snapshot"
@@ -167,7 +167,7 @@ def test_hom_runs_ten_ordered_modes_across_three_fault_recovery_paths(
             assert len(modes) == 6
             next_lo = modes[-1]["frequency"] + 1e-6
             seed_snapshots = sorted(
-                (seed_root / "result" / "worker_1").rglob("project.cst"),
+                (seed_root / "result" / "worker_1").rglob("*.cst"),
                 key=lambda path: path.stat().st_mtime_ns,
             )
             assert seed_snapshots

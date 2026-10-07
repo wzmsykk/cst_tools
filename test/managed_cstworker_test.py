@@ -1,6 +1,7 @@
 import logging
 import os
 import threading
+import json
 from pathlib import Path
 
 import pytest
@@ -10,6 +11,8 @@ from csttool.cstmanager import CSTManager, ManagerState
 from csttool.managed_cstworker import ManagedCSTWorker
 from csttool.managed_cstworker import ManagedWorkerShutdownError
 from csttool.postprocess_cst import VBPostProcessor
+from csttool.runtime_protocol import Task
+from csttool.runtime_protocol import Completion, CompletionStatus
 
 
 def build_worker_shell(tmp_path):
@@ -47,6 +50,94 @@ def build_worker_shell(tmp_path):
         ]
     )
     return worker
+
+
+def test_named_result_archive_preserves_cst_companion_and_task_identity(tmp_path):
+    worker = build_worker_shell(tmp_path)
+    task = Task.create(worker.session_id, {"fmin": 700, "fmax": 800})
+    directory = worker.result_root / task.task_id
+    directory.mkdir(parents=True)
+    (directory / "project.cst").write_bytes(b"snapshot")
+    (directory / "project" / "Result").mkdir(parents=True)
+    (directory / "project" / "Result" / "field.rd0").write_bytes(b"field-data")
+    postprocess = [{"resultName": "frequency", "value": 721.049793675422}]
+
+    result_dir, snapshot = worker._name_result_archive(task, "hom_700_800", directory, postprocess)
+
+    assert result_dir.name == f"hom_700_800__f_721.049794MHz__{task.task_id}"
+    assert snapshot.name == "hom_700_800__f_721.049794MHz.cst"
+    assert snapshot.read_bytes() == b"snapshot"
+    assert (snapshot.with_suffix("") / "Result" / "field.rd0").read_bytes() == b"field-data"
+    assert not directory.exists()
+    metadata = json.loads((result_dir / "task_result.json").read_text(encoding="utf-8"))
+    assert metadata["taskId"] == task.task_id
+    assert metadata["projectSnapshot"] == snapshot.name
+    assert metadata["postprocess"] == postprocess
+
+
+def test_named_archive_keeps_original_on_destination_collision(tmp_path):
+    worker = build_worker_shell(tmp_path)
+    task = Task.create(worker.session_id, {})
+    directory = worker.result_root / task.task_id
+    directory.mkdir(parents=True)
+    (directory / "project.cst").write_bytes(b"snapshot")
+    (directory / "project").mkdir()
+    destination = worker.result_root / f"task__{task.task_id}"
+    destination.mkdir()
+    (destination / "existing.txt").write_text("keep", encoding="utf-8")
+
+    result_dir, snapshot = worker._name_result_archive(task, "task", directory, [])
+    assert result_dir == directory
+    assert snapshot.name == "project.cst"
+    assert snapshot.read_bytes() == b"snapshot"
+    assert (directory / "project").is_dir()
+    assert (destination / "existing.txt").read_text(encoding="utf-8") == "keep"
+
+
+def test_archive_name_cannot_escape_result_root(tmp_path):
+    worker = build_worker_shell(tmp_path)
+    task = Task.create(worker.session_id, {})
+    directory = worker.result_root / task.task_id
+    directory.mkdir(parents=True)
+    (directory / "project.cst").write_bytes(b"snapshot")
+    result_dir, snapshot = worker._name_result_archive(task, '../bad:name\\file', directory, [])
+    assert result_dir.parent == worker.result_root
+    assert snapshot.parent == result_dir
+    assert snapshot.is_file()
+
+
+def test_worker_names_archive_only_after_acknowledgement(tmp_path, monkeypatch):
+    worker = build_worker_shell(tmp_path)
+    worker.ID = "0"
+    worker._lock = threading.RLock()
+    worker._stopping = False
+    worker.parameter_definitions = ()
+    observed = []
+    sample = [{"resultName": "frequency", "value": 721.049793675422}]
+
+    def wait_completion(task):
+        directory = worker.result_root / task.task_id
+        directory.mkdir(parents=True)
+        (directory / "project.cst").write_bytes(b"confirmed-snapshot")
+        (directory / "project").mkdir()
+        observed.append(directory)
+        return Completion(task.task_id, task.session_id, CompletionStatus.SUCCESS)
+
+    def wait_ready(marker, timeout):
+        if observed:
+            assert worker.ack_path.exists()
+            assert (observed[0] / "project.cst").is_file()
+
+    monkeypatch.setattr(worker, "_wait_completion", wait_completion)
+    monkeypatch.setattr(worker, "_wait_for_marker", wait_ready)
+    monkeypatch.setattr(worker.postprocess, "readAllResults", lambda: sample)
+    result = worker.runWithParam("hom_700_800", params={"fmin": 700, "fmax": 800})
+    assert result["TaskStatus"] == "Success"
+    snapshot = Path(result["ProjectSnapshot"])
+    assert snapshot.is_file()
+    assert snapshot.parent == Path(result["ResultDirectory"])
+    assert result["TaskID"] in snapshot.parent.name
+    assert not observed[0].exists()
 
 
 def test_managed_worker_macro_is_dynamic_ack_gated_and_standard_exit(tmp_path):

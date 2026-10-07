@@ -3,6 +3,7 @@ import os
 import logging
 import hashlib
 import json
+from dataclasses import replace
 from .myAlgorithm import myAlg
 
 import math
@@ -402,7 +403,13 @@ class myAlg01(myAlg):
 
     def _write_scan_results(self, report):
         rows = [
-            {"mode": scan_index, "solverMode": mode.mode_index, **mode.values}
+            {
+                "mode": scan_index, "solverMode": mode.mode_index, **mode.values,
+                "taskName": mode.task_name,
+                "taskId": mode.task_id,
+                "projectSnapshot": mode.project_snapshot or "",
+                "resultDirectory": str(Path(mode.project_snapshot).parent) if mode.project_snapshot else "",
+            }
             for scan_index, mode in enumerate(
                 sorted(report.modes, key=lambda item: item.frequency),
                 start=1,
@@ -410,8 +417,23 @@ class myAlg01(myAlg):
         ]
         destination = Path(self.relative_location) / "hom_scan_results.csv"
         temporary = destination.with_suffix(".csv.tmp")
-        pd.DataFrame(rows).to_csv(temporary, index=False)
+        pd.DataFrame(rows).to_csv(temporary, index=False, encoding="utf-8-sig")
         temporary.replace(destination)
+        guide = destination.with_name("hom_scan_results_README.txt")
+        temporary_guide = guide.with_suffix(".txt.tmp")
+        temporary_guide.write_text(
+            "HOM 扫描结果与 CST 存档对应说明\n\n"
+            "hom_scan_results.csv 每行对应一个已确认模态，按频率升序排列。\n"
+            "mode：扫描模态序号；solverMode：该次求解中的模态编号。\n"
+            "frequency：频率，单位 MHz。\n"
+            "taskName / taskId：产生该结果的任务名称和唯一编号。\n"
+            "projectSnapshot：对应的 CST 存档文件；resultDirectory：后处理结果目录。\n"
+            "这两列的路径均相对于项目根目录，不是 CSV 所在目录。\n"
+            "打开 CST 存档时请保留同名配套目录；每个任务目录的 task_result.json 保存原始任务与后处理结果。\n"
+            "运行中或中断时 CSV 仅包含已经确认的结果，不能据此判断完整扫描已经结束。\n",
+            encoding="utf-8-sig",
+        )
+        temporary_guide.replace(guide)
 
     def start(self):
         if not self.ready:
@@ -424,7 +446,7 @@ class myAlg01(myAlg):
             policy,
             mesh_cells_per_wavelength=self.mesh_cells_per_wavelength,
         )
-        scanner = AdaptiveHomScanner(policy)
+        scanner = AdaptiveHomScanner(policy, logger=self.logger)
         checkpoint_store = ScanCheckpointStore(
             Path(self.relative_location) / "hom_scan_checkpoint.json"
         )
@@ -483,7 +505,15 @@ class myAlg01(myAlg):
             postprocess = result.get("PostProcessResult")
             if not isinstance(postprocess, list):
                 raise ValueError("CST task returned no postprocess result list")
-            return self._extract_scan_modes(postprocess)
+            snapshot = result.get("ProjectSnapshot")
+            if snapshot:
+                snapshot = os.path.relpath(snapshot, self.manager.currProjectDir)
+            return [replace(
+                mode,
+                project_snapshot=snapshot,
+                task_name=result.get("RunName", job_name),
+                task_id=result.get("TaskID", ""),
+            ) for mode in self._extract_scan_modes(postprocess)]
 
         started = time.monotonic()
         try:
@@ -515,6 +545,14 @@ class myAlg01(myAlg):
             )
             raise
         except IncompleteScanError as exc:
+            for interval in exc.report.failed:
+                self.logger.error(
+                    "HOM_FAILED_INTERVAL lo=%.12g hi=%.12g reason=%s",
+                    interval.lo, interval.hi,
+                    exc.report.failure_reasons.get(
+                        AdaptiveHomScanner._interval_key(interval), "unknown failure"
+                    ),
+                )
             self.logger.error(
                 "HOM scan incomplete: failed_intervals=%d solver_calls=%d",
                 len(exc.report.failed),
