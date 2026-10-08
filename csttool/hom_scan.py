@@ -152,6 +152,11 @@ class AdaptiveHomScanner:
                     modes = self._validate_modes(solve(request))
                 except Exception as exc:
                     last_error = f"{type(exc).__name__}: {exc}"
+                    self.logger.warning(
+                        "HOM_SOLVE_INVALID_RESULT 区间=[%.12g, %.12g] MHz 尝试=%d/%d 原因=%s",
+                        interval.lo, interval.hi, _attempt + 1,
+                        self.policy.max_interval_attempts, last_error,
+                    )
                     modes = None
                     continue
                 for candidate in modes:
@@ -161,7 +166,9 @@ class AdaptiveHomScanner:
                         self._format_results(candidate),
                     )
                 if modes and self._already_accepted(report.modes, modes[0].frequency):
-                    break
+                    last_error = "solver returned an already accepted frequency; possible degenerate mode or boundary stall"
+                    modes = None
+                    continue
                 if modes and not self._at_or_above_lower_bound(interval, modes[0].frequency):
                     frequency = modes[0].frequency
                     last_error = f"returned frequency {frequency} is below the search lower bound {interval.lo}"
@@ -190,19 +197,15 @@ class AdaptiveHomScanner:
                 report.failure_reasons[self._interval_key(interval)] = (
                     last_error or "unknown solver failure"
                 )
-                self._checkpoint(checkpoint, report, queue)
-                continue
+                self.logger.warning(
+                    "HOM_FAILED_INTERVAL lo=%.12g hi=%.12g attempts=%d reason=%s；记录未确认区间，继续向后扫描",
+                    interval.lo, interval.hi, self.policy.max_interval_attempts,
+                    report.failure_reasons[self._interval_key(interval)],
+                )
+                next_lo = interval.hi
 
-            if modes:
+            elif modes:
                 mode = modes[0]
-                if self._already_accepted(report.modes, mode.frequency):
-                    report.failed.append(interval)
-                    report.failure_reasons[self._interval_key(interval)] = (
-                        "solver returned an already accepted frequency; "
-                        "possible degenerate mode or boundary stall"
-                    )
-                    self._checkpoint(checkpoint, report, queue)
-                    continue
                 if mode.frequency > self.policy.stop:
                     self.logger.info(
                         "HOM_SCAN_LIMIT_REACHED 下一模式频率=%.12g MHz 已超过扫描上限=%.12g MHz，正常结束",
@@ -227,7 +230,8 @@ class AdaptiveHomScanner:
                 self.logger.info("HOM_INTERVAL_EMPTY 区间=[%.12g, %.12g] MHz 无模态", interval.lo, interval.hi)
                 next_lo = interval.hi
 
-            report.completed.append(interval)
+            if modes is not None:
+                report.completed.append(interval)
             if next_lo < self.policy.stop:
                 next_hi = min(next_lo + self.policy.window_width, self.policy.stop)
                 if next_hi <= next_lo:
@@ -238,8 +242,6 @@ class AdaptiveHomScanner:
             if should_stop is not None and should_stop():
                 raise ScanInterrupted(report, list(queue))
 
-        if report.failed:
-            raise IncompleteScanError(report)
         return report
 
     @staticmethod
@@ -282,6 +284,11 @@ class AdaptiveHomScanner:
                 raise ValueError("invalid mode identity")
             if not math.isfinite(mode.frequency):
                 raise ValueError("mode frequency is non-finite")
+            if mode.frequency <= 0:
+                raise ValueError(
+                    f"invalid mode frequency {mode.frequency}: expected a positive frequency; "
+                    "mode or postprocess result may be unavailable"
+                )
             if not mode.values or any(
                 not math.isfinite(value) for value in mode.values.values()
             ):

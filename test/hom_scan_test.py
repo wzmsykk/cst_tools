@@ -94,11 +94,64 @@ def test_next_mode_above_global_stop_ends_normally(caplog):
 
 
 def test_frequency_below_lower_bound_fails_with_reason():
-    with pytest.raises(IncompleteScanError, match="below the search lower bound") as captured:
-        AdaptiveHomScanner(ScanPolicy(0, 10, 20)).run(lambda request: [mode(-1)])
-    assert captured.value.report.solver_calls == 2
-    assert not captured.value.report.modes
-    assert not captured.value.report.empty
+    report = AdaptiveHomScanner(ScanPolicy(5, 10, 20)).run(lambda request: [mode(4)])
+    assert report.solver_calls == 4
+    assert not report.modes
+    assert not report.empty
+    assert len(report.failed) == 2
+    assert all("below the search lower bound" in reason for reason in report.failure_reasons.values())
+
+
+@pytest.mark.parametrize("frequency", [-1.0, 0.0])
+def test_invalid_frequency_is_not_treated_as_out_of_window_or_empty(frequency, caplog):
+    with caplog.at_level(logging.WARNING):
+        report = AdaptiveHomScanner(ScanPolicy(1499.6944519768, 1549.6944519768, 1549.6944519768)).run(
+            lambda request: [mode(frequency)]
+        )
+    assert report.solver_calls == 2
+    assert not report.modes
+    assert not report.empty
+    assert "HOM_SOLVE_INVALID_RESULT" in caplog.text
+    assert "invalid mode frequency" in next(iter(report.failure_reasons.values()))
+    assert "below the search lower bound" not in caplog.text
+
+
+def test_invalid_frequency_retry_can_recover_without_skipping_interval():
+    requests = []
+
+    def solve(request):
+        requests.append(request)
+        if len(requests) == 1:
+            return [mode(-1)]
+        return [mode(5)] if request.solve_lo < 5 else []
+
+    report = AdaptiveHomScanner(ScanPolicy(0, 10, 10)).run(solve)
+    assert requests[0] == requests[1]
+    assert [item.frequency for item in report.modes] == [5]
+    assert not report.failed
+
+
+def test_exhausted_invalid_results_are_recorded_and_later_modes_are_scanned(caplog):
+    requests = []
+    checkpoints = []
+
+    def solve(request):
+        requests.append((request.solve_lo, request.solve_hi))
+        if request.solve_lo == 100:
+            return [mode(-1)]
+        return [mode(115)] if request.solve_lo < 115 else []
+
+    with caplog.at_level(logging.WARNING):
+        report = AdaptiveHomScanner(ScanPolicy(100, 110, 120, window_width=10)).run(
+            solve, checkpoint=lambda report, pending: checkpoints.append(list(pending))
+        )
+    assert requests[:3] == [(100, 110), (100, 110), (110, 120)]
+    assert report.failed == [ScanInterval(100, 110)]
+    assert [item.frequency for item in report.modes] == [115]
+    assert checkpoints[0] == [ScanInterval(110, 120)]
+    assert checkpoints[-1] == []
+    assert ScanInterval(100, 110) not in report.empty + report.completed
+    assert "HOM_FAILED_INTERVAL" in caplog.text
 
 
 def test_repeated_window_overshoot_is_bounded():
@@ -108,11 +161,11 @@ def test_repeated_window_overshoot_is_bounded():
         calls.append(request)
         return [mode(request.solve_hi + 1)]
 
-    with pytest.raises(IncompleteScanError, match="confirmation required") as captured:
-        AdaptiveHomScanner(ScanPolicy(0, 10, 20)).run(solve)
-    assert len(calls) == captured.value.report.solver_calls == 2
-    assert captured.value.report.failed == [calls[-1].interval]
-    assert not captured.value.report.modes
+    report = AdaptiveHomScanner(ScanPolicy(0, 10, 20)).run(solve)
+    assert len(calls) == report.solver_calls == 2
+    assert report.failed == [calls[-1].interval]
+    assert not report.modes
+    assert "confirmation required" in next(iter(report.failure_reasons.values()))
 
 
 def test_window_retry_uses_only_recomputed_frequency_values_and_snapshot():
@@ -168,22 +221,20 @@ def test_stop_before_confirmation_keeps_expanded_window_pending():
 def test_multi_mode_result_is_rejected_instead_of_silently_truncated():
     policy = ScanPolicy(0, 10, 10, max_interval_attempts=1)
 
-    with pytest.raises(IncompleteScanError) as captured:
-        AdaptiveHomScanner(policy).run(lambda _request: [mode(2), mode(3)])
+    report = AdaptiveHomScanner(policy).run(lambda _request: [mode(2), mode(3)])
 
     assert "more than one mode" in next(
-        iter(captured.value.report.failure_reasons.values())
+        iter(report.failure_reasons.values())
     )
 
 
 def test_repeated_boundary_frequency_fails_as_possible_degeneracy():
     policy = ScanPolicy(0, 10, 20, window_width=10, max_interval_attempts=1)
 
-    with pytest.raises(IncompleteScanError) as captured:
-        AdaptiveHomScanner(policy).run(lambda _request: [mode(5)])
+    report = AdaptiveHomScanner(policy).run(lambda _request: [mode(5)])
 
-    assert captured.value.report.solver_calls == 2
-    assert "degenerate" in next(iter(captured.value.report.failure_reasons.values()))
+    assert report.solver_calls == 3
+    assert "degenerate" in next(iter(report.failure_reasons.values()))
 
 
 def test_retry_is_bounded_and_failure_reason_is_preserved():
@@ -195,13 +246,12 @@ def test_retry_is_bounded_and_failure_reason_is_preserved():
         calls += 1
         raise RuntimeError("CST unavailable")
 
-    with pytest.raises(IncompleteScanError) as captured:
-        AdaptiveHomScanner(policy).run(solve)
+    report = AdaptiveHomScanner(policy).run(solve)
 
     assert calls == 2
-    assert captured.value.report.solver_calls == 2
+    assert report.solver_calls == 2
     assert "CST unavailable" in next(
-        iter(captured.value.report.failure_reasons.values())
+        iter(report.failure_reasons.values())
     )
 
 

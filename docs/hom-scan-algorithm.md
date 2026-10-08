@@ -74,3 +74,6 @@ CST 返回多个模式时不静默截断，而将该区间判为失败；这可�
 Worker 轮换；已经进入 `EigenmodeSolver.Start` 的区间允许运行到安全点。该区间结果
 写入 checkpoint 后扫描抛出 `ScanInterrupted`，应用状态写为 `INTERRUPTED`，随后
 Worker 通过 Stop Request/Ack、Save 和 Quit 退出。紧急进程终止不属于普通停止。
+# 异常结果重试与继续扫描
+
+每个区间按 `max_interval_attempts` 限制重算次数。无效频率、结果读取异常、重复模式或无法确认的窗口外结果在重试耗尽后，记录为未确认区间（`failed` 和 `failure_reasons`），并从该窗口上限继续向后扫描。未确认区间不计入已完成或已证明为空的区间；日志输出 `HOM_FAILED_INTERVAL`，检查点保留区间和原因。扫描结束时存在未确认区间会输出 `HOM_SCAN_COMPLETED_WITH_GAPS` 警告，正常返回结果，继续运行可补算这些区间。全局求解次数上限仍会终止扫描，用户停止仍保存待扫描区间。

@@ -70,10 +70,11 @@ def test_fake_worker_abnormal_outcomes_cannot_be_reported_complete(outcome, reas
     )
     policy = ScanPolicy(0, 5, 5, max_interval_attempts=1)
 
-    with pytest.raises(IncompleteScanError) as captured:
-        AdaptiveHomScanner(policy).run(solve_with(worker, myAlg01()))
+    report = AdaptiveHomScanner(policy).run(solve_with(worker, myAlg01()))
 
-    assert reason in next(iter(captured.value.report.failure_reasons.values()))
+    assert report.failed
+    assert not report.completed
+    assert reason in next(iter(report.failure_reasons.values()))
 
 
 def test_fake_worker_repeated_frequency_exercises_degeneracy_guard():
@@ -86,10 +87,9 @@ def test_fake_worker_repeated_frequency_exercises_degeneracy_guard():
     )
     policy = ScanPolicy(0, 5, 10, window_width=5, max_interval_attempts=1)
 
-    with pytest.raises(IncompleteScanError) as captured:
-        AdaptiveHomScanner(policy).run(solve_with(worker, myAlg01()))
+    report = AdaptiveHomScanner(policy).run(solve_with(worker, myAlg01()))
 
-    assert "degenerate" in next(iter(captured.value.report.failure_reasons.values()))
+    assert "degenerate" in next(iter(report.failure_reasons.values()))
 
 
 def test_probability_mix_is_seeded_and_exercises_all_configured_cases():

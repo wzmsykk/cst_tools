@@ -527,6 +527,11 @@ class myAlg01(myAlg):
                 ),
             )
             save_checkpoint(final_report, [])
+            if final_report.failed:
+                self.logger.warning(
+                    "HOM_SCAN_COMPLETED_WITH_GAPS 扫描已结束，未确认区间=%d；已记录到检查点，可继续运行补算",
+                    len(final_report.failed),
+                )
             self.logger.info(
                 "HOM scan completed: modes=%d intervals=%d solver_calls=%d elapsed=%.3fs",
                 len(final_report.modes),

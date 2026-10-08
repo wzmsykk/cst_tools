@@ -202,6 +202,34 @@ class ProjectConfigManager:
                     "project requires explicit recovery before execution: " + status
                 )
 
+    def recover_failed_project(self):
+        """Mark a failed run resumable after the caller verifies session closure.
+
+        The application must hold the project lock and check managed sessions
+        before calling this persistence operation.
+        """
+        cfgpath = self.currProjectDir / self.CFGfilename
+        if not cfgpath.is_file():
+            return False
+        conf = read_ini(cfgpath)
+        settings = ProjectSettings.from_parser(conf)
+        if settings.task_status != "FAILED":
+            return False
+        self.conf = conf
+        self.settings = settings
+        self.updateTaskStatus(TaskStatus.INTERRUPTED)
+        self.logger.info("上次扫描失败，会话已关闭，项目已转为可继续状态")
+        return True
+
+    def load_resume_configuration(self):
+        """Load persisted project configuration before resume initialization."""
+        self.conf = read_ini(self.currProjectDir / self.CFGfilename)
+        self.settings = ProjectSettings.from_parser(self.conf)
+        self.inputCSTFilePath = None  # The selected GUI source is irrelevant to resume.
+        self.setCurrPPSList(self.readPPSList())
+        self.setNotReady()
+        return self.settings
+
     def __savecfgobj(self, confobj, cfgfilename="project.ini", slient=False):
         cfgfilePath = self.currProjectDir / cfgfilename
         settings = ProjectSettings.from_parser(confobj)

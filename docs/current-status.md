@@ -122,6 +122,12 @@ Mesh 收敛分析是新项目启动前的可选阶段。默认按 `10, 15, 20, 2
 
 配置层主类已采用 `GlobalConfigManager` 与 `ProjectConfigManager` 命名，旧名称仅作为兼容别名。运行时以不可变 `GlobalSettings`/`ProjectSettings` 为主接口，`ConfigParser` 仅保留在序列化边界。配置 schema 当前为 3，canonical INI 全部使用小写 snake_case，并按 `paths/cst/execution/artifacts/mesh/task` 分区；无版本旧配置按 schema 1 迁移，高于当前版本的配置会被拒绝。新工程摘要统一使用 SHA-256，旧 MD5 配置仍可读取。全局 INI、项目 INI 和后处理 JSON 使用统一的同目录原子替换；全局默认配置位于所选 `current.ini` 的同级目录，并作为缺失字段的默认层加载。详见 `configuration-design.md`。
 
+## Pending（2026-10-07）
+
+- [x] 2026-10-08 HOM 扫描返回频率 -1：已将频率查询从电场树选择和 QFactor 计算中独立；模式缺失、非正频率及场树缺失返回明确 VBA 错误。扫描拒绝非正频率并记录 HOM_SOLVE_INVALID_RESULT，保留有限重试，不按空窗口跳过。新增 -1/0 无效频率与重试恢复测试；默认测试 287 passed、17 integration deselected。尚未启动真实 CST 验证；现场具体模式缺失原因仍需原始日志确认。Worker 重新初始化不在本次修正范围内。
+- [ ] 运行阶段显示与实际不一致：已静态检查 `GUI/run_controller.py`、`GUI/main_window.py`、`csttool/cst_progress.py`。当前 GUI 固定的 1/4–4/4 生命周期进度与 CST 单阶段百分比共用进度条；CST 事件没有百分比时保留上一阶段数值；日志解析器跨任务保留 stage/pass，且用读取时的当前任务上下文标记日志，存在延迟日志归属错误风险；停止或结束后未过滤迟到的 CST 事件，失败时阶段标签也未统一重置。待运行结束后修正：由后台生命周期/任务协议驱动权威状态，日志仅补充求解细节；按 run/session/task 区分事件并在新任务重置解析状态；阶段无百分比时显示不确定进度；终态和停止状态优先于日志；分开显示扫描总体进度与当前 CST 阶段进度，多 Worker 分别维护状态。验证跨区间、窗口扩大重算、网格/求解/后处理切换、停止/失败/完成及迟到事件。当前仅记录方案，尚未修改代码；具体现场错位需结合 CST 原始日志核验。
+- [ ] 日志线程命名：Qt 创建的后台线程被 Python `threading` 识别为外部线程，默认显示为 `Dummy-1` 等。为 GUI 主线程、运行、停止及恢复线程设置明确名称，例如 `GUI/MAIN`、`GUI/RUN`、`GUI/STOP`、`GUI/RECOVERY`，并验证日志输出。用户要求当前运算期间不修改代码；待运行结束后再实施。本项尚未实施。
+
 ## 6. 尚未完成
 
 - 旧 Worker、Pattern 和队列式 Manager API 已删除；生产只通过显式 Worker 工厂创建 Managed Worker；

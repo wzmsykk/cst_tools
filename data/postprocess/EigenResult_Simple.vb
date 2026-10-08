@@ -2,16 +2,21 @@ Function EigenResult_Simple(iModeNumber As Integer,queryKey As String) As Double
     If (iModeNumber > EigenmodeSolver.GetNumberOfModesCalculated) Then
             ReportWarningToWindow("3D Eigenmode result template execution: Cannot find result for mode #"+CStr(iModeNumber)+".")
             'CalculateEigenModeResult = lib_rundef
-            EigenResult_Simple=-1
-            Exit Function
+            Err.Raise vbObjectError + 2101, "EigenResult_Simple", "Missing eigenmode #" & CStr(iModeNumber)
     End If
     Dim frq_cst As Double
     frq_cst = EigenmodeSolver.GetModeFrequencyInHz(iModeNumber)/Units.GetFrequencyUnitToSI
+    If frq_cst <= 0 Then
+        Err.Raise vbObjectError + 2102, "EigenResult_Simple", "Invalid eigenmode frequency for mode #" & CStr(iModeNumber) & ": " & CStr(frq_cst)
+    End If
+    If LCase(queryKey) = "frequency" Or LCase(queryKey) = "freq" Then
+        EigenResult_Simple = frq_cst
+        Exit Function
+    End If
     If (Not SelectTreeItem("2D/3D Results\Modes\Mode " + CStr(iModeNumber) + "\e")) Then
                     ReportWarningToWindow("Error in 3D Eigenmode result template execution: Cannot find result for mode #"+CStr(iModeNumber)+".")
                     'CalculateEigenModeResult = lib_rundef
-                    EigenResult_Simple=-1
-                    Exit Function
+                    Err.Raise vbObjectError + 2103, "EigenResult_Simple", "Missing electric field result for mode #" & CStr(iModeNumber)
     End If
     Plot.Update
     ScreenUpdating True

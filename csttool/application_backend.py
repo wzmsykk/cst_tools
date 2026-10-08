@@ -19,6 +19,8 @@ from csttool.logging_config import ApplicationLogSession
 from csttool.managed_cstworker import ManagedCSTWorker
 from csttool import projectconfmanager
 from csttool.hom_scan import ScanInterrupted
+from csttool.hom_run_manifest import HomRunManifest
+from csttool.configuration import read_json
 from csttool.mesh_convergence import (
     MeshConvergenceAnalyzer,
     MeshConvergenceSettings,
@@ -179,6 +181,13 @@ class CstApplicationBackend:
         self.resume = bool(resume)
         self.worker_count = worker_count
         self.alg.set_resume(self.resume)
+        if self.resume:
+            try:
+                self._restore_resume_configuration()
+            except Exception as exc:
+                self.logger.exception("读取原项目续算配置失败")
+                self._set_state(BackendState.FAILED)
+                raise BackendInitializationError(f"读取原项目续算配置失败：{exc}") from exc
         self.logger.info(
             "RUN_INITIALIZE project=%s resume=%s workers=%d",
             self.get_project_directory(),
@@ -200,11 +209,49 @@ class CstApplicationBackend:
         self.logger.info("开始使用project目录:%s", self.get_project_directory())
         self._set_state(BackendState.INITIALIZED)
 
+    def _restore_resume_configuration(self):
+        project_settings = self.pconfman.load_resume_configuration()
+        if project_settings is None:
+            return
+        settings = dict(self.alg.getEditableAttrs())
+        settings["mesh_cells_per_wavelength"] = project_settings.cells_per_wavelength
+        settings["mesh_convergence_enabled"] = False
+        manifest_path = Path(self.get_project_directory()) / "save" / "csv" / "scan_manifest.json"
+        if manifest_path.is_file():
+            manifest = HomRunManifest(**read_json(manifest_path))
+            if manifest.schema_version != 3:
+                raise ValueError("不支持的原项目运行清单版本")
+            if manifest.mesh_cells_per_wavelength != project_settings.cells_per_wavelength:
+                raise ValueError("原项目配置与运行清单的网格设置不一致")
+            settings.update({
+                "fmin": manifest.frequency_start,
+                "fmax": manifest.frequency_start + manifest.initial_window,
+                "endfreq": manifest.frequency_stop,
+            })
+            if manifest.worker_count < 1:
+                raise ValueError("原项目 Worker 数量无效")
+            self.worker_count = manifest.worker_count
+            if manifest.cst_executable:
+                self.gconfman.select_cst_installation(manifest.cst_version, manifest.cst_executable)
+        self.alg.setEditableAttrs(settings)
+        self.logger.info(
+            "RESUME_CONFIG_LOADED 已读取原项目配置：mesh=%d workers=%d algorithm=%s",
+            project_settings.cells_per_wavelength, self.worker_count, settings,
+        )
+
     def prepare_run(self) -> None:
         self._require_state("prepare run", BackendState.INITIALIZED)
         try:
             self._acquire_project_run_lock()
             self.logger.info("RUN_PREPARE project=%s", self.get_project_directory())
+            unresolved = self.get_recovery_sessions()
+            if unresolved:
+                self._set_state(BackendState.RECOVERY_REQUIRED)
+                raise BackendPreparationError(
+                    f"发现 {len(unresolved)} 个未闭合 CST 会话，请先执行会话恢复"
+                )
+            if self.resume:
+                self.pconfman.recover_failed_project()
             settings = self.alg.getEditableAttrs()
             validate_postprocess = getattr(
                 self.alg,
@@ -223,12 +270,6 @@ class CstApplicationBackend:
                     "mesh_cells_per_wavelength"
                 ],
             )
-            unresolved = self.get_recovery_sessions()
-            if unresolved:
-                self._set_state(BackendState.RECOVERY_REQUIRED)
-                raise BackendPreparationError(
-                    f"发现 {len(unresolved)} 个未闭合 CST 会话，请先执行会话恢复"
-                )
             self.gconfman.printconf()
             self.logger.info("-----------------------------------")
             self._create_manager()

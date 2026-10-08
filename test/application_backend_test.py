@@ -69,6 +69,12 @@ class FakeProjectConfig:
         self.mesh_cells_per_wavelength = mesh_cells_per_wavelength
         self.ready = True
 
+    def recover_failed_project(self):
+        self.failed_recovered = True
+
+    def load_resume_configuration(self):
+        return None
+
     def isReady(self):
         return self.ready
 
@@ -86,7 +92,7 @@ class FakeAlgorithm:
         self.params = None
 
     def getEditableAttrs(self):
-        return {"fmin": 500, "mesh_cells_per_wavelength": 20}
+        return getattr(self, "attrs", {"fmin": 500, "mesh_cells_per_wavelength": 20})
 
     def setEditableAttrs(self, values):
         self.attrs = values
@@ -326,3 +332,100 @@ def test_successful_recovery_persists_interrupted_project_state(tmp_path):
 
     assert backend.state is BackendState.INTERRUPTED
     assert project.statuses[-1].name == "INTERRUPTED"
+
+
+@pytest.mark.parametrize("resume", [True, False])
+def test_failed_project_can_resume_only_after_closed_session_check(tmp_path, resume):
+    from pathlib import Path
+    from types import SimpleNamespace
+    from csttool.configuration import GlobalSettings, ProjectSettings, read_ini, write_ini_atomic
+    from csttool.projectconfmanager import ProjectConfigManager
+
+    backend, _, _, manager, calls = make_backend()
+    project = ProjectConfigManager(SimpleNamespace(settings=GlobalSettings()))
+    project.assignProjectDir(tmp_path)
+    source = tmp_path / "model.cst"
+    source.write_bytes(b"prepared model")
+    project.assignInputCSTFilePath(source)
+    (tmp_path / "params.json").write_text("[]", encoding="utf-8")
+    (tmp_path / "pps.json").write_text("[]", encoding="utf-8")
+    settings = ProjectSettings(
+        name="failed-run", cst_filename=Path("model.cst"), task_status="FAILED",
+        project_digest=project.file_digest(source),
+    )
+    write_ini_atomic(tmp_path / "project.ini", settings.to_parser())
+    backend.pconfman = project
+    backend.initialize_run(resume, 1)
+    if resume:
+        backend.prepare_run()
+        assert backend.state is BackendState.PREPARED
+        persisted = ProjectSettings.from_parser(read_ini(tmp_path / "project.ini"))
+        assert persisted.task_status == "INTERRUPTED"
+        assert len(calls) == 1
+        backend.execute_run()
+    else:
+        with pytest.raises(BackendPreparationError):
+            backend.prepare_run()
+        persisted = ProjectSettings.from_parser(read_ini(tmp_path / "project.ini"))
+        assert persisted.task_status == "FAILED"
+        assert not calls
+    assert ProjectRunLock.active_owner(tmp_path) is None
+
+
+def test_resume_does_not_recover_failed_state_with_unclosed_session(tmp_path):
+    backend, _, project, _, calls = make_backend()
+    backend.select_project_directory(tmp_path)
+    session = tmp_path / "temp" / "worker_0" / new_session_id()
+    FileProtocol(session / "protocol")
+    (session / "worker.state").write_text("dispatched:task", encoding="ascii")
+    backend.initialize_run(True, 1)
+    with pytest.raises(BackendPreparationError, match="未闭合"):
+        backend.prepare_run()
+    assert backend.state is BackendState.RECOVERY_REQUIRED
+    assert not hasattr(project, "failed_recovered")
+    assert not calls
+    assert ProjectRunLock.active_owner(tmp_path) is None
+
+
+def test_resume_restores_original_mesh_scan_backend_workers_and_postprocess(tmp_path):
+    from pathlib import Path
+    from types import SimpleNamespace
+    from dataclasses import asdict
+    from csttool.configuration import GlobalSettings, ProjectSettings, write_ini_atomic, write_json_atomic
+    from csttool.projectconfmanager import ProjectConfigManager
+    from csttool.hom_run_manifest import HomRunManifest
+
+    backend, global_config, _, _, calls = make_backend()
+    project = ProjectConfigManager(SimpleNamespace(settings=GlobalSettings()))
+    project.assignProjectDir(tmp_path)
+    source = tmp_path / "original.cst"
+    source.write_bytes(b"original")
+    (tmp_path / "params.json").write_text("[]", encoding="utf-8")
+    original_pps = [{"resultName": "frequency", "method": "Frequency", "params": {"iModeNumber": 1}}]
+    write_json_atomic(tmp_path / "pps.json", original_pps)
+    settings = ProjectSettings(name="original", cst_filename=Path("original.cst"),
+        project_digest=project.file_digest(source), cells_per_wavelength=10, task_status="FAILED")
+    write_ini_atomic(tmp_path / "project.ini", settings.to_parser())
+    manifest = HomRunManifest(3, str(source), str(source), settings.project_digest,
+        700, 3500, 100, 1, 1, True, "2025", "saved-cst.exe", 10)
+    write_json_atomic(tmp_path / "save" / "csv" / "scan_manifest.json", asdict(manifest))
+    backend.pconfman = project
+    project.assignInputCSTFilePath(tmp_path / "wrong-gui-source.cst")
+    project.setCurrPPSList([{"resultName": "wrong GUI settings"}])
+    backend.update_algorithm_settings({"fmin": 500, "fmax": 550, "endfreq": 1000,
+        "mesh_cells_per_wavelength": 20, "mesh_convergence_enabled": True})
+
+    backend.initialize_run(True, 4)
+    restored = backend.get_algorithm_settings()
+    assert restored["mesh_cells_per_wavelength"] == 10
+    assert (restored["fmin"], restored["fmax"], restored["endfreq"]) == (700, 800, 3500)
+    assert restored["mesh_convergence_enabled"] is False
+    assert backend.worker_count == 1
+    assert global_config.selected_installation == ("2025", "saved-cst.exe")
+    assert project.inputCSTFilePath is None
+    assert project.getCurrPPSList() == original_pps
+    backend.prepare_run()
+    assert calls[0]["maxTask"] == 1
+    assert backend.state is BackendState.PREPARED
+    backend.execute_run()
+    assert ProjectRunLock.active_owner(tmp_path) is None
