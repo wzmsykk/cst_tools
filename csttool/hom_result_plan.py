@@ -55,8 +55,6 @@ class IntegrationLine:
                 (self.zoffset_mm, "zoffset_mm"),
             )
         )
-        if offsets[_AXIS_NUMBER[axis] - 1] != 0.0:
-            raise ValueError("offset along the integration axis must be zero")
         object.__setattr__(self, "axis", axis)
         object.__setattr__(self, "xoffset_mm", offsets[0])
         object.__setattr__(self, "yoffset_mm", offsets[1])

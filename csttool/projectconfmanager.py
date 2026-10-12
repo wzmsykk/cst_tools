@@ -4,6 +4,7 @@ import json
 import logging
 from pathlib import Path
 import shutil
+import stat
 from dataclasses import replace
 from enum import Enum
 from install_compat import resource_path
@@ -48,6 +49,7 @@ class ProjectConfigManager:
             self.logger = logger
         else:
             self.logger = logging.getLogger(__name__)
+        self._global_config_manager = GlobalConfigManager
         self.global_settings = GlobalConfigManager.settings
         if not isinstance(self.global_settings, GlobalSettings):
             raise TypeError("global configuration requires GlobalSettings")
@@ -147,6 +149,7 @@ class ProjectConfigManager:
 
     def prepare_project(self, startFromExisted=False, *, mesh_cells_per_wavelength=20):
         # startFromExisted=True 从已有开始 不需要CST文件
+        self.setNotReady()
         self.logger.info("准备项目 | project=%s source=%s resume=%s mesh_cells=%s", self.currProjectDir, self.inputCSTFilePath, startFromExisted, mesh_cells_per_wavelength)
         iProjectDir = self.currProjectDir
         iInputCSTFilePath = self.inputCSTFilePath
@@ -157,6 +160,10 @@ class ProjectConfigManager:
             if iInputCSTFilePath == None or not iInputCSTFilePath.exists():
                 self.logger.error("未找到输入CST文件%s。" % str(iInputCSTFilePath))
                 raise FileNotFoundError
+            input_mode = iInputCSTFilePath.stat().st_mode
+            if not input_mode & stat.S_IWRITE:
+                iInputCSTFilePath.chmod(input_mode | stat.S_IWRITE)
+                self.logger.info("已清除输入 CST 文件的只读属性：%s", iInputCSTFilePath)
         dirClean = self.__isDirClean(iProjectDir)
         iConf = None
 
@@ -164,11 +171,9 @@ class ProjectConfigManager:
             if startFromExisted:
                 self.logger.debug("尝试从空白目录继续")
                 raise ProjectStatusError("尝试从空白目录继续")
-            self.logger.debug("目录%s无旧文件" % str(iProjectDir))
-            self.logger.debug("尝试从project目录%s创建空白配置文件。" % str(iProjectDir))
-            iConf = self.createNewEmptyProjectConfFile(iProjectDir)
-            iConf = replace(
-                iConf,
+            # Publish configuration only after preprocessing succeeds.
+            iConf = ProjectSettings(
+                name=iProjectDir.name,
                 cells_per_wavelength=int(mesh_cells_per_wavelength),
             )
 
@@ -224,6 +229,34 @@ class ProjectConfigManager:
                 )
             else:
                 raise ProjectStatusError(f"unsupported project task status: {status}")
+
+    def recover_failed_project(self):
+        """Mark a failed run resumable after the caller verifies session closure.
+
+        The application must hold the project lock and check managed sessions
+        before calling this persistence operation.
+        """
+        cfgpath = self.currProjectDir / self.CFGfilename
+        if not cfgpath.is_file():
+            return False
+        conf = read_ini(cfgpath)
+        settings = ProjectSettings.from_parser(conf)
+        if settings.task_status != "FAILED":
+            return False
+        self.conf = conf
+        self.settings = settings
+        self.update_task_status(TaskStatus.INTERRUPTED)
+        self.logger.info("上次扫描失败，会话已关闭，项目已转为可继续状态")
+        return True
+
+    def load_resume_configuration(self):
+        """Load persisted project configuration before resume initialization."""
+        self.conf = read_ini(self.currProjectDir / self.CFGfilename)
+        self.settings = ProjectSettings.from_parser(self.conf)
+        self.inputCSTFilePath = None  # The selected GUI source is irrelevant to resume.
+        self.set_postprocess_settings(self.readPPSList())
+        self.setNotReady()
+        return self.settings
 
     def __savecfgobj(self, confobj, cfgfilename="project.ini", slient=False):
         cfgfilePath = self.currProjectDir / cfgfilename
@@ -362,6 +395,7 @@ class ProjectConfigManager:
         mesh_cells_per_wavelength=20,
     ):
         """Create and validate a prepared project without modifying its source."""
+        self.global_settings = self._global_config_manager.settings
         settings = confobj
         if savejsonpath is None:
             jsonpath = projectDir / self.paramsfilename
@@ -434,10 +468,7 @@ class ProjectConfigManager:
             return False
         self._load_settings(cfgpath)
         self.logger.debug("测试CST模型文件是否存在")
-        if self.settings.cst_filename is None:
-            self.logger.error("项目配置未记录 CST 模型文件 | project=%s", self.currProjectDir)
-            return False
-        cstfilepath = self.currProjectDir / self.settings.cst_filename
+        cstfilepath = self._require_cst_project_file(cfgpath)
         self.logger.debug("推测模型文件位于%s", str(cstfilepath))
         if cstfilepath.exists():
             self.logger.debug("测试CST模型文件存在 通过")
@@ -479,6 +510,19 @@ class ProjectConfigManager:
         self.logger.debug("%s检测并更新项目配置文件结束\n" % cfgfilename)
         return result
 
+    def _require_cst_project_file(self, cfgpath):
+        if self.settings.cst_filename is None:
+            raise ProjectStatusError(
+                f"项目配置 {cfgpath} 缺少 CST 模型文件名（[cst] project_file）；"
+                "项目可能尚未完成预处理。请使用原始 CST 文件在新的项目目录重新创建项目。"
+            )
+        cstfilepath = self.currProjectDir / self.settings.cst_filename
+        if not cstfilepath.is_file():
+            raise ProjectStatusError(
+                f"项目配置 {cfgpath} 指定的 CST 模型文件不存在或不是文件：{cstfilepath}"
+            )
+        return cstfilepath
+
     def __checkProjectStatus(
         self, cfgfilename="project.ini", slient=False, force=False
     ):
@@ -498,10 +542,7 @@ class ProjectConfigManager:
             return False
 
         self._load_settings(cfgpath)
-        if self.settings.cst_filename is None:
-            self.logger.error("项目配置未记录 CST 模型文件 | project=%s", self.currProjectDir)
-            return False
-        cstfilepath = self.currProjectDir / self.settings.cst_filename
+        cstfilepath = self._require_cst_project_file(cfgpath)
         self.logger.debug("测试CST模型文件是否存在")
         self.logger.debug("推测模型文件位于%s", str(cstfilepath))
         if cstfilepath.exists():

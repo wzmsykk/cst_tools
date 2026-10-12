@@ -6,6 +6,7 @@ from time import sleep
 
 import pytest
 
+from csttool.configuration import CstBackendSettings, GlobalSettings, ProjectSettings
 from csttool.cstmanager import CSTManager
 from csttool.pillbox_analytic import (
     PillboxRadiusBatchOptimizer,

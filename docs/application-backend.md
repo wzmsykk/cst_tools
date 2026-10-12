@@ -85,3 +85,25 @@ camelCase Engine 适配、`False`/`0` 错误码翻译、`safe_mode` 或算法参
 应用后端、`CSTManager` 和算法链统一使用 `ManagedCSTWorker` 与结构化批任务接口。
 旧 `local_cstworker`、`worker.vb`、Pattern 模板及 Manager camelCase 队列接口已经删除。
 Profile/Warm 执行策略属于当前生产路径；运行时 VBA 仅保留复杂、依赖当前场数据的后处理能力。
+
+2026-10-06 配置迁移复查：移除 Manager 和运行清单对旧 INI 字典的回退；生产路径和
+测试替身统一提供 `GlobalSettings`/`ProjectSettings`。旧 INI 只由配置加载器迁移。
+会话恢复使用相同加载器读取 runtime 目录，支持新配置中的自定义相对路径和绝对路径。
+预处理在每次启动时读取最新全局设置，成功后才发布项目配置；算法异常保留完整堆栈。
+这次复查不替代真实 CST 的求解和停止验收，复杂后处理仍使用受管 Worker 内的声明式 VBA。
+
+继续扫描时先持有项目运行锁并检查残留会话；若不存在未关闭会话，持久化状态为
+`FAILED` 的项目自动转为 `INTERRUPTED`，随后执行配置、Mesh 和 checkpoint 校验。
+有未关闭会话时仍要求显式恢复，不自动停止 CST；新扫描不自动重置失败项目状态。
+
+续算初始化从 `project.ini` 读取原网格、工程文件和后处理文件，并加载原 PPS。
+HOM 项目从 `save/csv/scan_manifest.json` 恢复起止频率、初始窗口、Worker 数量及
+CST 版本/可执行文件；GUI 当前的新建项目参数不覆盖这些值。续算禁用 Mesh 收敛重跑。
+原配置与清单中的 Mesh 不一致时仍报错；后续工程摘要、checkpoint 及 PPS 指纹校验保持有效。
+
+任务结果在 Completion/Ack 完成且 Worker 返回 ready 后，使用任务名称、单模频率和
+完整 Task ID 命名目录；CST Backup 文件使用任务名称和频率命名，同名配套目录同步改名。
+每个目录包含 `task_result.json`，记录原始任务参数、协议身份、后处理值和存档文件名。
+HOM 汇总 CSV 的 `taskName/taskId/projectSnapshot/resultDirectory` 将模态关联到任务存档；
+路径相对于项目根目录。关联信息写入 checkpoint，恢复时随模态一起加载。旧 checkpoint
+没有这些可选字段时仍可读取；旧存档无需改名。命名失败会恢复原路径并记录警告。

@@ -146,6 +146,10 @@ class CSTManager:
         temp_path = self.project_settings.directories.temp
         result_path = self.project_settings.directories.result
         cst_filename = self.project_settings.cst_filename
+        if cst_filename is None:
+            raise ValueError("prepared project settings require a CST model filename")
+        if self.global_settings.cst.executable is None:
+            raise ValueError("global settings require a CST executable")
         self.tempDir = self._project_path(temp_path)
         self.resultDir = self._project_path(result_path)
         self.tempDir.mkdir(parents=True, exist_ok=True)

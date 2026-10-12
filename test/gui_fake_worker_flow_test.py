@@ -16,6 +16,7 @@ from PyQt5.QtWidgets import QApplication
 
 from GUI.main_window import MainWindow
 from GUI.run_controller import RunState
+from csttool.configuration import CstBackendSettings, GlobalSettings, ProjectSettings
 from csttool.cstmanager import CSTManager, ManagerState, SimulationTask
 
 

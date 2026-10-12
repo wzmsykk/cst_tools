@@ -7,6 +7,7 @@ import time
 
 import pytest
 
+from csttool.configuration import CstBackendSettings, GlobalSettings, ProjectSettings
 from csttool.cstmanager import CSTManager
 from csttool.managed_cstworker import ManagedCSTWorker
 from csttool.pillbox_analytic import PillboxRadiusBatchOptimizer

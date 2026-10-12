@@ -6,6 +6,7 @@ from dataclasses import asdict, dataclass, field
 import hashlib
 import json
 import math
+import logging
 import os
 from pathlib import Path
 from typing import Callable, Iterable
@@ -18,7 +19,11 @@ class ScanConfigurationError(ValueError):
 class IncompleteScanError(RuntimeError):
     def __init__(self, report: "ScanReport"):
         self.report = report
-        failed = ", ".join(f"[{item.lo}, {item.hi}]" for item in report.failed)
+        failed = "; ".join(
+            f"[{item.lo}, {item.hi}]: "
+            + report.failure_reasons.get(f"{item.lo:.17g}:{item.hi:.17g}", "unknown failure")
+            for item in report.failed
+        )
         super().__init__(f"HOM scan has failed intervals: {failed}")
 
 
@@ -83,6 +88,9 @@ class ModeResult:
     mode_index: int
     frequency: float
     values: dict[str, float]
+    project_snapshot: str | None = None
+    task_name: str = ""
+    task_id: str = ""
 
 
 @dataclass(slots=True)
@@ -102,8 +110,9 @@ SolveCallback = Callable[[SolveRequest], Iterable[ModeResult]]
 class AdaptiveHomScanner:
     """Scan a narrow interval for one mode, then continue above that mode."""
 
-    def __init__(self, policy: ScanPolicy):
+    def __init__(self, policy: ScanPolicy, logger=None):
         self.policy = policy
+        self.logger = logger or logging.getLogger(__name__)
 
     def run(
         self,
@@ -128,8 +137,13 @@ class AdaptiveHomScanner:
             modes = None
             last_error = None
             for _attempt in range(self.policy.max_interval_attempts):
+                if should_stop is not None and should_stop():
+                    pending_intervals = [interval] + queue
+                    self._checkpoint(checkpoint, report, pending_intervals)
+                    raise ScanInterrupted(report, pending_intervals)
                 if report.solver_calls >= self.policy.max_solver_calls:
                     report.failed.append(interval)
+                    report.failure_reasons[self._interval_key(interval)] = "solver call limit reached"
                     self._checkpoint(checkpoint, report, queue)
                     raise IncompleteScanError(report)
                 report.solver_calls += 1
@@ -138,7 +152,43 @@ class AdaptiveHomScanner:
                     modes = self._validate_modes(solve(request))
                 except Exception as exc:
                     last_error = f"{type(exc).__name__}: {exc}"
+                    self.logger.warning(
+                        "HOM_SOLVE_INVALID_RESULT 区间=[%.12g, %.12g] MHz 尝试=%d/%d 原因=%s",
+                        interval.lo, interval.hi, _attempt + 1,
+                        self.policy.max_interval_attempts, last_error,
+                    )
                     modes = None
+                    continue
+                for candidate in modes:
+                    self.logger.info(
+                        "HOM_SOLVE_RESULT 区间=[%.12g, %.12g] MHz 返回频率=%.12g MHz 后处理={%s}",
+                        interval.lo, interval.hi, candidate.frequency,
+                        self._format_results(candidate),
+                    )
+                if modes and self._already_accepted(report.modes, modes[0].frequency):
+                    last_error = "solver returned an already accepted frequency; possible degenerate mode or boundary stall"
+                    modes = None
+                    continue
+                if modes and not self._at_or_above_lower_bound(interval, modes[0].frequency):
+                    frequency = modes[0].frequency
+                    last_error = f"returned frequency {frequency} is below the search lower bound {interval.lo}"
+                    modes = None
+                    continue
+                if modes and modes[0].frequency > interval.hi:
+                    frequency = modes[0].frequency
+                    last_error = f"returned frequency {frequency} is outside the solve interval; expanded-window confirmation required"
+                    modes = None
+                    if _attempt + 1 < self.policy.max_interval_attempts:
+                        expanded_hi = max(
+                            interval.hi + self.policy.window_width,
+                            frequency + self.policy.window_width,
+                        )
+                        self.logger.info(
+                            "HOM_WINDOW_EXPAND 首次返回频率=%.12g MHz 超出窗口=[%.12g, %.12g] MHz；扩大上限至 %.12g MHz 重算，结果待确认 重试=%d/%d",
+                            frequency, interval.lo, interval.hi, expanded_hi,
+                            _attempt + 2, self.policy.max_interval_attempts,
+                        )
+                        interval = ScanInterval(interval.lo, expanded_hi)
                     continue
                 break
 
@@ -147,37 +197,41 @@ class AdaptiveHomScanner:
                 report.failure_reasons[self._interval_key(interval)] = (
                     last_error or "unknown solver failure"
                 )
-                self._checkpoint(checkpoint, report, queue)
-                continue
-
-            if modes:
-                mode = modes[0]
-                if self._already_accepted(report.modes, mode.frequency):
-                    report.failed.append(interval)
-                    report.failure_reasons[self._interval_key(interval)] = (
-                        "solver returned an already accepted frequency; "
-                        "possible degenerate mode or boundary stall"
-                    )
-                    self._checkpoint(checkpoint, report, queue)
-                    continue
-                if not self._inside(interval, mode.frequency):
-                    report.failed.append(interval)
-                    report.failure_reasons[self._interval_key(interval)] = (
-                        f"returned frequency {mode.frequency} is outside the solve interval"
-                    )
-                    self._checkpoint(checkpoint, report, queue)
-                    continue
-                report.modes.append(mode)
-                report.modes.sort(key=lambda item: item.frequency)
-                next_lo = max(
-                    math.nextafter(mode.frequency, math.inf),
-                    mode.frequency + self.policy.frequency_abs_tol,
+                self.logger.warning(
+                    "HOM_FAILED_INTERVAL lo=%.12g hi=%.12g attempts=%d reason=%s；记录未确认区间，继续向后扫描",
+                    interval.lo, interval.hi, self.policy.max_interval_attempts,
+                    report.failure_reasons[self._interval_key(interval)],
                 )
-            else:
-                report.empty.append(interval)
                 next_lo = interval.hi
 
-            report.completed.append(interval)
+            elif modes:
+                mode = modes[0]
+                if mode.frequency > self.policy.stop:
+                    self.logger.info(
+                        "HOM_SCAN_LIMIT_REACHED 下一模式频率=%.12g MHz 已超过扫描上限=%.12g MHz，正常结束",
+                        mode.frequency, self.policy.stop,
+                    )
+                    next_lo = self.policy.stop
+                else:
+                    report.modes.append(mode)
+                    report.modes.sort(key=lambda item: item.frequency)
+                    self.logger.info(
+                        "HOM_MODE_ACCEPTED 扫描模态=%d 求解器模态=%d 频率=%.12g MHz 后处理={%s} 任务=%s task_id=%s 存档=%s",
+                        report.modes.index(mode) + 1, mode.mode_index, mode.frequency,
+                        self._format_results(mode), mode.task_name or "未记录",
+                        mode.task_id or "未记录", mode.project_snapshot or "未记录",
+                    )
+                    next_lo = max(
+                        math.nextafter(mode.frequency, math.inf),
+                        mode.frequency + self.policy.frequency_abs_tol,
+                    )
+            else:
+                report.empty.append(interval)
+                self.logger.info("HOM_INTERVAL_EMPTY 区间=[%.12g, %.12g] MHz 无模态", interval.lo, interval.hi)
+                next_lo = interval.hi
+
+            if modes is not None:
+                report.completed.append(interval)
             if next_lo < self.policy.stop:
                 next_hi = min(next_lo + self.policy.window_width, self.policy.stop)
                 if next_hi <= next_lo:
@@ -188,22 +242,18 @@ class AdaptiveHomScanner:
             if should_stop is not None and should_stop():
                 raise ScanInterrupted(report, list(queue))
 
-        if report.failed:
-            raise IncompleteScanError(report)
         return report
 
-    def _inside(self, interval: ScanInterval, frequency: float) -> bool:
+    @staticmethod
+    def _format_results(mode: ModeResult) -> str:
+        return ", ".join(f"{key}={value:.12g}" for key, value in mode.values.items())
+
+    def _at_or_above_lower_bound(self, interval: ScanInterval, frequency: float) -> bool:
         return (
-            interval.lo <= frequency <= interval.hi
+            frequency >= interval.lo
             or math.isclose(
                 frequency,
                 interval.lo,
-                abs_tol=self.policy.frequency_abs_tol,
-                rel_tol=self.policy.frequency_rel_tol,
-            )
-            or math.isclose(
-                frequency,
-                interval.hi,
                 abs_tol=self.policy.frequency_abs_tol,
                 rel_tol=self.policy.frequency_rel_tol,
             )
@@ -234,6 +284,11 @@ class AdaptiveHomScanner:
                 raise ValueError("invalid mode identity")
             if not math.isfinite(mode.frequency):
                 raise ValueError("mode frequency is non-finite")
+            if mode.frequency <= 0:
+                raise ValueError(
+                    f"invalid mode frequency {mode.frequency}: expected a positive frequency; "
+                    "mode or postprocess result may be unavailable"
+                )
             if not mode.values or any(
                 not math.isfinite(value) for value in mode.values.values()
             ):

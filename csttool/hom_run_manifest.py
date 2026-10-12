@@ -48,8 +48,7 @@ class HomRunManifest:
         prepared = Path(manager.cstProjPath).resolve()
         project_config = getattr(manager, "pconfm", None)
         source = getattr(project_config, "inputCSTFilePath", None) or prepared
-        global_config = getattr(manager, "gconf", None)
-        cst_section = global_config["CST"] if global_config is not None else {}
+        global_settings = manager.global_settings
         return cls(
             schema_version=3,
             source_project=str(Path(source).resolve()),
@@ -61,8 +60,8 @@ class HomRunManifest:
             requested_modes=policy.requested_modes,
             worker_count=int(getattr(manager, "maxParallelTasks", 1)),
             background=True,
-            cst_version=str(cst_section.get("cstver", "")),
-            cst_executable=str(cst_section.get("cstexepath", "")),
+            cst_version=str(global_settings.cst.version),
+            cst_executable=str(global_settings.cst.executable or ""),
             mesh_cells_per_wavelength=int(mesh_cells_per_wavelength),
         )
 

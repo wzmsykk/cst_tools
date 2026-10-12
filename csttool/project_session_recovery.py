@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import configparser
 import ctypes
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -12,6 +11,7 @@ from pathlib import Path
 import time
 
 from .managed_session_recovery import recover_and_stop_session
+from .configuration import ProjectSettings, read_ini
 from .runtime_protocol import atomic_publish, decode_completion
 
 
@@ -192,10 +192,8 @@ def project_runtime_directory(project_directory: str | Path) -> Path:
     project_directory = Path(project_directory).resolve()
     config_path = project_directory / "project.ini"
     if config_path.is_file():
-        config = configparser.ConfigParser()
-        config.read(config_path, encoding="utf-8")
-        configured = config.get("DIRS", "tempdir", fallback="temp")
-        path = Path(configured)
+        settings = ProjectSettings.from_parser(read_ini(config_path))
+        path = settings.directories.temp
         return path.resolve() if path.is_absolute() else (project_directory / path).resolve()
     return project_directory / "temp"
 

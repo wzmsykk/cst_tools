@@ -50,8 +50,11 @@ format aligned with its data shape without adding a TOML writer dependency.
 
 `GlobalConfigManager` and `ProjectConfigManager` coordinate discovery,
 preprocessing, validation, recovery, and status transitions. They synchronize
-their compatibility `conf` view at persistence boundaries. `CSTManager` reads
-typed settings directly when available.
+their compatibility `conf` view at persistence boundaries. `CSTManager` and
+`HomRunManifest` require typed settings; they do not inspect INI sections or
+fall back to legacy dictionaries. Injected managers and test doubles must provide
+the same typed interface. Session recovery loads project settings through the
+shared migration reader, including custom relative or absolute runtime paths.
 
 Historical names `GlobalConfmanager` and `ProjectConfmanager` remain aliases so
 existing integrations can migrate without a flag day. New code must use the

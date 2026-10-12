@@ -34,6 +34,8 @@ class SimulationResult(Mapping[str, Any]):
     postprocess: list[dict[str, Any]] | None
     failure: str | None = None
     snapshot: Path | None = None
+    task_id: str = ""
+    result_directory: Path | None = None
 
     def __getitem__(self, key):
         return self.to_mapping()[key]
@@ -42,11 +44,13 @@ class SimulationResult(Mapping[str, Any]):
         return iter(self.to_mapping())
 
     def __len__(self):
-        return 7
+        return len(self.to_mapping())
 
     def to_mapping(self) -> dict[str, Any]:
         """Serialize at the existing algorithm result boundary."""
         return {"WorkerID": self.worker_id, "TaskStatus": self.status,
                 "RunName": self.job_name, "RunParameters": dict(self.parameters),
                 "PostProcessResult": self.postprocess, "FailureReport": self.failure,
-                "ProjectSnapshot": str(self.snapshot) if self.snapshot else None}
+                "ProjectSnapshot": str(self.snapshot) if self.snapshot else None,
+                "TaskID": self.task_id,
+                "ResultDirectory": str(self.result_directory) if self.result_directory else None}

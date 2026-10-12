@@ -40,6 +40,15 @@ def test_result_serialization_keeps_algorithm_contract(tmp_path):
     assert result['ProjectSnapshot'] == str(tmp_path / 'snapshot.cst')
 
 
+def test_typed_result_preserves_remote_archive_identity(tmp_path):
+    result = SimulationResult('1', 'Success', 'job', {}, [],
+                              snapshot=tmp_path / 'snapshot.cst',
+                              task_id='task-123', result_directory=tmp_path)
+    assert result['TaskID'] == 'task-123'
+    assert result['ResultDirectory'] == str(tmp_path)
+    assert len(result) == len(dict(result))
+
+
 def test_manifest_keeps_original_project(tmp_path):
     source = tmp_path / 'original.cst'
     source.write_bytes(b'original project')

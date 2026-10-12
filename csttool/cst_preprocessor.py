@@ -7,6 +7,7 @@ import logging
 import os
 from pathlib import Path
 import shutil
+import stat
 import subprocess
 from .cst_process_env import cst_process_environment
 import tempfile
@@ -123,6 +124,7 @@ class CstProjectPreprocessor:
             parameter_output = working / "parameters.txt"
             status_output = working / "completion.txt"
             shutil.copy2(source_project_path, working_project)
+            working_project.chmod(working_project.stat().st_mode | stat.S_IWRITE)
             macro_path.write_text(
                 self.render_macro(
                     working_project,
