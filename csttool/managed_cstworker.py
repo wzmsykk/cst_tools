@@ -319,6 +319,9 @@ class ManagedCSTWorker:
         except (TypeError, ValueError):
             return False
 
+    def set_attempt_context(self, job_id, attempt_no):
+        self._attempt_context = {'job_id': job_id, 'attempt_no': attempt_no}
+
     @record_worker_usage
     def run_task(self, result_name: str, *, params: Mapping[str, Any]) -> SimulationResult:
         with self._lock:
@@ -333,7 +336,8 @@ class ManagedCSTWorker:
             payload = archive_task(self.root, task, result_name)
             if getattr(self, 'run_store', None) is not None:
                 self.run_store.event(task.task_id, 'submitted', worker=self.ID,
-                                     session=self.session_id, job=result_name, parameters=dict(params))
+                                     session=self.session_id, job=result_name, parameters=dict(params),
+                                     **getattr(self, '_attempt_context', {}))
             if getattr(self, '_resource_usage', None) is not None:
                 self._resource_usage.identity['task_id'] = task.task_id
             self._active_task_context = {

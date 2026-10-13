@@ -21,7 +21,7 @@ from uuid import uuid4
 from .configuration import GlobalSettings, ProjectSettings
 from .logging_config import ContextLogger
 from .worker_models import WorkerConfig, SimulationResult
-from .run_store import RunStore
+from .run_store import RunStore, logical_job_id
 from .result_reconciliation import execution_fingerprint, find_received_result
 from .configuration import read_json, write_json_atomic
 
@@ -404,6 +404,9 @@ class CSTManager:
         self.logger.info("任务开始 | TASK_START worker=%s job=%s project=%s", slot.worker_id, task.job_name, self.currProjectDir, extra={"event": "TASK_START", "phase": "solve", "worker": slot.worker_id, "job": task.job_name, "project": self.currProjectDir})
         for attempt in range(task.retry_count + 1):
             try:
+                setter = getattr(slot.worker, 'set_attempt_context', None)
+                if setter is not None:
+                    setter(logical_job_id(task.job_name, task.params, self.execution_fingerprint), attempt + 1)
                 result = slot.worker.run_task(
                     task.job_name,
                     params=task.params,
@@ -598,6 +601,8 @@ class CSTManager:
         path = self._received_paths.get(task_id)
         if path is not None:
             receipt = read_json(path)
+            if receipt.get('phase') == 'algorithm_adopted':
+                return
             write_json_atomic(path, {**receipt, 'phase': 'algorithm_adopted'})
             self.run_store.event(task_id, 'algorithm_adopted')
 

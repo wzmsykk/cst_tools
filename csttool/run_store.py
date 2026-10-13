@@ -5,6 +5,13 @@ from pathlib import Path
 from threading import RLock
 
 from .configuration import write_json_atomic
+import hashlib
+
+
+def logical_job_id(name, parameters, definition):
+    payload = json.dumps({'name': name, 'parameters': dict(parameters), 'definition': definition},
+                         sort_keys=True, separators=(',', ':'))
+    return hashlib.sha256(payload.encode('utf-8')).hexdigest()
 
 
 class RunStore:
@@ -34,11 +41,22 @@ class RunStore:
             raise ValueError('invalid task identity')
         with self.lock:
             record = {'task_id': task_id, 'event': event, 'utc': self._utc(), **fields}
-            with (self.directory / 'events.jsonl').open('a', encoding='utf-8') as stream:
-                stream.write(json.dumps(record, ensure_ascii=False) + '\n')
             path = self.directory / 'tasks' / task_id / 'attempt.json'
             previous = json.loads(path.read_text(encoding='utf-8')) if path.exists() else {}
+            allowed = {
+                None: {'submitted', 'reconciled'},
+                'submitted': {'received', 'ack_pending'},
+                'received': {'acknowledged', 'ack_pending'},
+                'acknowledged': {'algorithm_adopted', 'ack_pending'},
+                'reconciled': {'algorithm_adopted'},
+                'ack_pending': {'reconciled'},
+                'algorithm_adopted': set(),
+            }
+            if event not in allowed.get(previous.get('event'), set()):
+                raise ValueError(f"invalid attempt transition: {previous.get('event')} -> {event}")
             write_json_atomic(path, {**previous, **record})
+            with (self.directory / 'events.jsonl').open('a', encoding='utf-8') as stream:
+                stream.write(json.dumps(record, ensure_ascii=False) + '\n')
 
     def artifacts(self, task_id, **paths):
         with self.lock:
