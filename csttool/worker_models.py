@@ -19,6 +19,7 @@ class WorkerConfig:
     memory_guard: MemoryGuardPolicy = field(default_factory=MemoryGuardPolicy)
     run_directory: Path | None = None
     project_directory: Path | None = None
+    execution_fingerprint: str | None = None
 
     @classmethod
     def from_mapping(cls, values):
@@ -40,6 +41,7 @@ class SimulationResult(Mapping[str, Any]):
     snapshot: Path | None = None
     task_id: str = ""
     result_directory: Path | None = None
+    receipt_path: Path | None = None
 
     def __getitem__(self, key):
         return self.to_mapping()[key]
@@ -57,4 +59,5 @@ class SimulationResult(Mapping[str, Any]):
                 "PostProcessResult": self.postprocess, "FailureReport": self.failure,
                 "ProjectSnapshot": str(self.snapshot) if self.snapshot else None,
                 "TaskID": self.task_id,
-                "ResultDirectory": str(self.result_directory) if self.result_directory else None}
+                "ResultDirectory": str(self.result_directory) if self.result_directory else None,
+                "ReceiptPath": str(self.receipt_path) if self.receipt_path else None}

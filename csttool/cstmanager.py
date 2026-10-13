@@ -22,6 +22,8 @@ from .configuration import GlobalSettings, ProjectSettings
 from .logging_config import ContextLogger
 from .worker_models import WorkerConfig, SimulationResult
 from .run_store import RunStore
+from .result_reconciliation import execution_fingerprint, find_received_result
+from .configuration import read_json, write_json_atomic
 
 
 class WorkerProtocol(Protocol):
@@ -158,6 +160,9 @@ class CSTManager:
         self.taskFileDir = self.tempDir
         self.cstProjPath = self.currProjectDir / cst_filename
         self.run_store = RunStore(self.currProjectDir, self.currProjectDir / 'logs' / uuid4().hex)
+        self.execution_fingerprint = (execution_fingerprint(self.cstProjPath, self.pconfm.get_postprocess_settings())
+                                      if self.cstProjPath.is_file() else None)
+        self._received_paths = {}
 
         self._state = ManagerState.IDLE
         self._state_lock = RLock()
@@ -213,6 +218,7 @@ class CSTManager:
             progress_callback=self._progress_callback,
             run_directory=self.run_store.directory,
             project_directory=self.currProjectDir,
+            execution_fingerprint=self.execution_fingerprint,
         )
 
     def _create_worker(
@@ -378,6 +384,21 @@ class CSTManager:
         }
 
     def _execute_task(self, slot: _WorkerSlot, task: SimulationTask) -> dict:
+        if task.continue_from_snapshot and self.execution_fingerprint:
+            candidate = find_received_result([self.tempDir, self.currProjectDir / 'logs'],
+                                              task.job_name, task.params, self.execution_fingerprint)
+            if candidate:
+                receipt_path, receipt = candidate
+                slot.confirmed_snapshot = self._validated_snapshot(receipt['snapshot'])
+                if not self._replace_worker(slot, continue_from_snapshot=True):
+                    raise RuntimeError('reconciled snapshot could not restore worker')
+                self._confirmed_snapshot = slot.confirmed_snapshot
+                self._received_paths[receipt['task_id']] = receipt_path
+                self.run_store.event(receipt['task_id'], 'reconciled')
+                return {'TaskStatus': 'Success', 'RunName': task.job_name,
+                        'RunParameters': dict(task.params), 'TaskID': receipt['task_id'],
+                        'PostProcessResult': receipt['postprocess'], 'ReceiptPath': str(receipt_path),
+                        'ProjectSnapshot': receipt['snapshot']}
         result: dict[str, Any] | None = None
         started_at = time.monotonic()
         self.logger.info("任务开始 | TASK_START worker=%s job=%s project=%s", slot.worker_id, task.job_name, self.currProjectDir, extra={"event": "TASK_START", "phase": "solve", "worker": slot.worker_id, "job": task.job_name, "project": self.currProjectDir})
@@ -404,6 +425,8 @@ class CSTManager:
                     self.request_stop()  # Never automatically replay a completed solve.
 
             if result.get("TaskStatus") != "Failure":
+                if result.get('TaskID') and result.get('ReceiptPath'):
+                    self._received_paths[result['TaskID']] = Path(result['ReceiptPath'])
                 snapshot_value = result.get("ProjectSnapshot")
                 if snapshot_value and task.continue_from_snapshot:
                     snapshot = self._validated_snapshot(snapshot_value)
@@ -570,6 +593,13 @@ class CSTManager:
             raise RuntimeError(
                 f"{len(stop_errors)} CST worker(s) did not stop cleanly"
             ) from stop_errors[0]
+
+    def adopt_result(self, task_id: str) -> None:
+        path = self._received_paths.get(task_id)
+        if path is not None:
+            receipt = read_json(path)
+            write_json_atomic(path, {**receipt, 'phase': 'algorithm_adopted'})
+            self.run_store.event(task_id, 'algorithm_adopted')
 
     def request_stop(self) -> None:
         """Stop dispatching new work without terminating the active solver."""

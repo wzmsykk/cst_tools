@@ -484,6 +484,11 @@ class HomScanAlgorithm(Algorithm):
                 snapshot_path=snapshot,
             )
             self._write_scan_results(current_report)
+            adopter = getattr(self.manager, 'adopt_result', None)
+            if adopter is not None:
+                for mode in current_report.modes:
+                    if mode.task_id:
+                        adopter(mode.task_id)
             self.logger.debug("HOM 检查点已保存 | HOM_CHECKPOINT modes=%d pending=%d path=%s snapshot=%s", len(current_report.modes), len(current_pending), checkpoint_store.path, snapshot, extra={"event": "HOM_CHECKPOINT", "phase": "lifecycle", "modes": len(current_report.modes), "pending": len(current_pending), "path": checkpoint_store.path, "snapshot": snapshot})
 
         def solve(request):

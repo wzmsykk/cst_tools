@@ -27,6 +27,7 @@ from .resource_usage import record_worker_usage
 from .native_progress import NativeProgressTracker
 from .solver_output import SolverOutputTracker
 from .run_store import RunStore
+from .result_reconciliation import file_hash
 from .cst_memory_guard import MemoryGuardPolicy, MemorySamplingError, SustainedMemoryGuard, owned_process_memory
 from .diagnostics import archive_task, write_run_manifest, write_failure_report
 from .runtime_protocol import (
@@ -78,6 +79,7 @@ class ManagedCSTWorker:
         self.source_project = config.project_path.resolve()
         self.executable = config.executable.resolve()
         self.parameter_definitions = tuple(config.parameters)
+        self.execution_fingerprint = config.execution_fingerprint
         self.postprocess = CstPostProcessor()
         self.postprocess.configure(config.postprocess)
         self.protocol = FileProtocol(self.root / "protocol")
@@ -401,6 +403,9 @@ class ManagedCSTWorker:
                     'job': result_name, 'parameters': dict(params),
                     'status': status, 'failure': failure, 'postprocess': postprocess_result,
                     'snapshot': str(project_snapshot.resolve()) if project_snapshot.exists() else None,
+                    'snapshot_sha256': file_hash(project_snapshot) if status == 'Success' else None,
+                    'workspace': str(self.root),
+                    'execution_fingerprint': getattr(self, 'execution_fingerprint', None),
                 }
                 try:
                     # Persist result consumption BEFORE authorizing VBA cleanup.
@@ -452,6 +457,7 @@ class ManagedCSTWorker:
                 self.ID, status, result_name, dict(params), postprocess_result,
                 failure, project_snapshot.resolve() if status == "Success" else None,
                 task_id=task.task_id, result_directory=task_result_root.resolve(),
+                receipt_path=receipt_path,
             )
 
     def _name_result_archive(self, task, resultname, directory, postprocess):
