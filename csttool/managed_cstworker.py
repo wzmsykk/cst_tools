@@ -436,7 +436,10 @@ class ManagedCSTWorker:
                     self.logger.debug("CST 已回到就绪状态 | TASK_ACK_READY task=%s job=%s", task.task_id, result_name, extra={"event": "TASK_ACK_READY", "phase": "ack", "task": task.task_id, "job": result_name})
                 except Exception as exc:
                     if getattr(self, 'run_store', None) is not None:
-                        self.run_store.event(task.task_id, 'ack_pending', error=str(exc))
+                        try:
+                            self.run_store.event(task.task_id, 'ack_pending', error=str(exc))
+                        except (OSError, ValueError):
+                            self.logger.warning('待确认索引写入失败，保留接收记录与原始异常', exc_info=True)
                     self._diagnose_failure("ack")
                     self.logger.exception("任务确认阶段失败 | TASK_ACK_FAILED task=%s job=%s", task.task_id, result_name, extra={"event": "TASK_ACK_FAILED", "phase": "ack", "task": task.task_id, "job": result_name})
                     raise ManagedAcknowledgmentPending(receipt_path, exc) from exc
@@ -448,6 +451,12 @@ class ManagedCSTWorker:
                 )
                 self.postprocess.set_result_directory(task_result_root)
                 self.postprocess.set_cst_run_result_directory(project_snapshot.with_suffix(""))
+                if getattr(self, 'run_store', None) is not None:
+                    try:
+                        self.run_store.artifacts(task.task_id, snapshot=project_snapshot,
+                                                 result_directory=task_result_root)
+                    except OSError:
+                        self.logger.warning('存档映射更新失败，不重算已完成任务', exc_info=True)
                 try:
                     write_json_atomic(receipt_path, {**received, 'phase': 'acknowledged',
                                                    'snapshot': str(project_snapshot.resolve())})

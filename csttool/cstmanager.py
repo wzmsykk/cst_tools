@@ -24,6 +24,7 @@ from .worker_models import WorkerConfig, SimulationResult
 from .run_store import RunStore, logical_job_id
 from .result_reconciliation import execution_fingerprint, find_received_result
 from .configuration import read_json, write_json_atomic
+from .resource_admission import ResourceAdmission, ResourceBudget, ResourceAdmissionError
 
 
 class WorkerProtocol(Protocol):
@@ -65,6 +66,7 @@ class ManagerState(Enum):
 
 class WorkerState(Enum):
     ALIVE = auto()
+    DRAINING = auto()
     RESTARTING = auto()
     DEAD = auto()
 
@@ -122,6 +124,7 @@ class CSTManager:
         max_jobs_per_worker: int = 6,
         progress_callback=None,
         run_id: str | None = None,
+        resource_budget: ResourceBudget | None = None,
     ) -> None:
         if maxTask < 1:
             raise ValueError("maxTask must be at least 1")
@@ -161,9 +164,15 @@ class CSTManager:
         self.taskFileDir = self.tempDir
         self.cstProjPath = self.currProjectDir / cst_filename
         self.run_store = RunStore(self.currProjectDir, self.currProjectDir / 'logs' / (run_id or uuid4().hex))
-        self.execution_fingerprint = (execution_fingerprint(self.cstProjPath, self.pconfm.get_postprocess_settings())
+        self.execution_fingerprint = (execution_fingerprint(self.cstProjPath, {
+            'postprocess': self.pconfm.get_postprocess_settings(),
+            'cst_version': self.global_settings.cst.version,
+            'executable': str(self.global_settings.cst.executable),
+        })
                                       if self.cstProjPath.is_file() else None)
         self._received_paths = {}
+        self.resource_admission = ResourceAdmission(resource_budget or ResourceBudget())
+        self.resource_admission.check(maxTask)
 
         self._state = ManagerState.IDLE
         self._state_lock = RLock()
@@ -327,13 +336,18 @@ class CSTManager:
     def _replace_worker(
         self, slot: _WorkerSlot, *, continue_from_snapshot: bool = False
     ) -> bool:
-        slot.state = WorkerState.RESTARTING
+        slot.state = WorkerState.DRAINING
         self.logger.info("Worker 重建开始 | WORKER_RESTART_START worker=%s continue_snapshot=%s", slot.worker_id, continue_from_snapshot, extra={"event": "WORKER_RESTART_START", "phase": "restart", "worker": slot.worker_id, "continue_snapshot": continue_from_snapshot})
         old_worker = slot.worker
         try:
             old_worker.stop()
         except Exception:
             self.logger.exception("Worker 关闭失败 | worker=%s project=%s", slot.worker_id, self.currProjectDir)
+            slot.state = WorkerState.DEAD
+            self.request_stop()
+            raise RuntimeError('worker drain failed; replacement is forbidden until session recovery')
+
+        slot.state = WorkerState.RESTARTING
 
         with self._state_lock:
             if self._state is not ManagerState.RUNNING:
@@ -395,7 +409,10 @@ class CSTManager:
                     raise RuntimeError('reconciled snapshot could not restore worker')
                 self._confirmed_snapshot = slot.confirmed_snapshot
                 self._received_paths[receipt['task_id']] = receipt_path
-                self.run_store.event(receipt['task_id'], 'reconciled')
+                self.run_store.event(receipt['task_id'], 'reconciled', job=task.job_name,
+                                     parameters=dict(task.params))
+                self.run_store.artifacts(receipt['task_id'], received=receipt_path,
+                                         snapshot=Path(receipt['snapshot']))
                 return {'TaskStatus': 'Success', 'RunName': task.job_name,
                         'RunParameters': dict(task.params), 'TaskID': receipt['task_id'],
                         'PostProcessResult': receipt['postprocess'], 'ReceiptPath': str(receipt_path),
@@ -408,10 +425,11 @@ class CSTManager:
                 setter = getattr(slot.worker, 'set_attempt_context', None)
                 if setter is not None:
                     setter(logical_job_id(task.job_name, task.params, self.execution_fingerprint), attempt + 1)
-                result = slot.worker.run_task(
-                    task.job_name,
-                    params=task.params,
-                )
+                with self.resource_admission.reservation():
+                    result = slot.worker.run_task(
+                        task.job_name,
+                        params=task.params,
+                    )
                 if isinstance(result, SimulationResult):
                     result = result.to_mapping()
             except Exception as exc:
@@ -423,6 +441,8 @@ class CSTManager:
                     attempt + 1,
                 )
                 result = self._exception_result(task, exc)
+                if isinstance(exc, ResourceAdmissionError):
+                    self.request_stop()
                 if getattr(exc, 'completed_result_pending', False):
                     result['AcknowledgmentPending'] = True
                     result['ReceiptPath'] = str(exc.receipt_path)

@@ -60,6 +60,8 @@ class RunStore:
 
     def artifacts(self, task_id, **paths):
         with self.lock:
-            write_json_atomic(self.directory / 'tasks' / task_id / 'artifacts.json', {
+            destination = self.directory / 'tasks' / task_id / 'artifacts.json'
+            previous = json.loads(destination.read_text(encoding='utf-8')) if destination.exists() else {}
+            write_json_atomic(destination, {**previous, **{
                 name: {**self.reference(path), 'exists_at_registration': Path(path).exists()}
-                for name, path in paths.items() if path is not None})
+                for name, path in paths.items() if path is not None}})

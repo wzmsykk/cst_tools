@@ -1,5 +1,7 @@
 # CST 原生阶段记录
 
+阶段4后，生产留档目录集中到 `logs/<run_id>/workers/<worker_id>/<session_id>/native_progress/<task_id>/`；原生源文件仍在temp工作副本的Result内，不改变CST工程文件布局。
+
 Managed Worker 在提交任务前建立观察基线，求解等待期间每 0.2 秒检查 `<会话>/worker-input/Result/progress.log`。它是可覆盖的状态文件，不按 stdout 日志的追加文件方式读取。
 
 读取 Header / Text / Progress，保留原始大小写、字段类型、未知字段和未知阶段，不预先假定完整阶段枚举。只接受三个字段完整且百分比在 0–100 的状态；读取前后文件指纹变化时跳过，重试下一次观察。启动时已有旧文件不归入新任务，等待文件更新后才记录。

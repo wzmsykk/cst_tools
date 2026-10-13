@@ -24,7 +24,7 @@ received 记录保存任务、会话、参数、接收结果、快照和接收�
 - Ack或清理失败不自行 Save/Quit，也不再十分钟超时退出；进入阻塞状态，等待独立停止请求。这不是无界重试，坏Ack不在等待循环中被反复打开。
 - Python以 ManagedAcknowledgmentPending 报告确认未闭合；Manager请求暂停，抑制该任务自动重试和Worker重建重算。HOM检查点仍只含此前确认模式。
 - 阻塞后停止保留协议残留、接收记录和快照。Save/Quit错误由独立处理器记录，不回到求解，不覆盖已有Completion。
-- 结果接收记录 acknowledged 不代表 HOM 算法检查点已经接纳它；目前没有自动将待确认结果合并到 HOM 检查点的事务。恢复后应核对指标和快照再接纳；不可仅凭success Completion当作已完成扫描模式。
+- 结果接收记录 acknowledged 不代表 HOM 检查点已经接纳。控制器阶段2现提供显式会话恢复后的结果核对：匹配工程/后处理/CST后端指纹及参数，校验快照摘要，随后通过原有HOM指标校验；检查点保存后才标记 algorithm_adopted。旧记录缺少指纹时不自动接纳。详见 controller-plan-implementation.md。
 - 已退出但缺停止确认与仍运行需要恢复是不同情况，不凭退出码0声称完整成功。
 
 ## 验证

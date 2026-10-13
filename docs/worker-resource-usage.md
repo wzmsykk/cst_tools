@@ -1,5 +1,7 @@
 # Worker 逐任务资源统计
 
+生产运行的观察目录现集中为 `logs/<run_id>/workers/<worker_id>/<session_id>/`，下面的“会话目录”统计路径以该目录为准。通信与工作副本仍在temp；独立工具未传run_directory时保留旧布局。
+
 普通应用日志默认 INFO：等待心跳每 10 分钟一次，开始、阶段变化、异常与结束继续及时记录。30 秒等待详情降为 DEBUG，可通过 `CstApplicationBackend(logging_level="debug")` 或注入 DEBUG logger 开启。资源 JSONL 的 30 秒采样不变；心跳间隔不是求解超时门限。GUI 继续沿用已有的阶段进度信号与原位显示，本次未新增 GUI 资源面板。
 
 每次 `run_task` 在会话目录 `resource_usage/<独立记录ID>/` 保存：
