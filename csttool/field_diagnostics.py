@@ -9,7 +9,7 @@ from .field_artifacts import read_field
 from .mode_matching import weighted_overlap, normalized_mac, match_modes, compare_subspaces
 
 
-def compare_fields(reference, candidates, policy):
+def compare_fields(reference, candidates, policy, *, quadrature=None):
     all_fields=list(reference)+list(candidates)
     if not reference or not candidates:
         raise ValueError('reference and candidate groups must be nonempty')
@@ -24,13 +24,17 @@ def compare_fields(reference, candidates, policy):
     a=np.stack([read_field(f) for f in reference],axis=-1)
     b=np.stack([read_field(f) for f in candidates],axis=-1)
     prepared=time.perf_counter()
-    matrices=weighted_overlap(a,b,first.sampling.weights(),scope=first.sampling.scope)
+    if quadrature is not None and quadrature.sampling.identity != first.sampling.identity:
+        raise ValueError('quadrature and field sampling differ')
+    weights = first.sampling.weights() if quadrature is None else np.asarray(quadrature.weights_m3)
+    scope = first.sampling.scope if quadrature is None else quadrature.scope
+    matrices=weighted_overlap(a,b,weights,scope=scope)
     mac=normalized_mac(matrices,policy.numerical_tolerance)
     matches=match_modes(mac,([f.frequency_hz for f in reference],[f.frequency_hz for f in candidates]),policy)
     group=compare_subspaces(matrices,policy)
     def complex_matrix(values):
         return {'real':values.real.tolist(),'imag':values.imag.tolist()}
-    return {'schema_version':1,'status':'complete','scope':first.sampling.scope,
+    return {'schema_version':1,'status':'complete','scope':scope,
             'physical_identity_confirmed':False,
             'metric_kind':matrices.metric_kind,'sampling_id':first.sampling.identity,
             'policy':asdict(policy),'policy_calibrated':False,
@@ -40,11 +44,12 @@ def compare_fields(reference, candidates, policy):
             'matrices':{'reference':complex_matrix(matrices.reference),'candidate':complex_matrix(matrices.candidate),'cross':complex_matrix(matrices.cross)},
             'normalization':'per-mode amplitude and common weight scale removed; not physical stored energy',
             'timing':{'prepare_seconds':prepared-start,'compute_seconds':time.perf_counter()-prepared},
+            'quadrature':None if quadrature is None else quadrature.to_mapping(),
             'warnings':['diagnostic scope only; matching policy not physically calibrated']}
 
 
 def run_field_diagnostic(reference, candidates, policy, destination, *, context=None,
-                         run_store=None, cancelled=lambda:False, logger=None):
+                         run_store=None, cancelled=lambda:False, logger=None, quadrature=None):
     """Reruns only analysis of supplied artifacts; no CST/solver callback exists."""
     destination=Path(destination)
     logger=logger or logging.getLogger(__name__)
@@ -53,7 +58,7 @@ def run_field_diagnostic(reference, candidates, policy, destination, *, context=
         if cancelled():
             result={'status':'cancelled','reason':'stop-requested'}
         else:
-            result=compare_fields(reference,candidates,policy)
+            result=compare_fields(reference,candidates,policy,quadrature=quadrature)
             if cancelled():
                 result={'status':'cancelled','reason':'stop-requested-after-analysis'}
     except Exception as exc:

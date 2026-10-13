@@ -72,6 +72,9 @@ def wait_probe(process, directory, *, stage_timeout=180, exit_timeout=60):
         if any(p.exists() for p in files[2:]) and completed_at is None:
             completed_at = time.monotonic()
         active = [p.pid for p in owned.values() if p.is_running()]
+        # Late child between enumeration and listing: require later ancestry proof.
+        for identity in owned:
+            foreign.pop(identity, None)
         for record in cst_processes():
             if (record['pid'], record['create_time']) not in owned:
                 foreign[(record['pid'], record['create_time'])] = record

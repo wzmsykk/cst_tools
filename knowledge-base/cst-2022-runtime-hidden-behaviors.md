@@ -129,6 +129,10 @@ CST2022官方Python包限制Python3.6–3.9，当前Python3.12不能直接使用
 
 ## 11. 历史覆盖与Start返回值的新反例
 
+2026-10-14全域基准补测：Solid.IsPointInsideShape与GetMaterialNameForShape可独立构造几何/材料掩码；理想PEC Pillbox的48³/64³/96³结果与解析圆柱逐点一致。体积切边仍有单元中心误差（16³约3.45%，96³约0.0861%），不能把二元掩码等同于精确切边体积。TM110双模全域子空间与解析基最小平方重叠约0.999999，基准通过不等于任意HOM阈值已校准。验收进程监测也出现晚发现子进程的竞争误报，已按祖先关系与PID+创建时间消除自己实例的旧记录，外来实例仍拒绝。详见[全域与双模验收](../docs/physical-domain-pillbox-acceptance.md)。
+
+2026-10-14保存场故障补测：`field-failure-recovery-21dbe3e6`仅复制.cst不带同名结果目录，导出真实报mode field missing；完成标记与退出0不能覆盖unavailable工件，整体仍incomplete。真实导出HDF5副本缺文件、哈希变化、缺数据集及坐标错误全部拒绝，利用完好工件备份可只恢复Python分析，无Solver重放；不能从不存在的原生场凭空恢复。详见[场故障验收](../docs/field-failure-recovery-acceptance.md)。
+
 详见[历史持久性与真实失败对照](../docs/cst-history-persistence-and-solver-failure.md)。`history-persistence-18ad6d40`实测：直接Boundary.Xmax=open在完整Rebuild后变回electric；AddToHistory后在完整重建、部分/完整参数更新都保持open。Gap值、concaveL表达式、新建项目参数与Global Data保留。因此边界/设置的历史化与参数表更新应分开；Global Data不自动失效结果，不应用于规避更新。
 
 `solver-failure-recovery-4d229e05`实测Default/Tet+open被求解日志明确拒绝，但Start返回1，随后查询报无Eigenmode数据库；同Worker恢复原边界后求解及标准退出成功。此版本/路线存在Start返回值与文档成功契约不一致的反例，不能仅凭返回1发布成功。Managed新增solver-result模式可用性检查；少于请求数不判失败，零可用模式或查询异常明确失败。最新历史化门禁证据见上述验收记录。
@@ -142,3 +146,5 @@ CST2022官方Python包限制Python3.6–3.9，当前Python3.12不能直接使用
 原失败记录不追认成功。新增参数表达式检查点和停止恢复后，`failed-rebuild-stop-ae5729af`重建/保存已返回且无保存拒绝，CST仍退出4；说明非零码可能继续携带任务失败，不能与等待UI的未关闭状态等同。
 
 `failed-rebuild-stop-b417feb1`基线恢复及`failed-rebuild-stop-0ea47a64`成功后失败恢复已通过：本会话恢复快照/保存回执、StopAck和实际退出核对，任务Failure保留；无Solver重放，原成功快照及源SHA未变，无主实例/求解残留。只允许这种有证据的特定退出4停止确认；没有通用忽略非零码。参数恢复不回滚任意历史/Global Data。详见[P0-1验收](../docs/failed-rebuild-stop-recovery.md)。
+
+2026-10-14全域双网格实测：理想Pillbox cell20/30实际四面体数83151/283098（Mesh.GetNumberOfMeshCells，文档明确支持四面体），频率相对变化2.599e-7、双模子空间最小平方重叠0.999998879，但单模MAC约0.903。这是数值极化基混合的实测，不是自然编号交换的证据。原生日志求解总时61/450秒；不能以频率接近替代场身份，也不能以加密参数替代实际网格库存。见[第二网格验收](../docs/physical-domain-pillbox-acceptance.md)。

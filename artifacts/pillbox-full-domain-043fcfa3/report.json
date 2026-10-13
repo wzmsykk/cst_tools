@@ -1,0 +1,1256 @@
+{
+  "geometry": "ideal-closed-PEC-pillbox-R229mm-L259mm-v1",
+  "source_sha256": "7b63939b2dbed3de567aa55a5ff19cb69e7447245882a691be15d28580f1ddfa",
+  "mesh": 20,
+  "solve": {
+    "WorkerID": "0",
+    "TaskStatus": "Success",
+    "RunName": "ideal-TM110-doublet",
+    "RunParameters": {
+      "nmodes": 2,
+      "fmin": 780,
+      "fmax": 850,
+      "cell": 20
+    },
+    "PostProcessResult": [
+      {
+        "id": 0,
+        "resultName": "frequency_1",
+        "value": 798.357964443744,
+        "params": {
+          "iModeNumber": 1
+        }
+      },
+      {
+        "id": 1,
+        "resultName": "frequency_2",
+        "value": 798.357974788953,
+        "params": {
+          "iModeNumber": 2
+        }
+      }
+    ],
+    "FailureReport": null,
+    "ProjectSnapshot": "D:\\work\\cst_tools\\artifacts\\pillbox-full-domain-043fcfa3\\solve\\result\\worker_0\\worker_0\\ideal-TM110-doublet__167a6479-ab0a-4198-95e5-6844c4689150\\ideal-TM110-doublet.cst",
+    "TaskID": "167a6479-ab0a-4198-95e5-6844c4689150",
+    "ResultDirectory": "D:\\work\\cst_tools\\artifacts\\pillbox-full-domain-043fcfa3\\solve\\result\\worker_0\\worker_0\\ideal-TM110-doublet__167a6479-ab0a-4198-95e5-6844c4689150",
+    "ReceiptPath": "D:\\work\\cst_tools\\artifacts\\pillbox-full-domain-043fcfa3\\solve\\temp\\worker_0\\8bef1892-8739-4ba5-8a8f-b468337f96b7\\received\\167a6479-ab0a-4198-95e5-6844c4689150.json"
+  },
+  "stop_returned": true,
+  "stop_ack": true,
+  "exit_code": 0,
+  "levels": [
+    {
+      "counts": [
+        48,
+        48,
+        48
+      ],
+      "volume_m3": 0.04253875534027776,
+      "normalized_gram_abs": [
+        [
+          1.0,
+          1.627160424756623e-06
+        ],
+        [
+          1.6271604247514854e-06,
+          1.0000000000000002
+        ]
+      ],
+      "mode_l2_norms": [
+        475266.03932609444,
+        475265.92002050474
+      ],
+      "quadrature": {
+        "identity": "e7a51c8ad6116d660fa3a1969b01c2e2db988c191927662fa4856eed59f3baf7",
+        "sampling_id": "c14cb5f6c8c74e90963807ce00dd1ae027fbc9c4760c6fb6346665a8aee95ef1",
+        "scope": "common-material-domain",
+        "rule": "masked-cell-midpoint-volume-v1",
+        "volume_m3": 0.04253875534027776,
+        "weight_unit": "m^3",
+        "materials": [
+          "Vacuum"
+        ],
+        "support_ids": [
+          "b38bf68803b86e247a973983db33fb81edc66fa130135f292416a58ec946c93f"
+        ],
+        "support_disagreement_fraction": 0.0,
+        "boundary_rule": "point-classification; cut-cell error requires refinement",
+        "physical_identity_confirmed": false
+      },
+      "diagnostic": {
+        "schema_version": 1,
+        "status": "complete",
+        "scope": "common-material-domain",
+        "physical_identity_confirmed": false,
+        "metric_kind": "weighted-sampled-field",
+        "sampling_id": "c14cb5f6c8c74e90963807ce00dd1ae027fbc9c4760c6fb6346665a8aee95ef1",
+        "policy": {
+          "minimum_mac": 0.9,
+          "minimum_margin": 0.05,
+          "minimum_subspace_overlap": 0.99,
+          "rank_tolerance": 1e-10,
+          "numerical_tolerance": 1e-08,
+          "maximum_frequency_change": null
+        },
+        "policy_calibrated": false,
+        "reference": [
+          {
+            "mode": 1,
+            "frequency_hz": 798357964.443744,
+            "sha256": "516bafa7ce3710c11d71436c128ea59e12eca8a62a9fe76559a47ecfa108a9bc"
+          },
+          {
+            "mode": 2,
+            "frequency_hz": 798357974.788953,
+            "sha256": "dc4841c5134477002c18ddf3169b3f69114423f3cb138eb8db34f58fd20ec4ec"
+          }
+        ],
+        "candidate": [
+          {
+            "mode": 1,
+            "frequency_hz": 798357964.443744,
+            "sha256": "516bafa7ce3710c11d71436c128ea59e12eca8a62a9fe76559a47ecfa108a9bc"
+          },
+          {
+            "mode": 2,
+            "frequency_hz": 798357974.788953,
+            "sha256": "dc4841c5134477002c18ddf3169b3f69114423f3cb138eb8db34f58fd20ec4ec"
+          }
+        ],
+        "mac": [
+          [
+            1.0,
+            2.647651048002664e-12
+          ],
+          [
+            2.647651048002664e-12,
+            1.0
+          ]
+        ],
+        "members": {
+          "status": "matched",
+          "reason": "explicit-policy-passed",
+          "margin": null,
+          "pairs": [
+            {
+              "reference_index": 0,
+              "candidate_index": 0,
+              "mac": 1.0
+            },
+            {
+              "reference_index": 1,
+              "candidate_index": 1,
+              "mac": 1.0
+            }
+          ]
+        },
+        "group": {
+          "reference_rank": 2,
+          "candidate_rank": 2,
+          "scope": "common-material-domain",
+          "metric_kind": "weighted-sampled-field",
+          "status": "matched",
+          "reason": "explicit-policy-passed",
+          "singular_values": [
+            1.0,
+            0.9999999999999996
+          ],
+          "minimum_squared_overlap": 0.9999999999999991,
+          "reference_condition": 1.0000924235780053,
+          "candidate_condition": 1.0000924235780053
+        },
+        "matrices": {
+          "reference": {
+            "real": [
+              [
+                20762.458095931837,
+                0.033785410342949955
+              ],
+              [
+                0.033785410342949955,
+                20764.375846502302
+              ]
+            ],
+            "imag": [
+              [
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0
+              ]
+            ]
+          },
+          "candidate": {
+            "real": [
+              [
+                20762.458095931837,
+                0.033785410342949955
+              ],
+              [
+                0.033785410342949955,
+                20764.375846502302
+              ]
+            ],
+            "imag": [
+              [
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0
+              ]
+            ]
+          },
+          "cross": {
+            "real": [
+              [
+                20762.458095931837,
+                0.033785410342949955
+              ],
+              [
+                0.033785410342949955,
+                20764.375846502302
+              ]
+            ],
+            "imag": [
+              [
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0
+              ]
+            ]
+          }
+        },
+        "normalization": "per-mode amplitude and common weight scale removed; not physical stored energy",
+        "timing": {
+          "prepare_seconds": 0.16319079999811947,
+          "compute_seconds": 0.11781270010396838
+        },
+        "quadrature": {
+          "identity": "e7a51c8ad6116d660fa3a1969b01c2e2db988c191927662fa4856eed59f3baf7",
+          "sampling_id": "c14cb5f6c8c74e90963807ce00dd1ae027fbc9c4760c6fb6346665a8aee95ef1",
+          "scope": "common-material-domain",
+          "rule": "masked-cell-midpoint-volume-v1",
+          "volume_m3": 0.04253875534027776,
+          "weight_unit": "m^3",
+          "materials": [
+            "Vacuum"
+          ],
+          "support_ids": [
+            "b38bf68803b86e247a973983db33fb81edc66fa130135f292416a58ec946c93f"
+          ],
+          "support_disagreement_fraction": 0.0,
+          "boundary_rule": "point-classification; cut-cell error requires refinement",
+          "physical_identity_confirmed": false
+        },
+        "warnings": [
+          "diagnostic scope only; matching policy not physically calibrated"
+        ],
+        "context": {}
+      },
+      "analytic_tm110_subspace": {
+        "reference_rank": 2,
+        "candidate_rank": 2,
+        "scope": "common-material-domain",
+        "metric_kind": "weighted-sampled-field",
+        "status": "matched",
+        "reason": "explicit-policy-passed",
+        "singular_values": [
+          0.9999995388857159,
+          0.9999995352861402
+        ],
+        "minimum_squared_overlap": 0.9999990705724963,
+        "reference_condition": 1.0000000000000022,
+        "candidate_condition": 1.0000924235780053
+      }
+    },
+    {
+      "counts": [
+        64,
+        64,
+        64
+      ],
+      "volume_m3": 0.04281582317578127,
+      "normalized_gram_abs": [
+        [
+          0.9999999999999999,
+          1.0412744270057096e-06
+        ],
+        [
+          1.0412744270043984e-06,
+          0.9999999999999999
+        ]
+      ],
+      "mode_l2_norms": [
+        475266.02375842456,
+        475265.33441280655
+      ],
+      "quadrature": {
+        "identity": "af8609e7935c36fd445e75ba124bb6b594872946b51ba4d18b26599dcd6cf36b",
+        "sampling_id": "35d9111d4771071777954f665a93c460f6ac6e39d69fe3ec3e5597ad23302598",
+        "scope": "common-material-domain",
+        "rule": "masked-cell-midpoint-volume-v1",
+        "volume_m3": 0.04281582317578127,
+        "weight_unit": "m^3",
+        "materials": [
+          "Vacuum"
+        ],
+        "support_ids": [
+          "5309b3861604c93c07cd45e045dbf79f2720acf8f62a2bc8a79bc8ae5ccbfdcc"
+        ],
+        "support_disagreement_fraction": 0.0,
+        "boundary_rule": "point-classification; cut-cell error requires refinement",
+        "physical_identity_confirmed": false
+      },
+      "diagnostic": {
+        "schema_version": 1,
+        "status": "complete",
+        "scope": "common-material-domain",
+        "physical_identity_confirmed": false,
+        "metric_kind": "weighted-sampled-field",
+        "sampling_id": "35d9111d4771071777954f665a93c460f6ac6e39d69fe3ec3e5597ad23302598",
+        "policy": {
+          "minimum_mac": 0.9,
+          "minimum_margin": 0.05,
+          "minimum_subspace_overlap": 0.99,
+          "rank_tolerance": 1e-10,
+          "numerical_tolerance": 1e-08,
+          "maximum_frequency_change": null
+        },
+        "policy_calibrated": false,
+        "reference": [
+          {
+            "mode": 1,
+            "frequency_hz": 798357964.443744,
+            "sha256": "433a986b329ec43cc8eea70a1e53558076ce303ca98e90071cfcd0a976bcca12"
+          },
+          {
+            "mode": 2,
+            "frequency_hz": 798357974.788953,
+            "sha256": "f9b2b82469060024f051454a9d76ff72b00bc636bafec88593e4624dbe5d4c38"
+          }
+        ],
+        "candidate": [
+          {
+            "mode": 1,
+            "frequency_hz": 798357964.443744,
+            "sha256": "433a986b329ec43cc8eea70a1e53558076ce303ca98e90071cfcd0a976bcca12"
+          },
+          {
+            "mode": 2,
+            "frequency_hz": 798357974.788953,
+            "sha256": "f9b2b82469060024f051454a9d76ff72b00bc636bafec88593e4624dbe5d4c38"
+          }
+        ],
+        "mac": [
+          [
+            1.0,
+            1.0842524320503303e-12
+          ],
+          [
+            1.0842524320503303e-12,
+            1.0
+          ]
+        ],
+        "members": {
+          "status": "matched",
+          "reason": "explicit-policy-passed",
+          "margin": null,
+          "pairs": [
+            {
+              "reference_index": 0,
+              "candidate_index": 0,
+              "mac": 1.0
+            },
+            {
+              "reference_index": 1,
+              "candidate_index": 1,
+              "mac": 1.0
+            }
+          ]
+        },
+        "group": {
+          "reference_rank": 2,
+          "candidate_rank": 2,
+          "scope": "common-material-domain",
+          "metric_kind": "weighted-sampled-field",
+          "status": "matched",
+          "reason": "explicit-policy-passed",
+          "singular_values": [
+            1.0,
+            1.0
+          ],
+          "minimum_squared_overlap": 1.0,
+          "reference_condition": 1.0008876888311318,
+          "candidate_condition": 1.0008876888311318
+        },
+        "matrices": {
+          "reference": {
+            "real": [
+              [
+                49304.470870892954,
+                -0.05131671312673228
+              ],
+              [
+                -0.05131671312673228,
+                49260.742780211534
+              ]
+            ],
+            "imag": [
+              [
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0
+              ]
+            ]
+          },
+          "candidate": {
+            "real": [
+              [
+                49304.470870892954,
+                -0.05131671312673228
+              ],
+              [
+                -0.05131671312673228,
+                49260.742780211534
+              ]
+            ],
+            "imag": [
+              [
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0
+              ]
+            ]
+          },
+          "cross": {
+            "real": [
+              [
+                49304.470870892954,
+                -0.05131671312673228
+              ],
+              [
+                -0.05131671312673228,
+                49260.742780211534
+              ]
+            ],
+            "imag": [
+              [
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0
+              ]
+            ]
+          }
+        },
+        "normalization": "per-mode amplitude and common weight scale removed; not physical stored energy",
+        "timing": {
+          "prepare_seconds": 0.3784546999959275,
+          "compute_seconds": 0.30407269997522235
+        },
+        "quadrature": {
+          "identity": "af8609e7935c36fd445e75ba124bb6b594872946b51ba4d18b26599dcd6cf36b",
+          "sampling_id": "35d9111d4771071777954f665a93c460f6ac6e39d69fe3ec3e5597ad23302598",
+          "scope": "common-material-domain",
+          "rule": "masked-cell-midpoint-volume-v1",
+          "volume_m3": 0.04281582317578127,
+          "weight_unit": "m^3",
+          "materials": [
+            "Vacuum"
+          ],
+          "support_ids": [
+            "5309b3861604c93c07cd45e045dbf79f2720acf8f62a2bc8a79bc8ae5ccbfdcc"
+          ],
+          "support_disagreement_fraction": 0.0,
+          "boundary_rule": "point-classification; cut-cell error requires refinement",
+          "physical_identity_confirmed": false
+        },
+        "warnings": [
+          "diagnostic scope only; matching policy not physically calibrated"
+        ],
+        "context": {}
+      },
+      "analytic_tm110_subspace": {
+        "reference_rank": 2,
+        "candidate_rank": 2,
+        "scope": "common-material-domain",
+        "metric_kind": "weighted-sampled-field",
+        "status": "matched",
+        "reason": "explicit-policy-passed",
+        "singular_values": [
+          0.9999995381133933,
+          0.9999995325387312
+        ],
+        "minimum_squared_overlap": 0.9999990650776809,
+        "reference_condition": 1.0000000000000016,
+        "candidate_condition": 1.0008876888311318
+      }
+    },
+    {
+      "counts": [
+        96,
+        96,
+        96
+      ],
+      "volume_m3": 0.04263307630555552,
+      "normalized_gram_abs": [
+        [
+          1.0,
+          3.4191853041817513e-07
+        ],
+        [
+          3.419185304160806e-07,
+          1.0
+        ]
+      ],
+      "mode_l2_norms": [
+        475265.6849557711,
+        475265.6433535416
+      ],
+      "quadrature": {
+        "identity": "6ed05e50d0d54b26edecab4ae2cd8df5aaf2d11e7a306cd581fa88118b4827a5",
+        "sampling_id": "5693a85a330384047814eb4c794f80dc7082969d9e0ea2457bf0673e40889703",
+        "scope": "common-material-domain",
+        "rule": "masked-cell-midpoint-volume-v1",
+        "volume_m3": 0.04263307630555552,
+        "weight_unit": "m^3",
+        "materials": [
+          "Vacuum"
+        ],
+        "support_ids": [
+          "54fe89bdc97fa2e8ac05c9e71c8129c0a47e9730b0f9d7200db1f17524199c5e"
+        ],
+        "support_disagreement_fraction": 0.0,
+        "boundary_rule": "point-classification; cut-cell error requires refinement",
+        "physical_identity_confirmed": false
+      },
+      "diagnostic": {
+        "schema_version": 1,
+        "status": "complete",
+        "scope": "common-material-domain",
+        "physical_identity_confirmed": false,
+        "metric_kind": "weighted-sampled-field",
+        "sampling_id": "5693a85a330384047814eb4c794f80dc7082969d9e0ea2457bf0673e40889703",
+        "policy": {
+          "minimum_mac": 0.9,
+          "minimum_margin": 0.05,
+          "minimum_subspace_overlap": 0.99,
+          "rank_tolerance": 1e-10,
+          "numerical_tolerance": 1e-08,
+          "maximum_frequency_change": null
+        },
+        "policy_calibrated": false,
+        "reference": [
+          {
+            "mode": 1,
+            "frequency_hz": 798357964.443744,
+            "sha256": "0eccb64d54c3cb10755eb77a1961c28179c55b62143fc31f08d2a115f439a772"
+          },
+          {
+            "mode": 2,
+            "frequency_hz": 798357974.788953,
+            "sha256": "64ce11be91560e184a19efe04b7e63a32bb8b8a9892b74db090a51c998ee2411"
+          }
+        ],
+        "candidate": [
+          {
+            "mode": 1,
+            "frequency_hz": 798357964.443744,
+            "sha256": "0eccb64d54c3cb10755eb77a1961c28179c55b62143fc31f08d2a115f439a772"
+          },
+          {
+            "mode": 2,
+            "frequency_hz": 798357974.788953,
+            "sha256": "64ce11be91560e184a19efe04b7e63a32bb8b8a9892b74db090a51c998ee2411"
+          }
+        ],
+        "mac": [
+          [
+            1.0,
+            1.1690828152418863e-13
+          ],
+          [
+            1.1690828152418863e-13,
+            1.0
+          ]
+        ],
+        "members": {
+          "status": "matched",
+          "reason": "explicit-policy-passed",
+          "margin": null,
+          "pairs": [
+            {
+              "reference_index": 0,
+              "candidate_index": 0,
+              "mac": 1.0
+            },
+            {
+              "reference_index": 1,
+              "candidate_index": 1,
+              "mac": 1.0
+            }
+          ]
+        },
+        "group": {
+          "reference_rank": 2,
+          "candidate_rank": 2,
+          "scope": "common-material-domain",
+          "metric_kind": "weighted-sampled-field",
+          "status": "matched",
+          "reason": "explicit-policy-passed",
+          "singular_values": [
+            1.0,
+            1.0
+          ],
+          "minimum_squared_overlap": 1.0,
+          "reference_condition": 1.0005372568779158,
+          "candidate_condition": 1.0005372568779158
+        },
+        "matrices": {
+          "reference": {
+            "real": [
+              [
+                166378.25226813383,
+                0.05687253201307216
+              ],
+              [
+                0.05687253201307216,
+                166288.9124786116
+              ]
+            ],
+            "imag": [
+              [
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0
+              ]
+            ]
+          },
+          "candidate": {
+            "real": [
+              [
+                166378.25226813383,
+                0.05687253201307216
+              ],
+              [
+                0.05687253201307216,
+                166288.9124786116
+              ]
+            ],
+            "imag": [
+              [
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0
+              ]
+            ]
+          },
+          "cross": {
+            "real": [
+              [
+                166378.25226813383,
+                0.05687253201307216
+              ],
+              [
+                0.05687253201307216,
+                166288.9124786116
+              ]
+            ],
+            "imag": [
+              [
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0
+              ]
+            ]
+          }
+        },
+        "normalization": "per-mode amplitude and common weight scale removed; not physical stored energy",
+        "timing": {
+          "prepare_seconds": 1.3217729000607505,
+          "compute_seconds": 1.1227089999010786
+        },
+        "quadrature": {
+          "identity": "6ed05e50d0d54b26edecab4ae2cd8df5aaf2d11e7a306cd581fa88118b4827a5",
+          "sampling_id": "5693a85a330384047814eb4c794f80dc7082969d9e0ea2457bf0673e40889703",
+          "scope": "common-material-domain",
+          "rule": "masked-cell-midpoint-volume-v1",
+          "volume_m3": 0.04263307630555552,
+          "weight_unit": "m^3",
+          "materials": [
+            "Vacuum"
+          ],
+          "support_ids": [
+            "54fe89bdc97fa2e8ac05c9e71c8129c0a47e9730b0f9d7200db1f17524199c5e"
+          ],
+          "support_disagreement_fraction": 0.0,
+          "boundary_rule": "point-classification; cut-cell error requires refinement",
+          "physical_identity_confirmed": false
+        },
+        "warnings": [
+          "diagnostic scope only; matching policy not physically calibrated"
+        ],
+        "context": {}
+      },
+      "analytic_tm110_subspace": {
+        "reference_rank": 2,
+        "candidate_rank": 2,
+        "scope": "common-material-domain",
+        "metric_kind": "weighted-sampled-field",
+        "status": "matched",
+        "reason": "explicit-policy-passed",
+        "singular_values": [
+          0.9999995368227905,
+          0.999999533198529
+        ],
+        "minimum_squared_overlap": 0.9999990663972759,
+        "reference_condition": 1.0000000000000093,
+        "candidate_condition": 1.0005372568779158
+      }
+    }
+  ],
+  "exports": [
+    {
+      "source": "D:\\work\\cst_tools\\artifacts\\pillbox-full-domain-043fcfa3\\solve\\result\\worker_0\\worker_0\\ideal-TM110-doublet__167a6479-ab0a-4198-95e5-6844c4689150\\ideal-TM110-doublet.cst",
+      "source_sha256": "509e827181ee6148da2b86a5f45b336f4d2ccd08a0798fe5b8991259f3f7c5d5",
+      "source_unchanged": true,
+      "session": {
+        "launcher_pid": 38832,
+        "owned": [
+          {
+            "pid": 38832,
+            "create_time": 1791912543.6862
+          },
+          {
+            "pid": 39604,
+            "create_time": 1791912543.7159245
+          },
+          {
+            "pid": 32692,
+            "create_time": 1791912546.4410844
+          },
+          {
+            "pid": 48776,
+            "create_time": 1791912548.083132
+          },
+          {
+            "pid": 21732,
+            "create_time": 1791912550.1271453
+          },
+          {
+            "pid": 34952,
+            "create_time": 1791912550.4043245
+          },
+          {
+            "pid": 48852,
+            "create_time": 1791912550.8342133
+          }
+        ],
+        "active_pids": [],
+        "elapsed_seconds": 31.73499999998603,
+        "exit_confirmed": true,
+        "foreign_processes": [],
+        "stage": "returning"
+      },
+      "exit_code": 0,
+      "wall_seconds": 31.760266199940816,
+      "result_directory": "D:\\work\\cst_tools\\artifacts\\pillbox-full-domain-043fcfa3\\fields-48",
+      "solver_run": false,
+      "PostProcessResult": [
+        {
+          "id": 0,
+          "resultName": "E_1",
+          "value": {
+            "kind": "field-artifact",
+            "status": "available",
+            "filename": "field_1_E_a6ee72f7ee07.h5",
+            "sha256": "516bafa7ce3710c11d71436c128ea59e12eca8a62a9fe76559a47ecfa108a9bc",
+            "mode": 1,
+            "frequency_hz": 798357964.443744,
+            "field_kind": "E",
+            "coordinates_unit": "m",
+            "sampling": {
+              "bounds_m": [
+                -0.229,
+                0.229,
+                -0.229,
+                0.229,
+                -0.1295,
+                0.1295
+              ],
+              "counts": [
+                48,
+                48,
+                48
+              ],
+              "scope": "specified-domain"
+            },
+            "field_unit": "V/m",
+            "sampling_id": "c14cb5f6c8c74e90963807ce00dd1ae027fbc9c4760c6fb6346665a8aee95ef1",
+            "support_verified": true,
+            "support_check": "calculation-box-and-retrieval; material mask not independently verified",
+            "raw_coordinate_scale_to_m": 0.001,
+            "raw_coordinate_unit": "mm"
+          },
+          "params": {
+            "iModeNumber": 1,
+            "field_kind": "E",
+            "sampling": {
+              "bounds_m": [
+                -0.229,
+                0.229,
+                -0.229,
+                0.229,
+                -0.1295,
+                0.1295
+              ],
+              "counts": [
+                48,
+                48,
+                48
+              ],
+              "scope": "specified-domain"
+            }
+          }
+        },
+        {
+          "id": 1,
+          "resultName": "E_2",
+          "value": {
+            "kind": "field-artifact",
+            "status": "available",
+            "filename": "field_2_E_98af5c47feb2.h5",
+            "sha256": "dc4841c5134477002c18ddf3169b3f69114423f3cb138eb8db34f58fd20ec4ec",
+            "mode": 2,
+            "frequency_hz": 798357974.788953,
+            "field_kind": "E",
+            "coordinates_unit": "m",
+            "sampling": {
+              "bounds_m": [
+                -0.229,
+                0.229,
+                -0.229,
+                0.229,
+                -0.1295,
+                0.1295
+              ],
+              "counts": [
+                48,
+                48,
+                48
+              ],
+              "scope": "specified-domain"
+            },
+            "field_unit": "V/m",
+            "sampling_id": "c14cb5f6c8c74e90963807ce00dd1ae027fbc9c4760c6fb6346665a8aee95ef1",
+            "support_verified": true,
+            "support_check": "calculation-box-and-retrieval; material mask not independently verified",
+            "raw_coordinate_scale_to_m": 0.001,
+            "raw_coordinate_unit": "mm"
+          },
+          "params": {
+            "iModeNumber": 2,
+            "field_kind": "E",
+            "sampling": {
+              "bounds_m": [
+                -0.229,
+                0.229,
+                -0.229,
+                0.229,
+                -0.1295,
+                0.1295
+              ],
+              "counts": [
+                48,
+                48,
+                48
+              ],
+              "scope": "specified-domain"
+            }
+          }
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "source": "D:\\work\\cst_tools\\artifacts\\pillbox-full-domain-043fcfa3\\solve\\result\\worker_0\\worker_0\\ideal-TM110-doublet__167a6479-ab0a-4198-95e5-6844c4689150\\ideal-TM110-doublet.cst",
+      "source_sha256": "509e827181ee6148da2b86a5f45b336f4d2ccd08a0798fe5b8991259f3f7c5d5",
+      "source_unchanged": true,
+      "session": {
+        "launcher_pid": 25232,
+        "owned": [
+          {
+            "pid": 25232,
+            "create_time": 1791912616.0739136
+          },
+          {
+            "pid": 26772,
+            "create_time": 1791912616.1017125
+          },
+          {
+            "pid": 52864,
+            "create_time": 1791912618.7889454
+          },
+          {
+            "pid": 2912,
+            "create_time": 1791912620.4835567
+          },
+          {
+            "pid": 45976,
+            "create_time": 1791912622.5272985
+          },
+          {
+            "pid": 49284,
+            "create_time": 1791912622.8619034
+          },
+          {
+            "pid": 53480,
+            "create_time": 1791912623.3247552
+          }
+        ],
+        "active_pids": [],
+        "elapsed_seconds": 35.92200000002049,
+        "exit_confirmed": true,
+        "foreign_processes": [],
+        "stage": "returning"
+      },
+      "exit_code": 0,
+      "wall_seconds": 35.95078050007578,
+      "result_directory": "D:\\work\\cst_tools\\artifacts\\pillbox-full-domain-043fcfa3\\fields-64",
+      "solver_run": false,
+      "PostProcessResult": [
+        {
+          "id": 0,
+          "resultName": "E_1",
+          "value": {
+            "kind": "field-artifact",
+            "status": "available",
+            "filename": "field_1_E_a6ee72f7ee07.h5",
+            "sha256": "433a986b329ec43cc8eea70a1e53558076ce303ca98e90071cfcd0a976bcca12",
+            "mode": 1,
+            "frequency_hz": 798357964.443744,
+            "field_kind": "E",
+            "coordinates_unit": "m",
+            "sampling": {
+              "bounds_m": [
+                -0.229,
+                0.229,
+                -0.229,
+                0.229,
+                -0.1295,
+                0.1295
+              ],
+              "counts": [
+                64,
+                64,
+                64
+              ],
+              "scope": "specified-domain"
+            },
+            "field_unit": "V/m",
+            "sampling_id": "35d9111d4771071777954f665a93c460f6ac6e39d69fe3ec3e5597ad23302598",
+            "support_verified": true,
+            "support_check": "calculation-box-and-retrieval; material mask not independently verified",
+            "raw_coordinate_scale_to_m": 0.001,
+            "raw_coordinate_unit": "mm"
+          },
+          "params": {
+            "iModeNumber": 1,
+            "field_kind": "E",
+            "sampling": {
+              "bounds_m": [
+                -0.229,
+                0.229,
+                -0.229,
+                0.229,
+                -0.1295,
+                0.1295
+              ],
+              "counts": [
+                64,
+                64,
+                64
+              ],
+              "scope": "specified-domain"
+            }
+          }
+        },
+        {
+          "id": 1,
+          "resultName": "E_2",
+          "value": {
+            "kind": "field-artifact",
+            "status": "available",
+            "filename": "field_2_E_98af5c47feb2.h5",
+            "sha256": "f9b2b82469060024f051454a9d76ff72b00bc636bafec88593e4624dbe5d4c38",
+            "mode": 2,
+            "frequency_hz": 798357974.788953,
+            "field_kind": "E",
+            "coordinates_unit": "m",
+            "sampling": {
+              "bounds_m": [
+                -0.229,
+                0.229,
+                -0.229,
+                0.229,
+                -0.1295,
+                0.1295
+              ],
+              "counts": [
+                64,
+                64,
+                64
+              ],
+              "scope": "specified-domain"
+            },
+            "field_unit": "V/m",
+            "sampling_id": "35d9111d4771071777954f665a93c460f6ac6e39d69fe3ec3e5597ad23302598",
+            "support_verified": true,
+            "support_check": "calculation-box-and-retrieval; material mask not independently verified",
+            "raw_coordinate_scale_to_m": 0.001,
+            "raw_coordinate_unit": "mm"
+          },
+          "params": {
+            "iModeNumber": 2,
+            "field_kind": "E",
+            "sampling": {
+              "bounds_m": [
+                -0.229,
+                0.229,
+                -0.229,
+                0.229,
+                -0.1295,
+                0.1295
+              ],
+              "counts": [
+                64,
+                64,
+                64
+              ],
+              "scope": "specified-domain"
+            }
+          }
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "source": "D:\\work\\cst_tools\\artifacts\\pillbox-full-domain-043fcfa3\\solve\\result\\worker_0\\worker_0\\ideal-TM110-doublet__167a6479-ab0a-4198-95e5-6844c4689150\\ideal-TM110-doublet.cst",
+      "source_sha256": "509e827181ee6148da2b86a5f45b336f4d2ccd08a0798fe5b8991259f3f7c5d5",
+      "source_unchanged": true,
+      "session": {
+        "launcher_pid": 56440,
+        "owned": [
+          {
+            "pid": 56440,
+            "create_time": 1791912722.1216023
+          },
+          {
+            "pid": 35424,
+            "create_time": 1791912722.1461017
+          },
+          {
+            "pid": 48880,
+            "create_time": 1791912724.822598
+          },
+          {
+            "pid": 22808,
+            "create_time": 1791912726.5535333
+          },
+          {
+            "pid": 53888,
+            "create_time": 1791912728.6575856
+          },
+          {
+            "pid": 19648,
+            "create_time": 1791912728.9587464
+          },
+          {
+            "pid": 43624,
+            "create_time": 1791912729.4063172
+          }
+        ],
+        "active_pids": [],
+        "elapsed_seconds": 42.79700000002049,
+        "exit_confirmed": true,
+        "foreign_processes": [],
+        "stage": "returning"
+      },
+      "exit_code": 0,
+      "wall_seconds": 42.8239101000363,
+      "result_directory": "D:\\work\\cst_tools\\artifacts\\pillbox-full-domain-043fcfa3\\fields-96",
+      "solver_run": false,
+      "PostProcessResult": [
+        {
+          "id": 0,
+          "resultName": "E_1",
+          "value": {
+            "kind": "field-artifact",
+            "status": "available",
+            "filename": "field_1_E_a6ee72f7ee07.h5",
+            "sha256": "0eccb64d54c3cb10755eb77a1961c28179c55b62143fc31f08d2a115f439a772",
+            "mode": 1,
+            "frequency_hz": 798357964.443744,
+            "field_kind": "E",
+            "coordinates_unit": "m",
+            "sampling": {
+              "bounds_m": [
+                -0.229,
+                0.229,
+                -0.229,
+                0.229,
+                -0.1295,
+                0.1295
+              ],
+              "counts": [
+                96,
+                96,
+                96
+              ],
+              "scope": "specified-domain"
+            },
+            "field_unit": "V/m",
+            "sampling_id": "5693a85a330384047814eb4c794f80dc7082969d9e0ea2457bf0673e40889703",
+            "support_verified": true,
+            "support_check": "calculation-box-and-retrieval; material mask not independently verified",
+            "raw_coordinate_scale_to_m": 0.001,
+            "raw_coordinate_unit": "mm"
+          },
+          "params": {
+            "iModeNumber": 1,
+            "field_kind": "E",
+            "sampling": {
+              "bounds_m": [
+                -0.229,
+                0.229,
+                -0.229,
+                0.229,
+                -0.1295,
+                0.1295
+              ],
+              "counts": [
+                96,
+                96,
+                96
+              ],
+              "scope": "specified-domain"
+            }
+          }
+        },
+        {
+          "id": 1,
+          "resultName": "E_2",
+          "value": {
+            "kind": "field-artifact",
+            "status": "available",
+            "filename": "field_2_E_98af5c47feb2.h5",
+            "sha256": "64ce11be91560e184a19efe04b7e63a32bb8b8a9892b74db090a51c998ee2411",
+            "mode": 2,
+            "frequency_hz": 798357974.788953,
+            "field_kind": "E",
+            "coordinates_unit": "m",
+            "sampling": {
+              "bounds_m": [
+                -0.229,
+                0.229,
+                -0.229,
+                0.229,
+                -0.1295,
+                0.1295
+              ],
+              "counts": [
+                96,
+                96,
+                96
+              ],
+              "scope": "specified-domain"
+            },
+            "field_unit": "V/m",
+            "sampling_id": "5693a85a330384047814eb4c794f80dc7082969d9e0ea2457bf0673e40889703",
+            "support_verified": true,
+            "support_check": "calculation-box-and-retrieval; material mask not independently verified",
+            "raw_coordinate_scale_to_m": 0.001,
+            "raw_coordinate_unit": "mm"
+          },
+          "params": {
+            "iModeNumber": 2,
+            "field_kind": "E",
+            "sampling": {
+              "bounds_m": [
+                -0.229,
+                0.229,
+                -0.229,
+                0.229,
+                -0.1295,
+                0.1295
+              ],
+              "counts": [
+                96,
+                96,
+                96
+              ],
+              "scope": "specified-domain"
+            }
+          }
+        }
+      ],
+      "status": "complete"
+    }
+  ],
+  "sampling_convergence": {
+    "status": "converged",
+    "tolerance": 0.01,
+    "changes": [
+      {
+        "volume_relative_change": 0.006471155170040704,
+        "gram_max_abs_change": 5.858859977509134e-07,
+        "l2_max_relative_change": 1.2321700233212974e-06
+      },
+      {
+        "volume_relative_change": 0.0042865044247800705,
+        "gram_max_abs_change": 6.993558965883179e-07,
+        "l2_max_relative_change": 7.128700097773353e-07
+      }
+    ],
+    "analytic_volume_relative_error": 0.0008606350342134973,
+    "physical_identity_confirmed": false,
+    "warning": "sampling convergence is not solver mesh convergence or physical identity"
+  },
+  "doublet": {
+    "frequencies_mhz": [
+      798.357964443744,
+      798.357974788953
+    ],
+    "analytic_tm110_mhz": 798.3577175794281,
+    "relative_frequency_error": 3.221732804876277e-07,
+    "relative_split": 1.2958112393124497e-08
+  },
+  "physical_identity_confirmed": false,
+  "gate_passed": true,
+  "source_unchanged": true
+}

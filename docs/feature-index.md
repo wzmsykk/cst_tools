@@ -20,6 +20,12 @@
 |F14|GUI运行控制|[run_controller.py](../GUI/run_controller.py)|`GuiRunController`|[GUI流程测试](../test/gui_fake_worker_flow_test.py)|[GUI路线](gui-refactor-todo.md)|
 |F15|任意轴运行时复杂后处理|[EigenResult_Complex.vb](../data/postprocess/EigenResult_Complex.vb)|`EigenResult_Complex`|[VBA语义门禁](../test/vba_document_contract_test.py)|[算子执行方案](postprocess-operator-execution-plan.md)|
 |F16|恢复失败真实注入与死会话收口|[故障探针](../test/support/validate_recovery_faults.py)|`run_case`, `reconcile_report`|[停止故障门禁](../test/failed_rebuild_stop_test.py)|[停止故障验收](failed-rebuild-stop-recovery.md)|
+|F17|缺场及损坏工件分析恢复验收|[场故障探针](../test/support/validate_field_failure_recovery.py)|`main`, `diagnose_saved_faults`|[工件恢复测试](../test/field_failure_recovery_probe_test.py)|[缺场与工件验收](field-failure-recovery-acceptance.md)|
+|F18|共同域与体积求积|[physical_domain.py](../csttool/physical_domain.py)|`common_quadrature`, `sampling_convergence`|[物理域测试](../test/physical_domain_test.py)|[全域验收](physical-domain-pillbox-acceptance.md)|
+|F19|原生几何/材料掩码|[geometry_support.py](../csttool/geometry_support.py)|`render_material_support`, `load_material_support`|[Pillbox探针](../test/support/validate_pillbox_full_domain.py)|[全域验收](physical-domain-pillbox-acceptance.md)|
+|F20|独立Pillbox双模基准|[pillbox_reference.py](../csttool/pillbox_reference.py)|`tm110_reference`|[Pillbox探针](../test/support/validate_pillbox_full_domain.py)|[全域验收](physical-domain-pillbox-acceptance.md)|
+|F21|Pillbox全域第二网格对照|[跨网格探针](../test/support/validate_pillbox_cross_mesh.py)|`compare_pair`, `verify_mesh_counts`|[物理域测试](../test/physical_domain_test.py)|[全域验收](physical-domain-pillbox-acceptance.md)|
+|F22|封闭真空腔固定参考模式追踪|[vacuum_mode_tracking.py](../csttool/vacuum_mode_tracking.py)|`select_vacuum_modes`, `VacuumModeTracker.evaluate`, `track_saved_sequence`|[追踪测试](../test/vacuum_mode_tracking_test.py)|[第一版API与使用](vacuum-mode-tracking-v1.md)|
 
 ## 从日志定位
 

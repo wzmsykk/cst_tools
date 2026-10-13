@@ -1,0 +1,44 @@
+{
+  "geometry": "ideal-closed-PEC-pillbox-R229mm-L259mm-v1",
+  "source_sha256": "7b63939b2dbed3de567aa55a5ff19cb69e7447245882a691be15d28580f1ddfa",
+  "mesh": 20,
+  "solve": {
+    "WorkerID": "0",
+    "TaskStatus": "Success",
+    "RunName": "ideal-TM110-doublet",
+    "RunParameters": {
+      "nmodes": 2,
+      "fmin": 760,
+      "fmax": 850,
+      "cell": 20
+    },
+    "PostProcessResult": [
+      {
+        "id": 0,
+        "resultName": "frequency_1",
+        "value": 765.514242009724,
+        "params": {
+          "iModeNumber": 1
+        }
+      },
+      {
+        "id": 1,
+        "resultName": "frequency_2",
+        "value": 798.357964447582,
+        "params": {
+          "iModeNumber": 2
+        }
+      }
+    ],
+    "FailureReport": null,
+    "ProjectSnapshot": "D:\\work\\cst_tools\\artifacts\\pillbox-full-domain-068b45d4\\solve\\result\\worker_0\\worker_0\\ideal-TM110-doublet__b19568bc-60c7-4fa0-8196-9460030f3f55\\ideal-TM110-doublet.cst",
+    "TaskID": "b19568bc-60c7-4fa0-8196-9460030f3f55",
+    "ResultDirectory": "D:\\work\\cst_tools\\artifacts\\pillbox-full-domain-068b45d4\\solve\\result\\worker_0\\worker_0\\ideal-TM110-doublet__b19568bc-60c7-4fa0-8196-9460030f3f55",
+    "ReceiptPath": "D:\\work\\cst_tools\\artifacts\\pillbox-full-domain-068b45d4\\solve\\temp\\worker_0\\1d2df256-4ee6-4c5a-9f73-06a99e561e1b\\received\\b19568bc-60c7-4fa0-8196-9460030f3f55.json"
+  },
+  "stop_returned": true,
+  "stop_ack": true,
+  "exit_code": 0,
+  "failure": "AssertionError: {'launcher_pid': 49932, 'owned': [{'pid': 49932, 'create_time': 1791912158.9956248}, {'pid': 56572, 'create_time': 1791912159.0292516}, {'pid': 11944, 'create_time': 1791912161.6753955}, {'pid': 30232, 'create_time': 1791912163.4931774}, {'pid': 35892, 'create_time': 1791912165.296534}, {'pid': 33292, 'create_time': 1791912165.4606106}, {'pid': 34796, 'create_time': 1791912165.9228134}], 'active_pids': [], 'elapsed_seconds': 26.5, 'exit_confirmed': True, 'foreign_processes': [{'pid': 56572, 'create_time': 1791912159.0292516, 'name': 'CST DESIGN ENVIRONMENT_AMD64.exe'}], 'stage': 'awaiting-macro'}",
+  "source_unchanged": true
+}

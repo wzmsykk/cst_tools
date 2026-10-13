@@ -1,0 +1,561 @@
+{
+  "geometry": "ideal-closed-PEC-pillbox-R229mm-L259mm-v1",
+  "source_sha256": "7b63939b2dbed3de567aa55a5ff19cb69e7447245882a691be15d28580f1ddfa",
+  "meshes": [
+    {
+      "cell": 20,
+      "solve": {
+        "WorkerID": "0",
+        "TaskStatus": "Success",
+        "RunName": "ideal-TM110-doublet",
+        "RunParameters": {
+          "nmodes": 2,
+          "fmin": 780,
+          "fmax": 850,
+          "cell": 20
+        },
+        "PostProcessResult": [
+          {
+            "id": 0,
+            "resultName": "frequency_1",
+            "value": 798.357964443744,
+            "params": {
+              "iModeNumber": 1
+            }
+          },
+          {
+            "id": 1,
+            "resultName": "frequency_2",
+            "value": 798.357974788953,
+            "params": {
+              "iModeNumber": 2
+            }
+          }
+        ],
+        "FailureReport": null,
+        "ProjectSnapshot": "D:\\work\\cst_tools\\artifacts\\pillbox-cross-mesh-49cd3233\\mesh-20\\solve\\result\\worker_0\\worker_0\\ideal-TM110-doublet__e1c1912a-a722-40f2-8b04-62bc3ffac92f\\ideal-TM110-doublet.cst",
+        "TaskID": "e1c1912a-a722-40f2-8b04-62bc3ffac92f",
+        "ResultDirectory": "D:\\work\\cst_tools\\artifacts\\pillbox-cross-mesh-49cd3233\\mesh-20\\solve\\result\\worker_0\\worker_0\\ideal-TM110-doublet__e1c1912a-a722-40f2-8b04-62bc3ffac92f",
+        "ReceiptPath": "D:\\work\\cst_tools\\artifacts\\pillbox-cross-mesh-49cd3233\\mesh-20\\solve\\temp\\worker_0\\6d3f5f6d-8748-413c-9d8c-44fc481ecc64\\received\\e1c1912a-a722-40f2-8b04-62bc3ffac92f.json"
+      },
+      "stop_returned": true,
+      "stop_ack": true,
+      "exit_code": 0,
+      "snapshot_sha256": "7ff28f1bf549969afaa28d456cabfd8386b65ad2f154cf82624823545a51631d",
+      "export": {
+        "source": "D:\\work\\cst_tools\\artifacts\\pillbox-cross-mesh-49cd3233\\mesh-20\\solve\\result\\worker_0\\worker_0\\ideal-TM110-doublet__e1c1912a-a722-40f2-8b04-62bc3ffac92f\\ideal-TM110-doublet.cst",
+        "source_sha256": "7ff28f1bf549969afaa28d456cabfd8386b65ad2f154cf82624823545a51631d",
+        "source_unchanged": true,
+        "session": {
+          "launcher_pid": 26320,
+          "owned": [
+            {
+              "pid": 26320,
+              "create_time": 1791913869.18087
+            },
+            {
+              "pid": 48640,
+              "create_time": 1791913869.203332
+            },
+            {
+              "pid": 21448,
+              "create_time": 1791913872.0569837
+            },
+            {
+              "pid": 24280,
+              "create_time": 1791913873.8675947
+            },
+            {
+              "pid": 37368,
+              "create_time": 1791913875.697838
+            },
+            {
+              "pid": 56852,
+              "create_time": 1791913875.9909
+            },
+            {
+              "pid": 53224,
+              "create_time": 1791913876.4575837
+            }
+          ],
+          "active_pids": [],
+          "elapsed_seconds": 33.46900000004098,
+          "exit_confirmed": true,
+          "foreign_processes": [],
+          "stage": "returning"
+        },
+        "exit_code": 0,
+        "wall_seconds": 33.48690230003558,
+        "result_directory": "D:\\work\\cst_tools\\artifacts\\pillbox-cross-mesh-49cd3233\\mesh-20\\fields",
+        "solver_run": false,
+        "PostProcessResult": [
+          {
+            "id": 0,
+            "resultName": "E_1",
+            "value": {
+              "kind": "field-artifact",
+              "status": "available",
+              "filename": "field_1_E_a6ee72f7ee07.h5",
+              "sha256": "6a98f9785d2e30945798f2d703f42adfc106779ff01377cd09c40e1829ba055c",
+              "mode": 1,
+              "frequency_hz": 798357964.443744,
+              "field_kind": "E",
+              "coordinates_unit": "m",
+              "sampling": {
+                "bounds_m": [
+                  -0.229,
+                  0.229,
+                  -0.229,
+                  0.229,
+                  -0.1295,
+                  0.1295
+                ],
+                "counts": [
+                  64,
+                  64,
+                  64
+                ],
+                "scope": "specified-domain"
+              },
+              "field_unit": "V/m",
+              "sampling_id": "35d9111d4771071777954f665a93c460f6ac6e39d69fe3ec3e5597ad23302598",
+              "support_verified": true,
+              "support_check": "calculation-box-and-retrieval; material mask not independently verified",
+              "raw_coordinate_scale_to_m": 0.001,
+              "raw_coordinate_unit": "mm"
+            },
+            "params": {
+              "iModeNumber": 1,
+              "field_kind": "E",
+              "sampling": {
+                "bounds_m": [
+                  -0.229,
+                  0.229,
+                  -0.229,
+                  0.229,
+                  -0.1295,
+                  0.1295
+                ],
+                "counts": [
+                  64,
+                  64,
+                  64
+                ],
+                "scope": "specified-domain"
+              }
+            }
+          },
+          {
+            "id": 1,
+            "resultName": "E_2",
+            "value": {
+              "kind": "field-artifact",
+              "status": "available",
+              "filename": "field_2_E_98af5c47feb2.h5",
+              "sha256": "2d6a9d5c8a3abfb00b6c12aa1edc1f048c6014f5ecacf6d1cd3053339204065e",
+              "mode": 2,
+              "frequency_hz": 798357974.788953,
+              "field_kind": "E",
+              "coordinates_unit": "m",
+              "sampling": {
+                "bounds_m": [
+                  -0.229,
+                  0.229,
+                  -0.229,
+                  0.229,
+                  -0.1295,
+                  0.1295
+                ],
+                "counts": [
+                  64,
+                  64,
+                  64
+                ],
+                "scope": "specified-domain"
+              },
+              "field_unit": "V/m",
+              "sampling_id": "35d9111d4771071777954f665a93c460f6ac6e39d69fe3ec3e5597ad23302598",
+              "support_verified": true,
+              "support_check": "calculation-box-and-retrieval; material mask not independently verified",
+              "raw_coordinate_scale_to_m": 0.001,
+              "raw_coordinate_unit": "mm"
+            },
+            "params": {
+              "iModeNumber": 2,
+              "field_kind": "E",
+              "sampling": {
+                "bounds_m": [
+                  -0.229,
+                  0.229,
+                  -0.229,
+                  0.229,
+                  -0.1295,
+                  0.1295
+                ],
+                "counts": [
+                  64,
+                  64,
+                  64
+                ],
+                "scope": "specified-domain"
+              }
+            }
+          }
+        ],
+        "status": "complete"
+      },
+      "frequencies_mhz": [
+        798.357964443744,
+        798.357974788953
+      ],
+      "field_sha256": [
+        "6a98f9785d2e30945798f2d703f42adfc106779ff01377cd09c40e1829ba055c",
+        "2d6a9d5c8a3abfb00b6c12aa1edc1f048c6014f5ecacf6d1cd3053339204065e"
+      ],
+      "quadrature": {
+        "identity": "af8609e7935c36fd445e75ba124bb6b594872946b51ba4d18b26599dcd6cf36b",
+        "sampling_id": "35d9111d4771071777954f665a93c460f6ac6e39d69fe3ec3e5597ad23302598",
+        "scope": "common-material-domain",
+        "rule": "masked-cell-midpoint-volume-v1",
+        "volume_m3": 0.04281582317578127,
+        "weight_unit": "m^3",
+        "materials": [
+          "Vacuum"
+        ],
+        "support_ids": [
+          "5309b3861604c93c07cd45e045dbf79f2720acf8f62a2bc8a79bc8ae5ccbfdcc"
+        ],
+        "support_evidence": [
+          {
+            "geometry_id": "ideal-closed-PEC-pillbox-R229mm-L259mm-v1",
+            "provenance": "CST-Solid.IsPointInsideShape-and-GetMaterialNameForShape"
+          }
+        ],
+        "sampling_scope": "specified-domain",
+        "coverage_claim": "selected materials in declared sampling box; whole geometry requires independent gate",
+        "support_disagreement_fraction": 0.0,
+        "boundary_rule": "point-classification; cut-cell error requires refinement",
+        "physical_identity_confirmed": false
+      },
+      "analytic_subspace": {
+        "reference_rank": 2,
+        "candidate_rank": 2,
+        "scope": "common-material-domain",
+        "metric_kind": "weighted-sampled-field",
+        "status": "matched",
+        "reason": "explicit-policy-passed",
+        "singular_values": [
+          0.9999995381133933,
+          0.9999995325387308
+        ],
+        "minimum_squared_overlap": 0.99999906507768,
+        "reference_condition": 1.0000000000000016,
+        "candidate_condition": 1.000887688831049
+      },
+      "native_mesh_cells": 83151
+    },
+    {
+      "cell": 30,
+      "solve": {
+        "WorkerID": "0",
+        "TaskStatus": "Success",
+        "RunName": "ideal-TM110-doublet",
+        "RunParameters": {
+          "nmodes": 2,
+          "fmin": 780,
+          "fmax": 850,
+          "cell": 30
+        },
+        "PostProcessResult": [
+          {
+            "id": 0,
+            "resultName": "frequency_1",
+            "value": 798.357767007934,
+            "params": {
+              "iModeNumber": 1
+            }
+          },
+          {
+            "id": 1,
+            "resultName": "frequency_2",
+            "value": 798.357767275089,
+            "params": {
+              "iModeNumber": 2
+            }
+          }
+        ],
+        "FailureReport": null,
+        "ProjectSnapshot": "D:\\work\\cst_tools\\artifacts\\pillbox-cross-mesh-49cd3233\\mesh-30\\solve\\result\\worker_0\\worker_0\\ideal-TM110-doublet__c40c55f5-fbef-4c42-9a0d-70c865fc75b4\\ideal-TM110-doublet.cst",
+        "TaskID": "c40c55f5-fbef-4c42-9a0d-70c865fc75b4",
+        "ResultDirectory": "D:\\work\\cst_tools\\artifacts\\pillbox-cross-mesh-49cd3233\\mesh-30\\solve\\result\\worker_0\\worker_0\\ideal-TM110-doublet__c40c55f5-fbef-4c42-9a0d-70c865fc75b4",
+        "ReceiptPath": "D:\\work\\cst_tools\\artifacts\\pillbox-cross-mesh-49cd3233\\mesh-30\\solve\\temp\\worker_0\\2f07eea5-1d6f-4fab-bf5f-91b9108e8cb7\\received\\c40c55f5-fbef-4c42-9a0d-70c865fc75b4.json"
+      },
+      "stop_returned": true,
+      "stop_ack": true,
+      "exit_code": 0,
+      "snapshot_sha256": "edb77ce34f28884a164652f77b32ae14d42785d48fb6bf939c020e263cfb1c42",
+      "export": {
+        "source": "D:\\work\\cst_tools\\artifacts\\pillbox-cross-mesh-49cd3233\\mesh-30\\solve\\result\\worker_0\\worker_0\\ideal-TM110-doublet__c40c55f5-fbef-4c42-9a0d-70c865fc75b4\\ideal-TM110-doublet.cst",
+        "source_sha256": "edb77ce34f28884a164652f77b32ae14d42785d48fb6bf939c020e263cfb1c42",
+        "source_unchanged": true,
+        "session": {
+          "launcher_pid": 33900,
+          "owned": [
+            {
+              "pid": 33900,
+              "create_time": 1791914537.307153
+            },
+            {
+              "pid": 19204,
+              "create_time": 1791914537.3327317
+            },
+            {
+              "pid": 37672,
+              "create_time": 1791914540.019797
+            },
+            {
+              "pid": 21188,
+              "create_time": 1791914541.5982845
+            },
+            {
+              "pid": 52464,
+              "create_time": 1791914543.6652331
+            },
+            {
+              "pid": 56860,
+              "create_time": 1791914543.9551091
+            },
+            {
+              "pid": 36140,
+              "create_time": 1791914544.4144595
+            }
+          ],
+          "active_pids": [],
+          "elapsed_seconds": 37.23499999998603,
+          "exit_confirmed": true,
+          "foreign_processes": [],
+          "stage": "returning"
+        },
+        "exit_code": 0,
+        "wall_seconds": 37.24883250007406,
+        "result_directory": "D:\\work\\cst_tools\\artifacts\\pillbox-cross-mesh-49cd3233\\mesh-30\\fields",
+        "solver_run": false,
+        "PostProcessResult": [
+          {
+            "id": 0,
+            "resultName": "E_1",
+            "value": {
+              "kind": "field-artifact",
+              "status": "available",
+              "filename": "field_1_E_a6ee72f7ee07.h5",
+              "sha256": "8f2caad89c491af667e04e153a976f3b82abe7cad806010f15fb35c8a30e0826",
+              "mode": 1,
+              "frequency_hz": 798357767.007934,
+              "field_kind": "E",
+              "coordinates_unit": "m",
+              "sampling": {
+                "bounds_m": [
+                  -0.229,
+                  0.229,
+                  -0.229,
+                  0.229,
+                  -0.1295,
+                  0.1295
+                ],
+                "counts": [
+                  64,
+                  64,
+                  64
+                ],
+                "scope": "specified-domain"
+              },
+              "field_unit": "V/m",
+              "sampling_id": "35d9111d4771071777954f665a93c460f6ac6e39d69fe3ec3e5597ad23302598",
+              "support_verified": true,
+              "support_check": "calculation-box-and-retrieval; material mask not independently verified",
+              "raw_coordinate_scale_to_m": 0.001,
+              "raw_coordinate_unit": "mm"
+            },
+            "params": {
+              "iModeNumber": 1,
+              "field_kind": "E",
+              "sampling": {
+                "bounds_m": [
+                  -0.229,
+                  0.229,
+                  -0.229,
+                  0.229,
+                  -0.1295,
+                  0.1295
+                ],
+                "counts": [
+                  64,
+                  64,
+                  64
+                ],
+                "scope": "specified-domain"
+              }
+            }
+          },
+          {
+            "id": 1,
+            "resultName": "E_2",
+            "value": {
+              "kind": "field-artifact",
+              "status": "available",
+              "filename": "field_2_E_98af5c47feb2.h5",
+              "sha256": "f9dd79cf5c280eaf77d2b7d6912c0c5e608c0d1edefb44eb4c15d889ff37f89a",
+              "mode": 2,
+              "frequency_hz": 798357767.275089,
+              "field_kind": "E",
+              "coordinates_unit": "m",
+              "sampling": {
+                "bounds_m": [
+                  -0.229,
+                  0.229,
+                  -0.229,
+                  0.229,
+                  -0.1295,
+                  0.1295
+                ],
+                "counts": [
+                  64,
+                  64,
+                  64
+                ],
+                "scope": "specified-domain"
+              },
+              "field_unit": "V/m",
+              "sampling_id": "35d9111d4771071777954f665a93c460f6ac6e39d69fe3ec3e5597ad23302598",
+              "support_verified": true,
+              "support_check": "calculation-box-and-retrieval; material mask not independently verified",
+              "raw_coordinate_scale_to_m": 0.001,
+              "raw_coordinate_unit": "mm"
+            },
+            "params": {
+              "iModeNumber": 2,
+              "field_kind": "E",
+              "sampling": {
+                "bounds_m": [
+                  -0.229,
+                  0.229,
+                  -0.229,
+                  0.229,
+                  -0.1295,
+                  0.1295
+                ],
+                "counts": [
+                  64,
+                  64,
+                  64
+                ],
+                "scope": "specified-domain"
+              }
+            }
+          }
+        ],
+        "status": "complete"
+      },
+      "frequencies_mhz": [
+        798.357767007934,
+        798.357767275089
+      ],
+      "field_sha256": [
+        "8f2caad89c491af667e04e153a976f3b82abe7cad806010f15fb35c8a30e0826",
+        "f9dd79cf5c280eaf77d2b7d6912c0c5e608c0d1edefb44eb4c15d889ff37f89a"
+      ],
+      "quadrature": {
+        "identity": "af8609e7935c36fd445e75ba124bb6b594872946b51ba4d18b26599dcd6cf36b",
+        "sampling_id": "35d9111d4771071777954f665a93c460f6ac6e39d69fe3ec3e5597ad23302598",
+        "scope": "common-material-domain",
+        "rule": "masked-cell-midpoint-volume-v1",
+        "volume_m3": 0.04281582317578127,
+        "weight_unit": "m^3",
+        "materials": [
+          "Vacuum"
+        ],
+        "support_ids": [
+          "5309b3861604c93c07cd45e045dbf79f2720acf8f62a2bc8a79bc8ae5ccbfdcc"
+        ],
+        "support_evidence": [
+          {
+            "geometry_id": "ideal-closed-PEC-pillbox-R229mm-L259mm-v1",
+            "provenance": "CST-Solid.IsPointInsideShape-and-GetMaterialNameForShape"
+          }
+        ],
+        "sampling_scope": "specified-domain",
+        "coverage_claim": "selected materials in declared sampling box; whole geometry requires independent gate",
+        "support_disagreement_fraction": 0.0,
+        "boundary_rule": "point-classification; cut-cell error requires refinement",
+        "physical_identity_confirmed": false
+      },
+      "analytic_subspace": {
+        "reference_rank": 2,
+        "candidate_rank": 2,
+        "scope": "common-material-domain",
+        "metric_kind": "weighted-sampled-field",
+        "status": "matched",
+        "reason": "explicit-policy-passed",
+        "singular_values": [
+          0.9999999084696699,
+          0.999999906753642
+        ],
+        "minimum_squared_overlap": 0.9999998135072927,
+        "reference_condition": 1.0000000000000016,
+        "candidate_condition": 1.0003399728787838
+      },
+      "native_mesh_cells": 283098
+    }
+  ],
+  "physical_identity_confirmed": false,
+  "policy_calibrated": false,
+  "cross_mesh": {
+    "subspace": {
+      "reference_rank": 2,
+      "candidate_rank": 2,
+      "scope": "common-material-domain",
+      "metric_kind": "weighted-sampled-field",
+      "status": "matched",
+      "reason": "explicit-policy-passed",
+      "singular_values": [
+        0.9999994460420869,
+        0.9999994395592864
+      ],
+      "minimum_squared_overlap": 0.9999988791188869,
+      "reference_condition": 1.000887688831049,
+      "candidate_condition": 1.0003399728787838
+    },
+    "mac": [
+      [
+        0.9031430272052533,
+        0.09685622624778381
+      ],
+      [
+        0.09685523935637667,
+        0.9031432783950017
+      ]
+    ],
+    "swapped_subspace": {
+      "reference_rank": 2,
+      "candidate_rank": 2,
+      "scope": "common-material-domain",
+      "metric_kind": "weighted-sampled-field",
+      "status": "matched",
+      "reason": "explicit-policy-passed",
+      "singular_values": [
+        0.9999994460420869,
+        0.9999994395592864
+      ],
+      "minimum_squared_overlap": 0.9999988791188869,
+      "reference_condition": 1.000887688831049,
+      "candidate_condition": 1.0003399728787838
+    },
+    "swap_invariant": true
+  },
+  "relative_frequency_change": 2.599258359493854e-07,
+  "gate_passed": true,
+  "sampling_note": "64^3 common grid; sampling convergence established separately, not repeated here",
+  "mesh_convergence_claim": "two-mesh agreement only; not a three-level solver convergence study",
+  "source_unchanged": true,
+  "distinct_mesh_verified": true
+}
