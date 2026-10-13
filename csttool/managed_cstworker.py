@@ -100,6 +100,7 @@ class ManagedCSTWorker:
         self.stop_ack_path = self.protocol.root / "stop.ack"
         self.project_path = self.root / "worker-input.cst"
         self.macro_path = self.root / "runtime_managed_worker_v1.bas"
+        self.batch_script_path = self.project_path.with_suffix('') / 'Model' / '3D' / 'Model.run'
         self.log_path = self.observation_root / "cst.log"
         self.pid_path = self.root / "worker.pid"
         self._lock = threading.RLock()
@@ -118,6 +119,7 @@ class ManagedCSTWorker:
         self.result_root.mkdir(parents=True, exist_ok=True)
         artifacts = {
             "cst_log": self.log_path, "macro": self.macro_path,
+            "batch_script": self.batch_script_path,
             "project": self.project_path, "task": self.task_path,
             "completion": self.completion_path, "ack": self.ack_path,
             "state": self.marker_path, "stop_request": self.stop_request_path,
@@ -205,11 +207,18 @@ class ManagedCSTWorker:
         if "%" in main or output.lower().count("sub main") != 1:
             raise ValueError("managed worker macro contains unresolved placeholders")
         self.macro_path.write_text(output, encoding="ascii", newline="\n")
+        batch_script = self.project_path.with_suffix('') / 'Model' / '3D' / 'Model.run'
+        batch_script.parent.mkdir(parents=True, exist_ok=True)
+        batch_script.write_text(output, encoding='ascii', newline='\n')
+
+    def _launch_command(self) -> list[str]:
+        # Documented -b runs Model/3D/Model.run in the already loaded project.
+        return [str(self.executable), '-m', '-b', str(self.project_path)]
 
     def _start(self) -> None:
         self._log_stream = self.log_path.open("wb", buffering=0)
         self._process = subprocess.Popen(
-            [str(self.executable), "-m", str(self.macro_path)],
+            self._launch_command(),
             env=cst_process_environment(),
             stdout=self._log_stream,
             stderr=subprocess.STDOUT,
@@ -724,7 +733,7 @@ class ManagedCSTWorker:
             self._diagnose_failure("shutdown")
             self.logger.error("CST 标准退出未获确认，需要会话恢复 | WORKER_STOP_FAILED worker=%s session=%s returncode=%s process_alive=%s timeout_seconds=%s", self.ID, self.session_id, self._process.poll(), self._process.poll() is None, self.STOP_TIMEOUT, extra={"event": "WORKER_STOP_FAILED", "phase": "shutdown", "worker": self.ID, "session": self.session_id, "returncode": self._process.poll(), "process_alive": self._process.poll() is None, "timeout_seconds": self.STOP_TIMEOUT})
             raise ManagedWorkerShutdownError(
-                f"worker {self.ID} did not confirm standard Save/Quit; " + (
+                f"worker {self.ID} did not confirm Save/StopAck/batch exit; " + (
                     "process already exited; reconcile preserved protocol and snapshot"
                     if self._process.poll() is not None else
                     "process is still running; session recovery is required"

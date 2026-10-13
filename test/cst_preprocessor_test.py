@@ -26,15 +26,16 @@ def test_macro_adds_missing_parameters_binds_solver_and_saves():
     assert 'DoesParameterExist("nmodes")' in source
     assert 'DoesParameterExist("cell")' in source
     assert 'history = "Solver.FrequencyRange ""fmin"", ""fmax"""' in source
-    assert '.SetFrequencyTarget ""True"", ""fmin""' in source
-    assert '.SetNumberOfModes ""nmodes""' in source
-    assert '.SetMeshAdaptationTet ""False""' in source
+    assert '.SetFrequencyTarget True, RestoreDoubleParameter(""fmin"")' in source
+    assert '.SetNumberOfModes CInt(RestoreDoubleParameter(""nmodes""))' in source
+    assert '.SetMeshAdaptationTet False' in source
     assert "AKSMaximumDF" not in source
     assert '.Set ""StepsPerWaveNear"", ""cell""' in source
     assert 'AddToHistory "CST Tools: Bind HOM solver parameters", history' in source
-    assert source.index("    BindHomSolverSettings") < source.index("    Rebuild")
+    assert source.index("    BindHomSolverSettings") < source.index("    If Not Rebuild")
     assert "Save\n" in source
-    assert "Quit\n" in source
+    assert "    Quit\n" not in source
+    assert 'OpenFile(cstProjectPath)' not in source
 
 
 def test_preprocessor_starts_cst_minimized_without_activation_on_windows(tmp_path):
@@ -83,8 +84,8 @@ def test_preprocessor_creates_distinct_prepared_project_and_parameter_manifest(
     parameter_json = tmp_path / "params.json"
 
     def successful_runner(command, **kwargs):
-        assert command[:2] == [str(executable), "-m"]
-        macro = Path(command[2]).read_text(encoding="utf-8")
+        assert command[:3] == [str(executable), "-m", "-b"]
+        macro = (Path(command[3]).with_suffix('')/'Model'/'3D'/'Model.run').read_text(encoding="utf-8")
         assert "%MESHCELLSPERWAVELENGTH%" not in macro
         assert 'StoreParameter "cell", "24"' in macro
         parameter_output = _macro_path(macro, "paramFileDstPath")
@@ -174,7 +175,7 @@ def test_preprocessor_does_not_publish_project_with_missing_parameters(tmp_path)
     output = tmp_path / "output.cst"
 
     def incomplete_runner(command, **kwargs):
-        macro = Path(command[2]).read_text(encoding="utf-8")
+        macro = (Path(command[3]).with_suffix('')/'Model'/'3D'/'Model.run').read_text(encoding="utf-8")
         parameter_output = _macro_path(macro, "paramFileDstPath")
         status_output = _macro_path(macro, "statusFilePath")
         status_output.write_text("SUCCESS\n", encoding="utf-8")

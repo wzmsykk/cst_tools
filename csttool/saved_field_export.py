@@ -7,6 +7,7 @@ from .cst_process_env import cst_process_environment
 from .configuration import write_json_atomic
 from .postprocess_cst import CstPostProcessor
 from .result_reconciliation import file_hash
+from .acceptance_session import exclusive_probe, wait_probe
 
 
 def prepare_saved_field_export(source, destination, settings):
@@ -28,19 +29,32 @@ def prepare_saved_field_export(source, destination, settings):
 Option Explicit
 Public outFullDir As String
 {source_vb}
+Sub ProbeStage(value As String)
+    Dim stageFile As Integer
+    stageFile=FreeFile
+    Open "{vb(destination/'stage.partial')}" For Output As #stageFile
+    Print #stageFile,value
+    Close #stageFile
+    If Dir("{vb(destination/'stage.txt')}")<>"" Then Kill "{vb(destination/'stage.txt')}"
+    Name "{vb(destination/'stage.partial')}" As "{vb(destination/'stage.txt')}"
+End Sub
 Sub Main
     Dim message As String,f As Integer
     On Error GoTo Failed
+    ProbeStage "loading"
     OpenFile "{vb(source)}"
+    ProbeStage "loaded"
     SaveAs "{vb(destination/'copy.cst')}",True
+    ProbeStage "saved-copy"
     outFullDir="{vb(str(destination)+os.sep)}"
     CustomPostProcess
+    ProbeStage "exported"
     Save
     f=FreeFile
     Open "{vb(destination/'completed.txt')}" For Output As #f
     Print #f,"SUCCESS"
     Close #f
-    Quit
+    ProbeStage "returning"
     Exit Sub
 Failed:
     message=CStr(Err.Number) & " " & Err.Description
@@ -50,7 +64,7 @@ Failed:
     Open "{vb(destination/'failed.txt')}" For Output As #f
     Print #f,message
     Close #f
-    Quit
+    ProbeStage "failed-returning"
 End Sub
 '''
     path=destination/'export.bas'
@@ -59,6 +73,11 @@ End Sub
 
 
 def export_saved_fields(executable, source, destination, settings):
+    with exclusive_probe(Path(__file__).resolve().parents[1]):
+        return _export_saved_fields(executable, source, destination, settings)
+
+
+def _export_saved_fields(executable, source, destination, settings):
     source=Path(source)
     destination=Path(destination)
     before=file_hash(source)
@@ -74,14 +93,29 @@ def export_saved_fields(executable, source, destination, settings):
         process=subprocess.Popen([str(executable),'-m',str(path)],env=cst_process_environment(),
                                  stdout=log,stderr=subprocess.STDOUT,**options)
         # No forced kill; marker publication and process exit are both required.
-        process.wait()
+        try:
+            session = wait_probe(process, destination)
+        except Exception as error:
+            write_json_atomic(destination/'export-result.json', {
+                'status':'incomplete', 'failure':str(error), 'solver_run':False,
+                'source':str(source.resolve()), 'source_sha256':before,
+                'source_unchanged':file_hash(source)==before,
+                'result_directory':str(destination.resolve()),
+                'session_status_path':str((destination/'session-status.json').resolve()),
+                'exit_code':process.poll(), 'PostProcessResult':[],
+            })
+            raise
     marker=destination/'completed.txt'
     result={'source':str(source.resolve()),'source_sha256':before,'source_unchanged':file_hash(source)==before,
+            'session':session,
             'exit_code':process.returncode,'wall_seconds':time.perf_counter()-started,
             'result_directory':str(destination.resolve()),'solver_run':False,
             'PostProcessResult':processor.read_all_results(),
             'status':'complete' if marker.exists() and marker.read_text().strip()=='SUCCESS' and process.returncode==0 else 'incomplete'}
-    if not result['source_unchanged']:
+    if (not result['source_unchanged'] or session['foreign_processes']
+            or (destination/'failed.txt').exists()
+            or any(not p.get('value') or p['value'].get('status') != 'available'
+                   for p in result['PostProcessResult'])):
         result['status']='incomplete'
     write_json_atomic(destination/'export-result.json',result)
     return result

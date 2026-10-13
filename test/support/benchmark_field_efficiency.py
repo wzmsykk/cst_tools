@@ -17,13 +17,34 @@ from csttool.configuration import read_json, write_json_atomic
 from csttool.cst_process_env import cst_process_environment
 from csttool.result_reconciliation import file_hash
 from csttool.resource_usage import ResourceUsageRecorder
+from csttool.acceptance_session import exclusive_probe, wait_probe
+
+
+def publish_report(destination, report, resources):
+    accepted = (report.get('completion') == 'SUCCESS' and 'failure' not in report
+                and report['exit_code'] == 0 and report['session']['exit_confirmed']
+                and not report['session']['foreign_processes']
+                and report['source_unchanged'] and report['numeric_validation_passed'])
+    report['status'] = 'Success' if accepted else 'Incomplete'
+    report['resource_summary'] = resources.finish(report['status'])
+    write_json_atomic(destination / 'report.json', report)
+    print({key:report[key] for key in ('status','completion','exit_code','source_unchanged',
+                                      'numeric_validation_passed','cst_process_seconds')},flush=True)
+    return 0 if accepted else 1
 
 
 def main():
+    with exclusive_probe(ROOT):
+        return run_probe()
+
+
+def run_probe():
     parser = argparse.ArgumentParser()
     parser.add_argument('--cst-exe', required=True)
     parser.add_argument('--native-only', action='store_true')
     parser.add_argument('--public-native-only', action='store_true')
+    parser.add_argument('--load-entry', choices=['project', 'application'], default='project')
+    parser.add_argument('--exit-strategy', choices=['quit', 'return'], default='return')
     args = parser.parse_args()
     existing=[p.info['pid'] for p in psutil.process_iter(['pid','name'])
               if (p.info.get('name') or '').upper().startswith('CST DESIGN ENVIRONMENT')]
@@ -40,6 +61,10 @@ def main():
                 'field_native_efficiency.bas' if args.native_only else 'field_efficiency.bas')
     macro = (ROOT / 'test/support' / template).read_text(encoding='ascii')
     macro = macro.replace('%SOURCE%', str(source)).replace('%PROJECT%', str(copy)).replace('%ROOT%', str(destination))
+    if args.load_entry == 'application':
+        raise ValueError('Application entry disabled: project-bound macro execution is not yet validated; do not mix implicit Project calls')
+    if args.exit_strategy == 'return':
+        macro = macro.replace('    Quit\n', '    ProbeStage "returning"\n')
     macro_path = destination / 'benchmark.bas'
     macro_path.write_text(macro, encoding='ascii')
     print(f'BENCHMARK_ROOT={destination}', flush=True)
@@ -56,11 +81,13 @@ def main():
         observer=threading.Thread(target=observe,daemon=True)
         observer.start()
         try:
-            process.wait()
+            session = wait_probe(process, destination)
         finally:
             stopped.set();observer.join(timeout=2)
-        resource_summary=resources.finish('Success' if process.returncode==0 else 'Failure')
+        resource_summary={}
     report = {'source': str(source), 'source_unchanged': file_hash(source) == original_hash,
+              'session':session,
+              'load_entry':args.load_entry, 'exit_strategy':args.exit_strategy,
               'cst_process_seconds': time.perf_counter() - started, 'exit_code': process.returncode,
               'solver_run': False, 'copy_method': 'CST SaveAs include_results=True; no filesystem companion copy',
               'sample_region_project_units': [-10,10,-10,10,-50,50],
@@ -72,7 +99,7 @@ def main():
     if failure.exists():
         report['failure'] = failure.read_text(errors='replace')
     report['completion'] = success.read_text().strip() if success.exists() else None
-    if report['completion'] == 'SUCCESS':
+    if report['completion'] == 'SUCCESS' and not failure.exists():
         with (destination / 'timings.csv').open() as stream:
             report['cst_timings'] = list(csv.DictReader(stream))
         if args.public_native_only:
@@ -100,9 +127,7 @@ def main():
                     'public_native_seconds':float(row['seconds']), 'hdf_pipeline_seconds':export+seconds,
                     'norm_scaled_error':float(np.max(np.abs(actual-expected))/max(actual[0],actual[1]))})
             report['numeric_validation_passed']=all(r['norm_scaled_error']<=1e-6 for r in report['python'])
-            write_json_atomic(destination / 'report.json',report)
-            print(report,flush=True)
-            return 0 if report['numeric_validation_passed'] and report['source_unchanged'] and process.returncode==0 else 1
+            return publish_report(destination, report, resources)
         if args.native_only:
             raw = next(r for r in report['cst_timings'] if r['stage']=='synthetic-raw')
             conjugated = next(r for r in report['cst_timings'] if r['stage']=='synthetic-conjugated')
@@ -119,9 +144,7 @@ def main():
                 errors.append(float(np.max(np.abs(actual-expected))/max(expected[0],expected[1])))
             report['native_norm_scaled_errors'] = errors
             report['numeric_validation_passed'] = report['synthetic_passed'] and max(errors)<=1e-6
-            write_json_atomic(destination / 'report.json', report)
-            print(report, flush=True)
-            return 0 if report['numeric_validation_passed'] and report['source_unchanged'] and process.returncode==0 else 1
+            return publish_report(destination, report, resources)
         for item in report['cst_timings']:
             if item['stage'] != 'vba-sum':
                 continue
@@ -181,11 +204,7 @@ def main():
         and row['hdf_maximum_norm_scaled_error'] <= 1e-10
         and row['hdf_vs_sample_maximum_relative_field_error'] <= 1e-10
         for row in report['python'])
-    write_json_atomic(destination / 'report.json', report)
-    print({key: report[key] for key in ('completion','exit_code','source_unchanged',
-                                      'numeric_validation_passed','cst_process_seconds')}, flush=True)
-    return 0 if (report['completion'] == 'SUCCESS' and process.returncode == 0
-                 and report['source_unchanged'] and report['numeric_validation_passed']) else 1
+    return publish_report(destination, report, resources)
 
 
 if __name__ == '__main__':

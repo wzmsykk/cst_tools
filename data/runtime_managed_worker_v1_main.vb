@@ -12,9 +12,13 @@ Sub Main
     Dim i As Long
     Dim ackBlocked As Boolean
     Dim receiptPath As String
+    Dim requestedModes As Double
+    Dim solverReturn As Long
 
     On Error GoTo WorkerFailed
-    OpenFile "%PROJECT_PATH%"
+    ' -m -b loads this project before compiling Model/3D/Model.run.
+    ' Never OpenFile here: compiling in an empty project loses the parameter
+    ' namespace used by CST's internal 3D/DS expression synchronization.
     CSTPMW_WriteMarker "%MARKER_PATH%", "ready"
 
     Do
@@ -47,13 +51,28 @@ Sub Main
                 GoTo WaitForAck
             End If
 
-            stage = "solver"
+            stage = "solver-config"
             For i = 0 To task.ParameterCount - 1
                 If LCase(task.Parameters(i).Name) = "nmodes" Then
-                    EigenmodeSolver.SetNumberOfModes "nmodes"
+                    requestedModes = RestoreDoubleParameter("nmodes")
+                    If requestedModes < 1 Or requestedModes > 32767 Or requestedModes <> Fix(requestedModes) Then Err.Raise vbObjectError + 2202, "worker", "nmodes must be a positive integer"
+                    EigenmodeSolver.SetNumberOfModes CInt(requestedModes)
                 End If
             Next i
-            EigenmodeSolver.Start
+            stage = "solver-start"
+            CSTPMW_Trace stage, "%PROJECT_PATH%", "calling EigenmodeSolver.Start"
+            solverReturn = EigenmodeSolver.Start
+            CSTPMW_Trace stage, "%PROJECT_PATH%", "returned=" & CStr(solverReturn)
+            If solverReturn <> 1 Then
+                CSTPMW_PublishFailure task, "SOLVER_FAILED", "EigenmodeSolver.Start returned 0"
+                GoTo WaitForAck
+            End If
+
+            stage = "solver-result"
+            If EigenmodeSolver.GetNumberOfModesCalculated < 1 Then
+                CSTPMW_PublishFailure task, "SOLVER_FAILED", "Start returned 1 but no eigenmodes are available"
+                GoTo WaitForAck
+            End If
 
             stage = "postprocess"
             outFullDir = "%RESULT_ROOT%" & task.TaskId & "\"
@@ -136,8 +155,10 @@ WorkerFailed:
         ackBlocked = True
         Resume AckWaitTick
     End If
-    If stage = "solver" Then
+    If stage = "solver-start" Or stage = "solver-result" Then
         errorCode = "SOLVER_FAILED"
+    ElseIf stage = "rebuild" Then
+        errorCode = "REBUILD_FAILED"
     ElseIf stage = "flush" Or stage = "postprocess" Then
         errorCode = "RESULT_FLUSH_FAILED"
     Else
@@ -175,10 +196,11 @@ Private Sub CSTPMW_CloseSession
             CSTPMW_Trace closeStage, "%STOP_ACK_PATH%", message
         End If
     End If
-    closeStage = "quit"
-    CSTPMW_Trace closeStage, "%PROJECT_PATH%", "begin"
-    Quit
-    CSTPMW_Trace closeStage, "%PROJECT_PATH%", "returned"
+    ' This worker is launched with -m as a batch macro. Quit here attempts
+    ' to close its own sheet while the batch is still active. Return through
+    ' Main instead; the batch runner closes the saved project normally.
+    closeStage = "batch-return"
+    CSTPMW_Trace closeStage, "%PROJECT_PATH%", "saved; returning to batch runner; Python must verify StopAck and process exit"
     Exit Sub
 CloseFailed:
     message = "shutdown " & closeStage & " failed: number=" & CStr(Err.Number) & "; description=" & Err.Description

@@ -13,20 +13,18 @@ Sub Main
     paramFileDstPath = "%PARAMDSTPATH%"
     statusFilePath = "%STATUSPATH%"
 
-    OpenFile(cstProjectPath)
+    ' -m -b loads the working project before compiling this project script.
     EnsureHomParameters
     BindHomSolverSettings
-    Rebuild
+    If Not Rebuild Then Err.Raise vbObjectError + 2201, "HOM preprocess", "Rebuild returned False"
     Save
     ExportParameterList paramFileDstPath
     WriteStatus "SUCCESS"
-    Quit
     Exit Sub
 
 Failed:
     WriteStatus "FAILURE" & vbTab & CStr(Err.Number) & vbTab & Err.Description
-    On Error Resume Next
-    Quit
+    ' Return to the batch runner; never Quit while its sheet is active.
 End Sub
 
 Sub EnsureHomParameters
@@ -48,11 +46,14 @@ End Sub
 
 Sub BindHomSolverSettings
     Dim history As String
+    Dim modeCount As Double
+    modeCount = RestoreDoubleParameter("nmodes")
+    If modeCount < 1 Or modeCount > 32767 Or modeCount <> Fix(modeCount) Then Err.Raise vbObjectError + 2202, "HOM preprocess", "nmodes must be a positive integer"
     history = "Solver.FrequencyRange ""fmin"", ""fmax""" & vbCrLf
     history = history & "With EigenmodeSolver" & vbCrLf
-    history = history & ".SetFrequencyTarget ""True"", ""fmin""" & vbCrLf
-    history = history & ".SetNumberOfModes ""nmodes""" & vbCrLf
-    history = history & ".SetMeshAdaptationTet ""False""" & vbCrLf
+    history = history & ".SetFrequencyTarget True, RestoreDoubleParameter(""fmin"")" & vbCrLf
+    history = history & ".SetNumberOfModes CInt(RestoreDoubleParameter(""nmodes""))" & vbCrLf
+    history = history & ".SetMeshAdaptationTet False" & vbCrLf
     history = history & "End With" & vbCrLf
     history = history & "With MeshSettings" & vbCrLf
     history = history & ".SetMeshType ""Tet""" & vbCrLf

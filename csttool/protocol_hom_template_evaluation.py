@@ -159,7 +159,7 @@ End Function
     lowered = macro.lower()
     if lowered.count("sub main") != 1:
         raise ValueError("P5.6 worker must contain exactly one Sub Main")
-    if lowered.count("eigenmodesolver.start") != 1:
+    if sum(line.strip().lower().startswith(("eigenmodesolver.start", "if eigenmodesolver.start <> 1 then")) for line in macro.splitlines()) != 1:
         raise ValueError("P5.6 worker must contain exactly one solver call")
     if "update params" in lowered:
         raise ValueError("P5.6 worker must not update parameters after solving")

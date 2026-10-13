@@ -119,8 +119,9 @@ class CstProjectPreprocessor:
             prefix="cst-preprocess-", dir=temp_directory
         ) as working:
             working = Path(working)
-            macro_path = working / "preprocess.bas"
             working_project = working / source_project_path.name
+            macro_path = working_project.with_suffix('') / 'Model' / '3D' / 'Model.run'
+            macro_path.parent.mkdir(parents=True, exist_ok=True)
             parameter_output = working / "parameters.txt"
             status_output = working / "completion.txt"
             shutil.copy2(source_project_path, working_project)
@@ -134,7 +135,7 @@ class CstProjectPreprocessor:
                 ),
                 encoding="utf-8",
             )
-            command = [str(self.executable), "-m", str(macro_path)]
+            command = [str(self.executable), "-m", "-b", str(working_project)]
             self.logger.info("启动 CST 工程参数预处理: %s", source_project_path)
             try:
                 completed = self.runner(
@@ -153,6 +154,8 @@ class CstProjectPreprocessor:
                 raise CstPreprocessError(
                     f"CST 工程参数预处理异常退出: {completed.returncode}"
                 )
+            if 'Error in macro execution' in ((completed.stdout or '') + (completed.stderr or '')):
+                raise CstPreprocessError('CST 工程参数预处理出现宏求值错误，即使退出码为0也不能接收')
             if not status_output.is_file():
                 raise CstPreprocessError("CST 工程参数预处理未返回完成状态")
             status = status_output.read_text(encoding="utf-8-sig").strip()

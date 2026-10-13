@@ -1,5 +1,14 @@
 '#Language "WWB-COM"
 Option Explicit
+Sub ProbeStage(value As String)
+    Dim stageFile As Integer
+    stageFile=FreeFile
+    Open "%ROOT%\stage.partial" For Output As #stageFile
+    Print #stageFile,value
+    Close #stageFile
+    If Dir("%ROOT%\stage.txt")<>"" Then Kill "%ROOT%\stage.txt"
+    Name "%ROOT%\stage.partial" As "%ROOT%\stage.txt"
+End Sub
 Sub Main
     Dim stage As String, t As Double, side As Long, n As Long, i As Long, j As Long, k As Long
     Dim p As Long, c As Long, m As Long, rep As Long, level As Variant, components As Variant
@@ -9,9 +18,12 @@ Sub Main
     Dim out As Integer, filename As String, message As String
     On Error GoTo Failed
     stage="open"
+    ProbeStage "loading"
     t=Timer
     OpenFile "%SOURCE%"
+    ProbeStage "loaded"
     SaveAs "%PROJECT%",True
+    ProbeStage "saved-copy"
     out=FreeFile
     Open "%ROOT%\timings.csv" For Output As #out
     Print #out,"points,repeat,stage,seconds,norm_a,norm_b,cross_re,cross_im"
@@ -34,6 +46,7 @@ Sub Main
             Next m
         Next i
         For rep=1 To 3
+            ProbeStage "sampling-" & CStr(side) & "-" & CStr(rep)
             ' Reverse route order in repetition 2; each route includes tree selection.
             For c=0 To 1
                 If (c=0 And rep<>2) Or (c=1 And rep=2) Then
@@ -92,11 +105,13 @@ Sub Main
         Next rep
     Next j
     Close #out
+    ProbeStage "saving"
     Save
     out=FreeFile
     Open "%ROOT%\completed.txt" For Output As #out
     Print #out,"SUCCESS"
     Close #out
+    ProbeStage "completed"
     Quit
     Exit Sub
 Failed:
@@ -107,6 +122,6 @@ Failed:
     Open "%ROOT%\failed.txt" For Output As #out
     Print #out,message
     Close #out
-    Save
-    Quit
+    ' Loading may not have succeeded: never save the source or quit from a failed batch.
+    ProbeStage "failed-returning"
 End Sub

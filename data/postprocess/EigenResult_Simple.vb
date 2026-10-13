@@ -1,4 +1,5 @@
 Function EigenResult_Simple(iModeNumber As Integer,queryKey As String) As Double
+    If iModeNumber < 1 Then Err.Raise vbObjectError + 2101, "EigenResult_Simple", "Mode number must be positive"
     If (iModeNumber > EigenmodeSolver.GetNumberOfModesCalculated) Then
             ReportWarningToWindow("3D Eigenmode result template execution: Cannot find result for mode #"+CStr(iModeNumber)+".")
             'CalculateEigenModeResult = lib_rundef

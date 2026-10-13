@@ -279,11 +279,17 @@ def test_managed_worker_macro_is_dynamic_ack_gated_and_standard_exit(tmp_path):
     assert "CSTP_ReadStopRequest" in macro
     assert "Do\n" in macro
     assert 'Private Sub CSTPMW_CloseSession' in macro
-    assert '    Save\n' in macro and '    Quit\n' in macro
+    assert '    Save\n' in macro and '    Quit\n' not in macro
+    assert 'closeStage = "batch-return"' in macro
     assert "stopped-with-completion" in macro
     assert "EigenResult_Simple_output" in macro
     assert "EigenResult_Complex_output" in macro
     assert "%" not in macro
+    script = worker.project_path.with_suffix('')/'Model'/'3D'/'Model.run'
+    assert script.read_text(encoding='ascii') == macro
+    assert '\n    OpenFile ' not in macro
+    worker.executable = Path('cst.exe')
+    assert worker._launch_command() == ['cst.exe','-m','-b',str(worker.project_path)]
 
 
 def test_expression_kind_comes_from_parameter_metadata_or_runtime_value():

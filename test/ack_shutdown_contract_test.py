@@ -27,7 +27,8 @@ def test_open_retry_is_bounded_and_does_not_retry_invalid_protocol():
 def test_shutdown_saves_before_stop_ack_and_has_independent_error_handler():
     macro = (ROOT / 'data/runtime_managed_worker_v1_main.vb').read_text(encoding='utf-8')
     close = macro.split('Private Sub CSTPMW_CloseSession', 1)[1].split('End Sub', 1)[0]
-    assert close.index('\n    Save\n') < close.index('CSTP_WriteStopAck') < close.index('\n    Quit\n')
+    assert close.index('\n    Save\n') < close.index('CSTP_WriteStopAck') < close.index('closeStage = "batch-return"')
+    assert '\n    Quit\n' not in close
     assert 'On Error GoTo CloseFailed' in close
     assert 'For i = 1 To 10' not in close
     assert 'CSTP_ReadStopRequest' in close

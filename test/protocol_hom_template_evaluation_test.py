@@ -21,7 +21,7 @@ def test_p5_6_worker_uses_supported_template_inventory_and_evaluation(tmp_path):
     macro = workspace.worker.macro_path.read_text(encoding="ascii")
 
     assert macro.lower().count("sub main") == 1
-    assert macro.count("EigenmodeSolver.Start") == 1
+    assert macro.count("If EigenmodeSolver.Start <> 1 Then") == 1
     assert macro.count("EvaluateResultTemplates") == 1
     assert "ResetTemplateIterator" in macro
     assert "GetNextTemplate" in macro

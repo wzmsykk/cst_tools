@@ -69,7 +69,7 @@ def test_hom_profile_is_checked_once_before_warm_task_loop(tmp_path):
     assert macro.count("stage:profile-preflight") == 1
     assert macro.index("stage:profile-preflight") < macro.index("CSTPWW_RunTask")
     assert macro.count("CSTPWW_WriteTemplateInventory") == 2
-    assert macro.count("EigenmodeSolver.Start") == 1
+    assert macro.count("If EigenmodeSolver.Start <> 1 Then") == 1
     for requirement in HOM_PROFILE_V1.required_templates:
         assert requirement.result_name in macro
 

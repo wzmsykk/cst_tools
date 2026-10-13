@@ -53,17 +53,19 @@ Function PP12(variant_cst As Variant) As String
 	PP12 = CST_Print(variant_cst, 12)
 End Function
 Function EigenResult_Complex(iModeNumber As Integer,queryKey As String,axis As Integer,ByRef iUVWvalue() As Double) As Double
+    If iModeNumber < 1 Then Err.Raise vbObjectError + 2101, "EigenResult_Complex", "Mode number must be positive"
     If (iModeNumber > EigenmodeSolver.GetNumberOfModesCalculated) Then
             ReportWarningToWindow("3D Eigenmode result template execution: Cannot find result for mode #"+CStr(iModeNumber)+".")
             'CalculateEigenModeResult = lib_rundef
-            Exit Function
+            Err.Raise vbObjectError + 2101, "EigenResult_Complex", "Missing eigenmode #" & CStr(iModeNumber)
     End If
     Dim frq_cst As Double
     frq_cst = EigenmodeSolver.GetModeFrequencyInHz(iModeNumber)/Units.GetFrequencyUnitToSI
+    If frq_cst <= 0 Then Err.Raise vbObjectError + 2102, "EigenResult_Complex", "Invalid eigenmode frequency"
     If (Not SelectTreeItem("2D/3D Results\Modes\Mode " + CStr(iModeNumber) + "\e")) Then
                     ReportWarningToWindow("Error in 3D Eigenmode result template execution: Cannot find result for mode #"+CStr(iModeNumber)+".")
                     'CalculateEigenModeResult = lib_rundef
-                    Exit Function
+                    Err.Raise vbObjectError + 2103, "EigenResult_Complex", "Missing electric field for mode #" & CStr(iModeNumber)
     End If
     Plot.Update
     ScreenUpdating True
@@ -110,7 +112,8 @@ Function EigenResult_Complex(iModeNumber As Integer,queryKey As String,axis As I
         NoMeshExists:
             'CalculateEigenModeResult = lib_rundef
             ReportError "No Mesh Exists."
-            Exit Function
+            On Error GoTo 0
+            Err.Raise vbObjectError + 2104, "EigenResult_Complex", "No mesh exists"
 
         MeshExists:
             If Abs(x1box) > dAbsMeshMax Then dAbsMeshMax = Abs(x1box)
@@ -244,7 +247,7 @@ Function EigenResult_Complex(iModeNumber As Integer,queryKey As String,axis As I
         If (Not SelectTreeItem("2D/3D Results\"+ sFieldCST)) Then
             'CalculateEigenModeResult = lib_rundef
             ReportError "Result not found in tree: " + sFieldCST
-            Exit Function
+            Err.Raise vbObjectError + 2103, "EigenResult_Complex", "Result not found in tree: " & sFieldCST
         End If
 
         Plot3DPlotsOn2DPlane False

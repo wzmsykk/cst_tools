@@ -8,12 +8,19 @@ sys.path.insert(0,str(ROOT))
 from csttool.configuration import read_json,write_json_atomic
 from csttool.managed_cstworker import ManagedCSTWorker
 from csttool.result_reconciliation import file_hash
+from csttool.acceptance_session import exclusive_probe
 from test.managed_hom_ten_modes_fault_resume_integration_test import _config
 
 
 def main():
+    with exclusive_probe(ROOT):
+        return run_validation()
+
+
+def run_validation():
     parser=argparse.ArgumentParser()
     parser.add_argument('--cst-exe',required=True)
+    parser.add_argument('--tasks',type=int,choices=(1,2),default=1)
     args=parser.parse_args()
     destination=ROOT/'artifacts'/('managed-field-diagnostic-'+uuid4().hex[:8])
     destination.mkdir(parents=True)
@@ -38,27 +45,40 @@ def main():
     worker=ManagedCSTWorker('0',config)
     report={}
     try:
-        result=dict(worker.run_task('field-diagnostic-acceptance',params={
-            'nmodes':2,'fmin':513.492631838138,'fmax':713.492631838138}))
-        report['result']=result
-        # Invalid optional export is deliberately included: diagnostic incomplete, solve Success.
-        assert result['TaskStatus']=='Success',result
-        assert result['FieldDiagnostic']['status']=='incomplete',result
-        field_records=result.get('FieldArtifacts',result['PostProcessResult'])
-        exports=[p['value'] for p in field_records if p['value'] and isinstance(p['value'],dict) and p['value'].get('kind')=='field-artifact']
-        assert [v['status'] for v in exports]==['available','available','unavailable'],exports
-        # Recover only analysis from the valid artifacts: no second Solver invocation.
-        valid=[p for p in field_records if p['resultName']!='invalid-support' and isinstance(p['value'],dict)]
-        diagnostic=worker._run_optional_field_diagnostic(type('TaskRef',(),{'task_id':result['TaskID']})(),Path(result['ResultDirectory']),valid)
-        report['recovered_diagnostic']=diagnostic
-        assert diagnostic['status']=='complete',diagnostic
-        report['recovery_solver_replayed']=False
+        report['results']=[]
+        for index in range(args.tasks):
+            result=dict(worker.run_task(f'field-diagnostic-acceptance-{index+1}',params={
+                'nmodes':2,'fmin':513.492631838138,'fmax':713.492631838138}))
+            report['result']=result
+            report['results'].append(result)
+            # Invalid optional export is deliberately included: diagnostic incomplete, solve Success.
+            assert result['TaskStatus']=='Success',result
+            assert result['FieldDiagnostic']['status']=='incomplete',result
+            field_records=result.get('FieldArtifacts',result['PostProcessResult'])
+            exports=[p['value'] for p in field_records if p['value'] and isinstance(p['value'],dict) and p['value'].get('kind')=='field-artifact']
+            assert [v['status'] for v in exports]==['available','available','unavailable'],exports
+            # Recover only analysis from valid artifacts: no extra Solver invocation.
+            valid=[p for p in field_records if p['resultName']!='invalid-support' and isinstance(p['value'],dict)]
+            diagnostic=worker._run_optional_field_diagnostic(type('TaskRef',(),{'task_id':result['TaskID']})(),Path(result['ResultDirectory']),valid)
+            report['recovered_diagnostic']=diagnostic
+            assert diagnostic['status']=='complete',diagnostic
+            report['recovery_solver_replayed']=False
+            print(f'TASK_COMPLETE index={index+1} id={result["TaskID"]}',flush=True)
     finally:
         report['stop_returned']=worker.stop()
         report['stop_ack']=worker.protocol.read_stop_ack(worker.session_id) is not None
         report['exit_code']=worker._process.poll()
         report['source_unchanged']=file_hash(source)==before
+        log = worker.root/'cst.log'
+        text = log.read_text(errors='replace') if log.exists() else ''
+        report['shutdown_errors'] = [token for token in (
+            'Unable to close sheet while a batch job is running',
+            'Expecting an existing scalar var.', 'EvaluateInternal CDbl(concaveL)') if token in text]
+        report['shutdown_clean'] = not report['shutdown_errors']
         write_json_atomic(destination/'report.json',report)
+    assert report['stop_returned'] and report['stop_ack'], report
+    assert report['exit_code'] == 0 and report['source_unchanged'], report
+    assert report['shutdown_clean'], report['shutdown_errors']
     print({k:report[k] for k in ('stop_returned','stop_ack','exit_code','source_unchanged')},flush=True)
     return 0
 

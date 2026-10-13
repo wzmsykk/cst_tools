@@ -42,7 +42,7 @@ def test_ten_mode_scan_requests_one_mode_per_solve(tmp_path, monkeypatch):
 def test_worker_applies_explicit_mode_count_after_rebuild_before_solve(template):
     source = (Path(__file__).parents[1] / "data" / template).read_text(encoding="utf-8")
     rebuild = source.index("rebuilt = Rebuild")
-    binding = source.index('EigenmodeSolver.SetNumberOfModes "nmodes"')
+    binding = source.index('EigenmodeSolver.SetNumberOfModes CInt(requestedModes)')
     solve = source.index("EigenmodeSolver.Start")
     assert rebuild < binding < solve
     assert 'If LCase(task.Parameters(i).Name) = "nmodes" Then' in source

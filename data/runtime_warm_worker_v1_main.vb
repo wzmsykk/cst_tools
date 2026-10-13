@@ -41,6 +41,7 @@ Private Function CSTPWW_RunTask(ByVal taskPath As String, ByVal completionPath A
     Dim errorMessage As String
     Dim completionError As String
     Dim stage As String
+    Dim requestedModes As Double
     Dim rebuilt As Boolean
     Dim acknowledged As Boolean
     Dim rebuildStart As Double
@@ -77,10 +78,15 @@ Private Function CSTPWW_RunTask(ByVal taskPath As String, ByVal completionPath A
     solveStart = Timer
     For i = 0 To task.ParameterCount - 1
         If LCase(task.Parameters(i).Name) = "nmodes" Then
-            EigenmodeSolver.SetNumberOfModes "nmodes"
+            requestedModes = RestoreDoubleParameter("nmodes")
+            If requestedModes < 1 Or requestedModes > 32767 Or requestedModes <> Fix(requestedModes) Then Err.Raise vbObjectError + 2202, "worker", "nmodes must be a positive integer"
+            EigenmodeSolver.SetNumberOfModes CInt(requestedModes)
         End If
     Next i
-    EigenmodeSolver.Start
+    If EigenmodeSolver.Start <> 1 Then
+        CSTPWW_PublishFailure completionPath, task, "SOLVER_FAILED", "EigenmodeSolver.Start returned 0"
+        Exit Function
+    End If
     solveSeconds = CSTPWW_Elapsed(solveStart, Timer)
 
     stage = "flush"
