@@ -134,3 +134,11 @@ CST2022官方Python包限制Python3.6–3.9，当前Python3.12不能直接使用
 `solver-failure-recovery-4d229e05`实测Default/Tet+open被求解日志明确拒绝，但Start返回1，随后查询报无Eigenmode数据库；同Worker恢复原边界后求解及标准退出成功。此版本/路线存在Start返回值与文档成功契约不一致的反例，不能仅凭返回1发布成功。Managed新增solver-result模式可用性检查；少于请求数不判失败，零可用模式或查询异常明确失败。最新历史化门禁证据见上述验收记录。
 
 `solver-failure-recovery-5c962473`的nmodes=0在历史重建阶段失败，不是Start失败。坏状态下立即停止发生保存拒绝、退出4，进程实际退出但标准关闭未通过；源未变，不将其追认为成功。仍需设计坏历史停止时的已知良好快照/恢复策略。
+
+### P0-1后续修正
+
+2026-10-14补测：`recovery-faults-771c8a0a`验证恢复Rebuild返回False及恢复快照/保存回执真实写入受阻，均不发布StopAck，标准批退出4后仅按确已死亡的隔离会话abandoned-dead收口。Backup输出受阻实测10051 Could not open file，成功Save也不能替代回执/停止确认。新增快照非空检查，损坏/非ASCII回执拒绝确认；正常路径9bde6833重跑通过。见[P0-1故障验收](../docs/failed-rebuild-stop-recovery.md)。这些是恢复失败门禁证据，不是所有故障可自动恢复的保证。
+
+原失败记录不追认成功。新增参数表达式检查点和停止恢复后，`failed-rebuild-stop-ae5729af`重建/保存已返回且无保存拒绝，CST仍退出4；说明非零码可能继续携带任务失败，不能与等待UI的未关闭状态等同。
+
+`failed-rebuild-stop-b417feb1`基线恢复及`failed-rebuild-stop-0ea47a64`成功后失败恢复已通过：本会话恢复快照/保存回执、StopAck和实际退出核对，任务Failure保留；无Solver重放，原成功快照及源SHA未变，无主实例/求解残留。只允许这种有证据的特定退出4停止确认；没有通用忽略非零码。参数恢复不回滚任意历史/Global Data。详见[P0-1验收](../docs/failed-rebuild-stop-recovery.md)。

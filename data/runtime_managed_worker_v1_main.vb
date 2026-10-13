@@ -1,5 +1,10 @@
 ' Long-lived managed Worker v1. Python owns task identity and lifecycle.
 Public outFullDir As String
+Private goodParameterNames() As String
+Private goodParameterExpressions() As String
+Private goodParameterCount As Long
+Private goodParametersAvailable As Boolean
+Private modelNeedsRecovery As Boolean
 
 Sub Main
     Dim task As CSTP_Task
@@ -19,6 +24,8 @@ Sub Main
     ' -m -b loads this project before compiling Model/3D/Model.run.
     ' Never OpenFile here: compiling in an empty project loses the parameter
     ' namespace used by CST's internal 3D/DS expression synchronization.
+    stage = "parameter-checkpoint"
+    CSTPMW_CaptureGoodParameters
     CSTPMW_WriteMarker "%MARKER_PATH%", "ready"
 
     Do
@@ -40,6 +47,7 @@ Sub Main
             End If
 
             stage = "parameters"
+            modelNeedsRecovery = True
             For i = 0 To task.ParameterCount - 1
                 StoreParameter task.Parameters(i).Name, task.Parameters(i).Value
             Next i
@@ -81,6 +89,9 @@ Sub Main
 
             stage = "flush"
             Backup outFullDir & "project.cst"
+            stage = "parameter-checkpoint"
+            CSTPMW_CaptureGoodParameters
+            modelNeedsRecovery = False
             If Not CSTP_WriteCompletion("%COMPLETION_PATH%", task.TaskId, task.SessionId, True, "", "", completionError) Then
                 CSTPMW_WriteMarker "%MARKER_PATH%", "failure:" & completionError
                 Exit Do
@@ -177,6 +188,8 @@ Private Sub CSTPMW_CloseSession
     Dim closeStage As String
     Dim message As String
     Dim stopRequested As Boolean
+    Dim recovered As Boolean
+    Dim recoveryFile As Integer
     On Error GoTo CloseFailed
     stopRequested = (Dir("%STOP_REQUEST_PATH%") <> "")
     closeStage = "stop-read"
@@ -186,10 +199,31 @@ Private Sub CSTPMW_CloseSession
             stopRequested = False
         End If
     End If
+    If modelNeedsRecovery Then
+        closeStage = "restore-parameters"
+        CSTPMW_RestoreGoodParameters
+        closeStage = "recovery-rebuild"
+        CSTPMW_Trace closeStage, "%PROJECT_PATH%", "begin; no Solver replay"
+        If Not Rebuild Then Err.Raise vbObjectError + 2401, "worker", "Recovery Rebuild returned False"
+        modelNeedsRecovery = False
+        recovered = True
+        CSTPMW_Trace closeStage, "%PROJECT_PATH%", "returned True"
+        closeStage = "recovery-snapshot"
+        Backup "%PROJECT_PATH%.recovered.cst"
+        If FileLen("%PROJECT_PATH%.recovered.cst") < 1 Then Err.Raise vbObjectError + 2403, "worker", "Recovery snapshot is empty"
+    End If
     closeStage = "save"
     CSTPMW_Trace closeStage, "%PROJECT_PATH%", "begin"
     Save
     CSTPMW_Trace closeStage, "%PROJECT_PATH%", "returned"
+    If recovered Then
+        closeStage = "recovery-receipt"
+        recoveryFile = FreeFile
+        Open "%PROJECT_PATH%.recovery-saved" For Output As #recoveryFile
+        Print #recoveryFile, "CST_RECOVERY_SAVED_V1"
+        Print #recoveryFile, "%SESSION_ID%"
+        Close #recoveryFile
+    End If
     If stopRequested Then
         closeStage = "stop-ack"
         If Not CSTP_WriteStopAck("%STOP_ACK_PATH%", "%SESSION_ID%", message) Then
@@ -209,6 +243,42 @@ CloseFailed:
     CSTPMW_WriteMarker "%MARKER_PATH%", "failure:" & message
     On Error GoTo 0
     ' Do not retry Save, overwrite Completion, or Quit with unsaved changes.
+End Sub
+
+Private Sub CSTPMW_CaptureGoodParameters
+    Dim index As Long, f As Integer
+    goodParametersAvailable = False
+    goodParameterCount = GetNumberOfParameters
+    ReDim goodParameterNames(goodParameterCount), goodParameterExpressions(goodParameterCount)
+    For index = 0 To goodParameterCount - 1
+        goodParameterNames(index) = GetParameterName(index)
+        goodParameterExpressions(index) = RestoreParameterExpression(goodParameterNames(index))
+    Next index
+    f = FreeFile
+    Open "%PROJECT_PATH%.last-good-parameters.tsv" For Output As #f
+    For index = 0 To goodParameterCount - 1
+        Print #f, goodParameterNames(index) & Chr(9) & goodParameterExpressions(index)
+    Next index
+    Close #f
+    goodParametersAvailable = True
+    CSTPMW_Trace "parameter-checkpoint", "%PROJECT_PATH%.last-good-parameters.tsv", "captured expressions; count=" & CStr(goodParameterCount)
+End Sub
+
+Private Sub CSTPMW_RestoreGoodParameters
+    Dim index As Long, saved As Long, name As String, found As Boolean
+    If Not goodParametersAvailable Then Err.Raise vbObjectError + 2402, "worker", "No valid parameter checkpoint"
+    For index = 0 To goodParameterCount - 1
+        StoreParameter goodParameterNames(index), goodParameterExpressions(index)
+    Next index
+    For index = GetNumberOfParameters - 1 To 0 Step -1
+        name = GetParameterName(index)
+        found = False
+        For saved = 0 To goodParameterCount - 1
+            If LCase(name) = LCase(goodParameterNames(saved)) Then found = True
+        Next saved
+        If Not found Then DeleteParameter name
+    Next index
+    CSTPMW_Trace "restore-parameters", "%PROJECT_PATH%.last-good-parameters.tsv", "restored expressions; new task parameters removed"
 End Sub
 
 Private Sub CSTPMW_Trace(ByVal stage As String, ByVal path As String, ByVal detail As String)

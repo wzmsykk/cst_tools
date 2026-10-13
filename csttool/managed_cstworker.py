@@ -124,6 +124,9 @@ class ManagedCSTWorker:
             "completion": self.completion_path, "ack": self.ack_path,
             "state": self.marker_path, "stop_request": self.stop_request_path,
             "stop_ack": self.stop_ack_path, "results": self.result_root,
+            "last_good_parameters": Path(str(self.project_path) + '.last-good-parameters.tsv'),
+            "recovery_snapshot": Path(str(self.project_path) + '.recovered.cst'),
+            "recovery_receipt": Path(str(self.project_path) + '.recovery-saved'),
         }
         manifest = write_run_manifest(self.observation_root / "diagnostics.json", config, artifacts,
                                       context={"worker": worker_id, "session": self.session_id})
@@ -702,6 +705,10 @@ class ManagedCSTWorker:
             if self._process is None:
                 return True
             if self._process.poll() is not None:
+                if self.protocol.read_stop_ack(self.session_id) is None or not self._stop_exit_is_confirmed():
+                    self._close_log()
+                    self._diagnose_failure("shutdown")
+                    raise ManagedWorkerShutdownError("CST exited without verified StopAck and exit code 0")
                 self.logger.debug("CST 进程已结束，无需重复退出 | WORKER_ALREADY_EXITED worker=%s session=%s returncode=%s", self.ID, self.session_id, self._process.poll(), extra={"event": "WORKER_ALREADY_EXITED", "phase": "readout", "worker": self.ID, "session": self.session_id, "returncode": self._process.poll()})
                 self._close_log()
                 return True
@@ -719,6 +726,8 @@ class ManagedCSTWorker:
                     try:
                         self._process.wait(timeout=max(0.1, deadline - time.monotonic()))
                     except subprocess.TimeoutExpired:
+                        break
+                    if not self._stop_exit_is_confirmed():
                         break
                     self._close_log()
                     self.logger.info(
@@ -739,6 +748,31 @@ class ManagedCSTWorker:
                     "process is still running; session recovery is required"
                 )
             )
+
+    def _stop_exit_is_confirmed(self) -> bool:
+        """Exit 4 remains a task error; accept shutdown only with own saved recovery."""
+        code = self._process.poll()
+        if code == 0:
+            return True
+        if code != 4:
+            return False
+        project = getattr(self, 'project_path', None)
+        if project is None:
+            return False
+        receipt = Path(str(project) + '.recovery-saved')
+        snapshot = Path(str(project) + '.recovered.cst')
+        try:
+            valid = (receipt.read_text(encoding='ascii').splitlines()
+                     == ['CST_RECOVERY_SAVED_V1', self.session_id]
+                     and snapshot.is_file() and snapshot.stat().st_size > 0)
+        except (OSError, UnicodeError):
+            return False
+        if valid:
+            self.logger.warning('失败任务后已恢复快照并标准退出；保留CST退出码4 | WORKER_STOP_RECOVERED session=%s snapshot=%s',
+                                self.session_id, snapshot,
+                                extra={'event': 'WORKER_STOP_RECOVERED', 'phase': 'shutdown',
+                                       'returncode': code, 'snapshot': snapshot})
+        return valid
 
     def emergency_terminate(self) -> None:
         """Explicit last resort; callers must mark the project for recovery."""

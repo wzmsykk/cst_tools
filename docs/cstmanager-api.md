@@ -2,6 +2,8 @@
 
 状态：当前生产调度接口。Manager 只接受显式 Worker 工厂，不再提供旧 Worker 回退或队列式兼容 API。
 
+Worker停止边界（2026-10-13）：停止确认与任务计算成功分开。Managed的失败参数恢复不会重新求解或把Failure转为Success；不可核对的恢复/保存/退出仍抛ManagedWorkerShutdownError。仅当前会话有恢复快照及保存回执、StopAck和实际退出的特定CST退出4可确认停止。见[P0-1验收](failed-rebuild-stop-recovery.md)。
+
 `CSTManager` 是优化算法与本地 CST 进程之间的批量任务调度器。它管理固定数量的 CST Worker，负责并发执行、失败重试、Worker 回收和结果汇总。
 
 ## 导入

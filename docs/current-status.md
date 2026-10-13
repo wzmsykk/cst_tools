@@ -1,9 +1,29 @@
 # CST Tools 当前状态与实施路线
 
-状态日期：2026-09-21
-当前基线提交：`4c6c5de Remove legacy logger compatibility layer`（其后工作区正在清理 legacy 功能）
+状态日期：2026-10-14
+已提交基线：`4b92e84`；其后P0-1安全停止与文档索引变更在工作区验收，未提交。
 
 本文是项目当前状态的权威入口。历史设计文档仍保留其分析价值；若与本文或[最小 Python/VBA 协议 TODO](./minimal-python-vba-todo.md)冲突，以本文和已经通过的真实 CST Gate 为准。
+
+## 最新状态与近期TODO（2026-10-14）
+
+入口：[功能—源码/函数—工具—文档索引](feature-index.md)。实施变更必须遵守[文档同步要求](../AGENTS.md)，主动同步相关API/设计/用途、状态、TODO与知识库，不等待另行要求。
+
+- Managed与预处理已使用`-m -b 副本.cst`，执行工程内Model/3D/Model.run；保留参数表达式，使用RestoreDoubleParameter读取参数值。
+- 缺失模式后处理失败与同Worker恢复、重建失败及求解器拒绝后恢复已真实通过。Start返回1但无结果的门禁已通过；返回0和Start本身抛异常仍未实测。
+- 直接边界setter会被重建覆盖，进入历史后完整/部分更新保留；项目参数与Global Data存储不同，Global Data不自动失效旧结果。见[持久性及求解失败对照](cst-history-persistence-and-solver-failure.md)。
+- P0-1坏重建立即停止：已实现最后良好参数表达式恢复、无Solver重放、恢复快照/回执及StopAck检查；最新真实结果以[停止验收](failed-rebuild-stop-recovery.md)为准。恢复后CST可能保留任务错误码4，不能改称任务成功，也不允许仅凭非零进程退出判安全关闭。
+- 场匹配仍为可选ROI诊断，物理身份/阈值未完成校准，不自动删并模式或跳过区间。
+
+|优先级|下一工作|
+|---|---|
+|P0-1已通过|基线/已有成功快照恢复及恢复重建、快照/回执写入失败三项真实注入通过；不伪造StopAck、不重放Solver。死会话abandoned-dead收口，活跃/未知进程拒绝；最新离线441通过|
+|P0|补Start返回0/Start异常、缺场/缺网格、加载失败/损坏工件/退出卡住真实门禁|
+|P1|网格/求解设置历史持久性逐项验证；共同物理域/材料掩码、全域权重及极化/模组校准|
+|P1|冷/热缓存全流程性能、路线独立资源峰值与重复性|
+|P2|GUI场匹配入口及目标Project多版本调用；不阻塞现有Managed/ROI路线|
+
+下文阶段表、旧日期Pending及扩展项保留历史证据，不使用旧测试数量作为当前代码验收；近期顺序以本节和[六阶段验收](mode-field-selection-implementation-status.md)为准。
 
 ## 1. 当前结论
 
@@ -23,7 +43,7 @@ GUI、默认 CLI、生产 `CSTManager` 和算法执行链均已切换到 Managed
 ```text
 Python Task
   -> 原子提交 Task v1
-  -> CST Worker 打开临时工程副本
+  -> -m -b 加载临时工程副本后执行工程内Model.run
   -> Profile 预检注册模板
   -> 应用允许的参数
   -> Rebuild / Solver
@@ -31,7 +51,8 @@ Python Task
   -> Completion
   -> Python 读取并校验结果
   -> Ack
-  -> Save / Quit 或继续下一 Warm Task
+  -> 继续下一任务，或必要参数恢复 / Save / StopAck / 返回批执行器
+  -> Python核对退出及恢复证据
 ```
 
 结果选择顺序固定为：
@@ -142,7 +163,7 @@ Mesh 收敛分析是新项目启动前的可选阶段。默认按 `10, 15, 20, 2
 
 这些项目不是 P6 的隐含组成部分。下一阶段只抽取已经由 HOM Gate 证明的通用核心，不以第二个 Profile 为前置条件，也不扩大为通用 ABI。
 
-## 7. 推荐后续顺序
+## 7. 历史扩展顺序（非当前近期TODO）
 
 1. 用真实 CST 分别验证默认、TM020 和 WTC 的 `SimulationTask` 生产调用；
 2. 将 Profile/Warm Worker 泛化为可接受任意任务数的生产候选 Worker，再通过 `worker_factory` 接入 `CSTManager`；
@@ -151,6 +172,11 @@ Mesh 收敛分析是新项目启动前的可选阶段。默认按 `10, 15, 20, 2
 5. 暂不做 Profile 序列化、Manifest、动态 capability negotiation、插件 ABI 或多 Profile 注册表。
 
 ## 8. 文档导航
+
+- AI定位入口：[功能索引](./feature-index.md)
+- 文档同步约定：[AGENTS.md](../AGENTS.md)
+- 最新停止恢复：[P0-1验收](./failed-rebuild-stop-recovery.md)
+- 近期门禁：[场匹配实施与验收](./mode-field-selection-implementation-status.md)
 
 - 当前实施记录：[最小 Python/VBA 协议 TODO](./minimal-python-vba-todo.md)
 - 测试命令与 Gate：[测试指南](./testing-guide.md)

@@ -1,6 +1,10 @@
 # CST Python / VBA Runtime Protocol
 
 状态：架构参考；wire format 与当前进度以最小协议和当前状态文档为准
+
+2026-10-14补测：恢复重建及恢复快照/回执写入失败不发布StopAck，保留任务Failure及诊断；仅明确已死的隔离会话可按abandoned-dead收口，活跃/未知进程不得如此处理。见[P0-1故障验收](failed-rebuild-stop-recovery.md)。
+
+2026-10-13实现更新：Managed失败后停止可恢复最后良好参数表达式、重建及保存恢复快照，不重跑Solver。StopAck不等于求解成功；CST退出4仅在本会话保存恢复回执及非空恢复快照匹配、StopAck和实际退出已确认时视为停止完成，任务失败状态不改写。恢复文件是诊断/生命周期补充，不改变Task/Completion/Ack wire format。详见[P0-1恢复](failed-rebuild-stop-recovery.md)及[功能索引](feature-index.md)。
 协议版本：`CST_TASK_V1` / `CST_COMPLETION_V1`  
 日期：2026-09-17
 当前总览：[CST Tools 当前状态与实施路线](./current-status.md)

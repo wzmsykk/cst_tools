@@ -50,6 +50,7 @@
 | `WORKER_TASK_COMPLETE` | `csttool/managed_cstworker.py` |
 | `WORKER_ALREADY_EXITED` | `csttool/managed_cstworker.py` |
 | `WORKER_STOP_REQUEST` | `csttool/managed_cstworker.py` |
+| `WORKER_STOP_RECOVERED` | `csttool/managed_cstworker.py` |
 | `WORKER_STOPPED` | `csttool/managed_cstworker.py` |
 | `WORKER_STOP_FAILED` | `csttool/managed_cstworker.py` |
 | `HOM_RESUMED` | `csttool/hom_scan_algorithm.py` |
