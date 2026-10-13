@@ -26,6 +26,7 @@ from .cst_process_env import cst_process_environment
 from .resource_usage import record_worker_usage
 from .native_progress import NativeProgressTracker
 from .solver_output import SolverOutputTracker
+from .run_store import RunStore
 from .cst_memory_guard import MemoryGuardPolicy, MemorySamplingError, SustainedMemoryGuard, owned_process_memory
 from .diagnostics import archive_task, write_run_manifest, write_failure_report
 from .runtime_protocol import (
@@ -71,6 +72,8 @@ class ManagedCSTWorker:
             "worker": worker_id, "session": self.session_id,
         })
         self.root = worker_root / self.session_id
+        self.run_store = (RunStore(config.project_directory or worker_root, config.run_directory)
+                          if config.run_directory is not None else None)
         self.result_root = config.result_directory.resolve() / f"worker_{worker_id}"
         self.source_project = config.project_path.resolve()
         self.executable = config.executable.resolve()
@@ -326,6 +329,9 @@ class ManagedCSTWorker:
                 expression_names=self._expression_names(params),
             )
             payload = archive_task(self.root, task, result_name)
+            if getattr(self, 'run_store', None) is not None:
+                self.run_store.event(task.task_id, 'submitted', worker=self.ID,
+                                     session=self.session_id, job=result_name, parameters=dict(params))
             if getattr(self, '_resource_usage', None) is not None:
                 self._resource_usage.identity['task_id'] = task.task_id
             self._active_task_context = {
@@ -399,6 +405,11 @@ class ManagedCSTWorker:
                 try:
                     # Persist result consumption BEFORE authorizing VBA cleanup.
                     write_json_atomic(receipt_path, received)
+                    if getattr(self, 'run_store', None) is not None:
+                        self.run_store.event(task.task_id, 'received', result_status=status)
+                        self.run_store.artifacts(task.task_id, received=receipt_path,
+                            snapshot=project_snapshot, protocol=self.protocol.root,
+                            log=self.log_path, native_progress=self.root / 'native_progress' / task.task_id)
                     publish_ack_idempotently(
                         self.ack_path,
                         Acknowledge(task.task_id, task.session_id),
@@ -406,8 +417,12 @@ class ManagedCSTWorker:
                     self.logger.debug("任务 Ack 已发布 | TASK_ACK_PUBLISHED task=%s job=%s", task.task_id, result_name, extra={"event": "TASK_ACK_PUBLISHED", "phase": "ack", "task": task.task_id, "job": result_name})
                     self._wait_for_marker("ready", self.START_TIMEOUT)
                     write_json_atomic(receipt_path, {**received, 'phase': 'acknowledged'})
+                    if getattr(self, 'run_store', None) is not None:
+                        self.run_store.event(task.task_id, 'acknowledged')
                     self.logger.debug("CST 已回到就绪状态 | TASK_ACK_READY task=%s job=%s", task.task_id, result_name, extra={"event": "TASK_ACK_READY", "phase": "ack", "task": task.task_id, "job": result_name})
                 except Exception as exc:
+                    if getattr(self, 'run_store', None) is not None:
+                        self.run_store.event(task.task_id, 'ack_pending', error=str(exc))
                     self._diagnose_failure("ack")
                     self.logger.exception("任务确认阶段失败 | TASK_ACK_FAILED task=%s job=%s", task.task_id, result_name, extra={"event": "TASK_ACK_FAILED", "phase": "ack", "task": task.task_id, "job": result_name})
                     raise ManagedAcknowledgmentPending(receipt_path, exc) from exc

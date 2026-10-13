@@ -21,6 +21,7 @@ from uuid import uuid4
 from .configuration import GlobalSettings, ProjectSettings
 from .logging_config import ContextLogger
 from .worker_models import WorkerConfig, SimulationResult
+from .run_store import RunStore
 
 
 class WorkerProtocol(Protocol):
@@ -156,6 +157,7 @@ class CSTManager:
         self.resultDir.mkdir(parents=True, exist_ok=True)
         self.taskFileDir = self.tempDir
         self.cstProjPath = self.currProjectDir / cst_filename
+        self.run_store = RunStore(self.currProjectDir, self.currProjectDir / 'logs' / uuid4().hex)
 
         self._state = ManagerState.IDLE
         self._state_lock = RLock()
@@ -209,6 +211,8 @@ class CSTManager:
             parameters=tuple(self.paramList),
             postprocess=tuple(self.pconfm.get_postprocess_settings()),
             progress_callback=self._progress_callback,
+            run_directory=self.run_store.directory,
+            project_directory=self.currProjectDir,
         )
 
     def _create_worker(

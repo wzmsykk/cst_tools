@@ -17,6 +17,8 @@ class WorkerConfig:
     background: bool = True
     progress_callback: Callable | None = None
     memory_guard: MemoryGuardPolicy = field(default_factory=MemoryGuardPolicy)
+    run_directory: Path | None = None
+    project_directory: Path | None = None
 
     @classmethod
     def from_mapping(cls, values):
