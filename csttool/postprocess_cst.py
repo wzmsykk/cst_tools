@@ -56,6 +56,7 @@ class CstPostProcessor:
         return tuple(simple + simple_all + complex_metrics + complex_all + [
             "ModeRec_All",
             "Direct_PPS_0D",
+            "ExportModeField",
         ])
 
     def configure(self, settings: Sequence[Mapping[str, Any]]) -> None:
@@ -79,6 +80,27 @@ class CstPostProcessor:
         result_name: str,
         params: Mapping[str, Any],
     ) -> None:
+        if method == 'ExportModeField':
+            from .field_artifacts import SamplingSpec, read_export_status
+            import hashlib
+            mode = self._required(params, 'iModeNumber', method)
+            if isinstance(mode, bool) or not isinstance(mode, int) or mode < 1:
+                raise ValueError('field export mode must be a positive integer')
+            kind = params.get('field_kind', 'E')
+            if kind not in ('E', 'H'):
+                raise ValueError('field kind must be E or H')
+            spec = SamplingSpec.from_mapping(params['sampling'])
+            token = hashlib.sha256(result_name.encode()).hexdigest()[:12]
+            filename = self._unique_filename(f'field_{mode}_{kind}_{token}.status')
+            base = Path(filename).stem
+            numbers = ','.join(format(float(v), '.17g') for v in spec.bounds_m)
+            counts = ','.join(str(n) for n in spec.counts)
+            self._register(import_file='ExportModeField.vb', result_name=result_name,
+                result_filename=filename,
+                function_call=f'ExportModeField_output {mode},"{kind}",{counts},{numbers},outFullDir,"{base}"\n',
+                reader=lambda name: read_export_status(self._result_path(name), spec, mode, kind),
+                params=dict(params))
+            return
         if method in self._SIMPLE_METRICS:
             self._add_simple_metric(
                 method,

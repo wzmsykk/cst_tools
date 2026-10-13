@@ -20,6 +20,8 @@ class WorkerConfig:
     run_directory: Path | None = None
     project_directory: Path | None = None
     execution_fingerprint: str | None = None
+    field_reference_result: Path | None = None
+    field_match_policy: Mapping[str, Any] | None = None
 
     @classmethod
     def from_mapping(cls, values):
@@ -27,7 +29,9 @@ class WorkerConfig:
         return cls(Path(values["taskFileDir"]), Path(values["resultDir"]),
                    Path(values["CSTENVPATH"]), Path(values["cstPath"]),
                    tuple(values["paramList"]), tuple(values.get("postProcess", ())),
-                   bool(values.get("runInBackground", True)), values.get("progressCallback"))
+                   bool(values.get("runInBackground", True)), values.get("progressCallback"),
+                   field_reference_result=(Path(values['fieldReferenceResult']) if values.get('fieldReferenceResult') else None),
+                   field_match_policy=values.get('fieldMatchPolicy'))
 
 
 @dataclass(frozen=True, slots=True)
@@ -42,6 +46,8 @@ class SimulationResult(Mapping[str, Any]):
     task_id: str = ""
     result_directory: Path | None = None
     receipt_path: Path | None = None
+    field_diagnostic: Mapping[str, Any] | None = None
+    field_artifacts: list[dict[str, Any]] | None = None
 
     def __getitem__(self, key):
         return self.to_mapping()[key]
@@ -54,10 +60,15 @@ class SimulationResult(Mapping[str, Any]):
 
     def to_mapping(self) -> dict[str, Any]:
         """Serialize at the existing algorithm result boundary."""
-        return {"WorkerID": self.worker_id, "TaskStatus": self.status,
+        result = {"WorkerID": self.worker_id, "TaskStatus": self.status,
                 "RunName": self.job_name, "RunParameters": dict(self.parameters),
                 "PostProcessResult": self.postprocess, "FailureReport": self.failure,
                 "ProjectSnapshot": str(self.snapshot) if self.snapshot else None,
                 "TaskID": self.task_id,
                 "ResultDirectory": str(self.result_directory) if self.result_directory else None,
                 "ReceiptPath": str(self.receipt_path) if self.receipt_path else None}
+        if self.field_diagnostic is not None:
+            result['FieldDiagnostic'] = dict(self.field_diagnostic)
+        if self.field_artifacts is not None:
+            result['FieldArtifacts'] = self.field_artifacts
+        return result

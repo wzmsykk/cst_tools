@@ -125,6 +125,8 @@ class CSTManager:
         progress_callback=None,
         run_id: str | None = None,
         resource_budget: ResourceBudget | None = None,
+        field_reference_result: Path | None = None,
+        field_match_policy: Mapping[str, Any] | None = None,
     ) -> None:
         if maxTask < 1:
             raise ValueError("maxTask must be at least 1")
@@ -144,6 +146,8 @@ class CSTManager:
         self.maxWorkerJobCountLimit = max_jobs_per_worker
         self._worker_factory = worker_factory
         self._progress_callback = progress_callback
+        self._field_reference_result = field_reference_result
+        self._field_match_policy = field_match_policy
 
         self.currProjectDir = Path(pconfm.currProjectDir).absolute()
         if not isinstance(self.logger, ContextLogger):
@@ -229,6 +233,8 @@ class CSTManager:
             run_directory=self.run_store.directory,
             project_directory=self.currProjectDir,
             execution_fingerprint=self.execution_fingerprint,
+            field_reference_result=self._field_reference_result,
+            field_match_policy=self._field_match_policy,
         )
 
     def _create_worker(

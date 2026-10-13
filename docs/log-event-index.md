@@ -53,5 +53,9 @@
 | `WORKER_STOPPED` | `csttool/managed_cstworker.py` |
 | `WORKER_STOP_FAILED` | `csttool/managed_cstworker.py` |
 | `HOM_RESUMED` | `csttool/hom_scan_algorithm.py` |
+| `FIELD_ARTIFACTS_READY` | `csttool/managed_cstworker.py` |
+| `FIELD_DIAGNOSTIC_COMPLETE` | `csttool/field_diagnostics.py` |
+| `FIELD_DIAGNOSTIC_INCOMPLETE` | `csttool/managed_cstworker.py` |
+| `FIELD_DIAGNOSTIC_PERSIST_FAILED` | `csttool/managed_cstworker.py` |
 | `HOM_CHECKPOINT` | `csttool/hom_scan_algorithm.py` |
 | `HOM_INTERVAL` | `csttool/hom_scan_algorithm.py` |

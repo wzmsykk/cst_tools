@@ -233,6 +233,39 @@ def test_worker_names_archive_only_after_acknowledgement(tmp_path, monkeypatch):
     assert not observed[0].exists()
 
 
+def test_optional_field_artifacts_do_not_enter_scalar_results(tmp_path, monkeypatch):
+    worker=build_worker_shell(tmp_path)
+    worker.ID='0';worker._lock=threading.RLock();worker._stopping=False
+    worker.parameter_definitions=()
+    def complete(task):
+        directory=worker.result_root/task.task_id;directory.mkdir(parents=True)
+        (directory/'project.cst').write_bytes(b'snapshot');(directory/'project').mkdir()
+        return Completion(task.task_id,task.session_id,CompletionStatus.SUCCESS)
+    monkeypatch.setattr(worker,'_wait_completion',complete)
+    monkeypatch.setattr(worker,'_wait_for_marker',lambda *args:None)
+    monkeypatch.setattr(worker.postprocess,'read_all_results',lambda:[
+        {'id':0,'resultName':'frequency','value':570.0},
+        {'id':1,'resultName':'field','value':{'kind':'field-artifact','status':'unavailable','reason':'disk full'}}])
+    result=worker.run_task('field-test',params={})
+    assert result['TaskStatus']=='Success'
+    assert result['PostProcessResult']==[{'id':0,'resultName':'frequency','value':570.0}]
+    assert result['FieldArtifacts'][0]['value']['status']=='unavailable'
+    receipt=json.loads(Path(result['ReceiptPath']).read_text())
+    assert receipt['postprocess']==result['PostProcessResult']
+    assert receipt['field_artifacts'][0]['value']['context']['task_id']==result['TaskID']
+
+
+def test_optional_diagnostic_missing_reference_does_not_request_solver_replay(tmp_path):
+    worker=build_worker_shell(tmp_path)
+    worker.ID='0';worker._stopping=False
+    worker._field_reference_result=tmp_path/'missing-reference.json'
+    worker._field_match_policy={'minimum_mac':.9,'minimum_margin':.05,'minimum_subspace_overlap':.99}
+    task=Task.create(worker.session_id,{})
+    result=worker._run_optional_field_diagnostic(task,tmp_path,[])
+    assert result['status']=='incomplete'
+    assert Path(result['path']).exists()
+
+
 def test_managed_worker_macro_is_dynamic_ack_gated_and_standard_exit(tmp_path):
     worker = build_worker_shell(tmp_path)
 

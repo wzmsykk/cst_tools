@@ -5,22 +5,30 @@ from pathlib import Path
 import subprocess
 import sys
 import time
+import threading
 from uuid import uuid4
 import numpy as np
 import h5py
+import psutil
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 from csttool.configuration import read_json, write_json_atomic
 from csttool.cst_process_env import cst_process_environment
 from csttool.result_reconciliation import file_hash
+from csttool.resource_usage import ResourceUsageRecorder
 
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--cst-exe', required=True)
     parser.add_argument('--native-only', action='store_true')
+    parser.add_argument('--public-native-only', action='store_true')
     args = parser.parse_args()
+    existing=[p.info['pid'] for p in psutil.process_iter(['pid','name'])
+              if (p.info.get('name') or '').upper().startswith('CST DESIGN ENVIRONMENT')]
+    if existing:
+        raise RuntimeError(f'run efficiency probes serially; existing CST pids={existing}')
     evidence = ROOT / 'artifacts/hom-mesh-baseline-de2d6b90/report.json'
     point = next(p for p in read_json(evidence)['points'] if p['cell'] == 30)
     source = Path(point['result']['ProjectSnapshot'])
@@ -28,7 +36,8 @@ def main():
     destination = ROOT / 'artifacts' / ('field-efficiency-' + uuid4().hex[:8])
     destination.mkdir(parents=True)
     copy = destination / 'benchmark.cst'
-    template = 'field_native_efficiency.bas' if args.native_only else 'field_efficiency.bas'
+    template = ('field_public_native.bas' if args.public_native_only else
+                'field_native_efficiency.bas' if args.native_only else 'field_efficiency.bas')
     macro = (ROOT / 'test/support' / template).read_text(encoding='ascii')
     macro = macro.replace('%SOURCE%', str(source)).replace('%PROJECT%', str(copy)).replace('%ROOT%', str(destination))
     macro_path = destination / 'benchmark.bas'
@@ -38,12 +47,25 @@ def main():
     with (destination / 'cst.log').open('wb') as log:
         process = subprocess.Popen([args.cst_exe, '-m', str(macro_path)],
                                    env=cst_process_environment(), stdout=log, stderr=subprocess.STDOUT)
-        process.wait()
+        resources=ResourceUsageRecorder(destination,'probe',destination.name,'field-efficiency')
+        stopped=threading.Event()
+        def observe():
+            while not stopped.is_set():
+                resources.sample(process,force=True)
+                stopped.wait(0.5)
+        observer=threading.Thread(target=observe,daemon=True)
+        observer.start()
+        try:
+            process.wait()
+        finally:
+            stopped.set();observer.join(timeout=2)
+        resource_summary=resources.finish('Success' if process.returncode==0 else 'Failure')
     report = {'source': str(source), 'source_unchanged': file_hash(source) == original_hash,
               'cst_process_seconds': time.perf_counter() - started, 'exit_code': process.returncode,
               'solver_run': False, 'copy_method': 'CST SaveAs include_results=True; no filesystem companion copy',
               'sample_region_project_units': [-10,10,-10,10,-50,50],
               'scope': 'equal-weight common-point ROI diagnostic, not full-volume quadrature',
+              'resource_summary':resource_summary,
               'python': []}
     success = destination / 'completed.txt'
     failure = destination / 'failed.txt'
@@ -53,6 +75,34 @@ def main():
     if report['completion'] == 'SUCCESS':
         with (destination / 'timings.csv').open() as stream:
             report['cst_timings'] = list(csv.DictReader(stream))
+        if args.public_native_only:
+            report['scope'] = 'common ROI weighted sum: weight=1+x^2/100; route order alternated'
+            for row in report['cst_timings']:
+                if row['stage']!='public-native':
+                    continue
+                t=time.perf_counter()
+                fields=[]; positions=[]
+                for mode in (1,2):
+                    path=destination / f"sample-{row['points']}-{row['repeat']}-mode{mode}.h5"
+                    with h5py.File(path) as stream:
+                        fields.append(stream['E-Field'][...]);positions.append(stream['Position'][...])
+                if not np.array_equal(positions[0],positions[1]):
+                    raise ValueError('coordinate mismatch')
+                w=np.sqrt(1+positions[0]['x']**2/100)
+                a,b=[np.column_stack([f[s]['re'].astype(float)+1j*f[s]['im'].astype(float)
+                                     for s in ('x','y','z')])*w[:,None] for f in fields]
+                actual=np.array([np.vdot(a,a).real,np.vdot(b,b).real,np.vdot(a,b).real,np.vdot(a,b).imag])
+                seconds=time.perf_counter()-t
+                expected=np.array([float(row[s]) for s in ('norm_a','norm_b','cross_re','cross_im')])
+                export=next(float(r['seconds']) for r in report['cst_timings']
+                    if r['stage']=='native-hdf5' and r['points']==row['points'] and r['repeat']==row['repeat'])
+                report['python'].append({'points':int(row['points']),'repeat':int(row['repeat']),
+                    'public_native_seconds':float(row['seconds']), 'hdf_pipeline_seconds':export+seconds,
+                    'norm_scaled_error':float(np.max(np.abs(actual-expected))/max(actual[0],actual[1]))})
+            report['numeric_validation_passed']=all(r['norm_scaled_error']<=1e-6 for r in report['python'])
+            write_json_atomic(destination / 'report.json',report)
+            print(report,flush=True)
+            return 0 if report['numeric_validation_passed'] and report['source_unchanged'] and process.returncode==0 else 1
         if args.native_only:
             raw = next(r for r in report['cst_timings'] if r['stage']=='synthetic-raw')
             conjugated = next(r for r in report['cst_timings'] if r['stage']=='synthetic-conjugated')

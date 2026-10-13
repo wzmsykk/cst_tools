@@ -1,6 +1,6 @@
 # COMSOL式场匹配：实现与验收计划
 
-日期：2026-10-13。依据：[算子流程选择](postprocess-operator-execution-plan.md)、[效率验收](cst-field-efficiency-acceptance-20261013.md)、[COMSOL方法摘要](../knowledge-base/comsol-eigenmode-tracking.md)。范围是参考场匹配及极化模族诊断；本文不表示功能已实现。
+日期：2026-10-13。依据：[算子流程选择](postprocess-operator-execution-plan.md)、[效率验收](cst-field-efficiency-acceptance-20261013.md)、[COMSOL方法摘要](../knowledge-base/comsol-eigenmode-tracking.md)。范围是参考场匹配及极化模族诊断；本文描述计划，实际交付与未通过门禁见[六阶段实施记录](mode-field-selection-implementation-status.md)。
 
 ## 1. 目标与不变边界
 

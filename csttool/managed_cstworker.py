@@ -82,6 +82,13 @@ class ManagedCSTWorker:
         self.executable = config.executable.resolve()
         self.parameter_definitions = tuple(config.parameters)
         self.execution_fingerprint = config.execution_fingerprint
+        self._field_reference_result = config.field_reference_result
+        self._field_match_policy = config.field_match_policy
+        if config.field_reference_result is not None:
+            from .mode_matching import MatchPolicy
+            if config.field_match_policy is None:
+                raise ValueError('field diagnostic requires an explicit matching policy')
+            MatchPolicy(**config.field_match_policy)
         self.postprocess = CstPostProcessor()
         self.postprocess.configure(config.postprocess)
         self.protocol = FileProtocol(self.root / "protocol")
@@ -383,6 +390,7 @@ class ManagedCSTWorker:
             self.logger.debug("收到 CST 完成标记 | CST_COMPLETION task=%s job=%s status=%s", task.task_id, result_name, completion.status.value, extra={"event": "CST_COMPLETION", "phase": "solve", "task": task.task_id, "job": result_name, "status": completion.status.value})
             task_result_root = self.result_root / task.task_id
             project_snapshot = task_result_root / "project.cst"
+            field_artifacts = []
             try:
                 if completion.status is CompletionStatus.SUCCESS:
                     if not project_snapshot.is_file() or project_snapshot.stat().st_size == 0:
@@ -392,6 +400,9 @@ class ManagedCSTWorker:
                     self.postprocess.set_result_directory(task_result_root)
                     self.postprocess.set_cst_run_result_directory(task_result_root / "project")
                     postprocess_result = self.postprocess.read_all_results()
+                    field_artifacts = [item for item in postprocess_result
+                        if isinstance(item.get('value'), dict) and item['value'].get('kind') == 'field-artifact']
+                    postprocess_result = [item for item in postprocess_result if item not in field_artifacts]
                     self.logger.debug("后处理结果读取完成 | RESULT_READ_DONE task=%s job=%s results=%d snapshot=%s", task.task_id, result_name, len(postprocess_result), project_snapshot, extra={"event": "RESULT_READ_DONE", "phase": "readout", "task": task.task_id, "job": result_name, "results": len(postprocess_result), "snapshot": project_snapshot})
                     status = "Success"
                     failure = None
@@ -411,6 +422,7 @@ class ManagedCSTWorker:
                     'task_id': task.task_id, 'session_id': task.session_id,
                     'job': result_name, 'parameters': dict(params),
                     'status': status, 'failure': failure, 'postprocess': postprocess_result,
+                    'field_artifacts': field_artifacts,
                     'snapshot': str(project_snapshot.resolve()) if project_snapshot.exists() else None,
                     'snapshot_sha256': file_hash(project_snapshot) if status == 'Success' else None,
                     'workspace': str(self.root),
@@ -445,16 +457,31 @@ class ManagedCSTWorker:
                     raise ManagedAcknowledgmentPending(receipt_path, exc) from exc
                 finally:
                     self._active_task_context = {}
+            field_diagnostic = None
             if status == "Success":
                 task_result_root, project_snapshot = self._name_result_archive(
                     task, result_name, task_result_root, postprocess_result
                 )
                 self.postprocess.set_result_directory(task_result_root)
                 self.postprocess.set_cst_run_result_directory(project_snapshot.with_suffix(""))
+                for item in field_artifacts:
+                    value = item.get('value')
+                    if isinstance(value, dict) and value.get('kind') == 'field-artifact':
+                        value['context'] = {'task_id': task.task_id, 'session_id': self.session_id,
+                                            'snapshot_sha256': received['snapshot_sha256']}
+                if field_artifacts:
+                    available = sum(item['value']['status']=='available' for item in field_artifacts)
+                    self.logger.info('场工件已归档 | FIELD_ARTIFACTS_READY task=%s available=%d unavailable=%d directory=%s',
+                        task.task_id,available,len(field_artifacts)-available,task_result_root,
+                        extra={'event':'FIELD_ARTIFACTS_READY','phase':'field-analysis','task':task.task_id,
+                               'available':available,'unavailable':len(field_artifacts)-available})
                 if getattr(self, 'run_store', None) is not None:
                     try:
                         self.run_store.artifacts(task.task_id, snapshot=project_snapshot,
                                                  result_directory=task_result_root)
+                        self.run_store.artifacts(task.task_id, **{
+                            f"field_{item['id']}":task_result_root/item['value']['filename']
+                            for item in field_artifacts if item['value']['status']=='available'})
                     except OSError:
                         self.logger.warning('存档映射更新失败，不重算已完成任务', exc_info=True)
                 try:
@@ -462,6 +489,7 @@ class ManagedCSTWorker:
                                                    'snapshot': str(project_snapshot.resolve())})
                 except OSError:
                     self.logger.warning('接收记录存档路径更新失败，原始记录仍保留', exc_info=True)
+                field_diagnostic = self._run_optional_field_diagnostic(task, task_result_root, field_artifacts)
             log_method = self.logger.info if status == "Success" else self.logger.error
             log_method(
                 "CST 任务结束 | WORKER_TASK_COMPLETE worker=%s task=%s status=%s elapsed_seconds=%.3f failure=%s job=%s",
@@ -476,7 +504,41 @@ class ManagedCSTWorker:
                 failure, project_snapshot.resolve() if status == "Success" else None,
                 task_id=task.task_id, result_directory=task_result_root.resolve(),
                 receipt_path=receipt_path,
+                field_diagnostic=field_diagnostic,
+                field_artifacts=field_artifacts or None,
             )
+
+    def _run_optional_field_diagnostic(self, task, directory, postprocess):
+        """Post-Ack diagnostics cannot replay or invalidate a completed solver task."""
+        reference = getattr(self, '_field_reference_result', None)
+        if reference is None:
+            return None
+        from .configuration import read_json
+        from .field_artifacts import artifacts_from_result
+        from .field_diagnostics import run_field_diagnostic
+        from .mode_matching import MatchPolicy
+        destination = directory / 'field-diagnostic.json'
+        try:
+            previous = read_json(reference)
+            ref_directory = previous.get('ResultDirectory', previous.get('result_directory'))
+            if not ref_directory:
+                raise ValueError('reference result directory missing')
+            candidates = artifacts_from_result(directory, postprocess,
+                                                expected_context={'task_id': task.task_id, 'session_id': self.session_id})
+            ref = artifacts_from_result(ref_directory, previous.get('FieldArtifacts') or previous.get('PostProcessResult', []))
+            result = run_field_diagnostic(ref, candidates, MatchPolicy(**self._field_match_policy), destination,
+                context={'task_id': task.task_id, 'session': self.session_id, 'worker': self.ID},
+                run_store=getattr(self,'run_store',None), cancelled=lambda: self._stopping, logger=self.logger)
+        except Exception as exc:
+            result = {'status': 'incomplete', 'reason': f'{type(exc).__name__}: {exc}'}
+            self.logger.warning('可选场诊断未完成，保留求解结果 | FIELD_DIAGNOSTIC_INCOMPLETE task=%s reason=%s',
+                                task.task_id,result['reason'],extra={'event':'FIELD_DIAGNOSTIC_INCOMPLETE','phase':'field-analysis','task':task.task_id})
+            try:
+                write_json_atomic(destination,result)
+            except OSError:
+                self.logger.warning('场诊断记录写入失败 | FIELD_DIAGNOSTIC_PERSIST_FAILED task=%s',task.task_id,exc_info=True,
+                                    extra={'event':'FIELD_DIAGNOSTIC_PERSIST_FAILED','phase':'field-analysis','task':task.task_id})
+        return {**result, 'path': str(destination)}
 
     def _name_result_archive(self, task, resultname, directory, postprocess):
         """Name a confirmed Backup and its CST companion directory together."""
