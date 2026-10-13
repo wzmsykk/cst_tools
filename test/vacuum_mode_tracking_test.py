@@ -155,3 +155,22 @@ def test_cli_success_and_unconfirmed_exit_codes(tmp_path):
     write_json_atomic(request,payload)
     assert subprocess.run(command,cwd=Path(__file__).parents[1],capture_output=True,timeout=20).returncode==2
     assert read_json(tmp_path/'reports/summary.json')['status']=='unconfirmed'
+
+
+def test_small_mesh_acceptance_wrapper_replays_only_fields(tmp_path):
+    from test.support.validate_pillbox_cross_mesh import validate_tracker
+    import shutil
+    for cell in (8,10):
+        fields=tmp_path/f'mesh-{cell}/fields'
+        fields.mkdir(parents=True)
+        snap=snapshot(fields,f'cell-{cell}',[(1,0,0),(0,1,0)])
+        desc=descriptor(fields,snap)
+        shutil.copy2(fields/desc['result_file'],fields/'export-result.json')
+        support=tmp_path/f'mesh-{cell}/support'
+        support.mkdir()
+        shutil.copy2(fields/desc['support_file'],support/'support.tsv')
+    write_json_atomic(tmp_path/'report.json',{'meshes':[{'cell':8},{'cell':10}],'gate_passed':True})
+    validate_tracker(tmp_path)
+    report=read_json(tmp_path/'report.json')['tracker_acceptance']
+    assert report['gate_passed'] and report['solver_replayed_for_recovery'] is False
+    assert not list(tmp_path.rglob('*.quarantined'))

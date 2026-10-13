@@ -73,12 +73,12 @@ python -m csttool.vacuum_mode_tracking --request tracking-request.json --output 
 
 ## 验收与TODO
 
-新增离线测试覆盖单模换号、整体相位/幅度、旋转双模与额外候选、缺维、病态、候选组歧义、频率门禁、错误域/ROI、缺文件后下一步恢复、归档载入/批量报告和写入失败。底层真实物理证据见[Pillbox全域与第二网格验收](physical-domain-pillbox-acceptance.md)；此版Tracker本身尚未重跑真实CST链，不能将之前的真实数据摘要当新接口运行验收。
+新增离线测试覆盖单模换号、整体相位/幅度、旋转双模与额外候选、缺维、病态、候选组歧义、频率门禁、错误域/ROI、缺文件后下一步恢复、归档载入/批量报告和写入失败。真实证据见[Pillbox全域、第二网格及小网格新Tracker验收](physical-domain-pillbox-acceptance.md)。新Tracker已使用cell8/10本轮真实E场与原生掩码通过；包含文件缺失/恢复及CLI缺成员后继续匹配，不用之前的摘要替代新接口实测。
 
 离线全套469 passed、19 deselected；参考初始化另拒绝缺失文件与秩不足的参考组。CLI子进程实测matched退出0、unconfirmed退出2。pytest临时工件在验收后清理，不保留测试产生的HDF5副本。
 
 - [x] 单真空域固定参考追踪及失败保留锚点、已存场批量复算入口。
-- [ ] 新Tracker接入真实Pillbox连续计算验收（先保持独立、串行）。
+- [x] 新Tracker独立串行Pillbox双网格验收及分析恢复：cell8/10，共5332/10220单元，仍非扫描自动调度或多步参数扫描验收。
 - [ ] Managed自动掩码登记、物理前提预检和GUI入口。
 - [ ] 对目标模式/模组的候选请求控制；与逐频枚举分离，不借组匹配静默合并HOM。
 - [ ] 三层mesh及更多模族阈值校准；复杂域后续扩展。

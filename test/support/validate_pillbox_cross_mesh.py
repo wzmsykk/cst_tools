@@ -2,6 +2,7 @@
 import argparse
 from pathlib import Path
 import shutil
+import subprocess
 import sys
 from uuid import uuid4
 
@@ -22,6 +23,63 @@ from csttool.physical_domain import common_quadrature
 from csttool.pillbox_reference import tm110_reference
 from csttool.mode_matching import MatchPolicy, weighted_overlap, normalized_mac, compare_subspaces
 from csttool.result_reconciliation import file_hash
+
+
+def validate_tracker(root):
+    """Real exported fields, CLI sequence and missing-file analysis recovery only."""
+    from csttool.vacuum_mode_tracking import (
+        VacuumTrackingDomain, VacuumModeTracker, load_tracking_snapshot,
+    )
+    from dataclasses import asdict
+    report = read_json(root / 'report.json')
+    domain = VacuumTrackingDomain(GEOMETRY, 'PEC', 'Vacuum', True,
+        'prepare/Model.run: PEC background and six electric walls, no symmetry',
+        'full cylinder bounding box; native sole Vacuum solid agrees with analytic cylinder',
+        '64^3 shared grid; previous 48/64/96 sampling acceptance, see physical-domain-pillbox-acceptance.md')
+    descriptors = []
+    for entry in report['meshes']:
+        run = root / f'mesh-{entry["cell"]}'
+        descriptors.append({'snapshot_id': f'cell-{entry["cell"]}',
+            'result_file': str(run / 'fields/export-result.json'),
+            'support_file': str(run / 'support/support.tsv'),
+            'support_sha256': file_hash(run / 'support/support.tsv')})
+    reference = load_tracking_snapshot(descriptors[0], domain, base=root)
+    candidate = load_tracking_snapshot(descriptors[1], domain, base=root)
+    tracker = VacuumModeTracker(reference, domain, MatchPolicy(.9, .05, .99,
+                                                             maximum_frequency_change=.01))
+    normal = tracker.evaluate(candidate, root / 'tracking/normal.json')
+    original = candidate.fields[0].path
+    quarantined = original.with_suffix('.h5.quarantined')
+    assert not quarantined.exists()
+    original.rename(quarantined)
+    try:
+        missing = tracker.evaluate(candidate, root / 'tracking/missing-file.json')
+    finally:
+        quarantined.rename(original)
+    recovered = tracker.evaluate(candidate, root / 'tracking/recovered.json')
+    request = {'domain': asdict(domain), 'policy': asdict(tracker.policy),
+        'reference': {**descriptors[0], 'modes': [1, 2]},
+        'candidates': [descriptors[1],
+            {**descriptors[1], 'snapshot_id': 'missing-member', 'modes': [1]},
+            {**descriptors[1], 'snapshot_id': 'swapped-and-recovered', 'modes': [2, 1]}]}
+    write_json_atomic(root / 'tracking-request.json', request)
+    process = subprocess.run([sys.executable, '-m', 'csttool.vacuum_mode_tracking',
+        '--request', str(root / 'tracking-request.json'), '--output', str(root / 'tracking/sequence')],
+        cwd=ROOT, capture_output=True, text=True, timeout=60)
+    sequence = read_json(root / 'tracking/sequence/summary.json')
+    passed = (normal['status'] == recovered['status'] == 'matched'
+        and missing['status'] == 'unconfirmed' and tracker.reference is reference
+        and process.returncode == 2
+        and [step['status'] for step in sequence['steps']] == ['matched', 'unconfirmed', 'matched'])
+    report['tracker_acceptance'] = {'gate_passed': passed, 'normal': normal,
+        'missing_file': missing, 'recovered': recovered, 'sequence': sequence,
+        'cli_exit_code': process.returncode, 'cli_stdout': process.stdout,
+        'cli_stderr': process.stderr, 'solver_replayed_for_recovery': False,
+        'reference_strategy': 'fixed-anchor', 'natural_number_swap_observed': False}
+    report['gate_passed'] = report['gate_passed'] and passed
+    write_json_atomic(root / 'report.json', report)
+    assert passed, report['tracker_acceptance']
+    print('TRACKER_GATE_PASSED=True', flush=True)
 
 
 def compare_pair(reference, candidate, weights, scope):
@@ -63,10 +121,15 @@ def main():
     parser.add_argument('--cst-exe', required=True, type=Path)
     parser.add_argument('--verify-mesh-root', type=Path,
                         help='Read mesh counts from completed snapshots; never rerun Solver')
+    parser.add_argument('--meshes', nargs=2, type=int, default=(8, 10),
+                        help='Two increasing cells-per-wavelength values (default: small 8 10)')
+    parser.add_argument('--tracking', action='store_true', help='Accept new Tracker/CLI and analysis-only recovery')
     args = parser.parse_args()
     if args.verify_mesh_root:
         verify_mesh_counts(args.cst_exe, args.verify_mesh_root)
         return
+    if not 1 <= args.meshes[0] < args.meshes[1]:
+        parser.error('--meshes requires two positive increasing values')
     if shutil.disk_usage(ROOT).free < 8 * 1024**3:
         raise RuntimeError('Need at least 8 GiB free')
     root = ROOT / 'artifacts' / ('pillbox-cross-mesh-' + uuid4().hex[:8])
@@ -81,7 +144,7 @@ def main():
     arrays, supports, frequencies = [], [], []
     try:
         prepared = prepare_ideal(args.cst_exe, source, root / 'prepare')
-        for mesh in (20, 30):
+        for mesh in args.meshes:
             run = root / f'mesh-{mesh}'
             config = _config(run / 'solve', '0', args.cst_exe, prepared)
             config['paramList'].append({'name': 'cell', 'type': 'double'})
@@ -146,6 +209,8 @@ def main():
         write_json_atomic(root / 'report.json', report)
     assert report['source_unchanged']
     verify_mesh_counts(args.cst_exe, root)
+    if args.tracking:
+        validate_tracker(root)
 
 
 if __name__ == '__main__':
