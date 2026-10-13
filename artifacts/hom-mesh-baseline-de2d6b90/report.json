@@ -1,0 +1,938 @@
+{
+  "source": "D:\\work\\cst_tools\\project\\HOM analysis\\HOM analysis_clean.cst",
+  "source_sha256": "996b485dade2ddc4232aafc052c04314836a54fd74423fa7b0fbe819a975b967",
+  "tolerance": 0.01,
+  "consecutive_required": 2,
+  "recommended_cell": null,
+  "points": [
+    {
+      "source": "D:\\work\\cst_tools\\artifacts\\hom-mesh-baseline-de2d6b90\\cell-12\\prepared.cst",
+      "source_sha256": "4ffce96bb1349194b4904da9022a6fd310a602aff93e5da59d2ff663298ec913",
+      "parameters": {
+        "nmodes": 2,
+        "fmin": 513.492631838138,
+        "fmax": 713.492631838138
+      },
+      "prime_parameters": null,
+      "result": {
+        "WorkerID": "0",
+        "TaskStatus": "Success",
+        "RunName": "controlled_failed_window",
+        "RunParameters": {
+          "nmodes": 2,
+          "fmin": 513.492631838138,
+          "fmax": 713.492631838138
+        },
+        "PostProcessResult": [
+          {
+            "id": 0,
+            "resultName": "frequency",
+            "value": {
+              "ModeIndex 1": 564.710985965621,
+              "ModeIndex 2": 565.643713787759
+            },
+            "params": {}
+          },
+          {
+            "id": 1,
+            "resultName": "R_divide_Q",
+            "value": {
+              "ModeIndex 1": 1.6449258044413e-06,
+              "ModeIndex 2": 8.37417927422627e-07
+            },
+            "params": {
+              "axis": "z",
+              "xoffset": 0.0,
+              "yoffset": 0.0,
+              "zoffset": 0.0
+            }
+          },
+          {
+            "id": 2,
+            "resultName": "R_divide_Q_5mm",
+            "value": {
+              "ModeIndex 1": 1.57364625390282e-06,
+              "ModeIndex 2": 9.20017970404172e-07
+            },
+            "params": {
+              "axis": "z",
+              "xoffset": 0.0,
+              "yoffset": 5.0,
+              "zoffset": 0.0
+            }
+          },
+          {
+            "id": 3,
+            "resultName": "R_divide_Q_10mm",
+            "value": {
+              "ModeIndex 1": 1.50611143016825e-06,
+              "ModeIndex 2": 1.01459467992375e-06
+            },
+            "params": {
+              "axis": "z",
+              "xoffset": 0.0,
+              "yoffset": 10.0,
+              "zoffset": 0.0
+            }
+          },
+          {
+            "id": 4,
+            "resultName": "Shunt_Impedance",
+            "value": {
+              "ModeIndex 1": 8.34327765686829e-07,
+              "ModeIndex 2": 4.26519056315706e-07
+            },
+            "params": {
+              "axis": "z",
+              "xoffset": 0.0,
+              "yoffset": 0.0,
+              "zoffset": 0.0
+            }
+          },
+          {
+            "id": 5,
+            "resultName": "Total_Loss",
+            "value": {
+              "ModeIndex 1": 5156486525.7857,
+              "ModeIndex 2": 5152438992.36063
+            },
+            "params": {}
+          },
+          {
+            "id": 6,
+            "resultName": "Q-factor",
+            "value": {
+              "ModeIndex 1": 0.507213008291404,
+              "ModeIndex 2": 0.509326397666731
+            },
+            "params": {}
+          }
+        ],
+        "FailureReport": null,
+        "ProjectSnapshot": "D:\\work\\cst_tools\\artifacts\\hom-mesh-baseline-de2d6b90\\cell-12\\solve\\result\\worker_0\\worker_0\\controlled_failed_window__281683d4-2db2-4c00-87aa-06f4f75be563\\controlled_failed_window.cst",
+        "TaskID": "281683d4-2db2-4c00-87aa-06f4f75be563",
+        "ResultDirectory": "D:\\work\\cst_tools\\artifacts\\hom-mesh-baseline-de2d6b90\\cell-12\\solve\\result\\worker_0\\worker_0\\controlled_failed_window__281683d4-2db2-4c00-87aa-06f4f75be563",
+        "ReceiptPath": "D:\\work\\cst_tools\\artifacts\\hom-mesh-baseline-de2d6b90\\cell-12\\solve\\temp\\worker_0\\07d8f66f-31f3-463c-b692-0b89cf3c395a\\received\\281683d4-2db2-4c00-87aa-06f4f75be563.json"
+      },
+      "postprocess": [
+        {
+          "resultName": "frequency",
+          "method": "Frequency_All",
+          "params": {}
+        },
+        {
+          "resultName": "R_divide_Q",
+          "method": "R_over_Q_All",
+          "params": {
+            "xoffset": 0.0,
+            "yoffset": 0.0
+          }
+        },
+        {
+          "resultName": "R_divide_Q_5mm",
+          "method": "R_over_Q_All",
+          "params": {
+            "xoffset": 0.0,
+            "yoffset": 5.0
+          }
+        },
+        {
+          "resultName": "R_divide_Q_10mm",
+          "method": "R_over_Q_All",
+          "params": {
+            "xoffset": 0.0,
+            "yoffset": 10.0
+          }
+        },
+        {
+          "resultName": "Shunt_Impedance",
+          "method": "Shunt_Impedance_All",
+          "params": {
+            "xoffset": 0.0,
+            "yoffset": 0.0
+          }
+        },
+        {
+          "resultName": "Total_Loss",
+          "method": "Total_Loss_All",
+          "params": {}
+        },
+        {
+          "resultName": "Q-factor",
+          "method": "Q_Factor_All",
+          "params": {}
+        }
+      ],
+      "session": "07d8f66f-31f3-463c-b692-0b89cf3c395a",
+      "workspace": "D:\\work\\cst_tools\\artifacts\\hom-mesh-baseline-de2d6b90\\cell-12\\solve\\temp\\worker_0\\07d8f66f-31f3-463c-b692-0b89cf3c395a",
+      "comparison_valid": true,
+      "stop_returned": true,
+      "stop_ack": true,
+      "exit_code": 0,
+      "process_alive": false,
+      "output.txt": "D:\\work\\cst_tools\\artifacts\\hom-mesh-baseline-de2d6b90\\cell-12\\solve\\temp\\worker_0\\07d8f66f-31f3-463c-b692-0b89cf3c395a\\worker-input\\Result\\output.txt",
+      "progress.log": "D:\\work\\cst_tools\\artifacts\\hom-mesh-baseline-de2d6b90\\cell-12\\solve\\temp\\worker_0\\07d8f66f-31f3-463c-b692-0b89cf3c395a\\worker-input\\Result\\progress.log",
+      "Model.log": "D:\\work\\cst_tools\\artifacts\\hom-mesh-baseline-de2d6b90\\cell-12\\solve\\temp\\worker_0\\07d8f66f-31f3-463c-b692-0b89cf3c395a\\worker-input\\Result\\Model.log",
+      "elapsed_seconds": 56.5,
+      "source_unchanged": true,
+      "cell": 12
+    },
+    {
+      "source": "D:\\work\\cst_tools\\artifacts\\hom-mesh-baseline-de2d6b90\\cell-18\\prepared.cst",
+      "source_sha256": "7b3a5a14de38831bed57d96dfe4af91f72170951e29dd60650a3cadb2c489c58",
+      "parameters": {
+        "nmodes": 2,
+        "fmin": 513.492631838138,
+        "fmax": 713.492631838138
+      },
+      "prime_parameters": null,
+      "result": {
+        "WorkerID": "0",
+        "TaskStatus": "Success",
+        "RunName": "controlled_failed_window",
+        "RunParameters": {
+          "nmodes": 2,
+          "fmin": 513.492631838138,
+          "fmax": 713.492631838138
+        },
+        "PostProcessResult": [
+          {
+            "id": 0,
+            "resultName": "frequency",
+            "value": {
+              "ModeIndex 1": 568.253644537974,
+              "ModeIndex 2": 568.536195284881
+            },
+            "params": {}
+          },
+          {
+            "id": 1,
+            "resultName": "R_divide_Q",
+            "value": {
+              "ModeIndex 1": 8.98122718865846e-07,
+              "ModeIndex 2": 1.82527788893373e-06
+            },
+            "params": {
+              "axis": "z",
+              "xoffset": 0.0,
+              "yoffset": 0.0,
+              "zoffset": 0.0
+            }
+          },
+          {
+            "id": 2,
+            "resultName": "R_divide_Q_5mm",
+            "value": {
+              "ModeIndex 1": 9.84654676717771e-07,
+              "ModeIndex 2": 1.74259344591776e-06
+            },
+            "params": {
+              "axis": "z",
+              "xoffset": 0.0,
+              "yoffset": 5.0,
+              "zoffset": 0.0
+            }
+          },
+          {
+            "id": 3,
+            "resultName": "R_divide_Q_10mm",
+            "value": {
+              "ModeIndex 1": 1.08450860624394e-06,
+              "ModeIndex 2": 1.66595667798427e-06
+            },
+            "params": {
+              "axis": "z",
+              "xoffset": 0.0,
+              "yoffset": 10.0,
+              "zoffset": 0.0
+            }
+          },
+          {
+            "id": 4,
+            "resultName": "Shunt_Impedance",
+            "value": {
+              "ModeIndex 1": 4.63122425561297e-07,
+              "ModeIndex 2": 9.42887676378214e-07
+            },
+            "params": {
+              "axis": "z",
+              "xoffset": 0.0,
+              "yoffset": 0.0,
+              "zoffset": 0.0
+            }
+          },
+          {
+            "id": 5,
+            "resultName": "Total_Loss",
+            "value": {
+              "ModeIndex 1": 5138657025.03357,
+              "ModeIndex 2": 5135787705.92431
+            },
+            "params": {}
+          },
+          {
+            "id": 6,
+            "resultName": "Q-factor",
+            "value": {
+              "ModeIndex 1": 0.515656063289581,
+              "ModeIndex 2": 0.516572124219956
+            },
+            "params": {}
+          }
+        ],
+        "FailureReport": null,
+        "ProjectSnapshot": "D:\\work\\cst_tools\\artifacts\\hom-mesh-baseline-de2d6b90\\cell-18\\solve\\result\\worker_0\\worker_0\\controlled_failed_window__c8eea91d-b672-43da-80c0-8ee839a60078\\controlled_failed_window.cst",
+        "TaskID": "c8eea91d-b672-43da-80c0-8ee839a60078",
+        "ResultDirectory": "D:\\work\\cst_tools\\artifacts\\hom-mesh-baseline-de2d6b90\\cell-18\\solve\\result\\worker_0\\worker_0\\controlled_failed_window__c8eea91d-b672-43da-80c0-8ee839a60078",
+        "ReceiptPath": "D:\\work\\cst_tools\\artifacts\\hom-mesh-baseline-de2d6b90\\cell-18\\solve\\temp\\worker_0\\b95900cb-5974-4f03-b6ed-866ce3735a04\\received\\c8eea91d-b672-43da-80c0-8ee839a60078.json"
+      },
+      "postprocess": [
+        {
+          "resultName": "frequency",
+          "method": "Frequency_All",
+          "params": {}
+        },
+        {
+          "resultName": "R_divide_Q",
+          "method": "R_over_Q_All",
+          "params": {
+            "xoffset": 0.0,
+            "yoffset": 0.0
+          }
+        },
+        {
+          "resultName": "R_divide_Q_5mm",
+          "method": "R_over_Q_All",
+          "params": {
+            "xoffset": 0.0,
+            "yoffset": 5.0
+          }
+        },
+        {
+          "resultName": "R_divide_Q_10mm",
+          "method": "R_over_Q_All",
+          "params": {
+            "xoffset": 0.0,
+            "yoffset": 10.0
+          }
+        },
+        {
+          "resultName": "Shunt_Impedance",
+          "method": "Shunt_Impedance_All",
+          "params": {
+            "xoffset": 0.0,
+            "yoffset": 0.0
+          }
+        },
+        {
+          "resultName": "Total_Loss",
+          "method": "Total_Loss_All",
+          "params": {}
+        },
+        {
+          "resultName": "Q-factor",
+          "method": "Q_Factor_All",
+          "params": {}
+        }
+      ],
+      "session": "b95900cb-5974-4f03-b6ed-866ce3735a04",
+      "workspace": "D:\\work\\cst_tools\\artifacts\\hom-mesh-baseline-de2d6b90\\cell-18\\solve\\temp\\worker_0\\b95900cb-5974-4f03-b6ed-866ce3735a04",
+      "comparison_valid": true,
+      "stop_returned": true,
+      "stop_ack": true,
+      "exit_code": 0,
+      "process_alive": false,
+      "output.txt": "D:\\work\\cst_tools\\artifacts\\hom-mesh-baseline-de2d6b90\\cell-18\\solve\\temp\\worker_0\\b95900cb-5974-4f03-b6ed-866ce3735a04\\worker-input\\Result\\output.txt",
+      "progress.log": "D:\\work\\cst_tools\\artifacts\\hom-mesh-baseline-de2d6b90\\cell-18\\solve\\temp\\worker_0\\b95900cb-5974-4f03-b6ed-866ce3735a04\\worker-input\\Result\\progress.log",
+      "Model.log": "D:\\work\\cst_tools\\artifacts\\hom-mesh-baseline-de2d6b90\\cell-18\\solve\\temp\\worker_0\\b95900cb-5974-4f03-b6ed-866ce3735a04\\worker-input\\Result\\Model.log",
+      "elapsed_seconds": 66.17099999997299,
+      "source_unchanged": true,
+      "cell": 18,
+      "relative_changes": {
+        "frequency:ModeIndex 1": 0.006234290983269168,
+        "frequency:ModeIndex 2": 0.005087594283548982,
+        "R_divide_Q:ModeIndex 1": 0.4540041159054624,
+        "R_divide_Q:ModeIndex 2": 0.5412107205704331,
+        "R_divide_Q_5mm:ModeIndex 1": 0.3742846117571109,
+        "R_divide_Q_5mm:ModeIndex 2": 0.4720409556460645,
+        "R_divide_Q_10mm:ModeIndex 1": 0.27992804216166933,
+        "R_divide_Q_10mm:ModeIndex 2": 0.3909837552610537,
+        "Shunt_Impedance:ModeIndex 1": 0.4449154821306362,
+        "Shunt_Impedance:ModeIndex 2": 0.5476459529580071,
+        "Total_Loss:ModeIndex 1": 0.003457683960380921,
+        "Total_Loss:ModeIndex 2": 0.003231728985245372,
+        "Q-factor:ModeIndex 1": 0.016373423293649044,
+        "Q-factor:ModeIndex 2": 0.014026553531447912
+      },
+      "maximum_relative_change": 0.5476459529580071
+    },
+    {
+      "source": "D:\\work\\cst_tools\\artifacts\\hom-mesh-baseline-de2d6b90\\cell-24\\prepared.cst",
+      "source_sha256": "4d1935e4f71f1870cdf20b32a881b91405f75842d478b1541be9f2b889792de3",
+      "parameters": {
+        "nmodes": 2,
+        "fmin": 513.492631838138,
+        "fmax": 713.492631838138
+      },
+      "prime_parameters": null,
+      "result": {
+        "WorkerID": "0",
+        "TaskStatus": "Success",
+        "RunName": "controlled_failed_window",
+        "RunParameters": {
+          "nmodes": 2,
+          "fmin": 513.492631838138,
+          "fmax": 713.492631838138
+        },
+        "PostProcessResult": [
+          {
+            "id": 0,
+            "resultName": "frequency",
+            "value": {
+              "ModeIndex 1": 569.530852761867,
+              "ModeIndex 2": 569.683091897513
+            },
+            "params": {}
+          },
+          {
+            "id": 1,
+            "resultName": "R_divide_Q",
+            "value": {
+              "ModeIndex 1": 9.30782974114578e-07,
+              "ModeIndex 2": 1.87736555635208e-06
+            },
+            "params": {
+              "axis": "z",
+              "xoffset": 0.0,
+              "yoffset": 0.0,
+              "zoffset": 0.0
+            }
+          },
+          {
+            "id": 2,
+            "resultName": "R_divide_Q_5mm",
+            "value": {
+              "ModeIndex 1": 1.01823720878876e-06,
+              "ModeIndex 2": 1.78854768333777e-06
+            },
+            "params": {
+              "axis": "z",
+              "xoffset": 0.0,
+              "yoffset": 5.0,
+              "zoffset": 0.0
+            }
+          },
+          {
+            "id": 3,
+            "resultName": "R_divide_Q_10mm",
+            "value": {
+              "ModeIndex 1": 1.12240172402562e-06,
+              "ModeIndex 2": 1.71249016477129e-06
+            },
+            "params": {
+              "axis": "z",
+              "xoffset": 0.0,
+              "yoffset": 10.0,
+              "zoffset": 0.0
+            }
+          },
+          {
+            "id": 4,
+            "resultName": "Shunt_Impedance",
+            "value": {
+              "ModeIndex 1": 4.82819029372633e-07,
+              "ModeIndex 2": 9.74460863855925e-07
+            },
+            "params": {
+              "axis": "z",
+              "xoffset": 0.0,
+              "yoffset": 0.0,
+              "zoffset": 0.0
+            }
+          },
+          {
+            "id": 5,
+            "resultName": "Total_Loss",
+            "value": {
+              "ModeIndex 1": 5132111118.29267,
+              "ModeIndex 2": 5131507514.47077
+            },
+            "params": {}
+          },
+          {
+            "id": 6,
+            "resultName": "Q-factor",
+            "value": {
+              "ModeIndex 1": 0.518723529329618,
+              "ModeIndex 2": 0.519057602052423
+            },
+            "params": {}
+          }
+        ],
+        "FailureReport": null,
+        "ProjectSnapshot": "D:\\work\\cst_tools\\artifacts\\hom-mesh-baseline-de2d6b90\\cell-24\\solve\\result\\worker_0\\worker_0\\controlled_failed_window__cb9ff7ca-fe74-405a-be21-debf0d285de7\\controlled_failed_window.cst",
+        "TaskID": "cb9ff7ca-fe74-405a-be21-debf0d285de7",
+        "ResultDirectory": "D:\\work\\cst_tools\\artifacts\\hom-mesh-baseline-de2d6b90\\cell-24\\solve\\result\\worker_0\\worker_0\\controlled_failed_window__cb9ff7ca-fe74-405a-be21-debf0d285de7",
+        "ReceiptPath": "D:\\work\\cst_tools\\artifacts\\hom-mesh-baseline-de2d6b90\\cell-24\\solve\\temp\\worker_0\\c739d1e5-474e-4874-bce6-cd782f305f08\\received\\cb9ff7ca-fe74-405a-be21-debf0d285de7.json"
+      },
+      "postprocess": [
+        {
+          "resultName": "frequency",
+          "method": "Frequency_All",
+          "params": {}
+        },
+        {
+          "resultName": "R_divide_Q",
+          "method": "R_over_Q_All",
+          "params": {
+            "xoffset": 0.0,
+            "yoffset": 0.0
+          }
+        },
+        {
+          "resultName": "R_divide_Q_5mm",
+          "method": "R_over_Q_All",
+          "params": {
+            "xoffset": 0.0,
+            "yoffset": 5.0
+          }
+        },
+        {
+          "resultName": "R_divide_Q_10mm",
+          "method": "R_over_Q_All",
+          "params": {
+            "xoffset": 0.0,
+            "yoffset": 10.0
+          }
+        },
+        {
+          "resultName": "Shunt_Impedance",
+          "method": "Shunt_Impedance_All",
+          "params": {
+            "xoffset": 0.0,
+            "yoffset": 0.0
+          }
+        },
+        {
+          "resultName": "Total_Loss",
+          "method": "Total_Loss_All",
+          "params": {}
+        },
+        {
+          "resultName": "Q-factor",
+          "method": "Q_Factor_All",
+          "params": {}
+        }
+      ],
+      "session": "c739d1e5-474e-4874-bce6-cd782f305f08",
+      "workspace": "D:\\work\\cst_tools\\artifacts\\hom-mesh-baseline-de2d6b90\\cell-24\\solve\\temp\\worker_0\\c739d1e5-474e-4874-bce6-cd782f305f08",
+      "comparison_valid": true,
+      "stop_returned": true,
+      "stop_ack": true,
+      "exit_code": 0,
+      "process_alive": false,
+      "output.txt": "D:\\work\\cst_tools\\artifacts\\hom-mesh-baseline-de2d6b90\\cell-24\\solve\\temp\\worker_0\\c739d1e5-474e-4874-bce6-cd782f305f08\\worker-input\\Result\\output.txt",
+      "progress.log": "D:\\work\\cst_tools\\artifacts\\hom-mesh-baseline-de2d6b90\\cell-24\\solve\\temp\\worker_0\\c739d1e5-474e-4874-bce6-cd782f305f08\\worker-input\\Result\\progress.log",
+      "Model.log": "D:\\work\\cst_tools\\artifacts\\hom-mesh-baseline-de2d6b90\\cell-24\\solve\\temp\\worker_0\\c739d1e5-474e-4874-bce6-cd782f305f08\\worker-input\\Result\\Model.log",
+      "elapsed_seconds": 164.46900000004098,
+      "source_unchanged": true,
+      "cell": 24,
+      "relative_changes": {
+        "frequency:ModeIndex 1": 0.0022425619572659754,
+        "frequency:ModeIndex 2": 0.0020132186279425185,
+        "R_divide_Q:ModeIndex 1": 0.035089012322985925,
+        "R_divide_Q:ModeIndex 2": 0.02774508525636424,
+        "R_divide_Q_5mm:ModeIndex 1": 0.03298104978007717,
+        "R_divide_Q_5mm:ModeIndex 2": 0.025693604843819762,
+        "R_divide_Q_10mm:ModeIndex 1": 0.03376074445589053,
+        "R_divide_Q_10mm:ModeIndex 2": 0.027172995059644496,
+        "Shunt_Impedance:ModeIndex 1": 0.04079500312348803,
+        "Shunt_Impedance:ModeIndex 2": 0.0324006726681424,
+        "Total_Loss:ModeIndex 1": 0.0012738555441647278,
+        "Total_Loss:ModeIndex 2": 0.0008334050585078699,
+        "Q-factor:ModeIndex 1": 0.005913489299398533,
+        "Q-factor:ModeIndex 2": 0.004788443175938638
+      },
+      "maximum_relative_change": 0.04079500312348803
+    },
+    {
+      "source": "D:\\work\\cst_tools\\artifacts\\hom-mesh-baseline-de2d6b90\\cell-30\\prepared.cst",
+      "source_sha256": "54eb65fca4c6f5e94d5ccfc3055bf139e48f7123456f5cf0a1de206efc1651e5",
+      "parameters": {
+        "nmodes": 2,
+        "fmin": 513.492631838138,
+        "fmax": 713.492631838138
+      },
+      "prime_parameters": null,
+      "result": {
+        "WorkerID": "0",
+        "TaskStatus": "Success",
+        "RunName": "controlled_failed_window",
+        "RunParameters": {
+          "nmodes": 2,
+          "fmin": 513.492631838138,
+          "fmax": 713.492631838138
+        },
+        "PostProcessResult": [
+          {
+            "id": 0,
+            "resultName": "frequency",
+            "value": {
+              "ModeIndex 1": 570.124959420368,
+              "ModeIndex 2": 570.135507219759
+            },
+            "params": {}
+          },
+          {
+            "id": 1,
+            "resultName": "R_divide_Q",
+            "value": {
+              "ModeIndex 1": 1.89827748249071e-06,
+              "ModeIndex 2": 9.44832894719059e-07
+            },
+            "params": {
+              "axis": "z",
+              "xoffset": 0.0,
+              "yoffset": 0.0,
+              "zoffset": 0.0
+            }
+          },
+          {
+            "id": 2,
+            "resultName": "R_divide_Q_5mm",
+            "value": {
+              "ModeIndex 1": 1.81382532401658e-06,
+              "ModeIndex 2": 1.03649118907993e-06
+            },
+            "params": {
+              "axis": "z",
+              "xoffset": 0.0,
+              "yoffset": 5.0,
+              "zoffset": 0.0
+            }
+          },
+          {
+            "id": 3,
+            "resultName": "R_divide_Q_10mm",
+            "value": {
+              "ModeIndex 1": 1.73646534056063e-06,
+              "ModeIndex 2": 1.14339008061591e-06
+            },
+            "params": {
+              "axis": "z",
+              "xoffset": 0.0,
+              "yoffset": 10.0,
+              "zoffset": 0.0
+            }
+          },
+          {
+            "id": 4,
+            "resultName": "Shunt_Impedance",
+            "value": {
+              "ModeIndex 1": 9.87180760617009e-07,
+              "ModeIndex 2": 4.9138560282586e-07
+            },
+            "params": {
+              "axis": "z",
+              "xoffset": 0.0,
+              "yoffset": 0.0,
+              "zoffset": 0.0
+            }
+          },
+          {
+            "id": 5,
+            "resultName": "Total_Loss",
+            "value": {
+              "ModeIndex 1": 5129701484.56969,
+              "ModeIndex 2": 5129567023.61657
+            },
+            "params": {}
+          },
+          {
+            "id": 6,
+            "resultName": "Q-factor",
+            "value": {
+              "ModeIndex 1": 0.520040283742785,
+              "ModeIndex 2": 0.520076730575697
+            },
+            "params": {}
+          }
+        ],
+        "FailureReport": null,
+        "ProjectSnapshot": "D:\\work\\cst_tools\\artifacts\\hom-mesh-baseline-de2d6b90\\cell-30\\solve\\result\\worker_0\\worker_0\\controlled_failed_window__7a729fe2-81cf-4dd0-8ce8-2cdae9fa92a9\\controlled_failed_window.cst",
+        "TaskID": "7a729fe2-81cf-4dd0-8ce8-2cdae9fa92a9",
+        "ResultDirectory": "D:\\work\\cst_tools\\artifacts\\hom-mesh-baseline-de2d6b90\\cell-30\\solve\\result\\worker_0\\worker_0\\controlled_failed_window__7a729fe2-81cf-4dd0-8ce8-2cdae9fa92a9",
+        "ReceiptPath": "D:\\work\\cst_tools\\artifacts\\hom-mesh-baseline-de2d6b90\\cell-30\\solve\\temp\\worker_0\\c9a8109e-de99-4f28-a5fd-2d1eca6ca213\\received\\7a729fe2-81cf-4dd0-8ce8-2cdae9fa92a9.json"
+      },
+      "postprocess": [
+        {
+          "resultName": "frequency",
+          "method": "Frequency_All",
+          "params": {}
+        },
+        {
+          "resultName": "R_divide_Q",
+          "method": "R_over_Q_All",
+          "params": {
+            "xoffset": 0.0,
+            "yoffset": 0.0
+          }
+        },
+        {
+          "resultName": "R_divide_Q_5mm",
+          "method": "R_over_Q_All",
+          "params": {
+            "xoffset": 0.0,
+            "yoffset": 5.0
+          }
+        },
+        {
+          "resultName": "R_divide_Q_10mm",
+          "method": "R_over_Q_All",
+          "params": {
+            "xoffset": 0.0,
+            "yoffset": 10.0
+          }
+        },
+        {
+          "resultName": "Shunt_Impedance",
+          "method": "Shunt_Impedance_All",
+          "params": {
+            "xoffset": 0.0,
+            "yoffset": 0.0
+          }
+        },
+        {
+          "resultName": "Total_Loss",
+          "method": "Total_Loss_All",
+          "params": {}
+        },
+        {
+          "resultName": "Q-factor",
+          "method": "Q_Factor_All",
+          "params": {}
+        }
+      ],
+      "session": "c9a8109e-de99-4f28-a5fd-2d1eca6ca213",
+      "workspace": "D:\\work\\cst_tools\\artifacts\\hom-mesh-baseline-de2d6b90\\cell-30\\solve\\temp\\worker_0\\c9a8109e-de99-4f28-a5fd-2d1eca6ca213",
+      "comparison_valid": true,
+      "stop_returned": true,
+      "stop_ack": true,
+      "exit_code": 0,
+      "process_alive": false,
+      "output.txt": "D:\\work\\cst_tools\\artifacts\\hom-mesh-baseline-de2d6b90\\cell-30\\solve\\temp\\worker_0\\c9a8109e-de99-4f28-a5fd-2d1eca6ca213\\worker-input\\Result\\output.txt",
+      "progress.log": "D:\\work\\cst_tools\\artifacts\\hom-mesh-baseline-de2d6b90\\cell-30\\solve\\temp\\worker_0\\c9a8109e-de99-4f28-a5fd-2d1eca6ca213\\worker-input\\Result\\progress.log",
+      "Model.log": "D:\\work\\cst_tools\\artifacts\\hom-mesh-baseline-de2d6b90\\cell-30\\solve\\temp\\worker_0\\c9a8109e-de99-4f28-a5fd-2d1eca6ca213\\worker-input\\Result\\Model.log",
+      "elapsed_seconds": 331.15600000007544,
+      "source_unchanged": true,
+      "cell": 30,
+      "relative_changes": {
+        "frequency:ModeIndex 1": 0.0010420639347293592,
+        "frequency:ModeIndex 2": 0.0007935224460096879,
+        "R_divide_Q:ModeIndex 1": 0.5096696965012159,
+        "R_divide_Q:ModeIndex 2": 0.4967240708543895,
+        "R_divide_Q_5mm:ModeIndex 1": 0.4386244390204289,
+        "R_divide_Q_5mm:ModeIndex 2": 0.4204844529805097,
+        "R_divide_Q_10mm:ModeIndex 1": 0.3536284901239407,
+        "R_divide_Q_10mm:ModeIndex 2": 0.3323231256229642,
+        "Shunt_Impedance:ModeIndex 1": 0.5109112245351491,
+        "Shunt_Impedance:ModeIndex 2": 0.49573592839690295,
+        "Total_Loss:ModeIndex 1": 0.00046952095686153544,
+        "Total_Loss:ModeIndex 2": 0.00037815219966593757,
+        "Q-factor:ModeIndex 1": 0.0025320238726319636,
+        "Q-factor:ModeIndex 2": 0.00195957339246056
+      },
+      "maximum_relative_change": 0.5109112245351491
+    },
+    {
+      "source": "D:\\work\\cst_tools\\artifacts\\hom-mesh-baseline-de2d6b90\\cell-36\\prepared.cst",
+      "source_sha256": "9ce7d4ed351f961d2b8df131f2539e21a18a45e7fe6cc11e54274a342bdfc811",
+      "parameters": {
+        "nmodes": 2,
+        "fmin": 513.492631838138,
+        "fmax": 713.492631838138
+      },
+      "prime_parameters": null,
+      "result": {
+        "WorkerID": "0",
+        "TaskStatus": "Success",
+        "RunName": "controlled_failed_window",
+        "RunParameters": {
+          "nmodes": 2,
+          "fmin": 513.492631838138,
+          "fmax": 713.492631838138
+        },
+        "PostProcessResult": [
+          {
+            "id": 0,
+            "resultName": "frequency",
+            "value": {
+              "ModeIndex 1": 570.365291419282,
+              "ModeIndex 2": 570.39681433108
+            },
+            "params": {}
+          },
+          {
+            "id": 1,
+            "resultName": "R_divide_Q",
+            "value": {
+              "ModeIndex 1": 9.48994003580645e-07,
+              "ModeIndex 2": 1.90862724001006e-06
+            },
+            "params": {
+              "axis": "z",
+              "xoffset": 0.0,
+              "yoffset": 0.0,
+              "zoffset": 0.0
+            }
+          },
+          {
+            "id": 2,
+            "resultName": "R_divide_Q_5mm",
+            "value": {
+              "ModeIndex 1": 1.04096281039071e-06,
+              "ModeIndex 2": 1.82462881247387e-06
+            },
+            "params": {
+              "axis": "z",
+              "xoffset": 0.0,
+              "yoffset": 5.0,
+              "zoffset": 0.0
+            }
+          },
+          {
+            "id": 3,
+            "resultName": "R_divide_Q_10mm",
+            "value": {
+              "ModeIndex 1": 1.14581767318665e-06,
+              "ModeIndex 2": 1.74431815436482e-06
+            },
+            "params": {
+              "axis": "z",
+              "xoffset": 0.0,
+              "yoffset": 10.0,
+              "zoffset": 0.0
+            }
+          },
+          {
+            "id": 4,
+            "resultName": "Shunt_Impedance",
+            "value": {
+              "ModeIndex 1": 4.93956388419715e-07,
+              "ModeIndex 2": 9.93631621022963e-07
+            },
+            "params": {
+              "axis": "z",
+              "xoffset": 0.0,
+              "yoffset": 0.0,
+              "zoffset": 0.0
+            }
+          },
+          {
+            "id": 5,
+            "resultName": "Total_Loss",
+            "value": {
+              "ModeIndex 1": 5129088612.82457,
+              "ModeIndex 2": 5128843045.27245
+            },
+            "params": {}
+          },
+          {
+            "id": 6,
+            "resultName": "Q-factor",
+            "value": {
+              "ModeIndex 1": 0.52050527880679,
+              "ModeIndex 2": 0.520600146636138
+            },
+            "params": {}
+          }
+        ],
+        "FailureReport": null,
+        "ProjectSnapshot": "D:\\work\\cst_tools\\artifacts\\hom-mesh-baseline-de2d6b90\\cell-36\\solve\\result\\worker_0\\worker_0\\controlled_failed_window__ae7c93cf-7a50-4772-afe1-ff1a98793212\\controlled_failed_window.cst",
+        "TaskID": "ae7c93cf-7a50-4772-afe1-ff1a98793212",
+        "ResultDirectory": "D:\\work\\cst_tools\\artifacts\\hom-mesh-baseline-de2d6b90\\cell-36\\solve\\result\\worker_0\\worker_0\\controlled_failed_window__ae7c93cf-7a50-4772-afe1-ff1a98793212",
+        "ReceiptPath": "D:\\work\\cst_tools\\artifacts\\hom-mesh-baseline-de2d6b90\\cell-36\\solve\\temp\\worker_0\\df9f9bb3-00c6-422d-8931-76ec6e1c4106\\received\\ae7c93cf-7a50-4772-afe1-ff1a98793212.json"
+      },
+      "postprocess": [
+        {
+          "resultName": "frequency",
+          "method": "Frequency_All",
+          "params": {}
+        },
+        {
+          "resultName": "R_divide_Q",
+          "method": "R_over_Q_All",
+          "params": {
+            "xoffset": 0.0,
+            "yoffset": 0.0
+          }
+        },
+        {
+          "resultName": "R_divide_Q_5mm",
+          "method": "R_over_Q_All",
+          "params": {
+            "xoffset": 0.0,
+            "yoffset": 5.0
+          }
+        },
+        {
+          "resultName": "R_divide_Q_10mm",
+          "method": "R_over_Q_All",
+          "params": {
+            "xoffset": 0.0,
+            "yoffset": 10.0
+          }
+        },
+        {
+          "resultName": "Shunt_Impedance",
+          "method": "Shunt_Impedance_All",
+          "params": {
+            "xoffset": 0.0,
+            "yoffset": 0.0
+          }
+        },
+        {
+          "resultName": "Total_Loss",
+          "method": "Total_Loss_All",
+          "params": {}
+        },
+        {
+          "resultName": "Q-factor",
+          "method": "Q_Factor_All",
+          "params": {}
+        }
+      ],
+      "session": "df9f9bb3-00c6-422d-8931-76ec6e1c4106",
+      "workspace": "D:\\work\\cst_tools\\artifacts\\hom-mesh-baseline-de2d6b90\\cell-36\\solve\\temp\\worker_0\\df9f9bb3-00c6-422d-8931-76ec6e1c4106",
+      "comparison_valid": true,
+      "stop_returned": true,
+      "stop_ack": true,
+      "exit_code": 0,
+      "process_alive": false,
+      "output.txt": "D:\\work\\cst_tools\\artifacts\\hom-mesh-baseline-de2d6b90\\cell-36\\solve\\temp\\worker_0\\df9f9bb3-00c6-422d-8931-76ec6e1c4106\\worker-input\\Result\\output.txt",
+      "progress.log": "D:\\work\\cst_tools\\artifacts\\hom-mesh-baseline-de2d6b90\\cell-36\\solve\\temp\\worker_0\\df9f9bb3-00c6-422d-8931-76ec6e1c4106\\worker-input\\Result\\progress.log",
+      "Model.log": "D:\\work\\cst_tools\\artifacts\\hom-mesh-baseline-de2d6b90\\cell-36\\solve\\temp\\worker_0\\df9f9bb3-00c6-422d-8931-76ec6e1c4106\\worker-input\\Result\\Model.log",
+      "elapsed_seconds": 486.23499999998603,
+      "source_unchanged": true,
+      "cell": 36,
+      "relative_changes": {
+        "frequency:ModeIndex 1": 0.00042136504890750656,
+        "frequency:ModeIndex 2": 0.0004581146050534041,
+        "R_divide_Q:ModeIndex 1": 0.5000762468427535,
+        "R_divide_Q:ModeIndex 2": 0.504967300626979,
+        "R_divide_Q_5mm:ModeIndex 1": 0.4260953375126685,
+        "R_divide_Q_5mm:ModeIndex 2": 0.431944085287882,
+        "R_divide_Q_10mm:ModeIndex 1": 0.34014365480124426,
+        "R_divide_Q_10mm:ModeIndex 2": 0.34450600209898824,
+        "Shunt_Impedance:ModeIndex 1": 0.4996292390149685,
+        "Shunt_Impedance:ModeIndex 2": 0.505465010946442,
+        "Total_Loss:ModeIndex 1": 0.00011947512871140491,
+        "Total_Loss:ModeIndex 2": 0.00014113829506210234,
+        "Q-factor:ModeIndex 1": 0.0008933532145359786,
+        "Q-factor:ModeIndex 2": 0.001005408976203687
+      },
+      "maximum_relative_change": 0.505465010946442
+    }
+  ],
+  "source_unchanged": true
+}

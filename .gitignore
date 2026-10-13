@@ -6,6 +6,7 @@ __pycache__/
 .pytest_tmp_*/
 build/
 dist/
+artifacts/
 log/*
 */result/*
 */temp/*

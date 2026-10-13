@@ -1,0 +1,209 @@
+{
+  "original_cold": {
+    "source": "D:\\work\\cst_tools\\project\\HOM analysis\\HOM analysis_clean.cst",
+    "source_sha256": "996b485dade2ddc4232aafc052c04314836a54fd74423fa7b0fbe819a975b967",
+    "parameters": {
+      "nmodes": 1,
+      "fmin": 513.492631838138,
+      "fmax": 563.492631838138
+    },
+    "prime_parameters": null,
+    "result": {
+      "WorkerID": "0",
+      "TaskStatus": "Failure",
+      "RunName": "controlled_failed_window",
+      "RunParameters": {
+        "nmodes": 1,
+        "fmin": 513.492631838138,
+        "fmax": 563.492631838138
+      },
+      "PostProcessResult": null,
+      "FailureReport": "RESULT_FLUSH_FAILED: postprocess failed: number=-2147219403; description=Missing eigenmode #1",
+      "ProjectSnapshot": null,
+      "TaskID": "3b2c620b-c9a1-4279-840d-ec0fcbaa1607",
+      "ResultDirectory": "D:\\work\\cst_tools\\.pytest_cache\\controlled\\980b5813\\original_cold\\result\\worker_0\\worker_0\\3b2c620b-c9a1-4279-840d-ec0fcbaa1607",
+      "ReceiptPath": "D:\\work\\cst_tools\\.pytest_cache\\controlled\\980b5813\\original_cold\\temp\\worker_0\\31be5774-2a17-417e-be3f-56f7b7296758\\received\\3b2c620b-c9a1-4279-840d-ec0fcbaa1607.json"
+    },
+    "session": "31be5774-2a17-417e-be3f-56f7b7296758",
+    "workspace": "D:\\work\\cst_tools\\.pytest_cache\\controlled\\980b5813\\original_cold\\temp\\worker_0\\31be5774-2a17-417e-be3f-56f7b7296758",
+    "comparison_valid": true,
+    "stop_returned": true,
+    "stop_ack": true,
+    "exit_code": 0,
+    "process_alive": false,
+    "output.txt": "D:\\work\\cst_tools\\.pytest_cache\\controlled\\980b5813\\original_cold\\temp\\worker_0\\31be5774-2a17-417e-be3f-56f7b7296758\\worker-input\\Result\\output.txt",
+    "progress.log": "D:\\work\\cst_tools\\.pytest_cache\\controlled\\980b5813\\original_cold\\temp\\worker_0\\31be5774-2a17-417e-be3f-56f7b7296758\\worker-input\\Result\\progress.log",
+    "Model.log": "D:\\work\\cst_tools\\.pytest_cache\\controlled\\980b5813\\original_cold\\temp\\worker_0\\31be5774-2a17-417e-be3f-56f7b7296758\\worker-input\\Result\\Model.log",
+    "elapsed_seconds": 99.93700000003446,
+    "source_unchanged": true
+  },
+  "snapshot_cold": {
+    "source": "D:\\work\\cst_tools\\.pytest_cache\\cst-acceptance-20261013-01\\test_hom_runs_ten_ordered_mode0\\hom-ten-mode-recovery\\result\\worker_0\\worker_0\\hom_from_504.406889__f_513.492631MHz__2a5535f8-9ed8-4b61-8852-3b5bf75cdd76\\hom_from_504.406889__f_513.492631MHz.cst",
+    "source_sha256": "227d7095797f5dad2c40f8ac5d498f326cbdba4d1353cc21808d1042e6e71719",
+    "parameters": {
+      "nmodes": 1,
+      "fmin": 513.492631838138,
+      "fmax": 563.492631838138
+    },
+    "prime_parameters": null,
+    "result": {
+      "WorkerID": "0",
+      "TaskStatus": "Failure",
+      "RunName": "controlled_failed_window",
+      "RunParameters": {
+        "nmodes": 1,
+        "fmin": 513.492631838138,
+        "fmax": 563.492631838138
+      },
+      "PostProcessResult": null,
+      "FailureReport": "RESULT_FLUSH_FAILED: postprocess failed: number=-2147219403; description=Missing eigenmode #1",
+      "ProjectSnapshot": null,
+      "TaskID": "9641af17-c1e8-4ba8-bd9d-66c7124346d9",
+      "ResultDirectory": "D:\\work\\cst_tools\\.pytest_cache\\controlled\\980b5813\\snapshot_cold\\result\\worker_0\\worker_0\\9641af17-c1e8-4ba8-bd9d-66c7124346d9",
+      "ReceiptPath": "D:\\work\\cst_tools\\.pytest_cache\\controlled\\980b5813\\snapshot_cold\\temp\\worker_0\\2203e303-161a-4a93-8f19-3b9e57742f3c\\received\\9641af17-c1e8-4ba8-bd9d-66c7124346d9.json"
+    },
+    "session": "2203e303-161a-4a93-8f19-3b9e57742f3c",
+    "workspace": "D:\\work\\cst_tools\\.pytest_cache\\controlled\\980b5813\\snapshot_cold\\temp\\worker_0\\2203e303-161a-4a93-8f19-3b9e57742f3c",
+    "comparison_valid": true,
+    "stop_returned": true,
+    "stop_ack": true,
+    "exit_code": 0,
+    "process_alive": false,
+    "output.txt": "D:\\work\\cst_tools\\.pytest_cache\\controlled\\980b5813\\snapshot_cold\\temp\\worker_0\\2203e303-161a-4a93-8f19-3b9e57742f3c\\worker-input\\Result\\output.txt",
+    "progress.log": "D:\\work\\cst_tools\\.pytest_cache\\controlled\\980b5813\\snapshot_cold\\temp\\worker_0\\2203e303-161a-4a93-8f19-3b9e57742f3c\\worker-input\\Result\\progress.log",
+    "Model.log": "D:\\work\\cst_tools\\.pytest_cache\\controlled\\980b5813\\snapshot_cold\\temp\\worker_0\\2203e303-161a-4a93-8f19-3b9e57742f3c\\worker-input\\Result\\Model.log",
+    "elapsed_seconds": 62.07799999997951,
+    "source_unchanged": true
+  },
+  "snapshot_warm": {
+    "source": "D:\\work\\cst_tools\\.pytest_cache\\cst-acceptance-20261013-01\\test_hom_runs_ten_ordered_mode0\\hom-ten-mode-recovery\\result\\worker_0\\worker_0\\hom_from_504.406889__f_513.492631MHz__2a5535f8-9ed8-4b61-8852-3b5bf75cdd76\\hom_from_504.406889__f_513.492631MHz.cst",
+    "source_sha256": "227d7095797f5dad2c40f8ac5d498f326cbdba4d1353cc21808d1042e6e71719",
+    "parameters": {
+      "nmodes": 1,
+      "fmin": 513.492631838138,
+      "fmax": 563.492631838138
+    },
+    "prime_parameters": {
+      "nmodes": 1,
+      "fmin": 504.406889342598,
+      "fmax": 554.406889342598
+    },
+    "result": {
+      "WorkerID": "0",
+      "TaskStatus": "Failure",
+      "RunName": "controlled_failed_window",
+      "RunParameters": {
+        "nmodes": 1,
+        "fmin": 513.492631838138,
+        "fmax": 563.492631838138
+      },
+      "PostProcessResult": null,
+      "FailureReport": "RESULT_FLUSH_FAILED: postprocess failed: number=-2147219403; description=Missing eigenmode #1",
+      "ProjectSnapshot": null,
+      "TaskID": "88da437b-0183-4cfe-b8aa-c3b288b4851e",
+      "ResultDirectory": "D:\\work\\cst_tools\\.pytest_cache\\controlled\\980b5813\\snapshot_warm\\result\\worker_0\\worker_0\\88da437b-0183-4cfe-b8aa-c3b288b4851e",
+      "ReceiptPath": "D:\\work\\cst_tools\\.pytest_cache\\controlled\\980b5813\\snapshot_warm\\temp\\worker_0\\27616de9-002e-4d6a-bec2-dda3c0feb0a8\\received\\88da437b-0183-4cfe-b8aa-c3b288b4851e.json"
+    },
+    "session": "27616de9-002e-4d6a-bec2-dda3c0feb0a8",
+    "workspace": "D:\\work\\cst_tools\\.pytest_cache\\controlled\\980b5813\\snapshot_warm\\temp\\worker_0\\27616de9-002e-4d6a-bec2-dda3c0feb0a8",
+    "prime_result": {
+      "WorkerID": "0",
+      "TaskStatus": "Success",
+      "RunName": "prime_previous_window",
+      "RunParameters": {
+        "nmodes": 1,
+        "fmin": 504.406889342598,
+        "fmax": 554.406889342598
+      },
+      "PostProcessResult": [
+        {
+          "id": 0,
+          "resultName": "frequency",
+          "value": 513.492630838139,
+          "params": {
+            "iModeNumber": 1
+          }
+        },
+        {
+          "id": 1,
+          "resultName": "R_divide_Q",
+          "value": 7.05167972126899e-07,
+          "params": {
+            "iModeNumber": 1,
+            "axis": "z",
+            "xoffset": 0.0,
+            "yoffset": 0.0,
+            "zoffset": 0.0
+          }
+        },
+        {
+          "id": 2,
+          "resultName": "R_divide_Q_5mm",
+          "value": 7.70537326645769e-07,
+          "params": {
+            "iModeNumber": 1,
+            "axis": "z",
+            "xoffset": 0.0,
+            "yoffset": 5.0,
+            "zoffset": 0.0
+          }
+        },
+        {
+          "id": 3,
+          "resultName": "R_divide_Q_10mm",
+          "value": 8.47509067304634e-07,
+          "params": {
+            "iModeNumber": 1,
+            "axis": "z",
+            "xoffset": 0.0,
+            "yoffset": 10.0,
+            "zoffset": 0.0
+          }
+        },
+        {
+          "id": 4,
+          "resultName": "Shunt_Impedance",
+          "value": 3.30544843461276e-07,
+          "params": {
+            "iModeNumber": 1,
+            "axis": "z",
+            "xoffset": 0.0,
+            "yoffset": 0.0,
+            "zoffset": 0.0
+          }
+        },
+        {
+          "id": 5,
+          "resultName": "Total_Loss",
+          "value": 4902804253.76722,
+          "params": {
+            "iModeNumber": 1
+          }
+        },
+        {
+          "id": 6,
+          "resultName": "Q-factor",
+          "value": 0.468746251285774,
+          "params": {
+            "iModeNumber": 1
+          }
+        }
+      ],
+      "FailureReport": null,
+      "ProjectSnapshot": "D:\\work\\cst_tools\\.pytest_cache\\controlled\\980b5813\\snapshot_warm\\result\\worker_0\\worker_0\\prime_previous_window__f_513.492631MHz__55d39f64-50e9-4cf2-9440-e7b8b51b3ccb\\prime_previous_window__f_513.492631MHz.cst",
+      "TaskID": "55d39f64-50e9-4cf2-9440-e7b8b51b3ccb",
+      "ResultDirectory": "D:\\work\\cst_tools\\.pytest_cache\\controlled\\980b5813\\snapshot_warm\\result\\worker_0\\worker_0\\prime_previous_window__f_513.492631MHz__55d39f64-50e9-4cf2-9440-e7b8b51b3ccb",
+      "ReceiptPath": "D:\\work\\cst_tools\\.pytest_cache\\controlled\\980b5813\\snapshot_warm\\temp\\worker_0\\27616de9-002e-4d6a-bec2-dda3c0feb0a8\\received\\55d39f64-50e9-4cf2-9440-e7b8b51b3ccb.json"
+    },
+    "comparison_valid": true,
+    "stop_returned": true,
+    "stop_ack": true,
+    "exit_code": 0,
+    "process_alive": false,
+    "output.txt": "D:\\work\\cst_tools\\.pytest_cache\\controlled\\980b5813\\snapshot_warm\\temp\\worker_0\\27616de9-002e-4d6a-bec2-dda3c0feb0a8\\worker-input\\Result\\output.txt",
+    "progress.log": "D:\\work\\cst_tools\\.pytest_cache\\controlled\\980b5813\\snapshot_warm\\temp\\worker_0\\27616de9-002e-4d6a-bec2-dda3c0feb0a8\\worker-input\\Result\\progress.log",
+    "Model.log": "D:\\work\\cst_tools\\.pytest_cache\\controlled\\980b5813\\snapshot_warm\\temp\\worker_0\\27616de9-002e-4d6a-bec2-dda3c0feb0a8\\worker-input\\Result\\Model.log",
+    "elapsed_seconds": 165.170999999973,
+    "source_unchanged": true
+  }
+}

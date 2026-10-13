@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="3" time="845.752" timestamp="2026-10-13T11:29:34.081559" hostname="LAPTOP-JMVDV92E"><testcase classname="test.cst_preprocessor_integration_test" name="test_cst_preprocessor_adds_hom_parameters_without_modifying_source" time="33.465" /><testcase classname="test.managed_cstworker_integration_test" name="test_managed_worker_runs_repeated_tasks_and_standardly_exits" time="288.507" /><testcase classname="test.managed_hom_ten_modes_fault_resume_integration_test" name="test_hom_runs_ten_ordered_modes_across_three_fault_recovery_paths" time="522.010"><failure message="AssertionError: SimulationResult(worker_id='1', status='Failure', job_name='hom_from_513.492632', parameters={'nmodes': 1, 'fmin': 513...-mode-recovery/temp/worker_1/f30a289a-c957-4c6e-938c-4ea9af74bf36/received/2cada292-5449-47d0-a0f6-09ed5252be5f.json'))&#10;assert 'Failure' == 'Success'&#10;  - Success&#10;  + Failure">test\managed_hom_ten_modes_fault_resume_integration_test.py:198: in test_hom_runs_ten_ordered_modes_across_three_fault_recovery_paths
+    solve_and_accept(second)
+test\managed_hom_ten_modes_fault_resume_integration_test.py:151: in solve_and_accept
+    values = _run_next(worker, lo)
+test\managed_hom_ten_modes_fault_resume_integration_test.py:78: in _run_next
+    return _result_values(result)
+test\managed_hom_ten_modes_fault_resume_integration_test.py:67: in _result_values
+    assert result["TaskStatus"] == "Success", result
+E   AssertionError: SimulationResult(worker_id='1', status='Failure', job_name='hom_from_513.492632', parameters={'nmodes': 1, 'fmin': 513...-mode-recovery/temp/worker_1/f30a289a-c957-4c6e-938c-4ea9af74bf36/received/2cada292-5449-47d0-a0f6-09ed5252be5f.json'))
+E   assert 'Failure' == 'Success'
+E     - Success
+E     + Failure</failure></testcase></testsuite></testsuites>

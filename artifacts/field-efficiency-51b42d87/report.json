@@ -1,0 +1,209 @@
+{
+  "source": "D:\\work\\cst_tools\\artifacts\\hom-mesh-baseline-de2d6b90\\cell-30\\solve\\result\\worker_0\\worker_0\\controlled_failed_window__7a729fe2-81cf-4dd0-8ce8-2cdae9fa92a9\\controlled_failed_window.cst",
+  "source_unchanged": true,
+  "cst_process_seconds": 62.140347599983215,
+  "exit_code": 0,
+  "solver_run": false,
+  "copy_method": "CST SaveAs include_results=True; no filesystem companion copy",
+  "sample_region_project_units": [
+    -10,
+    10,
+    -10,
+    10,
+    -50,
+    50
+  ],
+  "scope": "same native mesh index sum; no volume weights or cross-mesh interpolation",
+  "python": [],
+  "completion": "SUCCESS",
+  "cst_timings": [
+    {
+      "points": "0",
+      "repeat": "0",
+      "stage": "open",
+      "seconds": "10.67578125",
+      "norm_a": "0",
+      "norm_b": "0",
+      "cross_re": "0",
+      "cross_im": "0"
+    },
+    {
+      "points": "1",
+      "repeat": "0",
+      "stage": "synthetic-raw",
+      "seconds": "0",
+      "norm_a": "0",
+      "norm_b": "0",
+      "cross_re": "-1",
+      "cross_im": "5"
+    },
+    {
+      "points": "1",
+      "repeat": "0",
+      "stage": "synthetic-conjugated",
+      "seconds": "0",
+      "norm_a": "0",
+      "norm_b": "0",
+      "cross_re": "5",
+      "cross_im": "1"
+    },
+    {
+      "points": "927060",
+      "repeat": "1",
+      "stage": "native-load",
+      "seconds": "0.02734375",
+      "norm_a": "0",
+      "norm_b": "0",
+      "cross_re": "0",
+      "cross_im": "0"
+    },
+    {
+      "points": "927060",
+      "repeat": "1",
+      "stage": "native-dot",
+      "seconds": "0.859375",
+      "norm_a": "3.96020672432302E+18",
+      "norm_b": "3.95103423502586E+18",
+      "cross_re": "70656657725717.3",
+      "cross_im": "407938036339840"
+    },
+    {
+      "points": "927060",
+      "repeat": "1",
+      "stage": "native-total",
+      "seconds": "0.88671875",
+      "norm_a": "3.96020672432302E+18",
+      "norm_b": "3.95103423502586E+18",
+      "cross_re": "70656657725717.3",
+      "cross_im": "407938036339840"
+    },
+    {
+      "points": "927060",
+      "repeat": "1",
+      "stage": "reference-load-transfer",
+      "seconds": "4.4765625",
+      "norm_a": "0",
+      "norm_b": "0",
+      "cross_re": "0",
+      "cross_im": "0"
+    },
+    {
+      "points": "927060",
+      "repeat": "1",
+      "stage": "reference-sum",
+      "seconds": "6.4296875",
+      "norm_a": "3.96020672335869E+18",
+      "norm_b": "3.95103423229436E+18",
+      "cross_re": "70656657780633.7",
+      "cross_im": "407938036362440"
+    },
+    {
+      "points": "927060",
+      "repeat": "2",
+      "stage": "native-load",
+      "seconds": "0.03125",
+      "norm_a": "0",
+      "norm_b": "0",
+      "cross_re": "0",
+      "cross_im": "0"
+    },
+    {
+      "points": "927060",
+      "repeat": "2",
+      "stage": "native-dot",
+      "seconds": "0.71875",
+      "norm_a": "3.96020672432302E+18",
+      "norm_b": "3.95103423502586E+18",
+      "cross_re": "70656657725717.3",
+      "cross_im": "407938036339840"
+    },
+    {
+      "points": "927060",
+      "repeat": "2",
+      "stage": "native-total",
+      "seconds": "0.75",
+      "norm_a": "3.96020672432302E+18",
+      "norm_b": "3.95103423502586E+18",
+      "cross_re": "70656657725717.3",
+      "cross_im": "407938036339840"
+    },
+    {
+      "points": "927060",
+      "repeat": "2",
+      "stage": "reference-load-transfer",
+      "seconds": "4.515625",
+      "norm_a": "0",
+      "norm_b": "0",
+      "cross_re": "0",
+      "cross_im": "0"
+    },
+    {
+      "points": "927060",
+      "repeat": "2",
+      "stage": "reference-sum",
+      "seconds": "6.453125",
+      "norm_a": "3.96020672335869E+18",
+      "norm_b": "3.95103423229436E+18",
+      "cross_re": "70656657780633.7",
+      "cross_im": "407938036362440"
+    },
+    {
+      "points": "927060",
+      "repeat": "3",
+      "stage": "native-load",
+      "seconds": "0.03125",
+      "norm_a": "0",
+      "norm_b": "0",
+      "cross_re": "0",
+      "cross_im": "0"
+    },
+    {
+      "points": "927060",
+      "repeat": "3",
+      "stage": "native-dot",
+      "seconds": "0.7109375",
+      "norm_a": "3.96020672432302E+18",
+      "norm_b": "3.95103423502586E+18",
+      "cross_re": "70656657725717.3",
+      "cross_im": "407938036339840"
+    },
+    {
+      "points": "927060",
+      "repeat": "3",
+      "stage": "native-total",
+      "seconds": "0.7421875",
+      "norm_a": "3.96020672432302E+18",
+      "norm_b": "3.95103423502586E+18",
+      "cross_re": "70656657725717.3",
+      "cross_im": "407938036339840"
+    },
+    {
+      "points": "927060",
+      "repeat": "3",
+      "stage": "reference-load-transfer",
+      "seconds": "4.484375",
+      "norm_a": "0",
+      "norm_b": "0",
+      "cross_re": "0",
+      "cross_im": "0"
+    },
+    {
+      "points": "927060",
+      "repeat": "3",
+      "stage": "reference-sum",
+      "seconds": "6.3359375",
+      "norm_a": "3.96020672335869E+18",
+      "norm_b": "3.95103423229436E+18",
+      "cross_re": "70656657780633.7",
+      "cross_im": "407938036362440"
+    }
+  ],
+  "native_only": true,
+  "synthetic_passed": true,
+  "native_norm_scaled_errors": [
+    6.897367291178649e-10,
+    6.897367291178649e-10,
+    6.897367291178649e-10
+  ],
+  "numeric_validation_passed": true
+}

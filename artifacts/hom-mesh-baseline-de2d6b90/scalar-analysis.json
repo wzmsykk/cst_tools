@@ -1,0 +1,161 @@
+{
+  "tolerance": 0.05,
+  "physical_mode_identity_verified": false,
+  "provisional_signature_stable_cell": 30,
+  "warning": "R/Q sorting is a diagnostic heuristic, not field overlap or proof of a polarization pair.",
+  "points": [
+    {
+      "cell": 12,
+      "signature_order": [
+        "ModeIndex 2",
+        "ModeIndex 1"
+      ],
+      "center_frequency_mhz": 565.17734987669,
+      "splitting_mhz": 0.9327278221379629,
+      "r_over_q_sums": {
+        "R_divide_Q": 2.4823437318639273e-06,
+        "R_divide_Q_5mm": 2.493664224306992e-06,
+        "R_divide_Q_10mm": 2.5207061100920003e-06
+      },
+      "raw_maximum_change": null,
+      "mesh_nodes": 6194,
+      "tetrahedra": 23922
+    },
+    {
+      "cell": 18,
+      "signature_order": [
+        "ModeIndex 1",
+        "ModeIndex 2"
+      ],
+      "center_frequency_mhz": 568.3949199114275,
+      "splitting_mhz": 0.28255074690707715,
+      "r_over_q_sums": {
+        "R_divide_Q": 2.723400607799576e-06,
+        "R_divide_Q_5mm": 2.727248122635531e-06,
+        "R_divide_Q_10mm": 2.75046528422821e-06
+      },
+      "raw_maximum_change": 0.5476459529580071,
+      "mesh_nodes": 7982,
+      "tetrahedra": 33072,
+      "signature_relative_changes": {
+        "frequency:signature-0": 0.004592897512055571,
+        "frequency:signature-1": 0.006728172016107581,
+        "R_divide_Q:signature-0": 0.06759075365544402,
+        "R_divide_Q:signature-1": 0.0988080147060708,
+        "R_divide_Q_5mm:signature-0": 0.0656440352561548,
+        "R_divide_Q_5mm:signature-1": 0.09695158237322633,
+        "R_divide_Q_10mm:signature-0": 0.06446599493786233,
+        "R_divide_Q_10mm:signature-1": 0.09594802189539843,
+        "Shunt_Impedance:signature-0": 0.07903605445412905,
+        "Shunt_Impedance:signature-1": 0.11513557066349768,
+        "Total_Loss:signature-0": 0.0026748433795128605,
+        "Total_Loss:signature-1": 0.004014132444229787,
+        "Q-factor:signature-0": 0.012274975654257706,
+        "Q-factor:signature-1": 0.01811773320653842
+      },
+      "signature_maximum_change": 0.11513557066349768
+    },
+    {
+      "cell": 24,
+      "signature_order": [
+        "ModeIndex 1",
+        "ModeIndex 2"
+      ],
+      "center_frequency_mhz": 569.60697232969,
+      "splitting_mhz": 0.15223913564602753,
+      "r_over_q_sums": {
+        "R_divide_Q": 2.808148530466658e-06,
+        "R_divide_Q_5mm": 2.80678489212653e-06,
+        "R_divide_Q_10mm": 2.8348918887969097e-06
+      },
+      "raw_maximum_change": 0.04079500312348803,
+      "mesh_nodes": 12001,
+      "tetrahedra": 54433,
+      "signature_relative_changes": {
+        "frequency:signature-0": 0.0022425619572659754,
+        "frequency:signature-1": 0.0020132186279425185,
+        "R_divide_Q:signature-0": 0.035089012322985925,
+        "R_divide_Q:signature-1": 0.02774508525636424,
+        "R_divide_Q_5mm:signature-0": 0.03298104978007717,
+        "R_divide_Q_5mm:signature-1": 0.025693604843819762,
+        "R_divide_Q_10mm:signature-0": 0.03376074445589053,
+        "R_divide_Q_10mm:signature-1": 0.027172995059644496,
+        "Shunt_Impedance:signature-0": 0.04079500312348803,
+        "Shunt_Impedance:signature-1": 0.0324006726681424,
+        "Total_Loss:signature-0": 0.0012738555441647278,
+        "Total_Loss:signature-1": 0.0008334050585078699,
+        "Q-factor:signature-0": 0.005913489299398533,
+        "Q-factor:signature-1": 0.004788443175938638
+      },
+      "signature_maximum_change": 0.04079500312348803
+    },
+    {
+      "cell": 30,
+      "signature_order": [
+        "ModeIndex 2",
+        "ModeIndex 1"
+      ],
+      "center_frequency_mhz": 570.1302333200636,
+      "splitting_mhz": 0.010547799391019907,
+      "r_over_q_sums": {
+        "R_divide_Q": 2.843110377209769e-06,
+        "R_divide_Q_5mm": 2.85031651309651e-06,
+        "R_divide_Q_10mm": 2.87985542117654e-06
+      },
+      "raw_maximum_change": 0.5109112245351491,
+      "mesh_nodes": 19094,
+      "tetrahedra": 92706,
+      "signature_relative_changes": {
+        "frequency:signature-0": 0.0010605451690609412,
+        "frequency:signature-1": 0.0007750362715293383,
+        "R_divide_Q:signature-0": 0.014870270375862318,
+        "R_divide_Q:signature-1": 0.01101626412972654,
+        "R_divide_Q_5mm:signature-0": 0.017611322202722813,
+        "R_divide_Q_5mm:signature-1": 0.013936094255666602,
+        "R_divide_Q_10mm:signature-0": 0.018356252119123038,
+        "R_divide_Q_10mm:signature-1": 0.013806884150995749,
+        "Shunt_Impedance:signature-0": 0.017433505182004403,
+        "Shunt_Impedance:signature-1": 0.012885073604082137,
+        "Total_Loss:signature-0": 0.0004957208870695957,
+        "Total_Loss:signature-1": 0.00035194918763875057,
+        "Q-factor:signature-0": 0.00260192615151451,
+        "Q-factor:signature-1": 0.0018896260945200454
+      },
+      "signature_maximum_change": 0.018356252119123038
+    },
+    {
+      "cell": 36,
+      "signature_order": [
+        "ModeIndex 1",
+        "ModeIndex 2"
+      ],
+      "center_frequency_mhz": 570.381052875181,
+      "splitting_mhz": 0.03152291179799249,
+      "r_over_q_sums": {
+        "R_divide_Q": 2.857621243590705e-06,
+        "R_divide_Q_5mm": 2.86559162286458e-06,
+        "R_divide_Q_10mm": 2.8901358275514702e-06
+      },
+      "raw_maximum_change": 0.505465010946442,
+      "mesh_nodes": 29311,
+      "tetrahedra": 147920,
+      "signature_relative_changes": {
+        "frequency:signature-0": 0.0004028719891969954,
+        "frequency:signature-1": 0.00047660664274717983,
+        "R_divide_Q:signature-0": 0.004384757802352511,
+        "R_divide_Q:signature-1": 0.005422618572338698,
+        "R_divide_Q_5mm:signature-0": 0.00429565904386328,
+        "R_divide_Q_5mm:signature-1": 0.005920923961867248,
+        "R_divide_Q_10mm:signature-0": 0.002118655199294144,
+        "R_divide_Q_10mm:signature-1": 0.0045019389292829766,
+        "Shunt_Impedance:signature-0": 0.005204478885432704,
+        "Shunt_Impedance:signature-1": 0.0064922052292505595,
+        "Total_Loss:signature-0": 9.326533600168654e-05,
+        "Total_Loss:signature-1": 0.00016734683291445265,
+        "Q-factor:signature-0": 0.0008233311909446109,
+        "Q-factor:signature-1": 0.001075418239834406
+      },
+      "signature_maximum_change": 0.0064922052292505595
+    }
+  ]
+}

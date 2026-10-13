@@ -1,0 +1,20 @@
+{
+  "source": "D:\\work\\cst_tools\\artifacts\\hom-mesh-baseline-de2d6b90\\cell-30\\solve\\result\\worker_0\\worker_0\\controlled_failed_window__7a729fe2-81cf-4dd0-8ce8-2cdae9fa92a9\\controlled_failed_window.cst",
+  "source_unchanged": true,
+  "cst_process_seconds": 32.047263400047086,
+  "exit_code": 0,
+  "solver_run": false,
+  "copy_only_cst": true,
+  "sample_region_project_units": [
+    -10,
+    10,
+    -10,
+    10,
+    -50,
+    50
+  ],
+  "scope": "equal-weight common-point ROI diagnostic, not full-volume quadrature",
+  "python": [],
+  "failure": "sample: -2147221503: missing E mode\n",
+  "completion": null
+}

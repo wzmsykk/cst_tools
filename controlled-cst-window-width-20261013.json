@@ -1,0 +1,151 @@
+{
+  "width_100": {
+    "source": "D:\\work\\cst_tools\\project\\HOM analysis\\HOM analysis_clean.cst",
+    "source_sha256": "996b485dade2ddc4232aafc052c04314836a54fd74423fa7b0fbe819a975b967",
+    "parameters": {
+      "nmodes": 1,
+      "fmin": 513.492631838138,
+      "fmax": 613.492631838138
+    },
+    "prime_parameters": null,
+    "result": {
+      "WorkerID": "0",
+      "TaskStatus": "Failure",
+      "RunName": "controlled_failed_window",
+      "RunParameters": {
+        "nmodes": 1,
+        "fmin": 513.492631838138,
+        "fmax": 613.492631838138
+      },
+      "PostProcessResult": null,
+      "FailureReport": "RESULT_FLUSH_FAILED: postprocess failed: number=-2147219403; description=Missing eigenmode #1",
+      "ProjectSnapshot": null,
+      "TaskID": "9ab0c670-c12a-4087-adfd-0d89fc426691",
+      "ResultDirectory": "D:\\work\\cst_tools\\.pytest_cache\\controlled\\494c0a74\\width_100\\result\\worker_0\\worker_0\\9ab0c670-c12a-4087-adfd-0d89fc426691",
+      "ReceiptPath": "D:\\work\\cst_tools\\.pytest_cache\\controlled\\494c0a74\\width_100\\temp\\worker_0\\eee1864c-430d-49e0-b1ae-015d1627a351\\received\\9ab0c670-c12a-4087-adfd-0d89fc426691.json"
+    },
+    "session": "eee1864c-430d-49e0-b1ae-015d1627a351",
+    "workspace": "D:\\work\\cst_tools\\.pytest_cache\\controlled\\494c0a74\\width_100\\temp\\worker_0\\eee1864c-430d-49e0-b1ae-015d1627a351",
+    "comparison_valid": true,
+    "stop_returned": true,
+    "stop_ack": true,
+    "exit_code": 0,
+    "process_alive": false,
+    "output.txt": "D:\\work\\cst_tools\\.pytest_cache\\controlled\\494c0a74\\width_100\\temp\\worker_0\\eee1864c-430d-49e0-b1ae-015d1627a351\\worker-input\\Result\\output.txt",
+    "progress.log": "D:\\work\\cst_tools\\.pytest_cache\\controlled\\494c0a74\\width_100\\temp\\worker_0\\eee1864c-430d-49e0-b1ae-015d1627a351\\worker-input\\Result\\progress.log",
+    "Model.log": "D:\\work\\cst_tools\\.pytest_cache\\controlled\\494c0a74\\width_100\\temp\\worker_0\\eee1864c-430d-49e0-b1ae-015d1627a351\\worker-input\\Result\\Model.log",
+    "elapsed_seconds": 99.67200000002049,
+    "source_unchanged": true
+  },
+  "width_200": {
+    "source": "D:\\work\\cst_tools\\project\\HOM analysis\\HOM analysis_clean.cst",
+    "source_sha256": "996b485dade2ddc4232aafc052c04314836a54fd74423fa7b0fbe819a975b967",
+    "parameters": {
+      "nmodes": 1,
+      "fmin": 513.492631838138,
+      "fmax": 713.492631838138
+    },
+    "prime_parameters": null,
+    "result": {
+      "WorkerID": "0",
+      "TaskStatus": "Success",
+      "RunName": "controlled_failed_window",
+      "RunParameters": {
+        "nmodes": 1,
+        "fmin": 513.492631838138,
+        "fmax": 713.492631838138
+      },
+      "PostProcessResult": [
+        {
+          "id": 0,
+          "resultName": "frequency",
+          "value": 564.639290502774,
+          "params": {
+            "iModeNumber": 1
+          }
+        },
+        {
+          "id": 1,
+          "resultName": "R_divide_Q",
+          "value": 1.66043767249681e-06,
+          "params": {
+            "iModeNumber": 1,
+            "axis": "z",
+            "xoffset": 0.0,
+            "yoffset": 0.0,
+            "zoffset": 0.0
+          }
+        },
+        {
+          "id": 2,
+          "resultName": "R_divide_Q_5mm",
+          "value": 1.58860643601115e-06,
+          "params": {
+            "iModeNumber": 1,
+            "axis": "z",
+            "xoffset": 0.0,
+            "yoffset": 5.0,
+            "zoffset": 0.0
+          }
+        },
+        {
+          "id": 3,
+          "resultName": "R_divide_Q_10mm",
+          "value": 1.51636472428323e-06,
+          "params": {
+            "iModeNumber": 1,
+            "axis": "z",
+            "xoffset": 0.0,
+            "yoffset": 10.0,
+            "zoffset": 0.0
+          }
+        },
+        {
+          "id": 4,
+          "resultName": "Shunt_Impedance",
+          "value": 8.42768460983996e-07,
+          "params": {
+            "iModeNumber": 1,
+            "axis": "z",
+            "xoffset": 0.0,
+            "yoffset": 0.0,
+            "zoffset": 0.0
+          }
+        },
+        {
+          "id": 5,
+          "resultName": "Total_Loss",
+          "value": 5153770106.15992,
+          "params": {
+            "iModeNumber": 1
+          }
+        },
+        {
+          "id": 6,
+          "resultName": "Q-factor",
+          "value": 0.507558022166964,
+          "params": {
+            "iModeNumber": 1
+          }
+        }
+      ],
+      "FailureReport": null,
+      "ProjectSnapshot": "D:\\work\\cst_tools\\.pytest_cache\\controlled\\494c0a74\\width_200\\result\\worker_0\\worker_0\\controlled_failed_window__f_564.639291MHz__a89b642a-b1e3-4e8c-9421-23d6babf33ef\\controlled_failed_window__f_564.639291MHz.cst",
+      "TaskID": "a89b642a-b1e3-4e8c-9421-23d6babf33ef",
+      "ResultDirectory": "D:\\work\\cst_tools\\.pytest_cache\\controlled\\494c0a74\\width_200\\result\\worker_0\\worker_0\\controlled_failed_window__f_564.639291MHz__a89b642a-b1e3-4e8c-9421-23d6babf33ef",
+      "ReceiptPath": "D:\\work\\cst_tools\\.pytest_cache\\controlled\\494c0a74\\width_200\\temp\\worker_0\\aa245ff3-46b2-47de-bc95-cbb39474ea11\\received\\a89b642a-b1e3-4e8c-9421-23d6babf33ef.json"
+    },
+    "session": "aa245ff3-46b2-47de-bc95-cbb39474ea11",
+    "workspace": "D:\\work\\cst_tools\\.pytest_cache\\controlled\\494c0a74\\width_200\\temp\\worker_0\\aa245ff3-46b2-47de-bc95-cbb39474ea11",
+    "comparison_valid": true,
+    "stop_returned": true,
+    "stop_ack": true,
+    "exit_code": 0,
+    "process_alive": false,
+    "output.txt": "D:\\work\\cst_tools\\.pytest_cache\\controlled\\494c0a74\\width_200\\temp\\worker_0\\aa245ff3-46b2-47de-bc95-cbb39474ea11\\worker-input\\Result\\output.txt",
+    "progress.log": "D:\\work\\cst_tools\\.pytest_cache\\controlled\\494c0a74\\width_200\\temp\\worker_0\\aa245ff3-46b2-47de-bc95-cbb39474ea11\\worker-input\\Result\\progress.log",
+    "Model.log": "D:\\work\\cst_tools\\.pytest_cache\\controlled\\494c0a74\\width_200\\temp\\worker_0\\aa245ff3-46b2-47de-bc95-cbb39474ea11\\worker-input\\Result\\Model.log",
+    "elapsed_seconds": 117.06300000008196,
+    "source_unchanged": true
+  }
+}

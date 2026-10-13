@@ -9,6 +9,17 @@ from csttool.postprocess_cst import CstPostProcessor
 DATA_DIR = Path(__file__).parents[1] / "data"
 
 
+def test_all_modes_reader_preserves_each_mode_and_ignores_metadata(tmp_path):
+    from csttool.postprocess_readers import read_all_modes
+
+    artifact = tmp_path / "Frequency_All.txt"
+    artifact.write_text(
+        "Result Name\nEigenResult_Simple\nResult Type\nFrequency\n"
+        "ModeIndex 1\n564.6\nModeIndex 2\n564.8\n", encoding="utf-8"
+    )
+    assert read_all_modes(artifact) == {"ModeIndex 1": 564.6, "ModeIndex 2": 564.8}
+
+
 def load_settings(name):
     return json.loads((DATA_DIR / name).read_text(encoding="utf-8"))
 
