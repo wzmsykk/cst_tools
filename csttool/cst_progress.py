@@ -27,6 +27,8 @@ class CstProgressEvent:
     local_percent: int | None
     message: str
     timestamp: float
+    session_id: str | None = None
+    source: str = "stdout"
 
 
 class CstLogProgressParser:

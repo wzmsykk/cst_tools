@@ -335,6 +335,7 @@ def test_run_failure_with_residual_session_requires_recovery_before_retry(
 
 def test_cst_local_progress_is_labeled_as_stage_progress(qapp):
     window, _tool = make_window(qapp)
+    window.controller.state = RunState.RUNNING
 
     window.renderCstProgress(
         CstProgressEvent(
@@ -354,6 +355,26 @@ def test_cst_local_progress_is_labeled_as_stage_progress(qapp):
     assert "当前 CST 阶段" in window.runProgressBar.format()
     assert "500–550 MHz" in window.stageLabel.text()
     assert "Pass 2" in window.stageLabel.text()
+    window.controller.state = RunState.IDLE
+    window.close()
+
+
+def test_native_gui_progress_wins_over_stdout_and_ignores_terminal_events(qapp):
+    from dataclasses import replace
+    window, _tool = make_window(qapp)
+    window.controller.state = RunState.RUNNING
+    event = CstProgressEvent('0', 'task', 500, 550, 'Post-Processing:', None,
+                             45, 'creating results', 100, 'session', 'progress.log')
+    window.renderCstProgress(event)
+    assert window.runProgressBar.value() == 45
+    assert 'progress.log' in window.stageLabel.text()
+    window.renderCstProgress(replace(event, source='stdout', local_percent=99, timestamp=101))
+    assert window.runProgressBar.value() == 45
+    window.renderCstProgress(replace(event, local_percent=None, timestamp=102))
+    assert window.runProgressBar.maximum() == 0
+    window.controller.state = RunState.IDLE
+    window.renderCstProgress(replace(event, local_percent=100, timestamp=103))
+    assert window.runProgressBar.maximum() == 0
     window.close()
 
 

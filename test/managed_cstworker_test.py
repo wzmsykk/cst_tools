@@ -14,6 +14,81 @@ from csttool.managed_cstworker import ManagedWorkerShutdownError
 from csttool.postprocess_cst import CstPostProcessor
 from csttool.runtime_protocol import Task
 from csttool.runtime_protocol import Completion, CompletionStatus
+from csttool.runtime_protocol import encode_completion
+
+
+def test_default_solver_wait_accepts_completion_after_forty_minutes(tmp_path, monkeypatch, caplog):
+    worker = build_worker_shell(tmp_path)
+    worker.log_path = tmp_path / "cst.log"
+    task = Task.create(worker.session_id, {})
+    clock = [0.0]
+    checks = []
+    monkeypatch.setattr("csttool.managed_cstworker.time.monotonic", lambda: clock[0])
+    monkeypatch.setattr(worker, "_ensure_running", lambda: checks.append(clock[0]))
+    monkeypatch.setattr(worker, "_keep_window_minimized", lambda: None)
+
+    def advance(_):
+        clock[0] = 2401.0
+        worker.completion_path.parent.mkdir(parents=True, exist_ok=True)
+        worker.completion_path.write_text(encode_completion(
+            Completion(task.task_id, task.session_id, CompletionStatus.SUCCESS)
+        ), encoding="utf-8")
+
+    monkeypatch.setattr("csttool.managed_cstworker.time.sleep", advance)
+    with caplog.at_level(logging.INFO):
+        completion = worker._wait_completion(task)
+    assert worker.TASK_TIMEOUT is None
+    assert completion.status is CompletionStatus.SUCCESS
+    assert checks == [0.0, 2401.0]
+    assert any(getattr(record, "event", None) == "CST_WAIT_PROGRESS"
+               and record.timeout_seconds is None for record in caplog.records)
+
+
+def test_unlimited_solver_wait_still_detects_process_failure(tmp_path, monkeypatch):
+    worker = build_worker_shell(tmp_path)
+    task = Task.create(worker.session_id, {})
+    def failed():
+        raise RuntimeError("CST process exited")
+    monkeypatch.setattr(worker, "_ensure_running", failed)
+    with pytest.raises(RuntimeError, match="CST process exited"):
+        worker._wait_completion(task)
+
+
+def test_wait_logs_debug_samples_but_only_ten_minute_info_heartbeats(tmp_path, monkeypatch, caplog):
+    worker = build_worker_shell(tmp_path)
+    worker.log_path = tmp_path / 'cst.log'
+    task = Task.create(worker.session_id, {})
+    clock = [0.0]
+    ticks = iter([30, 60, 599, 600, 630, 1200, 1230])
+    monkeypatch.setattr('csttool.managed_cstworker.time.monotonic', lambda: clock[0])
+    monkeypatch.setattr(worker, '_ensure_running', lambda: None)
+    monkeypatch.setattr(worker, '_keep_window_minimized', lambda: None)
+    def advance(_):
+        clock[0] = next(ticks)
+        if clock[0] == 1230:
+            worker.completion_path.parent.mkdir(parents=True)
+            worker.completion_path.write_text(encode_completion(
+                Completion(task.task_id, task.session_id, CompletionStatus.SUCCESS)
+            ), encoding='utf-8')
+    monkeypatch.setattr('csttool.managed_cstworker.time.sleep', advance)
+    with caplog.at_level(logging.DEBUG):
+        worker._wait_completion(task)
+    records = [r for r in caplog.records if getattr(r, 'event', None) == 'CST_WAIT_PROGRESS']
+    assert [r.elapsed_seconds for r in records if r.levelno == logging.INFO] == [600, 1200]
+    assert any(r.levelno == logging.DEBUG and r.elapsed_seconds == 30 for r in records)
+
+
+def test_explicit_solver_timeout_remains_available_for_test_harness(tmp_path, monkeypatch):
+    worker = build_worker_shell(tmp_path)
+    worker.TASK_TIMEOUT = 1.0
+    task = Task.create(worker.session_id, {})
+    clock = [0.0]
+    monkeypatch.setattr("csttool.managed_cstworker.time.monotonic", lambda: clock[0])
+    monkeypatch.setattr("csttool.managed_cstworker.time.sleep", lambda _: clock.__setitem__(0, 2.0))
+    monkeypatch.setattr(worker, "_ensure_running", lambda: None)
+    monkeypatch.setattr(worker, "_keep_window_minimized", lambda: None)
+    with pytest.raises(TimeoutError):
+        worker._wait_completion(task)
 
 
 def build_worker_shell(tmp_path):
@@ -170,7 +245,8 @@ def test_managed_worker_macro_is_dynamic_ack_gated_and_standard_exit(tmp_path):
     assert "CSTP_ReadAck" in macro
     assert "CSTP_ReadStopRequest" in macro
     assert "Do\n" in macro
-    assert "Save\n            Quit" in macro
+    assert 'Private Sub CSTPMW_CloseSession' in macro
+    assert '    Save\n' in macro and '    Quit\n' in macro
     assert "stopped-with-completion" in macro
     assert "EigenResult_Simple_output" in macro
     assert "EigenResult_Complex_output" in macro
@@ -245,7 +321,7 @@ def test_standard_stop_timeout_does_not_kill_cst(tmp_path, caplog):
         "csttool.runtime_protocol", fromlist=["FileProtocol"]
     ).FileProtocol(tmp_path / "protocol")
 
-    with pytest.raises(ManagedWorkerShutdownError, match="emergency termination"):
+    with pytest.raises(ManagedWorkerShutdownError, match="process is still running"):
         worker.stop()
 
     assert not worker._process.killed
@@ -282,12 +358,19 @@ def test_task_logs_results_before_ack_and_only_completes_after_ready(tmp_path, m
     monkeypatch.setattr(worker.postprocess, "read_all_results", lambda: [])
     caplog.set_level(logging.DEBUG)
     if ack_fails:
-        with pytest.raises(TimeoutError):
+        from csttool.managed_cstworker import ManagedAcknowledgmentPending
+        with pytest.raises(ManagedAcknowledgmentPending) as captured:
             worker.run_task("mode-1", params={})
+        received = json.loads(captured.value.receipt_path.read_text(encoding='utf-8'))
+        assert received['phase'] == 'received' and received['status'] == 'Success'
+        assert Path(received['snapshot']).is_file()
         assert "TASK_ACK_FAILED" in caplog.text
         assert "WORKER_TASK_COMPLETE" not in caplog.text
     else:
         worker.run_task("mode-1", params={})
+        received = json.loads(next((worker.root / 'received').glob('*.json')).read_text(encoding='utf-8'))
+        assert received['phase'] == 'acknowledged'
+        assert Path(received['snapshot']).is_file()
         events = ["CST_COMPLETION ", "RESULT_READ_DONE", "TASK_ACK_PUBLISHED", "TASK_ACK_READY", "WORKER_TASK_COMPLETE"]
         offsets = [caplog.text.index(event) for event in events]
         assert offsets == sorted(offsets)

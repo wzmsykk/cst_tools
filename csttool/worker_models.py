@@ -1,6 +1,7 @@
 """Typed Python worker boundary; CST's file protocol remains independent."""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from .cst_memory_guard import MemoryGuardPolicy
 from pathlib import Path
 from typing import Any, Callable, Mapping, Sequence
 
@@ -15,6 +16,7 @@ class WorkerConfig:
     postprocess: Sequence[Mapping[str, Any]] = ()
     background: bool = True
     progress_callback: Callable | None = None
+    memory_guard: MemoryGuardPolicy = field(default_factory=MemoryGuardPolicy)
 
     @classmethod
     def from_mapping(cls, values):

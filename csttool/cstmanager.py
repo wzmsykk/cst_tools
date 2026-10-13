@@ -116,7 +116,7 @@ class CSTManager:
         maxTask: int = 2,
         *,
         worker_factory: WorkerFactory,
-        max_jobs_per_worker: int = 10,
+        max_jobs_per_worker: int = 6,
         progress_callback=None,
     ) -> None:
         if maxTask < 1:
@@ -394,6 +394,10 @@ class CSTManager:
                     attempt + 1,
                 )
                 result = self._exception_result(task, exc)
+                if getattr(exc, 'completed_result_pending', False):
+                    result['AcknowledgmentPending'] = True
+                    result['ReceiptPath'] = str(exc.receipt_path)
+                    self.request_stop()  # Never automatically replay a completed solve.
 
             if result.get("TaskStatus") != "Failure":
                 snapshot_value = result.get("ProjectSnapshot")

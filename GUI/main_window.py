@@ -220,20 +220,37 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.runProgressBar.setFormat(f"%v / %m　{STAGE_PRESENTATION.get(self._stage, self._stage)}")
 
     def renderCstProgress(self, event):
+        if self.controller.state is not RunState.RUNNING:
+            return
+        if not hasattr(self, '_cst_observations'):
+            self._cst_observations = {}
+        previous = self._cst_observations.get(event.worker_id)
+        if previous is not None and event.timestamp < previous.timestamp:
+            return
+        if (previous is not None and previous.task_id == event.task_id
+                and getattr(previous, 'source', 'stdout') == 'progress.log'
+                and getattr(event, 'source', 'stdout') == 'stdout'):
+            return
+        self._cst_observations[event.worker_id] = event
         stage = CST_STAGE_PRESENTATION.get(event.stage, event.stage)
         interval = ""
         if event.interval_lo is not None and event.interval_hi is not None:
             interval = f" {event.interval_lo:g}–{event.interval_hi:g} MHz"
         pass_text = f" / {event.pass_name}" if event.pass_name else ""
-        label = f"Worker {event.worker_id}{interval} · {stage}{pass_text}"
+        source = getattr(event, 'source', 'stdout')
+        label = f"Worker {event.worker_id}{interval} · {stage}{pass_text} · {source}"
         self.stageLabel.setText(label)
         self.stateDetailLabel.setText(label)
+        self.stageLabel.setToolTip(event.message)
         if event.local_percent is not None:
             self.runProgressBar.setRange(0, 100)
             self.runProgressBar.setValue(event.local_percent)
             self.runProgressBar.setFormat(
                 f"当前 CST 阶段 %p%　{stage}{pass_text}"
             )
+        else:
+            self.runProgressBar.setRange(0, 0)
+            self.runProgressBar.setFormat(f"当前 CST 阶段　{stage}")
         self.statusbar.showMessage(label)
 
     def _finishPendingClose(self):
@@ -351,6 +368,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self._sync_readiness()
 
     def renderRunState(self, state):
+        if state is RunState.RUNNING:
+            self._cst_observations = {}
         state_name = state.name.lower()
         for widget in (self.statusbar, self.stateBadge, self.runSummaryFrame):
             widget.setProperty("state", state_name)

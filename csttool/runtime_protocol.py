@@ -226,6 +226,16 @@ def encode_ack(ack: Acknowledge) -> str:
     return _encode(ACK_MAGIC, (("task_id", ack.task_id), ("session_id", ack.session_id)))
 
 
+def publish_ack_idempotently(path: str | Path, ack: Acknowledge) -> Path:
+    path = Path(path)
+    try:
+        return atomic_publish(path, encode_ack(ack))
+    except FileExistsError:
+        if not path.is_file() or decode_ack(path.read_text(encoding='utf-8')) != ack:
+            raise ProtocolError('existing Ack does not match task/session')
+        return path
+
+
 def decode_ack(text: str) -> Acknowledge:
     fields = _decode(text, ACK_MAGIC)
     _reject_unknown(fields, {"task_id", "session_id"})

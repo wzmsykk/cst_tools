@@ -12,6 +12,7 @@ dependencies = [
     "numpy",
     "pandas",
     "PyQt5",
+    "psutil>=5.9",
 ]
 
 [project.optional-dependencies]

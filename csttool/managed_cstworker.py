@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+from dataclasses import replace
 import math
 import os
 import re
@@ -22,6 +23,10 @@ from .vb_codec import quote_vb_string
 from .logging_config import ContextLogger
 from .worker_models import WorkerConfig, SimulationResult
 from .cst_process_env import cst_process_environment
+from .resource_usage import record_worker_usage
+from .native_progress import NativeProgressTracker
+from .solver_output import SolverOutputTracker
+from .cst_memory_guard import MemoryGuardPolicy, MemorySamplingError, SustainedMemoryGuard, owned_process_memory
 from .diagnostics import archive_task, write_run_manifest, write_failure_report
 from .runtime_protocol import (
     Acknowledge,
@@ -31,6 +36,7 @@ from .runtime_protocol import (
     atomic_publish,
     decode_completion,
     encode_ack,
+    publish_ack_idempotently,
     new_session_id,
 )
 
@@ -39,9 +45,19 @@ class ManagedWorkerShutdownError(RuntimeError):
     pass
 
 
+class ManagedAcknowledgmentPending(RuntimeError):
+    """Completion was received; automatic solver replay is unsafe."""
+    completed_result_pending = True
+
+    def __init__(self, receipt, cause):
+        self.receipt_path = Path(receipt)
+        super().__init__(f"ACK_PENDING: receipt={receipt}; {cause}")
+
+
 class ManagedCSTWorker:
     START_TIMEOUT = 120.0
-    TASK_TIMEOUT = 1200.0
+    # Solves may legitimately take hours; only lifecycle waits are bounded.
+    TASK_TIMEOUT: float | None = None
     STOP_TIMEOUT = 120.0
 
     def __init__(self, worker_id: str, config: WorkerConfig, logger=None):
@@ -75,6 +91,7 @@ class ManagedCSTWorker:
         self._lock = threading.RLock()
         self._stopping = False
         self._process: subprocess.Popen | None = None
+        self._memory_guard_policy = config.memory_guard
         self._log_stream = None
         self._run_in_background = config.background
         self._last_window_check = 0.0
@@ -121,7 +138,13 @@ class ManagedCSTWorker:
                          **getattr(self, '_active_task_context', {})},
                 paths={name: getattr(self, name, None) for name in (
                     'log_path', 'marker_path', 'task_path', 'completion_path',
-                    'ack_path', 'stop_request_path', 'stop_ack_path')})
+                    'ack_path', 'stop_request_path', 'stop_ack_path')} | {
+                        'lifecycle_log': Path(str(self.marker_path) + '.lifecycle.log'),
+                        'received_receipt': self.root / 'received' / (
+                            str(getattr(self, '_active_task_context', {}).get('task_id', 'unknown')) + '.json'),
+                        'ack_receipt': Path(str(self.ack_path) + '.' + str(
+                            getattr(self, '_active_task_context', {}).get('task_id', 'unknown')) + '.accepted'),
+                    })
             self.logger.error("CST 失败诊断已保存 | phase=%s path=%s", phase, path,
                               extra={"event": "WORKER_FAILURE_DIAGNOSTICS", "phase": phase,
                                      "artifacts": {"failure_report": path}})
@@ -179,11 +202,19 @@ class ManagedCSTWorker:
         if callable(self._progress_callback):
             parser = CstLogProgressParser(self.ID, self._progress_context)
             self._progress_monitor = CstLogProgressMonitor(
-                self.log_path, parser, self._progress_callback
+                self.log_path, parser, self._emit_redirected_progress
             )
             self._progress_monitor.start()
         self._wait_for_marker("ready", self.START_TIMEOUT)
         self.logger.info("CST 进程已启动 | worker=%s session=%s pid=%s project=%s", self.ID, self.session_id, self._process.pid, self.source_project)
+
+    def _emit_redirected_progress(self, event):
+        native = getattr(self, '_native_progress', None)
+        if native is not None and native.last_observation is not None:
+            return  # Native state is authoritative for observational GUI progress.
+        callback = getattr(self, '_progress_callback', None)
+        if callable(callback):
+            callback(replace(event, session_id=self.session_id, source='stdout'))
 
     def _background_startup_options(self) -> dict[str, Any]:
         """Isolate console signals and optionally start CST minimized."""
@@ -283,6 +314,7 @@ class ManagedCSTWorker:
         except (TypeError, ValueError):
             return False
 
+    @record_worker_usage
     def run_task(self, result_name: str, *, params: Mapping[str, Any]) -> SimulationResult:
         with self._lock:
             if self._stopping:
@@ -294,6 +326,8 @@ class ManagedCSTWorker:
                 expression_names=self._expression_names(params),
             )
             payload = archive_task(self.root, task, result_name)
+            if getattr(self, '_resource_usage', None) is not None:
+                self._resource_usage.identity['task_id'] = task.task_id
             self._active_task_context = {
                 "task_id": task.task_id,
                 "interval_lo": self._progress_number(params.get("fmin")),
@@ -308,6 +342,16 @@ class ManagedCSTWorker:
                 result_name,
                 params.get("fmin"),
                 params.get("fmax"), extra={"event": "WORKER_TASK_DISPATCH", "phase": "solve", "worker": self.ID, "session": self.session_id, "task": task.task_id, "job": result_name, "fmin": params.get("fmin"), "fmax": params.get("fmax")})
+            self._native_progress = NativeProgressTracker(
+                self.project_path.with_suffix('') / 'Result' / 'progress.log',
+                self.root / 'native_progress' / task.task_id,
+                self.ID, self.session_id, task, self.logger,
+                getattr(self, '_progress_callback', None),
+            )
+            self._solver_output = SolverOutputTracker(
+                self.project_path.with_suffix('') / 'Result' / 'output.txt',
+                self.root / 'native_progress' / task.task_id, task, self.logger,
+            )
             self.marker_path.write_text(
                 f"dispatched:{task.task_id}", encoding="ascii"
             )
@@ -344,18 +388,29 @@ class ManagedCSTWorker:
                 status = "Failure"
                 failure = f"RESULT_READ_FAILED: {type(exc).__name__}: {exc}"
             finally:
+                receipt_path = self.root / 'received' / f'{task.task_id}.json'
+                received = {
+                    'schema_version': 1, 'phase': 'received',
+                    'task_id': task.task_id, 'session_id': task.session_id,
+                    'job': result_name, 'parameters': dict(params),
+                    'status': status, 'failure': failure, 'postprocess': postprocess_result,
+                    'snapshot': str(project_snapshot.resolve()) if project_snapshot.exists() else None,
+                }
                 try:
-                    atomic_publish(
+                    # Persist result consumption BEFORE authorizing VBA cleanup.
+                    write_json_atomic(receipt_path, received)
+                    publish_ack_idempotently(
                         self.ack_path,
-                        encode_ack(Acknowledge(task.task_id, task.session_id)),
+                        Acknowledge(task.task_id, task.session_id),
                     )
                     self.logger.debug("任务 Ack 已发布 | TASK_ACK_PUBLISHED task=%s job=%s", task.task_id, result_name, extra={"event": "TASK_ACK_PUBLISHED", "phase": "ack", "task": task.task_id, "job": result_name})
                     self._wait_for_marker("ready", self.START_TIMEOUT)
+                    write_json_atomic(receipt_path, {**received, 'phase': 'acknowledged'})
                     self.logger.debug("CST 已回到就绪状态 | TASK_ACK_READY task=%s job=%s", task.task_id, result_name, extra={"event": "TASK_ACK_READY", "phase": "ack", "task": task.task_id, "job": result_name})
-                except Exception:
+                except Exception as exc:
                     self._diagnose_failure("ack")
                     self.logger.exception("任务确认阶段失败 | TASK_ACK_FAILED task=%s job=%s", task.task_id, result_name, extra={"event": "TASK_ACK_FAILED", "phase": "ack", "task": task.task_id, "job": result_name})
-                    raise
+                    raise ManagedAcknowledgmentPending(receipt_path, exc) from exc
                 finally:
                     self._active_task_context = {}
             if status == "Success":
@@ -364,6 +419,11 @@ class ManagedCSTWorker:
                 )
                 self.postprocess.set_result_directory(task_result_root)
                 self.postprocess.set_cst_run_result_directory(project_snapshot.with_suffix(""))
+                try:
+                    write_json_atomic(receipt_path, {**received, 'phase': 'acknowledged',
+                                                   'snapshot': str(project_snapshot.resolve())})
+                except OSError:
+                    self.logger.warning('接收记录存档路径更新失败，原始记录仍保留', exc_info=True)
             log_method = self.logger.info if status == "Success" else self.logger.error
             log_method(
                 "CST 任务结束 | WORKER_TASK_COMPLETE worker=%s task=%s status=%s elapsed_seconds=%.3f failure=%s job=%s",
@@ -444,18 +504,32 @@ class ManagedCSTWorker:
 
     def _wait_completion(self, task: Task):
         started = time.monotonic()
-        deadline = started + self.TASK_TIMEOUT
+        policy = getattr(self, "_memory_guard_policy", MemoryGuardPolicy())
+        guard = SustainedMemoryGuard(policy)
+        next_memory_sample = started
+        deadline = None if self.TASK_TIMEOUT is None else started + self.TASK_TIMEOUT
         next_report = started + 30.0
-        while time.monotonic() < deadline:
+        next_heartbeat = started + 600.0
+        while deadline is None or time.monotonic() < deadline:
             self._ensure_running()
             self._keep_window_minimized()
-            if time.monotonic() >= next_report:
+            if getattr(self, '_native_progress', None) is not None:
+                self._native_progress.poll()
+            if getattr(self, '_solver_output', None) is not None:
+                self._solver_output.poll()
+            if getattr(self, '_resource_usage', None) is not None:
+                self._resource_usage.sample(getattr(self, '_process', None))
+            if time.monotonic() >= next_report or time.monotonic() >= next_heartbeat:
                 elapsed = time.monotonic() - started
                 log_size = self.log_path.stat().st_size if self.log_path.exists() else None
-                self.logger.info("等待 CST 完成 | task=%s elapsed_seconds=%.1f log_bytes=%s", task.task_id, elapsed, log_size,
+                heartbeat = time.monotonic() >= next_heartbeat
+                self.logger.log(logging.INFO if heartbeat else logging.DEBUG,
+                    "CST 仍在运行 | task=%s elapsed_seconds=%.1f log_bytes=%s", task.task_id, elapsed, log_size,
                     extra={"event": "CST_WAIT_PROGRESS", "phase": "solve", "task": task.task_id,
                            "elapsed_seconds": elapsed, "log_bytes": log_size,
                            "timeout_seconds": self.TASK_TIMEOUT})
+                if heartbeat:
+                    next_heartbeat = time.monotonic() + 600.0
                 next_report = time.monotonic() + 30.0
             if self.completion_path.exists():
                 completion = decode_completion(
@@ -466,9 +540,52 @@ class ManagedCSTWorker:
                     task.session_id,
                 ):
                     raise RuntimeError("completion belongs to another task")
+                if getattr(self, '_solver_output', None) is not None:
+                    self._solver_output.poll(force=True)
+                if getattr(self, '_native_progress', None) is not None:
+                    self._native_progress.poll(force=True)
                 return completion
+            now = time.monotonic()
+            if policy.enabled and now >= next_memory_sample:
+                next_memory_sample = now + policy.sample_seconds
+                self._check_memory_guard(task, guard, now)
             time.sleep(0.1)
         raise TimeoutError(f"timed out waiting for CST task {task.task_id}")
+
+    def _check_memory_guard(self, task, guard, now):
+        process = getattr(self, "_process", None)
+        if process is None:
+            return
+        try:
+            sample = owned_process_memory(process)
+        except (OSError, MemorySamplingError) as exc:
+            # A failed sample must break continuous-pressure evidence.
+            guard.high_since = None
+            if not getattr(self, "_memory_sample_error_reported", False):
+                self.logger.warning("CST 内存监测不可用，禁用本次样本清理判断：%s", exc)
+                self._memory_sample_error_reported = True
+            return
+        if sample is None:
+            guard.high_since = None
+            return
+        memory, physical = sample
+        size = self.log_path.stat().st_size if self.log_path.exists() else None
+        native = getattr(self, '_native_progress', None)
+        if native is not None:
+            size = (size, native.last_observation)
+        if not guard.observe(now, memory, physical, size):
+            return
+        # Completion wins if it appeared during sampling; never discard success.
+        if self.completion_path.exists():
+            return
+        self.logger.error("CST 内存异常且持续无日志进展，开始安全退出 | task=%s pid=%s memory_bytes=%s physical_bytes=%s", task.task_id, process.pid, memory, physical)
+        self._diagnose_failure("memory-guard")
+        try:
+            self.stop()
+        except ManagedWorkerShutdownError:
+            self.logger.error("标准退出失败，紧急清理本会话 CST 进程树 | task=%s pid=%s", task.task_id, process.pid)
+            self.emergency_terminate()
+        raise RuntimeError("CST_MEMORY_GUARD: sustained extreme memory and stalled log; replay from confirmed snapshot")
 
     def stop(self) -> bool:
         with self._lock:
@@ -506,8 +623,11 @@ class ManagedCSTWorker:
             self._diagnose_failure("shutdown")
             self.logger.error("CST 标准退出未获确认，需要会话恢复 | WORKER_STOP_FAILED worker=%s session=%s returncode=%s process_alive=%s timeout_seconds=%s", self.ID, self.session_id, self._process.poll(), self._process.poll() is None, self.STOP_TIMEOUT, extra={"event": "WORKER_STOP_FAILED", "phase": "shutdown", "worker": self.ID, "session": self.session_id, "returncode": self._process.poll(), "process_alive": self._process.poll() is None, "timeout_seconds": self.STOP_TIMEOUT})
             raise ManagedWorkerShutdownError(
-                f"worker {self.ID} did not confirm standard Save/Quit; "
-                "explicit emergency termination is required"
+                f"worker {self.ID} did not confirm standard Save/Quit; " + (
+                    "process already exited; reconcile preserved protocol and snapshot"
+                    if self._process.poll() is not None else
+                    "process is still running; session recovery is required"
+                )
             )
 
     def emergency_terminate(self) -> None:

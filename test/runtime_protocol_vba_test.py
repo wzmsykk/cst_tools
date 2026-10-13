@@ -74,4 +74,4 @@ def test_vba_codec_is_a_library_with_required_contracts():
     assert 'task.Parameters(i).Kind <> "expression"' in source
     assert "expectedSessionId" in source
     assert "On Error Resume Next" in source
-    assert lowered.count("on error resume next") == 2
+    assert lowered.count("on error resume next") == 3

@@ -170,6 +170,16 @@ Public Function CSTP_ReadAck( _
     CSTP_ReadAck = True
 End Function
 
+Public Function CSTP_WriteAckReceipt(ByVal filePath As String, ByVal taskId As String, ByVal sessionId As String, ByRef errorMessage As String) As Boolean
+    Dim keys(0 To 1) As String
+    Dim values(0 To 1) As String
+    keys(0) = "task_id"
+    values(0) = taskId
+    keys(1) = "session_id"
+    values(1) = sessionId
+    CSTP_WriteAckReceipt = CSTP_AtomicWrite(filePath, CSTP_ACK_MAGIC, keys, values, 2, errorMessage)
+End Function
+
 Public Function CSTP_ReadStopRequest( _
     ByVal filePath As String, _
     ByVal expectedSessionId As String, _
@@ -223,8 +233,7 @@ Private Function CSTP_LoadFields( _
     CSTP_LoadFields = False
     fieldCount = 0
     On Error GoTo ReadFailed
-    fileNumber = FreeFile
-    Open filePath For Input As #fileNumber
+    If Not CSTP_OpenInput(filePath, fileNumber, errorMessage) Then Exit Function
     If EOF(fileNumber) Then
         errorMessage = "protocol file is empty"
         Close #fileNumber
@@ -273,10 +282,33 @@ Private Function CSTP_LoadFields( _
     Exit Function
 
 ReadFailed:
-    errorMessage = "protocol read failed: " & Err.Description
+    errorMessage = "protocol read failed: path=" & filePath & "; operation=read; number=" & CStr(Err.Number) & "; description=" & Err.Description
     On Error Resume Next
     Close #fileNumber
     On Error GoTo 0
+End Function
+
+Private Function CSTP_OpenInput(ByVal filePath As String, ByRef fileNumber As Integer, ByRef errorMessage As String) As Boolean
+    Dim attempt As Long
+    Dim errorNumber As Long
+    Dim description As String
+    CSTP_OpenInput = False
+    For attempt = 1 To 3
+        fileNumber = FreeFile
+        On Error Resume Next
+        Err.Clear
+        Open filePath For Input As #fileNumber
+        errorNumber = Err.Number
+        description = Err.Description
+        On Error GoTo 0
+        If errorNumber = 0 Then
+            CSTP_OpenInput = True
+            Exit Function
+        End If
+        errorMessage = "protocol read failed: path=" & filePath & "; operation=open; attempt=" & CStr(attempt) & "/3; number=" & CStr(errorNumber) & "; description=" & description
+        Debug.Print errorMessage
+        If attempt < 3 Then Wait 0.1
+    Next attempt
 End Function
 
 Private Function CSTP_AtomicWrite( _

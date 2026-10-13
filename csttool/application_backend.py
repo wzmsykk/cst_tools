@@ -71,6 +71,7 @@ class CstApplicationBackend:
         algorithm=None,
         manager_factory: Callable[..., object] | None = None,
         application_logger=None,
+        logging_level: str = "info",
         mesh_convergence_evaluator=None,
     ) -> None:
         self._lifecycle_lock = threading.RLock()
@@ -89,7 +90,7 @@ class CstApplicationBackend:
             self.log_path = rf"log\base_{timestamp}.log"
             self._log_owner = ApplicationLogSession(
                 self.log_path,
-                level="debug",
+                level=logging_level,
             )
             self.logger = self._log_owner.logger
             self.logger.info("日志已输出到%s", self.log_path)

@@ -12,6 +12,7 @@ from .runtime_protocol import (
     atomic_publish,
     decode_completion,
     encode_ack,
+    publish_ack_idempotently,
 )
 
 
@@ -39,13 +40,9 @@ def recover_and_stop_session(
             )
             if completion.session_id != session_id:
                 raise ValueError("completion belongs to another worker session")
-            if not ack_path.exists():
-                atomic_publish(
-                    ack_path,
-                    encode_ack(
-                        Acknowledge(completion.task_id, completion.session_id)
-                    ),
-                )
+            publish_ack_idempotently(
+                ack_path, Acknowledge(completion.task_id, completion.session_id)
+            )
         if protocol.read_stop_ack(session_id) is not None:
             return completion
         time.sleep(poll_interval)
