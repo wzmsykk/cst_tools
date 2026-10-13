@@ -99,7 +99,7 @@ def record_worker_usage(method):
         with self._lock:
             recorder = None
             try:
-                recorder = ResourceUsageRecorder(self.root, self.ID, self.session_id, result_name)
+                recorder = ResourceUsageRecorder(getattr(self, 'observation_root', self.root), self.ID, self.session_id, result_name)
             except (OSError, AttributeError):
                 self.logger.warning('无法创建资源统计记录，任务继续运行', exc_info=True)
             self._resource_usage = recorder

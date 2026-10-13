@@ -121,6 +121,7 @@ class CSTManager:
         worker_factory: WorkerFactory,
         max_jobs_per_worker: int = 6,
         progress_callback=None,
+        run_id: str | None = None,
     ) -> None:
         if maxTask < 1:
             raise ValueError("maxTask must be at least 1")
@@ -159,7 +160,7 @@ class CSTManager:
         self.resultDir.mkdir(parents=True, exist_ok=True)
         self.taskFileDir = self.tempDir
         self.cstProjPath = self.currProjectDir / cst_filename
-        self.run_store = RunStore(self.currProjectDir, self.currProjectDir / 'logs' / uuid4().hex)
+        self.run_store = RunStore(self.currProjectDir, self.currProjectDir / 'logs' / (run_id or uuid4().hex))
         self.execution_fingerprint = (execution_fingerprint(self.cstProjPath, self.pconfm.get_postprocess_settings())
                                       if self.cstProjPath.is_file() else None)
         self._received_paths = {}

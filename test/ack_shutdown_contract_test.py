@@ -48,7 +48,7 @@ def test_ack_failure_preserves_completion_and_logs_each_cleanup_operation():
     assert macro.index('CSTP_WriteAckReceipt') < macro.index('Kill "%TASK_PATH%"')
     assert 'Dir("%COMPLETION_PATH%") = ""' in handler
     assert 'delete-task' in macro and 'delete-completion' in macro and 'delete-ack' in macro
-    assert '%MARKER_PATH%.lifecycle.log' in macro
+    assert '%LIFECYCLE_PATH%' in macro
 
 
 def test_exited_worker_without_stop_ack_requires_reconciliation_not_kill(tmp_path, monkeypatch):

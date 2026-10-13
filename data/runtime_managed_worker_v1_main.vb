@@ -194,7 +194,7 @@ Private Sub CSTPMW_Trace(ByVal stage As String, ByVal path As String, ByVal deta
     On Error Resume Next
     Debug.Print "CST_LIFECYCLE stage=" & stage & "; path=" & path & "; " & detail
     fileNumber = FreeFile
-    Open "%MARKER_PATH%.lifecycle.log" For Append As #fileNumber
+    Open "%LIFECYCLE_PATH%" For Append As #fileNumber
     Print #fileNumber, CStr(Now) & " | stage=" & stage & "; path=" & path & "; " & detail
     Close #fileNumber
     On Error GoTo 0

@@ -73,6 +73,8 @@ class ManagedCSTWorker:
             "worker": worker_id, "session": self.session_id,
         })
         self.root = worker_root / self.session_id
+        self.observation_root = (config.run_directory / 'workers' / worker_id / self.session_id
+                                 if config.run_directory is not None else self.root)
         self.run_store = (RunStore(config.project_directory or worker_root, config.run_directory)
                           if config.run_directory is not None else None)
         self.result_root = config.result_directory.resolve() / f"worker_{worker_id}"
@@ -91,7 +93,7 @@ class ManagedCSTWorker:
         self.stop_ack_path = self.protocol.root / "stop.ack"
         self.project_path = self.root / "worker-input.cst"
         self.macro_path = self.root / "runtime_managed_worker_v1.bas"
-        self.log_path = self.root / "cst.log"
+        self.log_path = self.observation_root / "cst.log"
         self.pid_path = self.root / "worker.pid"
         self._lock = threading.RLock()
         self._stopping = False
@@ -105,6 +107,7 @@ class ManagedCSTWorker:
         self._progress_monitor: CstLogProgressMonitor | None = None
 
         self.root.mkdir(parents=True, exist_ok=True)
+        self.observation_root.mkdir(parents=True, exist_ok=True)
         self.result_root.mkdir(parents=True, exist_ok=True)
         artifacts = {
             "cst_log": self.log_path, "macro": self.macro_path,
@@ -113,7 +116,7 @@ class ManagedCSTWorker:
             "state": self.marker_path, "stop_request": self.stop_request_path,
             "stop_ack": self.stop_ack_path, "results": self.result_root,
         }
-        manifest = write_run_manifest(self.root / "diagnostics.json", config, artifacts,
+        manifest = write_run_manifest(self.observation_root / "diagnostics.json", config, artifacts,
                                       context={"worker": worker_id, "session": self.session_id})
         self.logger.info("Worker 诊断入口已保存 | WORKER_DIAGNOSTICS path=%s", manifest,
                          extra={"event": "WORKER_DIAGNOSTICS", "phase": "prepare", "artifacts": {**artifacts, "manifest": manifest}})
@@ -137,15 +140,16 @@ class ManagedCSTWorker:
 
     def _diagnose_failure(self, phase):
         try:
-            path = write_failure_report(self.root, phase=phase,
+            observation = getattr(self, 'observation_root', self.root)
+            path = write_failure_report(observation, phase=phase,
                 process=getattr(self, '_process', None),
                 context={"worker": self.ID, "session": self.session_id,
                          **getattr(self, '_active_task_context', {})},
                 paths={name: getattr(self, name, None) for name in (
                     'log_path', 'marker_path', 'task_path', 'completion_path',
                     'ack_path', 'stop_request_path', 'stop_ack_path')} | {
-                        'lifecycle_log': Path(str(self.marker_path) + '.lifecycle.log'),
-                        'received_receipt': self.root / 'received' / (
+                        'lifecycle_log': observation / 'lifecycle.log',
+                        'received_receipt': observation / 'received' / (
                             str(getattr(self, '_active_task_context', {}).get('task_id', 'unknown')) + '.json'),
                         'ack_receipt': Path(str(self.ack_path) + '.' + str(
                             getattr(self, '_active_task_context', {}).get('task_id', 'unknown')) + '.accepted'),
@@ -175,6 +179,7 @@ class ManagedCSTWorker:
             "%COMPLETION_PATH%": quote_vb_string(self.completion_path),
             "%ACK_PATH%": quote_vb_string(self.ack_path),
             "%MARKER_PATH%": quote_vb_string(self.marker_path),
+            "%LIFECYCLE_PATH%": quote_vb_string(getattr(self, 'observation_root', self.root) / 'lifecycle.log'),
             "%STOP_REQUEST_PATH%": quote_vb_string(self.stop_request_path),
             "%STOP_ACK_PATH%": quote_vb_string(self.stop_ack_path),
             "%RESULT_ROOT%": quote_vb_string(str(self.result_root) + "\\"),
@@ -356,13 +361,13 @@ class ManagedCSTWorker:
                 params.get("fmax"), extra={"event": "WORKER_TASK_DISPATCH", "phase": "solve", "worker": self.ID, "session": self.session_id, "task": task.task_id, "job": result_name, "fmin": params.get("fmin"), "fmax": params.get("fmax")})
             self._native_progress = NativeProgressTracker(
                 self.project_path.with_suffix('') / 'Result' / 'progress.log',
-                self.root / 'native_progress' / task.task_id,
+                getattr(self, 'observation_root', self.root) / 'native_progress' / task.task_id,
                 self.ID, self.session_id, task, self.logger,
                 getattr(self, '_progress_callback', None),
             )
             self._solver_output = SolverOutputTracker(
                 self.project_path.with_suffix('') / 'Result' / 'output.txt',
-                self.root / 'native_progress' / task.task_id, task, self.logger,
+                getattr(self, 'observation_root', self.root) / 'native_progress' / task.task_id, task, self.logger,
             )
             self.marker_path.write_text(
                 f"dispatched:{task.task_id}", encoding="ascii"
@@ -400,7 +405,7 @@ class ManagedCSTWorker:
                 status = "Failure"
                 failure = f"RESULT_READ_FAILED: {type(exc).__name__}: {exc}"
             finally:
-                receipt_path = self.root / 'received' / f'{task.task_id}.json'
+                receipt_path = getattr(self, 'observation_root', self.root) / 'received' / f'{task.task_id}.json'
                 received = {
                     'schema_version': 1, 'phase': 'received',
                     'task_id': task.task_id, 'session_id': task.session_id,
@@ -418,7 +423,7 @@ class ManagedCSTWorker:
                         self.run_store.event(task.task_id, 'received', result_status=status)
                         self.run_store.artifacts(task.task_id, received=receipt_path,
                             snapshot=project_snapshot, protocol=self.protocol.root,
-                            log=self.log_path, native_progress=self.root / 'native_progress' / task.task_id)
+                            log=self.log_path, native_progress=getattr(self, 'observation_root', self.root) / 'native_progress' / task.task_id)
                     publish_ack_idempotently(
                         self.ack_path,
                         Acknowledge(task.task_id, task.session_id),

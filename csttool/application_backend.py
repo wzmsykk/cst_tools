@@ -185,6 +185,13 @@ class CstApplicationBackend:
         self.resume = bool(resume)
         self.worker_count = worker_count
         self.run_id = uuid4().hex
+        if self._log_owner is not None:
+            name = self._base_logger.name
+            level = self._base_logger.level
+            self._log_owner.close()
+            self.log_path = Path(self.get_project_directory()) / 'logs' / self.run_id / 'application.log'
+            self._log_owner = ApplicationLogSession(self.log_path, level=level, name=name)
+            self._base_logger = self._log_owner.logger
         self.logger = ContextLogger(self._base_logger, {
             "run_id": self.run_id,
             "project": self.get_project_directory(),
@@ -553,6 +560,7 @@ class CstApplicationBackend:
         if self._uses_default_manager:
             manager_options["worker_factory"] = ManagedCSTWorker.create
             manager_options["progress_callback"] = self._publish_cst_progress
+            manager_options['run_id'] = self.run_id
         self.jm = self._manager_factory(
             params=project_params,
             pconfm=self.pconfman,
