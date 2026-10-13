@@ -21,7 +21,7 @@
 |P0部分通过|[缺结果目录场导出及四类HDF5工件故障恢复](field-failure-recovery-acceptance.md)通过，分析恢复无求解重放；仍补Start返回0/Start异常、部分场/原生网格缺失、加载失败及退出卡住门禁|
 |P1部分通过|[共同域/掩码/权重及理想Pillbox全域双模](physical-domain-pillbox-acceptance.md)及cell20/30第二mesh全域对照通过；继续多材料复杂CAD、三层网格收敛、阈值校准及自动登记/GUI/连续追踪|
 |P1|冷/热缓存全流程性能、路线独立资源峰值与重复性|
-|P1第一版小网格真实验收通过|封闭PEC/真空腔固定参考匹配；新Tracker使用真实Pillbox cell8/10及原生掩码，缺场/缺成员恢复与CLI序列通过。下一步自动掩码登记、前提预检与候选请求控制，不把连续追踪等同于逐频枚举|
+|P1第一版小网格真实验收通过|封闭PEC/真空腔固定参考匹配；cell8/10自动工程预检、掩码登记及Tracker/CLI恢复通过，Normal背景/开放边界真实拒绝。下一步Managed默认/GUI集成与候选请求控制，不把连续追踪等同于逐频枚举|
 |P2|GUI场匹配入口及目标Project多版本调用；不阻塞现有Managed/ROI路线|
 
 下文阶段表、旧日期Pending及扩展项保留历史证据，不使用旧测试数量作为当前代码验收；近期顺序以本节和[六阶段验收](mode-field-selection-implementation-status.md)为准。

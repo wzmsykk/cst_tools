@@ -43,4 +43,4 @@ M(a,b)=\frac{|\int_\Omega \mathbf E_a^*\cdot\mathbf E_b\,dV|^2}
 
 保持每mode、每积分线的R/Q及位置元数据。正交dipole极化在同一偏轴线上可呈现接近零/最大耦合；不能用单线R/Q排序代替场匹配，也不能把R/Q总和当作位置不变量。5%后处理容差与场重叠阈值是不同判据。
 
-2026-10-14更新：复场重叠、Gram/MAC、子空间及可选诊断已实现；共同域/材料掩码与体积求积核心、理想闭合Pillbox全域TM110双模及第二mesh也已真实验证。见[全域验收](../docs/physical-domain-pillbox-acceptance.md)。[固定参考真空腔追踪第一版](../docs/vacuum-mode-tracking-v1.md)Python/CLI还通过本轮真实小网格cell8/10及缺场/缺成员恢复，限定显式全域真空掩码；自动登记/扫描请求控制、复杂CAD、多材料及全局阈值校准仍未完成。不能将本例基准推广为任意HOM物理身份与方向性后处理的全部验收。
+2026-10-14更新：复场重叠、Gram/MAC、子空间及可选诊断已实现；共同域/材料掩码与体积求积核心、理想闭合Pillbox全域TM110双模及第二mesh也已真实验证。见[全域验收](../docs/physical-domain-pillbox-acceptance.md)。[固定参考真空腔追踪第一版](../docs/vacuum-mode-tracking-v1.md)Python/CLI通过真实小网格cell8/10及缺场/缺成员恢复；可选自动工程预检/掩码登记也通过同一小网格链，拒绝Normal背景与开放边界。Managed默认/GUI集成、扫描请求控制、复杂CAD、多材料及全局阈值校准仍未完成。不能将本例基准推广为任意HOM物理身份与方向性后处理的全部验收。

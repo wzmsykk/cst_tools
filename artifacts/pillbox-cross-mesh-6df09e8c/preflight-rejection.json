@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "status": "rejected",
+  "source": "D:\\work\\cst_tools\\artifacts\\pillbox-cross-mesh-6df09e8c\\invalid-prepare\\input.cst",
+  "source_sha256": "f55292d67bbc64ffa84a6e9e46d21a4cf58f68541d332bb50d95067ae55d4866",
+  "geometry_id": "ideal-closed-PEC-pillbox-R229mm-L259mm-v1",
+  "sampling": {
+    "bounds_m": [
+      -0.229,
+      0.229,
+      -0.229,
+      0.229,
+      -0.1295,
+      0.1295
+    ],
+    "counts": [
+      64,
+      64,
+      64
+    ],
+    "scope": "specified-domain"
+  },
+  "sampling_id": "35d9111d4771071777954f665a93c460f6ac6e39d69fe3ec3e5597ad23302598",
+  "solver_run": false,
+  "sampling_convergence_confirmed": false,
+  "session": {
+    "launcher_pid": 46516,
+    "owned": [
+      {
+        "pid": 46516,
+        "create_time": 1791916821.9048936
+      },
+      {
+        "pid": 25132,
+        "create_time": 1791916821.9359028
+      },
+      {
+        "pid": 15900,
+        "create_time": 1791916825.3796108
+      },
+      {
+        "pid": 5564,
+        "create_time": 1791916827.4610252
+      },
+      {
+        "pid": 26264,
+        "create_time": 1791916829.5016425
+      },
+      {
+        "pid": 26440,
+        "create_time": 1791916829.841727
+      },
+      {
+        "pid": 9884,
+        "create_time": 1791916830.4156723
+      }
+    ],
+    "active_pids": [],
+    "elapsed_seconds": 41.15599999995902,
+    "exit_confirmed": true,
+    "foreign_processes": [],
+    "stage": "awaiting-macro"
+  },
+  "exit_code": 0,
+  "source_unchanged": true,
+  "inventory": {
+    "solids": [
+      {
+        "name": "domain-benchmark:ideal-cavity",
+        "material": "Vacuum",
+        "bounds_m": [
+          -0.229,
+          0.229,
+          -0.229,
+          0.229,
+          -0.1295,
+          0.1295
+        ]
+      }
+    ],
+    "background": [
+      "Normal"
+    ],
+    "boundaries": [
+      "open",
+      "electric",
+      "electric",
+      "electric",
+      "electric",
+      "electric"
+    ],
+    "symmetry": [
+      "none",
+      "none",
+      "none"
+    ],
+    "ports": [
+      "0"
+    ]
+  },
+  "rejection_reasons": [
+    "background-not-PEC",
+    "boundaries-not-six-electric"
+  ]
+}

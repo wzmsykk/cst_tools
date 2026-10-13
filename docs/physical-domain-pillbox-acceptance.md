@@ -136,3 +136,7 @@ sampling_convergence至少要求3个递增级别，最后连续两次变化均�
 两轮StopAck及正常退出0、源工程SHA不变；原生掩码与单元数探针串行正常结束，最终可靠进程检查无主实例/Modeler/Solver残留。完整离线470 passed、19 deselected（16.36秒）。实现工具默认mesh8/10，生产设置未改变。
 
 本轮大型模型/原生场/HDF5及pytest验收临时目录已清理；保留总报告、各步追踪/CLI报告、掩码、宏及日志。tracking-request.json中的工件路径因此仅为历史记录，需要重新生成原始场才能复算，不能直接调用CLI期待成功。
+
+## 自动登记与前提预检小网格复验
+
+`artifacts/pillbox-cross-mesh-6df09e8c/report.json`为自动域版本：Solver前预检prepared工程、cell8/10完成快照自动生成/登记掩码，Tracker通过registration_file读取并核对来源SHA。双网格数5332/10220及子空间重叠约0.999944823，与手工登记路线一致。新公共API串行实际导出和错误工程拒绝均通过，详见[自动掩码登记验收](vacuum-domain-registration.md)。保留采样收敛/几何身份的显式证据，不把原生预检当任意几何/采样精度证明。

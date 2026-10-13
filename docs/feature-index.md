@@ -26,6 +26,7 @@
 |F20|独立Pillbox双模基准|[pillbox_reference.py](../csttool/pillbox_reference.py)|`tm110_reference`|[Pillbox探针](../test/support/validate_pillbox_full_domain.py)|[全域验收](physical-domain-pillbox-acceptance.md)|
 |F21|Pillbox全域第二网格与小网格Tracker验收|[跨网格探针](../test/support/validate_pillbox_cross_mesh.py)|`compare_pair`, `verify_mesh_counts`, `validate_tracker`|[追踪测试](../test/vacuum_mode_tracking_test.py)|[全域验收](physical-domain-pillbox-acceptance.md)|
 |F22|封闭真空腔固定参考模式追踪|[vacuum_mode_tracking.py](../csttool/vacuum_mode_tracking.py)|`select_vacuum_modes`, `VacuumModeTracker.evaluate`, `track_saved_sequence`|[追踪测试](../test/vacuum_mode_tracking_test.py)|[第一版API与使用](vacuum-mode-tracking-v1.md)|
+|F23|工程前提预检与自动掩码登记|[vacuum_domain_registry.py](../csttool/vacuum_domain_registry.py)|`register_vacuum_domain`, `load_registered_support`, `export_registered_vacuum_fields`|[登记测试](../test/vacuum_domain_registry_test.py)|[登记API与边界](vacuum-domain-registration.md)|
 
 ## 从日志定位
 

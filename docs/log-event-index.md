@@ -49,6 +49,7 @@
 | `TASK_ACK_FAILED` | `csttool/managed_cstworker.py` |
 | `WORKER_TASK_COMPLETE` | `csttool/managed_cstworker.py` |
 | `VACUUM_MODE_TRACKING` | `csttool/vacuum_mode_tracking.py` |
+| `VACUUM_DOMAIN_PREFLIGHT` | `csttool/vacuum_domain_registry.py` |
 | `WORKER_ALREADY_EXITED` | `csttool/managed_cstworker.py` |
 | `WORKER_STOP_REQUEST` | `csttool/managed_cstworker.py` |
 | `WORKER_STOP_RECOVERED` | `csttool/managed_cstworker.py` |

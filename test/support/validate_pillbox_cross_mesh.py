@@ -43,6 +43,8 @@ def validate_tracker(root):
             'result_file': str(run / 'fields/export-result.json'),
             'support_file': str(run / 'support/support.tsv'),
             'support_sha256': file_hash(run / 'support/support.tsv')})
+        if entry.get('domain_registration'):
+            descriptors[-1]['registration_file'] = str(run/'support/domain-registration.json')
     reference = load_tracking_snapshot(descriptors[0], domain, base=root)
     candidate = load_tracking_snapshot(descriptors[1], domain, base=root)
     tracker = VacuumModeTracker(reference, domain, MatchPolicy(.9, .05, .99,
@@ -80,6 +82,42 @@ def validate_tracker(root):
     write_json_atomic(root / 'report.json', report)
     assert passed, report['tracker_acceptance']
     print('TRACKER_GATE_PASSED=True', flush=True)
+
+
+def validate_rejected_domain(executable, root):
+    from csttool.vacuum_domain_registry import register_vacuum_domain
+    root = root.resolve()
+    root.relative_to((ROOT/'artifacts').resolve())
+    body = ('    history="With Background" & vbCrLf & ".Type ""normal""" & vbCrLf & "End With" & vbCrLf & "Boundary.Xmin ""open"""\n'
+            '    If Not AddToHistory("CSTTools: invalid domain preflight fixture",history) Then Err.Raise vbObjectError+1,"probe","History failed"\n'
+            '    If Not Rebuild Then Err.Raise vbObjectError+2,"probe","Rebuild failed"\n')
+    source = batch_probe(executable,root/'prepare/input.cst',root/'invalid-prepare',body)
+    spec = SamplingSpec((-RADIUS,RADIUS,-RADIUS,RADIUS,-LENGTH/2,LENGTH/2),(64,64,64),'specified-domain')
+    result = register_vacuum_domain(executable,source,root/'invalid-domain',spec,geometry_id=GEOMETRY)
+    assert result['status']=='rejected'
+    assert {'background-not-PEC','boundaries-not-six-electric'} <= set(result['rejection_reasons'])
+    assert result['source_unchanged'] and result['solver_run'] is False
+    write_json_atomic(root/'preflight-rejection.json',result)
+    print('REJECTED_DOMAIN_GATE_PASSED=True',flush=True)
+
+
+def validate_registered_export(executable, root):
+    from csttool.vacuum_domain_registry import export_registered_vacuum_fields
+    from csttool.vacuum_mode_tracking import load_tracking_snapshot, VacuumTrackingDomain
+    root = root.resolve()
+    root.relative_to((ROOT/'artifacts').resolve())
+    previous = read_json(root/'report.json')
+    spec = SamplingSpec((-RADIUS,RADIUS,-RADIUS,RADIUS,-LENGTH/2,LENGTH/2),(64,64,64),'specified-domain')
+    settings = [{'method':'ExportModeField','resultName':f'E_{mode}',
+        'params':{'iModeNumber':mode,'field_kind':'E','sampling':spec.to_mapping()}} for mode in (1,2)]
+    result = export_registered_vacuum_fields(executable,previous['meshes'][0]['solve']['ProjectSnapshot'],
+        root/'registered-export',settings,geometry_id=GEOMETRY)
+    domain = VacuumTrackingDomain(GEOMETRY,'PEC','Vacuum',True,'native inventory','native bbox','prior sampling evidence')
+    snapshot = load_tracking_snapshot(result['tracking_input'],domain,base=root)
+    assert len(snapshot.fields)==2
+    result['tracking_descriptor_loaded'] = True
+    write_json_atomic(root/'registered-export/workflow-report.json',result)
+    print('REGISTERED_EXPORT_GATE_PASSED=True',flush=True)
 
 
 def compare_pair(reference, candidate, weights, scope):
@@ -124,7 +162,16 @@ def main():
     parser.add_argument('--meshes', nargs=2, type=int, default=(8, 10),
                         help='Two increasing cells-per-wavelength values (default: small 8 10)')
     parser.add_argument('--tracking', action='store_true', help='Accept new Tracker/CLI and analysis-only recovery')
+    parser.add_argument('--automatic-domain', action='store_true', help='Native project preflight and registered masks')
+    parser.add_argument('--reject-preflight-root', type=Path, help='No-solver native invalid-project preflight test')
+    parser.add_argument('--registered-export-root', type=Path, help='No-solver public registered export workflow')
     args = parser.parse_args()
+    if args.reject_preflight_root:
+        validate_rejected_domain(args.cst_exe,args.reject_preflight_root)
+        return
+    if args.registered_export_root:
+        validate_registered_export(args.cst_exe,args.registered_export_root)
+        return
     if args.verify_mesh_root:
         verify_mesh_counts(args.cst_exe, args.verify_mesh_root)
         return
@@ -144,6 +191,12 @@ def main():
     arrays, supports, frequencies = [], [], []
     try:
         prepared = prepare_ideal(args.cst_exe, source, root / 'prepare')
+        if args.automatic_domain:
+            from csttool.vacuum_domain_registry import register_vacuum_domain
+            report['pre_solve_domain'] = register_vacuum_domain(args.cst_exe, prepared,
+                root/'pre-solve-domain', spec, geometry_id=GEOMETRY)
+            write_json_atomic(root/'report.json', report)
+            assert report['pre_solve_domain']['status'] == 'registered', report['pre_solve_domain']
         for mesh in args.meshes:
             run = root / f'mesh-{mesh}'
             config = _config(run / 'solve', '0', args.cst_exe, prepared)
@@ -168,7 +221,16 @@ def main():
             assert entry['stop_returned'] and entry['stop_ack'] and entry['exit_code'] == 0, entry
             snapshot = Path(result['ProjectSnapshot'])
             entry['snapshot_sha256'] = file_hash(snapshot)
-            support = export_native_support(args.cst_exe, snapshot, spec, run / 'support')
+            if args.automatic_domain:
+                from csttool.vacuum_domain_registry import load_registered_support
+                from csttool.physical_domain import cylinder_support
+                entry['domain_registration'] = register_vacuum_domain(args.cst_exe, snapshot,
+                    run/'support', spec, geometry_id=GEOMETRY)
+                support = load_registered_support(run/'support/domain-registration.json',
+                    source_sha256=file_hash(snapshot),sampling=spec,geometry_id=GEOMETRY)
+                assert support.material_labels == cylinder_support(spec,RADIUS,-LENGTH/2,LENGTH/2).material_labels
+            else:
+                support = export_native_support(args.cst_exe, snapshot, spec, run / 'support')
             supports.append(support)
             q = common_quadrature([support], ['Vacuum'])
             settings = [{'method': 'ExportModeField', 'resultName': f'E_{mode}',

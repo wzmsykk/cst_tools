@@ -195,9 +195,17 @@ def load_tracking_snapshot(descriptor, domain, *, base):
         if len(by_mode) != len(fields):
             raise ValueError('duplicate mode identity')
         fields = [by_mode[mode] for mode in selected]
-    support = load_material_support(fields[0].sampling, path(descriptor['support_file']),
-                                   expected_sha256=descriptor['support_sha256'],
-                                   geometry_id=domain.geometry_id)
+    if descriptor.get('registration_file'):
+        from .vacuum_domain_registry import load_registered_support
+        source_sha = result.get('source_sha256')
+        if not source_sha:
+            raise ValueError('registered input requires source snapshot SHA in export result')
+        support = load_registered_support(path(descriptor['registration_file']),
+            source_sha256=source_sha, sampling=fields[0].sampling, geometry_id=domain.geometry_id)
+    else:
+        support = load_material_support(fields[0].sampling, path(descriptor['support_file']),
+                                       expected_sha256=descriptor['support_sha256'],
+                                       geometry_id=domain.geometry_id)
     snapshot = TrackingSnapshot(descriptor['snapshot_id'], tuple(fields), support)
     _validate_snapshot(snapshot, domain)
     return snapshot

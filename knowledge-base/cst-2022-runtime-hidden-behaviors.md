@@ -148,3 +148,5 @@ CST2022官方Python包限制Python3.6–3.9，当前Python3.12不能直接使用
 `failed-rebuild-stop-b417feb1`基线恢复及`failed-rebuild-stop-0ea47a64`成功后失败恢复已通过：本会话恢复快照/保存回执、StopAck和实际退出核对，任务Failure保留；无Solver重放，原成功快照及源SHA未变，无主实例/求解残留。只允许这种有证据的特定退出4停止确认；没有通用忽略非零码。参数恢复不回滚任意历史/Global Data。详见[P0-1验收](../docs/failed-rebuild-stop-recovery.md)。
 
 2026-10-14全域双网格实测：理想Pillbox cell20/30实际四面体数83151/283098（Mesh.GetNumberOfMeshCells，文档明确支持四面体），频率相对变化2.599e-7、双模子空间最小平方重叠0.999998879，但单模MAC约0.903。这是数值极化基混合的实测，不是自然编号交换的证据。原生日志求解总时61/450秒；不能以频率接近替代场身份，也不能以加密参数替代实际网格库存。见[第二网格验收](../docs/physical-domain-pillbox-acceptance.md)。
+
+2026-10-14自动工程域预检：CST2022.5的Material.GetTypeOfBackgroundMaterial返回PEC/Normal；背景setter在Background对象，但getter在Material对象，不应按命名猜测。Solid.GetLooseBoundingBoxOfShape文档限制后处理时使用，本轮独立控制宏加载已保存副本查询成功，圆柱返回SI范围±0.229m、±0.1295m；不在历史重建中调用。Boundary.GetXSymmetry等返回none，Port.StartPortNumberIteration返回0。Normal背景加Xmin=open副本原生查询成功、正常退出0，但Python预检明确rejected；进程成功不代表工程满足算法前提。见[自动登记](../docs/vacuum-domain-registration.md)。

@@ -1,0 +1,1313 @@
+{
+  "geometry": "ideal-closed-PEC-pillbox-R229mm-L259mm-v1",
+  "source_sha256": "7b63939b2dbed3de567aa55a5ff19cb69e7447245882a691be15d28580f1ddfa",
+  "meshes": [
+    {
+      "cell": 8,
+      "solve": {
+        "WorkerID": "0",
+        "TaskStatus": "Success",
+        "RunName": "ideal-TM110-doublet",
+        "RunParameters": {
+          "nmodes": 2,
+          "fmin": 780,
+          "fmax": 850,
+          "cell": 8
+        },
+        "PostProcessResult": [
+          {
+            "id": 0,
+            "resultName": "frequency_1",
+            "value": 798.367318144302,
+            "params": {
+              "iModeNumber": 1
+            }
+          },
+          {
+            "id": 1,
+            "resultName": "frequency_2",
+            "value": 798.369833763561,
+            "params": {
+              "iModeNumber": 2
+            }
+          }
+        ],
+        "FailureReport": null,
+        "ProjectSnapshot": "D:\\work\\cst_tools\\artifacts\\pillbox-cross-mesh-6df09e8c\\mesh-8\\solve\\result\\worker_0\\worker_0\\ideal-TM110-doublet__b3e2ed10-c6c5-48dd-8640-991bb9ae4205\\ideal-TM110-doublet.cst",
+        "TaskID": "b3e2ed10-c6c5-48dd-8640-991bb9ae4205",
+        "ResultDirectory": "D:\\work\\cst_tools\\artifacts\\pillbox-cross-mesh-6df09e8c\\mesh-8\\solve\\result\\worker_0\\worker_0\\ideal-TM110-doublet__b3e2ed10-c6c5-48dd-8640-991bb9ae4205",
+        "ReceiptPath": "D:\\work\\cst_tools\\artifacts\\pillbox-cross-mesh-6df09e8c\\mesh-8\\solve\\temp\\worker_0\\5777b7e0-a3da-4431-b5a8-c2542ee138b2\\received\\b3e2ed10-c6c5-48dd-8640-991bb9ae4205.json"
+      },
+      "stop_returned": true,
+      "stop_ack": true,
+      "exit_code": 0,
+      "snapshot_sha256": "9d67faa078fd975f61f1c053cb492639ad1a4e8bca09b997c62e973bcac7ad80",
+      "domain_registration": {
+        "schema_version": 1,
+        "status": "registered",
+        "source": "D:\\work\\cst_tools\\artifacts\\pillbox-cross-mesh-6df09e8c\\mesh-8\\solve\\result\\worker_0\\worker_0\\ideal-TM110-doublet__b3e2ed10-c6c5-48dd-8640-991bb9ae4205\\ideal-TM110-doublet.cst",
+        "source_sha256": "9d67faa078fd975f61f1c053cb492639ad1a4e8bca09b997c62e973bcac7ad80",
+        "geometry_id": "ideal-closed-PEC-pillbox-R229mm-L259mm-v1",
+        "sampling": {
+          "bounds_m": [
+            -0.229,
+            0.229,
+            -0.229,
+            0.229,
+            -0.1295,
+            0.1295
+          ],
+          "counts": [
+            64,
+            64,
+            64
+          ],
+          "scope": "specified-domain"
+        },
+        "sampling_id": "35d9111d4771071777954f665a93c460f6ac6e39d69fe3ec3e5597ad23302598",
+        "solver_run": false,
+        "sampling_convergence_confirmed": false,
+        "session": {
+          "launcher_pid": 25464,
+          "owned": [
+            {
+              "pid": 25464,
+              "create_time": 1791916508.0682018
+            },
+            {
+              "pid": 5500,
+              "create_time": 1791916508.0982437
+            },
+            {
+              "pid": 26692,
+              "create_time": 1791916510.7929494
+            },
+            {
+              "pid": 22784,
+              "create_time": 1791916512.3815296
+            },
+            {
+              "pid": 36392,
+              "create_time": 1791916514.494444
+            },
+            {
+              "pid": 29680,
+              "create_time": 1791916514.769762
+            },
+            {
+              "pid": 41400,
+              "create_time": 1791916515.2692792
+            }
+          ],
+          "active_pids": [],
+          "elapsed_seconds": 38.31200000003446,
+          "exit_confirmed": true,
+          "foreign_processes": [],
+          "stage": "awaiting-macro"
+        },
+        "exit_code": 0,
+        "source_unchanged": true,
+        "inventory": {
+          "solids": [
+            {
+              "name": "domain-benchmark:ideal-cavity",
+              "material": "Vacuum",
+              "bounds_m": [
+                -0.229,
+                0.229,
+                -0.229,
+                0.229,
+                -0.1295,
+                0.1295
+              ]
+            }
+          ],
+          "background": [
+            "PEC"
+          ],
+          "boundaries": [
+            "electric",
+            "electric",
+            "electric",
+            "electric",
+            "electric",
+            "electric"
+          ],
+          "symmetry": [
+            "none",
+            "none",
+            "none"
+          ],
+          "ports": [
+            "0"
+          ]
+        },
+        "rejection_reasons": [],
+        "support_file": "support.tsv",
+        "support_sha256": "48cf9c32f51d782c632c9af0b9e84dee48cf3335f5c465e63ef7c419d9b0e77b",
+        "support_id": "5309b3861604c93c07cd45e045dbf79f2720acf8f62a2bc8a79bc8ae5ccbfdcc",
+        "inventory_sha256": "4d3b9f1164fa675f3f91bce83b7778fba74a4a84d9583f7921bcf93fd06d1900",
+        "quadrature": {
+          "identity": "af8609e7935c36fd445e75ba124bb6b594872946b51ba4d18b26599dcd6cf36b",
+          "sampling_id": "35d9111d4771071777954f665a93c460f6ac6e39d69fe3ec3e5597ad23302598",
+          "scope": "common-material-domain",
+          "rule": "masked-cell-midpoint-volume-v1",
+          "volume_m3": 0.04281582317578127,
+          "weight_unit": "m^3",
+          "materials": [
+            "Vacuum"
+          ],
+          "support_ids": [
+            "5309b3861604c93c07cd45e045dbf79f2720acf8f62a2bc8a79bc8ae5ccbfdcc"
+          ],
+          "support_evidence": [
+            {
+              "geometry_id": "ideal-closed-PEC-pillbox-R229mm-L259mm-v1",
+              "provenance": "CST-Solid.IsPointInsideShape-and-GetMaterialNameForShape"
+            }
+          ],
+          "sampling_scope": "specified-domain",
+          "coverage_claim": "selected materials in declared sampling box; whole geometry requires independent gate",
+          "support_disagreement_fraction": 0.0,
+          "boundary_rule": "point-classification; cut-cell error requires refinement",
+          "physical_identity_confirmed": false
+        }
+      },
+      "export": {
+        "source": "D:\\work\\cst_tools\\artifacts\\pillbox-cross-mesh-6df09e8c\\mesh-8\\solve\\result\\worker_0\\worker_0\\ideal-TM110-doublet__b3e2ed10-c6c5-48dd-8640-991bb9ae4205\\ideal-TM110-doublet.cst",
+        "source_sha256": "9d67faa078fd975f61f1c053cb492639ad1a4e8bca09b997c62e973bcac7ad80",
+        "source_unchanged": true,
+        "session": {
+          "launcher_pid": 38484,
+          "owned": [
+            {
+              "pid": 38484,
+              "create_time": 1791916548.3357975
+            },
+            {
+              "pid": 49600,
+              "create_time": 1791916548.3530362
+            },
+            {
+              "pid": 16380,
+              "create_time": 1791916550.1665895
+            },
+            {
+              "pid": 21716,
+              "create_time": 1791916551.065502
+            },
+            {
+              "pid": 31272,
+              "create_time": 1791916552.7667131
+            },
+            {
+              "pid": 38896,
+              "create_time": 1791916554.6315067
+            },
+            {
+              "pid": 58068,
+              "create_time": 1791916554.89527
+            },
+            {
+              "pid": 56340,
+              "create_time": 1791916555.3684063
+            }
+          ],
+          "active_pids": [],
+          "elapsed_seconds": 31.844000000040978,
+          "exit_confirmed": true,
+          "foreign_processes": [],
+          "stage": "returning"
+        },
+        "exit_code": 0,
+        "wall_seconds": 31.844319300027564,
+        "result_directory": "D:\\work\\cst_tools\\artifacts\\pillbox-cross-mesh-6df09e8c\\mesh-8\\fields",
+        "solver_run": false,
+        "PostProcessResult": [
+          {
+            "id": 0,
+            "resultName": "E_1",
+            "value": {
+              "kind": "field-artifact",
+              "status": "available",
+              "filename": "field_1_E_a6ee72f7ee07.h5",
+              "sha256": "61525bc9f26ea3f5bcb650104e88d06ea96fe04d5df9a1abeb962037dfe86015",
+              "mode": 1,
+              "frequency_hz": 798367318.144302,
+              "field_kind": "E",
+              "coordinates_unit": "m",
+              "sampling": {
+                "bounds_m": [
+                  -0.229,
+                  0.229,
+                  -0.229,
+                  0.229,
+                  -0.1295,
+                  0.1295
+                ],
+                "counts": [
+                  64,
+                  64,
+                  64
+                ],
+                "scope": "specified-domain"
+              },
+              "field_unit": "V/m",
+              "sampling_id": "35d9111d4771071777954f665a93c460f6ac6e39d69fe3ec3e5597ad23302598",
+              "support_verified": true,
+              "support_check": "calculation-box-and-retrieval; material mask not independently verified",
+              "raw_coordinate_scale_to_m": 0.001,
+              "raw_coordinate_unit": "mm"
+            },
+            "params": {
+              "iModeNumber": 1,
+              "field_kind": "E",
+              "sampling": {
+                "bounds_m": [
+                  -0.229,
+                  0.229,
+                  -0.229,
+                  0.229,
+                  -0.1295,
+                  0.1295
+                ],
+                "counts": [
+                  64,
+                  64,
+                  64
+                ],
+                "scope": "specified-domain"
+              }
+            }
+          },
+          {
+            "id": 1,
+            "resultName": "E_2",
+            "value": {
+              "kind": "field-artifact",
+              "status": "available",
+              "filename": "field_2_E_98af5c47feb2.h5",
+              "sha256": "f89cfece116ce434d4765f4f4a721c268a1582ae9d1f6820bb70d499ac113c91",
+              "mode": 2,
+              "frequency_hz": 798369833.763561,
+              "field_kind": "E",
+              "coordinates_unit": "m",
+              "sampling": {
+                "bounds_m": [
+                  -0.229,
+                  0.229,
+                  -0.229,
+                  0.229,
+                  -0.1295,
+                  0.1295
+                ],
+                "counts": [
+                  64,
+                  64,
+                  64
+                ],
+                "scope": "specified-domain"
+              },
+              "field_unit": "V/m",
+              "sampling_id": "35d9111d4771071777954f665a93c460f6ac6e39d69fe3ec3e5597ad23302598",
+              "support_verified": true,
+              "support_check": "calculation-box-and-retrieval; material mask not independently verified",
+              "raw_coordinate_scale_to_m": 0.001,
+              "raw_coordinate_unit": "mm"
+            },
+            "params": {
+              "iModeNumber": 2,
+              "field_kind": "E",
+              "sampling": {
+                "bounds_m": [
+                  -0.229,
+                  0.229,
+                  -0.229,
+                  0.229,
+                  -0.1295,
+                  0.1295
+                ],
+                "counts": [
+                  64,
+                  64,
+                  64
+                ],
+                "scope": "specified-domain"
+              }
+            }
+          }
+        ],
+        "status": "complete"
+      },
+      "frequencies_mhz": [
+        798.367318144302,
+        798.369833763561
+      ],
+      "field_sha256": [
+        "61525bc9f26ea3f5bcb650104e88d06ea96fe04d5df9a1abeb962037dfe86015",
+        "f89cfece116ce434d4765f4f4a721c268a1582ae9d1f6820bb70d499ac113c91"
+      ],
+      "quadrature": {
+        "identity": "af8609e7935c36fd445e75ba124bb6b594872946b51ba4d18b26599dcd6cf36b",
+        "sampling_id": "35d9111d4771071777954f665a93c460f6ac6e39d69fe3ec3e5597ad23302598",
+        "scope": "common-material-domain",
+        "rule": "masked-cell-midpoint-volume-v1",
+        "volume_m3": 0.04281582317578127,
+        "weight_unit": "m^3",
+        "materials": [
+          "Vacuum"
+        ],
+        "support_ids": [
+          "5309b3861604c93c07cd45e045dbf79f2720acf8f62a2bc8a79bc8ae5ccbfdcc"
+        ],
+        "support_evidence": [
+          {
+            "geometry_id": "ideal-closed-PEC-pillbox-R229mm-L259mm-v1",
+            "provenance": "CST-Solid.IsPointInsideShape-and-GetMaterialNameForShape"
+          }
+        ],
+        "sampling_scope": "specified-domain",
+        "coverage_claim": "selected materials in declared sampling box; whole geometry requires independent gate",
+        "support_disagreement_fraction": 0.0,
+        "boundary_rule": "point-classification; cut-cell error requires refinement",
+        "physical_identity_confirmed": false
+      },
+      "analytic_subspace": {
+        "reference_rank": 2,
+        "candidate_rank": 2,
+        "scope": "common-material-domain",
+        "metric_kind": "weighted-sampled-field",
+        "status": "matched",
+        "reason": "explicit-policy-passed",
+        "singular_values": [
+          0.9999811877865629,
+          0.9999799511967317
+        ],
+        "minimum_squared_overlap": 0.9999599027954178,
+        "reference_condition": 1.0000000000000016,
+        "candidate_condition": 1.0090192600095877
+      },
+      "native_mesh_cells": 5332
+    },
+    {
+      "cell": 10,
+      "solve": {
+        "WorkerID": "0",
+        "TaskStatus": "Success",
+        "RunName": "ideal-TM110-doublet",
+        "RunParameters": {
+          "nmodes": 2,
+          "fmin": 780,
+          "fmax": 850,
+          "cell": 10
+        },
+        "PostProcessResult": [
+          {
+            "id": 0,
+            "resultName": "frequency_1",
+            "value": 798.36190828433,
+            "params": {
+              "iModeNumber": 1
+            }
+          },
+          {
+            "id": 1,
+            "resultName": "frequency_2",
+            "value": 798.362410105541,
+            "params": {
+              "iModeNumber": 2
+            }
+          }
+        ],
+        "FailureReport": null,
+        "ProjectSnapshot": "D:\\work\\cst_tools\\artifacts\\pillbox-cross-mesh-6df09e8c\\mesh-10\\solve\\result\\worker_0\\worker_0\\ideal-TM110-doublet__f380d2d1-950a-4369-8b5c-f4fcdf4c516a\\ideal-TM110-doublet.cst",
+        "TaskID": "f380d2d1-950a-4369-8b5c-f4fcdf4c516a",
+        "ResultDirectory": "D:\\work\\cst_tools\\artifacts\\pillbox-cross-mesh-6df09e8c\\mesh-10\\solve\\result\\worker_0\\worker_0\\ideal-TM110-doublet__f380d2d1-950a-4369-8b5c-f4fcdf4c516a",
+        "ReceiptPath": "D:\\work\\cst_tools\\artifacts\\pillbox-cross-mesh-6df09e8c\\mesh-10\\solve\\temp\\worker_0\\1514e23e-9689-4941-86a1-2dfca880ba4c\\received\\f380d2d1-950a-4369-8b5c-f4fcdf4c516a.json"
+      },
+      "stop_returned": true,
+      "stop_ack": true,
+      "exit_code": 0,
+      "snapshot_sha256": "f6cb4b511c1bc8ea125b48210be95a41eedbd45a2560c9a6980e93062a345a97",
+      "domain_registration": {
+        "schema_version": 1,
+        "status": "registered",
+        "source": "D:\\work\\cst_tools\\artifacts\\pillbox-cross-mesh-6df09e8c\\mesh-10\\solve\\result\\worker_0\\worker_0\\ideal-TM110-doublet__f380d2d1-950a-4369-8b5c-f4fcdf4c516a\\ideal-TM110-doublet.cst",
+        "source_sha256": "f6cb4b511c1bc8ea125b48210be95a41eedbd45a2560c9a6980e93062a345a97",
+        "geometry_id": "ideal-closed-PEC-pillbox-R229mm-L259mm-v1",
+        "sampling": {
+          "bounds_m": [
+            -0.229,
+            0.229,
+            -0.229,
+            0.229,
+            -0.1295,
+            0.1295
+          ],
+          "counts": [
+            64,
+            64,
+            64
+          ],
+          "scope": "specified-domain"
+        },
+        "sampling_id": "35d9111d4771071777954f665a93c460f6ac6e39d69fe3ec3e5597ad23302598",
+        "solver_run": false,
+        "sampling_convergence_confirmed": false,
+        "session": {
+          "launcher_pid": 52244,
+          "owned": [
+            {
+              "pid": 52244,
+              "create_time": 1791916636.4848516
+            },
+            {
+              "pid": 47320,
+              "create_time": 1791916636.5016973
+            },
+            {
+              "pid": 11508,
+              "create_time": 1791916638.4590693
+            },
+            {
+              "pid": 5012,
+              "create_time": 1791916639.2455096
+            },
+            {
+              "pid": 47760,
+              "create_time": 1791916640.9212067
+            },
+            {
+              "pid": 29120,
+              "create_time": 1791916642.855647
+            },
+            {
+              "pid": 46564,
+              "create_time": 1791916643.2682903
+            },
+            {
+              "pid": 40676,
+              "create_time": 1791916643.7607772
+            }
+          ],
+          "active_pids": [],
+          "elapsed_seconds": 40.15599999995902,
+          "exit_confirmed": true,
+          "foreign_processes": [],
+          "stage": "awaiting-macro"
+        },
+        "exit_code": 0,
+        "source_unchanged": true,
+        "inventory": {
+          "solids": [
+            {
+              "name": "domain-benchmark:ideal-cavity",
+              "material": "Vacuum",
+              "bounds_m": [
+                -0.229,
+                0.229,
+                -0.229,
+                0.229,
+                -0.1295,
+                0.1295
+              ]
+            }
+          ],
+          "background": [
+            "PEC"
+          ],
+          "boundaries": [
+            "electric",
+            "electric",
+            "electric",
+            "electric",
+            "electric",
+            "electric"
+          ],
+          "symmetry": [
+            "none",
+            "none",
+            "none"
+          ],
+          "ports": [
+            "0"
+          ]
+        },
+        "rejection_reasons": [],
+        "support_file": "support.tsv",
+        "support_sha256": "48cf9c32f51d782c632c9af0b9e84dee48cf3335f5c465e63ef7c419d9b0e77b",
+        "support_id": "5309b3861604c93c07cd45e045dbf79f2720acf8f62a2bc8a79bc8ae5ccbfdcc",
+        "inventory_sha256": "4d3b9f1164fa675f3f91bce83b7778fba74a4a84d9583f7921bcf93fd06d1900",
+        "quadrature": {
+          "identity": "af8609e7935c36fd445e75ba124bb6b594872946b51ba4d18b26599dcd6cf36b",
+          "sampling_id": "35d9111d4771071777954f665a93c460f6ac6e39d69fe3ec3e5597ad23302598",
+          "scope": "common-material-domain",
+          "rule": "masked-cell-midpoint-volume-v1",
+          "volume_m3": 0.04281582317578127,
+          "weight_unit": "m^3",
+          "materials": [
+            "Vacuum"
+          ],
+          "support_ids": [
+            "5309b3861604c93c07cd45e045dbf79f2720acf8f62a2bc8a79bc8ae5ccbfdcc"
+          ],
+          "support_evidence": [
+            {
+              "geometry_id": "ideal-closed-PEC-pillbox-R229mm-L259mm-v1",
+              "provenance": "CST-Solid.IsPointInsideShape-and-GetMaterialNameForShape"
+            }
+          ],
+          "sampling_scope": "specified-domain",
+          "coverage_claim": "selected materials in declared sampling box; whole geometry requires independent gate",
+          "support_disagreement_fraction": 0.0,
+          "boundary_rule": "point-classification; cut-cell error requires refinement",
+          "physical_identity_confirmed": false
+        }
+      },
+      "export": {
+        "source": "D:\\work\\cst_tools\\artifacts\\pillbox-cross-mesh-6df09e8c\\mesh-10\\solve\\result\\worker_0\\worker_0\\ideal-TM110-doublet__f380d2d1-950a-4369-8b5c-f4fcdf4c516a\\ideal-TM110-doublet.cst",
+        "source_sha256": "f6cb4b511c1bc8ea125b48210be95a41eedbd45a2560c9a6980e93062a345a97",
+        "source_unchanged": true,
+        "session": {
+          "launcher_pid": 48972,
+          "owned": [
+            {
+              "pid": 48972,
+              "create_time": 1791916680.6195006
+            },
+            {
+              "pid": 48388,
+              "create_time": 1791916680.6428936
+            },
+            {
+              "pid": 21220,
+              "create_time": 1791916683.442446
+            },
+            {
+              "pid": 16196,
+              "create_time": 1791916685.0413356
+            },
+            {
+              "pid": 25872,
+              "create_time": 1791916687.242044
+            },
+            {
+              "pid": 23836,
+              "create_time": 1791916687.5146763
+            },
+            {
+              "pid": 48996,
+              "create_time": 1791916687.9931104
+            }
+          ],
+          "active_pids": [],
+          "elapsed_seconds": 34.28100000007544,
+          "exit_confirmed": true,
+          "foreign_processes": [],
+          "stage": "returning"
+        },
+        "exit_code": 0,
+        "wall_seconds": 34.309900899999775,
+        "result_directory": "D:\\work\\cst_tools\\artifacts\\pillbox-cross-mesh-6df09e8c\\mesh-10\\fields",
+        "solver_run": false,
+        "PostProcessResult": [
+          {
+            "id": 0,
+            "resultName": "E_1",
+            "value": {
+              "kind": "field-artifact",
+              "status": "available",
+              "filename": "field_1_E_a6ee72f7ee07.h5",
+              "sha256": "8932a6102b6ee12592a23839ab6525b06e136856da1d99ef7f70e26a66a73f7a",
+              "mode": 1,
+              "frequency_hz": 798361908.28433,
+              "field_kind": "E",
+              "coordinates_unit": "m",
+              "sampling": {
+                "bounds_m": [
+                  -0.229,
+                  0.229,
+                  -0.229,
+                  0.229,
+                  -0.1295,
+                  0.1295
+                ],
+                "counts": [
+                  64,
+                  64,
+                  64
+                ],
+                "scope": "specified-domain"
+              },
+              "field_unit": "V/m",
+              "sampling_id": "35d9111d4771071777954f665a93c460f6ac6e39d69fe3ec3e5597ad23302598",
+              "support_verified": true,
+              "support_check": "calculation-box-and-retrieval; material mask not independently verified",
+              "raw_coordinate_scale_to_m": 0.001,
+              "raw_coordinate_unit": "mm"
+            },
+            "params": {
+              "iModeNumber": 1,
+              "field_kind": "E",
+              "sampling": {
+                "bounds_m": [
+                  -0.229,
+                  0.229,
+                  -0.229,
+                  0.229,
+                  -0.1295,
+                  0.1295
+                ],
+                "counts": [
+                  64,
+                  64,
+                  64
+                ],
+                "scope": "specified-domain"
+              }
+            }
+          },
+          {
+            "id": 1,
+            "resultName": "E_2",
+            "value": {
+              "kind": "field-artifact",
+              "status": "available",
+              "filename": "field_2_E_98af5c47feb2.h5",
+              "sha256": "e831f80ac057aa1f2a860f6c1a83582e2677194af57e9562087a63c1a3bb6551",
+              "mode": 2,
+              "frequency_hz": 798362410.105541,
+              "field_kind": "E",
+              "coordinates_unit": "m",
+              "sampling": {
+                "bounds_m": [
+                  -0.229,
+                  0.229,
+                  -0.229,
+                  0.229,
+                  -0.1295,
+                  0.1295
+                ],
+                "counts": [
+                  64,
+                  64,
+                  64
+                ],
+                "scope": "specified-domain"
+              },
+              "field_unit": "V/m",
+              "sampling_id": "35d9111d4771071777954f665a93c460f6ac6e39d69fe3ec3e5597ad23302598",
+              "support_verified": true,
+              "support_check": "calculation-box-and-retrieval; material mask not independently verified",
+              "raw_coordinate_scale_to_m": 0.001,
+              "raw_coordinate_unit": "mm"
+            },
+            "params": {
+              "iModeNumber": 2,
+              "field_kind": "E",
+              "sampling": {
+                "bounds_m": [
+                  -0.229,
+                  0.229,
+                  -0.229,
+                  0.229,
+                  -0.1295,
+                  0.1295
+                ],
+                "counts": [
+                  64,
+                  64,
+                  64
+                ],
+                "scope": "specified-domain"
+              }
+            }
+          }
+        ],
+        "status": "complete"
+      },
+      "frequencies_mhz": [
+        798.36190828433,
+        798.362410105541
+      ],
+      "field_sha256": [
+        "8932a6102b6ee12592a23839ab6525b06e136856da1d99ef7f70e26a66a73f7a",
+        "e831f80ac057aa1f2a860f6c1a83582e2677194af57e9562087a63c1a3bb6551"
+      ],
+      "quadrature": {
+        "identity": "af8609e7935c36fd445e75ba124bb6b594872946b51ba4d18b26599dcd6cf36b",
+        "sampling_id": "35d9111d4771071777954f665a93c460f6ac6e39d69fe3ec3e5597ad23302598",
+        "scope": "common-material-domain",
+        "rule": "masked-cell-midpoint-volume-v1",
+        "volume_m3": 0.04281582317578127,
+        "weight_unit": "m^3",
+        "materials": [
+          "Vacuum"
+        ],
+        "support_ids": [
+          "5309b3861604c93c07cd45e045dbf79f2720acf8f62a2bc8a79bc8ae5ccbfdcc"
+        ],
+        "support_evidence": [
+          {
+            "geometry_id": "ideal-closed-PEC-pillbox-R229mm-L259mm-v1",
+            "provenance": "CST-Solid.IsPointInsideShape-and-GetMaterialNameForShape"
+          }
+        ],
+        "sampling_scope": "specified-domain",
+        "coverage_claim": "selected materials in declared sampling box; whole geometry requires independent gate",
+        "support_disagreement_fraction": 0.0,
+        "boundary_rule": "point-classification; cut-cell error requires refinement",
+        "physical_identity_confirmed": false
+      },
+      "analytic_subspace": {
+        "reference_rank": 2,
+        "candidate_rank": 2,
+        "scope": "common-material-domain",
+        "metric_kind": "weighted-sampled-field",
+        "status": "matched",
+        "reason": "explicit-policy-passed",
+        "singular_values": [
+          0.9999926850122667,
+          0.9999926651477334
+        ],
+        "minimum_squared_overlap": 0.999985330349267,
+        "reference_condition": 1.0000000000000016,
+        "candidate_condition": 1.0039788324802932
+      },
+      "native_mesh_cells": 10220
+    }
+  ],
+  "physical_identity_confirmed": false,
+  "policy_calibrated": false,
+  "pre_solve_domain": {
+    "schema_version": 1,
+    "status": "registered",
+    "source": "D:\\work\\cst_tools\\artifacts\\pillbox-cross-mesh-6df09e8c\\prepare\\input.cst",
+    "source_sha256": "14205b4c03c35768789d39bdebd4c397245594cab4378c0d696966f86113eb82",
+    "geometry_id": "ideal-closed-PEC-pillbox-R229mm-L259mm-v1",
+    "sampling": {
+      "bounds_m": [
+        -0.229,
+        0.229,
+        -0.229,
+        0.229,
+        -0.1295,
+        0.1295
+      ],
+      "counts": [
+        64,
+        64,
+        64
+      ],
+      "scope": "specified-domain"
+    },
+    "sampling_id": "35d9111d4771071777954f665a93c460f6ac6e39d69fe3ec3e5597ad23302598",
+    "solver_run": false,
+    "sampling_convergence_confirmed": false,
+    "session": {
+      "launcher_pid": 43932,
+      "owned": [
+        {
+          "pid": 43932,
+          "create_time": 1791916410.879439
+        },
+        {
+          "pid": 49708,
+          "create_time": 1791916410.917154
+        },
+        {
+          "pid": 20888,
+          "create_time": 1791916413.6930168
+        },
+        {
+          "pid": 12028,
+          "create_time": 1791916415.3830557
+        },
+        {
+          "pid": 8776,
+          "create_time": 1791916416.9291215
+        },
+        {
+          "pid": 29904,
+          "create_time": 1791916417.1143
+        },
+        {
+          "pid": 37240,
+          "create_time": 1791916417.557785
+        }
+      ],
+      "active_pids": [],
+      "elapsed_seconds": 43.76600000006147,
+      "exit_confirmed": true,
+      "foreign_processes": [],
+      "stage": "awaiting-macro"
+    },
+    "exit_code": 0,
+    "source_unchanged": true,
+    "inventory": {
+      "solids": [
+        {
+          "name": "domain-benchmark:ideal-cavity",
+          "material": "Vacuum",
+          "bounds_m": [
+            -0.229,
+            0.229,
+            -0.229,
+            0.229,
+            -0.1295,
+            0.1295
+          ]
+        }
+      ],
+      "background": [
+        "PEC"
+      ],
+      "boundaries": [
+        "electric",
+        "electric",
+        "electric",
+        "electric",
+        "electric",
+        "electric"
+      ],
+      "symmetry": [
+        "none",
+        "none",
+        "none"
+      ],
+      "ports": [
+        "0"
+      ]
+    },
+    "rejection_reasons": [],
+    "support_file": "support.tsv",
+    "support_sha256": "48cf9c32f51d782c632c9af0b9e84dee48cf3335f5c465e63ef7c419d9b0e77b",
+    "support_id": "5309b3861604c93c07cd45e045dbf79f2720acf8f62a2bc8a79bc8ae5ccbfdcc",
+    "inventory_sha256": "4d3b9f1164fa675f3f91bce83b7778fba74a4a84d9583f7921bcf93fd06d1900",
+    "quadrature": {
+      "identity": "af8609e7935c36fd445e75ba124bb6b594872946b51ba4d18b26599dcd6cf36b",
+      "sampling_id": "35d9111d4771071777954f665a93c460f6ac6e39d69fe3ec3e5597ad23302598",
+      "scope": "common-material-domain",
+      "rule": "masked-cell-midpoint-volume-v1",
+      "volume_m3": 0.04281582317578127,
+      "weight_unit": "m^3",
+      "materials": [
+        "Vacuum"
+      ],
+      "support_ids": [
+        "5309b3861604c93c07cd45e045dbf79f2720acf8f62a2bc8a79bc8ae5ccbfdcc"
+      ],
+      "support_evidence": [
+        {
+          "geometry_id": "ideal-closed-PEC-pillbox-R229mm-L259mm-v1",
+          "provenance": "CST-Solid.IsPointInsideShape-and-GetMaterialNameForShape"
+        }
+      ],
+      "sampling_scope": "specified-domain",
+      "coverage_claim": "selected materials in declared sampling box; whole geometry requires independent gate",
+      "support_disagreement_fraction": 0.0,
+      "boundary_rule": "point-classification; cut-cell error requires refinement",
+      "physical_identity_confirmed": false
+    }
+  },
+  "cross_mesh": {
+    "subspace": {
+      "reference_rank": 2,
+      "candidate_rank": 2,
+      "scope": "common-material-domain",
+      "metric_kind": "weighted-sampled-field",
+      "status": "matched",
+      "reason": "explicit-policy-passed",
+      "singular_values": [
+        0.9999738615055791,
+        0.9999724112313052
+      ],
+      "minimum_squared_overlap": 0.9999448232237506,
+      "reference_condition": 1.0090192600095877,
+      "candidate_condition": 1.0039788324802932
+    },
+    "mac": [
+      [
+        0.8997055908676694,
+        0.10024038749560453
+      ],
+      [
+        0.10023309812253774,
+        0.8997134704545686
+      ]
+    ],
+    "swapped_subspace": {
+      "reference_rank": 2,
+      "candidate_rank": 2,
+      "scope": "common-material-domain",
+      "metric_kind": "weighted-sampled-field",
+      "status": "matched",
+      "reason": "explicit-policy-passed",
+      "singular_values": [
+        0.9999738615055791,
+        0.9999724112313052
+      ],
+      "minimum_squared_overlap": 0.9999448232237506,
+      "reference_condition": 1.0090192600095877,
+      "candidate_condition": 1.0039788324802932
+    },
+    "swap_invariant": true
+  },
+  "relative_frequency_change": 9.298520192085257e-06,
+  "gate_passed": true,
+  "sampling_note": "64^3 common grid; sampling convergence established separately, not repeated here",
+  "mesh_convergence_claim": "two-mesh agreement only; not a three-level solver convergence study",
+  "source_unchanged": true,
+  "distinct_mesh_verified": true,
+  "tracker_acceptance": {
+    "gate_passed": true,
+    "normal": {
+      "reference": {
+        "snapshot_id": "cell-8",
+        "support_id": "5309b3861604c93c07cd45e045dbf79f2720acf8f62a2bc8a79bc8ae5ccbfdcc",
+        "fields": [
+          {
+            "mode": 1,
+            "frequency_hz": 798367318.144302,
+            "sha256": "61525bc9f26ea3f5bcb650104e88d06ea96fe04d5df9a1abeb962037dfe86015"
+          },
+          {
+            "mode": 2,
+            "frequency_hz": 798369833.763561,
+            "sha256": "f89cfece116ce434d4765f4f4a721c268a1582ae9d1f6820bb70d499ac113c91"
+          }
+        ]
+      },
+      "candidate": {
+        "snapshot_id": "cell-10",
+        "support_id": "5309b3861604c93c07cd45e045dbf79f2720acf8f62a2bc8a79bc8ae5ccbfdcc",
+        "fields": [
+          {
+            "mode": 1,
+            "frequency_hz": 798361908.28433,
+            "sha256": "8932a6102b6ee12592a23839ab6525b06e136856da1d99ef7f70e26a66a73f7a"
+          },
+          {
+            "mode": 2,
+            "frequency_hz": 798362410.105541,
+            "sha256": "e831f80ac057aa1f2a860f6c1a83582e2677194af57e9562087a63c1a3bb6551"
+          }
+        ]
+      },
+      "quadrature": {
+        "identity": "df02c76a4803e6ef9fe024e4be5a6fb70d240fa33b74e71362cacda57416624d",
+        "sampling_id": "35d9111d4771071777954f665a93c460f6ac6e39d69fe3ec3e5597ad23302598",
+        "scope": "common-material-domain",
+        "rule": "masked-cell-midpoint-volume-v1",
+        "volume_m3": 0.04281582317578127,
+        "weight_unit": "m^3",
+        "materials": [
+          "Vacuum"
+        ],
+        "support_ids": [
+          "5309b3861604c93c07cd45e045dbf79f2720acf8f62a2bc8a79bc8ae5ccbfdcc",
+          "5309b3861604c93c07cd45e045dbf79f2720acf8f62a2bc8a79bc8ae5ccbfdcc"
+        ],
+        "support_evidence": [
+          {
+            "geometry_id": "ideal-closed-PEC-pillbox-R229mm-L259mm-v1",
+            "provenance": "CST-Solid.IsPointInsideShape-and-GetMaterialNameForShape"
+          },
+          {
+            "geometry_id": "ideal-closed-PEC-pillbox-R229mm-L259mm-v1",
+            "provenance": "CST-Solid.IsPointInsideShape-and-GetMaterialNameForShape"
+          }
+        ],
+        "sampling_scope": "specified-domain",
+        "coverage_claim": "selected materials in declared sampling box; whole geometry requires independent gate",
+        "support_disagreement_fraction": 0.0,
+        "boundary_rule": "point-classification; cut-cell error requires refinement",
+        "physical_identity_confirmed": false
+      },
+      "selected_modes": [
+        1,
+        2
+      ],
+      "physical_identity_confirmed": false,
+      "policy_calibrated": false,
+      "member_identity_confirmed": false,
+      "mac": [
+        [
+          0.8997055908676694,
+          0.10024038749560453
+        ],
+        [
+          0.10023309812253774,
+          0.8997134704545686
+        ]
+      ],
+      "status": "matched",
+      "reason": "explicit-policy-passed",
+      "group": {
+        "reference_rank": 2,
+        "candidate_rank": 2,
+        "scope": "common-material-domain",
+        "metric_kind": "weighted-sampled-field",
+        "status": "matched",
+        "reason": "explicit-policy-passed",
+        "singular_values": [
+          0.9999738615055791,
+          0.9999724112313052
+        ],
+        "minimum_squared_overlap": 0.9999448232237506,
+        "reference_condition": 1.0090192600095877,
+        "candidate_condition": 1.0039788324802932
+      },
+      "margin": null,
+      "match_kind": "declared-mode-subspace",
+      "schema_version": 1,
+      "domain": {
+        "geometry_id": "ideal-closed-PEC-pillbox-R229mm-L259mm-v1",
+        "background": "PEC",
+        "interior": "Vacuum",
+        "closed": true,
+        "boundary_evidence": "prepare/Model.run: PEC background and six electric walls, no symmetry",
+        "coverage_evidence": "full cylinder bounding box; native sole Vacuum solid agrees with analytic cylinder",
+        "sampling_evidence": "64^3 shared grid; previous 48/64/96 sampling acceptance, see physical-domain-pillbox-acceptance.md"
+      },
+      "policy": {
+        "minimum_mac": 0.9,
+        "minimum_margin": 0.05,
+        "minimum_subspace_overlap": 0.99,
+        "rank_tolerance": 1e-10,
+        "numerical_tolerance": 1e-08,
+        "maximum_frequency_change": 0.01
+      },
+      "reference_strategy": "fixed-anchor",
+      "recovery_action": "none"
+    },
+    "missing_file": {
+      "status": "unconfirmed",
+      "reason": "FileNotFoundError: [Errno 2] No such file or directory: 'D:\\\\work\\\\cst_tools\\\\artifacts\\\\pillbox-cross-mesh-6df09e8c\\\\mesh-10\\\\fields\\\\field_1_E_a6ee72f7ee07.h5'",
+      "selected_modes": [],
+      "reference": {
+        "snapshot_id": "cell-8",
+        "support_id": "5309b3861604c93c07cd45e045dbf79f2720acf8f62a2bc8a79bc8ae5ccbfdcc",
+        "fields": [
+          {
+            "mode": 1,
+            "frequency_hz": 798367318.144302,
+            "sha256": "61525bc9f26ea3f5bcb650104e88d06ea96fe04d5df9a1abeb962037dfe86015"
+          },
+          {
+            "mode": 2,
+            "frequency_hz": 798369833.763561,
+            "sha256": "f89cfece116ce434d4765f4f4a721c268a1582ae9d1f6820bb70d499ac113c91"
+          }
+        ]
+      },
+      "candidate": {
+        "snapshot_id": "cell-10",
+        "support_id": "5309b3861604c93c07cd45e045dbf79f2720acf8f62a2bc8a79bc8ae5ccbfdcc",
+        "fields": [
+          {
+            "mode": 1,
+            "frequency_hz": 798361908.28433,
+            "sha256": "8932a6102b6ee12592a23839ab6525b06e136856da1d99ef7f70e26a66a73f7a"
+          },
+          {
+            "mode": 2,
+            "frequency_hz": 798362410.105541,
+            "sha256": "e831f80ac057aa1f2a860f6c1a83582e2677194af57e9562087a63c1a3bb6551"
+          }
+        ]
+      },
+      "schema_version": 1,
+      "domain": {
+        "geometry_id": "ideal-closed-PEC-pillbox-R229mm-L259mm-v1",
+        "background": "PEC",
+        "interior": "Vacuum",
+        "closed": true,
+        "boundary_evidence": "prepare/Model.run: PEC background and six electric walls, no symmetry",
+        "coverage_evidence": "full cylinder bounding box; native sole Vacuum solid agrees with analytic cylinder",
+        "sampling_evidence": "64^3 shared grid; previous 48/64/96 sampling acceptance, see physical-domain-pillbox-acceptance.md"
+      },
+      "policy": {
+        "minimum_mac": 0.9,
+        "minimum_margin": 0.05,
+        "minimum_subspace_overlap": 0.99,
+        "rank_tolerance": 1e-10,
+        "numerical_tolerance": 1e-08,
+        "maximum_frequency_change": 0.01
+      },
+      "reference_strategy": "fixed-anchor",
+      "physical_identity_confirmed": false,
+      "policy_calibrated": false,
+      "member_identity_confirmed": false,
+      "recovery_action": "retain-reference; inspect input or obtain additional candidates; no automatic solver replay"
+    },
+    "recovered": {
+      "reference": {
+        "snapshot_id": "cell-8",
+        "support_id": "5309b3861604c93c07cd45e045dbf79f2720acf8f62a2bc8a79bc8ae5ccbfdcc",
+        "fields": [
+          {
+            "mode": 1,
+            "frequency_hz": 798367318.144302,
+            "sha256": "61525bc9f26ea3f5bcb650104e88d06ea96fe04d5df9a1abeb962037dfe86015"
+          },
+          {
+            "mode": 2,
+            "frequency_hz": 798369833.763561,
+            "sha256": "f89cfece116ce434d4765f4f4a721c268a1582ae9d1f6820bb70d499ac113c91"
+          }
+        ]
+      },
+      "candidate": {
+        "snapshot_id": "cell-10",
+        "support_id": "5309b3861604c93c07cd45e045dbf79f2720acf8f62a2bc8a79bc8ae5ccbfdcc",
+        "fields": [
+          {
+            "mode": 1,
+            "frequency_hz": 798361908.28433,
+            "sha256": "8932a6102b6ee12592a23839ab6525b06e136856da1d99ef7f70e26a66a73f7a"
+          },
+          {
+            "mode": 2,
+            "frequency_hz": 798362410.105541,
+            "sha256": "e831f80ac057aa1f2a860f6c1a83582e2677194af57e9562087a63c1a3bb6551"
+          }
+        ]
+      },
+      "quadrature": {
+        "identity": "df02c76a4803e6ef9fe024e4be5a6fb70d240fa33b74e71362cacda57416624d",
+        "sampling_id": "35d9111d4771071777954f665a93c460f6ac6e39d69fe3ec3e5597ad23302598",
+        "scope": "common-material-domain",
+        "rule": "masked-cell-midpoint-volume-v1",
+        "volume_m3": 0.04281582317578127,
+        "weight_unit": "m^3",
+        "materials": [
+          "Vacuum"
+        ],
+        "support_ids": [
+          "5309b3861604c93c07cd45e045dbf79f2720acf8f62a2bc8a79bc8ae5ccbfdcc",
+          "5309b3861604c93c07cd45e045dbf79f2720acf8f62a2bc8a79bc8ae5ccbfdcc"
+        ],
+        "support_evidence": [
+          {
+            "geometry_id": "ideal-closed-PEC-pillbox-R229mm-L259mm-v1",
+            "provenance": "CST-Solid.IsPointInsideShape-and-GetMaterialNameForShape"
+          },
+          {
+            "geometry_id": "ideal-closed-PEC-pillbox-R229mm-L259mm-v1",
+            "provenance": "CST-Solid.IsPointInsideShape-and-GetMaterialNameForShape"
+          }
+        ],
+        "sampling_scope": "specified-domain",
+        "coverage_claim": "selected materials in declared sampling box; whole geometry requires independent gate",
+        "support_disagreement_fraction": 0.0,
+        "boundary_rule": "point-classification; cut-cell error requires refinement",
+        "physical_identity_confirmed": false
+      },
+      "selected_modes": [
+        1,
+        2
+      ],
+      "physical_identity_confirmed": false,
+      "policy_calibrated": false,
+      "member_identity_confirmed": false,
+      "mac": [
+        [
+          0.8997055908676694,
+          0.10024038749560453
+        ],
+        [
+          0.10023309812253774,
+          0.8997134704545686
+        ]
+      ],
+      "status": "matched",
+      "reason": "explicit-policy-passed",
+      "group": {
+        "reference_rank": 2,
+        "candidate_rank": 2,
+        "scope": "common-material-domain",
+        "metric_kind": "weighted-sampled-field",
+        "status": "matched",
+        "reason": "explicit-policy-passed",
+        "singular_values": [
+          0.9999738615055791,
+          0.9999724112313052
+        ],
+        "minimum_squared_overlap": 0.9999448232237506,
+        "reference_condition": 1.0090192600095877,
+        "candidate_condition": 1.0039788324802932
+      },
+      "margin": null,
+      "match_kind": "declared-mode-subspace",
+      "schema_version": 1,
+      "domain": {
+        "geometry_id": "ideal-closed-PEC-pillbox-R229mm-L259mm-v1",
+        "background": "PEC",
+        "interior": "Vacuum",
+        "closed": true,
+        "boundary_evidence": "prepare/Model.run: PEC background and six electric walls, no symmetry",
+        "coverage_evidence": "full cylinder bounding box; native sole Vacuum solid agrees with analytic cylinder",
+        "sampling_evidence": "64^3 shared grid; previous 48/64/96 sampling acceptance, see physical-domain-pillbox-acceptance.md"
+      },
+      "policy": {
+        "minimum_mac": 0.9,
+        "minimum_margin": 0.05,
+        "minimum_subspace_overlap": 0.99,
+        "rank_tolerance": 1e-10,
+        "numerical_tolerance": 1e-08,
+        "maximum_frequency_change": 0.01
+      },
+      "reference_strategy": "fixed-anchor",
+      "recovery_action": "none"
+    },
+    "sequence": {
+      "schema_version": 1,
+      "reference": {
+        "snapshot_id": "cell-8",
+        "support_id": "5309b3861604c93c07cd45e045dbf79f2720acf8f62a2bc8a79bc8ae5ccbfdcc",
+        "fields": [
+          {
+            "mode": 1,
+            "frequency_hz": 798367318.144302,
+            "sha256": "61525bc9f26ea3f5bcb650104e88d06ea96fe04d5df9a1abeb962037dfe86015"
+          },
+          {
+            "mode": 2,
+            "frequency_hz": 798369833.763561,
+            "sha256": "f89cfece116ce434d4765f4f4a721c268a1582ae9d1f6820bb70d499ac113c91"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "snapshot_id": "cell-10",
+          "status": "matched",
+          "reason": "explicit-policy-passed",
+          "report": "D:\\work\\cst_tools\\artifacts\\pillbox-cross-mesh-6df09e8c\\tracking\\sequence\\step-0001.json"
+        },
+        {
+          "snapshot_id": "missing-member",
+          "status": "unconfirmed",
+          "reason": "missing-candidates",
+          "report": "D:\\work\\cst_tools\\artifacts\\pillbox-cross-mesh-6df09e8c\\tracking\\sequence\\step-0002.json"
+        },
+        {
+          "snapshot_id": "swapped-and-recovered",
+          "status": "matched",
+          "reason": "explicit-policy-passed",
+          "report": "D:\\work\\cst_tools\\artifacts\\pillbox-cross-mesh-6df09e8c\\tracking\\sequence\\step-0003.json"
+        }
+      ],
+      "status": "unconfirmed",
+      "solver_replayed": false,
+      "physical_identity_confirmed": false
+    },
+    "cli_exit_code": 2,
+    "cli_stdout": "Tracking steps=3 matched=2\n",
+    "cli_stderr": "",
+    "solver_replayed_for_recovery": false,
+    "reference_strategy": "fixed-anchor",
+    "natural_number_swap_observed": false
+  }
+}
