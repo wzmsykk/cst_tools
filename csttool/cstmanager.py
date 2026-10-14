@@ -22,6 +22,7 @@ from .configuration import GlobalSettings, ProjectSettings
 from .logging_config import ContextLogger
 from .worker_models import WorkerConfig, SimulationResult
 from .run_store import RunStore, logical_job_id
+from .run_overview import RunOverview
 from .result_reconciliation import execution_fingerprint, find_received_result
 from .configuration import read_json, write_json_atomic
 from .resource_admission import ResourceAdmission, ResourceBudget, ResourceAdmissionError
@@ -124,6 +125,8 @@ class CSTManager:
         max_jobs_per_worker: int = 6,
         progress_callback=None,
         run_id: str | None = None,
+        run_directory: str | Path | None = None,
+        run_overview: RunOverview | None = None,
         resource_budget: ResourceBudget | None = None,
         field_reference_result: Path | None = None,
         field_match_policy: Mapping[str, Any] | None = None,
@@ -157,9 +160,13 @@ class CSTManager:
             self._vacuum_domain = validate_managed_domain_options(vacuum_domain)
 
         self.currProjectDir = Path(pconfm.currProjectDir).absolute()
-        if not isinstance(self.logger, ContextLogger):
+        bound_run = getattr(self.logger, 'extra', {}).get('run_id')
+        if run_id and bound_run and run_id != bound_run:
+            raise ValueError('run_id does not match logger context')
+        identity = run_id or bound_run or uuid4().hex
+        if not isinstance(self.logger, ContextLogger) or not bound_run:
             self.logger = ContextLogger(self.logger, {
-                "run_id": uuid4().hex, "project": self.currProjectDir,
+                "run_id": identity, "project": self.currProjectDir,
             })
         temp_path = self.project_settings.directories.temp
         result_path = self.project_settings.directories.result
@@ -174,7 +181,12 @@ class CSTManager:
         self.resultDir.mkdir(parents=True, exist_ok=True)
         self.taskFileDir = self.tempDir
         self.cstProjPath = self.currProjectDir / cst_filename
-        self.run_store = RunStore(self.currProjectDir, self.currProjectDir / 'logs' / (run_id or uuid4().hex))
+        self._standalone_overview = None
+        if run_directory is None:
+            self._standalone_overview = RunOverview(self.currProjectDir, identity, '批量任务')
+            run_directory = self._standalone_overview.directory
+        self.run_store = RunStore(self.currProjectDir, run_directory, run_id=identity)
+        self.run_store.overview = run_overview or self._standalone_overview
         self.execution_fingerprint = (execution_fingerprint(self.cstProjPath, {
             'postprocess': self.pconfm.get_postprocess_settings(),
             'cst_version': self.global_settings.cst.version,
@@ -645,6 +657,12 @@ class CSTManager:
             self._state = ManagerState.CLOSED
         self.logger.info(
             "MANAGER_STOPPED workers=%d errors=%d", len(slots), len(stop_errors), extra={"event": "MANAGER_STOPPED", "phase": "shutdown", "workers": len(slots), "errors": len(stop_errors)})
+        if self._standalone_overview is not None:
+            try:
+                self._standalone_overview.update(status='RECOVERY_REQUIRED' if stop_errors else 'STOPPED',
+                                                  stop_errors=len(stop_errors))
+            except (OSError, ValueError):
+                self.logger.warning('运行摘要未能更新，请核对完整日志', exc_info=True)
         if stop_errors:
             raise RuntimeError(
                 f"{len(stop_errors)} CST worker(s) did not stop cleanly"
@@ -669,7 +687,15 @@ class CSTManager:
             }:
                 return
             self._state = ManagerState.STOP_REQUESTED
+            workers = [slot.worker for slot in self._slots]
         self._clear_queue(self._task_queue)
+        for worker in workers:
+            publish_stop = getattr(worker, 'request_stop', None)
+            if publish_stop is not None:
+                try:
+                    publish_stop()
+                except Exception:
+                    self.logger.exception("Worker停止请求发布失败；保留本任务并等待标准收尾")
         self.logger.info("Manager 已接受安全停止请求 | project=%s", self.currProjectDir)
 
     def emergency_terminate(self) -> None:

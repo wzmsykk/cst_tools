@@ -284,9 +284,11 @@ def test_detail_journal_logs_complete_lines_once_and_stage_changes(tmp_path, cap
         observe({'stage':'save', 'elapsed_seconds':32.})
         processor._log_details(tmp_path, cursor)
     assert cursor == [2]
-    assert caplog.text.count('action=parameter-set') == 1
-    assert "before='2 * density' after='24' outcome=requested" in caplog.text
-    assert caplog.text.count('预处理阶段') == 2
+    changes = [record for record in caplog.records if getattr(record, 'action', '') == 'parameter-set']
+    assert len(changes) == 1
+    assert changes[0].before == '2 * density' and changes[0].after == '24'
+    assert changes[0].status == 'requested'
+    assert caplog.text.count('预处理进入阶段') == 2
     assert 'returned-success' in caplog.text
 
 

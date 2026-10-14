@@ -308,7 +308,7 @@ class CstPostProcessor:
             f"{result_name}.txt"
         )
 
-    def render_vb(self) -> list[str]:
+    def render_vb(self, *, cooperative_stop=False) -> list[str]:
         lines: list[str] = []
         imports = dict.fromkeys(
             doc["import"] for doc in self.postProcessDocList if doc["import"]
@@ -322,7 +322,11 @@ class CstPostProcessor:
         lines.append("\nSub CustomPostProcess\n")
         for doc in self.postProcessDocList:
             if doc["funcString"]:
+                if cooperative_stop:
+                    lines.append('    CSTPMW_CheckStop "postprocess-item"\n')
                 lines.append(f'    {doc["funcString"]}')
+        if cooperative_stop:
+            lines.append('    CSTPMW_CheckStop "postprocess-complete"\n')
         lines.append("End Sub\n")
         return lines
 

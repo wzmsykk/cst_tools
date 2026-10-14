@@ -364,7 +364,7 @@ def test_standard_stop_timeout_does_not_kill_cst(tmp_path, caplog):
         worker.stop()
 
     assert not worker._process.killed
-    assert "WORKER_STOP_FAILED" in caplog.text
+    assert any(getattr(record, 'event', '') == 'WORKER_STOP_FAILED' for record in caplog.records)
     assert "WORKER_STOPPED" not in caplog.text
 
 
@@ -403,15 +403,16 @@ def test_task_logs_results_before_ack_and_only_completes_after_ready(tmp_path, m
         received = json.loads(captured.value.receipt_path.read_text(encoding='utf-8'))
         assert received['phase'] == 'received' and received['status'] == 'Success'
         assert Path(received['snapshot']).is_file()
-        assert "TASK_ACK_FAILED" in caplog.text
-        assert "WORKER_TASK_COMPLETE" not in caplog.text
+        assert any(getattr(record, 'event', '') == 'TASK_ACK_FAILED' for record in caplog.records)
+        assert not any(getattr(record, 'event', '') == 'WORKER_TASK_COMPLETE' for record in caplog.records)
     else:
         worker.run_task("mode-1", params={})
         received = json.loads(next((worker.root / 'received').glob('*.json')).read_text(encoding='utf-8'))
         assert received['phase'] == 'acknowledged'
         assert Path(received['snapshot']).is_file()
-        events = ["CST_COMPLETION ", "RESULT_READ_DONE", "TASK_ACK_PUBLISHED", "TASK_ACK_READY", "WORKER_TASK_COMPLETE"]
-        offsets = [caplog.text.index(event) for event in events]
+        events = ["CST_COMPLETION", "RESULT_READ_DONE", "TASK_ACK_PUBLISHED", "TASK_ACK_READY", "WORKER_TASK_COMPLETE"]
+        recorded = [getattr(record, 'event', '') for record in caplog.records]
+        offsets = [recorded.index(event) for event in events]
         assert offsets == sorted(offsets)
     assert worker._active_task_context == {}
 

@@ -7,6 +7,16 @@
 
 ## 最新状态与近期TODO（2026-10-14）
 
+- 新应用日志目录包含时间/HOM频率范围/新运行或续跑/短ID；完整ID仍在元数据。增加summary.md与logs/index.md，Backend/Manager共用目录，HOM检查点实时更新覆盖，旧目录只补索引不改名。本批离线543 passed、19 integration deselected。见[可读日志目录](readable-log-directories.md)，服务器/网络盘验收待做。
+
+- Managed增加协作停止广播与VBA步骤检查；成功求解中断保留interrupted-project.cst，不回滚覆盖它。HOM求解前保存当前pending，空区间参与覆盖账本；已有检查点/扫描清单拒绝非续跑覆盖。本批离线537 passed、19 integration deselected。阻塞CST调用不能即时抢占，启动尚未注册Worker和仅后处理恢复联调待做。见[停止与覆盖续跑](cooperative-stop-and-hom-resume.md)。
+
+- 六链日志可读性重构：摘要与context分离，参数/进程/任务/事件码仍进双输出；ID新增规范别名；首异常堆栈与上层error_ref关联，独立收尾错误仍保留。任务提交日志移至实际发布之后，现有控制门禁不变。本批离线528 passed、19 integration deselected。见[六链日志设计/API](readable-logging.md)，真实CST日志验收待做。
+
+- GUI日志主视图改为事件表、级别/关键词/阶段/任务筛选及详情；保留原始标签和真实.log/JSONL入口。有界批量模型、身份完整的进度更新同一行，错误不合并。离线524 passed、19 integration deselected，离屏预览已检查；实际桌面体验待验收。见[结构化事件使用/API](gui-structured-log.md)。
+
+- GUI长日志追加改为有界队列/批量刷新，拖动暂停追加、向上阅读不强制跟随、长行不换行；仅显示镜像限流，文件日志不变。本批离线518 passed、19 integration deselected。见[日志显示性能](gui-log-performance.md)，实际桌面拖动验收待做。
+
 - 共享服务器预处理改为任务级归属（取代下方基线中间方案）：父子关系/精确副本路径确认的进程才需退出；其他用户及同用户新旧CST实例仅诊断，foreign不再阻塞重提。本批离线514 passed、19 integration deselected；成功标记/产物门禁不变，真实共享服务器验收待做。见[现行归属规则](preprocess-diagnostics.md)。
 
 - 历史中间方案（已被上条任务级归属取代）：启动前PID+创建时间基线仅记录；当时仍拒绝启动后新活跃未知实例，离线510 passed、19 integration deselected。保留此记录说明旧包行为，不作为现行门禁。见[归属门禁演进](preprocess-diagnostics.md)。

@@ -131,6 +131,8 @@ class AdaptiveHomScanner:
                 self._checkpoint(checkpoint, report, queue)
                 raise ScanInterrupted(report, list(queue))
             interval = queue.pop(0)
+            # Persist the in-flight interval before any solver side effect.
+            self._checkpoint(checkpoint, report, [interval] + queue)
             if not interval.lo < interval.hi:
                 raise ScanConfigurationError("scan interval did not make progress")
 
@@ -151,6 +153,10 @@ class AdaptiveHomScanner:
                 try:
                     modes = self._validate_modes(solve(request))
                 except Exception as exc:
+                    if should_stop is not None and should_stop():
+                        pending_intervals = [interval] + queue
+                        self._checkpoint(checkpoint, report, pending_intervals)
+                        raise ScanInterrupted(report, pending_intervals) from exc
                     last_error = f"{type(exc).__name__}: {exc}"
                     self.logger.warning(
                         "HOM_SOLVE_INVALID_RESULT 区间=[%.12g, %.12g] MHz 尝试=%d/%d 原因=%s",
@@ -321,6 +327,12 @@ class ScanCheckpointStore:
     ) -> None:
         snapshot = self._encode_snapshot(snapshot_path)
         document = {
+            "coverage": {
+                "confirmed_frontier": (min([item.lo for item in pending + report.failed])
+                     if pending or report.failed else min(policy.stop,
+                        max([item.hi for item in report.completed], default=policy.start))),
+                "calculated_upper": max([item.hi for item in report.completed], default=policy.start),
+            },
             "schemaVersion": self.SCHEMA_VERSION,
             "policy": asdict(policy),
             "projectFingerprint": project_fingerprint,

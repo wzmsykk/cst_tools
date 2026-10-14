@@ -5,8 +5,10 @@ from GUI.run_controller import GuiRunController, RunState
 from GUI.ui_main import Ui_MainWindow
 from GUI.postprocess_settings_dialog import PostProcessSettingsDialog
 from GUI.theme import apply_theme, set_visual_role
-from PyQt5.QtWidgets import QFileDialog, QPlainTextEdit
-from PyQt5.QtCore import QObject, QTimer, pyqtSignal
+from PyQt5.QtWidgets import QFileDialog
+from PyQt5.QtCore import QTimer
+from GUI.log_view import QPlainTextEditLogger
+from GUI.event_log_view import StructuredLogHandler
 import logging
 import pathlib
 
@@ -46,28 +48,6 @@ CST_STAGE_PRESENTATION = {
 }
 
 
-class _LogEmitter(QObject):
-    message = pyqtSignal(str)
-
-
-class QPlainTextEditLogger(logging.Handler):
-    def __init__(self, parent):
-        super().__init__()
-        self.widget = QPlainTextEdit(parent)
-        self.widget.setReadOnly(True)
-        self._emitter = _LogEmitter()
-        self._emitter.message.connect(self.widget.appendPlainText)
-        self.setFormatter(
-            logging.Formatter("%(asctime)s | %(levelname)s | %(message)s", "%H:%M:%S")
-        )
-
-    def emit(self, record):
-        try:
-            self._emitter.message.emit(self.format(record))
-        except Exception:
-            self.handleError(record)
-
-
 class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(
         self,
@@ -101,11 +81,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.pageLayout.setStretch(1, 1)
         self.workspaceSplitter.setSizes([560, 860])
 
-        self.logTextBox = QPlainTextEditLogger(self)
+        self.logTextBox = StructuredLogHandler(self)
         self.logTextBox.widget.document().setMaximumBlockCount(5000)
         self.logTextBox.widget.setPlaceholderText("运行日志将在这里显示…")
         self.logTextBox.widget.setAccessibleName("运行日志")
-        self.LogBoxLayout.addWidget(self.logTextBox.widget)
+        self.LogBoxLayout.addWidget(self.logTextBox.panel)
         self.runProgressBar.setAccessibleName("运行阶段进度")
 
         self.uiProjectDir = None
@@ -120,6 +100,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.controller = controller or GuiRunController(self.service)
         self.logger = self.service.logger
         self.logger.addHandler(self.logTextBox)
+        self.logTextBox.bind_logger(self.logger)
         self.logger.debug("GUI 已初始化")
 
         self.CalcDialogBox = calc_dialog or AlgorithmSettingsDialog(parent=self)
@@ -174,7 +155,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.postProcessButton.clicked.connect(self.showPPSDialogBox)
         self.StopButton.clicked.connect(self.requestStop)
         self.RecoverButton.clicked.connect(self.requestRecovery)
-        self.clearLogButton.clicked.connect(self.logTextBox.widget.clear)
+        self.clearLogButton.clicked.connect(self.logTextBox.clear)
 
         self.controller.state_changed.connect(self.renderRunState)
         self.controller.stage_changed.connect(self.renderStage)

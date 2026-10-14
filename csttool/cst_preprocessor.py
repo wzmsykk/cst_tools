@@ -18,6 +18,7 @@ from typing import Callable
 from csttool import projectutil
 from .acceptance_session import cst_processes, wait_probe
 from .configuration import write_json_atomic
+from .logging_config import log_failure
 
 
 REQUIRED_HOM_PARAMETERS = frozenset({"fmin", "fmax", "nmodes", "cell"})
@@ -76,8 +77,11 @@ class CstProjectPreprocessor:
                 continue
             timestamp, action, target, before, after, outcome = fields
             self.logger.info(
-                "CST 预处理明细 | action=%s target=%s before=%r after=%r outcome=%s cst_time=%s diagnostics=%s",
-                action, target, before, after, outcome, timestamp, working,
+                "预处理修改：%s %s，%s → %s（%s）",
+                action, target, before, after, outcome,
+                extra={'phase':'preprocess', 'action':action, 'target':target,
+                       'before':before, 'after':after, 'status':outcome,
+                       'diagnostics':str(working), 'cst_time':timestamp},
             )
 
     def _observer(self, working, cursor):
@@ -86,8 +90,10 @@ class CstProjectPreprocessor:
             self._log_details(working, cursor)
             stage = diagnostic['stage']
             if stage != last_stage[0]:
-                self.logger.info("CST 预处理阶段 | stage=%s elapsed=%.1fs diagnostics=%s",
-                                 stage, diagnostic['elapsed_seconds'], working)
+                self.logger.info("预处理进入阶段：%s", stage,
+                                 extra={'phase':'preprocess', 'stage':stage,
+                                        'elapsed_seconds':diagnostic['elapsed_seconds'],
+                                        'status':'started', 'diagnostics':str(working)})
                 last_stage[0] = stage
         return observe
 
@@ -100,7 +106,8 @@ class CstProjectPreprocessor:
             preexisting = cst_processes()
         except psutil.AccessDenied:
             preexisting = []
-        self.logger.info("CST 预处理进程基线 | preexisting=%s diagnostics=%s", preexisting, working)
+        self.logger.debug("已记录其他CST实例，不参与本任务退出检查",
+                          extra={'phase':'preprocess','preexisting_processes':preexisting,'diagnostics':str(working)})
         with (working / "cst.log").open("wb") as stream:
             process = subprocess.Popen(command, env=cst_process_environment(),
                                        stdout=stream, stderr=subprocess.STDOUT,
@@ -236,7 +243,9 @@ class CstProjectPreprocessor:
                 encoding="utf-8",
             )
             command = [str(self.executable), "-m", "-b", str(working_project)]
-            self.logger.info("启动 CST 工程参数预处理 | source=%s diagnostics=%s", source_project_path, working)
+            self.logger.info("开始预处理工程副本，原工程保持不变",
+                             extra={'phase':'preprocess','source_project':str(source_project_path),
+                                    'diagnostics':str(working),'modify_mesh':modify_mesh})
             try:
                 completed = self._run(command, working)
                 self._log_details(working, self._detail_cursor)
@@ -273,13 +282,16 @@ class CstProjectPreprocessor:
             self._log_details(working, self._detail_cursor)
             manifest.update(state="failed", error=str(exc))
             write_json_atomic(working / "preprocess-report.json", manifest)
-            self.logger.error("CST 预处理失败，副本及诊断已保留 | diagnostics=%s", working)
+            log_failure(self.logger, "预处理未完成；副本和诊断已保留，请先检查相关进程", exc,
+                        extra={'phase':'preprocess','diagnostics':str(working),
+                               'recovery_hint':'检查本任务相关进程和阶段记录，不直接重复提交'})
             raise CstPreprocessError(f"{exc}；诊断目录: {working}") from exc
         manifest.update(state="success", raw_copy_removed=True)
         shutil.copy2(macro_path, working / "Model.run")
         working_project.unlink()
         shutil.rmtree(working_project.with_suffix(''))
         write_json_atomic(working / "preprocess-report.json", manifest)
-        self.logger.info("CST 预处理完成 | output=%s parameters=%d diagnostics=%s",
-                         output_project_path, len(parameters), working)
+        self.logger.info("工程副本预处理完成，已校验参数并发布",
+                         extra={'phase':'preprocess','output':str(output_project_path),
+                                'parameters':len(parameters),'diagnostics':str(working),'status':'success'})
         return CstPreprocessResult(output_project_path, parameters)

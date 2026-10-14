@@ -15,14 +15,14 @@ def logical_job_id(name, parameters, definition):
 
 
 class RunStore:
-    def __init__(self, project, directory):
+    def __init__(self, project, directory, *, run_id=None):
         self.project = Path(project).resolve()
         self.directory = Path(directory)
         self.directory.mkdir(parents=True, exist_ok=True)
         self.lock = RLock()
         manifest = self.directory / 'run.json'
         if not manifest.exists():
-            write_json_atomic(manifest, {'schema_version': 1, 'run_id': self.directory.name,
+            write_json_atomic(manifest, {'schema_version': 1, 'run_id': run_id or self.directory.name,
                                         'project': str(self.project), 'created_utc': self._utc()})
 
     @staticmethod

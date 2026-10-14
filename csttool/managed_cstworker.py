@@ -20,7 +20,7 @@ from .postprocess_cst import CstPostProcessor
 from .configuration import write_json_atomic
 from .cst_progress import CstLogProgressMonitor, CstLogProgressParser
 from .vb_codec import quote_vb_string
-from .logging_config import ContextLogger
+from .logging_config import ContextLogger, log_failure
 from .worker_models import WorkerConfig, SimulationResult
 from .cst_process_env import cst_process_environment
 from .resource_usage import record_worker_usage
@@ -204,7 +204,7 @@ class ManagedCSTWorker:
         }
         for placeholder, value in replacements.items():
             main = main.replace(placeholder, value)
-        generated = "".join(self.postprocess.render_vb())
+        generated = "".join(self.postprocess.render_vb(cooperative_stop=True))
         output = (
             "'#Language \"WWB-COM\"\n\nOption Explicit\n\n"
             + codec
@@ -376,14 +376,6 @@ class ManagedCSTWorker:
                 "interval_hi": self._progress_number(params.get("fmax")),
             }
             started_at = time.monotonic()
-            self.logger.info(
-                "任务已发送给 CST | WORKER_TASK_DISPATCH worker=%s session=%s task=%s job=%s fmin=%s fmax=%s",
-                self.ID,
-                self.session_id,
-                task.task_id,
-                result_name,
-                params.get("fmin"),
-                params.get("fmax"), extra={"event": "WORKER_TASK_DISPATCH", "phase": "solve", "worker": self.ID, "session": self.session_id, "task": task.task_id, "job": result_name, "fmin": params.get("fmin"), "fmax": params.get("fmax")})
             self._native_progress = NativeProgressTracker(
                 self.project_path.with_suffix('') / 'Result' / 'progress.log',
                 getattr(self, 'observation_root', self.root) / 'native_progress' / task.task_id,
@@ -398,14 +390,18 @@ class ManagedCSTWorker:
                 f"dispatched:{task.task_id}", encoding="ascii"
             )
             atomic_publish(self.task_path, payload)
+            self.logger.info("任务已提交，等待CST完成计算",
+                extra={"event": "WORKER_TASK_DISPATCH", "phase": "solve", "worker": self.ID, "session": self.session_id, "task": task.task_id, "job": result_name, "fmin": params.get("fmin"), "fmax": params.get("fmax")})
             try:
                 completion = self._wait_completion(task)
-            except Exception:
+            except Exception as exc:
                 self._diagnose_failure("completion")
-                self.logger.exception("等待 CST 完成失败 | CST_COMPLETION_FAILED task=%s job=%s", task.task_id, result_name, extra={"event": "CST_COMPLETION_FAILED", "phase": "solve", "task": task.task_id, "job": result_name})
+                log_failure(self.logger, "未能确认计算完成；请检查完成协议与CST诊断", exc,
+                    extra={"event": "CST_COMPLETION_FAILED", "phase": "solve", "task": task.task_id, "job": result_name,
+                           "recovery_hint":"先核对本任务进程及完成标记，不因等待失败重复求解"})
                 self._active_task_context = {}
                 raise
-            self.logger.debug("收到 CST 完成标记 | CST_COMPLETION task=%s job=%s status=%s", task.task_id, result_name, completion.status.value, extra={"event": "CST_COMPLETION", "phase": "solve", "task": task.task_id, "job": result_name, "status": completion.status.value})
+            self.logger.debug("收到CST完成标记，开始核对结果", extra={"event": "CST_COMPLETION", "phase": "solve", "task": task.task_id, "job": result_name, "status": completion.status.value})
             task_result_root = self.result_root / task.task_id
             project_snapshot = task_result_root / "project.cst"
             field_artifacts = []
@@ -421,7 +417,7 @@ class ManagedCSTWorker:
                     field_artifacts = [item for item in postprocess_result
                         if isinstance(item.get('value'), dict) and item['value'].get('kind') == 'field-artifact']
                     postprocess_result = [item for item in postprocess_result if item not in field_artifacts]
-                    self.logger.debug("后处理结果读取完成 | RESULT_READ_DONE task=%s job=%s results=%d snapshot=%s", task.task_id, result_name, len(postprocess_result), project_snapshot, extra={"event": "RESULT_READ_DONE", "phase": "readout", "task": task.task_id, "job": result_name, "results": len(postprocess_result), "snapshot": project_snapshot})
+                    self.logger.info("后处理结果已读取，等待保存接收记录并确认任务", extra={"event": "RESULT_READ_DONE", "phase": "readout", "task": task.task_id, "job": result_name, "results": len(postprocess_result), "snapshot": project_snapshot})
                     status = "Success"
                     failure = None
                 else:
@@ -429,7 +425,9 @@ class ManagedCSTWorker:
                     status = "Failure"
                     failure = f"{completion.error_code.value}: {completion.error_message}"
             except Exception as exc:
-                self.logger.exception("后处理结果读取失败 | RESULT_READ_FAILED task=%s job=%s", task.task_id, result_name, extra={"event": "RESULT_READ_FAILED", "phase": "readout", "task": task.task_id, "job": result_name})
+                log_failure(self.logger, "后处理结果不可用；本次任务不能作为成功结果接收", exc,
+                    extra={"event": "RESULT_READ_FAILED", "phase": "readout", "task": task.task_id, "job": result_name,
+                           "recovery_hint":"检查结果文件和后处理要求，不能据此认定求解器未运行"})
                 postprocess_result = None
                 status = "Failure"
                 failure = f"RESULT_READ_FAILED: {type(exc).__name__}: {exc}"
@@ -458,12 +456,12 @@ class ManagedCSTWorker:
                         self.ack_path,
                         Acknowledge(task.task_id, task.session_id),
                     )
-                    self.logger.debug("任务 Ack 已发布 | TASK_ACK_PUBLISHED task=%s job=%s", task.task_id, result_name, extra={"event": "TASK_ACK_PUBLISHED", "phase": "ack", "task": task.task_id, "job": result_name})
+                    self.logger.debug("接收记录已保存，任务确认已发送，等待CST回到就绪状态", extra={"event": "TASK_ACK_PUBLISHED", "phase": "ack", "task": task.task_id, "job": result_name})
                     self._wait_for_marker("ready", self.START_TIMEOUT)
                     write_json_atomic(receipt_path, {**received, 'phase': 'acknowledged'})
                     if getattr(self, 'run_store', None) is not None:
                         self.run_store.event(task.task_id, 'acknowledged')
-                    self.logger.debug("CST 已回到就绪状态 | TASK_ACK_READY task=%s job=%s", task.task_id, result_name, extra={"event": "TASK_ACK_READY", "phase": "ack", "task": task.task_id, "job": result_name})
+                    self.logger.info("任务确认完成，CST已回到就绪状态", extra={"event": "TASK_ACK_READY", "phase": "ack", "task": task.task_id, "job": result_name, "result_status":status})
                 except Exception as exc:
                     if getattr(self, 'run_store', None) is not None:
                         try:
@@ -471,7 +469,10 @@ class ManagedCSTWorker:
                         except (OSError, ValueError):
                             self.logger.warning('待确认索引写入失败，保留接收记录与原始异常', exc_info=True)
                     self._diagnose_failure("ack")
-                    self.logger.exception("任务确认阶段失败 | TASK_ACK_FAILED task=%s job=%s", task.task_id, result_name, extra={"event": "TASK_ACK_FAILED", "phase": "ack", "task": task.task_id, "job": result_name})
+                    log_failure(self.logger, "任务确认未完成；保存状态请核对接收记录，先恢复会话再决定是否继续", exc,
+                        extra={"event": "TASK_ACK_FAILED", "phase": "ack", "task": task.task_id, "job": result_name,
+                               "receipt":str(receipt_path), "result_status":status,
+                               "recovery_hint":"检查接收记录是否实际保存，不直接重复计算"})
                     raise ManagedAcknowledgmentPending(receipt_path, exc) from exc
                 finally:
                     self._active_task_context = {}
@@ -523,13 +524,8 @@ class ManagedCSTWorker:
                         self.logger.warning('可选域登记待办写入失败，已确认求解不重算 | task=%s',task.task_id,exc_info=True)
             log_method = self.logger.info if status == "Success" else self.logger.error
             log_method(
-                "CST 任务结束 | WORKER_TASK_COMPLETE worker=%s task=%s status=%s elapsed_seconds=%.3f failure=%s job=%s",
-                self.ID,
-                task.task_id,
-                status,
-                time.monotonic() - started_at,
-                failure or "none",
-                result_name, extra={"event": "WORKER_TASK_COMPLETE", "phase": "solve", "worker": self.ID, "task": task.task_id, "status": status, "elapsed_seconds": time.monotonic() - started_at, "failure": failure or "none", "job": result_name})
+                "任务完成，结果已接收并确认" if status == "Success" else "任务未成功，失败信息已接收；请检查原因",
+                extra={"event": "WORKER_TASK_COMPLETE", "phase": "solve", "worker": self.ID, "task": task.task_id, "status": status, "elapsed_seconds": time.monotonic() - started_at, "failure": failure or "none", "job": result_name})
             return SimulationResult(
                 self.ID, status, result_name, dict(params), postprocess_result,
                 failure, project_snapshot.resolve() if status == "Success" else None,
@@ -657,7 +653,7 @@ class ManagedCSTWorker:
                 log_size = self.log_path.stat().st_size if self.log_path.exists() else None
                 heartbeat = time.monotonic() >= next_heartbeat
                 self.logger.log(logging.INFO if heartbeat else logging.DEBUG,
-                    "CST 仍在运行 | task=%s elapsed_seconds=%.1f log_bytes=%s", task.task_id, elapsed, log_size,
+                    "CST尚未返回完成标记，继续等待",
                     extra={"event": "CST_WAIT_PROGRESS", "phase": "solve", "task": task.task_id,
                            "elapsed_seconds": elapsed, "log_bytes": log_size,
                            "timeout_seconds": self.TASK_TIMEOUT})
@@ -720,6 +716,10 @@ class ManagedCSTWorker:
             self.emergency_terminate()
         raise RuntimeError("CST_MEMORY_GUARD: sustained extreme memory and stalled log; replay from confirmed snapshot")
 
+    def request_stop(self) -> None:
+        """Publish cancellation without waiting for the running task's lock."""
+        self.protocol.request_stop(self.session_id)
+
     def stop(self) -> bool:
         with self._lock:
             if self._process is None:
@@ -735,10 +735,8 @@ class ManagedCSTWorker:
                 return True
             self._stopping = True
             self.logger.info(
-                "请求 CST 标准退出 | WORKER_STOP_REQUEST worker=%s session=%s pid=%s",
-                self.ID,
-                self.session_id,
-                getattr(self._process, "pid", None), extra={"event": "WORKER_STOP_REQUEST", "phase": "shutdown", "worker": self.ID, "session": self.session_id, "pid": getattr(self._process, "pid", None)})
+                "已请求CST标准退出，等待保存回执与进程结束",
+                extra={"event": "WORKER_STOP_REQUEST", "phase": "shutdown", "worker": self.ID, "session": self.session_id, "pid": getattr(self._process, "pid", None)})
             if not self.stop_request_path.exists():
                 self.protocol.request_stop(self.session_id)
             deadline = time.monotonic() + self.STOP_TIMEOUT
@@ -752,7 +750,7 @@ class ManagedCSTWorker:
                         break
                     self._close_log()
                     self.logger.info(
-                        "CST 已确认停止并退出 | WORKER_STOPPED worker=%s session=%s", self.ID, self.session_id, extra={"event": "WORKER_STOPPED", "phase": "shutdown", "worker": self.ID, "session": self.session_id})
+                        "CST标准退出已确认，本会话已关闭", extra={"event": "WORKER_STOPPED", "phase": "shutdown", "worker": self.ID, "session": self.session_id})
                     self._finish_domain_registration()
                     return True
                 if self._process.poll() is not None:
@@ -762,7 +760,7 @@ class ManagedCSTWorker:
             if self._process.poll() is not None:
                 self._close_log()
             self._diagnose_failure("shutdown")
-            self.logger.error("CST 标准退出未获确认，需要会话恢复 | WORKER_STOP_FAILED worker=%s session=%s returncode=%s process_alive=%s timeout_seconds=%s", self.ID, self.session_id, self._process.poll(), self._process.poll() is None, self.STOP_TIMEOUT, extra={"event": "WORKER_STOP_FAILED", "phase": "shutdown", "worker": self.ID, "session": self.session_id, "returncode": self._process.poll(), "process_alive": self._process.poll() is None, "timeout_seconds": self.STOP_TIMEOUT})
+            self.logger.error("CST标准退出未确认；保留会话，请先执行恢复", extra={"event": "WORKER_STOP_FAILED", "phase": "shutdown", "worker": self.ID, "session": self.session_id, "returncode": self._process.poll(), "process_alive": self._process.poll() is None, "timeout_seconds": self.STOP_TIMEOUT, "recovery_hint":"核对StopAck、快照及本任务进程，不强杀独立实例"})
             raise ManagedWorkerShutdownError(
                 f"worker {self.ID} did not confirm Save/StopAck/batch exit; " + (
                     "process already exited; reconcile preserved protocol and snapshot"

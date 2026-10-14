@@ -148,7 +148,8 @@ def test_exhausted_invalid_results_are_recorded_and_later_modes_are_scanned(capl
     assert requests[:3] == [(100, 110), (100, 110), (110, 120)]
     assert report.failed == [ScanInterval(100, 110)]
     assert [item.frequency for item in report.modes] == [115]
-    assert checkpoints[0] == [ScanInterval(110, 120)]
+    assert checkpoints[0] == [ScanInterval(100, 110)]
+    assert [ScanInterval(110, 120)] in checkpoints
     assert checkpoints[-1] == []
     assert ScanInterval(100, 110) not in report.empty + report.completed
     assert "HOM_FAILED_INTERVAL" in caplog.text

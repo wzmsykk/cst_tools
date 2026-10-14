@@ -5,6 +5,9 @@ Private goodParameterExpressions() As String
 Private goodParameterCount As Long
 Private goodParametersAvailable As Boolean
 Private modelNeedsRecovery As Boolean
+Private cancellationRequested As Boolean
+Private activeTaskId As String
+Private activeTaskSolveReady As Boolean
 
 Sub Main
     Dim task As CSTP_Task
@@ -21,6 +24,10 @@ Sub Main
     Dim solverReturn As Long
 
     On Error GoTo WorkerFailed
+    If Dir("%STOP_REQUEST_PATH%") <> "" Then
+        CSTPMW_CloseSession
+        Exit Sub
+    End If
     ' -m -b loads this project before compiling Model/3D/Model.run.
     ' Never OpenFile here: compiling in an empty project loses the parameter
     ' namespace used by CST's internal 3D/DS expression synchronization.
@@ -47,12 +54,17 @@ Sub Main
             End If
 
             stage = "parameters"
+            activeTaskId = task.TaskId
+            activeTaskSolveReady = False
+            CSTPMW_CheckStop "before-parameters"
             modelNeedsRecovery = True
             For i = 0 To task.ParameterCount - 1
+                CSTPMW_CheckStop "parameters"
                 StoreParameter task.Parameters(i).Name, task.Parameters(i).Value
             Next i
 
             stage = "rebuild"
+            CSTPMW_CheckStop "before-rebuild"
             rebuilt = Rebuild
             If Not rebuilt Then
                 CSTPMW_PublishFailure task, "REBUILD_FAILED", "Rebuild returned False"
@@ -60,6 +72,7 @@ Sub Main
             End If
 
             stage = "solver-config"
+            CSTPMW_CheckStop "after-rebuild"
             For i = 0 To task.ParameterCount - 1
                 If LCase(task.Parameters(i).Name) = "nmodes" Then
                     requestedModes = RestoreDoubleParameter("nmodes")
@@ -68,6 +81,7 @@ Sub Main
                 End If
             Next i
             stage = "solver-start"
+            CSTPMW_CheckStop "before-solver"
             CSTPMW_Trace stage, "%PROJECT_PATH%", "calling EigenmodeSolver.Start"
             solverReturn = EigenmodeSolver.Start
             CSTPMW_Trace stage, "%PROJECT_PATH%", "returned=" & CStr(solverReturn)
@@ -81,6 +95,8 @@ Sub Main
                 CSTPMW_PublishFailure task, "SOLVER_FAILED", "Start returned 1 but no eigenmodes are available"
                 GoTo WaitForAck
             End If
+            activeTaskSolveReady = True
+            CSTPMW_CheckStop "after-solver"
 
             stage = "postprocess"
             outFullDir = "%RESULT_ROOT%" & task.TaskId & "\"
@@ -88,6 +104,7 @@ Sub Main
             CustomPostProcess
 
             stage = "flush"
+            CSTPMW_CheckStop "before-flush"
             Backup outFullDir & "project.cst"
             stage = "parameter-checkpoint"
             CSTPMW_CaptureGoodParameters
@@ -166,7 +183,10 @@ WorkerFailed:
         ackBlocked = True
         Resume AckWaitTick
     End If
-    If stage = "solver-start" Or stage = "solver-result" Then
+    If cancellationRequested Then
+        errorCode = "INTERNAL_ERROR"
+        errorMessage = "STOP_REQUESTED: " & errorMessage
+    ElseIf stage = "solver-start" Or stage = "solver-result" Then
         errorCode = "SOLVER_FAILED"
     ElseIf stage = "rebuild" Then
         errorCode = "REBUILD_FAILED"
@@ -182,6 +202,26 @@ WorkerFailed:
         CSTPMW_WriteMarker "%MARKER_PATH%", "failure:" & errorCode & ":" & errorMessage
         Resume CloseWorker
     End If
+End Sub
+
+Private Sub CSTPMW_CheckStop(checkpoint As String)
+    Dim stopError As String
+    If Dir("%STOP_REQUEST_PATH%") = "" Then Exit Sub
+    If Not CSTP_ReadStopRequest("%STOP_REQUEST_PATH%", "%SESSION_ID%", stopError) Then
+        Err.Raise vbObjectError + 2421, "worker stop", stopError
+    End If
+    cancellationRequested = True
+    CSTPMW_Trace "cancel-checkpoint", checkpoint, "stop requested; no further task steps"
+    If activeTaskSolveReady Then
+        ' Preserve the solved project; never restore parameters over its results.
+        CSTPMW_CaptureGoodParameters
+        modelNeedsRecovery = False
+        outFullDir = "%RESULT_ROOT%" & activeTaskId & "\"
+        If Dir(outFullDir, 16) = "" Then MkDir outFullDir
+        Backup outFullDir & "interrupted-project.cst"
+        CSTPMW_Trace "interrupted-solve", outFullDir, "saved; postprocess/acceptance not complete"
+    End If
+    Err.Raise vbObjectError + 2420, "worker stop", "Stopped at " & checkpoint
 End Sub
 
 Private Sub CSTPMW_CloseSession

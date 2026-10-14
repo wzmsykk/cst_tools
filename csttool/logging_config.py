@@ -26,6 +26,50 @@ class RecordIdentity(logging.Filter):
         return True
 
 
+def normalized_context(fields):
+    """Add canonical identities without removing compatibility aliases."""
+    fields = dict(fields)
+    for old, new in (('task', 'task_id'), ('session', 'session_id'), ('worker', 'worker_id')):
+        if old in fields and new not in fields:
+            fields[new] = fields[old]
+    return fields
+
+
+class DiagnosticTextFormatter(logging.Formatter):
+    """Human summary first; full structured details on a separate line."""
+    def format(self, record):
+        rendered = super().format(record)
+        standard = logging.makeLogRecord({}).__dict__
+        details = normalized_context({key: value for key, value in record.__dict__.items()
+            if key not in standard and key not in {'message', 'asctime', 'exc_text', 'record_id'}})
+        if details:
+            rendered += '\n  context=' + json.dumps(details, ensure_ascii=False, default=str)
+        return rendered
+
+
+def log_failure(logger, message, error, *, extra=None):
+    """Retain the first traceback; refer to it when the same cause is propagated."""
+    cursor, seen, reference = error, set(), None
+    while cursor is not None and id(cursor) not in seen:
+        seen.add(id(cursor))
+        reference = getattr(cursor, '_cst_log_failure_id', None)
+        if reference:
+            break
+        # Implicit context can be a *different* cleanup failure, not propagation.
+        cursor = cursor.__cause__
+    identity = reference or uuid4().hex
+    fields = {**(extra or {}), 'error_ref':identity, 'reason':str(error),
+              'error_type':type(error).__name__, 'traceback_repeated':bool(reference)}
+    if not reference:
+        fields['record_id'] = identity
+    logger.error(message, extra=fields,
+                 exc_info=None if reference else (type(error), error, error.__traceback__), stacklevel=2)
+    try:
+        error._cst_log_failure_id = identity
+    except (AttributeError, TypeError):
+        pass  # Non-extensible exception types safely retain duplicate diagnostics.
+
+
 def _code_version():
     root = Path(__file__).resolve().parent.parent
     try:
@@ -51,9 +95,9 @@ class JsonLineFormatter(logging.Formatter):
                 "message": str(record.exc_info[1]),
                 "traceback": self.formatException(record.exc_info),
             }
-        fields = {key: value for key, value in record.__dict__.items()
+        fields = normalized_context({key: value for key, value in record.__dict__.items()
                   if key not in logging.makeLogRecord({}).__dict__
-                  and key not in {"message", "asctime", "exc_text", "record_id"}}
+                  and key not in {"message", "asctime", "exc_text", "record_id"}})
         payload = {
             "schema_version": 1,
             "timestamp": datetime.fromtimestamp(record.created, timezone.utc).isoformat(),
@@ -77,19 +121,16 @@ class JsonLineFormatter(logging.Formatter):
 
 
 class ContextLogger(logging.LoggerAdapter):
-    """Attach correlation fields to records and plain-text messages."""
+    """Attach correlation fields without altering the human message."""
 
     def log(self, level, msg, *args, **kwargs):
         if self.isEnabledFor(level):
             kwargs["stacklevel"] = kwargs.get("stacklevel", 1) + 1
-            # Format before appending paths: a literal '%' in a project name
-            # must not become an unintended logging format placeholder.
-            super().log(level, msg % args if args else msg, **kwargs)
+            super().log(level, msg, *args, **kwargs)
 
     def process(self, msg, kwargs):
-        kwargs["extra"] = {**kwargs.get("extra", {}), **self.extra}
-        context = " ".join(f"{key}={value}" for key, value in self.extra.items())
-        return f"{msg} | {context}", kwargs
+        kwargs["extra"] = normalized_context({**kwargs.get("extra", {}), **self.extra})
+        return msg, kwargs
 
 
 def _coerce_level(level: str | int) -> int:
@@ -145,7 +186,7 @@ class ApplicationLogSession:
             self.jsonl_path = config.path.with_name(config.path.name + ".jsonl")
         identity = RecordIdentity()
 
-        formatter = logging.Formatter(config.format_string)
+        formatter = DiagnosticTextFormatter(config.format_string)
         file_handler = TimedRotatingFileHandler(
             filename=config.path,
             when=config.when,

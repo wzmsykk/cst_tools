@@ -16,7 +16,8 @@ from uuid import uuid4
 from install_compat import resource_path
 
 from csttool import cstmanager, globalconfmanager, hom_scan_algorithm
-from csttool.logging_config import ApplicationLogSession, ContextLogger
+from csttool.logging_config import ApplicationLogSession, ContextLogger, log_failure
+from csttool.run_overview import RunOverview, RunOverviewHandler
 from csttool.managed_cstworker import ManagedCSTWorker
 from csttool import projectconfmanager
 from csttool.hom_scan import ScanInterrupted
@@ -101,6 +102,8 @@ class CstApplicationBackend:
 
         self._base_logger = self.logger
         self.run_id = None
+        self._run_overview = None
+        self._overview_handler = None
         self.logger.debug("运行资源目录 | path=%s", resource_path("."))
         self.gconfman = global_config_manager or globalconfmanager.GlobalConfigManager(
             logger=self.logger
@@ -192,9 +195,29 @@ class CstApplicationBackend:
             name = self._base_logger.name
             level = self._base_logger.level
             self._log_owner.close()
-            self.log_path = Path(self.get_project_directory()) / 'logs' / self.run_id / 'application.log'
+            if self._overview_handler is not None:
+                self._base_logger.removeHandler(self._overview_handler)
+                self._overview_handler.close()
+            settings = self.alg.get_editable_attributes()
+            naming_settings = dict(settings)
+            source_hint = getattr(self.pconfman, 'inputCSTFilePath', getattr(self.pconfman, 'currCSTFilePath', None))
+            if self.resume:
+                try:
+                    original = read_json(Path(self.get_project_directory())/'save/csv/scan_manifest.json')
+                    naming_settings.update(fmin=original['frequency_start'], endfreq=original['frequency_stop'])
+                    source_hint = original.get('source_project', source_hint)
+                except (OSError, ValueError, KeyError, TypeError):
+                    naming_settings = {}
+            purpose = (f"HOM-{naming_settings.get('fmin','?')}-{naming_settings.get('endfreq',naming_settings.get('fmax','?'))}MHz"
+                       if 'fmin' in naming_settings else ('续跑-原配置待确认' if self.resume else '批量优化'))
+            self._run_overview = RunOverview(self.get_project_directory(), self.run_id, purpose,
+                                            resume=self.resume, settings=settings)
+            self._run_overview.update(source_project=str(source_hint) if source_hint else '未知')
+            self.log_path = self._run_overview.directory / 'application.log'
             self._log_owner = ApplicationLogSession(self.log_path, level=level, name=name)
             self._base_logger = self._log_owner.logger
+            self._overview_handler = RunOverviewHandler(self._run_overview)
+            self._base_logger.addHandler(self._overview_handler)
         self.logger = ContextLogger(self._base_logger, {
             "run_id": self.run_id,
             "project": self.get_project_directory(),
@@ -205,6 +228,8 @@ class CstApplicationBackend:
         if self.resume:
             try:
                 self._restore_resume_configuration()
+                if self._run_overview is not None:
+                    self._run_overview.update(settings=self.alg.get_editable_attributes())
             except Exception as exc:
                 self.logger.exception("读取原项目续算配置失败")
                 self._set_state(BackendState.FAILED)
@@ -269,6 +294,10 @@ class CstApplicationBackend:
         self._require_state("prepare run", BackendState.INITIALIZED)
         try:
             self._acquire_project_run_lock()
+            checkpoint = Path(self.get_project_directory()) / 'save' / 'csv' / 'hom_scan_checkpoint.json'
+            manifest = checkpoint.with_name('scan_manifest.json')
+            if (checkpoint.exists() or manifest.exists()) and not self.resume:
+                raise BackendPreparationError("已有HOM检查点，禁止从头覆盖；请使用继续运行或新项目目录")
             self.logger.info("准备运行 | RUN_PREPARE project=%s", self.get_project_directory(), extra={"event": "RUN_PREPARE", "phase": "lifecycle", "project": self.get_project_directory()})
             unresolved = self.get_recovery_sessions()
             if unresolved:
@@ -306,7 +335,9 @@ class CstApplicationBackend:
             self.alg.set_job_manager(self.jm)
             self.alg.set_cst_parameters(algorithm_params)
         except Exception as exc:
-            self.logger.exception("运行准备失败 | project=%s resume=%s", self.get_project_directory(), self.resume)
+            log_failure(self.logger, "运行准备未完成，本次未开始正式扫描", exc,
+                        extra={'phase':'prepare','project':self.get_project_directory(),
+                               'resume':self.resume,'recovery_hint':'检查首个异常及诊断目录，再决定恢复或重试'})
             if self.state is not BackendState.RECOVERY_REQUIRED:
                 self._set_state(BackendState.FAILED)
             try:
@@ -452,18 +483,22 @@ class CstApplicationBackend:
             raise
         except Exception as exc:
             failure = exc
-            self.logger.exception("运行失败，开始安全停止", extra={"event": "RUN_EXECUTE_FAILED", "phase": "execute"})
+            log_failure(self.logger, "运行中断于异常，正在按标准流程收尾", exc,
+                        extra={"event": "RUN_EXECUTE_FAILED", "phase": "execute"})
             self._set_state(BackendState.FAILED)
             raise
         finally:
             try:
                 self._stop_manager_once()
-            except Exception:
+            except Exception as stop_error:
                 self._set_state(BackendState.RECOVERY_REQUIRED)
-                self.logger.exception("安全停止失败，需要恢复会话", extra={"event": "RUN_SHUTDOWN_FAILED", "phase": "shutdown"})
+                log_failure(self.logger, "安全停止未完成，后续运行前必须恢复会话", stop_error,
+                            extra={"event": "RUN_SHUTDOWN_FAILED", "phase": "shutdown"})
                 if failure is None:
                     raise
-                self.logger.exception("运行失败后关闭 Worker 失败，需要会话恢复 | project=%s", self.get_project_directory())
+                self.logger.error("原运行异常与退出异常均已保留，请先恢复会话",
+                                  extra={'phase':'shutdown','project':self.get_project_directory(),
+                                         'run_error':str(failure),'shutdown_error':str(stop_error)})
             finally:
                 self._clear_manager()
                 try:
@@ -578,6 +613,9 @@ class CstApplicationBackend:
             manager_options["worker_factory"] = ManagedCSTWorker.create
             manager_options["progress_callback"] = self._publish_cst_progress
             manager_options['run_id'] = self.run_id
+            if self._run_overview is not None:
+                manager_options['run_directory'] = self._run_overview.directory
+                manager_options['run_overview'] = self._run_overview
         self.jm = self._manager_factory(
             params=project_params,
             pconfm=self.pconfman,
@@ -648,6 +686,10 @@ class CstApplicationBackend:
                 "已释放项目运行锁 | PROJECT_LOCK_RELEASED project=%s", self.get_project_directory(), extra={"event": "PROJECT_LOCK_RELEASED", "phase": "lifecycle", "project": self.get_project_directory()})
 
     def close_logging(self) -> None:
+        if self._overview_handler is not None:
+            self._base_logger.removeHandler(self._overview_handler)
+            self._overview_handler.close()
+            self._overview_handler = None
         if self._log_owner is not None:
             self._log_owner.close()
 
@@ -686,3 +728,10 @@ class CstApplicationBackend:
     def _set_state(self, state: BackendState) -> None:
         with self._lifecycle_lock:
             self.state = state
+        if getattr(self, '_run_overview', None) is not None:
+            try:
+                prepared = getattr(getattr(self.pconfman, 'settings', None), 'cst_filename', None)
+                fields = {'prepared_project':str(Path(self.get_project_directory()) / prepared)} if prepared else {}
+                self._run_overview.update(status=state.name, **fields)
+            except (OSError, ValueError, TypeError, AttributeError):
+                self.logger.warning("运行摘要更新失败，完整日志与控制状态不受影响", exc_info=True)

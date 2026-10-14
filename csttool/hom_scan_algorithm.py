@@ -450,6 +450,10 @@ class HomScanAlgorithm(Algorithm):
             raise RuntimeError("HOM scan is not ready")
 
         policy = self._scan_policy()
+        existing_checkpoint = Path(self.relative_location) / "hom_scan_checkpoint.json"
+        existing_manifest = Path(self.relative_location) / "scan_manifest.json"
+        if (existing_checkpoint.exists() or existing_manifest.exists()) and not self.resume_requested:
+            raise RuntimeError("已有HOM检查点，禁止从头覆盖；请继续运行或使用新的项目目录")
         HomRunManifest.ensure(
             Path(self.relative_location) / "scan_manifest.json",
             self.manager,
@@ -494,6 +498,12 @@ class HomScanAlgorithm(Algorithm):
                 snapshot_path=snapshot,
             )
             self._write_scan_results(current_report)
+            overview = getattr(getattr(self.manager, 'run_store', None), 'overview', None)
+            if overview is not None:
+                try:
+                    overview.update()
+                except (OSError, ValueError, TypeError, AttributeError):
+                    self.logger.warning('运行摘要更新失败，扫描检查点和结果仍保留', exc_info=True)
             adopter = getattr(self.manager, 'adopt_result', None)
             if adopter is not None:
                 for mode in current_report.modes:

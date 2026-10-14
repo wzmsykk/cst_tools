@@ -66,7 +66,8 @@ def test_context_is_isolated_between_concurrent_runs(caplog):
     assert {record.run_id for record in records} == {"run-a", "run-b"}
     for record in records:
         assert f"job={record.run_id}" in record.getMessage()
-        assert "project=100% cavity" in record.getMessage()
+        assert record.project == '100% cavity'
+        assert 'project=' not in record.getMessage()
     assert "%(name)s" in DEFAULT_FORMAT
 
 
@@ -92,3 +93,76 @@ def test_jsonl_has_source_context_error_and_same_record_identity(tmp_path):
     assert str(tmp_path / "project.cst") == item["artifacts"]["snapshot"]
     assert item["record_id"] in (tmp_path / "dual.log").read_text(encoding="utf-8")
     assert set(item["code"]) == {"revision", "dirty"}
+
+
+def test_clean_summary_and_diagnostic_formatter_keep_context_and_aliases(tmp_path):
+    with ApplicationLogSession(tmp_path/'readable.log',console=False) as logger:
+        adapter = ContextLogger(logger, {'run_id':'r', 'session':'s', 'worker':'w'})
+        adapter.info('任务已提交', extra={'task':'t','event':'WORKER_TASK_DISPATCH','phase':'solve','fmin':500})
+    item = json.loads((tmp_path/'readable.jsonl').read_text(encoding='utf-8'))
+    assert item['message'] == '任务已提交'
+    assert item['context']['task'] == item['context']['task_id'] == 't'
+    assert item['context']['session'] == item['context']['session_id'] == 's'
+    assert item['context']['worker'] == item['context']['worker_id'] == 'w'
+    text = (tmp_path/'readable.log').read_text(encoding='utf-8')
+    assert 'context=' in text and 'WORKER_TASK_DISPATCH' in text
+    assert '"fmin": 500' in text and 'source=' in text
+
+
+def test_same_cause_has_one_traceback_and_independent_error_keeps_its_trace(tmp_path):
+    from csttool.logging_config import log_failure
+    with ApplicationLogSession(tmp_path/'failure.log',console=False) as logger:
+        try:
+            raise ValueError('root failure')
+        except ValueError as root:
+            line = inspect.currentframe().f_lineno + 1
+            log_failure(logger, '读取失败', root, extra={'phase':'readout'})
+            try:
+                raise RuntimeError('outer failure') from root
+            except RuntimeError as outer:
+                log_failure(logger, '运行未完成', outer, extra={'phase':'execute'})
+        try:
+            raise OSError('separate shutdown failure')
+        except OSError as independent:
+            log_failure(logger, '退出失败', independent, extra={'phase':'shutdown'})
+    rows = [json.loads(text) for text in (tmp_path/'failure.jsonl').read_text(encoding='utf-8').splitlines()]
+    assert len(rows) == 3
+    assert rows[0]['source']['line'] == line
+    assert rows[0]['source']['file'] == __file__
+    assert rows[0]['error']['type'] == 'ValueError'
+    assert rows[1]['error'] is None
+    assert rows[1]['context']['error_ref'] == rows[0]['record_id']
+    assert rows[1]['context']['reason'] == 'outer failure'
+    assert rows[2]['error']['type'] == 'OSError'
+    assert rows[2]['context']['error_ref'] != rows[0]['record_id']
+
+
+def test_failure_source_is_business_call_even_through_nested_adapters(caplog):
+    from csttool.logging_config import log_failure
+    logger = ContextLogger(ContextLogger(logging.getLogger('failure-source'), {'run_id':'r'}), {'worker':'w'})
+    try:
+        raise ValueError('test')
+    except ValueError as error:
+        line = inspect.currentframe().f_lineno + 1
+        log_failure(logger, '失败摘要', error)
+    captured = [record for record in caplog.records if record.name == 'failure-source'][-1]
+    assert captured.lineno == line
+    assert captured.pathname == __file__
+
+
+def test_new_cleanup_error_with_implicit_context_is_not_deduplicated(caplog):
+    from csttool.logging_config import log_failure
+    logger = logging.getLogger('cleanup-separate')
+    try:
+        raise ValueError('run failed')
+    except ValueError as run_error:
+        log_failure(logger, '运行失败', run_error)
+        try:
+            raise OSError('stop failed')
+        except OSError as stop_error:
+            assert stop_error.__context__ is run_error
+            log_failure(logger, '退出失败', stop_error)
+    rows = [record for record in caplog.records if record.name == 'cleanup-separate']
+    assert len(rows) == 2
+    assert all(record.exc_info for record in rows)
+    assert rows[0].error_ref != rows[1].error_ref

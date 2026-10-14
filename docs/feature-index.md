@@ -36,6 +36,12 @@
 |F30|HOM预处理保留mesh选项与恢复策略|[projectconfmanager.py](../csttool/projectconfmanager.py)|`ProjectConfigManager.prepare_project`|[mesh策略测试](../test/projectconfmanager_mesh_test.py)|[预处理诊断](preprocess-diagnostics.md)|
 |F31|GUI预处理保留mesh交互|[algorithm_settings_dialog.py](../GUI/algorithm_settings_dialog.py)|`AlgorithmSettingsDialog._set_preserve_mesh`|[GUI配置测试](../test/gui_config_models_test.py)|[预处理诊断](preprocess-diagnostics.md)|
 |F32|CST任务级归属、共享实例诊断与退出门禁|[acceptance_session.py](../csttool/acceptance_session.py)|`wait_probe`, `task_project_processes`|[进程监测测试](../test/acceptance_session_test.py)|[预处理诊断](preprocess-diagnostics.md)|
+|F33|GUI长日志有界批量显示与滚动|[log_view.py](../GUI/log_view.py)|`QPlainTextEditLogger.emit`, `QPlainTextEditLogger.flush_pending`, `QPlainTextEditLogger.clear`|[日志显示测试](../test/gui_log_view_test.py)|[日志显示性能](gui-log-performance.md)|
+|F34|GUI事件模型、组合筛选、详情及原始文件入口|[event_log_view.py](../GUI/event_log_view.py)|`EventTableModel.append_events`, `EventFilter.filterAcceptsRow`, `StructuredLogHandler.show_details`, `StructuredLogHandler.file_path`|[结构化日志测试](../test/gui_event_log_view_test.py)|[结构化事件使用](gui-structured-log.md)|
+|F35|可读摘要、完整文本上下文及异常传播引用|[logging_config.py](../csttool/logging_config.py)|`DiagnosticTextFormatter.format`, `normalized_context`, `log_failure`|[日志配置测试](../test/logging_config_test.py)、[Worker顺序测试](../test/managed_cstworker_test.py)|[六链日志设计](readable-logging.md)|
+|F36|Worker不取任务锁的协作停止|[managed_cstworker.py](../csttool/managed_cstworker.py)|`ManagedCSTWorker.request_stop`|[停止及续跑测试](../test/cooperative_stop_resume_test.py)|[停止与覆盖续跑](cooperative-stop-and-hom-resume.md)|
+|F37|VBA步骤停止检查与中断求解保留|[Managed模板](../data/runtime_managed_worker_v1_main.vb)|`CSTPMW_CheckStop`|[停止及续跑测试](../test/cooperative_stop_resume_test.py)|[停止与覆盖续跑](cooperative-stop-and-hom-resume.md)|
+|F38|可读运行日志目录、摘要、旧目录总览|[run_overview.py](../csttool/run_overview.py)|`RunOverview.update`, `RunOverviewHandler.emit`, `rebuild_log_index`|[运行总览测试](../test/run_overview_test.py)|[可读日志目录](readable-log-directories.md)|
 
 ## 从日志定位
 
