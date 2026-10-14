@@ -27,6 +27,11 @@
 |F21|Pillbox全域第二网格与小网格Tracker验收|[跨网格探针](../test/support/validate_pillbox_cross_mesh.py)|`compare_pair`, `verify_mesh_counts`, `validate_tracker`|[追踪测试](../test/vacuum_mode_tracking_test.py)|[全域验收](physical-domain-pillbox-acceptance.md)|
 |F22|封闭真空腔固定参考模式追踪|[vacuum_mode_tracking.py](../csttool/vacuum_mode_tracking.py)|`select_vacuum_modes`, `VacuumModeTracker.evaluate`, `track_saved_sequence`|[追踪测试](../test/vacuum_mode_tracking_test.py)|[第一版API与使用](vacuum-mode-tracking-v1.md)|
 |F23|工程前提预检与自动掩码登记|[vacuum_domain_registry.py](../csttool/vacuum_domain_registry.py)|`register_vacuum_domain`, `load_registered_support`, `export_registered_vacuum_fields`|[登记测试](../test/vacuum_domain_registry_test.py)|[登记API与边界](vacuum-domain-registration.md)|
+|F24|Managed可选退出后登记|[managed_cstworker.py](../csttool/managed_cstworker.py)|`ManagedCSTWorker._finish_domain_registration`|[可选链测试](../test/managed_vacuum_domain_test.py)|[GUI与生命周期](managed-vacuum-domain-gui.md)|
+|F25|GUI真空域设置开关|[algorithm_settings_dialog.py](../GUI/algorithm_settings_dialog.py)|`AlgorithmSettingsDialog.setValues`|[GUI配置测试](../test/gui_config_models_test.py)|[GUI与生命周期](managed-vacuum-domain-gui.md)|
+|F26|Managed固定参考模式匹配|[managed_cstworker.py](../csttool/managed_cstworker.py)|`ManagedCSTWorker._run_vacuum_matching`|[匹配链测试](../test/managed_vacuum_matching_test.py)|[GUI与生命周期](managed-vacuum-domain-gui.md)|
+|F27|GUI登记/匹配假Worker流程|[假Worker验收](../test/gui_vacuum_matching_fake_flow_test.py)|`MatchingFakeWorker`, `MatchingFakeBackend`|[流程测试](../test/gui_vacuum_matching_fake_flow_test.py)|[GUI与生命周期](managed-vacuum-domain-gui.md)|
+|F28|随机谱HOM假Worker与异常扫描|[hom_fake_worker.py](../test/support/hom_fake_worker.py)|`ProbabilisticHomWorker`|[随机谱测试](../test/hom_probabilistic_fake_worker_test.py)|[HOM假Worker验收](fake-hom-acceptance.md)|
 
 ## 从日志定位
 

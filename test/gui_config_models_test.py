@@ -51,6 +51,23 @@ def test_algorithm_settings_are_typed_and_cross_validated():
         )
 
 
+def test_vacuum_domain_gui_is_off_by_default_validates_and_cancel_restores(qapp,tmp_path):
+    from test.managed_vacuum_domain_test import options
+    from csttool.configuration import write_json_atomic
+    path=tmp_path/'domain.json';write_json_atomic(path,options())
+    dialog=AlgorithmSettingsDialog()
+    dialog.setDefaultValues({'fmin':500,'fmax':700,'endfreq':1000})
+    assert not dialog.vacuumDomainCheckBox.isChecked()
+    assert not dialog.vacuumDomainConfigEdit.isEnabled()
+    dialog.vacuumDomainCheckBox.setChecked(True)
+    dialog.vacuumDomainConfigEdit.setText(str(path))
+    dialog.setValues()
+    assert dialog.getValues()['vacuum_domain_enabled'] is True
+    dialog.reject()
+    assert not dialog.vacuumDomainCheckBox.isChecked()
+    assert not dialog.getValues().get('vacuum_domain_enabled',False)
+
+
 def test_algorithm_dialog_installs_numeric_validators_and_returns_copy(qapp):
     dialog = AlgorithmSettingsDialog()
     dialog.setDefaultValues({"fmin": 500, "fmax": 700, "endfreq": 2500})

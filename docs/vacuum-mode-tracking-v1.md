@@ -80,7 +80,8 @@ python -m csttool.vacuum_mode_tracking --request tracking-request.json --output 
 - [x] 单真空域固定参考追踪及失败保留锚点、已存场批量复算入口。
 - [x] 新Tracker独立串行Pillbox双网格验收及分析恢复：cell8/10，共5332/10220单元，仍非扫描自动调度或多步参数扫描验收。
 - [x] 显式导出/Tracker流程的原生工程前提预检与自动掩码登记。
-- [ ] Managed任务默认集成和GUI入口；当前可选独立API不代表所有任务已自动启用。
+- [x] Managed可选登记与GUI开关；默认关闭，单Worker且标准退出后串行登记；匹配需另外显式配置matching。
+- [x] 可选matching配置：显式first-valid或外部固定参考，退出后自动匹配并输出报告/日志；没有该配置时保持只登记。
 - [ ] 对目标模式/模组的候选请求控制；与逐频枚举分离，不借组匹配静默合并HOM。
 - [ ] 三层mesh及更多模族阈值校准；复杂域后续扩展。
 

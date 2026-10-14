@@ -127,11 +127,14 @@ class CSTManager:
         resource_budget: ResourceBudget | None = None,
         field_reference_result: Path | None = None,
         field_match_policy: Mapping[str, Any] | None = None,
+        vacuum_domain: Mapping[str, Any] | None = None,
     ) -> None:
         if maxTask < 1:
             raise ValueError("maxTask must be at least 1")
         if max_jobs_per_worker < 1:
             raise ValueError("max_jobs_per_worker must be at least 1")
+        if vacuum_domain is not None and maxTask != 1:
+            raise ValueError('optional vacuum domain registration requires one Worker')
 
         self.logger = logger or logging.getLogger(__name__)
         self.pconfm = pconfm
@@ -148,6 +151,10 @@ class CSTManager:
         self._progress_callback = progress_callback
         self._field_reference_result = field_reference_result
         self._field_match_policy = field_match_policy
+        self._vacuum_domain = None
+        if vacuum_domain is not None:
+            from .vacuum_domain_registry import validate_managed_domain_options
+            self._vacuum_domain = validate_managed_domain_options(vacuum_domain)
 
         self.currProjectDir = Path(pconfm.currProjectDir).absolute()
         if not isinstance(self.logger, ContextLogger):
@@ -172,11 +179,21 @@ class CSTManager:
             'postprocess': self.pconfm.get_postprocess_settings(),
             'cst_version': self.global_settings.cst.version,
             'executable': str(self.global_settings.cst.executable),
+            **({'vacuum_domain':self._vacuum_domain} if self._vacuum_domain is not None else {}),
         })
                                       if self.cstProjPath.is_file() else None)
         self._received_paths = {}
         self.resource_admission = ResourceAdmission(resource_budget or ResourceBudget())
         self.resource_admission.check(maxTask)
+        if self._vacuum_domain is not None:
+            from .vacuum_domain_registry import register_vacuum_domain
+            from .field_artifacts import SamplingSpec
+            preflight = register_vacuum_domain(self.global_settings.cst.executable,self.cstProjPath,
+                self.run_store.directory/'vacuum-preflight',
+                SamplingSpec.from_mapping(self._vacuum_domain['sampling']),
+                geometry_id=self._vacuum_domain['geometry_id'])
+            if preflight['status'] != 'registered':
+                raise ValueError('vacuum preflight rejected: '+','.join(preflight['rejection_reasons']))
 
         self._state = ManagerState.IDLE
         self._state_lock = RLock()
@@ -222,19 +239,28 @@ class CSTManager:
     ) -> WorkerConfig:
         worker_dir = self.tempDir / f"worker_{worker_id}"
         worker_dir.mkdir(parents=True, exist_ok=True)
+        postprocess = list(self.pconfm.get_postprocess_settings())
+        if self._vacuum_domain is not None:
+            for mode in self._vacuum_domain['modes']:
+                params = {'iModeNumber':mode,'field_kind':'E','sampling':self._vacuum_domain['sampling']}
+                if not any(item.get('method')=='ExportModeField' and item.get('params')==params
+                           for item in postprocess):
+                    postprocess.append({'method':'ExportModeField','resultName':f'vacuum_E_{mode}','params':params})
         return WorkerConfig(
             task_directory=worker_dir,
             result_directory=self.resultDir,
             executable=self.global_settings.cst.executable,
             project_path=Path(source_project or self.cstProjPath),
             parameters=tuple(self.paramList),
-            postprocess=tuple(self.pconfm.get_postprocess_settings()),
+            postprocess=tuple(postprocess),
             progress_callback=self._progress_callback,
             run_directory=self.run_store.directory,
             project_directory=self.currProjectDir,
             execution_fingerprint=self.execution_fingerprint,
             field_reference_result=self._field_reference_result,
             field_match_policy=self._field_match_policy,
+            vacuum_domain=self._vacuum_domain,
+            vacuum_reference_store=self.run_store.directory/'vacuum-reference.json',
         )
 
     def _create_worker(

@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import (
     QMessageBox,
     QSpinBox,
     QVBoxLayout,
+    QLineEdit, QPushButton, QFileDialog, QHBoxLayout, QScrollArea, QWidget,
 )
 from GUI.ui_algo_pop import Ui_AlgoPopDialog
 from GUI.config_models import AlgorithmSettings
@@ -65,6 +66,13 @@ class AlgorithmSettingsDialog(QDialog, Ui_AlgoPopDialog):
         self.meshConvergenceCheckBox.toggled.connect(
             self._set_convergence_controls_enabled
         )
+        self.vacuumDomainCheckBox = QCheckBox('可选：工程前提预检与真空域掩码登记',self)
+        self.vacuumDomainConfigEdit = QLineEdit(self)
+        self.vacuumDomainConfigEdit.setAccessibleName('真空域设置JSON路径')
+        self.vacuumDomainBrowseButton = QPushButton('选择JSON…',self)
+        self.vacuumDomainBrowseButton.clicked.connect(self._select_domain_config)
+        self.vacuumDomainCheckBox.toggled.connect(self._set_domain_controls_enabled)
+        self._set_domain_controls_enabled(False)
         self._install_responsive_layout()
         self.buttonBox.accepted.disconnect()
         self.buttonBox.rejected.disconnect()
@@ -76,6 +84,14 @@ class AlgorithmSettingsDialog(QDialog, Ui_AlgoPopDialog):
         layout = QVBoxLayout(self)
         layout.setContentsMargins(28, 24, 28, 20)
         layout.setSpacing(18)
+        outer_layout = layout
+        scroll = QScrollArea(self)
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QScrollArea.NoFrame)
+        content = QWidget(scroll)
+        layout = QVBoxLayout(content)
+        scroll.setWidget(content)
+        outer_layout.addWidget(scroll)
         fields = QGridLayout()
         fields.setHorizontalSpacing(12)
         fields.setVerticalSpacing(14)
@@ -104,8 +120,29 @@ class AlgorithmSettingsDialog(QDialog, Ui_AlgoPopDialog):
             convergence_fields.addWidget(QLabel(text, self), row, 0)
             convergence_fields.addWidget(editor, row, 1)
         layout.addLayout(convergence_fields)
+        layout.addWidget(self.vacuumDomainCheckBox)
+        domain_row = QHBoxLayout()
+        domain_label = QLabel('域设置文件',self)
+        domain_label.setBuddy(self.vacuumDomainConfigEdit)
+        domain_row.addWidget(domain_label)
+        domain_row.addWidget(self.vacuumDomainConfigEdit,1)
+        domain_row.addWidget(self.vacuumDomainBrowseButton)
+        layout.addLayout(domain_row)
+        hint = QLabel('默认关闭，仅支持单Worker、PEC背景封闭真空腔。运行前预检；正常退出后登记。'
+                      '增加E场导出耗时，不自动匹配或合并HOM。',self)
+        hint.setWordWrap(True)
+        layout.addWidget(hint)
         layout.addStretch(1)
-        layout.addWidget(self.buttonBox)
+        outer_layout.addWidget(self.buttonBox)
+
+    def _select_domain_config(self):
+        path,_ = QFileDialog.getOpenFileName(self,'选择真空域设置',self.vacuumDomainConfigEdit.text(),'JSON (*.json)')
+        if path:
+            self.vacuumDomainConfigEdit.setText(path)
+
+    def _set_domain_controls_enabled(self,enabled):
+        self.vacuumDomainConfigEdit.setEnabled(enabled)
+        self.vacuumDomainBrowseButton.setEnabled(enabled)
 
     def setDefaultValues(self, param_dict):
         self.data = AlgorithmSettings.from_mapping(param_dict).to_backend_payload()
@@ -138,6 +175,9 @@ class AlgorithmSettingsDialog(QDialog, Ui_AlgoPopDialog):
         self._set_convergence_controls_enabled(
             self.meshConvergenceCheckBox.isChecked()
         )
+        self.vacuumDomainCheckBox.setChecked(bool(self.data.get('vacuum_domain_enabled',False)))
+        self.vacuumDomainConfigEdit.setText(self.data.get('vacuum_domain_config',''))
+        self._set_domain_controls_enabled(self.vacuumDomainCheckBox.isChecked())
 
     def _set_convergence_controls_enabled(self, enabled):
         for editor in self._convergence_editors:
@@ -157,14 +197,20 @@ class AlgorithmSettingsDialog(QDialog, Ui_AlgoPopDialog):
                 "mesh_convergence_tolerance": (
                     self.meshConvergenceToleranceSpinBox.value() / 100
                 ),
+                'vacuum_domain_enabled':self.vacuumDomainCheckBox.isChecked(),
+                'vacuum_domain_config':self.vacuumDomainConfigEdit.text(),
             }
         )
+        if settings.vacuum_domain_enabled:
+            from csttool.configuration import read_json
+            from csttool.vacuum_domain_registry import validate_managed_domain_options
+            validate_managed_domain_options(read_json(settings.vacuum_domain_config))
         self.data = settings.to_backend_payload()
 
     def accept(self):
         try:
             self.setValues()
-        except (TypeError, ValueError) as exc:
+        except (TypeError, ValueError, OSError, KeyError) as exc:
             QMessageBox.warning(self, "算法设置无效", str(exc))
             return
         self._committed_data = dict(self.data)

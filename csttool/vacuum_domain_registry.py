@@ -15,6 +15,37 @@ from .physical_domain import common_quadrature
 from .result_reconciliation import file_hash
 
 
+def validate_managed_domain_options(value):
+    sampling = SamplingSpec.from_mapping(value['sampling'])
+    geometry_id = value['geometry_id']
+    modes = value.get('modes', [1])
+    if sampling.scope != 'specified-domain' or not isinstance(geometry_id,str) or not geometry_id.strip():
+        raise ValueError('full-domain sampling and explicit fixed geometry identity required')
+    if (not modes or len(set(modes)) != len(modes) or len(modes)>8
+            or any(isinstance(m,bool) or not isinstance(m,int) or m<1 for m in modes)):
+        raise ValueError('one to eight distinct positive field mode numbers required')
+    result = {'geometry_id':geometry_id,'sampling':sampling.to_mapping(),'modes':list(modes)}
+    if value.get('matching') is not None:
+        from .mode_matching import MatchPolicy
+        matching = dict(value['matching'])
+        if matching.get('reference_strategy') not in ('first-valid','external'):
+            raise ValueError('matching requires explicit first-valid or external reference strategy')
+        policy = MatchPolicy(**matching['policy'])
+        if (policy.maximum_frequency_change is None or not isinstance(matching.get('sampling_evidence'),str)
+                or not matching['sampling_evidence'].strip()):
+            raise ValueError('matching requires frequency gate and sampling evidence')
+        if matching['reference_strategy']=='first-valid' and len(modes)>4:
+            raise ValueError('first-valid reference group is limited to four modes')
+        if matching['reference_strategy']=='external':
+            reference = Path(matching['reference_file']).resolve()
+            digest = file_hash(reference)
+            if matching.get('reference_sha256',digest) != digest:
+                raise ValueError('external reference descriptor changed')
+            matching.update(reference_file=str(reference),reference_sha256=digest)
+        result['matching'] = matching
+    return result
+
+
 def render_vacuum_preflight(destination):
     path = str(Path(destination)).replace('"', '""')
     if '\n' in path or '\r' in path:

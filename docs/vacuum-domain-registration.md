@@ -38,7 +38,7 @@ registered仅是工程前提与工件校验通过，不是物理模族、材料�
 
 `--reject-preflight-root artifacts/<本轮目录>`：仅在基准副本中历史化修改背景Normal和Xmin=open，再独立预检；无Solver，预期rejected。原基准不改。
 
-自动登记是上述显式API/验收流程的一部分，尚非所有Managed任务默认行为；GUI、扫描候选请求自动调度仍待接入。采样门禁继续由独立收敛证据提供。
+自动登记是上述显式API/验收流程的一部分，尚非所有Managed任务默认行为；已有[Managed默认关闭的可选配置与GUI入口](managed-vacuum-domain-gui.md)，扫描候选请求自动调度仍待接入。采样门禁继续由独立收敛证据提供。
 
 ## 本轮真实结果
 

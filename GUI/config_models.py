@@ -34,6 +34,8 @@ class AlgorithmSettings:
     mesh_convergence_stop: int
     mesh_convergence_step: int
     mesh_convergence_tolerance: float
+    vacuum_domain_enabled: bool = False
+    vacuum_domain_config: str = ''
 
     @classmethod
     def from_mapping(cls, values: Mapping[str, Any]) -> "AlgorithmSettings":
@@ -53,9 +55,13 @@ class AlgorithmSettings:
             mesh_convergence_tolerance=float(
                 values.get("mesh_convergence_tolerance", 0.01)
             ),
+            vacuum_domain_enabled=_as_bool(values.get('vacuum_domain_enabled',False)),
+            vacuum_domain_config=str(values.get('vacuum_domain_config','')).strip(),
         )
         if settings.fmin >= settings.fmax:
             raise ValueError("最低频率必须小于最高频率")
+        if settings.vacuum_domain_enabled and not settings.vacuum_domain_config:
+            raise ValueError('启用真空域登记时必须选择域设置JSON')
         if settings.endfreq < settings.fmax:
             raise ValueError("扫描频率上限不能低于最高频率")
         if settings.mesh_cells_per_wavelength < 1:
@@ -81,6 +87,10 @@ class AlgorithmSettings:
             "mesh_convergence_stop": self.mesh_convergence_stop,
             "mesh_convergence_step": self.mesh_convergence_step,
             "mesh_convergence_tolerance": self.mesh_convergence_tolerance,
+            **({'vacuum_domain_enabled':True,'vacuum_domain_config':self.vacuum_domain_config}
+               if self.vacuum_domain_enabled else
+               ({'vacuum_domain_enabled':False,'vacuum_domain_config':self.vacuum_domain_config}
+                if self.vacuum_domain_config else {})),
         }
 
 

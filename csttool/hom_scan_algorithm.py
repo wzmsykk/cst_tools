@@ -66,6 +66,8 @@ class HomScanAlgorithm(Algorithm):
         self.output_name = None
         self.text_name = ["Frequency", "R_Q", "R_Q_5mm", "Q-Factor", "R_Q_10mm"]
         self.mesh_cells_per_wavelength = 20
+        self.vacuum_domain_enabled = False
+        self.vacuum_domain_config = ''
         self.mesh_convergence_enabled = False
         self.mesh_convergence_start = 10
         self.mesh_convergence_stop = 30
@@ -113,6 +115,8 @@ class HomScanAlgorithm(Algorithm):
         self.mesh_cells_per_wavelength = int(
             d.get("mesh_cells_per_wavelength", 20)
         )
+        self.vacuum_domain_enabled = bool(d.get('vacuum_domain_enabled',False))
+        self.vacuum_domain_config = str(d.get('vacuum_domain_config',''))
         if self.mesh_cells_per_wavelength < 1:
             raise ValueError("mesh_cells_per_wavelength must be positive")
         self.mesh_convergence_enabled = bool(
@@ -147,6 +151,9 @@ class HomScanAlgorithm(Algorithm):
             "mesh_convergence_step": self.mesh_convergence_step,
             "mesh_convergence_tolerance": self.mesh_convergence_tolerance,
         }
+        if self.vacuum_domain_enabled or self.vacuum_domain_config:
+            d.update(vacuum_domain_enabled=self.vacuum_domain_enabled,
+                     vacuum_domain_config=self.vacuum_domain_config)
         return d
 
     def validate_postprocess_settings(self, settings):

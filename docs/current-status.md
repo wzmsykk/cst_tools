@@ -14,6 +14,8 @@
 - 直接边界setter会被重建覆盖，进入历史后完整/部分更新保留；项目参数与Global Data存储不同，Global Data不自动失效旧结果。见[持久性及求解失败对照](cst-history-persistence-and-solver-failure.md)。
 - P0-1坏重建立即停止：已实现最后良好参数表达式恢复、无Solver重放、恢复快照/回执及StopAck检查；最新真实结果以[停止验收](failed-rebuild-stop-recovery.md)为准。恢复后CST可能保留任务错误码4，不能改称任务成功，也不允许仅凭非零进程退出判安全关闭。
 - 默认Worker场匹配仍为可选ROI诊断；另有[封闭PEC/真空腔固定参考追踪第一版](vacuum-mode-tracking-v1.md)，支持显式全域掩码和已保存场批量分析。物理身份/阈值未完成校准，不自动删并模式或跳过区间。
+- 最新GUI登记/匹配假Worker流程六场景通过（含默认关闭、未确认、回收、拒绝与窗口关闭），全套离线494 passed、19 deselected；仅逻辑/模拟工件验收，不增加真实CST或生产应用Backend的验收声明。见[GUI假Worker验收](managed-vacuum-domain-gui.md)。
+- 最新[HOM假Worker专项](fake-hom-acceptance.md)57项通过：五个随机模型正常扫描找齐生成频率及七项标量，异常/重试/检查点恢复通过；持续异常仍保留未确认区间，不将该结果冒称真实CST或完整场身份追踪验收。
 
 |优先级|下一工作|
 |---|---|
@@ -21,7 +23,7 @@
 |P0部分通过|[缺结果目录场导出及四类HDF5工件故障恢复](field-failure-recovery-acceptance.md)通过，分析恢复无求解重放；仍补Start返回0/Start异常、部分场/原生网格缺失、加载失败及退出卡住门禁|
 |P1部分通过|[共同域/掩码/权重及理想Pillbox全域双模](physical-domain-pillbox-acceptance.md)及cell20/30第二mesh全域对照通过；继续多材料复杂CAD、三层网格收敛、阈值校准及自动登记/GUI/连续追踪|
 |P1|冷/热缓存全流程性能、路线独立资源峰值与重复性|
-|P1第一版小网格真实验收通过|封闭PEC/真空腔固定参考匹配；cell8/10自动工程预检、掩码登记及Tracker/CLI恢复通过，Normal背景/开放边界真实拒绝。下一步Managed默认/GUI集成与候选请求控制，不把连续追踪等同于逐频枚举|
+|P1第一版小网格真实验收通过|封闭PEC/真空腔固定参考匹配；cell8/10自动工程预检、掩码登记及Tracker/CLI恢复通过，Normal背景/开放边界真实拒绝。[Managed可选开关与GUI](managed-vacuum-domain-gui.md)已接入，默认关闭、单Worker、标准退出后登记；JSON matching配置支持first-valid/外部固定参考、报告与日志输出。下一步候选请求与GUI报告浏览，不把连续追踪等同于逐频枚举|
 |P2|GUI场匹配入口及目标Project多版本调用；不阻塞现有Managed/ROI路线|
 
 下文阶段表、旧日期Pending及扩展项保留历史证据，不使用旧测试数量作为当前代码验收；近期顺序以本节和[六阶段验收](mode-field-selection-implementation-status.md)为准。

@@ -22,6 +22,8 @@ class WorkerConfig:
     execution_fingerprint: str | None = None
     field_reference_result: Path | None = None
     field_match_policy: Mapping[str, Any] | None = None
+    vacuum_domain: Mapping[str, Any] | None = None
+    vacuum_reference_store: Path | None = None
 
     @classmethod
     def from_mapping(cls, values):
@@ -31,7 +33,8 @@ class WorkerConfig:
                    tuple(values["paramList"]), tuple(values.get("postProcess", ())),
                    bool(values.get("runInBackground", True)), values.get("progressCallback"),
                    field_reference_result=(Path(values['fieldReferenceResult']) if values.get('fieldReferenceResult') else None),
-                   field_match_policy=values.get('fieldMatchPolicy'))
+                   field_match_policy=values.get('fieldMatchPolicy'),
+                   vacuum_domain=values.get('vacuumDomain'))
 
 
 @dataclass(frozen=True, slots=True)
@@ -48,6 +51,7 @@ class SimulationResult(Mapping[str, Any]):
     receipt_path: Path | None = None
     field_diagnostic: Mapping[str, Any] | None = None
     field_artifacts: list[dict[str, Any]] | None = None
+    domain_registration: Mapping[str, Any] | None = None
 
     def __getitem__(self, key):
         return self.to_mapping()[key]
@@ -71,4 +75,6 @@ class SimulationResult(Mapping[str, Any]):
             result['FieldDiagnostic'] = dict(self.field_diagnostic)
         if self.field_artifacts is not None:
             result['FieldArtifacts'] = self.field_artifacts
+        if self.domain_registration is not None:
+            result['DomainRegistration'] = dict(self.domain_registration)
         return result

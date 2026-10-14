@@ -1,0 +1,721 @@
+{
+  "source_sha256": "7b63939b2dbed3de567aa55a5ff19cb69e7447245882a691be15d28580f1ddfa",
+  "mesh": 8,
+  "nmodes": 2,
+  "result": {
+    "WorkerID": "0",
+    "TaskStatus": "Success",
+    "RunName": "domain-doublet",
+    "RunParameters": {
+      "nmodes": 2,
+      "fmin": 780,
+      "fmax": 850,
+      "cell": 8
+    },
+    "PostProcessResult": [
+      {
+        "id": 0,
+        "resultName": "frequency_1",
+        "value": 798.367318144302,
+        "params": {
+          "iModeNumber": 1
+        }
+      },
+      {
+        "id": 1,
+        "resultName": "frequency_2",
+        "value": 798.369833763561,
+        "params": {
+          "iModeNumber": 2
+        }
+      }
+    ],
+    "FailureReport": null,
+    "ProjectSnapshot": "D:\\work\\cst_tools\\artifacts\\managed-vacuum-domain-5fc7a299\\prepare\\result\\worker_0\\domain-doublet__7bc9bdb0-c4ea-4375-abf8-2d48444f375f\\domain-doublet.cst",
+    "TaskID": "7bc9bdb0-c4ea-4375-abf8-2d48444f375f",
+    "ResultDirectory": "D:\\work\\cst_tools\\artifacts\\managed-vacuum-domain-5fc7a299\\prepare\\result\\worker_0\\domain-doublet__7bc9bdb0-c4ea-4375-abf8-2d48444f375f",
+    "ReceiptPath": "D:\\work\\cst_tools\\artifacts\\managed-vacuum-domain-5fc7a299\\prepare\\logs\\776d2dab1e604cc88b53ec0158da89c5\\workers\\0\\cf9970ba-c42f-4706-a455-1a625ce5a133\\received\\7bc9bdb0-c4ea-4375-abf8-2d48444f375f.json",
+    "FieldArtifacts": [
+      {
+        "id": 2,
+        "resultName": "vacuum_E_1",
+        "value": {
+          "kind": "field-artifact",
+          "status": "available",
+          "filename": "field_1_E_99dbc6157237.h5",
+          "sha256": "64651b28ce793465deb179713320bdbae1efc2e7c7087c6a710515efa5566e46",
+          "mode": 1,
+          "frequency_hz": 798367318.144302,
+          "field_kind": "E",
+          "coordinates_unit": "m",
+          "sampling": {
+            "bounds_m": [
+              -0.229,
+              0.229,
+              -0.229,
+              0.229,
+              -0.1295,
+              0.1295
+            ],
+            "counts": [
+              64,
+              64,
+              64
+            ],
+            "scope": "specified-domain"
+          },
+          "field_unit": "V/m",
+          "sampling_id": "35d9111d4771071777954f665a93c460f6ac6e39d69fe3ec3e5597ad23302598",
+          "support_verified": true,
+          "support_check": "calculation-box-and-retrieval; material mask not independently verified",
+          "raw_coordinate_scale_to_m": 0.001,
+          "raw_coordinate_unit": "mm",
+          "context": {
+            "task_id": "7bc9bdb0-c4ea-4375-abf8-2d48444f375f",
+            "session_id": "cf9970ba-c42f-4706-a455-1a625ce5a133",
+            "snapshot_sha256": "9847c3dce7a3dcbcb543b3c3eda6960955da12b825d499b74a617445d5fb946f"
+          }
+        },
+        "params": {
+          "iModeNumber": 1,
+          "field_kind": "E",
+          "sampling": {
+            "bounds_m": [
+              -0.229,
+              0.229,
+              -0.229,
+              0.229,
+              -0.1295,
+              0.1295
+            ],
+            "counts": [
+              64,
+              64,
+              64
+            ],
+            "scope": "specified-domain"
+          }
+        }
+      },
+      {
+        "id": 3,
+        "resultName": "vacuum_E_2",
+        "value": {
+          "kind": "field-artifact",
+          "status": "available",
+          "filename": "field_2_E_b42219974395.h5",
+          "sha256": "171e492865d58507523a30e6ebfc60fe478858ce95ea2d57b25354db22325e45",
+          "mode": 2,
+          "frequency_hz": 798369833.763561,
+          "field_kind": "E",
+          "coordinates_unit": "m",
+          "sampling": {
+            "bounds_m": [
+              -0.229,
+              0.229,
+              -0.229,
+              0.229,
+              -0.1295,
+              0.1295
+            ],
+            "counts": [
+              64,
+              64,
+              64
+            ],
+            "scope": "specified-domain"
+          },
+          "field_unit": "V/m",
+          "sampling_id": "35d9111d4771071777954f665a93c460f6ac6e39d69fe3ec3e5597ad23302598",
+          "support_verified": true,
+          "support_check": "calculation-box-and-retrieval; material mask not independently verified",
+          "raw_coordinate_scale_to_m": 0.001,
+          "raw_coordinate_unit": "mm",
+          "context": {
+            "task_id": "7bc9bdb0-c4ea-4375-abf8-2d48444f375f",
+            "session_id": "cf9970ba-c42f-4706-a455-1a625ce5a133",
+            "snapshot_sha256": "9847c3dce7a3dcbcb543b3c3eda6960955da12b825d499b74a617445d5fb946f"
+          }
+        },
+        "params": {
+          "iModeNumber": 2,
+          "field_kind": "E",
+          "sampling": {
+            "bounds_m": [
+              -0.229,
+              0.229,
+              -0.229,
+              0.229,
+              -0.1295,
+              0.1295
+            ],
+            "counts": [
+              64,
+              64,
+              64
+            ],
+            "scope": "specified-domain"
+          }
+        }
+      }
+    ],
+    "DomainRegistration": {
+      "status": "pending-after-stop",
+      "path": "D:\\work\\cst_tools\\artifacts\\managed-vacuum-domain-5fc7a299\\prepare\\result\\worker_0\\domain-doublet__7bc9bdb0-c4ea-4375-abf8-2d48444f375f\\vacuum-domain\\domain-registration.json",
+      "tracking_input": "D:\\work\\cst_tools\\artifacts\\managed-vacuum-domain-5fc7a299\\prepare\\result\\worker_0\\domain-doublet__7bc9bdb0-c4ea-4375-abf8-2d48444f375f\\vacuum-tracking-input.json",
+      "matching_report": "D:\\work\\cst_tools\\artifacts\\managed-vacuum-domain-5fc7a299\\prepare\\result\\worker_0\\domain-doublet__7bc9bdb0-c4ea-4375-abf8-2d48444f375f\\vacuum-mode-matching.json"
+    }
+  },
+  "second_result": {
+    "WorkerID": "0",
+    "TaskStatus": "Success",
+    "RunName": "matching-doublet",
+    "RunParameters": {
+      "nmodes": 2,
+      "fmin": 780,
+      "fmax": 850,
+      "cell": 8
+    },
+    "PostProcessResult": [
+      {
+        "id": 0,
+        "resultName": "frequency_1",
+        "value": 798.367318144302,
+        "params": {
+          "iModeNumber": 1
+        }
+      },
+      {
+        "id": 1,
+        "resultName": "frequency_2",
+        "value": 798.369833763561,
+        "params": {
+          "iModeNumber": 2
+        }
+      }
+    ],
+    "FailureReport": null,
+    "ProjectSnapshot": "D:\\work\\cst_tools\\artifacts\\managed-vacuum-domain-5fc7a299\\prepare\\result\\worker_0\\matching-doublet__9950f57e-6c5b-45de-8e09-233c812bf4d6\\matching-doublet.cst",
+    "TaskID": "9950f57e-6c5b-45de-8e09-233c812bf4d6",
+    "ResultDirectory": "D:\\work\\cst_tools\\artifacts\\managed-vacuum-domain-5fc7a299\\prepare\\result\\worker_0\\matching-doublet__9950f57e-6c5b-45de-8e09-233c812bf4d6",
+    "ReceiptPath": "D:\\work\\cst_tools\\artifacts\\managed-vacuum-domain-5fc7a299\\prepare\\logs\\776d2dab1e604cc88b53ec0158da89c5\\workers\\0\\cf9970ba-c42f-4706-a455-1a625ce5a133\\received\\9950f57e-6c5b-45de-8e09-233c812bf4d6.json",
+    "FieldArtifacts": [
+      {
+        "id": 2,
+        "resultName": "vacuum_E_1",
+        "value": {
+          "kind": "field-artifact",
+          "status": "available",
+          "filename": "field_1_E_99dbc6157237.h5",
+          "sha256": "2be232d9f0a7898ed81bcade1ad5c16b0f842777c031e39b63fa12f357efa992",
+          "mode": 1,
+          "frequency_hz": 798367318.144302,
+          "field_kind": "E",
+          "coordinates_unit": "m",
+          "sampling": {
+            "bounds_m": [
+              -0.229,
+              0.229,
+              -0.229,
+              0.229,
+              -0.1295,
+              0.1295
+            ],
+            "counts": [
+              64,
+              64,
+              64
+            ],
+            "scope": "specified-domain"
+          },
+          "field_unit": "V/m",
+          "sampling_id": "35d9111d4771071777954f665a93c460f6ac6e39d69fe3ec3e5597ad23302598",
+          "support_verified": true,
+          "support_check": "calculation-box-and-retrieval; material mask not independently verified",
+          "raw_coordinate_scale_to_m": 0.001,
+          "raw_coordinate_unit": "mm",
+          "context": {
+            "task_id": "9950f57e-6c5b-45de-8e09-233c812bf4d6",
+            "session_id": "cf9970ba-c42f-4706-a455-1a625ce5a133",
+            "snapshot_sha256": "5207a9d19caa75537e04dac50b5185896b9ff76b188618b2a1fdb325be6ac11c"
+          }
+        },
+        "params": {
+          "iModeNumber": 1,
+          "field_kind": "E",
+          "sampling": {
+            "bounds_m": [
+              -0.229,
+              0.229,
+              -0.229,
+              0.229,
+              -0.1295,
+              0.1295
+            ],
+            "counts": [
+              64,
+              64,
+              64
+            ],
+            "scope": "specified-domain"
+          }
+        }
+      },
+      {
+        "id": 3,
+        "resultName": "vacuum_E_2",
+        "value": {
+          "kind": "field-artifact",
+          "status": "available",
+          "filename": "field_2_E_b42219974395.h5",
+          "sha256": "d17f630c51c647dcf19804dafdc614bf8e53d63914a0152020e8b1f8e56af16f",
+          "mode": 2,
+          "frequency_hz": 798369833.763561,
+          "field_kind": "E",
+          "coordinates_unit": "m",
+          "sampling": {
+            "bounds_m": [
+              -0.229,
+              0.229,
+              -0.229,
+              0.229,
+              -0.1295,
+              0.1295
+            ],
+            "counts": [
+              64,
+              64,
+              64
+            ],
+            "scope": "specified-domain"
+          },
+          "field_unit": "V/m",
+          "sampling_id": "35d9111d4771071777954f665a93c460f6ac6e39d69fe3ec3e5597ad23302598",
+          "support_verified": true,
+          "support_check": "calculation-box-and-retrieval; material mask not independently verified",
+          "raw_coordinate_scale_to_m": 0.001,
+          "raw_coordinate_unit": "mm",
+          "context": {
+            "task_id": "9950f57e-6c5b-45de-8e09-233c812bf4d6",
+            "session_id": "cf9970ba-c42f-4706-a455-1a625ce5a133",
+            "snapshot_sha256": "5207a9d19caa75537e04dac50b5185896b9ff76b188618b2a1fdb325be6ac11c"
+          }
+        },
+        "params": {
+          "iModeNumber": 2,
+          "field_kind": "E",
+          "sampling": {
+            "bounds_m": [
+              -0.229,
+              0.229,
+              -0.229,
+              0.229,
+              -0.1295,
+              0.1295
+            ],
+            "counts": [
+              64,
+              64,
+              64
+            ],
+            "scope": "specified-domain"
+          }
+        }
+      }
+    ],
+    "DomainRegistration": {
+      "status": "pending-after-stop",
+      "path": "D:\\work\\cst_tools\\artifacts\\managed-vacuum-domain-5fc7a299\\prepare\\result\\worker_0\\matching-doublet__9950f57e-6c5b-45de-8e09-233c812bf4d6\\vacuum-domain\\domain-registration.json",
+      "tracking_input": "D:\\work\\cst_tools\\artifacts\\managed-vacuum-domain-5fc7a299\\prepare\\result\\worker_0\\matching-doublet__9950f57e-6c5b-45de-8e09-233c812bf4d6\\vacuum-tracking-input.json",
+      "matching_report": "D:\\work\\cst_tools\\artifacts\\managed-vacuum-domain-5fc7a299\\prepare\\result\\worker_0\\matching-doublet__9950f57e-6c5b-45de-8e09-233c812bf4d6\\vacuum-mode-matching.json"
+    }
+  },
+  "matching": [
+    {
+      "status": "reference-established",
+      "reason": "first-valid-fixed-anchor",
+      "selected_modes": [],
+      "reference": {
+        "snapshot_id": "7bc9bdb0-c4ea-4375-abf8-2d48444f375f",
+        "result_file": "D:\\work\\cst_tools\\artifacts\\managed-vacuum-domain-5fc7a299\\prepare\\result\\worker_0\\domain-doublet__7bc9bdb0-c4ea-4375-abf8-2d48444f375f\\vacuum-fields.json",
+        "registration_file": "D:\\work\\cst_tools\\artifacts\\managed-vacuum-domain-5fc7a299\\prepare\\result\\worker_0\\domain-doublet__7bc9bdb0-c4ea-4375-abf8-2d48444f375f\\vacuum-domain\\domain-registration.json"
+      },
+      "physical_identity_confirmed": false,
+      "policy_calibrated": false,
+      "solver_replayed": false
+    },
+    {
+      "reference": {
+        "snapshot_id": "7bc9bdb0-c4ea-4375-abf8-2d48444f375f",
+        "support_id": "5309b3861604c93c07cd45e045dbf79f2720acf8f62a2bc8a79bc8ae5ccbfdcc",
+        "fields": [
+          {
+            "mode": 1,
+            "frequency_hz": 798367318.144302,
+            "sha256": "64651b28ce793465deb179713320bdbae1efc2e7c7087c6a710515efa5566e46"
+          },
+          {
+            "mode": 2,
+            "frequency_hz": 798369833.763561,
+            "sha256": "171e492865d58507523a30e6ebfc60fe478858ce95ea2d57b25354db22325e45"
+          }
+        ]
+      },
+      "candidate": {
+        "snapshot_id": "9950f57e-6c5b-45de-8e09-233c812bf4d6",
+        "support_id": "5309b3861604c93c07cd45e045dbf79f2720acf8f62a2bc8a79bc8ae5ccbfdcc",
+        "fields": [
+          {
+            "mode": 1,
+            "frequency_hz": 798367318.144302,
+            "sha256": "2be232d9f0a7898ed81bcade1ad5c16b0f842777c031e39b63fa12f357efa992"
+          },
+          {
+            "mode": 2,
+            "frequency_hz": 798369833.763561,
+            "sha256": "d17f630c51c647dcf19804dafdc614bf8e53d63914a0152020e8b1f8e56af16f"
+          }
+        ]
+      },
+      "quadrature": {
+        "identity": "df02c76a4803e6ef9fe024e4be5a6fb70d240fa33b74e71362cacda57416624d",
+        "sampling_id": "35d9111d4771071777954f665a93c460f6ac6e39d69fe3ec3e5597ad23302598",
+        "scope": "common-material-domain",
+        "rule": "masked-cell-midpoint-volume-v1",
+        "volume_m3": 0.04281582317578127,
+        "weight_unit": "m^3",
+        "materials": [
+          "Vacuum"
+        ],
+        "support_ids": [
+          "5309b3861604c93c07cd45e045dbf79f2720acf8f62a2bc8a79bc8ae5ccbfdcc",
+          "5309b3861604c93c07cd45e045dbf79f2720acf8f62a2bc8a79bc8ae5ccbfdcc"
+        ],
+        "support_evidence": [
+          {
+            "geometry_id": "ideal-closed-PEC-pillbox-R229mm-L259mm-v1",
+            "provenance": "CST-Solid.IsPointInsideShape-and-GetMaterialNameForShape"
+          },
+          {
+            "geometry_id": "ideal-closed-PEC-pillbox-R229mm-L259mm-v1",
+            "provenance": "CST-Solid.IsPointInsideShape-and-GetMaterialNameForShape"
+          }
+        ],
+        "sampling_scope": "specified-domain",
+        "coverage_claim": "selected materials in declared sampling box; whole geometry requires independent gate",
+        "support_disagreement_fraction": 0.0,
+        "boundary_rule": "point-classification; cut-cell error requires refinement",
+        "physical_identity_confirmed": false
+      },
+      "selected_modes": [
+        1,
+        2
+      ],
+      "physical_identity_confirmed": false,
+      "policy_calibrated": false,
+      "member_identity_confirmed": false,
+      "mac": [
+        [
+          1.0,
+          1.2517209101674345e-10
+        ],
+        [
+          1.251723698911214e-10,
+          0.9999999999999996
+        ]
+      ],
+      "status": "matched",
+      "reason": "explicit-policy-passed",
+      "group": {
+        "reference_rank": 2,
+        "candidate_rank": 2,
+        "scope": "common-material-domain",
+        "metric_kind": "weighted-sampled-field",
+        "status": "matched",
+        "reason": "explicit-policy-passed",
+        "singular_values": [
+          1.0,
+          0.9999999999999999
+        ],
+        "minimum_squared_overlap": 0.9999999999999998,
+        "reference_condition": 1.0090192600268744,
+        "candidate_condition": 1.0090192600287602
+      },
+      "margin": null,
+      "match_kind": "declared-mode-subspace",
+      "schema_version": 1,
+      "domain": {
+        "geometry_id": "ideal-closed-PEC-pillbox-R229mm-L259mm-v1",
+        "background": "PEC",
+        "interior": "Vacuum",
+        "closed": true,
+        "boundary_evidence": "native registered inventory",
+        "coverage_evidence": "native registered full bounds",
+        "sampling_evidence": "previous full-cylinder sampling study"
+      },
+      "policy": {
+        "minimum_mac": 0.9,
+        "minimum_margin": 0.05,
+        "minimum_subspace_overlap": 0.99,
+        "rank_tolerance": 1e-10,
+        "numerical_tolerance": 1e-08,
+        "maximum_frequency_change": 0.01
+      },
+      "reference_strategy": "fixed-anchor",
+      "recovery_action": "none"
+    }
+  ],
+  "registration": {
+    "schema_version": 1,
+    "status": "registered",
+    "source": "D:\\work\\cst_tools\\artifacts\\managed-vacuum-domain-5fc7a299\\prepare\\result\\worker_0\\domain-doublet__7bc9bdb0-c4ea-4375-abf8-2d48444f375f\\domain-doublet.cst",
+    "source_sha256": "9847c3dce7a3dcbcb543b3c3eda6960955da12b825d499b74a617445d5fb946f",
+    "geometry_id": "ideal-closed-PEC-pillbox-R229mm-L259mm-v1",
+    "sampling": {
+      "bounds_m": [
+        -0.229,
+        0.229,
+        -0.229,
+        0.229,
+        -0.1295,
+        0.1295
+      ],
+      "counts": [
+        64,
+        64,
+        64
+      ],
+      "scope": "specified-domain"
+    },
+    "sampling_id": "35d9111d4771071777954f665a93c460f6ac6e39d69fe3ec3e5597ad23302598",
+    "solver_run": false,
+    "sampling_convergence_confirmed": false,
+    "session": {
+      "launcher_pid": 48664,
+      "owned": [
+        {
+          "pid": 48664,
+          "create_time": 1791920279.1468663
+        },
+        {
+          "pid": 16444,
+          "create_time": 1791920279.1811557
+        },
+        {
+          "pid": 32924,
+          "create_time": 1791920281.898957
+        },
+        {
+          "pid": 42164,
+          "create_time": 1791920283.7067869
+        },
+        {
+          "pid": 3204,
+          "create_time": 1791920285.7646823
+        },
+        {
+          "pid": 36300,
+          "create_time": 1791920286.066909
+        },
+        {
+          "pid": 7216,
+          "create_time": 1791920286.6111646
+        }
+      ],
+      "active_pids": [],
+      "elapsed_seconds": 40.296999999904074,
+      "exit_confirmed": true,
+      "foreign_processes": [],
+      "stage": "awaiting-macro"
+    },
+    "exit_code": 0,
+    "source_unchanged": true,
+    "inventory": {
+      "solids": [
+        {
+          "name": "domain-benchmark:ideal-cavity",
+          "material": "Vacuum",
+          "bounds_m": [
+            -0.229,
+            0.229,
+            -0.229,
+            0.229,
+            -0.1295,
+            0.1295
+          ]
+        }
+      ],
+      "background": [
+        "PEC"
+      ],
+      "boundaries": [
+        "electric",
+        "electric",
+        "electric",
+        "electric",
+        "electric",
+        "electric"
+      ],
+      "symmetry": [
+        "none",
+        "none",
+        "none"
+      ],
+      "ports": [
+        "0"
+      ]
+    },
+    "rejection_reasons": [],
+    "support_file": "support.tsv",
+    "support_sha256": "48cf9c32f51d782c632c9af0b9e84dee48cf3335f5c465e63ef7c419d9b0e77b",
+    "support_id": "5309b3861604c93c07cd45e045dbf79f2720acf8f62a2bc8a79bc8ae5ccbfdcc",
+    "inventory_sha256": "4d3b9f1164fa675f3f91bce83b7778fba74a4a84d9583f7921bcf93fd06d1900",
+    "quadrature": {
+      "identity": "af8609e7935c36fd445e75ba124bb6b594872946b51ba4d18b26599dcd6cf36b",
+      "sampling_id": "35d9111d4771071777954f665a93c460f6ac6e39d69fe3ec3e5597ad23302598",
+      "scope": "common-material-domain",
+      "rule": "masked-cell-midpoint-volume-v1",
+      "volume_m3": 0.04281582317578127,
+      "weight_unit": "m^3",
+      "materials": [
+        "Vacuum"
+      ],
+      "support_ids": [
+        "5309b3861604c93c07cd45e045dbf79f2720acf8f62a2bc8a79bc8ae5ccbfdcc"
+      ],
+      "support_evidence": [
+        {
+          "geometry_id": "ideal-closed-PEC-pillbox-R229mm-L259mm-v1",
+          "provenance": "CST-Solid.IsPointInsideShape-and-GetMaterialNameForShape"
+        }
+      ],
+      "sampling_scope": "specified-domain",
+      "coverage_claim": "selected materials in declared sampling box; whole geometry requires independent gate",
+      "support_disagreement_fraction": 0.0,
+      "boundary_rule": "point-classification; cut-cell error requires refinement",
+      "physical_identity_confirmed": false
+    }
+  },
+  "tracking": {
+    "reference": {
+      "snapshot_id": "7bc9bdb0-c4ea-4375-abf8-2d48444f375f",
+      "support_id": "5309b3861604c93c07cd45e045dbf79f2720acf8f62a2bc8a79bc8ae5ccbfdcc",
+      "fields": [
+        {
+          "mode": 1,
+          "frequency_hz": 798367318.144302,
+          "sha256": "64651b28ce793465deb179713320bdbae1efc2e7c7087c6a710515efa5566e46"
+        },
+        {
+          "mode": 2,
+          "frequency_hz": 798369833.763561,
+          "sha256": "171e492865d58507523a30e6ebfc60fe478858ce95ea2d57b25354db22325e45"
+        }
+      ]
+    },
+    "candidate": {
+      "snapshot_id": "7bc9bdb0-c4ea-4375-abf8-2d48444f375f",
+      "support_id": "5309b3861604c93c07cd45e045dbf79f2720acf8f62a2bc8a79bc8ae5ccbfdcc",
+      "fields": [
+        {
+          "mode": 1,
+          "frequency_hz": 798367318.144302,
+          "sha256": "64651b28ce793465deb179713320bdbae1efc2e7c7087c6a710515efa5566e46"
+        },
+        {
+          "mode": 2,
+          "frequency_hz": 798369833.763561,
+          "sha256": "171e492865d58507523a30e6ebfc60fe478858ce95ea2d57b25354db22325e45"
+        }
+      ]
+    },
+    "quadrature": {
+      "identity": "df02c76a4803e6ef9fe024e4be5a6fb70d240fa33b74e71362cacda57416624d",
+      "sampling_id": "35d9111d4771071777954f665a93c460f6ac6e39d69fe3ec3e5597ad23302598",
+      "scope": "common-material-domain",
+      "rule": "masked-cell-midpoint-volume-v1",
+      "volume_m3": 0.04281582317578127,
+      "weight_unit": "m^3",
+      "materials": [
+        "Vacuum"
+      ],
+      "support_ids": [
+        "5309b3861604c93c07cd45e045dbf79f2720acf8f62a2bc8a79bc8ae5ccbfdcc",
+        "5309b3861604c93c07cd45e045dbf79f2720acf8f62a2bc8a79bc8ae5ccbfdcc"
+      ],
+      "support_evidence": [
+        {
+          "geometry_id": "ideal-closed-PEC-pillbox-R229mm-L259mm-v1",
+          "provenance": "CST-Solid.IsPointInsideShape-and-GetMaterialNameForShape"
+        },
+        {
+          "geometry_id": "ideal-closed-PEC-pillbox-R229mm-L259mm-v1",
+          "provenance": "CST-Solid.IsPointInsideShape-and-GetMaterialNameForShape"
+        }
+      ],
+      "sampling_scope": "specified-domain",
+      "coverage_claim": "selected materials in declared sampling box; whole geometry requires independent gate",
+      "support_disagreement_fraction": 0.0,
+      "boundary_rule": "point-classification; cut-cell error requires refinement",
+      "physical_identity_confirmed": false
+    },
+    "selected_modes": [
+      1,
+      2
+    ],
+    "physical_identity_confirmed": false,
+    "policy_calibrated": false,
+    "member_identity_confirmed": false,
+    "mac": [
+      [
+        1.0,
+        1.2517235639554387e-10
+      ],
+      [
+        1.2517235639554387e-10,
+        1.0
+      ]
+    ],
+    "status": "matched",
+    "reason": "explicit-policy-passed",
+    "group": {
+      "reference_rank": 2,
+      "candidate_rank": 2,
+      "scope": "common-material-domain",
+      "metric_kind": "weighted-sampled-field",
+      "status": "matched",
+      "reason": "explicit-policy-passed",
+      "singular_values": [
+        0.9999999999999999,
+        0.9999999999999997
+      ],
+      "minimum_squared_overlap": 0.9999999999999993,
+      "reference_condition": 1.0090192600268744,
+      "candidate_condition": 1.0090192600268744
+    },
+    "margin": null,
+    "match_kind": "declared-mode-subspace",
+    "schema_version": 1,
+    "domain": {
+      "geometry_id": "ideal-closed-PEC-pillbox-R229mm-L259mm-v1",
+      "background": "PEC",
+      "interior": "Vacuum",
+      "closed": true,
+      "boundary_evidence": "native preflight",
+      "coverage_evidence": "native full bounds",
+      "sampling_evidence": "prior sampling evidence"
+    },
+    "policy": {
+      "minimum_mac": 0.9,
+      "minimum_margin": 0.05,
+      "minimum_subspace_overlap": 0.99,
+      "rank_tolerance": 1e-10,
+      "numerical_tolerance": 1e-08,
+      "maximum_frequency_change": 0.01
+    },
+    "reference_strategy": "fixed-anchor",
+    "recovery_action": "none"
+  },
+  "gate_passed": true,
+  "source_unchanged": true
+}

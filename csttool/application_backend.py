@@ -110,6 +110,7 @@ class CstApplicationBackend:
             logger=self.logger,
         )
         self.alg = algorithm or hom_scan_algorithm.HomScanAlgorithm(manager=None, params=None)
+        self._vacuum_domain_settings = {}
         self._uses_default_manager = manager_factory is None
         self._manager_factory = manager_factory or cstmanager.CSTManager
 
@@ -158,11 +159,13 @@ class CstApplicationBackend:
         return self.pconfman.read_postprocess_settings(path)
 
     def get_algorithm_settings(self):
-        return self.alg.get_editable_attributes()
+        return {**self.alg.get_editable_attributes(), **self._vacuum_domain_settings}
 
     def update_algorithm_settings(self, values) -> None:
         self._require_configurable("update algorithm settings")
         self.alg.set_editable_attributes(values)
+        self._vacuum_domain_settings.update({key:values[key] for key in
+            ('vacuum_domain_enabled','vacuum_domain_config') if key in values})
         self.logger.info("算法设置已更新 | project=%s algorithm=%s", self.get_project_directory(), type(self.alg).__name__)
 
     def initialize_run(
@@ -557,6 +560,13 @@ class CstApplicationBackend:
             raise BackendLifecycleError("Manager 已存在")
         project_params = self.pconfman.get_parameters()
         manager_options = {}
+        settings = self.get_algorithm_settings()
+        if settings.get('vacuum_domain_enabled',False):
+            if self.worker_count != 1:
+                raise BackendPreparationError('真空域登记第一版仅支持一个Worker')
+            from .vacuum_domain_registry import validate_managed_domain_options
+            config_path = Path(settings['vacuum_domain_config']).resolve()
+            manager_options['vacuum_domain'] = validate_managed_domain_options(read_json(config_path))
         if self._uses_default_manager:
             manager_options["worker_factory"] = ManagedCSTWorker.create
             manager_options["progress_callback"] = self._publish_cst_progress

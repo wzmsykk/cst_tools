@@ -84,6 +84,12 @@ class ManagedCSTWorker:
         self.execution_fingerprint = config.execution_fingerprint
         self._field_reference_result = config.field_reference_result
         self._field_match_policy = config.field_match_policy
+        self._vacuum_domain = config.vacuum_domain
+        self._vacuum_reference_store = config.vacuum_reference_store
+        self._domain_jobs = []
+        if config.vacuum_domain is not None:
+            from .vacuum_domain_registry import validate_managed_domain_options
+            self._vacuum_domain = validate_managed_domain_options(config.vacuum_domain)
         if config.field_reference_result is not None:
             from .mode_matching import MatchPolicy
             if config.field_match_policy is None:
@@ -470,6 +476,7 @@ class ManagedCSTWorker:
                 finally:
                     self._active_task_context = {}
             field_diagnostic = None
+            domain_registration = None
             if status == "Success":
                 task_result_root, project_snapshot = self._name_result_archive(
                     task, result_name, task_result_root, postprocess_result
@@ -502,6 +509,18 @@ class ManagedCSTWorker:
                 except OSError:
                     self.logger.warning('接收记录存档路径更新失败，原始记录仍保留', exc_info=True)
                 field_diagnostic = self._run_optional_field_diagnostic(task, task_result_root, field_artifacts)
+                if getattr(self,'_vacuum_domain',None) is not None:
+                    destination = task_result_root/'vacuum-domain'
+                    domain_registration = {'status':'pending-after-stop',
+                        'path':str(destination/'domain-registration.json'),
+                        'tracking_input':str(task_result_root/'vacuum-tracking-input.json')}
+                    if self._vacuum_domain.get('matching'):
+                        domain_registration['matching_report'] = str(task_result_root/'vacuum-mode-matching.json')
+                    self._domain_jobs.append((task.task_id,project_snapshot,task_result_root,field_artifacts))
+                    try:
+                        write_json_atomic(task_result_root/'vacuum-domain-pending.json',domain_registration)
+                    except OSError:
+                        self.logger.warning('可选域登记待办写入失败，已确认求解不重算 | task=%s',task.task_id,exc_info=True)
             log_method = self.logger.info if status == "Success" else self.logger.error
             log_method(
                 "CST 任务结束 | WORKER_TASK_COMPLETE worker=%s task=%s status=%s elapsed_seconds=%.3f failure=%s job=%s",
@@ -518,6 +537,7 @@ class ManagedCSTWorker:
                 receipt_path=receipt_path,
                 field_diagnostic=field_diagnostic,
                 field_artifacts=field_artifacts or None,
+                domain_registration=domain_registration,
             )
 
     def _run_optional_field_diagnostic(self, task, directory, postprocess):
@@ -711,6 +731,7 @@ class ManagedCSTWorker:
                     raise ManagedWorkerShutdownError("CST exited without verified StopAck and exit code 0")
                 self.logger.debug("CST 进程已结束，无需重复退出 | WORKER_ALREADY_EXITED worker=%s session=%s returncode=%s", self.ID, self.session_id, self._process.poll(), extra={"event": "WORKER_ALREADY_EXITED", "phase": "readout", "worker": self.ID, "session": self.session_id, "returncode": self._process.poll()})
                 self._close_log()
+                self._finish_domain_registration()
                 return True
             self._stopping = True
             self.logger.info(
@@ -732,6 +753,7 @@ class ManagedCSTWorker:
                     self._close_log()
                     self.logger.info(
                         "CST 已确认停止并退出 | WORKER_STOPPED worker=%s session=%s", self.ID, self.session_id, extra={"event": "WORKER_STOPPED", "phase": "shutdown", "worker": self.ID, "session": self.session_id})
+                    self._finish_domain_registration()
                     return True
                 if self._process.poll() is not None:
                     break
@@ -748,6 +770,106 @@ class ManagedCSTWorker:
                     "process is still running; session recovery is required"
                 )
             )
+
+    def _finish_domain_registration(self):
+        """Only after verified standard exit; optional analysis never replays Solver."""
+        if not getattr(self,'_vacuum_domain',None):
+            return
+        if self._process is None or self._process.poll() is None:
+            raise RuntimeError('domain registration requires a confirmed stopped CST process')
+        if self.protocol.read_stop_ack(self.session_id) is None or not self._stop_exit_is_confirmed():
+            raise RuntimeError('domain registration requires verified StopAck and standard exit')
+        from .vacuum_domain_registry import register_vacuum_domain
+        from .field_artifacts import SamplingSpec
+        jobs = getattr(self,'_domain_jobs',[])
+        self._domain_jobs = []
+        for task_id,snapshot,directory,fields in jobs:
+            destination = directory/'vacuum-domain'
+            try:
+                result = register_vacuum_domain(self.executable,snapshot,destination,
+                    SamplingSpec.from_mapping(self._vacuum_domain['sampling']),
+                    geometry_id=self._vacuum_domain['geometry_id'])
+                if result['status']=='registered':
+                    export_input = directory/'vacuum-fields.json'
+                    selected_fields = [item for item in fields if item.get('value',{}).get('field_kind')=='E'
+                        and item['value'].get('sampling_id')==result['sampling_id']
+                        and item['value'].get('mode') in self._vacuum_domain['modes']]
+                    write_json_atomic(export_input,{'ResultDirectory':str(directory),'FieldArtifacts':selected_fields,
+                                                    'source_sha256':result['source_sha256']})
+                    write_json_atomic(directory/'vacuum-tracking-input.json',{'snapshot_id':task_id,
+                        'result_file':str(export_input),'registration_file':str(destination/'domain-registration.json')})
+                    if self._vacuum_domain.get('matching'):
+                        try:
+                            self._run_vacuum_matching(directory)
+                        except Exception:
+                            self.logger.warning('匹配报告写入或映射失败；域登记与求解结果保留 | task=%s',task_id,exc_info=True)
+                elif self._vacuum_domain.get('matching'):
+                    write_json_atomic(directory/'vacuum-mode-matching.json',{
+                        'status':'unconfirmed','reason':'domain-preflight-rejected',
+                        'rejection_reasons':result.get('rejection_reasons',[]),'selected_modes':[],
+                        'physical_identity_confirmed':False,'solver_replayed':False})
+                if getattr(self,'run_store',None) is not None:
+                    self.run_store.artifacts(task_id,domain_registration=destination/'domain-registration.json')
+                self.logger.info('归档真空域登记结束 | task=%s status=%s report=%s',
+                    task_id,result['status'],destination/'domain-registration.json',
+                    extra={'event':'WORKER_VACUUM_DOMAIN','phase':'field-analysis','task':task_id,
+                           'status':result['status'],'artifacts':{'registration':str(destination/'domain-registration.json')}})
+            except Exception as error:
+                self.logger.warning('可选真空域登记未完成，求解结果保留 | task=%s reason=%s',task_id,error)
+                try:
+                    write_json_atomic(directory/'vacuum-domain-error.json',{'status':'incomplete',
+                        'reason':f'{type(error).__name__}: {error}','task_id':task_id,'solver_replayed':False})
+                except OSError:
+                    self.logger.warning('域登记错误回执写入失败，检查磁盘；CST已确认退出 | task=%s',task_id,exc_info=True)
+
+    def _run_vacuum_matching(self,directory):
+        """Frozen anchor across Worker recycling; no solver side effects."""
+        from .configuration import read_json
+        from .vacuum_mode_tracking import VacuumTrackingDomain,load_tracking_snapshot,VacuumModeTracker
+        from .mode_matching import MatchPolicy
+        matching = self._vacuum_domain['matching']
+        output = directory/'vacuum-mode-matching.json'
+        descriptor = {}
+        try:
+            domain = VacuumTrackingDomain(self._vacuum_domain['geometry_id'],'PEC','Vacuum',True,
+                'native registered inventory','native registered full bounds',matching['sampling_evidence'])
+            descriptor = read_json(directory/'vacuum-tracking-input.json')
+            candidate = load_tracking_snapshot(descriptor,domain,base=directory)
+            policy = MatchPolicy(**matching['policy'])
+            if matching['reference_strategy']=='external':
+                anchor = Path(matching['reference_file'])
+                if file_hash(anchor) != matching['reference_sha256']:
+                    raise ValueError('external reference descriptor changed')
+            else:
+                anchor = getattr(self,'_vacuum_reference_store',None) or self.observation_root/'vacuum-reference.json'
+                if not anchor.exists():
+                    VacuumModeTracker(candidate,domain,policy)  # Validate before publishing anchor.
+                    write_json_atomic(anchor,descriptor)
+                    from dataclasses import asdict
+                    result = {'schema_version':1,'status':'reference-established','reason':'first-valid-fixed-anchor',
+                              'selected_modes':[],'reference':descriptor,'physical_identity_confirmed':False,
+                              'policy_calibrated':False,'solver_replayed':False,
+                              'domain':asdict(domain),'policy':asdict(policy),'reference_strategy':'fixed-anchor'}
+                    write_json_atomic(output,result)
+                    self.logger.info('固定模式参考已建立 | snapshot=%s report=%s',candidate.snapshot_id,output,
+                        extra={'event':'WORKER_VACUUM_MATCH','phase':'field-analysis','status':result['status'],
+                               'artifacts':{'matching':str(output)}})
+                    if getattr(self,'run_store',None) is not None:
+                        self.run_store.artifacts(descriptor['snapshot_id'],mode_matching=output,reference=anchor)
+                    return result
+            reference = load_tracking_snapshot(read_json(anchor),domain,base=anchor.parent)
+            result = VacuumModeTracker(reference,domain,policy).evaluate(candidate,output)
+        except Exception as error:
+            result = {'status':'unconfirmed','reason':f'{type(error).__name__}: {error}',
+                      'selected_modes':[],'physical_identity_confirmed':False,'solver_replayed':False}
+            write_json_atomic(output,result)
+        self.logger.info('模式匹配结束 | status=%s modes=%s reason=%s report=%s',
+            result['status'],result.get('selected_modes',[]),result['reason'],output,
+            extra={'event':'WORKER_VACUUM_MATCH','phase':'field-analysis',
+                   'status':result['status'],'artifacts':{'matching':str(output)}})
+        if getattr(self,'run_store',None) is not None and descriptor.get('snapshot_id'):
+            self.run_store.artifacts(descriptor['snapshot_id'],mode_matching=output)
+        return result
 
     def _stop_exit_is_confirmed(self) -> bool:
         """Exit 4 remains a task error; accept shutdown only with own saved recovery."""

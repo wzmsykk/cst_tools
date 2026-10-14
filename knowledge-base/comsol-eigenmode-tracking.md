@@ -44,3 +44,7 @@ M(a,b)=\frac{|\int_\Omega \mathbf E_a^*\cdot\mathbf E_b\,dV|^2}
 保持每mode、每积分线的R/Q及位置元数据。正交dipole极化在同一偏轴线上可呈现接近零/最大耦合；不能用单线R/Q排序代替场匹配，也不能把R/Q总和当作位置不变量。5%后处理容差与场重叠阈值是不同判据。
 
 2026-10-14更新：复场重叠、Gram/MAC、子空间及可选诊断已实现；共同域/材料掩码与体积求积核心、理想闭合Pillbox全域TM110双模及第二mesh也已真实验证。见[全域验收](../docs/physical-domain-pillbox-acceptance.md)。[固定参考真空腔追踪第一版](../docs/vacuum-mode-tracking-v1.md)Python/CLI通过真实小网格cell8/10及缺场/缺成员恢复；可选自动工程预检/掩码登记也通过同一小网格链，拒绝Normal背景与开放边界。Managed默认/GUI集成、扫描请求控制、复杂CAD、多材料及全局阈值校准仍未完成。不能将本例基准推广为任意HOM物理身份与方向性后处理的全部验收。
+
+后续同日更新：Managed已有默认关闭的可选开关及GUI入口；单Worker，运行前原生预检，Warm标准退出后串行登记成功快照。真实cell8 Manager链通过，不在存活Worker旁启动第二原生探针，也不在重建历史执行包围盒查询。自动参考选择、GUI匹配结果浏览/候选请求控制仍未完成，不能将登记成功当模式身份确认。见[Managed与GUI接入](../docs/managed-vacuum-domain-gui.md)。
+
+再后续更新：域设置JSON的可选matching已接入Managed。显式first-valid/外部参考，固定锚点不因未确认更新，输出MAC、编号、组级重叠及未确认原因；真实两个cell8重复任务的建参考→自动匹配通过。仍不进行HOM合并/跳频、自动猜退简并组或GUI矩阵浏览，physical_identity_confirmed与policy_calibrated保持False。
