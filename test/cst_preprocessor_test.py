@@ -229,16 +229,24 @@ def test_native_runner_uses_stage_monitor_without_communicate_timeout(tmp_path, 
     class Process:
         pid = 123
         returncode = 0
-    monkeypatch.setattr(module.subprocess, 'Popen', lambda *a, **kw: Process())
+    baseline = [{'pid':99, 'create_time':99., 'name':'independent CST'}]
+    observed = []
+    monkeypatch.setattr(module, 'cst_processes', lambda:observed.append('baseline') or baseline)
+    def launch(*args, **kwargs):
+        assert observed == ['baseline']
+        return Process()
+    monkeypatch.setattr(module.subprocess, 'Popen', launch)
     from types import SimpleNamespace
     monkeypatch.setattr(module.psutil, 'Process', lambda pid:SimpleNamespace(create_time=lambda:1.))
     def monitor(process, directory, **kwargs):
         assert kwargs['completion_names'] == ('completion.txt',)
         assert {'bind-history', 'rebuild', 'save'} <= set(kwargs['unbounded_stages'])
         assert kwargs['stage_timeout'] == 180
-        return {'foreign_processes': []}
+        assert kwargs['preexisting_processes'] == baseline
+        assert kwargs['task_project'] == str(tmp_path/'model.cst')
+        return {'foreign_processes': [{'pid':88,'create_time':88.}]}
     monkeypatch.setattr(module, 'wait_probe', monitor)
-    assert CstProjectPreprocessor(tmp_path / 'cst.exe', TEMPLATE)._run(['fake'], tmp_path).returncode == 0
+    assert CstProjectPreprocessor(tmp_path / 'cst.exe', TEMPLATE)._run(['fake','-m','-b',str(tmp_path/'model.cst')], tmp_path).returncode == 0
 
 
 def test_previous_live_preprocess_blocks_retry_without_launch(tmp_path, monkeypatch):
@@ -259,3 +267,75 @@ def test_previous_live_preprocess_blocks_retry_without_launch(tmp_path, monkeypa
     with pytest.raises(CstPreprocessError, match='仍活跃'):
         CstProjectPreprocessor(executable, TEMPLATE, runner=forbidden).preprocess(
             source, tmp_path / 'output.cst', tmp_path / 'p.json', tmp_path / 'temp')
+
+
+def test_detail_journal_logs_complete_lines_once_and_stage_changes(tmp_path, caplog):
+    import logging
+    processor = CstProjectPreprocessor(tmp_path / 'cst.exe', TEMPLATE)
+    cursor = [0]
+    observe = processor._observer(tmp_path, cursor)
+    journal = tmp_path / 'changes.tsv'
+    complete = 'now\tparameter-set\tcell\t2 * density\t24\trequested\n'
+    journal.write_text(complete + 'now\tstage\trebuild', encoding='utf-8')
+    with caplog.at_level(logging.INFO):
+        observe({'stage':'rebuild', 'elapsed_seconds':1.})
+        observe({'stage':'rebuild', 'elapsed_seconds':31.})
+        journal.write_text(complete + 'now\tstage\trebuild\t\t\treturned-success\n', encoding='utf-8')
+        observe({'stage':'save', 'elapsed_seconds':32.})
+        processor._log_details(tmp_path, cursor)
+    assert cursor == [2]
+    assert caplog.text.count('action=parameter-set') == 1
+    assert "before='2 * density' after='24' outcome=requested" in caplog.text
+    assert caplog.text.count('预处理阶段') == 2
+    assert 'returned-success' in caplog.text
+
+
+def test_macro_details_use_documented_parameter_index_not_name():
+    source = TEMPLATE.read_text(encoding='utf-8-sig')
+    assert 'GetParameterSValue(parameterIndex)' in source
+    assert 'GetParameterSValue("' not in source
+    assert 'ParameterExpression("fmin")' in source
+    assert '"<not-read>", history, "requested"' in source
+    assert '"returned-not-verified"' in source
+    assert source.index('failureNumber = Err.Number') < source.index('WriteDetail "error"')
+
+
+def test_preserve_mesh_accepts_project_without_cell(tmp_path):
+    executable = tmp_path / 'cst.exe'
+    executable.write_bytes(b'fake')
+    source = tmp_path / 'source.cst'
+    source.write_bytes(b'original')
+    def runner(command, **kwargs):
+        macro = (Path(command[3]).with_suffix('') / 'Model/3D/Model.run').read_text(encoding='utf-8')
+        assert 'modifyMesh = False' in macro
+        assert 'If Not modifyMesh Then' in macro
+        assert 'If modifyMesh Then history = history & ".SetMeshAdaptationTet False"' in macro
+        _macro_path(macro, 'statusFilePath').write_text('SUCCESS')
+        _macro_path(macro, 'paramFileDstPath').write_text(
+            'parameters\nproject\n3\n0 fmin 500 min\n1 fmax 700 max\n2 nmodes 1 modes\n')
+        return subprocess.CompletedProcess(command, 0, '', '')
+    result = CstProjectPreprocessor(executable, TEMPLATE, runner=runner).preprocess(
+        source, tmp_path / 'prepared.cst', tmp_path / 'p.json', tmp_path / 'temp', modify_mesh=False)
+    assert {p['name'] for p in result.parameters} == {'fmin','fmax','nmodes'}
+
+
+def test_old_foreign_receipt_does_not_block_retry(tmp_path):
+    import json
+    import psutil
+    executable = tmp_path/'cst.exe'
+    executable.write_bytes(b'fake')
+    source = tmp_path/'source.cst'
+    source.write_bytes(b'original')
+    receipt = tmp_path/'temp/cst-preprocess-old/session-status.json'
+    receipt.parent.mkdir(parents=True)
+    identity = psutil.Process()
+    receipt.write_text(json.dumps({'owned':[], 'foreign_processes':[
+        {'pid':identity.pid, 'create_time':identity.create_time()}]}))
+    calls = []
+    def runner(command, **kwargs):
+        calls.append(command)
+        return subprocess.CompletedProcess(command, 0, '', '')
+    with pytest.raises(CstPreprocessError, match='未返回完成状态'):
+        CstProjectPreprocessor(executable,TEMPLATE,runner=runner).preprocess(
+            source,tmp_path/'prepared.cst',tmp_path/'p.json',tmp_path/'temp')
+    assert len(calls) == 1

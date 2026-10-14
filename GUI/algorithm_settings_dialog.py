@@ -43,6 +43,9 @@ class AlgorithmSettingsDialog(QDialog, Ui_AlgoPopDialog):
         ):
             editor.setValidator(validator)
         self.meshCellsLineEdit.setValidator(QIntValidator(1, 999999, self))
+        self.preserveMeshCheckBox = QCheckBox("预处理不修改 mesh（保留工程网格设置）", self)
+        self.preserveMeshCheckBox.setToolTip("不写入cell或mesh设置；仍执行HOM参数绑定和重建，不保证保留已有网格数据。")
+        self.preserveMeshCheckBox.toggled.connect(self._set_preserve_mesh)
         self.meshConvergenceCheckBox = QCheckBox("运行前执行 Mesh 收敛分析", self)
         self.meshConvergenceStartSpinBox = QSpinBox(self)
         self.meshConvergenceStopSpinBox = QSpinBox(self)
@@ -108,6 +111,10 @@ class AlgorithmSettingsDialog(QDialog, Ui_AlgoPopDialog):
                 fields.addWidget(unit, row, 2)
         fields.setColumnStretch(1, 1)
         layout.addLayout(fields)
+        layout.addWidget(self.preserveMeshCheckBox)
+        mesh_hint = QLabel("勾选后保留网格密度、类型及自适应设置；仍会重建工程。", self)
+        mesh_hint.setWordWrap(True)
+        layout.addWidget(mesh_hint)
         layout.addWidget(self.meshConvergenceCheckBox)
         convergence_fields = QGridLayout()
         convergence_rows = (
@@ -139,6 +146,13 @@ class AlgorithmSettingsDialog(QDialog, Ui_AlgoPopDialog):
         path,_ = QFileDialog.getOpenFileName(self,'选择真空域设置',self.vacuumDomainConfigEdit.text(),'JSON (*.json)')
         if path:
             self.vacuumDomainConfigEdit.setText(path)
+
+    def _set_preserve_mesh(self, preserve):
+        self.meshCellsLineEdit.setEnabled(not preserve)
+        self.meshConvergenceCheckBox.setEnabled(not preserve)
+        if preserve:
+            self.meshConvergenceCheckBox.setChecked(False)
+            self._set_convergence_controls_enabled(False)
 
     def _set_domain_controls_enabled(self,enabled):
         self.vacuumDomainConfigEdit.setEnabled(enabled)
@@ -175,6 +189,8 @@ class AlgorithmSettingsDialog(QDialog, Ui_AlgoPopDialog):
         self._set_convergence_controls_enabled(
             self.meshConvergenceCheckBox.isChecked()
         )
+        self.preserveMeshCheckBox.setChecked(not self.data.get('preprocess_modify_mesh', True))
+        self._set_preserve_mesh(self.preserveMeshCheckBox.isChecked())
         self.vacuumDomainCheckBox.setChecked(bool(self.data.get('vacuum_domain_enabled',False)))
         self.vacuumDomainConfigEdit.setText(self.data.get('vacuum_domain_config',''))
         self._set_domain_controls_enabled(self.vacuumDomainCheckBox.isChecked())
@@ -190,6 +206,7 @@ class AlgorithmSettingsDialog(QDialog, Ui_AlgoPopDialog):
                 "fmin": self.fminLineEdit.text(),
                 "endfreq": self.maxFreqThresholdLineEdit.text(),
                 "mesh_cells_per_wavelength": self.meshCellsLineEdit.text(),
+                "preprocess_modify_mesh": not self.preserveMeshCheckBox.isChecked(),
                 "mesh_convergence_enabled": self.meshConvergenceCheckBox.isChecked(),
                 "mesh_convergence_start": self.meshConvergenceStartSpinBox.value(),
                 "mesh_convergence_stop": self.meshConvergenceStopSpinBox.value(),

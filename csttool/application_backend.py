@@ -237,6 +237,8 @@ class CstApplicationBackend:
             return
         settings = dict(self.alg.get_editable_attributes())
         settings["mesh_cells_per_wavelength"] = project_settings.cells_per_wavelength
+        if "population_size" not in settings:
+            settings["preprocess_modify_mesh"] = project_settings.fixed_mesh
         settings["mesh_convergence_enabled"] = False
         manifest_path = Path(self.get_project_directory()) / "save" / "csv" / "scan_manifest.json"
         if manifest_path.is_file():
@@ -245,6 +247,8 @@ class CstApplicationBackend:
                 raise ValueError("不支持的原项目运行清单版本")
             if manifest.mesh_cells_per_wavelength != project_settings.cells_per_wavelength:
                 raise ValueError("原项目配置与运行清单的网格设置不一致")
+            if manifest.preprocess_modify_mesh != project_settings.fixed_mesh:
+                raise ValueError("原项目配置与运行清单的预处理mesh策略不一致")
             settings.update({
                 "fmin": manifest.frequency_start,
                 "fmax": manifest.frequency_start + manifest.initial_window,
@@ -275,6 +279,8 @@ class CstApplicationBackend:
             if self.resume:
                 self.pconfman.recover_failed_project()
             settings = self.alg.get_editable_attributes()
+            if not settings.get('preprocess_modify_mesh', True) and settings.get('mesh_convergence_enabled', False):
+                raise BackendPreparationError("保留原mesh时不能启用Mesh收敛分析")
             validate_postprocess = getattr(
                 self.alg,
                 "validate_postprocess_settings",
@@ -291,6 +297,7 @@ class CstApplicationBackend:
                 mesh_cells_per_wavelength=settings[
                     "mesh_cells_per_wavelength"
                 ],
+                **({"modify_mesh": False} if not settings.get('preprocess_modify_mesh', True) else {}),
             )
             self.gconfman.printconf()
             self.logger.debug("项目配置校验完成 | project=%s", self.get_project_directory())

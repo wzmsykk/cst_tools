@@ -88,3 +88,6 @@ Mesh 在项目初始化前确定。恢复已有项目时若请求值与记录不
 - `mesh_convergence_tolerance`：相邻 Mesh 后处理结果允许的最大相对变化；`0.01` 表示 1%。
 
 收敛分析要求所有选定单模标量后处理结果连续两个级别满足容差。报告输出到 `mesh_convergence/mesh_convergence.json` 和 `.csv`。
+## 预处理mesh策略补充（2026-10-14）
+
+HOM算法键`preprocess_modify_mesh`默认True；False对应GUI“预处理不修改mesh”。项目`[mesh] fixed=False`表示预处理保留原设置，不是原工程自适应开关的读取值。此时cells_per_wavelength不应用。与mesh_convergence_enabled=True互斥；恢复沿用项目策略，切换需新建项目。见[预处理诊断及API](preprocess-diagnostics.md)。

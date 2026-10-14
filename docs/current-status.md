@@ -7,6 +7,14 @@
 
 ## 最新状态与近期TODO（2026-10-14）
 
+- 共享服务器预处理改为任务级归属（取代下方基线中间方案）：父子关系/精确副本路径确认的进程才需退出；其他用户及同用户新旧CST实例仅诊断，foreign不再阻塞重提。本批离线514 passed、19 integration deselected；成功标记/产物门禁不变，真实共享服务器验收待做。见[现行归属规则](preprocess-diagnostics.md)。
+
+- 历史中间方案（已被上条任务级归属取代）：启动前PID+创建时间基线仅记录；当时仍拒绝启动后新活跃未知实例，离线510 passed、19 integration deselected。保留此记录说明旧包行为，不作为现行门禁。见[归属门禁演进](preprocess-diagnostics.md)。
+
+- HOM GUI及Python预处理增加可选“不修改mesh”，默认仍固定mesh；策略保存到project.ini与HOM清单，恢复沿用，拒绝策略漂移及与收敛分析冲突。本批全套离线506 passed、19 integration deselected。见[预处理诊断](preprocess-diagnostics.md)；真实设置保留验收待做。
+
+- 预处理新增参数/历史块/阶段明细changes.tsv，实时转发既有日志链；区分requested、参数读取值及未逐项核验的历史返回，不刷周期时长。API和限制见[预处理诊断](preprocess-diagnostics.md)。本次相关离线52项通过，尚未真实CST重跑。
+
 - 工程预处理失败保留副本及诊断，历史执行/重建/保存取消180秒总时限，加载/退出仍有界，不强杀或自动重试。见[预处理诊断与边界](preprocess-diagnostics.md)。本批相关离线50项通过，尚未重跑用户F盘原模型；旧发布包不变。
 
 入口：[功能—源码/函数—工具—文档索引](feature-index.md)。实施变更必须遵守[文档同步要求](../AGENTS.md)，主动同步相关API/设计/用途、状态、TODO与知识库，不等待另行要求。

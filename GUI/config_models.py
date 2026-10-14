@@ -36,6 +36,7 @@ class AlgorithmSettings:
     mesh_convergence_tolerance: float
     vacuum_domain_enabled: bool = False
     vacuum_domain_config: str = ''
+    preprocess_modify_mesh: bool = True
 
     @classmethod
     def from_mapping(cls, values: Mapping[str, Any]) -> "AlgorithmSettings":
@@ -57,6 +58,7 @@ class AlgorithmSettings:
             ),
             vacuum_domain_enabled=_as_bool(values.get('vacuum_domain_enabled',False)),
             vacuum_domain_config=str(values.get('vacuum_domain_config','')).strip(),
+            preprocess_modify_mesh=_as_bool(values.get('preprocess_modify_mesh', True)),
         )
         if settings.fmin >= settings.fmax:
             raise ValueError("最低频率必须小于最高频率")
@@ -66,6 +68,8 @@ class AlgorithmSettings:
             raise ValueError("扫描频率上限不能低于最高频率")
         if settings.mesh_cells_per_wavelength < 1:
             raise ValueError("每波长网格数必须是正整数")
+        if not settings.preprocess_modify_mesh and settings.mesh_convergence_enabled:
+            raise ValueError("保留原mesh时不能启用Mesh收敛分析")
         if (
             settings.mesh_convergence_start < 1
             or settings.mesh_convergence_stop < settings.mesh_convergence_start
@@ -82,6 +86,7 @@ class AlgorithmSettings:
             "fmax": self.fmax,
             "endfreq": self.endfreq,
             "mesh_cells_per_wavelength": self.mesh_cells_per_wavelength,
+            **({"preprocess_modify_mesh": False} if not self.preprocess_modify_mesh else {}),
             "mesh_convergence_enabled": self.mesh_convergence_enabled,
             "mesh_convergence_start": self.mesh_convergence_start,
             "mesh_convergence_stop": self.mesh_convergence_stop,

@@ -113,7 +113,8 @@ def test_project_config_and_postprocess_files_use_roundtrip_io(tmp_path):
     assert manager.readPPSList() == []
 
 
-def test_new_project_pipeline_keeps_typed_settings(tmp_path, monkeypatch):
+@pytest.mark.parametrize('modify_mesh', [True, False])
+def test_new_project_pipeline_keeps_typed_settings(tmp_path, monkeypatch, modify_mesh):
     destination = tmp_path / 'project'
     destination.mkdir()
     source = tmp_path / 'source.cst'
@@ -126,11 +127,13 @@ def test_new_project_pipeline_keeps_typed_settings(tmp_path, monkeypatch):
     def preprocess(settings, projectDir, savejsonpath, **kwargs):
         assert isinstance(settings, ProjectSettings)
         observed.append(settings)
+        assert kwargs.get('modify_mesh', True) == modify_mesh
         (projectDir / savejsonpath).write_text('[]', encoding='utf-8')
         return projectDir / settings.cst_filename
 
     monkeypatch.setattr(manager, '_preprocess_cst_project', preprocess)
-    assert manager.prepare_project(mesh_cells_per_wavelength=25)
+    assert manager.prepare_project(mesh_cells_per_wavelength=25, modify_mesh=modify_mesh)
+    assert manager.settings.fixed_mesh == modify_mesh
     assert manager.settings.cells_per_wavelength == 25
     assert manager.settings.cst_filename == Path('source.cst')
     assert len(observed) == 1

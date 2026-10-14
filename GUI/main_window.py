@@ -457,7 +457,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.uiCSTFilePath,
             settings.get("fmin", "?"),
             settings.get("endfreq", settings.get("fmax", "?")),
-            settings.get("mesh_cells_per_wavelength", "?"),
+            settings.get("mesh_cells_per_wavelength", "?") if settings.get('preprocess_modify_mesh', True) else "保持原工程（不修改）",
             settings.get("mesh_convergence_enabled", False),
             worker_count,
         )

@@ -32,3 +32,10 @@ def test_legacy_project_without_mesh_metadata_is_left_unchanged(caplog):
         manager._validate_fixed_mesh(24)
 
     assert "保持工程现状" in caplog.text
+
+
+def test_preserved_mesh_rejects_policy_drift_but_ignores_unused_density():
+    manager = _manager_with_config(ProjectSettings(name='preserved', fixed_mesh=False).to_parser())
+    manager._validate_fixed_mesh(99, False)
+    with pytest.raises(ProjectStatusError, match='策略'):
+        manager._validate_fixed_mesh(20, True)

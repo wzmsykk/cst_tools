@@ -16,7 +16,7 @@ import tempfile
 from typing import Callable
 
 from csttool import projectutil
-from .acceptance_session import wait_probe
+from .acceptance_session import cst_processes, wait_probe
 from .configuration import write_json_atomic
 
 
@@ -52,12 +52,55 @@ class CstProjectPreprocessor:
         self.runner = runner
         self.logger = logger or logging.getLogger(__name__)
         self.run_in_background = bool(run_in_background)
+        self._detail_cursor = [0]
+
+    def _log_details(self, working, cursor):
+        """Forward closed, complete journal lines once, including failure tails."""
+        path = working / "changes.tsv"
+        if not path.exists():
+            return
+        # VBA uses the host ANSI encoding for Open/Print; do not assume UTF-8.
+        try:
+            content = path.read_text(errors="replace")
+        except OSError:
+            # CST may briefly hold an exclusive writer handle. Read next tick.
+            return
+        lines = content.splitlines(keepends=True)
+        for line in lines[cursor[0]:]:
+            if not line.endswith(('\n', '\r')):
+                break
+            fields = line.rstrip('\r\n').split('\t')
+            cursor[0] += 1
+            if len(fields) != 6:
+                self.logger.warning("预处理诊断行格式异常 | diagnostics=%s line=%r", working, line)
+                continue
+            timestamp, action, target, before, after, outcome = fields
+            self.logger.info(
+                "CST 预处理明细 | action=%s target=%s before=%r after=%r outcome=%s cst_time=%s diagnostics=%s",
+                action, target, before, after, outcome, timestamp, working,
+            )
+
+    def _observer(self, working, cursor):
+        last_stage = [None]
+        def observe(diagnostic):
+            self._log_details(working, cursor)
+            stage = diagnostic['stage']
+            if stage != last_stage[0]:
+                self.logger.info("CST 预处理阶段 | stage=%s elapsed=%.1fs diagnostics=%s",
+                                 stage, diagnostic['elapsed_seconds'], working)
+                last_stage[0] = stage
+        return observe
 
     def _run(self, command, working):
         if self.runner is not None:
             return self.runner(command, env=cst_process_environment(),
                                capture_output=True, text=True, errors="replace",
                                timeout=None, check=False, **self._startup_options())
+        try:
+            preexisting = cst_processes()
+        except psutil.AccessDenied:
+            preexisting = []
+        self.logger.info("CST 预处理进程基线 | preexisting=%s diagnostics=%s", preexisting, working)
         with (working / "cst.log").open("wb") as stream:
             process = subprocess.Popen(command, env=cst_process_environment(),
                                        stdout=stream, stderr=subprocess.STDOUT,
@@ -67,6 +110,7 @@ class CstProjectPreprocessor:
                             "create_time": psutil.Process(process.pid).create_time()}
                 write_json_atomic(working / "session-status.json",
                                   {"launcher_pid": process.pid, "owned": [identity],
+                                   "preexisting_processes": preexisting,
                                    "exit_confirmed": False})
             except psutil.NoSuchProcess:
                 pass
@@ -74,9 +118,13 @@ class CstProjectPreprocessor:
                 process, working, stage_timeout=self.timeout, exit_timeout=60,
                 completion_names=("completion.txt",),
                 unbounded_stages=("bind-history", "rebuild", "save"),
+                on_observation=self._observer(working, self._detail_cursor),
+                preexisting_processes=preexisting,
+                task_project=command[3],
             )
         if diagnostic['foreign_processes']:
-            raise CstPreprocessError("发现未确认归属的 CST 进程，不能确认安全退出")
+            self.logger.debug("独立/未关联CST仅记录，不阻塞本任务 | processes=%s diagnostics=%s",
+                              diagnostic['foreign_processes'], working)
         return subprocess.CompletedProcess(command, process.returncode,
                                            (working / "cst.log").read_text(errors="replace"), "")
 
@@ -103,6 +151,7 @@ class CstProjectPreprocessor:
         parameter_output: Path,
         status_output: Path,
         mesh_cells_per_wavelength: int,
+        modify_mesh: bool = True,
     ) -> str:
         source = self.macro_template.read_text(encoding="utf-8-sig")
         replacements = {
@@ -110,6 +159,8 @@ class CstProjectPreprocessor:
             "%PARAMDSTPATH%": self._vb_path(parameter_output),
             "%STATUSPATH%": self._vb_path(status_output),
             "%STAGEPATH%": self._vb_path(status_output.parent / "stage.txt"),
+            "%DETAILPATH%": self._vb_path(status_output.parent / "changes.tsv"),
+            "%MODIFYMESH%": "True" if modify_mesh else "False",
             "%MESHCELLSPERWAVELENGTH%": str(int(mesh_cells_per_wavelength)),
         }
         for marker, value in replacements.items():
@@ -126,6 +177,7 @@ class CstProjectPreprocessor:
         temp_directory: str | Path,
         *,
         mesh_cells_per_wavelength: int = 20,
+        modify_mesh: bool = True,
     ) -> CstPreprocessResult:
         source_project_path = Path(source_project_path).resolve()
         output_project_path = Path(output_project_path).resolve()
@@ -151,7 +203,8 @@ class CstProjectPreprocessor:
         # silently launch a second copy or delete its evidence.
         for receipt in temp_directory.glob("cst-preprocess-*/session-status.json"):
             previous = json.loads(receipt.read_text(encoding="utf-8"))
-            for identity in previous.get("owned", []) + previous.get("foreign_processes", []):
+            # foreign_processes never proved task association, including old receipts.
+            for identity in previous.get("owned", []):
                 try:
                     process = psutil.Process(identity['pid'])
                     if process.create_time() == identity['create_time'] and process.is_running():
@@ -160,8 +213,10 @@ class CstProjectPreprocessor:
                     pass
         working = Path(tempfile.mkdtemp(prefix="cst-preprocess-", dir=temp_directory))
         manifest = {"source": str(source_project_path), "output": str(output_project_path),
-                    "parameter_json": str(parameter_json_path), "state": "preparing"}
+                    "parameter_json": str(parameter_json_path), "state": "preparing",
+                    "modify_mesh": modify_mesh}
         write_json_atomic(working / "preprocess-report.json", manifest)
+        self._detail_cursor = [0]
         try:
             working_project = working / source_project_path.name
             macro_path = working_project.with_suffix('') / 'Model' / '3D' / 'Model.run'
@@ -176,6 +231,7 @@ class CstProjectPreprocessor:
                     parameter_output,
                     status_output,
                     mesh_cells_per_wavelength,
+                    modify_mesh,
                 ),
                 encoding="utf-8",
             )
@@ -183,6 +239,7 @@ class CstProjectPreprocessor:
             self.logger.info("启动 CST 工程参数预处理 | source=%s diagnostics=%s", source_project_path, working)
             try:
                 completed = self._run(command, working)
+                self._log_details(working, self._detail_cursor)
             except subprocess.TimeoutExpired as exc:
                 raise CstPreprocessError("CST 工程参数预处理超时") from exc
             (working / "runner-output.txt").write_text(
@@ -203,7 +260,8 @@ class CstProjectPreprocessor:
             projectutil.custom_ascii_2_json(parameter_output, parameter_json_path)
             parameters = tuple(projectutil.get_parameters(parameter_json_path))
             names = {item["name"] for item in parameters}
-            missing = REQUIRED_HOM_PARAMETERS - names
+            required = REQUIRED_HOM_PARAMETERS if modify_mesh else REQUIRED_HOM_PARAMETERS - {"cell"}
+            missing = required - names
             if missing:
                 raise CstPreprocessError(
                     "CST 工程参数预处理缺少参数: "
@@ -212,6 +270,7 @@ class CstProjectPreprocessor:
             output_project_path.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(working_project, output_project_path)
         except Exception as exc:
+            self._log_details(working, self._detail_cursor)
             manifest.update(state="failed", error=str(exc))
             write_json_atomic(working / "preprocess-report.json", manifest)
             self.logger.error("CST 预处理失败，副本及诊断已保留 | diagnostics=%s", working)
@@ -221,4 +280,6 @@ class CstProjectPreprocessor:
         working_project.unlink()
         shutil.rmtree(working_project.with_suffix(''))
         write_json_atomic(working / "preprocess-report.json", manifest)
+        self.logger.info("CST 预处理完成 | output=%s parameters=%d diagnostics=%s",
+                         output_project_path, len(parameters), working)
         return CstPreprocessResult(output_project_path, parameters)

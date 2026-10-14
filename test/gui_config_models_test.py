@@ -51,6 +51,23 @@ def test_algorithm_settings_are_typed_and_cross_validated():
         )
 
 
+def test_preserve_mesh_dialog_disables_conflicting_controls_and_cancel_restores(qapp):
+    dialog = AlgorithmSettingsDialog()
+    dialog.setDefaultValues({'mesh_convergence_enabled':True})
+    dialog.preserveMeshCheckBox.setChecked(True)
+    assert not dialog.meshCellsLineEdit.isEnabled()
+    assert not dialog.meshConvergenceCheckBox.isEnabled()
+    assert not dialog.meshConvergenceCheckBox.isChecked()
+    dialog.setValues()
+    assert dialog.getValues()['preprocess_modify_mesh'] is False
+    dialog.reject()
+    assert not dialog.preserveMeshCheckBox.isChecked()
+    assert dialog.meshCellsLineEdit.isEnabled()
+    assert dialog.meshConvergenceCheckBox.isChecked()
+    with pytest.raises(ValueError, match='不能启用'):
+        AlgorithmSettings.from_mapping({'preprocess_modify_mesh':False, 'mesh_convergence_enabled':True})
+
+
 def test_vacuum_domain_gui_is_off_by_default_validates_and_cancel_restores(qapp,tmp_path):
     from test.managed_vacuum_domain_test import options
     from csttool.configuration import write_json_atomic

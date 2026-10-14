@@ -74,6 +74,20 @@ def test_manifest_rejects_mesh_setting_drift(tmp_path):
         HomRunManifest.ensure(path, manager, policy, mesh_cells_per_wavelength=24)
 
 
+def test_manifest_records_mesh_preservation_and_rejects_policy_change(tmp_path):
+    from csttool.configuration import ProjectSettings
+    project = tmp_path / 'model.cst'
+    project.write_bytes(b'model')
+    manager = _Manager(project, project)
+    manager.pconfm.settings = ProjectSettings(name='test', fixed_mesh=False)
+    path = tmp_path / 'scan_manifest.json'
+    policy = ScanPolicy(500, 550, 1000)
+    assert HomRunManifest.ensure(path, manager, policy).preprocess_modify_mesh is False
+    manager.pconfm.settings = replace(manager.pconfm.settings, fixed_mesh=True)
+    with pytest.raises(ManifestMismatchError):
+        HomRunManifest.ensure(path, manager, policy)
+
+
 def test_manifest_uses_typed_settings_without_a_parser_view(tmp_path):
     prepared = tmp_path / "prepared.cst"
     prepared.write_bytes(b"prepared")

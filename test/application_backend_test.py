@@ -64,9 +64,10 @@ class FakeProjectConfig:
     def select_input_project(self, path):
         self.currCSTFilePath = path
 
-    def prepare_project(self, resume, *, mesh_cells_per_wavelength):
+    def prepare_project(self, resume, *, mesh_cells_per_wavelength, modify_mesh=True):
         self.prepared_with = resume
         self.mesh_cells_per_wavelength = mesh_cells_per_wavelength
+        self.modify_mesh = modify_mesh
         self.ready = True
 
     def recover_failed_project(self):
@@ -158,6 +159,18 @@ def test_backend_happy_path_has_explicit_lifecycle_and_cleanup():
     assert global_config.saved == 1
     assert project.prepared_with is True
     assert project.mesh_cells_per_wavelength == 20
+
+
+def test_backend_forwards_preserve_mesh_option():
+    algorithm = FakeAlgorithm()
+    algorithm.attrs = {'fmin':500, 'mesh_cells_per_wavelength':20, 'preprocess_modify_mesh':False}
+    backend, _, project, *_ = make_backend(algorithm=algorithm)
+    backend.select_project_directory('project')
+    backend.select_cst_file('model.cst')
+    backend.initialize_run(False, 1)
+    backend.prepare_run()
+    assert project.modify_mesh is False
+    backend.execute_run()
 
 
 def test_backend_mesh_convergence_writes_report_and_returns_recommendation(tmp_path):

@@ -36,6 +36,7 @@ class HomRunManifest:
     cst_version: str = ""
     cst_executable: str = ""
     mesh_cells_per_wavelength: int = 20
+    preprocess_modify_mesh: bool = True
 
     @classmethod
     def create(
@@ -63,6 +64,7 @@ class HomRunManifest:
             cst_version=str(global_settings.cst.version),
             cst_executable=str(global_settings.cst.executable or ""),
             mesh_cells_per_wavelength=int(mesh_cells_per_wavelength),
+            preprocess_modify_mesh=getattr(getattr(project_config, 'settings', None), 'fixed_mesh', True),
         )
 
     def write_once(self, path: str | Path) -> Path:

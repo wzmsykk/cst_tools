@@ -32,7 +32,10 @@
 |F26|Managed固定参考模式匹配|[managed_cstworker.py](../csttool/managed_cstworker.py)|`ManagedCSTWorker._run_vacuum_matching`|[匹配链测试](../test/managed_vacuum_matching_test.py)|[GUI与生命周期](managed-vacuum-domain-gui.md)|
 |F27|GUI登记/匹配假Worker流程|[假Worker验收](../test/gui_vacuum_matching_fake_flow_test.py)|`MatchingFakeWorker`, `MatchingFakeBackend`|[流程测试](../test/gui_vacuum_matching_fake_flow_test.py)|[GUI与生命周期](managed-vacuum-domain-gui.md)|
 |F28|随机谱HOM假Worker与异常扫描|[hom_fake_worker.py](../test/support/hom_fake_worker.py)|`ProbabilisticHomWorker`|[随机谱测试](../test/hom_probabilistic_fake_worker_test.py)|[HOM假Worker验收](fake-hom-acceptance.md)|
-|F29|预处理阶段监测与失败保留|[cst_preprocessor.py](../csttool/cst_preprocessor.py)|`CstProjectPreprocessor._run`|[预处理测试](../test/cst_preprocessor_test.py)|[预处理诊断](preprocess-diagnostics.md)|
+|F29|预处理阶段监测、修改明细与失败保留|[cst_preprocessor.py](../csttool/cst_preprocessor.py)|`CstProjectPreprocessor._run`, `CstProjectPreprocessor._log_details`, `CstProjectPreprocessor._observer`|[预处理测试](../test/cst_preprocessor_test.py)|[预处理诊断](preprocess-diagnostics.md)|
+|F30|HOM预处理保留mesh选项与恢复策略|[projectconfmanager.py](../csttool/projectconfmanager.py)|`ProjectConfigManager.prepare_project`|[mesh策略测试](../test/projectconfmanager_mesh_test.py)|[预处理诊断](preprocess-diagnostics.md)|
+|F31|GUI预处理保留mesh交互|[algorithm_settings_dialog.py](../GUI/algorithm_settings_dialog.py)|`AlgorithmSettingsDialog._set_preserve_mesh`|[GUI配置测试](../test/gui_config_models_test.py)|[预处理诊断](preprocess-diagnostics.md)|
+|F32|CST任务级归属、共享实例诊断与退出门禁|[acceptance_session.py](../csttool/acceptance_session.py)|`wait_probe`, `task_project_processes`|[进程监测测试](../test/acceptance_session_test.py)|[预处理诊断](preprocess-diagnostics.md)|
 
 ## 从日志定位
 
