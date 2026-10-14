@@ -61,3 +61,24 @@ def test_late_child_is_not_competitor_but_unrelated_process_remains(tmp_path, mo
     result = session.wait_probe(launcher,tmp_path)
     assert result['exit_confirmed']
     assert [p['pid'] for p in result['foreign_processes']]==[9]
+
+
+def test_long_rebuild_is_not_total_timeout_but_completion_exit_is_bounded(tmp_path, monkeypatch):
+    from types import SimpleNamespace
+    clock = {'value': 0.}
+    root = SimpleNamespace(pid=1, create_time=lambda:1., children=lambda recursive:[],
+                           is_running=lambda:True)
+    monkeypatch.setattr(session.psutil, 'Process', lambda pid:root)
+    monkeypatch.setattr(session, 'cst_processes', lambda:[])
+    monkeypatch.setattr(session.time, 'monotonic', lambda:clock['value'])
+    def advance(seconds):
+        clock['value'] += 200
+        if clock['value'] >= 600:
+            (tmp_path / 'completion.txt').write_text('SUCCESS')
+    monkeypatch.setattr(session.time, 'sleep', advance)
+    (tmp_path / 'stage.txt').write_text('rebuild')
+    launcher = SimpleNamespace(pid=1, poll=lambda:None)
+    with pytest.raises(RuntimeError, match='exit-unconfirmed'):
+        session.wait_probe(launcher, tmp_path, stage_timeout=180, exit_timeout=60,
+                           completion_names=('completion.txt',), unbounded_stages=('rebuild',))
+    assert clock['value'] >= 800

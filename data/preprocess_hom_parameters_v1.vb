@@ -5,6 +5,7 @@ Option Explicit
 Public cstProjectPath As String
 Public paramFileDstPath As String
 Public statusFilePath As String
+Public stageFilePath As String
 
 Sub Main
     On Error GoTo Failed
@@ -12,12 +13,18 @@ Sub Main
     cstProjectPath = "%CSTPROJFILE%"
     paramFileDstPath = "%PARAMDSTPATH%"
     statusFilePath = "%STATUSPATH%"
+    stageFilePath = "%STAGEPATH%"
 
     ' -m -b loads the working project before compiling this project script.
+    WriteStage "parameters"
     EnsureHomParameters
+    WriteStage "bind-history"
     BindHomSolverSettings
+    WriteStage "rebuild"
     If Not Rebuild Then Err.Raise vbObjectError + 2201, "HOM preprocess", "Rebuild returned False"
+    WriteStage "save"
     Save
+    WriteStage "export-parameters"
     ExportParameterList paramFileDstPath
     WriteStatus "SUCCESS"
     Exit Sub
@@ -25,6 +32,14 @@ Sub Main
 Failed:
     WriteStatus "FAILURE" & vbTab & CStr(Err.Number) & vbTab & Err.Description
     ' Return to the batch runner; never Quit while its sheet is active.
+End Sub
+
+Sub WriteStage(message As String)
+    Dim fileNumber As Integer
+    fileNumber = FreeFile
+    Open stageFilePath For Output As #fileNumber
+    Print #fileNumber, message
+    Close #fileNumber
 End Sub
 
 Sub EnsureHomParameters

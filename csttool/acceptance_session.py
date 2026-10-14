@@ -49,7 +49,8 @@ def exclusive_probe(root):
             unlock()
 
 
-def wait_probe(process, directory, *, stage_timeout=180, exit_timeout=60):
+def wait_probe(process, directory, *, stage_timeout=180, exit_timeout=60,
+               completion_names=('completed.txt', 'failed.txt'), unbounded_stages=()):
     """Bound idle probe phases, not normal solves. Keep failures for intervention."""
     directory = Path(directory)
     started = changed = time.monotonic()
@@ -64,7 +65,7 @@ def wait_probe(process, directory, *, stage_timeout=180, exit_timeout=60):
                 owned[(child.pid, child.create_time())] = child
         except psutil.NoSuchProcess:
             pass
-        files = [directory / name for name in ('stage.txt', 'cst.log', 'completed.txt', 'failed.txt')]
+        files = [directory / name for name in ('stage.txt', 'cst.log', *completion_names)]
         current = tuple((p.stat().st_size, p.stat().st_mtime_ns) if p.exists() else None for p in files)
         if current != signature:
             signature = current
@@ -88,6 +89,8 @@ def wait_probe(process, directory, *, stage_timeout=180, exit_timeout=60):
             return diagnostic
         expired = (time.monotonic()-completed_at > exit_timeout if completed_at is not None
                    else time.monotonic()-changed > stage_timeout)
+        if completed_at is None and diagnostic['stage'] in unbounded_stages:
+            expired = False
         if expired:
             diagnostic['failure'] = 'exit-unconfirmed' if completed_at else 'probe-phase-stalled'
             write_json_atomic(directory / 'session-status.json', diagnostic)

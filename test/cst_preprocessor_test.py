@@ -120,6 +120,10 @@ def test_preprocessor_creates_distinct_prepared_project_and_parameter_manifest(
     assert output_project.read_bytes() == b"original-project"
     assert output_project.stat().st_mode & stat.S_IWRITE
     assert result.project_path == output_project
+    directory, = (tmp_path / "temp").glob("cst-preprocess-*")
+    assert (directory / "Model.run").is_file()
+    assert not (directory / source_project.name).exists()
+    assert not (directory / source_project.stem).exists()
     assert [item["name"] for item in result.parameters] == [
         "fmin",
         "fmax",
@@ -198,3 +202,60 @@ def test_preprocessor_does_not_publish_project_with_missing_parameters(tmp_path)
             tmp_path / "temp",
         )
     assert not output.exists()
+
+
+def test_failed_preprocessing_preserves_copy_macro_and_report(tmp_path):
+    import json
+    executable = tmp_path / "cst.exe"
+    executable.write_bytes(b"fake")
+    source = tmp_path / "source.cst"
+    source.write_bytes(b"original")
+    def failed_runner(command, **kwargs):
+        assert kwargs['timeout'] is None
+        return subprocess.CompletedProcess(command, 4, "macro failed", "")
+    with pytest.raises(CstPreprocessError, match="诊断目录"):
+        CstProjectPreprocessor(executable, TEMPLATE, runner=failed_runner).preprocess(
+            source, tmp_path / "output.cst", tmp_path / "p.json", tmp_path / "temp")
+    directory, = (tmp_path / "temp").glob("cst-preprocess-*")
+    assert (directory / "source.cst").read_bytes() == b"original"
+    assert (directory / "source/Model/3D/Model.run").is_file()
+    assert (directory / "runner-output.txt").read_text() == "macro failed"
+    assert json.loads((directory / "preprocess-report.json").read_text(encoding="utf-8"))['state'] == 'failed'
+    assert not (tmp_path / "output.cst").exists()
+
+
+def test_native_runner_uses_stage_monitor_without_communicate_timeout(tmp_path, monkeypatch):
+    import csttool.cst_preprocessor as module
+    class Process:
+        pid = 123
+        returncode = 0
+    monkeypatch.setattr(module.subprocess, 'Popen', lambda *a, **kw: Process())
+    from types import SimpleNamespace
+    monkeypatch.setattr(module.psutil, 'Process', lambda pid:SimpleNamespace(create_time=lambda:1.))
+    def monitor(process, directory, **kwargs):
+        assert kwargs['completion_names'] == ('completion.txt',)
+        assert {'bind-history', 'rebuild', 'save'} <= set(kwargs['unbounded_stages'])
+        assert kwargs['stage_timeout'] == 180
+        return {'foreign_processes': []}
+    monkeypatch.setattr(module, 'wait_probe', monitor)
+    assert CstProjectPreprocessor(tmp_path / 'cst.exe', TEMPLATE)._run(['fake'], tmp_path).returncode == 0
+
+
+def test_previous_live_preprocess_blocks_retry_without_launch(tmp_path, monkeypatch):
+    import json
+    from types import SimpleNamespace
+    import csttool.cst_preprocessor as module
+    executable = tmp_path / 'cst.exe'
+    executable.write_bytes(b'fake')
+    source = tmp_path / 'source.cst'
+    source.write_bytes(b'original')
+    old = tmp_path / 'temp/cst-preprocess-old'
+    old.mkdir(parents=True)
+    (old / 'session-status.json').write_text(json.dumps({'owned':[{'pid':1, 'create_time':2.}]}))
+    monkeypatch.setattr(module.psutil, 'Process', lambda pid:SimpleNamespace(
+        create_time=lambda:2., is_running=lambda:True))
+    def forbidden(*args, **kwargs):
+        pytest.fail('must not launch competing CST')
+    with pytest.raises(CstPreprocessError, match='仍活跃'):
+        CstProjectPreprocessor(executable, TEMPLATE, runner=forbidden).preprocess(
+            source, tmp_path / 'output.cst', tmp_path / 'p.json', tmp_path / 'temp')
