@@ -10,6 +10,9 @@ import os
 from pathlib import Path
 import time
 from uuid import uuid4
+import socket
+import psutil
+from .runner_ownership import RunnerOwnership
 
 from .project_session_recovery import project_runtime_directory
 
@@ -23,6 +26,8 @@ class ProjectRunOwner:
     process_id: int
     token: str
     acquired_at: str
+    created_at: float | None = None
+    host: str | None = None
 
 
 def _process_is_alive(process_id: int) -> bool:
@@ -35,7 +40,7 @@ def _process_is_alive(process_id: int) -> bool:
             query_limited_information, False, process_id
         )
         if not handle:
-            return False
+            return ctypes.windll.kernel32.GetLastError() == 5
         try:
             exit_code = ctypes.c_ulong()
             if not ctypes.windll.kernel32.GetExitCodeProcess(
@@ -61,6 +66,7 @@ def _read_owner(path: Path) -> ProjectRunOwner | None:
             process_id=int(document["process_id"]),
             token=str(document["token"]),
             acquired_at=str(document["acquired_at"]),
+            created_at=document.get('created_at'), host=document.get('host'),
         )
     except (KeyError, OSError, TypeError, ValueError):
         return None
@@ -85,10 +91,21 @@ class ProjectRunLock:
             process_id=os.getpid(),
             token=str(uuid4()),
             acquired_at=datetime.now(timezone.utc).isoformat(),
+            created_at=psutil.Process().create_time(), host=socket.gethostname(),
         )
         self.acquired = False
 
     def acquire(self) -> None:
+        try:
+            guard = RunnerOwnership(str(self.path) + '.guard').acquire()
+        except RuntimeError as exc:
+            raise ProjectRunBusyError('项目运行锁正在更新') from exc
+        try:
+            self._acquire_guarded()
+        finally:
+            guard.close()
+
+    def _acquire_guarded(self) -> None:
         self.path.parent.mkdir(parents=True, exist_ok=True)
         payload = json.dumps(
             {
@@ -96,6 +113,7 @@ class ProjectRunLock:
                 "process_id": self.owner.process_id,
                 "token": self.owner.token,
                 "acquired_at": self.owner.acquired_at,
+                'created_at': self.owner.created_at, 'host': self.owner.host,
             },
             ensure_ascii=True,
         ).encode("utf-8")
@@ -107,13 +125,13 @@ class ProjectRunLock:
                 )
             except FileExistsError:
                 existing = _read_owner(self.path)
-                if existing is not None and _process_is_alive(existing.process_id):
+                if existing is not None and _owner_is_alive(existing):
                     raise ProjectRunBusyError(
                         "该项目已在另一个窗口中运行"
                         f"（进程 {existing.process_id}，开始于 {existing.acquired_at}）"
                     )
-                if existing is None and _is_recent(self.path):
-                    raise ProjectRunBusyError("该项目正在被另一个窗口占用")
+                if existing is None:
+                    raise ProjectRunBusyError("项目锁身份不可读，禁止自动抢占；请核实原运行归属")
                 try:
                     self.path.unlink()
                 except FileNotFoundError:
@@ -130,6 +148,13 @@ class ProjectRunLock:
     def release(self) -> None:
         if not self.acquired:
             return
+        guard = RunnerOwnership(str(self.path) + '.guard').acquire()
+        try:
+            self._release_guarded()
+        finally:
+            guard.close()
+
+    def _release_guarded(self):
         existing = _read_owner(self.path)
         if existing is not None and existing.token == self.owner.token:
             try:
@@ -143,9 +168,24 @@ class ProjectRunLock:
         path = project_runtime_directory(project_directory) / cls.filename
         owner = _read_owner(path)
         if owner is None:
-            if _is_recent(path):
+            if path.exists():
                 return ProjectRunOwner(0, "unknown", "正在建立运行锁")
             return None
-        if not _process_is_alive(owner.process_id):
+        if not _owner_is_alive(owner):
             return None
         return owner
+
+
+def _owner_is_alive(owner):
+    if owner.host and owner.host != socket.gethostname():
+        return True  # Cross-host ownership cannot be established locally.
+    if not _process_is_alive(owner.process_id):
+        return False
+    if owner.created_at is not None:
+        try:
+            return abs(psutil.Process(owner.process_id).create_time() - float(owner.created_at)) < .01
+        except psutil.NoSuchProcess:
+            return False
+        except (psutil.AccessDenied, OSError, ValueError, TypeError):
+            return True  # Unknown is not permission to steal the lease.
+    return True

@@ -16,6 +16,21 @@ from csttool.cst_progress import CstProgressEvent
 from csttool.cst_installations import CstInstallation
 
 
+@pytest.fixture(autouse=True)
+def accept_confirmation(monkeypatch):
+    monkeypatch.setattr("GUI.main_window.QMessageBox.question", lambda *a: 16384)
+    yield
+    # A recovery-required window deliberately refuses close; release fake windows
+    # only after the test, avoiding stale Qt widgets in shared logger handlers.
+    app = QApplication.instance()
+    if app:
+        for window in app.topLevelWidgets():
+            if isinstance(window, MainWindow) and not window.controller.has_active_work:
+                window.controller.state = RunState.IDLE
+                window._close_confirmed = True
+                window.close()
+
+
 @pytest.fixture(scope="module")
 def qapp():
     app = QApplication.instance() or QApplication([])
@@ -187,6 +202,64 @@ def make_window(qapp):
     tool = FakeMainTool()
     window = MainWindow(tool, FakeDialog(), FakeDialog())
     return window, tool
+
+
+def test_exit_cancel_keeps_logging_and_window(qapp, monkeypatch):
+    window, tool = make_window(qapp)
+    monkeypatch.setattr("GUI.main_window.QMessageBox.question", lambda *a: 65536)
+    event = QCloseEvent()
+    window.closeEvent(event)
+    assert not event.isAccepted()
+    assert not window._close_pending
+    assert window.logTextBox in window.logger.handlers
+    monkeypatch.setattr("GUI.main_window.QMessageBox.question", lambda *a: 16384)
+    window.close()
+
+
+def test_stop_cancel_does_not_dispatch(qapp, monkeypatch, tmp_path):
+    window, tool = make_window(qapp)
+    choose_inputs(window, monkeypatch, tmp_path)
+    window.run()
+    process_until(qapp, lambda: tool.start_count == 1)
+    monkeypatch.setattr("GUI.main_window.QMessageBox.question", lambda *a: 65536)
+    window.requestStop()
+    assert tool.stop_count == 0
+    assert window.controller.state is RunState.RUNNING
+    monkeypatch.setattr("GUI.main_window.QMessageBox.question", lambda *a: 16384)
+    window.close()
+    process_until(qapp, lambda: not window.controller.has_active_work)
+    process_until(qapp, lambda: not window._close_pending)
+
+
+def test_confirmation_defaults_to_no(qapp, monkeypatch):
+    window, _ = make_window(qapp)
+    calls = []
+    def question(*args):
+        calls.append(args)
+        return 65536
+    monkeypatch.setattr("GUI.main_window.QMessageBox.question", question)
+    assert not window._confirm_action("title", "message")
+    assert calls[0][-1] == 65536
+    assert not window._confirmation_open
+    monkeypatch.setattr("GUI.main_window.QMessageBox.question", lambda *a: 16384)
+    window.close()
+
+
+def test_stop_failure_blocks_pending_exit(qapp):
+    window, _ = make_window(qapp)
+    controller = window.controller
+    controller.state = RunState.STOPPING
+    window._close_pending = True
+    window._close_confirmed = True
+    controller._stop_failed("test stop failure")
+    controller._run_interrupted()
+    controller._emit_settled_if_idle()
+    qapp.processEvents()
+    assert controller.state is RunState.RECOVERY_REQUIRED
+    assert not window._close_confirmed
+    assert window.logTextBox in window.logger.handlers
+    controller.state = RunState.IDLE
+    window.close()
 
 
 def process_until(qapp, predicate, timeout=3):

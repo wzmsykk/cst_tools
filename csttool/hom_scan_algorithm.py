@@ -23,6 +23,7 @@ from . import yfunction
 import time
 import pandas as pd
 from pathlib import Path
+from .configuration import read_json
 
 
 class HomScanAlgorithm(Algorithm):
@@ -82,6 +83,8 @@ class HomScanAlgorithm(Algorithm):
 
         self.end_frequency = 2500
         self.resume_requested = False
+        from .scan_settings import default_hom_settings
+        self.set_editable_attributes(default_hom_settings())
 
     def check_and_set_ready(self):
         if self.CSTparams is not None and self.manager is not None:
@@ -105,6 +108,8 @@ class HomScanAlgorithm(Algorithm):
         self.check_and_set_ready()
 
     def set_editable_attributes(self, dict):
+        from .scan_settings import validate_hom_settings
+        validate_hom_settings(dict)
         d = {
             "fmin": self.input_min[1],
             "fmax": self.input_min[2],
@@ -498,6 +503,10 @@ class HomScanAlgorithm(Algorithm):
                 snapshot_path=snapshot,
             )
             self._write_scan_results(current_report)
+            listener = getattr(self, 'checkpoint_listener', None)
+            if listener is not None:
+                document = read_json(checkpoint_store.path)
+                listener(current_report, current_pending, document['coverage'])
             overview = getattr(getattr(self.manager, 'run_store', None), 'overview', None)
             if overview is not None:
                 try:
@@ -506,6 +515,8 @@ class HomScanAlgorithm(Algorithm):
                     self.logger.warning('运行摘要更新失败，扫描检查点和结果仍保留', exc_info=True)
             adopter = getattr(self.manager, 'adopt_result', None)
             if adopter is not None:
+                for task_id in current_report.adopted_task_ids:
+                    adopter(task_id)
                 for mode in current_report.modes:
                     if mode.task_id:
                         adopter(mode.task_id)
@@ -536,12 +547,13 @@ class HomScanAlgorithm(Algorithm):
             snapshot = result.get("ProjectSnapshot")
             if snapshot:
                 snapshot = os.path.relpath(snapshot, self.manager.currProjectDir)
-            return [replace(
+            from .hom_scan import TaskModeResults
+            return TaskModeResults([replace(
                 mode,
                 project_snapshot=snapshot,
                 task_name=result.get("RunName", job_name),
                 task_id=result.get("TaskID", ""),
-            ) for mode in self._extract_scan_modes(postprocess)]
+            ) for mode in self._extract_scan_modes(postprocess)], result.get('TaskID', ''))
 
         started = time.monotonic()
         try:

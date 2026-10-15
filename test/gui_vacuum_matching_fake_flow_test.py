@@ -93,6 +93,7 @@ class MatchingFakeBackend(FakeWorkerGuiBackend):
 
 
 def window_with_fake_matching(qapp,tmp_path,monkeypatch,**kwargs):
+    monkeypatch.setattr("GUI.main_window.QMessageBox.question",lambda *a:16384)
     backend=MatchingFakeBackend(tmp_path,**kwargs)
     def fake_registration(executable,source,destination,sampling,*,geometry_id):
         assert backend.tracker['active']==0,'native probe must not run during fake solve'

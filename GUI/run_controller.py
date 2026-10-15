@@ -285,7 +285,7 @@ class GuiRunController(QObject):
         self._on_stage("completed")
         target = RunState.READY if self.inputs_ready else RunState.IDLE
         if self.state is RunState.STOPPING:
-            self._terminal_after_stop = target
+            self._terminal_after_stop = self._terminal_after_stop or target
         else:
             self._transition(target)
 
@@ -295,7 +295,7 @@ class GuiRunController(QObject):
             RunState.RECOVERY_REQUIRED if requires_recovery else RunState.FAILED
         )
         if self.state is RunState.STOPPING:
-            self._terminal_after_stop = target
+            self._terminal_after_stop = self._terminal_after_stop or target
         else:
             self._transition(target)
         self.error.emit(message)
@@ -304,7 +304,7 @@ class GuiRunController(QObject):
         self._on_stage("interrupted")
         target = RunState.READY if self.inputs_ready else RunState.IDLE
         if self.state is RunState.STOPPING:
-            self._terminal_after_stop = target
+            self._terminal_after_stop = self._terminal_after_stop or target
         else:
             self._transition(target)
 
@@ -314,8 +314,7 @@ class GuiRunController(QObject):
         self._emit_settled_if_idle()
 
     def _stop_failed(self, message: str) -> None:
-        if self._backend_requires_recovery():
-            self._terminal_after_stop = RunState.RECOVERY_REQUIRED
+        self._terminal_after_stop = RunState.RECOVERY_REQUIRED
         self.error.emit(f"标准停止失败: {message}")
 
     def _stop_thread_finished(self) -> None:

@@ -397,8 +397,10 @@ def write_ini_atomic(path: str | Path, parser: configparser.ConfigParser) -> Pat
             "w", encoding="utf-8", dir=destination.parent, delete=False
         ) as stream:
             parser.write(stream)
+            stream.flush()
+            os.fsync(stream.fileno())
             temporary = Path(stream.name)
-        os.replace(temporary, destination)
+        replace_file_atomic(temporary, destination)
     finally:
         if temporary is not None and temporary.exists():
             temporary.unlink()
@@ -406,8 +408,14 @@ def write_ini_atomic(path: str | Path, parser: configparser.ConfigParser) -> Pat
 
 
 def read_json(path: str | Path):
-    with Path(path).open("r", encoding="utf-8") as stream:
+    with open_shared_read(path) as stream:
         return json.load(stream)
+
+
+def open_shared_read(path, encoding='utf-8'):
+    """Release the physical file before decoding/retaining a JSON snapshot."""
+    import io
+    return io.StringIO(Path(path).read_text(encoding=encoding))
 
 
 def write_json_atomic(path: str | Path, value) -> Path:
@@ -419,9 +427,24 @@ def write_json_atomic(path: str | Path, value) -> Path:
             "w", encoding="utf-8", dir=destination.parent, delete=False
         ) as stream:
             json.dump(value, stream, ensure_ascii=False, indent=2)
+            stream.flush()
+            os.fsync(stream.fileno())
             temporary = Path(stream.name)
-        os.replace(temporary, destination)
+        replace_file_atomic(temporary, destination)
     finally:
         if temporary is not None and temporary.exists():
             temporary.unlink()
     return destination
+
+
+def replace_file_atomic(source, destination):
+    """Bounded Windows sharing-conflict handling, not operation/solve retries."""
+    import time
+    for attempt in range(5):
+        try:
+            os.replace(source, destination)
+            return
+        except PermissionError as exc:
+            if os.name != 'nt' or getattr(exc, 'winerror', None) not in (5, 32) or attempt == 4:
+                raise
+            time.sleep(.01 * (2 ** attempt))

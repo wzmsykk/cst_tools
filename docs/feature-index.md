@@ -42,8 +42,25 @@
 |F36|Worker不取任务锁的协作停止|[managed_cstworker.py](../csttool/managed_cstworker.py)|`ManagedCSTWorker.request_stop`|[停止及续跑测试](../test/cooperative_stop_resume_test.py)|[停止与覆盖续跑](cooperative-stop-and-hom-resume.md)|
 |F37|VBA步骤停止检查与中断求解保留|[Managed模板](../data/runtime_managed_worker_v1_main.vb)|`CSTPMW_CheckStop`|[停止及续跑测试](../test/cooperative_stop_resume_test.py)|[停止与覆盖续跑](cooperative-stop-and-hom-resume.md)|
 |F38|可读运行日志目录、摘要、旧目录总览|[run_overview.py](../csttool/run_overview.py)|`RunOverview.update`, `RunOverviewHandler.emit`, `rebuild_log_index`|[运行总览测试](../test/run_overview_test.py)|[可读日志目录](readable-log-directories.md)|
+|F40|运行级持久停止意图与最小契约|[execution_contract.py](../csttool/execution_contract.py)|`StopIntent.check`, `StopIntent.request`, `ArtifactRef`, `validate_command`|[恢复测试](../test/runner_recovery_test.py)|[本机Runner](local-runner.md)|
+|F41|独立Runner及持久本机命令|[runner.py](../csttool/runner.py)|`Runner.command`, `Runner.snapshot`, `LocalExecution.run`, `serve`|[进程验收](../test/runner_test.py)|[本机Runner](local-runner.md)|
+|F42|控制器OS所有权与受保护目录|[runner_ownership.py](../csttool/runner_ownership.py)|`RunnerOwnership.acquire`, `protect_directory`|[进程验收](../test/runner_test.py)|[统一计划](execution-platform-implementation-plan.md)|
+|F43|本机Runner发现/启动/CLI|[runner_client.py](../csttool/runner_client.py)|`RunnerClient.connect`, `RunnerClient.command`, `main`|[进程验收](../test/runner_test.py)|[本机Runner](local-runner.md)|
+|F44|生产GUI客户端与重连|[runner_controller.py](../GUI/runner_controller.py)|`RunnerController.poll`, `RunnerController.detach`|[GUI测试](../test/gui_runner_test.py)|[本机Runner](local-runner.md)|
+|F45|有限标准批次和持久采用|[standard_batch.py](../csttool/standard_batch.py)|`StandardBatchAlgorithm.start`|[真实副本验收](../test/runner_cst_integration_test.py)|[本机Runner](local-runner.md)|
+|F46|完成未接收的结果核验导入|[result_reconciliation.py](../csttool/result_reconciliation.py)|`recover_completed_result`|[恢复测试](../test/runner_recovery_test.py)|[本机Runner](local-runner.md)|
 
 ## 从日志定位
+
+Runner审计修复：F41/F43/F44增加`cancel_start`和命令对账，当前API及门禁见[修复记录](runner-audit-fix-20261015.md)。
+
+|功能ID|功能|源码|函数/类型|测试|说明|
+|---|---|---|---|---|---|
+|F47|有界JSONL游标与异常记录跳过|[event_replay.py](../csttool/event_replay.py)|`read_events`|[审计回归](../test/runner_audit_regression_test.py)|[Runner API](local-runner.md)|
+|F48|纯HOM草稿默认值与mesh校验|[scan_settings.py](../csttool/scan_settings.py)|`default_hom_settings`, `validate_hom_settings`|[审计回归](../test/runner_audit_regression_test.py)|[修复记录](runner-audit-fix-20261015.md)|
+|F49|配置草稿与显式进程内执行适配|[application_service.py](../GUI/application_service.py)|`ConfigurationDraft`, `ConfigurationService`, `CstApplicationService`|[服务测试](../test/gui_application_service_test.py)|[Runner API](local-runner.md)|
+
+停止与退出确认：F39，源码 [MainWindow](../GUI/main_window.py) 的 `closeEvent`、`requestStop`、`_confirm_action` 和 [Controller](../GUI/run_controller.py) 的 `_stop_failed`；测试 [GUI测试](../test/gui_main_window_test.py)，说明 [停止/退出](gui-stop-exit.md)。
 
 - 使用run_id→session_id→task_id，先查RunStore与received记录，再查协议目录和lifecycle.log；不能仅按时间猜任务。
 - `WORKER_TASK_COMPLETE`：F03；`REBUILD_FAILED`、`SOLVER_FAILED`：F09；`WORKER_STOP_FAILED`：F03/F04/F05。
@@ -51,5 +68,15 @@
 - 核对最近证据：`docs/current-status.md`→具体验收文档→artifacts/report.json。大型原始模型/场文件可能未提交。
 
 ## 维护
+
+F40–F44审计回应：[收悉工作记录及逐项结论](runner-audit-response-20261015.md)保留修复前历史；四项缺陷/M1现已修复，当前验收及剩余门禁见[修复记录](runner-audit-fix-20261015.md)。
+
+F40–F44历史审查边界：[2026-10-15本机分离审查](../knowledge-base/runner-separation-review-20261015.md)，涉及 Runner.snapshot/events 与 RunnerController.poll/_observe/_command；现行映射包括F47–F49，不将原审查“未修复”作为当前结论。
+
+实施总入口D00：[统一实施计划E0–E9](execution-platform-implementation-plan.md)。本机E0–E5主链已实施，实际验收及未完成门禁以该文为准；D01/D02保留设计细节。
+
+规划入口D02（未实施）：[远程/分布式扩展设计](remote-distributed-execution-design.md)，含任务/尝试身份、所有权代次、数据位置、Warm亲和及阶段验收；当前本地源码约束与复用映射见该文第10节。
+
+设计入口D01：[GUI/Runner分离设计与TODO](gui-runner-process-separation-design.md)。历史拟议方案保留，当前接口见[本机Runner](local-runner.md)，实际实现映射见F40–F46。
 
 遵守根目录[AGENTS.md](../AGENTS.md)。索引测试检查本地链接和Python/VBA符号，不自动证明功能完整或更新 prose 内容；实现者必须同步状态、用途、限制与验收证据。

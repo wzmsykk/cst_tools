@@ -101,6 +101,14 @@ class ScanReport:
     failed: list[ScanInterval] = field(default_factory=list)
     failure_reasons: dict[str, str] = field(default_factory=dict)
     solver_calls: int = 0
+    adopted_task_ids: list[str] = field(default_factory=list)
+
+
+class TaskModeResults(list):
+    """A successful solver task, including one yielding no modes."""
+    def __init__(self, modes, task_id=''):
+        super().__init__(modes)
+        self.task_id = task_id
 
 
 CheckpointCallback = Callable[[ScanReport, list[ScanInterval]], None]
@@ -151,7 +159,9 @@ class AdaptiveHomScanner:
                 report.solver_calls += 1
                 request = SolveRequest(interval, interval.lo, interval.hi, 1)
                 try:
-                    modes = self._validate_modes(solve(request))
+                    returned = solve(request)
+                    task_id = getattr(returned, 'task_id', '')
+                    modes = self._validate_modes(returned)
                 except Exception as exc:
                     if should_stop is not None and should_stop():
                         pending_intervals = [interval] + queue
@@ -238,6 +248,8 @@ class AdaptiveHomScanner:
 
             if modes is not None:
                 report.completed.append(interval)
+                if task_id and task_id not in report.adopted_task_ids:
+                    report.adopted_task_ids.append(task_id)
             if next_lo < self.policy.stop:
                 next_hi = min(next_lo + self.policy.window_width, self.policy.stop)
                 if next_hi <= next_lo:
@@ -345,14 +357,12 @@ class ScanCheckpointStore:
                 "failed": [asdict(item) for item in report.failed],
                 "failure_reasons": report.failure_reasons,
                 "solver_calls": report.solver_calls,
+                "adopted_task_ids": report.adopted_task_ids,
             },
         }
         self.path.parent.mkdir(parents=True, exist_ok=True)
-        temporary = self.path.with_suffix(self.path.suffix + ".tmp")
-        temporary.write_text(
-            json.dumps(document, ensure_ascii=False, indent=2), encoding="utf-8"
-        )
-        os.replace(temporary, self.path)
+        from .configuration import write_json_atomic
+        write_json_atomic(self.path, document)
 
     def _encode_snapshot(self, snapshot_path: str | Path | None):
         if snapshot_path is None:
@@ -377,7 +387,8 @@ class ScanCheckpointStore:
         return digest.hexdigest()
 
     def _load_document(self, policy: ScanPolicy, project_fingerprint: dict):
-        document = json.loads(self.path.read_text(encoding="utf-8"))
+        from .configuration import read_json
+        document = read_json(self.path)
         if document.get("schemaVersion") != self.SCHEMA_VERSION:
             raise ScanConfigurationError("unsupported HOM checkpoint version")
         if document.get("policy") != asdict(policy):
@@ -392,6 +403,7 @@ class ScanCheckpointStore:
             failed=[ScanInterval(**item) for item in raw["failed"]],
             failure_reasons=dict(raw.get("failure_reasons", {})),
             solver_calls=raw["solver_calls"],
+            adopted_task_ids=list(raw.get('adopted_task_ids', [])),
         )
         pending = [ScanInterval(**item) for item in document["pending"]]
         return document, report, pending

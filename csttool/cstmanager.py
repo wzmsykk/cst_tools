@@ -131,6 +131,7 @@ class CSTManager:
         field_reference_result: Path | None = None,
         field_match_policy: Mapping[str, Any] | None = None,
         vacuum_domain: Mapping[str, Any] | None = None,
+        stop_check=None,
     ) -> None:
         if maxTask < 1:
             raise ValueError("maxTask must be at least 1")
@@ -140,6 +141,7 @@ class CSTManager:
             raise ValueError('optional vacuum domain registration requires one Worker')
 
         self.logger = logger or logging.getLogger(__name__)
+        self._external_stop_check = stop_check or (lambda: False)
         self.pconfm = pconfm
         self.global_settings = gconfm.settings
         self.project_settings = pconfm.settings
@@ -240,7 +242,7 @@ class CSTManager:
 
     @property
     def stop_requested(self) -> bool:
-        return self.state in {
+        return getattr(self, '_external_stop_check', lambda: False)() or self.state in {
             ManagerState.STOP_REQUESTED,
             ManagerState.STOPPING,
             ManagerState.CLOSED,
@@ -286,10 +288,20 @@ class CSTManager:
         )
 
     def _start_initial_workers(self) -> None:
-        for index in range(self.maxParallelTasks):
-            worker_id = str(index)
-            self._slots.append(_WorkerSlot(worker_id, self._create_worker(worker_id)))
-            self.logger.debug("Worker 已创建 | WORKER_CREATED worker=%s project=%s", worker_id, self.currProjectDir, extra={"event": "WORKER_CREATED", "phase": "lifecycle", "worker": worker_id, "project": self.currProjectDir})
+        try:
+            for index in range(self.maxParallelTasks):
+                if self._external_stop_check():
+                    self.request_stop()
+                    break
+                worker_id = str(index)
+                self._slots.append(_WorkerSlot(worker_id, self._create_worker(worker_id)))
+                if self._external_stop_check():
+                    self.request_stop()
+                    break
+                self.logger.debug("Worker 已创建 | WORKER_CREATED worker=%s project=%s", worker_id, self.currProjectDir, extra={"event": "WORKER_CREATED", "phase": "lifecycle", "worker": worker_id, "project": self.currProjectDir})
+        except Exception:
+            self.stop()
+            raise
 
     @property
     def result_directory(self) -> Path:
@@ -360,6 +372,8 @@ class CSTManager:
     def submit(self, task: SimulationTask) -> int:
         """Queue a task and return its monotonically increasing sequence ID."""
         with self._state_lock:
+            if getattr(self, '_external_stop_check', lambda: False)():
+                raise RuntimeError('CSTManager stop intent is set')
             if self._state in {
                 ManagerState.STOP_REQUESTED,
                 ManagerState.STOPPING,
@@ -448,6 +462,8 @@ class CSTManager:
                                               task.job_name, task.params, self.execution_fingerprint)
             if candidate:
                 receipt_path, receipt = candidate
+                if receipt.get('optional_analysis_pending'):
+                    raise RuntimeError('completed solve has unfinished optional field analysis; recover analysis without replaying Solver')
                 slot.confirmed_snapshot = self._validated_snapshot(receipt['snapshot'])
                 if not self._replace_worker(slot, continue_from_snapshot=True):
                     raise RuntimeError('reconciled snapshot could not restore worker')
@@ -460,7 +476,11 @@ class CSTManager:
                 return {'TaskStatus': 'Success', 'RunName': task.job_name,
                         'RunParameters': dict(task.params), 'TaskID': receipt['task_id'],
                         'PostProcessResult': receipt['postprocess'], 'ReceiptPath': str(receipt_path),
-                        'ProjectSnapshot': receipt['snapshot']}
+                        'ProjectSnapshot': receipt['snapshot'],
+                        'FieldArtifacts': receipt.get('field_artifacts'),
+                        'FieldDiagnostic': receipt.get('field_diagnostic'),
+                        'DomainRegistration': receipt.get('domain_registration'),
+                        'ResultDirectory': receipt.get('result_directory', str(Path(receipt['snapshot']).parent))}
         result: dict[str, Any] | None = None
         started_at = time.monotonic()
         self.logger.info("任务开始 | TASK_START worker=%s job=%s project=%s", slot.worker_id, task.job_name, self.currProjectDir, extra={"event": "TASK_START", "phase": "solve", "worker": slot.worker_id, "job": task.job_name, "project": self.currProjectDir})
@@ -538,7 +558,7 @@ class CSTManager:
         return result
 
     def _drain_tasks(self, slot: _WorkerSlot) -> None:
-        while self.state is ManagerState.RUNNING:
+        while self.state is ManagerState.RUNNING and not self.stop_requested:
             try:
                 queued = self._task_queue.get_nowait()
             except Empty:

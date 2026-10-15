@@ -242,6 +242,9 @@ class StructuredLogHandler(QPlainTextEditLogger):
         self.json_button.setEnabled(bool(self.file_path('.jsonl')))
 
     def file_path(self, suffix):
+        explicit = getattr(self, '_source_files', {})
+        if suffix in explicit:
+            return explicit[suffix]
         logger = self._logger
         while logger is not None:
             for handler in logger.handlers:
@@ -249,6 +252,12 @@ class StructuredLogHandler(QPlainTextEditLogger):
                 if filename and Path(filename).suffix.lower() == suffix:
                     return filename
             logger = logger.parent if logger.propagate else None
+
+    def bind_source_files(self, directory):
+        self._source_files = {suffix: str(Path(directory) / ('application' + suffix))
+                              for suffix in ('.log', '.jsonl')}
+        self.log_button.setEnabled(True)
+        self.json_button.setEnabled(True)
 
     def open_file(self, suffix):
         path = self.file_path(suffix)

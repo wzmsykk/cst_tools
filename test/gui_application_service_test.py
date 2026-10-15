@@ -63,5 +63,5 @@ def test_application_service_requires_modern_backend_contract():
 def test_default_service_uses_application_backend(monkeypatch):
     backend = object.__new__(CstApplicationBackend)
     backend.logger = logging.getLogger("new-backend-test")
-    monkeypatch.setattr("GUI.application_service.CstApplicationBackend", lambda: backend)
+    monkeypatch.setattr("csttool.application_backend.CstApplicationBackend", lambda: backend)
     assert CstApplicationService().backend is backend

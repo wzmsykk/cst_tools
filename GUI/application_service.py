@@ -6,8 +6,6 @@ from dataclasses import dataclass
 import logging
 from typing import Protocol, runtime_checkable
 
-from csttool.application_backend import CstApplicationBackend
-
 
 @dataclass(frozen=True)
 class RunRequest:
@@ -20,7 +18,7 @@ class RunRequest:
 
 
 @runtime_checkable
-class ApplicationBackend(Protocol):
+class ConfigurationDraft(Protocol):
     logger: logging.Logger
     supports_cst_backend_selection: bool
 
@@ -42,6 +40,10 @@ class ApplicationBackend(Protocol):
 
     def update_algorithm_settings(self, values) -> None: ...
 
+
+@runtime_checkable
+class ApplicationBackend(ConfigurationDraft, Protocol):
+
     def initialize_run(self, resume: bool, worker_count: int) -> None: ...
 
     def prepare_run(self) -> None: ...
@@ -59,13 +61,13 @@ class ApplicationBackend(Protocol):
     def add_progress_listener(self, listener) -> None: ...
 
 
-class CstApplicationService:
-    """Stable GUI facade backed by the production application backend."""
+class ConfigurationService:
+    """Configuration only. Contains no execution or recovery facts."""
 
     def __init__(self, backend=None):
-        candidate = backend or CstApplicationBackend()
-        if not isinstance(candidate, ApplicationBackend):
-            raise TypeError("backend does not implement ApplicationBackend")
+        candidate = backend
+        if not isinstance(candidate, ConfigurationDraft):
+            raise TypeError("backend does not implement ConfigurationDraft")
         self._backend = candidate
         self.logger = self._backend.logger
 
@@ -104,6 +106,23 @@ class CstApplicationService:
     def update_algorithm_settings(self, values) -> None:
         self._backend.update_algorithm_settings(values)
 
+    def close_logging(self) -> None:
+        close = getattr(self._backend, 'close_logging', None)
+        if close is not None:
+            close()
+
+
+class CstApplicationService(ConfigurationService):
+    """Explicit in-process execution adapter for Backend/legacy test injection."""
+
+    def __init__(self, backend=None):
+        if backend is None:
+            from csttool.application_backend import CstApplicationBackend
+            backend = CstApplicationBackend()
+        if not isinstance(backend, ApplicationBackend):
+            raise TypeError('backend does not implement ApplicationBackend')
+        super().__init__(backend)
+
     def initialize_run(self, request: RunRequest) -> None:
         self._backend.initialize_run(
             request.resume,
@@ -130,8 +149,3 @@ class CstApplicationService:
 
     def add_progress_listener(self, listener) -> None:
         self._backend.add_progress_listener(listener)
-
-    def close_logging(self) -> None:
-        close = getattr(self._backend, "close_logging", None)
-        if close is not None:
-            close()

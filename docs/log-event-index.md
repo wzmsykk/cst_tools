@@ -6,6 +6,8 @@
 
 | 事件 | 实现模块 |
 | --- | --- |
+| `LOG_RECORD_SKIPPED` | `csttool/event_replay.py` |
+| `LOG_RECORD_INVALID` | `csttool/event_replay.py` |
 | `RUN_INITIALIZE` | `csttool/application_backend.py` |
 | `RUN_PREPARE` | `csttool/application_backend.py` |
 | `RUN_PREPARED` | `csttool/application_backend.py` |

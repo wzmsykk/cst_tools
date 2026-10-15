@@ -19,6 +19,7 @@ def main(argv=None) -> int:
     window = MainWindow()
     window.show()
     if smoke_test:
+        window._close_confirmed = True
         QTimer.singleShot(0, window.close)
         QTimer.singleShot(50, app.quit)
     return app.exec_()

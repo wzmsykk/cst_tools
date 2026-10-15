@@ -229,6 +229,7 @@ def process_until(qapp, predicate, timeout=5):
 
 
 def make_window(qapp, tmp_path, monkeypatch, **backend_options):
+    monkeypatch.setattr("GUI.main_window.QMessageBox.question", lambda *a: 16384)
     backend = FakeWorkerGuiBackend(tmp_path, **backend_options)
     window = MainWindow(backend, FakeDialog(), FakeDialog())
     cst_path = tmp_path / "input.cst"

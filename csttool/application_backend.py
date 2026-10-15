@@ -33,6 +33,7 @@ from csttool.project_session_recovery import (
     recover_project_sessions,
 )
 from csttool.project_run_lock import ProjectRunBusyError, ProjectRunLock
+from csttool.execution_contract import StopIntent
 
 
 class BackendState(Enum):
@@ -74,8 +75,12 @@ class CstApplicationBackend:
         application_logger=None,
         logging_level: str = "info",
         mesh_convergence_evaluator=None,
+        stop_intent=None,
+        execution_run_id=None,
     ) -> None:
         self._lifecycle_lock = threading.RLock()
+        self.stop_intent = stop_intent or StopIntent()
+        self.execution_run_id = execution_run_id
         self.state = BackendState.CREATED
         self.worker_count = 1
         self.resume = False
@@ -176,6 +181,8 @@ class CstApplicationBackend:
         resume: bool,
         worker_count: int,
     ) -> None:
+        if self.stop_intent.path is None and self.state in {BackendState.STOPPED, BackendState.INTERRUPTED, BackendState.FAILED}:
+            self.stop_intent = StopIntent()
         self._require_state(
             "initialize run",
             BackendState.CREATED,
@@ -190,7 +197,7 @@ class CstApplicationBackend:
 
         self.resume = bool(resume)
         self.worker_count = worker_count
-        self.run_id = uuid4().hex
+        self.run_id = self.execution_run_id or uuid4().hex
         if self._log_owner is not None:
             name = self._base_logger.name
             level = self._base_logger.level
@@ -293,10 +300,12 @@ class CstApplicationBackend:
     def prepare_run(self) -> None:
         self._require_state("prepare run", BackendState.INITIALIZED)
         try:
+            self.stop_intent.check()
             self._acquire_project_run_lock()
             checkpoint = Path(self.get_project_directory()) / 'save' / 'csv' / 'hom_scan_checkpoint.json'
             manifest = checkpoint.with_name('scan_manifest.json')
-            if (checkpoint.exists() or manifest.exists()) and not self.resume:
+            standard_checkpoint = Path(self.get_project_directory()) / 'save/standard_batch_checkpoint.json'
+            if (checkpoint.exists() or manifest.exists() or standard_checkpoint.exists()) and not self.resume:
                 raise BackendPreparationError("已有HOM检查点，禁止从头覆盖；请使用继续运行或新项目目录")
             self.logger.info("准备运行 | RUN_PREPARE project=%s", self.get_project_directory(), extra={"event": "RUN_PREPARE", "phase": "lifecycle", "project": self.get_project_directory()})
             unresolved = self.get_recovery_sessions()
@@ -318,6 +327,7 @@ class CstApplicationBackend:
             if validate_postprocess is not None:
                 validate_postprocess(self.pconfman.get_postprocess_settings())
             if not self.resume and settings.get("mesh_convergence_enabled", False):
+                self.stop_intent.check()
                 recommended = self._run_mesh_convergence(settings)
                 settings["mesh_cells_per_wavelength"] = recommended
                 self.alg.set_editable_attributes(settings)
@@ -328,9 +338,11 @@ class CstApplicationBackend:
                 ],
                 **({"modify_mesh": False} if not settings.get('preprocess_modify_mesh', True) else {}),
             )
+            self.stop_intent.check()
             self.gconfman.printconf()
             self.logger.debug("项目配置校验完成 | project=%s", self.get_project_directory())
             self._create_manager()
+            self.stop_intent.check()
             algorithm_params = self.pconfman.get_parameters()
             self.alg.set_job_manager(self.jm)
             self.alg.set_cst_parameters(algorithm_params)
@@ -345,6 +357,9 @@ class CstApplicationBackend:
             finally:
                 self._clear_manager()
                 self._release_project_run_lock()
+            if isinstance(exc, ScanInterrupted):
+                self._set_state(BackendState.INTERRUPTED)
+                raise
             if isinstance(exc, BackendPreparationError):
                 raise
             raise BackendPreparationError("运行配置准备失败") from exc
@@ -397,6 +412,7 @@ class CstApplicationBackend:
         return int(report.recommended_cells_per_wavelength)
 
     def _evaluate_mesh_level(self, level, settings, output_directory):
+        self.stop_intent.check()
         source = self.get_cst_file()
         if source is None:
             raise BackendPreparationError("Mesh 收敛分析需要 CST 模板")
@@ -415,8 +431,10 @@ class CstApplicationBackend:
             config.prepare_project(
                 False, mesh_cells_per_wavelength=level
             )
+            self.stop_intent.check()
             manager_options = {}
             if self._uses_default_manager:
+                manager_options['stop_check'] = self.stop_intent.is_set
                 manager_options["worker_factory"] = ManagedCSTWorker.create
                 manager_options["progress_callback"] = self._publish_cst_progress
             manager = self._manager_factory(
@@ -431,6 +449,7 @@ class CstApplicationBackend:
                 self.jm = manager
                 self._manager_stop_requested = False
             try:
+                self.stop_intent.check()
                 result = manager.execute(
                     cstmanager.SimulationTask(
                         {
@@ -464,6 +483,7 @@ class CstApplicationBackend:
         started_at = time.monotonic()
         self.logger.info("运行开始 | RUN_EXECUTE_START project=%s", self.get_project_directory(), extra={"event": "RUN_EXECUTE_START", "phase": "lifecycle", "project": self.get_project_directory()})
         try:
+            self.stop_intent.check()
             self._update_task_status(projectconfmanager.TaskStatus.RUNNING)
             if self.alg is None:
                 raise BackendLifecycleError("未指定计算方法")
@@ -524,6 +544,7 @@ class CstApplicationBackend:
         return result
 
     def request_stop(self) -> None:
+        self.stop_intent.request()
         accepted = False
         with self._lifecycle_lock:
             if self.jm is None:
@@ -610,6 +631,7 @@ class CstApplicationBackend:
             config_path = Path(settings['vacuum_domain_config']).resolve()
             manager_options['vacuum_domain'] = validate_managed_domain_options(read_json(config_path))
         if self._uses_default_manager:
+            manager_options['stop_check'] = self.stop_intent.is_set
             manager_options["worker_factory"] = ManagedCSTWorker.create
             manager_options["progress_callback"] = self._publish_cst_progress
             manager_options['run_id'] = self.run_id
@@ -625,6 +647,8 @@ class CstApplicationBackend:
             **manager_options,
         )
         self._manager_stop_requested = False
+        if self.stop_intent.is_set():
+            self.jm.request_stop()
         self.logger.debug("Manager 已创建 | project=%s workers=%d", self.get_project_directory(), self.worker_count)
 
     def add_progress_listener(self, listener) -> None:

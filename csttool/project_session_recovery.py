@@ -248,6 +248,8 @@ def recover_project_sessions(
     ]
     failures = []
     for item in records:
+        from .result_reconciliation import recover_completed_result
+        recover_completed_result(item.root)
         if item.process_alive is False and not item.has_stop_ack:
             # Each worker operates on an isolated project copy. Once the recorded
             # process is definitively dead, the unfinished task can be abandoned
@@ -267,6 +269,7 @@ def recover_project_sessions(
                 item.session_id,
                 timeout=timeout_per_session,
             )
+            recover_completed_result(item.root)
             _wait_for_process_exit(item, timeout_per_session)
             _write_recovery_receipt(item, "standard-stop", completion=completion)
         except Exception as exc:

@@ -1,11 +1,29 @@
 # CST Tools 当前状态与实施路线
 
-状态日期：2026-10-14
+状态日期：2026-10-15
 历史提交基线：`3717a04`（P0-1停止恢复、故障验收与文档索引）；后续提交包含场故障验收、共同域、Pillbox双网格与真空腔追踪第一版，准确提交身份以Git日志为准。
 
 本文是项目当前状态的权威入口。历史设计文档仍保留其分析价值；若与本文或[最小 Python/VBA 协议 TODO](./minimal-python-vba-todo.md)冲突，以本文和已经通过的真实 CST Gate 为准。
 
-## 最新状态与近期TODO（2026-10-14）
+## 最新状态与近期TODO（2026-10-15）
+
+- 审计修复最终验收（2026-10-15）：完整离线595 passed、21 integration deselected；故障与文档/日志索引专项27 passed。含真实本机HTTP响应体丢失、socket超时、启动未发送/迟到、取消响应丢失及停止意图恢复；均使用假执行器。报告artifacts/runner-audit-fix-20261015.xml及runner-audit-focused-20261015.xml（artifacts不保证随Git迁移）。真实CST逐窗口崩溃和实际桌面仍待验收，未提交/推送/重打包。
+
+- 2026-10-15审计修复：A1–A4及M1已实施，增加按启动ID取消墓碑/停止对账、持久UI停止意图、只读控制权申请、连接代次隔离和有界日志游标v2；配置草稿/执行端口分离。新增真实回环HTTP响应体丢失与socket超时故障验收，全部使用假执行器，未重跑CST。当前结果、剩余TODO与兼容边界见[本轮修复记录](runner-audit-fix-20261015.md)；下两条为修复前审计历史，旧源码包未更新。
+
+- 2026-10-15审计回应已登记：[实施方逐项回应与修复门禁](runner-audit-response-20261015.md)。四项缺陷和维护性建议全部认可；无CST合成对照再次确认，A2另有Future超时/重连状态机复现但尚无HTTP故障注入。执行实现未修改，E0–E5不得视为完整验收通过；既有源码包仍含缺口。
+
+- 2026-10-15审查补充：本机分离主链存在控制权过期后GUI仍只读、跨项目启动、超长日志游标三项合成探针复现，以及启动响应丢失时清除排队停止的代码路径问题。相关离线26项通过不覆盖这些缺口；实现尚未修复，详见[审查记录与待办](../knowledge-base/runner-separation-review-20261015.md)。历史571项及真实CST证据保持原范围。
+
+- 2026-10-15实施更新：E0–E5本机主链已接入，生产GUI经独立Runner控制Backend/Manager，不再在GUI创建真实Backend。持久停止意图、OS所有权、命令去重、重连/仅关界面、空区间采用身份、完成未接收导入及标准批次已实现。当前API见[本机Runner](local-runner.md)，阶段与剩余门禁见[统一计划](execution-platform-implementation-plan.md)。最终单进程离线571 passed、21 integration deselected；真实单任务通过并最终复验、R双任务停止/续跑通过，原工程未改、无强杀。不声称真实CST控制器崩溃注入、实际桌面或远程验收已通过。
+
+- 2026-10-15实施前统一计划存档：[独立Runner→远程控制→多节点执行E0–E9](execution-platform-implementation-plan.md)。取代两个设计各自的阶段顺序；当时尚未开始，当前实施状态以上条及该文第8节为准。E6–E9仍未实施。
+
+- 2026-10-15前置设计：[远程/分布式执行边界与L0–R4 TODO](remote-distributed-execution-design.md)。区分远程控制、独立任务分发和CST原生分布式求解；近期仅预留Controller/执行层、身份和工件引用，不启动远程服务，不改变当前本机实现保证。
+
+- 2026-10-15实施前设计存档：[GUI/Runner进程分离方案及P0–P6 TODO](gui-runner-process-separation-design.md)。记录当时拟议所有权、命令去重、结果对账和验收；同进程边界是历史状态，当前生产接口见本机Runner文档。
+
+- 2026-10-15：GUI停止/退出增加默认取消的确认；关闭等待所有后台线程标准收尾，停止异常不可被后续运行返回覆盖，需要恢复时保留窗口及日志。见[停止/退出确认及边界](gui-stop-exit.md)。相关40项、其余509项分批通过（文档索引重复）；完整单进程回归两次Qt原生退出，根因待定位，真实CST退出对照仍待做。
 
 - 新应用日志目录包含时间/HOM频率范围/新运行或续跑/短ID；完整ID仍在元数据。增加summary.md与logs/index.md，Backend/Manager共用目录，HOM检查点实时更新覆盖，旧目录只补索引不改名。本批离线543 passed、19 integration deselected。见[可读日志目录](readable-log-directories.md)，服务器/网络盘验收待做。
 

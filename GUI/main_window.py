@@ -1,6 +1,6 @@
-from PyQt5.QtWidgets import QApplication, QMainWindow
+from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox
 from GUI.algorithm_settings_dialog import AlgorithmSettingsDialog
-from GUI.application_service import CstApplicationService
+from GUI.application_service import CstApplicationService, ConfigurationService
 from GUI.run_controller import GuiRunController, RunState
 from GUI.ui_main import Ui_MainWindow
 from GUI.postprocess_settings_dialog import PostProcessSettingsDialog
@@ -94,10 +94,26 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self._new_run_ready = False
         self._resume_ready = False
         self._close_pending = False
+        self._close_confirmed = False
+        self._confirmation_open = False
         self._stage = ""
 
-        self.service = CstApplicationService(engine)
+        if engine is None:
+            from GUI.runner_backend import RunnerBackend
+            engine = RunnerBackend()
+        self.service = (ConfigurationService(engine) if getattr(engine, 'uses_runner', False)
+                        else CstApplicationService(engine))
+        if controller is None and getattr(engine, 'uses_runner', False):
+            from GUI.runner_controller import RunnerController
+            controller = RunnerController(self.service)
         self.controller = controller or GuiRunController(self.service)
+        if getattr(engine, 'uses_runner', False):
+            from PyQt5.QtWidgets import QPushButton
+            self.claimControlButton = QPushButton('申请控制权', self)
+            self.claimControlButton.setEnabled(False)
+            self.claimControlButton.setToolTip('其他窗口租约有效时会被拒绝；不会重新启动或停止计算')
+            self.claimControlButton.clicked.connect(self.controller.request_control)
+            self.statusBar().addPermanentWidget(self.claimControlButton)
         self.logger = self.service.logger
         self.logger.addHandler(self.logTextBox)
         self.logTextBox.bind_logger(self.logger)
@@ -132,17 +148,68 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         )
 
     def closeEvent(self, event):
+        if self._confirmation_open:
+            event.ignore()
+            return
+        if not self._close_confirmed:
+            if hasattr(self.controller, 'detach'):
+                choice = self._runner_close_choice()
+                if choice == 'cancel':
+                    event.ignore()
+                    return
+                if choice == 'detach':
+                    self.controller.detach()
+                    self.logger.info('关闭界面，后台Runner保持原运行状态')
+                    self.logger.removeHandler(self.logTextBox)
+                    self.logTextBox.close()
+                    event.accept()
+                    return
+                self._close_confirmed = True
+            else:
+                if not self._confirm_action("确认退出", "确定退出 CST Batch Studio？\n如有后台任务，将先请求安全停止，等待标准收尾完成后退出；不会强制结束 CST。\n阻塞中的 CST 操作可能需要等待较长时间。"):
+                    event.ignore()
+                    return
+                self._close_confirmed = True
         if self.controller.has_active_work:
             self._close_pending = True
             self.logger.info("窗口等待关闭：正在安全停止后台任务")
-            self.controller.request_stop()
+            accepted = self.controller.request_stop()
+            if hasattr(self.controller, 'detach') and not accepted and self.controller.state not in {RunState.STOPPING, RunState.RECOVERING}:
+                self._close_pending = False
+                self._close_confirmed = False
+                self.logger.warning('停止请求尚未发送：请确认连接/控制权后重试，或选择仅关闭界面')
+            event.ignore()
+            return
+        if self.controller.state is RunState.RECOVERY_REQUIRED:
+            self._close_pending = False
+            self._close_confirmed = False
+            self.logger.error("取消窗口退出：尚未确认 CST 安全关闭，请先清理残留会话")
+            self.statusbar.showMessage("退出未完成：请先清理残留会话并确认安全关闭")
             event.ignore()
             return
         self.logger.info("窗口已关闭")
         self.logger.removeHandler(self.logTextBox)
         self.logTextBox.close()
         self.service.close_logging()
+        if hasattr(self.controller, 'detach'):
+            self.controller.detach()
         event.accept()
+
+    def _runner_close_choice(self):
+        self._confirmation_open = True
+        try:
+            box = QMessageBox(self)
+            box.setWindowTitle('关闭界面或停止计算')
+            box.setText('仅关闭界面不会停止后台计算。后台状态未知时也可断开界面，但不代表任务已停止。')
+            cancel = box.addButton('取消', QMessageBox.RejectRole)
+            background = box.addButton('仅关闭界面，后台继续', QMessageBox.AcceptRole)
+            stop = box.addButton('安全停止后退出', QMessageBox.DestructiveRole)
+            box.setDefaultButton(cancel)
+            box.setEscapeButton(cancel)
+            box.exec_()
+            return 'detach' if box.clickedButton() is background else ('stop' if box.clickedButton() is stop else 'cancel')
+        finally:
+            self._confirmation_open = False
 
     def setSignalNSlots(self):
         self.selectProjectDirButton.clicked.connect(self.read_dir)
@@ -163,6 +230,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.controller.error.connect(self.onRunError)
         self.controller.cst_progress.connect(self.renderCstProgress)
         self.controller.settled.connect(self._finishPendingClose)
+        if hasattr(self.controller, 'connection_changed'):
+            self.controller.connection_changed.connect(self.connectionLabelChanged)
 
         self.CalcDialogBox._signal_done.connect(self.updateAlgSetting)
         self.PPSDialogBox._signal_done.connect(self.updatePPSSetting)
@@ -238,6 +307,34 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if self._close_pending and not self.controller.has_active_work:
             self._close_pending = False
             QTimer.singleShot(0, self.close)
+
+    def connectionLabelChanged(self, text):
+        if hasattr(self, 'claimControlButton'):
+            self.claimControlButton.setEnabled(self.service.backend.client is not None
+                and not self.controller.unknown and not self.controller.pending)
+        directory = getattr(self.service.backend, 'log_directory', None)
+        if directory:
+            self.logTextBox.bind_source_files(directory)
+        blocked = (getattr(self.controller, 'unknown', False), getattr(self.controller, 'read_only', False))
+        if getattr(self, '_runner_connection_blocked', None) != blocked:
+            self.renderRunState(self.controller.state)
+            self._runner_connection_blocked = blocked
+        if any(blocked):
+            for widget in (self.StartButton, self.ResumeButton, self.StopButton, self.RecoverButton,
+                           self.selectProjectDirButton, self.selectCSTPathButton,
+                           self.AlgSettingButton, self.postProcessButton, self.workerCountSpinBox,
+                           self.cstBackendComboBox, self.refreshCstBackendsButton):
+                widget.setEnabled(False)
+        self.statusbar.showMessage(text)
+
+    def _confirm_action(self, title, message):
+        self._confirmation_open = True
+        try:
+            return QMessageBox.question(
+                self, title, message, QMessageBox.Yes | QMessageBox.No, QMessageBox.No
+            ) == QMessageBox.Yes
+        finally:
+            self._confirmation_open = False
 
     def read_dir(self):
         # 选取输出目录
@@ -418,6 +515,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.statusbar.showMessage(status_text)
 
     def requestStop(self):
+        if self.controller.state is not RunState.RUNNING:
+            return
+        if not self._confirm_action("确认停止", "确定停止当前运行？\n将请求 Worker 安全收尾，不强制结束 CST；当前阻塞操作返回前仍需等待。\nHOM 后续应通过“继续未完成”恢复已记录的计算进度，不要从头覆盖结果。"):
+            return
         if self.controller.request_stop():
             self.logger.info("用户请求安全停止当前运行")
 

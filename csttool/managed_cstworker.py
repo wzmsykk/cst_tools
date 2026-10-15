@@ -17,7 +17,7 @@ from typing import Any, Mapping
 from install_compat import resource_path
 
 from .postprocess_cst import CstPostProcessor
-from .configuration import write_json_atomic
+from .configuration import write_json_atomic, read_json
 from .cst_progress import CstLogProgressMonitor, CstLogProgressParser
 from .vb_codec import quote_vb_string
 from .logging_config import ContextLogger, log_failure
@@ -96,6 +96,7 @@ class ManagedCSTWorker:
                 raise ValueError('field diagnostic requires an explicit matching policy')
             MatchPolicy(**config.field_match_policy)
         self.postprocess = CstPostProcessor()
+        self.postprocess_settings = list(config.postprocess)
         self.postprocess.configure(config.postprocess)
         self.protocol = FileProtocol(self.root / "protocol")
         self.task_path = self.protocol.root / "current.task"
@@ -364,6 +365,17 @@ class ManagedCSTWorker:
                 expression_names=self._expression_names(params),
             )
             payload = archive_task(self.root, task, result_name)
+            if hasattr(self, 'postprocess_settings'):
+                write_json_atomic(self.root / 'task-context.json', {
+                    'schema_version': 1, 'task_id': task.task_id, 'session_id': task.session_id,
+                    'job': result_name, 'parameters': dict(params),
+                    'postprocess': self.postprocess_settings,
+                    'result_root': str((self.result_root / task.task_id).resolve()),
+                    'receipt_path': str((getattr(self, 'observation_root', self.root) / 'received' / f'{task.task_id}.json').resolve()),
+                    'execution_fingerprint': self.execution_fingerprint,
+                    'optional_analysis_pending': bool(getattr(self, '_field_reference_result', None)
+                                                      or getattr(self, '_vacuum_domain', None)),
+                })
             if getattr(self, 'run_store', None) is not None:
                 self.run_store.event(task.task_id, 'submitted', worker=self.ID,
                                      session=self.session_id, job=result_name, parameters=dict(params),
@@ -443,6 +455,8 @@ class ManagedCSTWorker:
                     'snapshot_sha256': file_hash(project_snapshot) if status == 'Success' else None,
                     'workspace': str(self.root),
                     'execution_fingerprint': getattr(self, 'execution_fingerprint', None),
+                    'optional_analysis_pending': bool(getattr(self, '_field_reference_result', None)
+                                                      or getattr(self, '_vacuum_domain', None)),
                 }
                 try:
                     # Persist result consumption BEFORE authorizing VBA cleanup.
@@ -522,6 +536,17 @@ class ManagedCSTWorker:
                         write_json_atomic(task_result_root/'vacuum-domain-pending.json',domain_registration)
                     except OSError:
                         self.logger.warning('可选域登记待办写入失败，已确认求解不重算 | task=%s',task.task_id,exc_info=True)
+                if field_artifacts or field_diagnostic or domain_registration:
+                    try:
+                        latest = read_json(receipt_path)
+                        write_json_atomic(receipt_path, {**latest, 'field_artifacts': field_artifacts,
+                            'field_diagnostic': field_diagnostic, 'domain_registration': domain_registration,
+                            'result_directory': str(task_result_root.resolve()),
+                            'optional_analysis_pending': bool(getattr(self, '_vacuum_domain', None))})
+                    except Exception as exc:
+                        # Mark this as an already-completed result, so Manager
+                        # cannot replay Solver to repair an analysis receipt.
+                        raise ManagedAcknowledgmentPending(receipt_path, exc) from exc
             log_method = self.logger.info if status == "Success" else self.logger.error
             log_method(
                 "任务完成，结果已接收并确认" if status == "Success" else "任务未成功，失败信息已接收；请检查原因",
