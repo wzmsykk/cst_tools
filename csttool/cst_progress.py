@@ -16,6 +16,16 @@ _PERCENT = re.compile(r"\]\s*(\d{1,3})\s*%")
 _PASS = re.compile(r"Eigenmodes,\s*(Pass\s+\d+)", re.IGNORECASE)
 
 
+def normalize_cst_stage(header: str) -> str:
+    """Known display aliases only; unknown vocabulary remains available verbatim."""
+    key = re.sub(r'[\s_-]+', '', header.strip().rstrip(':：').casefold())
+    return {'collectingfeatures': 'feature-collection',
+            'creatingtetrahedralmesh': 'tetrahedral-mesh',
+            'mesh': 'mesh', 'meshing': 'mesh', 'eigenmode': 'eigenmode-solver',
+            'eigenmodes': 'eigenmode-solver', 'eigenmodesolver': 'eigenmode-solver',
+            'postprocessing': 'postprocess', 'postprocess': 'postprocess'}.get(key, header)
+
+
 @dataclass(frozen=True, slots=True)
 class CstProgressEvent:
     worker_id: str
@@ -29,6 +39,7 @@ class CstProgressEvent:
     timestamp: float
     session_id: str | None = None
     source: str = "stdout"
+    native_header: str | None = None
 
 
 class CstLogProgressParser:

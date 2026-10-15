@@ -5,7 +5,7 @@ import locale
 import time
 
 from .configuration import write_json_atomic
-from .cst_progress import CstProgressEvent
+from .cst_progress import CstProgressEvent, normalize_cst_stage
 
 
 def parse_native_progress(text):
@@ -79,8 +79,8 @@ class NativeProgressTracker:
                 try:
                     self.callback(CstProgressEvent(
                         self.identity['worker'], self.identity['task_id'], number('fmin'),
-                        number('fmax'), parsed['header'], None, parsed['percent'],
-                        parsed['text'], time.time(), self.identity['session'], 'progress.log'))
+                        number('fmax'), normalize_cst_stage(parsed['header']), None, parsed['percent'],
+                        parsed['text'], time.time(), self.identity['session'], 'progress.log', parsed['header']))
                 except Exception:
                     self.logger.debug('原生进度回调失败，不影响求解', exc_info=True)
             record = {**self.identity, 'utc': datetime.now(timezone.utc).isoformat(),

@@ -166,3 +166,41 @@ def test_dragging_and_selection_pause_follow_and_latest_resumes(view):
     handler.latest.click()
     assert not handler.table.currentIndex().isValid()
     assert scroll.value() == scroll.maximum()
+
+
+def test_auto_scroll_toggle_controls_both_views_and_latest_is_one_shot(view):
+    from PyQt5.QtTest import QTest
+    handler, app = view
+    assert handler.autoScrollButton.isCheckable()
+    assert handler.autoScrollButton.isChecked() and handler.auto_scroll
+    for i in range(300):
+        handler.emit(make_record(f'initial-{i}'))
+    while handler._events:
+        handler.flush_pending()
+    app.processEvents()
+    handler.go_latest()
+    table_scroll = handler.table.verticalScrollBar()
+    raw_scroll = handler.widget.verticalScrollBar()
+    handler.autoScrollButton.setFocus()
+    QTest.keyClick(handler.autoScrollButton, Qt.Key_Space)
+    assert not handler.autoScrollButton.isChecked() and not handler.auto_scroll
+    before = table_scroll.value(), raw_scroll.value()
+    for i in range(30):
+        handler.emit(make_record(f'new-{i}'))
+    handler.flush_pending()
+    app.processEvents()
+    assert (table_scroll.value(), raw_scroll.value()) == before
+    assert handler.model.rows[-1]['summary'] == 'new-29'
+    assert 'new-29' in handler.widget.toPlainText()
+    handler.latest.click()
+    assert not handler.autoScrollButton.isChecked()
+    assert table_scroll.value() == table_scroll.maximum()
+    handler.table.setCurrentIndex(handler.proxy.index(2, 0))
+    handler.autoScrollButton.click()
+    app.processEvents()
+    assert handler.auto_scroll and handler.autoScrollButton.isChecked()
+    assert not handler.table.currentIndex().isValid()
+    assert table_scroll.value() == table_scroll.maximum()
+    assert raw_scroll.value() == raw_scroll.maximum()
+    handler.set_auto_scroll(False)
+    assert not handler.autoScrollButton.isChecked()

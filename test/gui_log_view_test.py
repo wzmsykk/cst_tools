@@ -98,3 +98,23 @@ def test_document_eviction_keeps_visible_anchor_when_available(view):
     handler.flush_pending()
     assert handler.widget.document().blockCount() == handler.MAX_BLOCKS
     assert handler.widget.firstVisibleBlock().text() == anchor
+
+
+def test_auto_scroll_defaults_on_and_off_keeps_position_while_receiving(view):
+    handler, app = view
+    assert handler.auto_scroll
+    handler.widget.setPlainText('\n'.join(str(i) for i in range(300)))
+    app.processEvents()
+    handler.set_auto_scroll(True)
+    scroll = handler.widget.verticalScrollBar()
+    assert scroll.value() == scroll.maximum()
+    handler.set_auto_scroll(False)
+    previous = scroll.value()
+    for i in range(20):
+        handler.emit(record(f'new-{i}'))
+    handler.flush_pending()
+    app.processEvents()
+    assert scroll.value() == previous
+    assert 'new-19' in handler.widget.toPlainText()
+    handler.set_auto_scroll(True)
+    assert scroll.value() == scroll.maximum()

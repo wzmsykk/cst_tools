@@ -60,6 +60,8 @@ Runner审计修复：F41/F43/F44增加`cancel_start`和命令对账，当前API�
 |F48|纯HOM草稿默认值与mesh校验|[scan_settings.py](../csttool/scan_settings.py)|`default_hom_settings`, `validate_hom_settings`|[审计回归](../test/runner_audit_regression_test.py)|[修复记录](runner-audit-fix-20261015.md)|
 |F49|配置草稿与显式进程内执行适配|[application_service.py](../GUI/application_service.py)|`ConfigurationDraft`, `ConfigurationService`, `CstApplicationService`|[服务测试](../test/gui_application_service_test.py)|[Runner API](local-runner.md)|
 |F50|自动恢复任务摘要及日志保留|[main_window.py](../GUI/main_window.py)|`MainWindow.renderRunnerSnapshot`|[日志恢复测试](../test/gui_log_restore_test.py)|[日志恢复API与边界](gui-log-restoration.md)|
+|F51|默认开启的日志自动滚动开关|[event_log_view.py](../GUI/event_log_view.py)|`StructuredLogHandler.set_auto_scroll`, `StructuredLogHandler.go_latest`|[事件显示测试](../test/gui_event_log_view_test.py)、[原始镜像测试](../test/gui_log_view_test.py)|[结构化日志使用](gui-structured-log.md)|
+|F52|原生阶段标准键及原文保留（含用户日志四阶段）|[cst_progress.py](../csttool/cst_progress.py)|`normalize_cst_stage`, `CstProgressEvent`|[原生进度测试](../test/native_progress_test.py)、[GUI显示](../test/gui_main_window_test.py)|[原生阶段记录](cst-native-progress-observation.md)|
 
 停止与退出确认：F39，源码 [MainWindow](../GUI/main_window.py) 的 `closeEvent`、`requestStop`、`_confirm_action` 和 [Controller](../GUI/run_controller.py) 的 `_stop_failed`；测试 [GUI测试](../test/gui_main_window_test.py)，说明 [停止/退出](gui-stop-exit.md)。
 

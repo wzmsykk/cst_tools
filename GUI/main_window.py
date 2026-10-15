@@ -6,9 +6,10 @@ from GUI.ui_main import Ui_MainWindow
 from GUI.postprocess_settings_dialog import PostProcessSettingsDialog
 from GUI.theme import apply_theme, set_visual_role
 from PyQt5.QtWidgets import QFileDialog
-from PyQt5.QtCore import QTimer
+from PyQt5.QtCore import QTimer, Qt
 from GUI.log_view import QPlainTextEditLogger
 from GUI.event_log_view import StructuredLogHandler
+from csttool.cst_progress import normalize_cst_stage
 import logging
 import pathlib
 
@@ -40,12 +41,21 @@ STAGE_PRESENTATION = {
 }
 
 CST_STAGE_PRESENTATION = {
+    "feature-collection": "收集模型特征",
+    "tetrahedral-mesh": "四面体网格生成",
     "starting": "启动",
     "mesh": "网格生成",
     "mesh-refinement": "网格加密",
     "mesh-refinement-complete": "网格加密完成",
     "eigenmode-solver": "本征模求解",
     "postprocess": "后处理",
+}
+
+CST_MESSAGE_PRESENTATION = {
+    'Collecting all features': '正在收集模型特征',
+    'Mesher initialization': '正在初始化网格生成器',
+    'Calculating eigenmode solution.': '正在计算本征模',
+    'Creating parametric 1D results.': '正在生成参数化 1D 结果',
 }
 
 
@@ -87,6 +97,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.logTextBox.widget.setAccessibleName("运行日志")
         self.LogBoxLayout.addWidget(self.logTextBox.panel)
         self.runProgressBar.setAccessibleName("运行阶段进度")
+        self.stageLabel.setTextFormat(Qt.PlainText)
+        self.stageLabel.setWordWrap(True)
+        self.stateDetailLabel.setTextFormat(Qt.PlainText)
+        self.runSummaryLayout.setStretch(0, 1)
+        self.runSummaryLayout.setStretch(1, 1)
 
         self.uiProjectDir = None
         self.uiCSTFilePath = None
@@ -300,25 +315,32 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 and getattr(event, 'source', 'stdout') == 'stdout'):
             return
         self._cst_observations[event.worker_id] = event
-        stage = CST_STAGE_PRESENTATION.get(event.stage, event.stage)
+        stage_key = normalize_cst_stage(event.stage)
+        stage = CST_STAGE_PRESENTATION.get(stage_key, event.stage)
         interval = ""
         if event.interval_lo is not None and event.interval_hi is not None:
             interval = f" {event.interval_lo:g}–{event.interval_hi:g} MHz"
         pass_text = f" / {event.pass_name}" if event.pass_name else ""
         source = getattr(event, 'source', 'stdout')
-        label = f"Worker {event.worker_id}{interval} · {stage}{pass_text} · {source}"
-        self.stageLabel.setText(label)
-        self.stateDetailLabel.setText(label)
-        self.stageLabel.setToolTip(event.message)
+        label = f"Worker {event.worker_id}{interval} · {stage}{pass_text}"
+        detail = CST_MESSAGE_PRESENTATION.get(event.message.strip(), event.message.strip())
+        tooltip = (f"来源：{source}\n原始阶段：{event.native_header or event.stage}\n"
+                   f"原始文本：{event.message}\n任务：{event.task_id}\n会话：{event.session_id}\n"
+                   '百分比仅为CST报告的局部读数，不代表任务或整个扫描完成。')
+        self.stageLabel.setText(label + (f'\n{detail}' if detail else ''))
+        self.stateDetailLabel.setText(detail or stage)
+        self.stageLabel.setToolTip(tooltip)
+        self.stateDetailLabel.setToolTip(tooltip)
+        self.runProgressBar.setToolTip(tooltip)
         if event.local_percent is not None:
             self.runProgressBar.setRange(0, 100)
             self.runProgressBar.setValue(event.local_percent)
             self.runProgressBar.setFormat(
-                f"当前 CST 阶段 %p%　{stage}{pass_text}"
+                "CST 局部读数 %p%（非任务完成）"
             )
         else:
             self.runProgressBar.setRange(0, 0)
-            self.runProgressBar.setFormat(f"当前 CST 阶段　{stage}")
+            self.runProgressBar.setFormat("CST 局部进度未知")
         self.statusbar.showMessage(label)
 
     def _finishPendingClose(self):

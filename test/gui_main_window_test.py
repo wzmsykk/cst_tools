@@ -425,7 +425,8 @@ def test_cst_local_progress_is_labeled_as_stage_progress(qapp):
     )
 
     assert window.runProgressBar.value() == 37
-    assert "当前 CST 阶段" in window.runProgressBar.format()
+    assert "CST 局部读数" in window.runProgressBar.format()
+    assert "非任务完成" in window.runProgressBar.format()
     assert "500–550 MHz" in window.stageLabel.text()
     assert "Pass 2" in window.stageLabel.text()
     window.controller.state = RunState.IDLE
@@ -440,7 +441,7 @@ def test_native_gui_progress_wins_over_stdout_and_ignores_terminal_events(qapp):
                              45, 'creating results', 100, 'session', 'progress.log')
     window.renderCstProgress(event)
     assert window.runProgressBar.value() == 45
-    assert 'progress.log' in window.stageLabel.text()
+    assert 'progress.log' in window.stageLabel.toolTip()
     window.renderCstProgress(replace(event, source='stdout', local_percent=99, timestamp=101))
     assert window.runProgressBar.value() == 45
     window.renderCstProgress(replace(event, local_percent=None, timestamp=102))
@@ -448,6 +449,49 @@ def test_native_gui_progress_wins_over_stdout_and_ignores_terminal_events(qapp):
     window.controller.state = RunState.IDLE
     window.renderCstProgress(replace(event, local_percent=100, timestamp=103))
     assert window.runProgressBar.maximum() == 0
+    window.close()
+
+
+@pytest.mark.parametrize('stage', ['Post-Processing:', 'postprocess'])
+def test_native_postprocess_sample_displays_stage_step_and_local_scope(qapp, stage):
+    from PyQt5.QtCore import Qt
+    window, _tool = make_window(qapp)
+    window.controller.state = RunState.RUNNING
+    event = CstProgressEvent('0', 'b67a0ca7-1afb-4752-9ecb-3a482c36f386',
+        714.606, 764.606, stage, None, 100, 'Creating parametric 1D results.',
+        100, 'session', 'progress.log', 'Post-Processing:')
+    window.renderCstProgress(event)
+    assert '后处理' in window.stageLabel.text()
+    assert '正在生成参数化 1D 结果' in window.stageLabel.text()
+    assert 'progress.log' not in window.stageLabel.text()
+    assert 'Post-Processing:' in window.stageLabel.toolTip()
+    assert 'Creating parametric 1D results.' in window.stageLabel.toolTip()
+    assert window.runProgressBar.value() == 100
+    assert '非任务完成' in window.runProgressBar.format()
+    assert window.controller.state is RunState.RUNNING
+    assert window.stageLabel.textFormat() == Qt.PlainText
+    assert window.runSummaryLayout.stretch(0) == window.runSummaryLayout.stretch(1) == 1
+    window.controller.state = RunState.IDLE
+    window.close()
+
+
+@pytest.mark.parametrize(('header', 'message', 'title', 'detail'), [
+    ('Collecting features:', 'Collecting all features', '收集模型特征', '正在收集模型特征'),
+    ('Creating Tetrahedral Mesh:', 'Mesher initialization', '四面体网格生成', '正在初始化网格生成器'),
+    ('Eigenmode solver:', 'Calculating eigenmode solution.', '本征模求解', '正在计算本征模'),
+    ('Post-Processing:', 'Creating parametric 1D results.', '后处理', '正在生成参数化 1D 结果'),
+])
+def test_observed_application_log_stages_have_readable_display(qapp, header, message, title, detail):
+    window, _tool = make_window(qapp)
+    window.controller.state = RunState.RUNNING
+    # Percent is unspecified in application.log; use unknown, not a fabricated reading.
+    window.renderCstProgress(CstProgressEvent('0', 'sample', 700, 750, header, None, None,
+        message, time.time(), 'session', 'progress.log', header))
+    assert title in window.stageLabel.text()
+    assert detail in window.stageLabel.text()
+    assert header in window.stageLabel.toolTip()
+    assert window.runProgressBar.maximum() == 0
+    window.controller.state = RunState.IDLE
     window.close()
 
 

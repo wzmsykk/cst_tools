@@ -7,6 +7,16 @@
 
 ## 最新状态与近期TODO（2026-10-15）
 
+- 用户application.log补充：确认Collecting features、Creating Tetrahedral Mesh、Eigenmode solver、Post-Processing四种原生Header，补齐前两者及四类步骤的中文显示；样例回放等23 passed、26 deselected。该截段7项HOM模式被采用、末尾第8任务在网格阶段；没有进度百分比时序，不能据此解释100%的内部语义。来源/证据边界见[原生阶段记录](cst-native-progress-observation.md)，未新跑CST，原日志未复制进Git。
+
+- 原生进度显示修正：已知Header归一化到标准阶段键，同时保留native_header和原始Text；样例Post-Processing显示“后处理 / 正在生成参数化1D结果”，原始来源/任务信息在提示中。百分比标明局部读数、非任务完成，不改Completion/Ack门禁。旧保存事件兼容、未知标题保留原文；使用/边界见[原生阶段记录](cst-native-progress-observation.md)。本轮不启动CST。
+
+- 原生阶段显示验收：主窗口30 passed，其余离线578 passed、21 integration deselected，合计608项按两组通过；样例/解析/索引交叉专项15 passed，不重复计数。两次单进程全量在Qt阶段提前退出，无完整报告，不能称为单进程全量通过。证据artifacts/native-progress-display-{gui,rest,core}-20261015.xml（artifacts不保证随Git迁移）；未真实CST/现场视觉验收、未提交/推送/打包。
+
+- GUI新增“自动滚动：开/关”按钮，每次打开默认开启，同时控制事件表与原始日志；关闭后继续接收而不跟随，重新开启返回底部，“回到最新”仅一次跳转。保留拖动/选中暂停和有界缓存。实现/使用见[结构化日志](gui-structured-log.md)，本轮不启动CST、不提交/推送/打包。
+
+- 自动滚动验收：完整离线604 passed、21 integration deselected（50.09s），核心日志/主题/文档检查20 passed；报告artifacts/gui-auto-scroll-all-20261015.xml及gui-auto-scroll-core-20261015.xml（artifacts不保证随Git迁移）。主窗口组合子集此前三次在旧进程内假后端线程收尾附近提前退出、无正常pytest结果，不计通过；完整套件通过不证明Qt原生退出根因已消除，实际桌面体验仍待人工验收。
+
 - GUI日志恢复最终离线验收：602 passed、21 integration deselected；专项86 passed。恢复窗口重复close/detach加幂等保护后全量通过；此前两次Qt测试提前退出不计通过。轻量报告artifacts/gui-log-restore-all-20261015.xml及gui-log-restore-focused-20261015.xml（artifacts不保证随Git迁移）。未真实CST验收、未提交/推送或重打包，现有源码包不含本轮修改。
 
 - GUI日志保留/恢复：移除清空按钮及clear API，Runner重启保留状态/日志位置并分页回放历史，GUI恢复覆盖/模式/任务摘要及原日志时间与源码；只显示、不自动提交计算。5000条有界镜像不变，完整历史仍在文件。API、测试与剩余TODO见[日志恢复](gui-log-restoration.md)；本轮未启动真实CST。

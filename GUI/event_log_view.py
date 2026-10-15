@@ -200,6 +200,13 @@ class StructuredLogHandler(QPlainTextEditLogger):
         self.notice = QLabel('事件缓存最多5000条；文件日志保留完整内容')
         self.notice.setWordWrap(True)
         footer.addWidget(self.notice, 1)
+        self.autoScrollButton = QPushButton('自动滚动：开')
+        self.autoScrollButton.setCheckable(True)
+        self.autoScrollButton.setChecked(True)
+        self.autoScrollButton.setAccessibleName('日志自动滚动')
+        self.autoScrollButton.setToolTip('默认开启；关闭后继续接收日志但不跟随。开启时回到最新；向上阅读或选中事件时暂时暂停跟随。')
+        self.autoScrollButton.toggled.connect(self.set_auto_scroll)
+        footer.addWidget(self.autoScrollButton)
         self.latest = QPushButton('回到最新')
         self.latest.clicked.connect(self.go_latest)
         footer.addWidget(self.latest)
@@ -223,6 +230,14 @@ class StructuredLogHandler(QPlainTextEditLogger):
         for field in (self.search, self.phase, self.task):
             field.textChanged.connect(lambda: self._filter_timer.start())
         self.level_filter.currentIndexChanged.connect(self.apply_filters)
+
+    def set_auto_scroll(self, enabled):
+        super().set_auto_scroll(enabled)
+        self.autoScrollButton.setText('自动滚动：开' if self.auto_scroll else '自动滚动：关')
+        if self.autoScrollButton.isChecked() != self.auto_scroll:
+            self.autoScrollButton.setChecked(self.auto_scroll)
+        if self.auto_scroll:
+            self.go_latest()
 
     def go_latest(self):
         self.table.clearSelection()
@@ -289,10 +304,13 @@ class StructuredLogHandler(QPlainTextEditLogger):
             dropped, self._event_dropped = self._event_dropped, 0
         if batch:
             scroll = self.table.verticalScrollBar()
-            follow = scroll.value() >= scroll.maximum() - 1 and not self.table.currentIndex().isValid()
+            follow = self.auto_scroll and scroll.value() >= scroll.maximum() - 1 and not self.table.currentIndex().isValid()
+            previous_position = scroll.value()
             self.model.append_events(batch)
             if follow:
                 self.table.scrollToBottom()
+            elif not self.auto_scroll:
+                scroll.setValue(previous_position)
         if dropped:
             self.notice.setText(f'界面积压省略{dropped}条事件；完整内容见文件日志')
 

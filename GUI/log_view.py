@@ -24,12 +24,13 @@ class QPlainTextEditLogger(logging.Handler):
         self.widget.setUndoRedoEnabled(False)
         self.widget.setLineWrapMode(QPlainTextEdit.NoWrap)
         self.widget.setMaximumBlockCount(self.MAX_BLOCKS)
-        self.widget.setToolTip("仅显示最近5000行；长消息界面截断，完整内容见文件日志。向上滚动暂停跟随，回到底部恢复。")
+        self.widget.setToolTip("仅显示最近5000行；长消息界面截断，完整内容见文件日志。开启自动滚动时，向上阅读暂停跟随，回到底部恢复。")
         self._pending = deque()
         self._guard = threading.Lock()
         self._scheduled = False
         self._disposed = False
         self._dropped = 0
+        self.auto_scroll = True
         self._wakeup = _Wakeup(parent)
         self._wakeup.ready.connect(self.flush_pending, Qt.QueuedConnection)
         self._timer = QTimer(self.widget)
@@ -75,7 +76,7 @@ class QPlainTextEditLogger(logging.Handler):
         if dropped:
             batch.insert(0, f"[界面日志积压：省略{dropped}条显示，完整内容见文件日志]")
         if batch:
-            follow = scroll.value() >= scroll.maximum() - 1
+            follow = self.auto_scroll and scroll.value() >= scroll.maximum() - 1
             first = self.widget.firstVisibleBlock().blockNumber()
             before = self.widget.document().blockCount()
             removed = max(0, before + sum(text.count('\n') + 1 for text in batch) - self.MAX_BLOCKS)
@@ -88,6 +89,12 @@ class QPlainTextEditLogger(logging.Handler):
             self._timer.start()
         else:
             self._timer.stop()
+
+    def set_auto_scroll(self, enabled):
+        """GUI-thread display preference; never changes log intake or storage."""
+        self.auto_scroll = bool(enabled)
+        if self.auto_scroll:
+            self.widget.verticalScrollBar().setValue(self.widget.verticalScrollBar().maximum())
 
     def close(self):
         with self._guard:
