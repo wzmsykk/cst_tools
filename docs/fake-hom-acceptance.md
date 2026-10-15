@@ -1,5 +1,32 @@
 # 假Worker HOM专项验收
 
+## 2026-10-15：独立Runner审计修复后复验
+
+源码基线：053e4ca。仅假执行器，不启动真实CST或修改用户工程。
+
+```powershell
+python -m pytest -q test/hom_probabilistic_fake_worker_test.py test/hom_scan_test.py test/hom_mode_count_contract_test.py test/gui_fake_worker_flow_test.py test/gui_vacuum_matching_fake_flow_test.py test/runner_test.py test/gui_runner_test.py test/runner_audit_regression_test.py test/documentation_index_test.py --basetemp D:/work/cst_tools/.pytest-hom-fake-20261015 --junitxml artifacts/fake-hom-acceptance-20261015/report.xml
+```
+
+结果：103 passed（40.10秒）。报告artifacts/fake-hom-acceptance-20261015/report.xml；artifacts不保证随Git迁移。
+包括HOM扫描/模式数约束、GUI假Worker与可选场匹配流程、独立Runner停止续跑/崩溃恢复、HTTP启动及取消响应丢失/超时故障。场匹配流程通过不表示完整HOM谱的物理场身份追踪已验收。
+
+另逐组核对CSV驱动随机模型：扫描911.715464937295–1860.70021088335 MHz，窗口20 MHz、nmodes=1。
+
+|模型种子|预期/找到模式数|每mode后处理项|求解调用数|空区间数|失败区间数|
+|---|---|---|---|---|---|
+|0|8/8|7|52|44|0|
+|1|8/8|7|53|45|0|
+|17|8/8|7|54|46|0|
+|20260919|8/8|7|55|47|0|
+|4294967295|8/8|7|56|48|0|
+
+找到频率与每组生成谱逐项相等；七项为frequency、R_divide_Q、R_divide_Q_5mm、R_divide_Q_10mm、Shunt_Impedance、Total_Loss、Q-factor。
+空区间属于有效覆盖，不要求每次调用都产出模式；完整找齐结论限正常返回路线。持续异常必须保留缺口，不能把故障测试通过解释为任何异常下都找齐。
+本轮不修改实现，测试结束后清理临时模型/检查点，保留轻量JUnit和本文；原始临时数据需重新生成。
+
+## 2026-10-14：历史验收
+
 日期：2026-10-14。本轮不运行真实CST，不修改用户工程。
 
 命令：

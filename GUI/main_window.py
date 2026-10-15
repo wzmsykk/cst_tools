@@ -34,6 +34,7 @@ STAGE_PRESENTATION = {
     "stopping": "安全停止 Worker",
     "recovering": "恢复残留 CST 会话",
     "recovered": "会话恢复完成",
+    "recovery-required": "需要恢复残留会话，未重新开始计算",
     "completed": "本次运行已完成",
     "interrupted": "已安全停止，可从检查点继续",
 }
@@ -77,7 +78,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         set_visual_role(self.RecoverButton, "quiet")
         set_visual_role(self.AlgSettingButton, "quiet")
         set_visual_role(self.postProcessButton, "quiet")
-        set_visual_role(self.clearLogButton, "quiet")
         self.pageLayout.setStretch(1, 1)
         self.workspaceSplitter.setSizes([560, 860])
 
@@ -148,6 +148,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         )
 
     def closeEvent(self, event):
+        if getattr(self.controller, 'closed', False):
+            event.accept()
+            return
         if self._confirmation_open:
             event.ignore()
             return
@@ -222,7 +225,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.postProcessButton.clicked.connect(self.showPPSDialogBox)
         self.StopButton.clicked.connect(self.requestStop)
         self.RecoverButton.clicked.connect(self.requestRecovery)
-        self.clearLogButton.clicked.connect(self.logTextBox.clear)
 
         self.controller.state_changed.connect(self.renderRunState)
         self.controller.stage_changed.connect(self.renderStage)
@@ -232,6 +234,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.controller.settled.connect(self._finishPendingClose)
         if hasattr(self.controller, 'connection_changed'):
             self.controller.connection_changed.connect(self.connectionLabelChanged)
+        if hasattr(self.controller, 'snapshot_changed'):
+            self.controller.snapshot_changed.connect(self.renderRunnerSnapshot)
 
         self.CalcDialogBox._signal_done.connect(self.updateAlgSetting)
         self.PPSDialogBox._signal_done.connect(self.updatePPSSetting)
@@ -268,6 +272,20 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.runProgressBar.setRange(0, total)
         self.runProgressBar.setValue(current)
         self.runProgressBar.setFormat(f"%v / %m　{STAGE_PRESENTATION.get(self._stage, self._stage)}")
+
+    def renderRunnerSnapshot(self, status):
+        """Restore durable task facts; displaying history never starts execution."""
+        parts = [STAGE_PRESENTATION.get(status.get('phase', ''), status.get('phase', ''))]
+        coverage = status.get('coverage') or {}
+        frontier = coverage.get('confirmed_frontier')
+        if frontier is not None:
+            parts.append(f'已确认覆盖至 {frontier:g} MHz')
+        if status.get('mode_count') is not None:
+            parts.append(f"已接收 {status['mode_count']} 个模式")
+        if status.get('total_tasks', 0):
+            self.renderProgress(status.get('completed_tasks', 0), status['total_tasks'])
+            parts.append(f"任务 {status.get('completed_tasks', 0)}/{status['total_tasks']}")
+        self.stateDetailLabel.setText(' · '.join(part for part in parts if part))
 
     def renderCstProgress(self, event):
         if self.controller.state is not RunState.RUNNING:

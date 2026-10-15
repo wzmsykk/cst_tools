@@ -36,7 +36,7 @@
 |F30|HOM预处理保留mesh选项与恢复策略|[projectconfmanager.py](../csttool/projectconfmanager.py)|`ProjectConfigManager.prepare_project`|[mesh策略测试](../test/projectconfmanager_mesh_test.py)|[预处理诊断](preprocess-diagnostics.md)|
 |F31|GUI预处理保留mesh交互|[algorithm_settings_dialog.py](../GUI/algorithm_settings_dialog.py)|`AlgorithmSettingsDialog._set_preserve_mesh`|[GUI配置测试](../test/gui_config_models_test.py)|[预处理诊断](preprocess-diagnostics.md)|
 |F32|CST任务级归属、共享实例诊断与退出门禁|[acceptance_session.py](../csttool/acceptance_session.py)|`wait_probe`, `task_project_processes`|[进程监测测试](../test/acceptance_session_test.py)|[预处理诊断](preprocess-diagnostics.md)|
-|F33|GUI长日志有界批量显示与滚动|[log_view.py](../GUI/log_view.py)|`QPlainTextEditLogger.emit`, `QPlainTextEditLogger.flush_pending`, `QPlainTextEditLogger.clear`|[日志显示测试](../test/gui_log_view_test.py)|[日志显示性能](gui-log-performance.md)|
+|F33|GUI长日志有界批量显示与滚动（无清空API）|[log_view.py](../GUI/log_view.py)|`QPlainTextEditLogger.emit`, `QPlainTextEditLogger.flush_pending`|[日志显示测试](../test/gui_log_view_test.py)|[日志显示性能](gui-log-performance.md)|
 |F34|GUI事件模型、组合筛选、详情及原始文件入口|[event_log_view.py](../GUI/event_log_view.py)|`EventTableModel.append_events`, `EventFilter.filterAcceptsRow`, `StructuredLogHandler.show_details`, `StructuredLogHandler.file_path`|[结构化日志测试](../test/gui_event_log_view_test.py)|[结构化事件使用](gui-structured-log.md)|
 |F35|可读摘要、完整文本上下文及异常传播引用|[logging_config.py](../csttool/logging_config.py)|`DiagnosticTextFormatter.format`, `normalized_context`, `log_failure`|[日志配置测试](../test/logging_config_test.py)、[Worker顺序测试](../test/managed_cstworker_test.py)|[六链日志设计](readable-logging.md)|
 |F36|Worker不取任务锁的协作停止|[managed_cstworker.py](../csttool/managed_cstworker.py)|`ManagedCSTWorker.request_stop`|[停止及续跑测试](../test/cooperative_stop_resume_test.py)|[停止与覆盖续跑](cooperative-stop-and-hom-resume.md)|
@@ -59,6 +59,7 @@ Runner审计修复：F41/F43/F44增加`cancel_start`和命令对账，当前API�
 |F47|有界JSONL游标与异常记录跳过|[event_replay.py](../csttool/event_replay.py)|`read_events`|[审计回归](../test/runner_audit_regression_test.py)|[Runner API](local-runner.md)|
 |F48|纯HOM草稿默认值与mesh校验|[scan_settings.py](../csttool/scan_settings.py)|`default_hom_settings`, `validate_hom_settings`|[审计回归](../test/runner_audit_regression_test.py)|[修复记录](runner-audit-fix-20261015.md)|
 |F49|配置草稿与显式进程内执行适配|[application_service.py](../GUI/application_service.py)|`ConfigurationDraft`, `ConfigurationService`, `CstApplicationService`|[服务测试](../test/gui_application_service_test.py)|[Runner API](local-runner.md)|
+|F50|自动恢复任务摘要及日志保留|[main_window.py](../GUI/main_window.py)|`MainWindow.renderRunnerSnapshot`|[日志恢复测试](../test/gui_log_restore_test.py)|[日志恢复API与边界](gui-log-restoration.md)|
 
 停止与退出确认：F39，源码 [MainWindow](../GUI/main_window.py) 的 `closeEvent`、`requestStop`、`_confirm_action` 和 [Controller](../GUI/run_controller.py) 的 `_stop_failed`；测试 [GUI测试](../test/gui_main_window_test.py)，说明 [停止/退出](gui-stop-exit.md)。
 

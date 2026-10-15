@@ -6,6 +6,8 @@
 
 ## 执行链与GUI
 
+2026-10-15增补：[GUI日志保留/自动恢复](gui-log-restoration.md)。清空按钮/API已移除；连接已有项目会恢复持久状态与日志历史，事件游标v2增加source，多文件分页，不自动重新运行求解。
+
 生产MainWindow默认使用RunnerBackend配置草稿及RunnerController异步客户端；
 真实CstApplicationBackend、Manager、Worker只在独立Runner创建。
 测试可显式注入进程内假Backend，不属于第二条生产GUI执行链。

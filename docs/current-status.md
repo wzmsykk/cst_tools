@@ -7,6 +7,12 @@
 
 ## 最新状态与近期TODO（2026-10-15）
 
+- GUI日志恢复最终离线验收：602 passed、21 integration deselected；专项86 passed。恢复窗口重复close/detach加幂等保护后全量通过；此前两次Qt测试提前退出不计通过。轻量报告artifacts/gui-log-restore-all-20261015.xml及gui-log-restore-focused-20261015.xml（artifacts不保证随Git迁移）。未真实CST验收、未提交/推送或重打包，现有源码包不含本轮修改。
+
+- GUI日志保留/恢复：移除清空按钮及clear API，Runner重启保留状态/日志位置并分页回放历史，GUI恢复覆盖/模式/任务摘要及原日志时间与源码；只显示、不自动提交计算。5000条有界镜像不变，完整历史仍在文件。API、测试与剩余TODO见[日志恢复](gui-log-restoration.md)；本轮未启动真实CST。
+
+- 假Worker HOM复验（053e4ca）：103 passed，含随机谱/标量后处理、GUI假Worker及可选匹配、独立Runner停止续跑与HTTP故障。5组随机谱每组8/8频率、每mode七项后处理、零失败区间；仅正常返回路线完整找齐。未启动真实CST，报告及边界见[专项记录](fake-hom-acceptance.md)。
+
 - 审计修复最终验收（2026-10-15）：完整离线595 passed、21 integration deselected；故障与文档/日志索引专项27 passed。含真实本机HTTP响应体丢失、socket超时、启动未发送/迟到、取消响应丢失及停止意图恢复；均使用假执行器。报告artifacts/runner-audit-fix-20261015.xml及runner-audit-focused-20261015.xml（artifacts不保证随Git迁移）。真实CST逐窗口崩溃和实际桌面仍待验收，未提交/推送/重打包。
 
 - 2026-10-15审计修复：A1–A4及M1已实施，增加按启动ID取消墓碑/停止对账、持久UI停止意图、只读控制权申请、连接代次隔离和有界日志游标v2；配置草稿/执行端口分离。新增真实回环HTTP响应体丢失与socket超时故障验收，全部使用假执行器，未重跑CST。当前结果、剩余TODO与兼容边界见[本轮修复记录](runner-audit-fix-20261015.md)；下两条为修复前审计历史，旧源码包未更新。

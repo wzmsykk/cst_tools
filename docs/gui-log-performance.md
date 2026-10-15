@@ -10,7 +10,7 @@
 
 显示仍保留最近5000行；待显示最多2000条，每条显示最多4096字符。洪峰时省略旧显示记录并提示数量，超长消息显示截断提示。限制仅作用于GUI镜像，不修改LogRecord，不改变log/JSONL文件输出；完整详情请查看已配置的文件日志。若程序未配置文件handler，不能保证界面省略内容另有完整副本。
 
-清空按钮同步清空待显示队列，避免清空后旧日志又出现；关闭handler停止接收，队列释放，不操作CST或任务。窗口回收沿用现有removeHandler/close流程。
+2026-10-15移除清空按钮及Handler.clear，待显示队列不因运行/恢复被清空。关闭handler仍停止接收并释放队列，不操作CST或任务。窗口回收沿用removeHandler/close流程；历史日志和任务状态[分批恢复](gui-log-restoration.md)，5000条显示上限不变。
 
 源码从main_window移至log_view，main_window保留导入名以兼容原调用。日志刷新是异步的，测试应处理GUI事件或主动flush_pending；不再承诺emit后立即可读。历史被淘汰时只可锚定仍在缓存内的内容。
 

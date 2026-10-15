@@ -66,7 +66,7 @@ def test_scroll_back_drag_and_tail_follow(view):
     assert scroll.value() == scroll.maximum()
 
 
-def test_clear_removes_pending_and_long_records_are_display_only_truncated(view):
+def test_no_clear_api_and_long_records_are_display_only_truncated(view):
     handler, app = view
     text = 'x' * 100000
     item = record(text)
@@ -77,9 +77,11 @@ def test_clear_removes_pending_and_long_records_are_display_only_truncated(view)
     assert item.msg == text
     assert handler.widget.lineWrapMode() == QPlainTextEdit.NoWrap
     handler.emit(record('pending'))
-    handler.clear()
+    assert not hasattr(handler, 'clear')
     app.processEvents()
-    assert handler.widget.toPlainText() == ''
+    handler.flush_pending()
+    assert 'pending' in handler.widget.toPlainText()
+    assert '界面截断' in handler.widget.toPlainText()
     handler.close()
     handler.emit(record('after close'))
     assert not handler._pending

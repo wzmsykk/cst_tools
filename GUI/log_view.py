@@ -89,13 +89,6 @@ class QPlainTextEditLogger(logging.Handler):
         else:
             self._timer.stop()
 
-    def clear(self):
-        with self._guard:
-            self._pending.clear()
-            self._dropped = 0
-            self._scheduled = False
-        self.widget.clear()
-
     def close(self):
         with self._guard:
             self._disposed = True

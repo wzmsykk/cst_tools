@@ -1,6 +1,7 @@
 """Nonblocking GUI controller for the independent local Runner."""
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import fields
+from datetime import datetime
 import logging
 from uuid import uuid4
 from PyQt5.QtCore import QObject, QTimer, pyqtSignal
@@ -16,6 +17,7 @@ class RunnerController(QObject):
     settled = pyqtSignal()
     cst_progress = pyqtSignal(object)
     connection_changed = pyqtSignal(str)
+    snapshot_changed = pyqtSignal(object)
 
     def __init__(self, service):
         super().__init__()
@@ -67,7 +69,8 @@ class RunnerController(QObject):
 
     def _observe(self, client, instance=None, observed_run=None, cursor=0):
         status = client.connect(launch=instance is None)
-        if instance != status['instance_id'] or observed_run != status['run_id']:
+        if (instance != status['instance_id'] or observed_run != status['run_id']) and not (
+                isinstance(cursor, dict) and cursor.get('source')):
             cursor = 0
         events = client.events(cursor)
         return status, events
@@ -127,6 +130,7 @@ class RunnerController(QObject):
                 self.observed_run = self.run_id
                 self.backend.log_directory = status.get('log_directory')
                 self.backend.artifacts = status.get('artifacts', [])
+                self.backend.runner_status = dict(status)
                 self.cursor = events['cursor']
                 mapping = {'PREPARING': RunState.RUNNING, 'RUNNING': RunState.RUNNING,
                            'STOPPING': RunState.STOPPING, 'RECOVERING': RunState.RECOVERING,
@@ -142,6 +146,7 @@ class RunnerController(QObject):
                 self.connection_changed.emit('已连接后台 Runner' if not self.read_only
                     else ('控制权租约已过期，可点击“申请控制权”' if not status.get('control_lease_valid', True)
                           else '已连接（其他窗口持有控制权，仅查看）'))
+                self.snapshot_changed.emit(status)
                 error = status.get('error')
                 if error and error != self.last_error:
                     self.error.emit(error)
@@ -157,7 +162,14 @@ class RunnerController(QObject):
                     names = {field.name for field in fields(CstProgressEvent)}
                     self.cst_progress.emit(CstProgressEvent(**{k:v for k,v in progress.items() if k in names}))
                 for event in events['events']:
+                    timestamp = {}
+                    if event.get('timestamp'):
+                        try:
+                            timestamp['created'] = datetime.fromisoformat(event['timestamp']).timestamp()
+                        except (ValueError, TypeError):
+                            pass
                     record = logging.makeLogRecord({'name': self.backend.logger.name,
+                        **timestamp,
                         'levelno': event.get('levelno', logging._nameToLevel.get(event.get('level', 'INFO'), 20)),
                         'levelname': event.get('level', 'INFO'), 'msg': event.get('message', ''),
                         'pathname': event.get('source', {}).get('file', ''),
@@ -240,6 +252,8 @@ class RunnerController(QObject):
         self.state_changed.emit(self.state)
 
     def detach(self):
+        if self.closed:
+            return
         self.closed = True
         self.timer.stop()
         client = self.backend.client

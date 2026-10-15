@@ -674,15 +674,18 @@ def test_explicit_stop_button_requests_standard_stop(qapp, monkeypatch, tmp_path
     window.close()
 
 
-def test_log_can_be_cleared_without_touching_run_state(qapp):
+def test_log_has_no_clear_button_or_function(qapp):
     window, tool = make_window(qapp)
     tool.logger.info("clear-me")
     qapp.processEvents()
     assert "clear-me" in window.logTextBox.widget.toPlainText()
 
-    window.clearLogButton.click()
-
-    assert window.logTextBox.widget.toPlainText() == ""
+    assert not hasattr(window, 'clearLogButton')
+    assert not hasattr(window.logTextBox, 'clear')
+    from pathlib import Path
+    ui_source = (Path(__file__).parents[1] / 'GUI/ui_main.ui').read_text(encoding='utf-8')
+    assert 'clearLogButton' not in ui_source
+    assert 'clear-me' in window.logTextBox.widget.toPlainText()
     assert window.controller.state is RunState.IDLE
     window.close()
 

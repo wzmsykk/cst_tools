@@ -35,7 +35,7 @@ def make_record(message='message', level=logging.INFO, **extras):
     return record
 
 
-def test_filters_details_raw_and_clear(view):
+def test_filters_details_raw_and_no_clear_api(view):
     handler, app = view
     handler.emit(make_record('first task', phase='solve', task_id='A', run_id='r', artifacts={'snapshot':'copy.cst'}))
     handler.emit(make_record('second task failure', logging.ERROR, phase='shutdown', task_id='B'))
@@ -63,11 +63,13 @@ def test_filters_details_raw_and_clear(view):
     handler.tabs.setCurrentIndex(1)
     assert 'debug details' in handler.widget.toPlainText()
     handler.emit(make_record('pending'))
-    handler.clear()
+    assert not hasattr(handler, 'clear')
+    assert not hasattr(handler.model, 'clear')
     app.processEvents()
-    assert handler.model.rowCount() == 0
-    assert not handler.details.toPlainText()
-    assert not handler.widget.toPlainText()
+    handler.flush_pending()
+    assert handler.model.rowCount() == 4
+    assert 'debug details' in handler.widget.toPlainText()
+    assert 'pending' in handler.widget.toPlainText()
 
 
 def test_only_explicit_identified_progress_coalesces_not_errors_or_other_tasks(view):

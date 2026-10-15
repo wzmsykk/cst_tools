@@ -123,12 +123,6 @@ class EventTableModel(QAbstractTableModel):
             self.endRemoveRows()
         self._progress = {row['progress_key']: i for i, row in enumerate(self.rows) if row['progress_key']}
 
-    def clear(self):
-        self.beginResetModel()
-        self.rows.clear()
-        self._progress.clear()
-        self.endResetModel()
-
 
 class EventFilter(QSortFilterProxyModel):
     def __init__(self, parent=None):
@@ -325,15 +319,6 @@ class StructuredLogHandler(QPlainTextEditLogger):
         if event['clipped']:
             text += '\n[详情缓存截断，完整内容见文件日志]'
         self.details.setPlainText(text)
-
-    def clear(self):
-        super().clear()
-        with self._guard:
-            self._events.clear()
-            self._event_dropped = 0
-        self.model.clear()
-        self.details.clear()
-        self.notice.setText('界面日志已清空；文件日志不受影响')
 
     def close(self):
         if hasattr(self, '_events'):

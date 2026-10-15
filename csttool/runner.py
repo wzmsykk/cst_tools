@@ -51,10 +51,22 @@ class Runner:
         previous = self.control / 'status.json'
         if previous.exists():
             old = read_json(previous)
-            self.status['run_id'] = old.get('run_id')
+            for key in ('run_id', 'state', 'phase', 'error', 'session_safety', 'last_progress',
+                        'log_directory', 'log_history', 'coverage', 'mode_count',
+                        'completed_tasks', 'total_tasks', 'artifacts'):
+                if key in old:
+                    self.status[key] = old[key]
             if old.get('state') in ACTIVE or old.get('state') == 'RECOVERY_REQUIRED':
                 self.status['state'] = 'RECOVERY_REQUIRED'
+                self.status['phase'] = 'recovery-required'
                 self.status['error'] = 'Previous controller stopped; reconcile sessions before resume'
+        if not self.status.get('log_directory') and not self.status.get('log_history'):
+            # Pre-Runner projects have file logs but no control/status log pointers.
+            legacy = sorted(path.parent for path in self.project.glob('logs/*/application.jsonl')
+                            if path.resolve().is_relative_to(self.project))
+            if legacy:
+                self.status['log_history'] = [dict(run_id=None, directory=str(path)) for path in legacy[:-1]]
+                self.status['log_directory'] = str(legacy[-1])
         for command_path in (self.control / 'commands').glob('*.json'):
             intent = read_json(command_path)
             if intent['command']['operation'] == 'start':
@@ -77,6 +89,12 @@ class Runner:
 
     def update(self, **values):
         with self.lock:
+            directory = self.status.get('log_directory')
+            if directory and 'log_directory' in values and values['log_directory'] != directory:
+                history = list(self.status.get('log_history', []))
+                if not any(item['directory'] == directory for item in history):
+                    history.append(dict(run_id=self.status['run_id'], directory=directory))
+                self.status['log_history'] = history
             self.status.update(values)
             try:
                 self._save_status()
@@ -116,8 +134,49 @@ class Runner:
 
     def events(self, cursor=0, limit=100):
         from .event_replay import read_events
-        path = Path(self.status.get('log_directory') or self.control) / 'application.jsonl'
-        return dict(read_events(path, cursor, limit), instance_id=self.instance_id)
+        with self.lock:
+            directories = [item['directory'] for item in self.status.get('log_history', [])]
+            if self.status.get('log_directory'):
+                directories.append(self.status['log_directory'])
+            elif not directories:
+                directories.append(str(self.control))
+        paths = list(dict.fromkeys(str(Path(directory).resolve() / 'application.jsonl')
+                    for directory in directories if Path(directory).resolve().is_relative_to(self.project)))
+        if not paths:
+            paths = [str(self.control / 'application.jsonl')]
+        source = cursor.get('source') if isinstance(cursor, dict) else None
+        index = paths.index(source) if source in paths else 0
+        path = Path(paths[index])
+        position = cursor if source == str(path) else 0
+        try:
+            result = read_events(path, position, limit)
+            size = path.stat().st_size if path.exists() else 0
+        except OSError as exc:
+            state = dict(position) if isinstance(position, dict) else {'offset': 0}
+            error = f'{type(exc).__name__}: {exc}'
+            events = [] if state.get('read_error') == error else [{
+                'level': 'WARNING', 'message': '日志暂时无法读取；任务状态不受影响',
+                'context': {'raw_file': str(path), 'reason': error}}]
+            state.update(source=str(path), read_error=error)
+            if index < len(paths) - 1:
+                state = {'source': paths[index + 1], 'offset': 0}
+            return dict(schema_version=2, instance_id=self.instance_id, cursor=state, events=events)
+        state = result['cursor'] if isinstance(result['cursor'], dict) else {'offset': 0}
+        state.pop('read_error', None)
+        state['source'] = str(path)
+        result['cursor'] = state
+        if index < len(paths) - 1 and state['offset'] >= size:
+            if not path.exists():
+                result['events'].append({'level': 'WARNING', 'message': '旧日志文件已不存在，继续读取后续运行日志',
+                                        'context': {'raw_file': str(path)}})
+            result['cursor'] = {'source': paths[index + 1], 'offset': 0}
+        elif index < len(paths) - 1 and not result['events'] and (
+                state['offset'] == (position.get('offset', 0) if isinstance(position, dict) else 0)):
+            # A finalized history file may end in an interrupted partial write.
+            result['events'].append({'level': 'WARNING', 'message': '旧日志尾行未写完，继续读取后续运行日志',
+                'context': {'raw_file': str(path), 'byte_offset': state['offset']}})
+            result['cursor'] = {'source': paths[index + 1], 'offset': 0}
+        return dict(result, instance_id=self.instance_id)
 
     def command(self, command):
         validate_command(command)
