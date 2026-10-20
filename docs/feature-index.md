@@ -4,6 +4,9 @@
 
 |ID|功能|源码|函数/类|测试或操作工具|说明文档|
 |---|---|---|---|---|---|
+|F53|项目恢复公共门禁与检查点校验|[project_recovery_state.py](../csttool/project_recovery_state.py)|`persisted_project_status`, `validate_recovery_checkpoint`|[状态回归](../test/project_recovery_state_test.py)|[恢复状态对账与TODO](project-recovery-state-reconciliation.md)|
+|F54|恢复专用配置加载|[配置管理器](../csttool/projectconfmanager.py)|`ProjectConfigManager.load_recovery_configuration`|[状态回归](../test/project_recovery_state_test.py)|[恢复状态对账](project-recovery-state-reconciliation.md)|
+|F55|Runner与持久项目状态对账|[Runner](../csttool/runner.py)|`Runner._reconcile_project_state`, `LocalExecution.session_safety`|[GUI恢复入口测试](../test/gui_runner_test.py)|[恢复状态对账](project-recovery-state-reconciliation.md)|
 |F01|任务批量调度|[cstmanager.py](../csttool/cstmanager.py)|`CSTManager.run_batch`|[manager测试](../test/cstmanager_test.py)|[Manager API](cstmanager-api.md)|
 |F02|工程预处理与历史设置|[cst_preprocessor.py](../csttool/cst_preprocessor.py)|`CstProjectPreprocessor.preprocess`|[预处理测试](../test/cst_preprocessor_test.py)|[作用域修正](concave-expression-scope-rebuild-fix.md)|
 |F03|Managed任务与停止|[managed_cstworker.py](../csttool/managed_cstworker.py)|`ManagedCSTWorker.run_task`, `ManagedCSTWorker.stop`|[Worker测试](../test/managed_cstworker_test.py)|[生命周期与回滚](failed-rebuild-stop-recovery.md)|

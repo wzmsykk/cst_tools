@@ -50,6 +50,8 @@ RUNNING -> STOPPING -> STOPPED
 
 ## 异常恢复
 
+2026-10-20补充：[恢复状态对账](project-recovery-state-reconciliation.md)。prepare_run与is_recovery_required同时检查持久项目门禁；recover_project_sessions先加载已有配置，在同一项目锁内核验会话、检查点及登记快照并写入INTERRUPTED，成功后才记录完成。核验/持久化失败保持RECOVERY_REQUIRED；缺配置不创建默认文件。普通FAILED续跑兼容行为不变，显式恢复门禁不自动清除。
+
 恢复按以下顺序收口：
 
 1. 扫描项目 `temp/worker_*/<session>`，读取协议状态、Worker 标记和 PID 存活状态；

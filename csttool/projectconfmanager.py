@@ -259,6 +259,11 @@ class ProjectConfigManager:
         self.setNotReady()
         return self.settings
 
+    def load_recovery_configuration(self):
+        """Load metadata without opening CST or depending on postprocess files."""
+        path = self.currProjectDir / self.CFGfilename
+        return self._load_settings(path) if path.exists() else None
+
     def __savecfgobj(self, confobj, cfgfilename="project.ini", slient=False):
         cfgfilePath = self.currProjectDir / cfgfilename
         settings = confobj

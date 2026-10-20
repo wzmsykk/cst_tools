@@ -23,6 +23,9 @@ from csttool import projectconfmanager
 from csttool.hom_scan import ScanInterrupted
 from csttool.hom_run_manifest import HomRunManifest
 from csttool.configuration import read_json
+from csttool.project_recovery_state import (
+    EXPLICIT_RECOVERY_STATES, persisted_project_status, validate_recovery_checkpoint,
+)
 from csttool.mesh_convergence import (
     MeshConvergenceAnalyzer,
     MeshConvergenceSettings,
@@ -314,6 +317,14 @@ class CstApplicationBackend:
                 raise BackendPreparationError(
                     f"发现 {len(unresolved)} 个未闭合 CST 会话，请先执行会话恢复"
                 )
+            try:
+                project_status = persisted_project_status(self.get_project_directory())
+            except Exception as exc:
+                self._set_state(BackendState.RECOVERY_REQUIRED)
+                raise BackendPreparationError('项目配置无法核验，请先检查配置并执行显式恢复') from exc
+            if project_status in EXPLICIT_RECOVERY_STATES:
+                self._set_state(BackendState.RECOVERY_REQUIRED)
+                raise BackendPreparationError(f'项目状态为 {project_status}，请先执行显式恢复，再继续扫描')
             if self.resume:
                 self.pconfman.recover_failed_project()
             settings = self.alg.get_editable_attributes()
@@ -581,6 +592,11 @@ class CstApplicationBackend:
         ]
 
     def is_recovery_required(self) -> bool:
+        try:
+            if persisted_project_status(self.get_project_directory()) in EXPLICIT_RECOVERY_STATES:
+                return True
+        except Exception:
+            return True  # An unreadable persisted gate is not safe to bypass.
         return self.state is BackendState.RECOVERY_REQUIRED or bool(
             self.get_recovery_sessions()
         )
@@ -594,18 +610,29 @@ class CstApplicationBackend:
             self._acquire_project_run_lock()
         except BackendPreparationError as exc:
             raise BackendLifecycleError(str(exc)) from exc
+        except Exception:
+            self._set_state(BackendState.RECOVERY_REQUIRED)
+            self.logger.exception("恢复前无法核验项目锁路径 | project=%s", project_directory)
+            raise
         try:
             self.logger.info("开始会话恢复 | RECOVERY_START project=%s", project_directory, extra={"event": "RECOVERY_START", "phase": "recovery", "project": project_directory})
+            load_configuration = getattr(self.pconfman, 'load_recovery_configuration', None)
+            loaded_configuration = None
+            if load_configuration is not None:
+                loaded_configuration = load_configuration()
             recovered = recover_project_sessions(project_directory)
+            validate_recovery_checkpoint(project_directory)
+            if load_configuration is None or loaded_configuration is not None:
+                self._update_task_status(projectconfmanager.TaskStatus.INTERRUPTED)
+            self._set_state(BackendState.INTERRUPTED)
+            self.logger.info("会话恢复完成 | project=%s closed_sessions=%d", project_directory, len(recovered))
+            return recovered
         except Exception:
+            self._set_state(BackendState.RECOVERY_REQUIRED)
             self.logger.exception("会话恢复失败 | project=%s status=RECOVERY_REQUIRED", project_directory, extra={"event": "RECOVERY_REQUIRED", "phase": "recovery", "project": project_directory})
             raise
         finally:
             self._release_project_run_lock()
-        self.logger.info("会话恢复完成 | project=%s closed_sessions=%d", project_directory, len(recovered))
-        self._update_task_status(projectconfmanager.TaskStatus.INTERRUPTED)
-        self._set_state(BackendState.INTERRUPTED)
-        return recovered
 
     def emergency_terminate(self) -> None:
         manager = self.jm

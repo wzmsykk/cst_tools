@@ -57,6 +57,28 @@ def wait(app, predicate):
     raise AssertionError('Qt client condition timed out')
 
 
+def test_persisted_recovery_gate_keeps_gui_recovery_entry(app, tmp_path):
+    from csttool.runner import Runner
+    from test.project_recovery_state_test import real_project_backend
+    real_project_backend(tmp_path)
+    runner = Runner(tmp_path)
+    backend = RunnerBackend()
+    backend.select_project_directory(str(tmp_path))
+    class SnapshotClient(Client):
+        def connect(self, **kwargs):
+            return runner.snapshot()
+    backend.client = SnapshotClient(backend.project)
+    controller = RunnerController(ConfigurationService(backend))
+    try:
+        controller.set_inputs_ready(True)
+        wait(app, lambda: controller.state is RunState.RECOVERY_REQUIRED)
+        assert controller.recovery_count == 1
+        assert runner.snapshot()['project_task_status'] == 'RECOVERY_REQUIRED'
+    finally:
+        controller.detach()
+        runner.close()
+
+
 def test_gui_dispatch_is_async_reconnect_does_not_resubmit(app, tmp_path):
     backend = RunnerBackend()
     backend.select_project_directory(str(tmp_path))

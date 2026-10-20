@@ -1,11 +1,15 @@
 # CST Tools 当前状态与实施路线
 
-状态日期：2026-10-15
+状态日期：2026-10-20
 历史提交基线：`3717a04`（P0-1停止恢复、故障验收与文档索引）；后续提交包含场故障验收、共同域、Pillbox双网格与真空腔追踪第一版，准确提交身份以Git日志为准。
 
 本文是项目当前状态的权威入口。历史设计文档仍保留其分析价值；若与本文或[最小 Python/VBA 协议 TODO](./minimal-python-vba-todo.md)冲突，以本文和已经通过的真实 CST Gate 为准。
 
-## 最新状态与近期TODO（2026-10-15）
+## 最新状态与近期TODO（2026-10-20）
+
+- 2026-10-20恢复状态修正：统一持久项目门禁、后端与Runner的恢复判定；会话关闭与项目对账分开表达。显式恢复在同一项目锁内加载配置、收口会话、核验检查点/快照并持久写入INTERRUPTED，之后才报告完成。背景、兼容与现场待办见[恢复状态对账](project-recovery-state-reconciliation.md)。本轮不启动真实CST，以下旧验收数字不代表本次代码。
+
+- 本轮合并专项验收85 passed（43.19s）：后端、Runner/HTTP故障、GUI恢复状态、配置/mesh及文档索引；报告artifacts/recovery-state-20261020.xml（不保证随Git迁移）。未做全仓回归、现场GUI或真实CST恢复；尚未提交/推送/打包。
 
 - 用户application.log补充：确认Collecting features、Creating Tetrahedral Mesh、Eigenmode solver、Post-Processing四种原生Header，补齐前两者及四类步骤的中文显示；样例回放等23 passed、26 deselected。该截段7项HOM模式被采用、末尾第8任务在网格阶段；没有进度百分比时序，不能据此解释100%的内部语义。来源/证据边界见[原生阶段记录](cst-native-progress-observation.md)，未新跑CST，原日志未复制进Git。
 

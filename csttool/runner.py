@@ -18,6 +18,7 @@ from .configuration import read_json, write_json_atomic
 from .execution_contract import StopIntent, validate_command
 from .hom_scan import ScanInterrupted
 from .runner_ownership import RunnerOwnership, protect_directory
+from .project_recovery_state import EXPLICIT_RECOVERY_STATES, persisted_project_status
 
 ACTIVE = {'PREPARING', 'RUNNING', 'STOPPING', 'RECOVERING'}
 
@@ -81,7 +82,24 @@ class Runner:
             document = read_json(checkpoint)
             self.status.update(coverage=document.get('coverage'),
                                mode_count=len(document.get('report', {}).get('modes', [])))
+        self._reconcile_project_state()
         self._save_status()
+
+    def _reconcile_project_state(self):
+        """Project recovery and session closure are separate facts, not aliases."""
+        if self.status['state'] in ACTIVE:
+            return
+        try:
+            status = persisted_project_status(self.project)
+            reason = f'项目状态为 {status}，请先执行显式恢复，再继续扫描' if status in EXPLICIT_RECOVERY_STATES else None
+        except Exception as exc:
+            status = 'UNREADABLE'
+            reason = f'项目配置无法核验，需恢复检查：{type(exc).__name__}: {exc}'
+        self.status['project_task_status'] = status
+        if reason and self.status['state'] != 'RECOVERY_REQUIRED':
+            self.status.update(state='RECOVERY_REQUIRED', phase='recovery-required',
+                previous_error=self.status.get('error'), error=reason, recovery_reason=reason)
+            self._save_status()
 
     def _save_status(self):
         self.status['version'] += 1
@@ -107,6 +125,7 @@ class Runner:
 
     def snapshot(self):
         with self.lock:
+            self._reconcile_project_state()
             remaining = max(0., 10 - (time.monotonic() - self.owner_seen)) if self.owner_client else 0.
             value = dict(self.status, owner_client=self.owner_client,
                          control_lease_valid=remaining > 0, control_lease_remaining=remaining,
@@ -184,6 +203,7 @@ class Runner:
         digest = hashlib.sha256(encoded).hexdigest()
         path = self.control / 'commands' / (command['request_id'] + '.json')
         with self.lock:
+            self._reconcile_project_state()
             if path.exists():
                 existing = read_json(path)
                 if existing['digest'] != digest:
@@ -256,6 +276,7 @@ class Runner:
                 self.stop_intent = StopIntent(self.control / 'runs' / str(run_id or 'recovery') / 'stop.json')
                 self.update(run_id=run_id, state='PREPARING' if op == 'start' else 'RECOVERING',
                             phase='initializing' if op == 'start' else 'recovering', error=None,
+                            recovery_reason=None,
                             session_safety='unknown', log_directory=None, last_progress=None,
                             completed_tasks=0, total_tasks=len(payload.get('tasks', [])))
                 self.worker = threading.Thread(target=self._execute, args=(op, payload), daemon=False)
@@ -295,13 +316,14 @@ class Runner:
                 if self.status['state'] == 'RECOVERY_REQUIRED':
                     target = 'RECOVERY_REQUIRED'
                 self.update(state=target, phase=target.lower(),
-                            session_safety='confirmed-closed' if target != 'RECOVERY_REQUIRED' else 'unknown')
+                            session_safety=self._session_safety(executor, target == 'RECOVERY_REQUIRED'))
         except Exception as exc:
             interrupted = isinstance(exc, ScanInterrupted)
             recovery = self._needs_recovery(executor)
             self.update(state='RECOVERY_REQUIRED' if recovery else ('INTERRUPTED' if interrupted else 'FAILED'),
+                        phase='recovery-required' if recovery else ('interrupted' if interrupted else 'failed'),
                         error=None if interrupted else f'{type(exc).__name__}: {exc}',
-                        session_safety='unknown' if recovery else 'confirmed-closed')
+                        session_safety=self._session_safety(executor, recovery))
         finally:
             try:
                 if executor:
@@ -318,6 +340,14 @@ class Runner:
         if self.worker and self.worker.is_alive():
             raise RuntimeError('cannot close active Runner')
         self.ownership.close()
+
+    @staticmethod
+    def _session_safety(executor, recovery):
+        try:
+            probe = getattr(executor, 'session_safety', None)
+            return probe() if callable(probe) else ('unknown' if recovery else 'confirmed-closed')
+        except Exception:
+            return 'unknown'
 
     @staticmethod
     def _needs_recovery(executor):
@@ -422,11 +452,20 @@ class LocalExecution:
         self.backend.request_stop()
 
     def recover(self):
+        if self._preprocessor_recovery_required():
+            raise RuntimeError('任务归属的预处理CST进程尚未确认退出，不能清除项目恢复状态')
         self.backend.recover_project_sessions()
 
     def recovery_required(self):
         if self.backend.is_recovery_required():
             return True
+        return self._preprocessor_recovery_required()
+
+    def session_safety(self):
+        return ('unknown' if self.backend.get_recovery_sessions() or self._preprocessor_recovery_required()
+                else 'confirmed-closed')
+
+    def _preprocessor_recovery_required(self):
         # Preprocessing owns CST too, but is not a Managed session.
         import psutil
         for path in self.project.glob('temp/cst-preprocess-*/session-status.json'):

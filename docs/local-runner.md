@@ -1,5 +1,7 @@
 # 独立本机 Runner：API、使用和恢复
 
+2026-10-20：增加[项目恢复状态对账](project-recovery-state-reconciliation.md)。空闲Runner在启动、查询和命令前核验project.ini；持久恢复门禁不能被FAILED或confirmed-closed掩盖。状态增加project_task_status，触发重对账时保留previous_error并说明recovery_reason；不自动续算。会话安全与项目可续跑性是独立事实。
+
 更新：2026-10-15。当前仅本机，尚不支持远程/分布式执行。
 
 审查修复（2026-10-15）：四项缺陷及配置/执行接口混合已处理；实现、故障验收及剩余边界见[修复记录](runner-audit-fix-20261015.md)。历史源码包不包含本轮修复。
