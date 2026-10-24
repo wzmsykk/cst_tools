@@ -5,6 +5,7 @@
 同一次执行按 `context.run_id` 筛选，再按 `context.worker`、`context.task` 或 `context.job` 缩小范围。`source.file/line/function` 是业务日志调用位置；`error.traceback` 是异常发生路径。用 `event` 搜索下表中的模块，定位相应实现。旧日志结合 `code.revision` 定位；`code.dirty=true` 表示包含未提交代码，单凭提交号不能完全复现。
 
 | 事件 | 实现模块 |
+| `CHECKPOINT_ADOPTION_RECONCILED` | `csttool/application_backend.py` |
 | --- | --- |
 | `LOG_RECORD_SKIPPED` | `csttool/event_replay.py` |
 | `LOG_RECORD_INVALID` | `csttool/event_replay.py` |
@@ -56,7 +57,6 @@
 | `WORKER_VACUUM_MATCH` | `csttool/managed_cstworker.py` |
 | `VACUUM_MODE_TRACKING` | `csttool/vacuum_mode_tracking.py` |
 | `VACUUM_DOMAIN_PREFLIGHT` | `csttool/vacuum_domain_registry.py` |
-| `WORKER_ALREADY_EXITED` | `csttool/managed_cstworker.py` |
 | `WORKER_STOP_REQUEST` | `csttool/managed_cstworker.py` |
 | `WORKER_STOP_RECOVERED` | `csttool/managed_cstworker.py` |
 | `WORKER_STOPPED` | `csttool/managed_cstworker.py` |

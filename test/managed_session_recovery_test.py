@@ -12,6 +12,7 @@ from csttool.runtime_protocol import (
     encode_stop_ack,
     new_session_id,
 )
+import pytest
 
 
 def test_recovery_acks_preserved_completion_and_waits_for_stop_ack(tmp_path):
@@ -46,3 +47,22 @@ def test_recovery_acks_preserved_completion_and_waits_for_stop_ack(tmp_path):
     assert completion.task_id == task_id
     assert (protocol.root / "current.ack").exists()
     assert not thread.is_alive()
+
+
+def test_existing_wrong_stop_request_is_rejected_without_waiting(tmp_path, monkeypatch):
+    protocol = FileProtocol(tmp_path)
+    protocol.request_stop(new_session_id())
+    before = (tmp_path / 'stop.request').read_bytes()
+    monkeypatch.setattr('csttool.managed_session_recovery.time.sleep',
+                        lambda value: pytest.fail('invalid request must not enter polling'))
+    with pytest.raises(ValueError, match='another'):
+        recover_and_stop_session(tmp_path, new_session_id(), timeout=1)
+    assert (tmp_path / 'stop.request').read_bytes() == before
+
+
+def test_observed_peer_exit_ends_wait_without_inventing_ack(tmp_path):
+    session_id = new_session_id()
+    completion = recover_and_stop_session(tmp_path, session_id, timeout=1,
+                                          peer_exited=lambda: True)
+    assert completion is None
+    assert not (tmp_path / 'stop.ack').exists()

@@ -691,11 +691,8 @@ class CSTManager:
     def adopt_result(self, task_id: str) -> None:
         path = self._received_paths.get(task_id)
         if path is not None:
-            receipt = read_json(path)
-            if receipt.get('phase') == 'algorithm_adopted':
-                return
-            write_json_atomic(path, {**receipt, 'phase': 'algorithm_adopted'})
-            self.run_store.event(task_id, 'algorithm_adopted')
+            from .checkpoint_adoption import mark_adopted
+            mark_adopted(path, self.run_store, task_id)
 
     def request_stop(self) -> None:
         """Stop dispatching new work without terminating the active solver."""

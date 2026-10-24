@@ -111,6 +111,26 @@ class RunnerClient:
                 time.sleep(.1)
         raise TimeoutError('Runner did not become ready; do not submit a second run')
 
+    def shutdown_and_wait(self, *, run_id=None, timeout=10):
+        """Standard shutdown; confirm OS ownership release, never kill or relaunch."""
+        self.connect(launch=False)
+        self.command('claim')
+        try:
+            self.command('shutdown', run_id=run_id)
+        except (OSError, ValueError):
+            # A lost response is not proof of failure or success; check ownership.
+            pass
+        end = time.monotonic() + timeout
+        while time.monotonic() < end:
+            try:
+                lease = RunnerOwnership(self.project / 'control/runner.lock').acquire()
+            except RuntimeError:
+                time.sleep(.1)
+            else:
+                lease.close()
+                return {'runner_stopped': True}
+        raise TimeoutError('Runner退出尚未确认；未强杀进程，请重新连接检查后台状态')
+
 
 def main():
     import argparse

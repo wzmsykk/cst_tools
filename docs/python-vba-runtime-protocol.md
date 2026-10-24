@@ -1,6 +1,22 @@
 # CST Python / VBA Runtime Protocol
 
+L5[采用标记对账](checkpoint-adoption-l5.md)补齐检查点确认后的receipt/RunStore状态，复用TaskID，Python/VBA wire格式不变；对账不触发Solver或重复导入。
+
+L5停止/ACK补验：成功received/acknowledged未被算法采用且Completion已清理时仍须恢复；恢复决定绑定received_task_id，不改变Task/ACK/close.receipt格式。十二个真实时点与已修缺口见[验收记录](stop-ack-l5-acceptance.md)。
+
+L5真实验收发现活动工程Save后可能变化，正常回执改引用独立.closed.cst Backup；Python/VBA固定token两端同步。已验收/未触发情形见[L5记录](close-v2-l5-acceptance.md)，不放宽退出1规则。
+
+2026-10-24 L4：[Runner/GUI事实与诊断](runner-lifecycle-l4.md)接入，不修改VBA wire格式，不以ACK/StopAck或日志推断采用与退出成功。L5真实运行仍待验收。
+
 状态：架构参考；wire format 与当前进度以最小协议和当前状态文档为准
+
+2026-10-24 L3：[生产宏状态/退役/v2发布](production-close-v2-l3.md)接入新会话；任务/ACK仍v1，新收尾回执v2，旧会话不修改。只完成源码/离线/假对端验收，不声称真实CST执行通过或可放行退出1。
+
+2026-10-24 L2增补：[收尾回执v2 API与静态门禁](close-receipt-v2.md)已实现，生产仍v1；新VBA库/契约宏只有源码检查，未真实执行。不是默认启用v2或接受退出1。
+
+2026-10-24：仅[L1关闭证据核验](session-closure-l1.md)实施。正常stop/发现/恢复统一使用独立进程/模型/退出事实；缺退出证据的旧会话保守恢复，活跃/未知不排除。VBA及v1格式不变，close.receipt v2及退出1解释仍pending。
+
+2026-10-20范围更新：[生命周期协议故障矩阵与L1–L5计划](python-vba-lifecycle-protocol-v2-plan.md)。任务结果、模型恢复、进程安全和结果采用分别判断；拟新增close.receipt v2并统一正常停止/发现/显式恢复，但尚未实施，不自动接受退出1。本文旧架构中的通用Manifest/动态Profile/legacy保留路线不是当前API要求；不能按名称或示例推测生产语义。
 
 2026-10-14补测：恢复重建及恢复快照/回执写入失败不发布StopAck，保留任务Failure及诊断；仅明确已死的隔离会话可按abandoned-dead收口，活跃/未知进程不得如此处理。见[P0-1故障验收](failed-rebuild-stop-recovery.md)。
 

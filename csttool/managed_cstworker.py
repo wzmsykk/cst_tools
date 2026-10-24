@@ -28,6 +28,8 @@ from .native_progress import NativeProgressTracker
 from .solver_output import SolverOutputTracker
 from .run_store import RunStore
 from .result_reconciliation import file_hash
+from .session_closure import (accepted_exit_code, collect_close_evidence, evaluate_closure,
+                              read_stop_evidence, write_close_verification)
 from .cst_memory_guard import MemoryGuardPolicy, MemorySamplingError, SustainedMemoryGuard, owned_process_memory
 from .diagnostics import archive_task, write_run_manifest, write_failure_report
 from .runtime_protocol import (
@@ -112,6 +114,7 @@ class ManagedCSTWorker:
         self.pid_path = self.root / "worker.pid"
         self._lock = threading.RLock()
         self._stopping = False
+        self._retiring = False
         self._process: subprocess.Popen | None = None
         self._memory_guard_policy = config.memory_guard
         self._log_stream = None
@@ -134,6 +137,9 @@ class ManagedCSTWorker:
             "last_good_parameters": Path(str(self.project_path) + '.last-good-parameters.tsv'),
             "recovery_snapshot": Path(str(self.project_path) + '.recovered.cst'),
             "recovery_receipt": Path(str(self.project_path) + '.recovery-saved'),
+            "close_protocol": self.root / 'close-protocol.json',
+            "close_receipt": self.protocol.root / 'close.receipt',
+            "close_snapshot": Path(str(self.project_path) + '.closed.cst'),
         }
         manifest = write_run_manifest(self.observation_root / "diagnostics.json", config, artifacts,
                                       context={"worker": worker_id, "session": self.session_id})
@@ -167,6 +173,8 @@ class ManagedCSTWorker:
                 paths={name: getattr(self, name, None) for name in (
                     'log_path', 'marker_path', 'task_path', 'completion_path',
                     'ack_path', 'stop_request_path', 'stop_ack_path')} | {
+                        'close_protocol': self.root / 'close-protocol.json',
+                        'close_receipt': self.root / 'protocol/close.receipt',
                         'lifecycle_log': observation / 'lifecycle.log',
                         'received_receipt': observation / 'received' / (
                             str(getattr(self, '_active_task_context', {}).get('task_id', 'unknown')) + '.json'),
@@ -188,6 +196,7 @@ class ManagedCSTWorker:
         codec = Path(resource_path("data/runtime_protocol_v1.vb")).read_text(
             encoding="utf-8"
         )
+        codec += '\n' + Path(resource_path('data/runtime_close_receipt_v2.vb')).read_text(encoding='utf-8')
         main = Path(resource_path("data/runtime_managed_worker_v1_main.vb")).read_text(
             encoding="utf-8"
         )
@@ -201,6 +210,7 @@ class ManagedCSTWorker:
             "%LIFECYCLE_PATH%": quote_vb_string(getattr(self, 'observation_root', self.root) / 'lifecycle.log'),
             "%STOP_REQUEST_PATH%": quote_vb_string(self.stop_request_path),
             "%STOP_ACK_PATH%": quote_vb_string(self.stop_ack_path),
+            "%CLOSE_RECEIPT_PATH%": quote_vb_string(self.task_path.parent / 'close.receipt'),
             "%RESULT_ROOT%": quote_vb_string(str(self.result_root) + "\\"),
         }
         for placeholder, value in replacements.items():
@@ -216,6 +226,9 @@ class ManagedCSTWorker:
         )
         if "%" in main or output.lower().count("sub main") != 1:
             raise ValueError("managed worker macro contains unresolved placeholders")
+        from .close_receipt import declare_close_protocol
+        self.close_protocol = 'v2'
+        declare_close_protocol(self.root, self.session_id, 'v2')
         self.macro_path.write_text(output, encoding="ascii", newline="\n")
         batch_script = self.project_path.with_suffix('') / 'Model' / '3D' / 'Model.run'
         batch_script.parent.mkdir(parents=True, exist_ok=True)
@@ -317,12 +330,40 @@ class ManagedCSTWorker:
             self._keep_window_minimized()
             if self.marker_path.exists():
                 marker = self.marker_path.read_text(encoding="ascii").strip()
-                if marker == expected:
+                if marker == expected or (expected == 'ready' and marker.startswith('ready:')):
                     return
                 if marker.startswith("failure:"):
                     raise RuntimeError(marker)
             time.sleep(0.1)
         raise TimeoutError(f"managed CST worker timed out waiting for {expected}")
+
+    @property
+    def retiring(self):
+        return getattr(self, '_retiring', False)
+
+    def _wait_task_ack(self, task):
+        if getattr(self, 'close_protocol', 'v1') == 'v1':
+            self._wait_for_marker('ready', self.START_TIMEOUT)
+            return 'ready'
+        from .runtime_protocol import decode_ack
+        accepted = Path(str(self.ack_path) + '.' + task.task_id + '.accepted')
+        deadline = time.monotonic() + self.START_TIMEOUT
+        while time.monotonic() < deadline:
+            self._ensure_running()
+            try:
+                marker = self.marker_path.read_text(encoding='ascii').strip()
+            except FileNotFoundError:
+                marker = ''
+            if marker in {'ready:' + task.task_id, 'retiring:' + task.task_id}:
+                if (not accepted.is_file() or decode_ack(accepted.read_text(encoding='ascii'))
+                        != Acknowledge(task.task_id, task.session_id)):
+                    raise RuntimeError('task ACK cleanup marker has no matching accepted receipt')
+                if not any(path.exists() for path in (self.task_path, self.completion_path, self.ack_path)):
+                    return marker.split(':', 1)[0]
+            if marker.startswith('failure:'):
+                raise RuntimeError(marker)
+            time.sleep(.1)
+        raise TimeoutError('managed CST worker timed out waiting for task-scoped ACK cleanup')
 
     def _ensure_running(self) -> None:
         if self._process is None:
@@ -356,8 +397,8 @@ class ManagedCSTWorker:
     @record_worker_usage
     def run_task(self, result_name: str, *, params: Mapping[str, Any]) -> SimulationResult:
         with self._lock:
-            if self._stopping:
-                raise RuntimeError("managed CST worker is stopping")
+            if self._stopping or self.retiring:
+                raise RuntimeError("managed CST worker is stopping or retiring")
             self._wait_for_marker("ready", self.START_TIMEOUT)
             task = Task.create(
                 self.session_id,
@@ -368,6 +409,7 @@ class ManagedCSTWorker:
             if hasattr(self, 'postprocess_settings'):
                 write_json_atomic(self.root / 'task-context.json', {
                     'schema_version': 1, 'task_id': task.task_id, 'session_id': task.session_id,
+                    'close_protocol': getattr(self, 'close_protocol', 'v1'),
                     'job': result_name, 'parameters': dict(params),
                     'postprocess': self.postprocess_settings,
                     'result_root': str((self.result_root / task.task_id).resolve()),
@@ -471,12 +513,15 @@ class ManagedCSTWorker:
                         Acknowledge(task.task_id, task.session_id),
                     )
                     self.logger.debug("接收记录已保存，任务确认已发送，等待CST回到就绪状态", extra={"event": "TASK_ACK_PUBLISHED", "phase": "ack", "task": task.task_id, "job": result_name})
-                    self._wait_for_marker("ready", self.START_TIMEOUT)
-                    write_json_atomic(receipt_path, {**received, 'phase': 'acknowledged'})
+                    ack_state = self._wait_task_ack(task)
+                    self._retiring = ack_state == 'retiring' or status == 'Failure'
+                    write_json_atomic(receipt_path, {**received, 'phase': 'acknowledged',
+                                                   'worker_state': 'retiring' if self.retiring else 'ready'})
                     if getattr(self, 'run_store', None) is not None:
                         self.run_store.event(task.task_id, 'acknowledged')
-                    self.logger.info("任务确认完成，CST已回到就绪状态", extra={"event": "TASK_ACK_READY", "phase": "ack", "task": task.task_id, "job": result_name, "result_status":status})
+                    self.logger.info("任务确认清理完成，Worker状态=%s", 'retiring' if self.retiring else 'ready', extra={"event": "TASK_ACK_READY", "phase": "ack", "task": task.task_id, "job": result_name, "result_status":status, "worker_state": 'retiring' if self.retiring else 'ready'})
                 except Exception as exc:
+                    self._retiring = True
                     if getattr(self, 'run_store', None) is not None:
                         try:
                             self.run_store.event(task.task_id, 'ack_pending', error=str(exc))
@@ -546,6 +591,7 @@ class ManagedCSTWorker:
                     except Exception as exc:
                         # Mark this as an already-completed result, so Manager
                         # cannot replay Solver to repair an analysis receipt.
+                        self._retiring = True
                         raise ManagedAcknowledgmentPending(receipt_path, exc) from exc
             log_method = self.logger.info if status == "Success" else self.logger.error
             log_method(
@@ -749,50 +795,52 @@ class ManagedCSTWorker:
         with self._lock:
             if self._process is None:
                 return True
-            if self._process.poll() is not None:
-                if self.protocol.read_stop_ack(self.session_id) is None or not self._stop_exit_is_confirmed():
-                    self._close_log()
-                    self._diagnose_failure("shutdown")
-                    raise ManagedWorkerShutdownError("CST exited without verified StopAck and exit code 0")
-                self.logger.debug("CST 进程已结束，无需重复退出 | WORKER_ALREADY_EXITED worker=%s session=%s returncode=%s", self.ID, self.session_id, self._process.poll(), extra={"event": "WORKER_ALREADY_EXITED", "phase": "readout", "worker": self.ID, "session": self.session_id, "returncode": self._process.poll()})
-                self._close_log()
-                self._finish_domain_registration()
-                return True
             self._stopping = True
-            self.logger.info(
-                "已请求CST标准退出，等待保存回执与进程结束",
-                extra={"event": "WORKER_STOP_REQUEST", "phase": "shutdown", "worker": self.ID, "session": self.session_id, "pid": getattr(self._process, "pid", None)})
-            if not self.stop_request_path.exists():
-                self.protocol.request_stop(self.session_id)
+            if self._process.poll() is None:
+                self.logger.info(
+                    "已请求CST标准退出，等待保存回执与进程结束",
+                    extra={"event": "WORKER_STOP_REQUEST", "phase": "shutdown", "worker": self.ID, "session": self.session_id, "pid": getattr(self._process, "pid", None)})
+                if not self.stop_request_path.exists():
+                    self.protocol.request_stop(self.session_id)
+                else:
+                    self.protocol.read_stop_request(self.session_id)
             deadline = time.monotonic() + self.STOP_TIMEOUT
-            while time.monotonic() < deadline:
-                if self.protocol.read_stop_ack(self.session_id) is not None:
-                    try:
-                        self._process.wait(timeout=max(0.1, deadline - time.monotonic()))
-                    except subprocess.TimeoutExpired:
-                        break
-                    if not self._stop_exit_is_confirmed():
-                        break
+            while True:
+                assessment = self._shutdown_assessment()
+                if assessment.standard_closed:
+                    write_close_verification(self.root, getattr(self._process, 'pid', None), assessment)
                     self._close_log()
                     self.logger.info(
-                        "CST标准退出已确认，本会话已关闭", extra={"event": "WORKER_STOPPED", "phase": "shutdown", "worker": self.ID, "session": self.session_id})
+                        "CST标准退出已确认，本会话已关闭", extra={"event": "WORKER_STOPPED", "phase": "shutdown", "worker": self.ID, "session": self.session_id, "closure": assessment.disposition, "returncode": assessment.exit_code})
+                    if assessment.exit_code == 4:
+                        self._stop_exit_is_confirmed()  # Retain the existing recovered-4 warning.
                     self._finish_domain_registration()
                     return True
-                if self._process.poll() is not None:
+                if (assessment.process_state == 'exited' or time.monotonic() >= deadline
+                        or any(reason.startswith(('stop-ack-invalid', 'close-protocol-invalid')) for reason in assessment.missing_evidence)):
                     break
                 time.sleep(0.1)
 
+            write_close_verification(self.root, getattr(self._process, 'pid', None), assessment)
             if self._process.poll() is not None:
                 self._close_log()
             self._diagnose_failure("shutdown")
-            self.logger.error("CST标准退出未确认；保留会话，请先执行恢复", extra={"event": "WORKER_STOP_FAILED", "phase": "shutdown", "worker": self.ID, "session": self.session_id, "returncode": self._process.poll(), "process_alive": self._process.poll() is None, "timeout_seconds": self.STOP_TIMEOUT, "recovery_hint":"核对StopAck、快照及本任务进程，不强杀独立实例"})
+            self.logger.error("CST标准退出未确认；保留会话，请先执行恢复", extra={"event": "WORKER_STOP_FAILED", "phase": "shutdown", "worker": self.ID, "session": self.session_id, "returncode": assessment.exit_code, "process_state": assessment.process_state, "model_state": assessment.model_state, "missing_evidence": assessment.missing_evidence, "timeout_seconds": self.STOP_TIMEOUT, "recovery_hint":"核对StopAck、快照及本任务进程，不强杀独立实例"})
             raise ManagedWorkerShutdownError(
                 f"worker {self.ID} did not confirm Save/StopAck/batch exit; " + (
                     "process already exited; reconcile preserved protocol and snapshot"
-                    if self._process.poll() is not None else
-                    "process is still running; session recovery is required"
-                )
+                    if assessment.process_state == 'exited' else
+                    "process is still running or unknown; session recovery is required"
+                ) + '; missing=' + ', '.join(assessment.missing_evidence)
             )
+
+    def _shutdown_assessment(self):
+        from .project_session_recovery import _process_tree_is_alive
+        code = self._process.poll()
+        pid = getattr(self._process, 'pid', None)
+        alive = True if code is None else _process_tree_is_alive(pid) if type(pid) is int else None
+        return evaluate_closure(collect_close_evidence(self.root, self.session_id, alive, code,
+            project_path=self.project_path, expected_close_protocol=getattr(self, 'close_protocol', None)))
 
     def _finish_domain_registration(self):
         """Only after verified standard exit; optional analysis never replays Solver."""
@@ -800,7 +848,11 @@ class ManagedCSTWorker:
             return
         if self._process is None or self._process.poll() is None:
             raise RuntimeError('domain registration requires a confirmed stopped CST process')
-        if self.protocol.read_stop_ack(self.session_id) is None or not self._stop_exit_is_confirmed():
+        if getattr(self, 'close_protocol', 'v1') == 'v2':
+            verified = self._shutdown_assessment().standard_closed
+        else:
+            verified = self.protocol.read_stop_ack(self.session_id) is not None and self._stop_exit_is_confirmed()
+        if not verified:
             raise RuntimeError('domain registration requires verified StopAck and standard exit')
         from .vacuum_domain_registry import register_vacuum_domain
         from .field_artifacts import SamplingSpec
@@ -897,22 +949,13 @@ class ManagedCSTWorker:
     def _stop_exit_is_confirmed(self) -> bool:
         """Exit 4 remains a task error; accept shutdown only with own saved recovery."""
         code = self._process.poll()
-        if code == 0:
-            return True
-        if code != 4:
-            return False
         project = getattr(self, 'project_path', None)
         if project is None:
-            return False
-        receipt = Path(str(project) + '.recovery-saved')
+            return code == 0
         snapshot = Path(str(project) + '.recovered.cst')
-        try:
-            valid = (receipt.read_text(encoding='ascii').splitlines()
-                     == ['CST_RECOVERY_SAVED_V1', self.session_id]
-                     and snapshot.is_file() and snapshot.stat().st_size > 0)
-        except (OSError, UnicodeError):
-            return False
-        if valid:
+        _, recovered, _ = read_stop_evidence(project.parent, self.session_id, project_path=project)
+        valid = accepted_exit_code(code, recovered)
+        if valid and code == 4:
             self.logger.warning('失败任务后已恢复快照并标准退出；保留CST退出码4 | WORKER_STOP_RECOVERED session=%s snapshot=%s',
                                 self.session_id, snapshot,
                                 extra={'event': 'WORKER_STOP_RECOVERED', 'phase': 'shutdown',

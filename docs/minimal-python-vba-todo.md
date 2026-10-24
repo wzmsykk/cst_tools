@@ -1,9 +1,25 @@
 # 最小 Python / VBA 协议 TODO
 
-状态：P0–P7 已完成；当前实施记录
+状态：历史P0–P7已完成；生命周期L1–L4已接入，L5已有部分真实CST验收；2026-10-25追加真实HOM恢复对照，完整矩阵仍有未完成项，以本页勾选项及当前状态为准。
 当前总览：[CST Tools 当前状态与实施路线](./current-status.md)
 
 设计依据：[最小 Python / VBA Runtime Protocol](./minimal-python-vba-protocol.md)
+
+## 当前优先：生命周期协议L1–L5（2026-10-24更新）
+
+- [x] 2026-10-25真实HOM中断补验：小网格Pillbox基线及checkpoint/received/solver三个Runner退出窗口通过；每例实际Solver5次与基线提交序列一致，确认覆盖/旧结果/四场哈希不破坏、两次recover不改检查点、采用事件/CSV无重复。修复生产相对快照路径与cwd混淆。见[记录及范围](hom-interruption-l5-acceptance.md)；不扩大为长扫描/全后处理/掉电保证。
+- [ ] 评估小网格扩窗产生的频率漂移：本轮基线约503.495→503.583MHz被登记为近频结果，不能据此断言独立物理模式；需固定网格或场匹配另做物理判别验收，不与恢复幂等混为一谈。
+
+完整语义、故障矩阵、兼容范围与门禁见[生命周期修订计划](python-vba-lifecycle-protocol-v2-plan.md)。不把退出1加入白名单，不把旧Gate数字当新增情形验收。
+
+- [x] L1：统一证据事实模型及关闭核验，正常stop/发现/显式恢复共用；修复活跃/未知进程误排除、解析匹配StopAck，记录Python退出观测；历史无退出码已死会话显式放弃。任务/采用无可靠来源仍unknown，完整采集属于L4。见[L1实施](session-closure-l1.md)，不代表v2或真实CST已验收。
+- [x] L2：静态close_protocol版本和close.receipt v2两端codec、四组golden；原子发布、严格身份/冲突检查，损坏v2不降级v1。见[v2说明](close-receipt-v2.md)；隔离契约宏已生成/检查，真实WinWrap执行和生产启用仍pending，不代表L3–L5完成。
+- [x] L3：新生产会话生成v2、实际收尾writer及分阶段事实；失败ACK后retiring；求解后失败保留产物不盲目Rebuild；Python任务级ACK与退役配套。见[L3边界](production-close-v2-l3.md)，仅离线/假对端及源码契约，不是L5真实CST通过。
+- [x] L4：正常stop/发现/显式恢复/Runner使用同一核验规则；ACK清理完成关联task，错误/缺证据与源码展示，物理安全独立于结果待对账，覆盖/采用不由诊断修改。见[实现与边界](runner-lifecycle-l4.md)，不代表L5真实验收。
+- [ ] L5完整矩阵：真实启动/正常单模/无结果/重建失败恢复退出4和七阶段故障已核验，修复活动文件变化导致的快照失配。已有[十二个停止/ACK时点](stop-ack-l5-acceptance.md)及[六类实际Controller/GUI进程退出](controller-exit-l5-acceptance.md)，修复未采用received漏发现、收尾活跃状态及归档旧路径。真正Start=0/Start异常、退出1、整机掉电/文件系统崩溃、索引未发布的部分rename窗口、任意指令级停止、API自身Save/恢复失败及大文件仍pending。
+- [x] 采用标记对账：标准检查点与HOM已采用TaskID核验后补齐receipt/RunStore；普通采用也幂等，事件/索引/receipt部分写入可续补。真实标准双任务三个退出窗口、两次recover、不重复导入候选/采用事件/求解已通过；HOM多模式/空任务为离线验证。见[采用对账](checkpoint-adoption-l5.md)。不将此范围扩大为任意算法切换、真实HOM、掉电/文件系统损坏的全组合保证。
+
+10月20日仅文档修订；10月24日L1改变Python停止/发现/恢复核验，VBA wire仍v1。以下P0–P7及“明确不做”为历史阶段范围，不能解释为禁止当前已出现实际需求的持久恢复、产物校验或后续生命周期扩展；也不表示通用RPC/多Transport已进入范围。
 
 ## P0：修复现有确定缺陷
 

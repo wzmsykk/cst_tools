@@ -1,11 +1,63 @@
 # CST Tools 当前状态与实施路线
 
-状态日期：2026-10-20
+状态日期：2026-10-25
 历史提交基线：`3717a04`（P0-1停止恢复、故障验收与文档索引）；后续提交包含场故障验收、共同域、Pillbox双网格与真空腔追踪第一版，准确提交身份以Git日志为准。
 
 本文是项目当前状态的权威入口。历史设计文档仍保留其分析价值；若与本文或[最小 Python/VBA 协议 TODO](./minimal-python-vba-todo.md)冲突，以本文和已经通过的真实 CST Gate 为准。
 
-## 最新状态与近期TODO（2026-10-20）
+## 最新状态与近期TODO（2026-10-25）
+
+- 2026-10-25真实HOM恢复补验通过：[小网格Pillbox记录](hom-interruption-l5-acceptance.md)。修复HOM检查点相对快照路径被误按cwd解析的问题；采用核验现以项目根目录解析，原路径/身份/SHA256门禁保留。cell=8、nmodes=1、480–530MHz，checkpoint/received/solver三个Runner退出窗口每例Solver均5次，与无中断基线的任务参数顺序一致；两次recover不改确认检查点、旧结果/四场哈希保留、采用事件/CSV无重复。汇总artifacts/hom-interruption-l5-verification-20261025.json，不保证随Git迁移。
+- 本轮离线其余套件776 passed、21 integration deselected（154.53s），主窗口34 passed（1.05s），专项79 passed（6.73s，重叠）。初次受限回归假对端ACK读取PermissionError未计通过，正常权限复验不证明偶发问题消失。实际孤立旧CST丢失退出码按abandoned-dead收口、不伪造标准退出；会话均无活跃进程/恢复阻断。基线扩窗存在近频结果漂移，独立物理模式判别仍TODO，未称十模/全复杂后处理/掉电通过。未提交/打包。
+- 本轮Runner全部离线、CST清单为空、原工程哈希不变；已清理193296796字节（约184.3MiB）模型/原始场及pytest临时目录，保留轻量报告/宏/日志/标记及cleanup.json哈希。原始模型需重新生成后才能严格复核，不能再直接使用验收目录旧路径恢复。
+
+- L5采用标记补齐：[检查点对账](checkpoint-adoption-l5.md)。标准results与HOM已采用TaskID为权威，先核验身份/参数/后处理及快照哈希，再补齐所属RunStore日志/索引和receipt；普通Manager采用也复用幂等写入，不再因receipt已标记而漏补RunStore。Backend在显式恢复和resume准备的项目锁内对账，检查点/模型/覆盖不改、不新建Task、不导入或求解。
+- 真实Pillbox双任务三个Runner退出窗口通过：采用尚未开始、事件已写索引未写、索引已写receipt未写。每例recover两次标记字节稳定、每个所属RunStore对同Task采用事件一条、旧Task不再成为导入候选，原检查点/快照/场不变、Solver总数仍2。汇总artifacts/checkpoint-adoption-l5-verification-20261024.json，不保证随Git迁移。HOM多模式/空任务为离线验证，真实HOM及掉电等仍pending。
+- 采用补写本轮最终离线768 passed、21 integration deselected（167.10s），主窗口34 passed（1.28s），采用/日志/恢复/后端/索引专项85 passed（7.99s，含重叠）。报告artifacts/checkpoint-adoption-l5-{offline,window,focused}-20261024.xml。已确认检查点/模型无修改、无强杀CST；未提交/打包。
+- 本轮三个测试Runner已离线、正常权限CST清单为空、原Pillbox哈希不变。已清理93488634字节（约89.2MiB）模型/原始场及pytest临时目录，保留标记/检查点/报告/日志/宏和cleanup.json哈希；原始产物需重新生成后才能复核。
+
+- L5 Controller/GUI真实进程退出补验：[六类记录](controller-exit-l5-acceptance.md)。实际结束本轮GUI/Runner Python（不结束CST），覆盖GUI重连、求解区间、Completion未接收、received未ACK、归档重命名后、检查点确认后。六类均保持首项TaskID/工程哈希，全部两任务只调用Solver两次；后四类额外复核首项四个场/能量文件哈希。汇总artifacts/controller-exit-l5-verification-20261024.json，不保证随Git迁移。
+- 本轮修复：新增HTTP快照execution_active，避免IDLE标签先于线程释放导致GUI过早就绪；根据既有同Task/Session归档索引＋原快照哈希修复receipt旧路径，坏证据仍阻断，不改模型/确认检查点、不重算。收尾竞态和归档路径各保留一轮失败证据；不计为通过。检查点确认但采用标记未落盘用例按pending_index=2续跑不重算，receipt仍acknowledged，标记补写/跨算法导入另列TODO。
+- 进程退出本轮离线746 passed、21 integration deselected（90.83s），主窗口34 passed（1.27s），退出/GUI/恢复/协议/文档与日志索引专项50 passed（40.24s，含重叠）。报告artifacts/controller-exit-l5-{offline,window,focused}-20261024.xml。六类真实通过不等于完整HOM/掉电/任意指令级故障通过；原工程未改，无强杀CST，所有测试Runner已离线；未提交/打包。
+- 本轮六个验收目录已清理249267286字节（约237.7MiB）模型/原始场及pytest临时副本，保留汇总、成功/失败报告、宏、日志、检查点/接收/恢复记录及cleanup.json哈希清单。原始产物需再生成，不能再直接用原模型路径复核。
+
+- L5停止/ACK补验：[十二时点记录](stop-ack-l5-acceptance.md)。真实复现并修复ACK清理后Completion消失但成功received未采用时漏发现恢复：当前任务接收记录也参与发现，新增received-result-not-reconciled，显式恢复绑定received_task_id，物理标准退出与未采用结果分开。Task/Completion/ACK/v2收尾wire不改，旧后台需正常退出后更新。
+- 十二个选定停止/ACK时点通过（含错误session/截断ACK）；两种取消后中断快照E/H与活动场哈希相同；已完成任务每例只Solver一次、实际Manager幂等采用一次。汇总artifacts/stop-ack-l5-verification-20261024.json（不保证随Git迁移）。探针误接inbox轮及修复前ack-accepted漏恢复轮保留失败证据，不计通过。OS级Controller/GUI崩溃、任意指令级停止、Start=0/Start异常/退出1等仍pending。
+- 本轮离线739 passed、21 integration deselected（145.55s），主窗口34 passed（1.31s），协议/恢复/覆盖/文档专项77 passed（3.96s，含重叠）。报告artifacts/stop-ack-l5-{offline,window,focused}-20261024.xml。所有CST副本正常批退出，原工程未改、未强杀；未提交/打包。
+- 停止/ACK本轮六个目录已清理约177.4MiB模型/原始场及pytest临时目录；保留轻量证据、错误ACK及cleanup.json哈希，原始模型/场需重新生成后才能复核。最终正常用户权限进程清单为空，原Pillbox哈希不变。
+
+- L5部分真实验收：[WinWrap/CST串行记录](close-v2-l5-acceptance.md)。发现Save后至批退出活动.cst大小变化，修正正常回执引用独立.closed.cst Backup，双端codec固定允许列表同步，严格长度/身份校验和退出1规则不变。新token要求两端同批更新，不热替换旧会话。
+- 已真实通过：启动即关闭、cell=8单模503.605585MHz及退出0；nmodes=0重建失败退役/恢复回执/退出4；open边界Start=1但无数据库判失败、保存与退出0独立成立。七阶段故障日志/错误码/进程/显式恢复核验通过，restore/save为明确入口异常注入，其他为真实非法参数/写入失败。缺回执及无效StopAck仍保留恢复阻断。真正Start=0/Start异常、退出1、全停止时序仍pending，不称L5全量完成。
+- L5追加：WinWrap四组golden全部实际读写/幂等/冲突拒绝并退出0；真实求解后后处理入口异常，四个E/H/能量.m3t收尾前后哈希相同、不恢复Rebuild，任务失败与标准退出0分开成立。离线729 passed、21 integration deselected（157.40s），主窗口34 passed（1.42s），最终协议/Worker/文档及日志索引专项132 passed（12.03s，含重叠）。报告artifacts/close-l5-{offline,window,focused}-20261024.xml；不保证随Git迁移。无强杀、原工程哈希不变，未提交/打包。
+- 本轮十个L5验收目录的模型/原始场已清理约80.3MiB，保留轻量报告/日志/宏/参数和cleanup.json哈希；现存数据不能再直接重验原快照，需要先重新生成。原工程、测试夹具及此前用户删除改动未动。
+
+- L4源码接入：[Runner/GUI事实传播](runner-lifecycle-l4.md)。进程退出/任务/模型/结果登记独立显示，标准关闭但Completion待对账不再等同unknown进程；异常原因链及源码跨HTTP保留，清理异常单列。进度事件限频采集、最终刷新、重连历史标记；不修改覆盖/采用门禁。L5真实CST/WWB及现场视觉仍pending。
+
+- L4离线回归724 passed、21 integration deselected（155.42s），主窗口独立34 passed（1.29s）；最后增补的事实/GUI/恢复/文档与日志索引专项40 passed（39.47s，含重叠）。全仓报告采集在最后两项故障测试及明细限量测试加入前，增补门禁由专项覆盖，不称最终全仓总数。报告artifacts/close-l4-{offline,window,focused}-20261024.xml，不保证随Git迁移。未启动真实CST、未提交/打包。
+
+- L3已接入源码：[生产状态/失败退役/v2发布](production-close-v2-l3.md)。新Managed会话生成v2，采集task/model状态，失败ACK后retiring不再收任务；求解后的失败保留当前模型/结果不Rebuild，实际Save→v2回执→合法StopAck→批返回。Python匹配task级ACK清理并拒绝复用，关闭证据保留独立失败/保存事实。旧会话不改，退出1不放行。尚未真实WinWrap/CST验收，L4–L5仍pending；下方L2“生产仍v1”为当时状态。
+
+- L3最终离线713 passed、21 integration deselected（142.87s），主窗口独立34 passed，分组747项；最终假对端/恢复/文档专项22 passed（5.74s，含重叠）。报告artifacts/close-l3-{offline,window,focused}-20261024.xml（不保证随Git迁移）。保留未执行的生产宏样本及哈希artifacts/close-v2-l3-production-20261024；无有效模型、未编译运行。受限专项曾有一次假对端PermissionError，未确定权限策略或共享时序根因；提升权限同专项及全量通过，不证明偶发问题消除。临时副本结束后清理；未提交、打包或启动CST。
+
+- L2已实现：[收尾回执v2](close-receipt-v2.md)包含Python/VBA codec、四组golden、静态版本声明、原子/幂等写入及防降级门禁、隔离WWB契约宏生成/产物校验。生产Managed仍显式v1，不启用新CloseSession状态机，退出1不放行；VBA只有源码契约检查、未真实编译执行，L3–L5仍pending。
+
+- L2最终离线695 passed、21 integration deselected（144.78s），主窗口独立34 passed，分组729项；专项123 passed（3.17s，含重叠）。报告artifacts/close-v2-{offline,window,focused}-20261024.xml（不保证随Git迁移）。保留未执行的微型契约工作空间artifacts/close-v2-contract-20261024-startup及宏哈希；其中8字节.cst只是codec夹具，不是模型。临时pytest副本已结束并清理，未真实CST、未提交或打包。
+
+- 2026-10-24实施L1：[统一关闭证据核验](session-closure-l1.md)接入正常stop/发现/显式恢复；活跃或未知进程不能被stopped/StopAck排除，回执需身份校验，历史无退出码的已死会话显式记为放弃而非标准关闭。新增Python退出观测文件；Task/ACK及VBA保持v1，退出1仍拒绝。L2–L5仍pending，以下10月20日“未实施”是当时状态，不覆盖本轮验收。
+
+- L1验收（2026-10-24）：提升权限离线639 passed、21 integration deselected（136.91s），主窗口独立34 passed，按两组673项；报告artifacts/lifecycle-l1-{offline,window}-20261024.xml（不保证随Git迁移）。之前受限回归一次事件索引未同步、一次结果目录rename WinError5，均保留边界，不计通过；已同步索引后同套提升权限通过。未启动真实CST，不证明退出1原因或L2–L5完成。
+
+- L1最终证据/文档专项40 passed（1.38s），含最后补充的协议等待＋进程退出共用期限测试；其余与上述分组重叠，不将40再次加总。报告artifacts/lifecycle-l1-focused-20261024.xml；测试临时副本结束后清理，轻量报告保留。
+
+- 协议审计与范围更新（设计，未实施）：增加[生命周期故障矩阵及L1–L5](python-vba-lifecycle-protocol-v2-plan.md)，分开任务结果/模型收尾/进程安全/结果采用；计划close.receipt v2、失败后退役、求解后结果保护及统一关闭核验。当前退出码规则不变，不接受退出1捷径；会话发现活跃/未知进程误排除等列为优先待修复，旧验收不覆盖新范围。协议主体、TODO及知识库同步。
+
+- 范围文档本轮检查31 passed（1.57s）：文档索引、现行Codec/VBA/ACK/停止及会话恢复；报告artifacts/protocol-scope-20261020.xml（不保证随Git迁移）。未实现v2或新故障矩阵，未启动CST，不据此宣称已修复发现/退出漏洞。
+
+- GUI新增当前项目“后台管理”：身份/源码位置、连接/启动、控制权、停止/恢复及确认后正常退出；退出核验OS所有权释放，成功后保持离线，不自动启动。旧Runner身份缺失显示未知，安全门禁不绕过。实现与未完成现场验收见[后台管理](gui-runner-management.md)；本轮不启动真实CST，未提交/打包。
+
+- 后台管理验收：相关链91 passed、主窗口34 passed、主题5 passed，分组130项。组合主窗口/主题此前Qt提前退出不计通过；分开复验不证明该原生退出问题已消除。报告artifacts/runner-management{,-window,-theme}-20261020.xml（不保证随Git迁移）。没有现场桌面或真实CST验收。
+
+- 离线后允许选择其他项目的最后调整：GUI/文档专项12 passed，与上述测试重叠，不另计130项；报告artifacts/runner-management-touchup-20261020.xml。测试临时目录已清理，可重新生成。
 
 - 2026-10-20恢复状态修正：统一持久项目门禁、后端与Runner的恢复判定；会话关闭与项目对账分开表达。显式恢复在同一项目锁内加载配置、收口会话、核验检查点/快照并持久写入INTERRUPTED，之后才报告完成。背景、兼容与现场待办见[恢复状态对账](project-recovery-state-reconciliation.md)。本轮不启动真实CST，以下旧验收数字不代表本次代码。
 

@@ -10,6 +10,7 @@ import logging
 import os
 from pathlib import Path
 import secrets
+import sys
 import threading
 import time
 from uuid import uuid4
@@ -54,9 +55,11 @@ class Runner:
             old = read_json(previous)
             for key in ('run_id', 'state', 'phase', 'error', 'session_safety', 'last_progress',
                         'log_directory', 'log_history', 'coverage', 'mode_count',
-                        'completed_tasks', 'total_tasks', 'artifacts'):
+                        'completed_tasks', 'total_tasks', 'artifacts', 'lifecycle', 'error_diagnostic', 'cleanup_diagnostic'):
                 if key in old:
                     self.status[key] = old[key]
+            if self.status.get('lifecycle'):
+                self.status['lifecycle'] = dict(self.status['lifecycle'], historical=True)
             if old.get('state') in ACTIVE or old.get('state') == 'RECOVERY_REQUIRED':
                 self.status['state'] = 'RECOVERY_REQUIRED'
                 self.status['phase'] = 'recovery-required'
@@ -128,6 +131,11 @@ class Runner:
             self._reconcile_project_state()
             remaining = max(0., 10 - (time.monotonic() - self.owner_seen)) if self.owner_client else 0.
             value = dict(self.status, owner_client=self.owner_client,
+                         execution_active=bool(self.executor is not None
+                             or self.worker and self.worker.is_alive()
+                             or self.stop_delivery and self.stop_delivery.is_alive()),
+                         runtime={'pid': os.getpid(), 'python': sys.executable,
+                                  'source_root': str(Path(__file__).resolve().parents[1])},
                          control_lease_valid=remaining > 0, control_lease_remaining=remaining,
                          control_revision=self.control_revision)
         return value
@@ -277,6 +285,7 @@ class Runner:
                 self.update(run_id=run_id, state='PREPARING' if op == 'start' else 'RECOVERING',
                             phase='initializing' if op == 'start' else 'recovering', error=None,
                             recovery_reason=None,
+                            lifecycle=None, error_diagnostic=None, cleanup_diagnostic=None,
                             session_safety='unknown', log_directory=None, last_progress=None,
                             completed_tasks=0, total_tasks=len(payload.get('tasks', [])))
                 self.worker = threading.Thread(target=self._execute, args=(op, payload), daemon=False)
@@ -291,7 +300,9 @@ class Runner:
         try:
             executor.request_stop()
         except Exception as exc:
-            self.update(state='RECOVERY_REQUIRED', error=f'stop failed: {exc}', session_safety='unknown')
+            from .lifecycle_diagnostics import error_diagnostic
+            self.update(state='RECOVERY_REQUIRED', error=f'stop failed: {exc}', session_safety='unknown',
+                        error_diagnostic=error_diagnostic(exc, 'stop-delivery'))
 
     def _execute(self, operation, payload):
         executor = None
@@ -320,17 +331,35 @@ class Runner:
         except Exception as exc:
             interrupted = isinstance(exc, ScanInterrupted)
             recovery = self._needs_recovery(executor)
+            from .lifecycle_diagnostics import error_diagnostic
             self.update(state='RECOVERY_REQUIRED' if recovery else ('INTERRUPTED' if interrupted else 'FAILED'),
                         phase='recovery-required' if recovery else ('interrupted' if interrupted else 'failed'),
                         error=None if interrupted else f'{type(exc).__name__}: {exc}',
-                        session_safety=self._session_safety(executor, recovery))
+                        session_safety=self._session_safety(executor, recovery),
+                        error_diagnostic=None if interrupted else error_diagnostic(exc, self.status.get('phase')))
         finally:
             try:
                 if executor:
                     executor.close()
             except Exception as exc:
-                self.update(state='RECOVERY_REQUIRED', error=f'cleanup failed: {exc}', session_safety='unknown')
+                from .lifecycle_diagnostics import error_diagnostic
+                self.update(state='RECOVERY_REQUIRED', error=f'cleanup failed: {exc}', session_safety='unknown',
+                            cleanup_diagnostic=error_diagnostic(exc, 'cleanup'))
             finally:
+                probe = getattr(executor, 'lifecycle_facts', None)
+                if callable(probe):
+                    try:
+                        facts = probe()
+                        values = dict(lifecycle=facts, session_safety=facts['session_safety'])
+                        if facts.get('recovery_required'):
+                            values.update(state='RECOVERY_REQUIRED', phase='recovery-required')
+                        self.update(**values)
+                    except Exception as exc:
+                        from .lifecycle_diagnostics import error_diagnostic
+                        self.update(state='RECOVERY_REQUIRED', phase='recovery-required',
+                            session_safety='unknown', lifecycle=dict(
+                            schema_version=1, session_safety='unknown',
+                            diagnostic=error_diagnostic(exc, 'lifecycle-probe')))
                 with self.lock:
                     self.executor = None
                     if self.status['run_id'] and self.status['state'] not in ACTIVE:
@@ -413,7 +442,22 @@ class LocalExecution:
         self.backend._run_overview = self.overview
         self.backend.alg.checkpoint_listener = lambda report, pending, coverage: self.update(
             coverage=coverage, mode_count=len(report.modes))
-        self.backend.add_progress_listener(lambda event: self.update(last_progress=asdict(event)))
+        self._last_lifecycle_observation = 0.
+        self.backend.add_progress_listener(self._progress)
+
+    def _progress(self, event):
+        values = dict(last_progress=asdict(event))
+        if time.monotonic() - self._last_lifecycle_observation >= 5:
+            self._last_lifecycle_observation = time.monotonic()
+            try:
+                values['lifecycle'] = self.lifecycle_facts()
+                values['session_safety'] = values['lifecycle']['session_safety']
+            except Exception as exc:
+                from .lifecycle_diagnostics import error_diagnostic
+                values['session_safety'] = 'unknown'
+                values['lifecycle'] = dict(schema_version=1, session_safety='unknown',
+                    diagnostic=error_diagnostic(exc, 'lifecycle-probe'))
+        self.update(**values)
 
     def run(self, payload):
         self.stop.check()
@@ -462,8 +506,16 @@ class LocalExecution:
         return self._preprocessor_recovery_required()
 
     def session_safety(self):
-        return ('unknown' if self.backend.get_recovery_sessions() or self._preprocessor_recovery_required()
-                else 'confirmed-closed')
+        return self.lifecycle_facts()['session_safety']
+
+    def lifecycle_facts(self):
+        from .lifecycle_diagnostics import project_lifecycle
+        facts = project_lifecycle(self.project)
+        facts['preprocessor_recovery_required'] = self._preprocessor_recovery_required()
+        if facts['preprocessor_recovery_required']:
+            facts['session_safety'] = 'unknown'
+            facts['recovery_required'] = True
+        return facts
 
     def _preprocessor_recovery_required(self):
         # Preprocessing owns CST too, but is not a Managed session.

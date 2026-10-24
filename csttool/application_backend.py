@@ -326,6 +326,8 @@ class CstApplicationBackend:
                 self._set_state(BackendState.RECOVERY_REQUIRED)
                 raise BackendPreparationError(f'项目状态为 {project_status}，请先执行显式恢复，再继续扫描')
             if self.resume:
+                self._reconcile_checkpoint_adoptions()
+            if self.resume:
                 self.pconfman.recover_failed_project()
             settings = self.alg.get_editable_attributes()
             if not settings.get('preprocess_modify_mesh', True) and settings.get('mesh_convergence_enabled', False):
@@ -622,6 +624,7 @@ class CstApplicationBackend:
                 loaded_configuration = load_configuration()
             recovered = recover_project_sessions(project_directory)
             validate_recovery_checkpoint(project_directory)
+            self._reconcile_checkpoint_adoptions()
             if load_configuration is None or loaded_configuration is not None:
                 self._update_task_status(projectconfmanager.TaskStatus.INTERRUPTED)
             self._set_state(BackendState.INTERRUPTED)
@@ -633,6 +636,15 @@ class CstApplicationBackend:
             raise
         finally:
             self._release_project_run_lock()
+
+    def _reconcile_checkpoint_adoptions(self):
+        from .checkpoint_adoption import reconcile_checkpoint_adoptions
+        tasks = reconcile_checkpoint_adoptions(self.get_project_directory())
+        if tasks:
+            self.logger.info('检查点采用标记已核验并同步 | tasks=%d', len(tasks), extra={
+                'event': 'CHECKPOINT_ADOPTION_RECONCILED', 'phase': 'recovery',
+                'project': self.get_project_directory(), 'task_count': len(tasks), 'task_sample': tasks[:5]})
+        return tasks
 
     def emergency_terminate(self) -> None:
         manager = self.jm

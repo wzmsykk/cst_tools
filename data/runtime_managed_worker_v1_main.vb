@@ -8,6 +8,10 @@ Private modelNeedsRecovery As Boolean
 Private cancellationRequested As Boolean
 Private activeTaskId As String
 Private activeTaskSolveReady As Boolean
+Private solverReturnedSuccess As Boolean
+Private activeTaskOutcome As String
+Private currentModelState As String
+Private workerRetiring As Boolean
 
 Sub Main
     Dim task As CSTP_Task
@@ -24,6 +28,8 @@ Sub Main
     Dim solverReturn As Long
 
     On Error GoTo WorkerFailed
+    activeTaskOutcome = "not-started"
+    currentModelState = "prepared"
     If Dir("%STOP_REQUEST_PATH%") <> "" Then
         CSTPMW_CloseSession
         Exit Sub
@@ -46,7 +52,10 @@ Sub Main
             Exit Sub
         End If
 
-        If Dir("%TASK_PATH%") <> "" Then
+        If workerRetiring Then
+            ' A failed model must not consume another task, even if one appears.
+            Wait 0.1
+        ElseIf Dir("%TASK_PATH%") <> "" Then
             stage = "read-task"
             If Not CSTP_ReadTask("%TASK_PATH%", "%SESSION_ID%", task, errorCode, errorMessage) Then
                 CSTPMW_WriteMarker "%MARKER_PATH%", "failure:" & errorCode & ":" & errorMessage
@@ -55,9 +64,13 @@ Sub Main
 
             stage = "parameters"
             activeTaskId = task.TaskId
+            activeTaskOutcome = "unknown"
             activeTaskSolveReady = False
+            solverReturnedSuccess = False
+            cancellationRequested = False
             CSTPMW_CheckStop "before-parameters"
             modelNeedsRecovery = True
+            currentModelState = "dirty"
             For i = 0 To task.ParameterCount - 1
                 CSTPMW_CheckStop "parameters"
                 StoreParameter task.Parameters(i).Name, task.Parameters(i).Value
@@ -89,6 +102,7 @@ Sub Main
                 CSTPMW_PublishFailure task, "SOLVER_FAILED", "EigenmodeSolver.Start returned 0"
                 GoTo WaitForAck
             End If
+            solverReturnedSuccess = True
 
             stage = "solver-result"
             If EigenmodeSolver.GetNumberOfModesCalculated < 1 Then
@@ -106,9 +120,12 @@ Sub Main
             stage = "flush"
             CSTPMW_CheckStop "before-flush"
             Backup outFullDir & "project.cst"
+            If FileLen(outFullDir & "project.cst") < 1 Then Err.Raise vbObjectError + 2408, "worker", "Task snapshot is empty"
+            currentModelState = "committed"
             stage = "parameter-checkpoint"
             CSTPMW_CaptureGoodParameters
             modelNeedsRecovery = False
+            activeTaskOutcome = "success"
             If Not CSTP_WriteCompletion("%COMPLETION_PATH%", task.TaskId, task.SessionId, True, "", "", completionError) Then
                 CSTPMW_WriteMarker "%MARKER_PATH%", "failure:" & completionError
                 Exit Do
@@ -159,7 +176,11 @@ WaitForAck:
                     Kill "%COMPLETION_PATH%"
                     CSTPMW_Trace stage, "%ACK_PATH%", "delete-ack"
                     Kill "%ACK_PATH%"
-                    CSTPMW_WriteMarker "%MARKER_PATH%", "ready"
+                    If workerRetiring Then
+                        CSTPMW_WriteMarker "%MARKER_PATH%", "retiring:" & task.TaskId
+                    Else
+                        CSTPMW_WriteMarker "%MARKER_PATH%", "ready:" & task.TaskId
+                    End If
                     acknowledged = True
                     Exit Do
                 End If
@@ -199,6 +220,8 @@ WorkerFailed:
         CSTPMW_PublishFailure task, errorCode, errorMessage
         Resume WaitForAck
     Else
+        workerRetiring = True
+        If activeTaskId = "" Then activeTaskOutcome = "unknown"
         CSTPMW_WriteMarker "%MARKER_PATH%", "failure:" & errorCode & ":" & errorMessage
         Resume CloseWorker
     End If
@@ -214,11 +237,12 @@ Private Sub CSTPMW_CheckStop(checkpoint As String)
     CSTPMW_Trace "cancel-checkpoint", checkpoint, "stop requested; no further task steps"
     If activeTaskSolveReady Then
         ' Preserve the solved project; never restore parameters over its results.
-        CSTPMW_CaptureGoodParameters
         modelNeedsRecovery = False
         outFullDir = "%RESULT_ROOT%" & activeTaskId & "\"
         If Dir(outFullDir, 16) = "" Then MkDir outFullDir
         Backup outFullDir & "interrupted-project.cst"
+        If FileLen(outFullDir & "interrupted-project.cst") < 1 Then Err.Raise vbObjectError + 2409, "worker", "Interrupted snapshot is empty"
+        currentModelState = "committed"
         CSTPMW_Trace "interrupted-solve", outFullDir, "saved; postprocess/acceptance not complete"
     End If
     Err.Raise vbObjectError + 2420, "worker stop", "Stopped at " & checkpoint
@@ -230,31 +254,54 @@ Private Sub CSTPMW_CloseSession
     Dim stopRequested As Boolean
     Dim recovered As Boolean
     Dim recoveryFile As Integer
+    Dim closeReceipt As CSTC2_CloseReceipt
+    Dim failureDetail As String
     On Error GoTo CloseFailed
+    closeReceipt.SessionId = "%SESSION_ID%"
+    closeReceipt.LastTaskId = activeTaskId
+    If closeReceipt.LastTaskId = "" Then closeReceipt.LastTaskId = "none"
+    closeReceipt.TaskOutcome = activeTaskOutcome
+    closeReceipt.CloseOrigin = "worker-failure"
+    closeReceipt.LastCompletedPhase = "none"
+    closeReceipt.SnapshotRef = "none"
+    closeReceipt.SnapshotBytes = "0"
     stopRequested = (Dir("%STOP_REQUEST_PATH%") <> "")
     closeStage = "stop-read"
     If stopRequested Then
         If Not CSTP_ReadStopRequest("%STOP_REQUEST_PATH%", "%SESSION_ID%", message) Then
             CSTPMW_Trace closeStage, "%STOP_REQUEST_PATH%", message
-            stopRequested = False
+            Err.Raise vbObjectError + 2404, "worker", "Invalid stop request: " & message
         End If
+        closeReceipt.CloseOrigin = "stop-request"
+    End If
+    ' Start succeeded and produced modes: never Rebuild merely because a
+    ' required postprocessor, Backup or parameter-checkpoint writer failed.
+    If activeTaskSolveReady Or solverReturnedSuccess Then
+        modelNeedsRecovery = False
     End If
     If modelNeedsRecovery Then
         closeStage = "restore-parameters"
         CSTPMW_RestoreGoodParameters
+        closeReceipt.LastCompletedPhase = "restore"
         closeStage = "recovery-rebuild"
         CSTPMW_Trace closeStage, "%PROJECT_PATH%", "begin; no Solver replay"
         If Not Rebuild Then Err.Raise vbObjectError + 2401, "worker", "Recovery Rebuild returned False"
+        closeReceipt.LastCompletedPhase = "rebuild"
+        currentModelState = "unknown"
         modelNeedsRecovery = False
         recovered = True
         CSTPMW_Trace closeStage, "%PROJECT_PATH%", "returned True"
         closeStage = "recovery-snapshot"
         Backup "%PROJECT_PATH%.recovered.cst"
         If FileLen("%PROJECT_PATH%.recovered.cst") < 1 Then Err.Raise vbObjectError + 2403, "worker", "Recovery snapshot is empty"
+        closeReceipt.LastCompletedPhase = "backup"
     End If
     closeStage = "save"
     CSTPMW_Trace closeStage, "%PROJECT_PATH%", "begin"
     Save
+    If FileLen("%PROJECT_PATH%") < 1 Then Err.Raise vbObjectError + 2405, "worker", "Saved project is empty"
+    closeReceipt.LastCompletedPhase = "save"
+    If activeTaskSolveReady Or solverReturnedSuccess Then currentModelState = "committed"
     CSTPMW_Trace closeStage, "%PROJECT_PATH%", "returned"
     If recovered Then
         closeStage = "recovery-receipt"
@@ -263,12 +310,41 @@ Private Sub CSTPMW_CloseSession
         Print #recoveryFile, "CST_RECOVERY_SAVED_V1"
         Print #recoveryFile, "%SESSION_ID%"
         Close #recoveryFile
+        recoveryFile = 0
+        currentModelState = "restored-saved"
     End If
+    closeReceipt.ModelState = currentModelState
+    closeReceipt.CloseOutcome = "saved"
+    ' Batch shutdown may rewrite the active project after Save returns.
+    ' Bind the receipt to an immutable Backup, not that mutable active file.
+    If Not recovered Then
+        closeStage = "close-snapshot"
+        CSTPMW_Trace closeStage, "%PROJECT_PATH%.closed.cst", "begin; immutable close evidence"
+        Backup "%PROJECT_PATH%.closed.cst"
+        If FileLen("%PROJECT_PATH%.closed.cst") < 1 Then Err.Raise vbObjectError + 2408, "worker", "Close snapshot is empty"
+        closeReceipt.SnapshotRef = "worker-input.cst.closed.cst"
+        closeReceipt.SnapshotBytes = CStr(FileLen("%PROJECT_PATH%.closed.cst"))
+        CSTPMW_Trace closeStage, "%PROJECT_PATH%.closed.cst", "returned; bytes=" & closeReceipt.SnapshotBytes
+    End If
+    If recovered Then
+        closeReceipt.CloseOutcome = "restored-saved"
+        closeReceipt.SnapshotRef = "worker-input.cst.recovered.cst"
+        closeReceipt.SnapshotBytes = CStr(FileLen("%PROJECT_PATH%.recovered.cst"))
+    End If
+    closeReceipt.ErrorCode = "none"
+    closeStage = "close-receipt"
+    If Not CSTC2_WriteCloseReceipt("%CLOSE_RECEIPT_PATH%", closeReceipt, message) Then Err.Raise vbObjectError + 2406, "worker", message
     If stopRequested Then
         closeStage = "stop-ack"
         If Not CSTP_WriteStopAck("%STOP_ACK_PATH%", "%SESSION_ID%", message) Then
             CSTPMW_Trace closeStage, "%STOP_ACK_PATH%", message
+            Err.Raise vbObjectError + 2407, "worker", message
         End If
+    End If
+    If Dir("%COMPLETION_PATH%") <> "" Then
+        CSTPMW_WriteMarker "%MARKER_PATH%", "stopped-with-completion"
+    Else
+        CSTPMW_WriteMarker "%MARKER_PATH%", "stopped"
     End If
     ' This worker is launched with -m as a batch macro. Quit here attempts
     ' to close its own sheet while the batch is still active. Return through
@@ -278,9 +354,32 @@ Private Sub CSTPMW_CloseSession
     Exit Sub
 CloseFailed:
     message = "shutdown " & closeStage & " failed: number=" & CStr(Err.Number) & "; description=" & Err.Description
+    failureDetail = message
     CSTPMW_Trace closeStage, "%PROJECT_PATH%", message
     On Error Resume Next
-    CSTPMW_WriteMarker "%MARKER_PATH%", "failure:" & message
+    If recoveryFile <> 0 Then Close #recoveryFile
+    closeReceipt.CloseOutcome = "failed"
+    closeReceipt.ModelState = currentModelState
+    closeReceipt.SnapshotRef = "none"
+    closeReceipt.SnapshotBytes = "0"
+    closeReceipt.ErrorCode = "CLOSE_INTERNAL_ERROR"
+    If closeStage = "stop-read" Or closeStage = "stop-ack" Then closeReceipt.ErrorCode = "CLOSE_PROTOCOL_ERROR"
+    If closeStage = "restore-parameters" Then
+        closeReceipt.ErrorCode = "CLOSE_RESTORE_FAILED"
+        closeReceipt.ModelState = "restore-failed"
+    End If
+    If closeStage = "recovery-rebuild" Then
+        closeReceipt.ErrorCode = "CLOSE_REBUILD_FAILED"
+        closeReceipt.ModelState = "restore-failed"
+    End If
+    If closeStage = "recovery-snapshot" Or closeStage = "close-snapshot" Then closeReceipt.ErrorCode = "CLOSE_BACKUP_FAILED"
+    If closeStage = "save" Then closeReceipt.ErrorCode = "CLOSE_SAVE_FAILED"
+    If closeStage = "recovery-receipt" Or closeStage = "close-receipt" Then closeReceipt.ErrorCode = "CLOSE_RECEIPT_FAILED"
+    ' This may fail if a positive receipt already exists: never overwrite it.
+    If Not CSTC2_WriteCloseReceipt("%CLOSE_RECEIPT_PATH%", closeReceipt, message) Then
+        CSTPMW_Trace "close-receipt-failed", "%CLOSE_RECEIPT_PATH%", message
+    End If
+    CSTPMW_WriteMarker "%MARKER_PATH%", "failure:" & failureDetail
     On Error GoTo 0
     ' Do not retry Save, overwrite Completion, or Quit with unsaved changes.
 End Sub
@@ -334,6 +433,14 @@ End Sub
 
 Private Sub CSTPMW_PublishFailure(ByRef task As CSTP_Task, ByVal errorCode As String, ByVal errorMessage As String)
     Dim completionError As String
+    workerRetiring = True
+    activeTaskOutcome = "failure"
+    If cancellationRequested Then activeTaskOutcome = "cancelled"
+    ' The close path must preserve the only solved field data, even if the
+    ' task's required postprocessing or result snapshot failed.
+    If activeTaskSolveReady Or solverReturnedSuccess Then
+        modelNeedsRecovery = False
+    End If
     If Not CSTP_WriteCompletion("%COMPLETION_PATH%", task.TaskId, task.SessionId, False, errorCode, errorMessage, completionError) Then
         CSTPMW_WriteMarker "%MARKER_PATH%", "failure:" & completionError
     End If

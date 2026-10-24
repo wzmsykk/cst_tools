@@ -1,9 +1,21 @@
 # 功能—实现—验收映射入口
 
-日期：2026-10-14。这是维护中的核心功能索引，不是全仓符号清单。先按功能ID查实现，再查工具、日志和验收；历史方案不是现行运行保证。
+日期：2026-10-25。这是维护中的核心功能索引，不是全仓符号清单。先按功能ID查实现，再查工具、日志和验收；历史方案不是现行运行保证。
+
+设计入口D03：[Python/VBA生命周期故障矩阵与L1–L5](python-vba-lifecycle-protocol-v2-plan.md)。L1–L4已接入，新会话生成v2；[真实收尾](close-v2-l5-acceptance.md)、[Controller退出](controller-exit-l5-acceptance.md)及[HOM恢复](hom-interruption-l5-acceptance.md)分别记录实际范围。完整L5仍pending，不把部分窗口通过扩大为全矩阵保证。
 
 |ID|功能|源码|函数/类|测试或操作工具|说明文档|
 |---|---|---|---|---|---|
+|F76|真实小网格HOM中断恢复及无中断对照|[HOM退出探针](../test/support/validate_hom_exit_l5.py)|`run_case`, `adoption`, `evidence`, `submissions`, `verify_reports`|[探针断言测试](../test/hom_exit_l5_test.py)、[采用对账测试](../test/checkpoint_adoption_test.py)|[HOM验收及边界](hom-interruption-l5-acceptance.md)|
+|F62|L3任务级ACK与失败退役|[managed_cstworker.py](../csttool/managed_cstworker.py)|`ManagedCSTWorker._wait_task_ack`, `ManagedCSTWorker.retiring`, `ManagedCSTWorker._build_macro`|[L3假对端专项](../test/production_close_v2_test.py)|[L3状态/时序](production-close-v2-l3.md)|
+|F63|L3生产宏状态采集与v2实际发布|[生产宏](../data/runtime_managed_worker_v1_main.vb)|`Main`, `CSTPMW_PublishFailure`, `CSTPMW_CloseSession`, `CSTPMW_CheckStop`|[L3源码契约](../test/production_close_v2_test.py)|[L3保护与门禁](production-close-v2-l3.md)|
+|F64|v2实际任务/模型事实采集|[session_closure.py](../csttool/session_closure.py)|`collect_close_evidence`, `_validate_last_received_task`|[L3停止边界测试](../test/production_close_v2_test.py)|[L3身份/关闭边界](production-close-v2-l3.md)|
+|F59|L2收尾回执v2及静态版本|[close_receipt.py](../csttool/close_receipt.py)|`CloseReceipt`, `encode_close_receipt`, `decode_close_receipt`, `declare_close_protocol`, `read_close_receipt`|[v2矩阵](../test/close_receipt_test.py)|[v2协议API与边界](close-receipt-v2.md)|
+|F60|VBA收尾回执v2库|[runtime_close_receipt_v2.vb](../data/runtime_close_receipt_v2.vb)|`CSTC2_ReadCloseReceipt`, `CSTC2_WriteCloseReceipt`|[源码契约测试](../test/close_receipt_test.py)|[v2 VBA接口](close-receipt-v2.md)|
+|F61|v2隔离契约宏生成及产物核验|[close_receipt_contract.py](../csttool/close_receipt_contract.py)|`prepare_close_receipt_contract`, `verify_close_receipt_contract`|[契约测试](../test/close_receipt_test.py)|[v2验收范围](close-receipt-v2.md)|
+|F58|L1关闭证据内核及Python退出观测|[session_closure.py](../csttool/session_closure.py)|`CloseEvidence`, `ClosureAssessment`, `evaluate_closure`, `read_recorded_exit`|[L1故障矩阵](../test/session_closure_test.py)|[L1实现与兼容](session-closure-l1.md)|
+|F56|GUI后台服务管理|[runner_management_dialog.py](../GUI/runner_management_dialog.py)|`RunnerManagementDialog`|[GUI测试](../test/gui_runner_test.py)|[后台管理](gui-runner-management.md)|
+|F57|Runner有界标准退出核验|[runner_client.py](../csttool/runner_client.py)|`RunnerClient.shutdown_and_wait`|[独立假Runner测试](../test/runner_test.py)|[后台管理](gui-runner-management.md)|
 |F53|项目恢复公共门禁与检查点校验|[project_recovery_state.py](../csttool/project_recovery_state.py)|`persisted_project_status`, `validate_recovery_checkpoint`|[状态回归](../test/project_recovery_state_test.py)|[恢复状态对账与TODO](project-recovery-state-reconciliation.md)|
 |F54|恢复专用配置加载|[配置管理器](../csttool/projectconfmanager.py)|`ProjectConfigManager.load_recovery_configuration`|[状态回归](../test/project_recovery_state_test.py)|[恢复状态对账](project-recovery-state-reconciliation.md)|
 |F55|Runner与持久项目状态对账|[Runner](../csttool/runner.py)|`Runner._reconcile_project_state`, `LocalExecution.session_safety`|[GUI恢复入口测试](../test/gui_runner_test.py)|[恢复状态对账](project-recovery-state-reconciliation.md)|
@@ -54,6 +66,32 @@
 |F46|完成未接收的结果核验导入|[result_reconciliation.py](../csttool/result_reconciliation.py)|`recover_completed_result`|[恢复测试](../test/runner_recovery_test.py)|[本机Runner](local-runner.md)|
 
 ## 从日志定位
+
+|功能ID|目的|源码|函数|测试|说明|
+|---|---|---|---|---|---|
+|F73|检查点已确认采用标记补写|[checkpoint_adoption.py](../csttool/checkpoint_adoption.py)|`confirmed_tasks`, `reconcile_checkpoint_adoptions`, `mark_adopted`|[身份/幂等/故障矩阵](../test/checkpoint_adoption_test.py)|[采用对账](checkpoint-adoption-l5.md)|
+|F74|RunStore日志/索引幂等采用与共享锁|[run_store.py](../csttool/run_store.py)|`RunStore.ensure_adopted`, `RunStore._adoption_events`|[并发/截断/部分写入](../test/checkpoint_adoption_test.py)|[写入顺序及边界](checkpoint-adoption-l5.md)|
+|F75|真实采用标记三个退出窗口复核|[validate_controller_exit_l5.py](../test/support/validate_controller_exit_l5.py)|`marker_state`, `marker_hashes`, `verify_adoption_reports`|[真实串行记录](checkpoint-adoption-l5.md)|[Controller验收](controller-exit-l5-acceptance.md)|
+
+|功能ID|目的|源码|函数|测试|说明|
+|---|---|---|---|---|---|
+|F70|L5 GUI/Runner进程退出与真实恢复|[validate_controller_exit_l5.py](../test/support/validate_controller_exit_l5.py)|`run_case`, `runner_child`, `gui_child`, `verify_reports`|[退出相关回归](../test/controller_exit_l5_test.py)|[六类真实记录](controller-exit-l5-acceptance.md)|
+|F71|已完成归档的接收路径恢复|[result_reconciliation.py](../csttool/result_reconciliation.py)|`reconcile_archive_receipt`, `recover_completed_result`, `find_received_result`|[身份/哈希/歧义回归](../test/controller_exit_l5_test.py)|[归档缺口与边界](controller-exit-l5-acceptance.md)|
+|F72|线程收尾与客户端可启动状态|[runner.py](../csttool/runner.py)|`Runner.snapshot`|[活跃快照](../test/controller_exit_l5_test.py)、[GUI等待](../test/gui_runner_test.py)|[API及收尾竞态](controller-exit-l5-acceptance.md)|
+
+|功能ID|目的|源码|函数|测试|说明|
+|---|---|---|---|---|---|
+|F68|Completion清理后的待采用结果恢复发现|[project_session_recovery.py](../csttool/project_session_recovery.py)|`_pending_result_task`, `ManagedSessionRecord.closure`|[停止/ACK回归](../test/stop_ack_l5_test.py)|[实际缺口与修复](stop-ack-l5-acceptance.md)|
+|F69|真实停止/ACK时序与产物复核|[validate_stop_ack_l5.py](../test/support/validate_stop_ack_l5.py)|`run_timing`, `read_current_completion`, `verify_timing_reports`|[探针契约](../test/stop_ack_l5_test.py)|[十二时点验收](stop-ack-l5-acceptance.md)|
+
+|功能ID|目的|源码|函数|测试|说明|
+|---|---|---|---|---|---|
+|F67|L5串行真实副本与故障核验|[validate_close_v2_l5.py](../test/support/validate_close_v2_l5.py)|`run_case`, `run_codec`, `verify_fault_matrix`|[固定收尾快照测试](../test/close_v2_l5_test.py)|[真实验收与剩余](close-v2-l5-acceptance.md)|
+
+|功能ID|目的|源码|函数|测试|说明|
+|---|---|---|---|---|---|
+|F65|L4生命周期事实与异常原因链|[lifecycle_diagnostics.py](../csttool/lifecycle_diagnostics.py)|`project_lifecycle`, `lifecycle_facts`, `result_observation`, `error_diagnostic`|[事实测试](../test/lifecycle_diagnostics_test.py)|[Runner/GUI事实](runner-lifecycle-l4.md)|
+|F66|L4 GUI诊断与源码展示|[lifecycle_display.py](../GUI/lifecycle_display.py)|`lifecycle_lines`, `runner_error_text`|[GUI测试](../test/gui_runner_test.py)|[使用及边界](runner-lifecycle-l4.md)|
 
 Runner审计修复：F41/F43/F44增加`cancel_start`和命令对账，当前API及门禁见[修复记录](runner-audit-fix-20261015.md)。
 

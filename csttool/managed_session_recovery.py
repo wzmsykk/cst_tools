@@ -22,12 +22,15 @@ def recover_and_stop_session(
     *,
     timeout: float = 1200.0,
     poll_interval: float = 0.1,
+    peer_exited=None,
 ) -> Completion | None:
-    """Request stop, preserve any completed task, ACK it, and await StopAck."""
+    """Await StopAck or an owned peer's observed exit; caller must verify closure."""
     protocol = FileProtocol(protocol_root)
     stop_path = protocol.root / "stop.request"
     if not stop_path.exists():
         protocol.request_stop(session_id)
+    else:
+        protocol.read_stop_request(session_id)
     completion_path = protocol.root / "current.completion"
     ack_path = protocol.root / "current.ack"
     deadline = time.monotonic() + timeout
@@ -45,5 +48,7 @@ def recover_and_stop_session(
             )
         if protocol.read_stop_ack(session_id) is not None:
             return completion
+        if peer_exited is not None and peer_exited():
+            return completion  # Exit is NOT a fabricated StopAck or success.
         time.sleep(poll_interval)
     raise TimeoutError("timed out recovering managed CST session")

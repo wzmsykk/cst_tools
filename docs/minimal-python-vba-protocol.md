@@ -1,9 +1,27 @@
 # 最小 Python / VBA Runtime Protocol
 
-状态：已实现并通过 P2.5–P6 独立 Gate；尚未替换 production Manager
+L5采用补写的现行实现见[检查点对账](checkpoint-adoption-l5.md)：已确认TaskID的元数据幂等同步，不增加跨语言消息或运行时文档服务。
+
+L5新增[十二个停止/ACK时点](stop-ack-l5-acceptance.md)，Completion清理后当前成功接收记录仍参与恢复判定；只是内部发现/恢复元数据修正，wire不变。
+
+L5当前部分真实验收与固定收尾快照token修订见[串行记录](close-v2-l5-acceptance.md)；未触发矩阵仍pending，以下L5待做为历史范围。
+
+2026-10-24当前进度：L1–L4源码接入，新增[Runner/GUI事实与诊断](runner-lifecycle-l4.md)，L5真实WinWrap/CST待验收。下面历史规范不覆盖新验收范围。
+
+状态：下文主体为2026-09-17第一切片历史规范；生产迁移进度见当前状态。2026-10-20新增生命周期修订设计，尚未实现，不以历史Gate追认新范围。
 日期：2026-09-17
 
 当前实现、HOM Profile 和后续顺序见[当前状态与实施路线](./current-status.md)。
+
+## 2026-10-20：范围修订入口
+
+2026-10-24 L3：[生产宏](production-close-v2-l3.md)现为新会话生成v2收尾，失败后retiring、task级ACK清理、求解后结果保护均已接入；旧会话及Task/Completion/ACK仍v1。以下“待L3”为之前阶段快照，真实WinWrap/CST仍待L5。
+
+2026-10-24进度：L1及[L2收尾回执v2 codec/静态门禁](close-receipt-v2.md)已实现；生产Worker仍v1，v2实际状态采集/宏调用/真实验收属L3–L5。下段“尚未实现”为10月20日设计状态，当前接口以L2专页为准。
+
+当前Task/Completion/Ack仍为v1，生产另有StopRequest/StopAck及恢复机制。新增[生命周期协议故障矩阵与L1–L5计划](python-vba-lifecycle-protocol-v2-plan.md)：任务/模型/进程/采用四维事实、收尾回执v2、统一停止与恢复判定、失败Worker退役及求解后结果保护。该文是待实施设计，不改变当前退出0/有条件退出4门禁。
+
+下文“五阶段”“三种消息”“只做第一切片”“全部成功后Ack”等表述只描述当时的最小阶段。当前失败Completion或必需结果读取失败也需先保存失败接收记录再ACK，ACK表示消费与清理授权，不表示成功。字段顺序/编码以runtime_protocol.py和golden vectors为准，不按架构提案的key=value示例推断实现。历史延期项不再是拒绝有证据的生命周期修订的理由。
 
 ## 1. 只解决当前真实问题
 

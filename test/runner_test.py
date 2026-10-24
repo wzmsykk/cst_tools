@@ -199,6 +199,39 @@ def fake_runner(tmp_path):
     log.close()
 
 
+@pytest.mark.parametrize('lost_response', [False, True])
+def test_shutdown_wait_confirms_real_runner_release(fake_runner, monkeypatch, lost_response):
+    client, process = fake_runner
+    runtime = client.status()['runtime']
+    assert runtime['pid'] == process.pid
+    assert Path(runtime['source_root']) == Path(__file__).resolve().parents[1]
+    assert runtime['python']
+    original = client.command
+    def command_with_loss(op, *args, **kwargs):
+        result = original(op, *args, **kwargs)
+        if op == 'shutdown' and lost_response:
+            raise TimeoutError('shutdown response lost after acceptance')
+        return result
+    monkeypatch.setattr(client, 'command', command_with_loss)
+    assert client.shutdown_and_wait() == {'runner_stopped': True}
+    process.wait(5)
+    assert process.returncode == 0
+
+
+def test_shutdown_timeout_never_kills_or_reports_stopped(tmp_path, monkeypatch):
+    from csttool.runner_ownership import RunnerOwnership
+    lease = RunnerOwnership(tmp_path / 'control/runner.lock').acquire()
+    client = RunnerClient(tmp_path)
+    monkeypatch.setattr(client, 'connect', lambda **kwargs: {})
+    monkeypatch.setattr(client, 'command', lambda *args, **kwargs: {})
+    try:
+        with pytest.raises(TimeoutError, match='退出尚未确认'):
+            client.shutdown_and_wait(timeout=.1)
+        assert lease.stream is not None
+    finally:
+        lease.close()
+
+
 def test_process_disconnect_reconnect_stop_resume_and_auth(fake_runner, tmp_path):
     client, process = fake_runner
     client.command('claim')

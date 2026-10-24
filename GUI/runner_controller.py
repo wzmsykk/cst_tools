@@ -48,6 +48,7 @@ class RunnerController(QObject):
         self.timer.timeout.connect(self.poll)
         self.timer.start()
         self.closed = False
+        self.runner_stopped = False
         self._restore_stop_request(self.context_client)
 
     def _restore_stop_request(self, client):
@@ -87,6 +88,7 @@ class RunnerController(QObject):
             return
         old = self.context_client
         self.context_client = client
+        self.runner_stopped = False
         self.generation += 1
         self.instance = self.run_id = self.observed_run = self.start_request_id = None
         self.cursor = 0
@@ -122,6 +124,17 @@ class RunnerController(QObject):
                 self.pending_operation = None
             try:
                 status, events = future.result()
+                if status.get('runner_stopped'):
+                    self.backend.logger.info('后台服务已正常退出，已确认项目Runner所有权释放 | project=%s', self.backend.project)
+                    self.runner_stopped = True
+                    self.unknown = False
+                    self.backend.runner_status = dict(getattr(self.backend, 'runner_status', {}),
+                                                      state='OFFLINE')
+                    self.state = RunState.IDLE
+                    self.state_changed.emit(self.state)
+                    self.connection_changed.emit('后台 Runner 已退出；点击“连接/启动”可重新启动，不自动续算')
+                    self.snapshot_changed.emit(self.backend.runner_status)
+                    return
                 if status['project'] != self.backend.project:
                     return
                 self.unknown = False
@@ -137,6 +150,9 @@ class RunnerController(QObject):
                            'RECOVERY_REQUIRED': RunState.RECOVERY_REQUIRED, 'FAILED': RunState.FAILED}
                 previous_state = self.state
                 self.state = mapping.get(status['state'], RunState.READY if self.inputs_ready else RunState.IDLE)
+                if status.get('execution_active') and status['state'] not in {
+                        'PREPARING', 'RUNNING', 'STOPPING', 'RECOVERING'}:
+                    self.state = RunState.RECOVERING if previous_state is RunState.RECOVERING else RunState.STOPPING
                 self.recovery_count = int(self.state is RunState.RECOVERY_REQUIRED)
                 if self.state is not previous_state:
                     self.state_changed.emit(self.state)
@@ -147,7 +163,8 @@ class RunnerController(QObject):
                     else ('控制权租约已过期，可点击“申请控制权”' if not status.get('control_lease_valid', True)
                           else '已连接（其他窗口持有控制权，仅查看）'))
                 self.snapshot_changed.emit(status)
-                error = status.get('error')
+                from GUI.lifecycle_display import runner_error_text
+                error = runner_error_text(status)
                 if error and error != self.last_error:
                     self.error.emit(error)
                 self.last_error = error
@@ -189,7 +206,7 @@ class RunnerController(QObject):
                     self.error.emit(str(exc))
                     self.last_error = str(exc)
         client = self.backend.client
-        if client and not self.future:
+        if client and not self.future and not self.runner_stopped:
             if self.queued_action is not None:
                 action, self.queued_action = self.queued_action, None
                 self.future = self.pool.submit(action)
@@ -200,7 +217,7 @@ class RunnerController(QObject):
     def _command(self, op, payload=None):
         self._sync_context()
         client = self.backend.client
-        if client is None or self.unknown or self.pending or (self.read_only and op != 'claim'):
+        if client is None or self.runner_stopped or self.unknown or self.pending or (self.read_only and op != 'claim'):
             return False
         run_id = self.run_id
         request_id = uuid4().hex
@@ -239,6 +256,28 @@ class RunnerController(QObject):
 
     def request_control(self):
         return self._command('claim')
+
+    def request_shutdown(self):
+        if (self.has_active_work or self.read_only or self.runner_stopped
+                or self.state is RunState.RECOVERY_REQUIRED or not self.backend.client):
+            return False
+        client, run_id = self.backend.client, self.run_id
+        self.queued_action = lambda: (client.shutdown_and_wait(run_id=run_id), {'cursor': self.cursor, 'events': []})
+        self.pending = True
+        self.pending_operation = 'shutdown'
+        self.backend.logger.info('请求后台服务正常退出 | project=%s instance=%s run_id=%s',
+                                 self.backend.project, self.instance, run_id)
+        self.connection_changed.emit('正在请求 Runner 正常退出并等待所有权释放…')
+        self.poll()
+        return True
+
+    def connect_runner(self):
+        if not self.backend.project or self.pending or (self.has_active_work and not self.unknown):
+            return False
+        # Explicit action only: a successful shutdown must never trigger auto-launch.
+        self.backend.select_project_directory(self.backend.project)
+        self.poll()
+        return True
 
     def request_recovery(self):
         return self._command('recover')

@@ -1,5 +1,11 @@
 # CST Application Backend
 
+L5[检查点采用对账](checkpoint-adoption-l5.md)由`_reconcile_checkpoint_adoptions`接入显式恢复（会话关闭/检查点核验之后）及resume准备（创建Manager之前），均持有项目锁。只补写已确认标记，不推进检查点、不导入结果或调用Solver；错误走既有准备/恢复失败门禁，日志可按CHECKPOINT_ADOPTION_RECONCILED追踪。
+
+L5 Controller意外退出：[恢复实测](controller-exit-l5-acceptance.md)。显式恢复核验已有成功接收快照，Completion已清理时也可按匹配归档索引重绑定旧路径；不改变模型或已确认检查点，不因缺路径重新求解。任务采用与控制进程标准退出仍独立。
+
+2026-10-24 L4：Runner使用共享关闭核验结果展示独立事实，不再将Backend.get_recovery_sessions列表直接当物理安全判定。Backend恢复门禁保持；API、错误与兼容见[事实传播](runner-lifecycle-l4.md)。
+
 ## 目的
 
 `CstApplicationBackend` 是 GUI、CLI 与 CST 执行实现之间的应用边界。它负责一次运行的配置、工程准备、算法执行和 Manager 清理，但不负责 Qt、命令行参数解析或 CST Worker 的内部调度。
@@ -49,6 +55,10 @@ RUNNING -> STOPPING -> STOPPED
 - 本机生产后端默认使用 1 个 Worker，避免无意中启动多个 CST 实例；用户可根据本机资源和许可证显式调高 `worker_count`。运行开始后该值被冻结。
 
 ## 异常恢复
+
+2026-10-24 L3：[新生产宏v2/失败退役](production-close-v2-l3.md)接入，旧会话不变。活跃进程未发布回执时pending仍有界等待；有效failed回执可在确认进程死亡并对账后显式放弃，缺失/损坏v2继续阻断。失败任务的保存状态不等于可采用结果，退出1仍拒绝；真实CST未验收。
+
+2026-10-24：[L1统一证据与兼容](session-closure-l1.md)改变会话发现/恢复核验：未知进程身份不自动收口；缺退出码的已死旧会话仅显式放弃，不冒充标准退出。已接收结果与确认覆盖保留，损坏/串session StopAck明确阻断。
 
 2026-10-20补充：[恢复状态对账](project-recovery-state-reconciliation.md)。prepare_run与is_recovery_required同时检查持久项目门禁；recover_project_sessions先加载已有配置，在同一项目锁内核验会话、检查点及登记快照并写入INTERRUPTED，成功后才记录完成。核验/持久化失败保持RECOVERY_REQUIRED；缺配置不创建默认文件。普通FAILED续跑兼容行为不变，显式恢复门禁不自动清除。
 
@@ -116,3 +126,7 @@ HOM 汇总 CSV 的 `taskName/taskId/projectSnapshot/resultDirectory` 将模态�
 启动就绪、Ack 后就绪和标准退出仍各有 120 秒门限；预处理及会话恢复的独立门限不变。手动停止仍遵循既有安全停止协议，通常需等待正在运行的求解返回，不承诺立即中断 Solver。无法结束的求解需要人工诊断，不自动杀进程。
 
 测试工具可显式覆盖 TASK_TIMEOUT 为秒数以验证故障路径。新增模拟时钟测试验证超过 40 分钟仍接受完成结果、进程异常仍上报及显式限时仍有效。
+
+## 2026-10-25 HOM恢复路径说明
+
+检查点采用核验中，HOM `mode.project_snapshot` 以项目根目录解析；`confirmedSnapshot.path` 仍按检查点父目录解析，receipt快照绝对路径及SHA256继续严格核对。对账不重写模型/覆盖，也不通过Solver重算补证据。真实窗口与剩余边界见[小网格HOM验收](hom-interruption-l5-acceptance.md)。

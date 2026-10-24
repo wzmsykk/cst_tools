@@ -45,7 +45,7 @@ def test_discovers_only_sessions_that_need_protocol_recovery(tmp_path):
 
     assert project_runtime_directory(project) == project / "temp"
     assert {item.session_id for item in records if item.needs_recovery} == {
-        active_id
+        active_id, stopped_id  # StopAck does not prove an unknown process exited.
     }
     assert stopped_root.is_dir()
 
@@ -77,10 +77,14 @@ def test_session_discovery_uses_migrated_runtime_directory(tmp_path, legacy, abs
     assert records[0].needs_recovery
 
 
-def test_project_recovery_stops_and_acks_an_active_session(tmp_path):
+def test_project_recovery_stops_and_acks_an_active_session(tmp_path, monkeypatch):
     project = tmp_path / "project"
     project.mkdir()
     session_id, root, protocol = _session(project)
+    (root / 'worker.pid').write_text('12345', encoding='ascii')
+    from threading import Event
+    exited = Event()
+    monkeypatch.setattr(project_session_recovery, '_process_tree_is_alive', lambda pid: not exited.is_set())
     task_id = new_session_id()
 
     def worker_side():
@@ -101,8 +105,9 @@ def test_project_recovery_stops_and_acks_an_active_session(tmp_path):
         (root / "worker.state").write_text(
             "stopped-with-completion", encoding="ascii"
         )
+        exited.set()
 
-    thread = Thread(target=worker_side)
+    thread = Thread(target=worker_side, daemon=True)
     thread.start()
     recovered = recover_project_sessions(project, timeout_per_session=2)
     thread.join(2)
@@ -113,7 +118,7 @@ def test_project_recovery_stops_and_acks_an_active_session(tmp_path):
     ]
     assert not thread.is_alive()
     receipt = json.loads((root / "recovery.json").read_text(encoding="utf-8"))
-    assert receipt["disposition"] == "standard-stop"
+    assert receipt["disposition"] == "abandoned-dead"  # No original process exit code was observed.
     assert receipt["completion_task_id"] == task_id
 
 

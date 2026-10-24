@@ -129,6 +129,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.claimControlButton.setToolTip('其他窗口租约有效时会被拒绝；不会重新启动或停止计算')
             self.claimControlButton.clicked.connect(self.controller.request_control)
             self.statusBar().addPermanentWidget(self.claimControlButton)
+            self.runnerManagementButton = QPushButton('后台管理', self)
+            self.runnerManagementButton.clicked.connect(self.showRunnerManagement)
+            self.statusBar().addPermanentWidget(self.runnerManagementButton)
         self.logger = self.service.logger
         self.logger.addHandler(self.logTextBox)
         self.logTextBox.bind_logger(self.logger)
@@ -348,22 +351,36 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self._close_pending = False
             QTimer.singleShot(0, self.close)
 
+    def showRunnerManagement(self):
+        if not hasattr(self, '_runner_dialog'):
+            from GUI.runner_management_dialog import RunnerManagementDialog
+            self._runner_dialog = RunnerManagementDialog(self)
+        self._runner_dialog.refresh()
+        self._runner_dialog.show()
+        self._runner_dialog.raise_()
+        self._runner_dialog.activateWindow()
+
     def connectionLabelChanged(self, text):
         if hasattr(self, 'claimControlButton'):
             self.claimControlButton.setEnabled(self.service.backend.client is not None
-                and not self.controller.unknown and not self.controller.pending)
+                and not self.controller.unknown and not self.controller.pending
+                and not self.controller.runner_stopped)
         directory = getattr(self.service.backend, 'log_directory', None)
         if directory:
             self.logTextBox.bind_source_files(directory)
-        blocked = (getattr(self.controller, 'unknown', False), getattr(self.controller, 'read_only', False))
+        blocked = (getattr(self.controller, 'unknown', False), getattr(self.controller, 'read_only', False),
+                   getattr(self.controller, 'runner_stopped', False))
         if getattr(self, '_runner_connection_blocked', None) != blocked:
             self.renderRunState(self.controller.state)
             self._runner_connection_blocked = blocked
-        if any(blocked):
+        if any(blocked[:2]):
             for widget in (self.StartButton, self.ResumeButton, self.StopButton, self.RecoverButton,
                            self.selectProjectDirButton, self.selectCSTPathButton,
                            self.AlgSettingButton, self.postProcessButton, self.workerCountSpinBox,
                            self.cstBackendComboBox, self.refreshCstBackendsButton):
+                widget.setEnabled(False)
+        elif blocked[2]:
+            for widget in (self.StartButton, self.ResumeButton, self.StopButton, self.RecoverButton):
                 widget.setEnabled(False)
         self.statusbar.showMessage(text)
 
@@ -553,6 +570,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.stateDetailLabel.setText(detail)
         status_text = STAGE_PRESENTATION.get(self._stage, self._stage) if self._stage else detail
         self.statusbar.showMessage(status_text)
+        if getattr(self.controller, 'runner_stopped', False):
+            for widget in (self.StartButton, self.ResumeButton, self.StopButton, self.RecoverButton):
+                widget.setEnabled(False)
 
     def requestStop(self):
         if self.controller.state is not RunState.RUNNING:

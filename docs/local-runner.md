@@ -1,5 +1,21 @@
 # 独立本机 Runner：API、使用和恢复
 
+L5[采用标记补写](checkpoint-adoption-l5.md)：显式recover和resume准备在项目锁内依据已确认检查点核验并补齐receipt及所属RunStore，不改变覆盖或重算；重复recover不增加同Task采用事件。日志CHECKPOINT_ADOPTION_RECONCILED表示核验/同步数量，非新增导入数量。缺/坏证据保留恢复阻断；wire不变，旧Runner仍须安全重启更新。
+
+L5实际进程退出补验：[六类记录](controller-exit-l5-acceptance.md)。HTTP快照增加execution_active实时线程/执行器状态，终态标签不等于可立即start；GUI保持收尾状态直至释放。归档结果旧路径仅通过身份/哈希匹配的既有索引修复，错误继续阻断，不重复计算。旧后台缺字段沿用旧展示和409门禁，更新需正常退出后重启。
+
+停止/ACK L5实测补充：[十二时点](stop-ack-l5-acceptance.md)。标准退出后即使Completion已清理，当前Task成功接收记录尚未采用也需显式恢复；lifecycle缺证据增加received-result-not-reconciled，结果状态received-unadopted。恢复决定绑定received_task_id，不改变wire或退出码规则。
+
+L5部分真实CST验收修复正常关闭的活动文件失配：新增独立.closed.cst快照，退出/采用策略不变，需Python/VBA同时更新。证据及仍pending见[串行验收](close-v2-l5-acceptance.md)。
+
+2026-10-24 L4：[事实字段与诊断API](runner-lifecycle-l4.md)新增lifecycle/error_diagnostic/cleanup_diagnostic；session_safety增加running、exited-unverified，恢复状态仍独立。旧客户端可忽略新字段，旧后台GUI显示未采集。以下L3“待L4”为当时状态。
+
+2026-10-24 L3：[生产v2状态与退役](production-close-v2-l3.md)已接入新会话源码；Runner控制操作不变。task/model关闭事实更细，失败ACK后不复用同Worker；完整GUI事实展示待L4，真实WinWrap/CST待L5，不把字段存在当运行验收。
+
+2026-10-24：[L1证据核验](session-closure-l1.md)使Backend发现/恢复更保守：未知进程、无可信退出证据或串session回执不再靠stopped标记解除。控制CLI/GUI操作格式不变，不自动重跑任务；close.receipt v2仍未接入。
+
+2026-10-20：[GUI后台管理](gui-runner-management.md)提供当前项目身份、连接与标准退出；快照新增runtime.pid/python/source_root（旧服务无字段时显示未知）。退出必须确认所有权释放，成功后暂停GUI轮询，显式连接不提交计算。现有CLI与安全门禁不变，未实现自动升级/强制退出。
+
 2026-10-20：增加[项目恢复状态对账](project-recovery-state-reconciliation.md)。空闲Runner在启动、查询和命令前核验project.ini；持久恢复门禁不能被FAILED或confirmed-closed掩盖。状态增加project_task_status，触发重对账时保留previous_error并说明recovery_reason；不自动续算。会话安全与项目可续跑性是独立事实。
 
 更新：2026-10-15。当前仅本机，尚不支持远程/分布式执行。
@@ -99,3 +115,7 @@ GUI/runner_backend.py、runner_controller.py。功能映射见[功能索引](fea
 阶段与剩余门禁统一见[实施计划](execution-platform-implementation-plan.md)，旧设计的拟议接口不取代本页当前接口。
 
 新实测边界见[Runner/路径知识库](../knowledge-base/runner-process-and-path-boundaries.md)。
+
+## 2026-10-25 HOM真实副本验收入口
+
+生产HOM链的checkpoint/received/solver中断对照见[小网格HOM](hom-interruption-l5-acceptance.md)。恢复继续使用既有显式recover和resume；HOM模式快照的项目相对路径由采用核验正确解析，不按Runner cwd解析。不改变HTTP命令、Task/ACK或VBA wire；旧Runner需正常停止并更新，不能靠替换文件热修复已导入模块。

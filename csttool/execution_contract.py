@@ -14,6 +14,7 @@ class RunnerSnapshot(TypedDict):
     project: str
     run_id: str | None
     state: str
+    execution_active: bool
     owner_client: str | None
     control_lease_valid: bool
     control_lease_remaining: float
