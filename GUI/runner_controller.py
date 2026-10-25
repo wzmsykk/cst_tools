@@ -48,6 +48,8 @@ class RunnerController(QObject):
         self.timer.timeout.connect(self.poll)
         self.timer.start()
         self.closed = False
+        from GUI.hom_dashboard import HomDisplayReader
+        self._hom_reader = HomDisplayReader()
         self.runner_stopped = False
         self.detaching = False
         self._restore_stop_request(self.context_client)
@@ -75,6 +77,7 @@ class RunnerController(QObject):
                 isinstance(cursor, dict) and cursor.get('source')):
             cursor = 0
         events = client.events(cursor)
+        status = dict(status, hom_display=self._hom_reader.read(client.project))
         return status, events
 
     def _sync_context(self):

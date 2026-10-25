@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QLabel
+from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QLabel, QTabWidget, QWidget, QVBoxLayout, QHBoxLayout
 from GUI.algorithm_settings_dialog import AlgorithmSettingsDialog
 from GUI.application_service import CstApplicationService, ConfigurationService
 from GUI.run_controller import GuiRunController, RunState
@@ -103,7 +103,33 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.logTextBox.widget.document().setMaximumBlockCount(5000)
         self.logTextBox.widget.setPlaceholderText("运行日志将在这里显示…")
         self.logTextBox.widget.setAccessibleName("运行日志")
-        self.LogBoxLayout.addWidget(self.logTextBox.panel)
+        from GUI.hom_dashboard import HomDashboard
+        self.resultTabs = QTabWidget(self.logPanel)
+        self.resultTabs.setAccessibleName('扫频结果与详细运行信息')
+        self.homDashboard = HomDashboard(self.resultTabs)
+        self.detailsPage = QWidget(self.resultTabs)
+        details_layout = QVBoxLayout(self.detailsPage)
+        self.runtimeActions = QHBoxLayout()
+        self.connectionDetails = QLabel('后台尚未连接', self.detailsPage)
+        self.connectionDetails.setWordWrap(True)
+        self.connectionDetails.setTextFormat(Qt.PlainText)
+        self.runtimeActions.addWidget(self.connectionDetails, 1)
+        details_layout.addLayout(self.runtimeActions)
+        self.resultReadDetails = QLabel(self.detailsPage)
+        self.resultReadDetails.setWordWrap(True)
+        self.resultReadDetails.setTextFormat(Qt.PlainText)
+        self.resultReadDetails.hide()
+        details_layout.addWidget(self.resultReadDetails)
+        self.logPanelLayout.removeWidget(self.runSummaryFrame)
+        details_layout.addWidget(self.runSummaryFrame)
+        details_layout.addWidget(self.logTextBox.panel, 1)
+        self.resultTabs.addTab(self.homDashboard, 'HOM 扫频与结果')
+        self.resultTabs.addTab(self.detailsPage, '详细运行信息')
+        self.LogBoxLayout.addWidget(self.resultTabs)
+        self.logHeaderLabel.setText('扫描工作台')
+        self.homDashboard.actions.addWidget(self.logTextBox.export_button)
+        self._diagnostic_thread = None
+        self.logTextBox.export_button.clicked.connect(self.exportFailureLogs)
         self.runProgressBar.setAccessibleName("运行阶段进度")
         self.stageLabel.setTextFormat(Qt.PlainText)
         self.stageLabel.setWordWrap(True)
@@ -136,10 +162,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.claimControlButton.setEnabled(False)
             self.claimControlButton.setToolTip('其他窗口租约有效时会被拒绝；不会重新启动或停止计算')
             self.claimControlButton.clicked.connect(self.controller.request_control)
-            self.statusBar().addPermanentWidget(self.claimControlButton)
+            self.runtimeActions.addWidget(self.claimControlButton)
             self.runnerManagementButton = QPushButton('后台管理', self)
             self.runnerManagementButton.clicked.connect(self.showRunnerManagement)
-            self.statusBar().addPermanentWidget(self.runnerManagementButton)
+            self.runtimeActions.addWidget(self.runnerManagementButton)
         self.logger = self.service.logger
         self.logger.addHandler(self.logTextBox)
         self.logTextBox.bind_logger(self.logger)
@@ -157,6 +183,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         # DATA
         self.CalcDialogBox.setDefaultValues(self.service.get_algorithm_settings())
+        self.homDashboard.show_configuration(self.service.get_algorithm_settings())
         self._sync_readiness()
         self.renderRunState(self.controller.state)
         if getattr(self.service.backend, 'session_store', None) is not None:
@@ -168,6 +195,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             return
         if backend.restore_last_project():
             self.uiProjectDir = backend.project
+            self.homDashboard.update_snapshot({'project': backend.project})
             self.dirNameLineEdit.setText(backend.project)
             self.uiCSTFilePath = backend.source
             self.cstFilePathLineEdit.setText(backend.source or '')
@@ -198,6 +226,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         )
 
     def closeEvent(self, event):
+        if self._diagnostic_thread is not None and self._diagnostic_thread.isRunning():
+            self.statusbar.showMessage('正在导出失败日志，请等待完成后退出')
+            event.ignore()
+            return
         if getattr(self.controller, 'closed', False):
             try:
                 self._close_local_resources()
@@ -345,6 +377,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def updateAlgSetting(self):
         self.service.update_algorithm_settings(self.CalcDialogBox.getValues())
+        self.homDashboard.show_configuration(self.service.get_algorithm_settings())
 
     def updatePPSSetting(self):
         self.service.update_postprocess_settings(self.PPSDialogBox.getPPSList())
@@ -353,15 +386,50 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if self._close_pending and not getattr(self.controller, 'detaching', False):
             self._exit_failed('后台操作失败：' + str(message) + '。可检查日志后恢复，或仅关闭界面。')
         self.logger.error("后台运行失败 | reason=%s", message)
+        brief = str(message).splitlines()[0]
+        self.stateDetailLabel.setText(brief + '；详细原因见运行信息，可导出失败日志')
+        self.statusbar.showMessage(f"运行失败：{brief}；可点击“导出失败日志”")
+
+    def exportFailureLogs(self):
+        if self._diagnostic_thread is not None:
+            return
+        if not self.uiProjectDir:
+            self.statusbar.showMessage('请先选择需要导出诊断的项目目录')
+            return
+        from GUI.diagnostic_export import DiagnosticExportThread
+        self.logTextBox.export_button.setEnabled(False)
+        self.logTextBox.export_button.setText('正在导出…')
+        self.statusbar.showMessage('正在收集失败诊断；后台任务保持原状态')
+        thread = DiagnosticExportThread(str(self.uiProjectDir), self)
+        self._diagnostic_thread = thread
+        thread.finished.connect(self._diagnosticsFinished)
+        thread.start()
+
+    def _diagnosticsFinished(self):
+        thread = self._diagnostic_thread
+        outcome = thread.outcome or {'error': '诊断导出线程未返回结果'}
+        self._diagnostic_thread = None
+        thread.deleteLater()
+        self.logTextBox.export_button.setEnabled(True)
+        self.logTextBox.export_button.setText('导出失败日志')
+        if 'error' in outcome:
+            message = '失败日志导出失败：' + outcome['error']
+            self.logger.error(message)
+        else:
+            result = outcome['result']
+            message = '失败日志已导出：' + result['path']
+            self.logTextBox.export_button.setToolTip(message)
+            self.logger.info('%s | 文件记录=%s 提示=%s', message, result['files'], result['warnings'])
         self.stateDetailLabel.setText(message)
-        self.statusbar.showMessage(f"运行失败：{message}")
+        self.statusbar.showMessage(message)
 
     def renderStage(self, stage):
         self._stage = stage
         stage_text = STAGE_PRESENTATION.get(stage, stage)
         self.stageLabel.setText(stage_text)
-        self.stateDetailLabel.setText(stage_text)
-        self.statusbar.showMessage(stage_text)
+        brief = STAGE_PRESENTATION.get(stage, '正在处理任务，详细步骤见运行信息')
+        self.stateDetailLabel.setText(brief)
+        self.statusbar.showMessage(brief)
 
     def renderProgress(self, current, total):
         self.runProgressBar.setRange(0, total)
@@ -370,7 +438,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def renderRunnerSnapshot(self, status):
         """Restore durable task facts; displaying history never starts execution."""
-        parts = [STAGE_PRESENTATION.get(status.get('phase', ''), status.get('phase', ''))]
+        self.homDashboard.update_snapshot(status)
+        diagnostic = (status.get('hom_display') or {}).get('diagnostic')
+        self.resultReadDetails.setText('结果读取诊断：' + diagnostic if diagnostic else '')
+        self.resultReadDetails.setVisible(bool(diagnostic))
+        parts = [STAGE_PRESENTATION.get(status.get('phase', ''), '正在处理任务')]
         coverage = status.get('coverage') or {}
         frontier = coverage.get('confirmed_frontier')
         if frontier is not None:
@@ -408,9 +480,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                    f"原始文本：{event.message}\n任务：{event.task_id}\n会话：{event.session_id}\n"
                    '百分比仅为CST报告的局部读数，不代表任务或整个扫描完成。')
         self.stageLabel.setText(label + (f'\n{detail}' if detail else ''))
-        self.stateDetailLabel.setText(detail or stage)
+        self.homDashboard.update_progress(event, CST_STAGE_PRESENTATION.get(stage_key, '计算中'))
         self.stageLabel.setToolTip(tooltip)
-        self.stateDetailLabel.setToolTip(tooltip)
         self.runProgressBar.setToolTip(tooltip)
         if event.local_percent is not None:
             self.runProgressBar.setRange(0, 100)
@@ -421,7 +492,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         else:
             self.runProgressBar.setRange(0, 0)
             self.runProgressBar.setFormat("CST 局部进度未知")
-        self.statusbar.showMessage(label)
+        self.statusbar.showMessage(self.homDashboard.current.text())
 
     def _finishPendingClose(self):
         if self._close_pending and (getattr(self.controller, 'closed', False) or (
@@ -440,6 +511,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self._runner_dialog.activateWindow()
 
     def connectionLabelChanged(self, text):
+        self.connectionDetails.setText(text)
         if hasattr(self, 'claimControlButton'):
             self.claimControlButton.setEnabled(self.service.backend.client is not None
                 and not self.controller.unknown and not self.controller.pending
@@ -461,7 +533,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         elif blocked[2]:
             for widget in (self.StartButton, self.ResumeButton, self.StopButton, self.RecoverButton):
                 widget.setEnabled(False)
-        self.statusbar.showMessage(text)
+        if any(blocked[:2]):
+            self.statusbar.showMessage('后台连接或控制权需检查，请打开“详细运行信息”')
 
     def _confirm_action(self, title, message):
         self._confirmation_open = True
@@ -474,12 +547,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def read_dir(self):
         # 选取输出目录
-        self.uiProjectDir = QFileDialog.getExistingDirectory(
+        selected = QFileDialog.getExistingDirectory(
             self, "选取文件夹", self.uiProjectDir
         )
 
-        if not self.uiProjectDir:
+        if not selected:
             return
+        self.uiProjectDir = selected
+        self.homDashboard.update_snapshot({'project': selected})
+        self.resultReadDetails.hide()
         self.dirNameLineEdit.setText(self.uiProjectDir)
         self.service.select_project_directory(self.uiProjectDir)
         try:
@@ -674,6 +750,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             return
         worker_count = self.workerCountSpinBox.value()
         settings = self.service.get_algorithm_settings()
+        self.homDashboard.show_configuration(settings)
         self.logger.info(
             "运行确认: project=%s, cst=%s, fmin=%s MHz, stop=%s MHz, fixed_mesh_cells=%s, mesh_convergence=%s, workers=%d, background=minimized",
             self.uiProjectDir,

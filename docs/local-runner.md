@@ -123,3 +123,5 @@ GUI/runner_backend.py、runner_controller.py。功能映射见[功能索引](fea
 ## 2026-10-25 HOM真实副本验收入口
 
 生产HOM链的checkpoint/received/solver中断对照见[小网格HOM](hom-interruption-l5-acceptance.md)。恢复继续使用既有显式recover和resume；HOM模式快照的项目相对路径由采用核验正确解析，不按Runner cwd解析。不改变HTTP命令、Task/ACK或VBA wire；旧Runner需正常停止并更新，不能靠替换文件热修复已导入模块。
+
+2026-10-25新增[一键导出失败诊断](failure-diagnostic-export.md)：日志区按钮直接生成项目diagnostics ZIP，即使Runner离线也可收集本地证据；不发控制指令，不读取endpoint认证文件，不是新增HTTP接口。

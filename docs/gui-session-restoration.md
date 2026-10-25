@@ -30,3 +30,5 @@
 最终测试数字、报告与清理以current-status为准。真实进程是Qt GUI/Runner Python，计算为fake或未提交，并非真实CST重新连接/求解验收。原有退出时stop/shutdown/detach语义保持；未完成项目只找回和展示，不自动计算。
 
 本轮最终离线810 passed、21 integration deselected（204.81s），主窗口另34 passed（1.49s），文档/日志索引3 passed（1.05s，重叠），烟雾启动通过。报告artifacts/gui-reopen-{offline,main,index}-20261025.xml；轻量进程日志及summary.json另留artifacts/gui-reopen-20261025，本轮pytest临时项目结束后清理。未提交、未重打包。
+
+2026-10-25显示分层更新：[默认HOM工作台](gui-hom-workspace.md)展示确认覆盖/模式及指标；完整日志和后台管理收纳到详细页，日志保留与重连回放逻辑不变，本地检查点只读观察不提交任务。

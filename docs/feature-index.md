@@ -10,6 +10,10 @@
 
 |ID|功能|源码|函数/类|测试或操作工具|说明文档|
 |---|---|---|---|---|---|
+|F90|HOM检查点只读缓存与模式结果表|[hom_dashboard.py](../GUI/hom_dashboard.py)|`HomDisplayReader.read`, `HomModeTableModel.set_modes`, `HomDashboard.update_snapshot`|[数据/缓存/覆盖/大表测试](../test/hom_dashboard_test.py)|[工作台设计](gui-hom-workspace.md)|
+|F91|主工作台/详细信息分层及主界面异常摘要|[main_window.py](../GUI/main_window.py)|`MainWindow.__init__`, `MainWindow.renderRunnerSnapshot`, `MainWindow.renderCstProgress`, `MainWindow.onRunError`|[页面/错误测试](../test/hom_dashboard_test.py)、[主窗口回归](../test/gui_main_window_test.py)|[显示分层与边界](gui-hom-workspace.md)|
+|F88|有界失败诊断ZIP及源文件映射|[diagnostic_bundle.py](../csttool/diagnostic_bundle.py)|`export_failure_bundle`|[边界/大日志测试](../test/diagnostic_bundle_test.py)|[范围及API](failure-diagnostic-export.md)|
+|F89|GUI一键后台导出与退出保护|[main_window.py](../GUI/main_window.py)、[diagnostic_export.py](../GUI/diagnostic_export.py)|`MainWindow.exportFailureLogs`, `MainWindow._diagnosticsFinished`|[Qt异步/错误/关闭测试](../test/gui_diagnostic_export_test.py)|[使用与限制](failure-diagnostic-export.md)|
 |F84|同会话停止请求幂等与并发发布|[runtime_protocol.py](../csttool/runtime_protocol.py)|`FileProtocol.request_stop`, `_stop_publication_lock`|[重复/并发/冲突测试](../test/runtime_protocol_test.py)、[失败后重复停止](../test/production_close_v2_test.py)|[现场诊断与边界](solver-failure-stop-idempotency-20261025.md)|
 |F85|任务级表达式撤销及逐阶段诊断|[生产宏](../data/runtime_managed_worker_v1_main.vb)|`CSTPMW_RestoreGoodParameters`, `CSTPMW_CloseSession`|[当前VBA契约](../test/vba_document_contract_test.py)、[真实副本工具](../test/support/validate_batch_restore_close.py)|[任务级撤销边界](task-parameter-undo.md)|
 |F86|单会话收尾预算及有界阶段观察|[managed_cstworker.py](../csttool/managed_cstworker.py)|`ManagedCSTWorker.stop`, `ManagedCSTWorker._observe_close_progress`|[预算与长日志测试](../test/managed_cstworker_test.py)|[等待边界](parameter-restore-close-budget.md)、[真实验收](batch-restore-real-acceptance-20261025.md)|
