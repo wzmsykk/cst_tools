@@ -7,6 +7,18 @@
 
 ## 当前优先：生命周期协议L1–L5（2026-10-24更新）
 
+- [x] 实现任务级参数撤销、相同表达式跳过、setter前记录已尝试前缀、仅批量恢复修改项/删除新增项，取消每轮全表检查点；见[实现边界](task-parameter-undo.md)。
+- [x] 新版真实副本：requested5/changed3、恢复2项/删除1项、旧快照/基准输入/正常关闭/迟到核验通过；见任务级撤销文档，不复用旧全表版本通过结论。
+- [ ] 零参数真实任务、setter部分生效后异常/撤销文件写失败的真实注入、复杂CAD副作用和Start0/exit1仍未验收；当前仅源码契约/既有门禁覆盖部分执行边界。
+
+- [x] 现场暴露的重复stop.request发布错误：同session有效意图幂等、进程内跨实例串行，坏/异会话/临时文件不覆盖；Worker/恢复共用入口。VBA失败文案改为实际返回值，见[记录](solver-failure-stop-idempotency-20261025.md)。不是现场求解/退出问题整体修复。
+- [x] 补取110caff3的diagnostics/lifecycle/cst：实际Start=0、ACK后恢复完成316秒、Rebuild56秒、Save7秒，400秒后批返回且退出1，见[原生对照](solver-failure-native-analysis-20261025.md)。不是受控重现或合法回执/退出码接受验证。
+- [x] 补output.txt及close.receipt：最大迭代次数耗尽；v2严格解析和session/task身份一致，回执报告恢复保存成功。
+- [ ] 补stop.ack、资源samples和快照本体/哈希及进程退出事实；迭代耗尽的数值根因和退出1受控对照仍待验收，不确认OOM/泄漏，不自动推进覆盖。
+- [x] 实施StoreParameters精确数组批量恢复原表达式、删除新增参数/校验/Rebuild、阶段诊断；重复stop共用600秒预算，失败重试从预处理基准新建Worker，见[实现边界](parameter-restore-close-budget.md)。
+- [x] 真实WinWrap/CST小网格副本编译与208项依赖表达式恢复/删除新增参数/校验、失败从processed.cst重试及短预算迟到关闭通过，见[验收记录](batch-restore-real-acceptance-20261025.md)。
+- [ ] 实际零参数工程、复杂CAD同模型性能对照、真实长恢复及Start=0/退出1语义仍pending；本轮失败为Rebuild=False，不作为数值不收敛验收。
+
 - [x] GUI重新打开自动找回最后项目、读取原设置、连接后台/回放历史；保留控制权/恢复/检查点防覆盖门禁，不自动start/recover。见[自动找回](gui-session-restoration.md)；新用户无记录需手动选择一次，损坏/丢失目录不创建空工程。
 - [ ] 自动找回的真实CST后台连接与现场视觉补验；当前独立进程计算为fake/无任务，不能代证实际CST运行环境。
 

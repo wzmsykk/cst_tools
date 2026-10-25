@@ -13,6 +13,8 @@ import os
 from pathlib import Path
 import time
 from typing import Any, Mapping, Protocol
+from threading import Lock
+from weakref import WeakValueDictionary
 from uuid import UUID, uuid4
 
 
@@ -21,6 +23,20 @@ COMPLETION_MAGIC = "CST_COMPLETION_V1"
 ACK_MAGIC = "CST_ACK_V1"
 STOP_REQUEST_MAGIC = "CST_STOP_REQUEST_V1"
 STOP_ACK_MAGIC = "CST_STOP_ACK_V1"
+
+# Concurrent Manager/Worker callers share a publication lock, never the task lock.
+_stop_locks = WeakValueDictionary()
+_stop_locks_guard = Lock()
+
+
+def _stop_publication_lock(path):
+    key = os.path.normcase(str(Path(path).resolve()))
+    with _stop_locks_guard:
+        lock = _stop_locks.get(key)
+        if lock is None:
+            lock = Lock()
+            _stop_locks[key] = lock
+        return lock
 
 
 class ProtocolError(ValueError):
@@ -339,10 +355,14 @@ class FileProtocol:
         return ack
 
     def request_stop(self, session_id: str) -> Path:
-        return atomic_publish(
-            self.root / "stop.request",
-            encode_stop_request(StopRequest(session_id)),
-        )
+        request = StopRequest(session_id)
+        path = self.root / "stop.request"
+        with _stop_publication_lock(path):
+            if path.exists():
+                if self.read_stop_request(session_id) != request:
+                    raise ProtocolError('existing stop request changed during validation')
+                return path
+            return atomic_publish(path, encode_stop_request(request))
 
     def read_stop_request(self, session_id: str) -> StopRequest | None:
         path = self.root / "stop.request"

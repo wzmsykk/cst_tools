@@ -10,6 +10,10 @@
 
 |ID|功能|源码|函数/类|测试或操作工具|说明文档|
 |---|---|---|---|---|---|
+|F84|同会话停止请求幂等与并发发布|[runtime_protocol.py](../csttool/runtime_protocol.py)|`FileProtocol.request_stop`, `_stop_publication_lock`|[重复/并发/冲突测试](../test/runtime_protocol_test.py)、[失败后重复停止](../test/production_close_v2_test.py)|[现场诊断与边界](solver-failure-stop-idempotency-20261025.md)|
+|F85|任务级表达式撤销及逐阶段诊断|[生产宏](../data/runtime_managed_worker_v1_main.vb)|`CSTPMW_RestoreGoodParameters`, `CSTPMW_CloseSession`|[当前VBA契约](../test/vba_document_contract_test.py)、[真实副本工具](../test/support/validate_batch_restore_close.py)|[任务级撤销边界](task-parameter-undo.md)|
+|F86|单会话收尾预算及有界阶段观察|[managed_cstworker.py](../csttool/managed_cstworker.py)|`ManagedCSTWorker.stop`, `ManagedCSTWorker._observe_close_progress`|[预算与长日志测试](../test/managed_cstworker_test.py)|[等待边界](parameter-restore-close-budget.md)、[真实验收](batch-restore-real-acceptance-20261025.md)|
+|F87|失败重试从预处理基准启动并保留确认结果|[cstmanager.py](../csttool/cstmanager.py)|`CSTManager._execute_task`, `CSTManager._replace_worker`|[失败HOM来源与成功回收](../test/cstmanager_test.py)|[基准与快照区别](parameter-restore-close-budget.md)|
 |F81|每用户记忆最后项目选择|[session_store.py](../GUI/session_store.py)|`GuiSessionStore.last_project`, `GuiSessionStore.remember`|[损坏/缺失/跨实例测试](../test/gui_session_restore_test.py)|[自动找回使用与边界](gui-session-restoration.md)|
 |F82|只读恢复原项目设置并自动连接|[runner_backend.py](../GUI/runner_backend.py)|`RunnerBackend.restore_last_project`|[真实GUI重开测试](../test/gui_session_process_test.py)|[后台重连及无自动求解](gui-session-restoration.md)|
 |F83|启动填充项目与恢复显示|[main_window.py](../GUI/main_window.py)|`MainWindow._restore_previous_project`|[状态/日志回放测试](../test/gui_session_restore_test.py)|[持久项目与运行门禁](gui-session-restoration.md)|
@@ -33,7 +37,7 @@
 |F01|任务批量调度|[cstmanager.py](../csttool/cstmanager.py)|`CSTManager.run_batch`|[manager测试](../test/cstmanager_test.py)|[Manager API](cstmanager-api.md)|
 |F02|工程预处理与历史设置|[cst_preprocessor.py](../csttool/cst_preprocessor.py)|`CstProjectPreprocessor.preprocess`|[预处理测试](../test/cst_preprocessor_test.py)|[作用域修正](concave-expression-scope-rebuild-fix.md)|
 |F03|Managed任务与停止|[managed_cstworker.py](../csttool/managed_cstworker.py)|`ManagedCSTWorker.run_task`, `ManagedCSTWorker.stop`|[Worker测试](../test/managed_cstworker_test.py)|[生命周期与回滚](failed-rebuild-stop-recovery.md)|
-|F04|VBA参数恢复与批退出|[Managed模板](../data/runtime_managed_worker_v1_main.vb)|`CSTPMW_CaptureGoodParameters`, `CSTPMW_RestoreGoodParameters`, `CSTPMW_CloseSession`|[直接停止探针](../test/support/validate_failed_rebuild_stop.py)|[生命周期与回滚](failed-rebuild-stop-recovery.md)|
+|F04|VBA参数恢复与批退出|[Managed模板](../data/runtime_managed_worker_v1_main.vb)|`CSTPMW_CaptureTaskParameters`, `CSTPMW_RestoreGoodParameters`, `CSTPMW_CloseSession`|[直接停止探针](../test/support/validate_failed_rebuild_stop.py)|[生命周期与回滚](failed-rebuild-stop-recovery.md)|
 |F05|会话发现与恢复|[project_session_recovery.py](../csttool/project_session_recovery.py)|`discover_managed_sessions`, `recover_project_sessions`|[Ack测试](../test/ack_shutdown_contract_test.py)|[运行协议](python-vba-runtime-protocol.md)|
 |F06|字段读取与支持域校验|[field_artifacts.py](../csttool/field_artifacts.py)|`read_field`, `artifacts_from_result`|[导出生命周期测试](../test/saved_field_export_lifecycle_test.py)|[算子执行方案](postprocess-operator-execution-plan.md)|
 |F07|场匹配诊断|[field_diagnostics.py](../csttool/field_diagnostics.py)|`run_field_diagnostic`|[真实诊断探针](../test/support/validate_managed_field_diagnostic.py)|[六阶段验收](mode-field-selection-implementation-status.md)|

@@ -62,7 +62,7 @@ class ManagedCSTWorker:
     START_TIMEOUT = 120.0
     # Solves may legitimately take hours; only lifecycle waits are bounded.
     TASK_TIMEOUT: float | None = None
-    STOP_TIMEOUT = 120.0
+    STOP_TIMEOUT = 600.0  # One bounded budget shared by all stop() calls.
 
     def __init__(self, worker_id: str, config: WorkerConfig, logger=None):
         if isinstance(config, Mapping):
@@ -134,7 +134,7 @@ class ManagedCSTWorker:
             "completion": self.completion_path, "ack": self.ack_path,
             "state": self.marker_path, "stop_request": self.stop_request_path,
             "stop_ack": self.stop_ack_path, "results": self.result_root,
-            "last_good_parameters": Path(str(self.project_path) + '.last-good-parameters.tsv'),
+            "task_parameter_undo": Path(str(self.project_path) + '.last-good-parameters.tsv'),
             "recovery_snapshot": Path(str(self.project_path) + '.recovered.cst'),
             "recovery_receipt": Path(str(self.project_path) + '.recovery-saved'),
             "close_protocol": self.root / 'close-protocol.json',
@@ -800,13 +800,16 @@ class ManagedCSTWorker:
                 self.logger.info(
                     "已请求CST标准退出，等待保存回执与进程结束",
                     extra={"event": "WORKER_STOP_REQUEST", "phase": "shutdown", "worker": self.ID, "session": self.session_id, "pid": getattr(self._process, "pid", None)})
-                if not self.stop_request_path.exists():
-                    self.protocol.request_stop(self.session_id)
-                else:
-                    self.protocol.read_stop_request(self.session_id)
-            deadline = time.monotonic() + self.STOP_TIMEOUT
+                self.protocol.request_stop(self.session_id)
+            # Replacement and Manager cleanup share one deadline. Publishing
+            # cancellation while Solver is active does not start this budget.
+            if getattr(self, '_stop_deadline', None) is None:
+                self._stop_started = time.monotonic()
+                self._stop_deadline = self._stop_started + self.STOP_TIMEOUT
+            deadline = self._stop_deadline
             while True:
                 assessment = self._shutdown_assessment()
+                self._observe_close_progress()
                 if assessment.standard_closed:
                     write_close_verification(self.root, getattr(self._process, 'pid', None), assessment)
                     self._close_log()
@@ -825,7 +828,7 @@ class ManagedCSTWorker:
             if self._process.poll() is not None:
                 self._close_log()
             self._diagnose_failure("shutdown")
-            self.logger.error("CST标准退出未确认；保留会话，请先执行恢复", extra={"event": "WORKER_STOP_FAILED", "phase": "shutdown", "worker": self.ID, "session": self.session_id, "returncode": assessment.exit_code, "process_state": assessment.process_state, "model_state": assessment.model_state, "missing_evidence": assessment.missing_evidence, "timeout_seconds": self.STOP_TIMEOUT, "recovery_hint":"核对StopAck、快照及本任务进程，不强杀独立实例"})
+            self.logger.error("CST标准退出未确认；保留会话，请先执行恢复", extra={"event": "WORKER_STOP_FAILED", "phase": "shutdown", "worker": self.ID, "session": self.session_id, "returncode": assessment.exit_code, "process_state": assessment.process_state, "model_state": assessment.model_state, "missing_evidence": assessment.missing_evidence, "timeout_seconds": self.STOP_TIMEOUT, "elapsed_seconds": time.monotonic() - self._stop_started, "lifecycle_detail": getattr(self, "_last_close_detail", None), "recovery_hint":"核对StopAck、快照及本任务进程，不强杀独立实例"})
             raise ManagedWorkerShutdownError(
                 f"worker {self.ID} did not confirm Save/StopAck/batch exit; " + (
                     "process already exited; reconcile preserved protocol and snapshot"
@@ -833,6 +836,31 @@ class ManagedCSTWorker:
                     "process is still running or unknown; session recovery is required"
                 ) + '; missing=' + ', '.join(assessment.missing_evidence)
             )
+
+    def _observe_close_progress(self):
+        """Read a bounded tail and emit only changed complete lifecycle lines."""
+        path = getattr(self, 'observation_root', self.root) / 'lifecycle.log'
+        try:
+            stamp = path.stat()
+            signature = (stamp.st_mtime_ns, stamp.st_size)
+            if signature == getattr(self, '_close_log_signature', None):
+                return
+            with path.open('rb') as stream:
+                stream.seek(max(0, stamp.st_size - 8192))
+                tail = stream.read(8192)
+            lines = tail.split(b'\n')[:-1]
+            if not lines:
+                return
+            detail = lines[-1].decode('utf-8', errors='replace').strip()
+            self._close_log_signature = signature
+            if detail and detail != getattr(self, '_last_close_detail', None):
+                self._last_close_detail = detail
+                self.logger.info('CST收尾阶段更新 | %s', detail, extra={
+                    'event': 'WORKER_CLOSE_PROGRESS', 'phase': 'shutdown',
+                    'lifecycle_detail': detail, 'artifacts': {'lifecycle_log': str(path)},
+                    'remaining_seconds': max(0.0, self._stop_deadline - time.monotonic())})
+        except OSError:
+            return  # Observation never replaces protocol/closure facts.
 
     def _shutdown_assessment(self):
         from .project_session_recovery import _process_tree_is_alive

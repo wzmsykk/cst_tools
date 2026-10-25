@@ -541,9 +541,12 @@ class CSTManager:
             )
             if self.stop_requested:
                 break
+            # A failed session is retired. Retry from the configured
+            # preprocessed base, retaining confirmed results/coverage separately.
+            # Successful job-limit recycling may still use its confirmed snapshot.
             if not self._replace_worker(
                 slot,
-                continue_from_snapshot=task.continue_from_snapshot,
+                continue_from_snapshot=False,
             ):
                 break
 

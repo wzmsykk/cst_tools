@@ -188,6 +188,27 @@ def test_actual_python_ack_and_close_with_synthetic_peer(peer_factory, outcome):
     assert worker._shutdown_assessment().task_outcome == frame.task_outcome
 
 
+def test_repeated_stop_after_solver_failure_ack_does_not_publish_conflict(peer_factory):
+    _, worker, peer, field = peer_factory('solver-failure')
+    before = field.read_bytes()
+    result = worker.run_task('failed-once', params={})
+    assert result.status == 'Failure' and worker.retiring
+    worker.request_stop()  # Manager replacement path.
+    content = worker.stop_request_path.read_bytes()
+    worker.request_stop()  # Manager stop broadcast after replacement failure.
+    assert worker.stop_request_path.read_bytes() == content
+    assert worker.stop()
+    assert peer.operations.count('solver') == 1
+    assert field.read_bytes() == before
+
+
+def test_solver_failure_diagnostic_keeps_actual_non_success_return():
+    source = Path('data/runtime_managed_worker_v1_main.vb').read_text(encoding='utf-8')
+    failed = source.split('If solverReturn <> 1 Then', 1)[1].split('End If', 1)[0]
+    assert '"EigenmodeSolver.Start returned " & CStr(solverReturn)' in failed
+    assert '"EigenmodeSolver.Start returned 0"' not in failed
+
+
 @pytest.mark.parametrize('fault', ['restore', 'rebuild', 'backup', 'save', 'recovery-receipt', 'receipt'])
 def test_close_failure_preserves_evidence_and_blocks_positive_ack(peer_factory, fault):
     project, worker, peer, field = peer_factory('solver-failure', fault, exit_code=4)

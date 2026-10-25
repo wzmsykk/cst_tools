@@ -267,3 +267,11 @@ Manager 只能重试同一不可变 `SimulationTask`。每个 attempt 使用新 
 ## 16. 第一实现切片
 
 只实现一个 Worker、一个 scope、literal/expression 参数、Eigenmode solve、一个 `.rd0` 标量、无 Runtime VBA postprocess、Task/Completion/Ack fake-worker 测试和 default 真实 CST Contract Test。先证明身份、时序和结果所有权，再决定 Operation ABI 的实际范围。
+
+## 2026-10-25停止发布补充
+
+FileProtocol.request_stop对同session有效的既有stop.request返回原路径，不重写；进程内相同路径的不同实例共享短时发布锁，不取运行任务锁。坏消息、异会话、临时文件残留不自动覆盖或重试。Worker stop及显式恢复复用该入口，StopAck/v2收尾回执/进程退出核验不变。见[现场记录与未验证边界](solver-failure-stop-idempotency-20261025.md)；Task/ACK/Stop wire不变。
+
+2026-10-25后续实现：[批量恢复与收尾预算](parameter-restore-close-budget.md)。宏批量保留表达式并校验；Worker共用一次600秒期限；失败重试从预处理基准启动，旧副本仍须正常关闭。此前未实施描述为历史分析，真实CST兼容/提速及退出1对照仍pending，关闭证据门禁不变。
+
+2026-10-25后续改为[任务级参数撤销](task-parameter-undo.md)：不再每轮全表读取/失败全表写回；只恢复本任务已尝试修改的参数。原完整检查点及全量恢复说明为历史版本，600秒预算/关闭门禁不变。

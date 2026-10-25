@@ -32,7 +32,7 @@ def test_recovery_keeps_expressions_and_never_replays_solver():
     assert close.index('CSTPMW_RestoreGoodParameters') < close.index('If Not Rebuild') < close.index('\n    Save\n') < close.index('CSTP_WriteStopAck')
     assert 'EigenmodeSolver.Start' not in close and '\n    Quit\n' not in close
     assert close.index('\n    Save\n') < close.index('CST_RECOVERY_SAVED_V1')
-    capture = source.split('Private Sub CSTPMW_CaptureGoodParameters', 1)[1].split('End Sub', 1)[0]
+    capture = source.split('Private Sub CSTPMW_CaptureTaskParameters', 1)[1].split('End Sub', 1)[0]
     assert 'RestoreParameterExpression' in capture and 'RestoreDoubleParameter' not in capture
 
 

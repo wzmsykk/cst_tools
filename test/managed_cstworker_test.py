@@ -501,3 +501,60 @@ def test_manager_propagates_worker_shutdown_failure_after_closing(tmp_path):
 
     assert manager.state is ManagerState.CLOSED
 from csttool.configuration import GlobalSettings, ProjectSettings
+
+
+def test_stop_reuses_budget_and_can_observe_late_close(tmp_path, monkeypatch):
+    from types import SimpleNamespace
+    worker = build_worker_shell(tmp_path)
+    worker.ID = 'budget'
+    from csttool.runtime_protocol import FileProtocol
+    worker.protocol = FileProtocol(worker.root / 'protocol')
+    worker._lock = threading.RLock()
+    worker._process = SimpleNamespace(pid=None, poll=lambda: None)
+    worker.STOP_TIMEOUT = 1.0
+    clock = [0.0]
+    monkeypatch.setattr('csttool.managed_cstworker.time.monotonic', lambda: clock[0])
+    sleeps = []
+    def advance(seconds):
+        sleeps.append(seconds)
+        clock[0] += seconds
+    monkeypatch.setattr('csttool.managed_cstworker.time.sleep', advance)
+    closed = [False]
+    def assess():
+        return SimpleNamespace(standard_closed=closed[0], process_state='running',
+            missing_evidence=('process-exit-unconfirmed',), exit_code=None,
+            model_state='unknown', disposition='pending')
+    monkeypatch.setattr(worker, '_shutdown_assessment', assess)
+    monkeypatch.setattr('csttool.managed_cstworker.write_close_verification', lambda *a: None)
+    monkeypatch.setattr(worker, '_diagnose_failure', lambda *a: None)
+    monkeypatch.setattr(worker, '_close_log', lambda: None)
+    monkeypatch.setattr(worker, '_finish_domain_registration', lambda: None)
+    worker.request_stop()
+    assert not hasattr(worker, '_stop_deadline')
+    for _ in range(2):
+        with pytest.raises(ManagedWorkerShutdownError):
+            worker.stop()
+        if _ == 0:
+            first_sleeps, deadline = len(sleeps), worker._stop_deadline
+    assert len(sleeps) == first_sleeps
+    assert worker._stop_deadline == deadline
+    closed[0] = True
+    assert worker.stop() is True
+    assert len(sleeps) == first_sleeps
+
+
+def test_close_stage_observation_is_bounded_deduplicated_and_complete(tmp_path, caplog):
+    worker = build_worker_shell(tmp_path)
+    worker._stop_deadline = float('inf')
+    path = worker.root / 'lifecycle.log'
+    path.write_bytes(b'x' * 20000 + b'\nnow | stage=restore-batch; begin\npartial')
+    with caplog.at_level(logging.INFO):
+        worker._observe_close_progress()
+        worker._observe_close_progress()
+        with path.open('ab') as stream:
+            stream.write(b' completed\n')
+        worker._observe_close_progress()
+    records = [r for r in caplog.records if getattr(r, 'event', None) == 'WORKER_CLOSE_PROGRESS']
+    assert len(records) == 2
+    assert records[0].lifecycle_detail == 'now | stage=restore-batch; begin'
+    assert records[1].lifecycle_detail == 'partial completed'

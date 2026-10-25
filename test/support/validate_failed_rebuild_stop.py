@@ -76,7 +76,9 @@ def main():
         assert report['saved_recovery_snapshot'], report
         assert report['source_unchanged'] and report['recovery_rebuild_passed'], report
         assert report['solver_calls'] == int(args.after_success), report
-        assert 'concaveL\t(Leq-Gap)/2' in report['checkpoint'], report
+        assert report['checkpoint'].startswith('CST_PARAMETER_UNDO_V2\n'), report
+        assert 'nmodes\t-1\t' in report['checkpoint'], report
+        assert 'concaveL\t' not in report['checkpoint'], report
         if args.after_success:
             assert report['good_snapshot_unchanged'], report
         print('FAILED_REBUILD_STOP_PASSED', flush=True)

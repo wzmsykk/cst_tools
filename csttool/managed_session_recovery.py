@@ -26,11 +26,7 @@ def recover_and_stop_session(
 ) -> Completion | None:
     """Await StopAck or an owned peer's observed exit; caller must verify closure."""
     protocol = FileProtocol(protocol_root)
-    stop_path = protocol.root / "stop.request"
-    if not stop_path.exists():
-        protocol.request_stop(session_id)
-    else:
-        protocol.read_stop_request(session_id)
+    protocol.request_stop(session_id)
     completion_path = protocol.root / "current.completion"
     ack_path = protocol.root / "current.ack"
     deadline = time.monotonic() + timeout

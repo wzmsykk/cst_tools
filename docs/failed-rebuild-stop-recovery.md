@@ -10,9 +10,9 @@
 
 ## 实现
 
-Managed VBA在启动和每个成功任务快照发布后捕获完整参数名称与原始表达式；工作副本旁输出`worker-input.cst.last-good-parameters.tsv`用于诊断。任务开始变更参数即标记需要恢复，只有成功完成快照/参数检查点才清除。
+2026-10-25现行为[任务级撤销](task-parameter-undo.md)：只捕获当前任务实际要修改的参数原表达式和存在性，写入前完整保存带CST_PARAMETER_UNDO_V2头的诊断文件。启动及成功后不再全量捕获；成功快照完成后撤销记录失效。setter前记录尝试前缀，失败只恢复该前缀。旧last-good-parameters.tsv路径保留但格式不再是全表，不能用历史全量假设读取。
 
-失败后直接Stop：恢复最后良好参数表达式→移除该检查点之后新增的任务参数→完整Rebuild→Save→StopAck→返回批执行器。没有Solver重放，原失败Completion/received记录不改成成功，已有成功结果留在独立快照。
+失败后直接Stop：恢复本任务已尝试修改的原参数表达式→移除本任务已尝试新增的参数→完整Rebuild→Save→StopAck→返回批执行器。没有Solver重放，原失败Completion/received记录不改成成功，已有成功结果留在独立快照。
 
 恢复、重建或保存失败均不发布成功StopAck；保留诊断并要求会话核对。Python停止要求StopAck及退出核对。退出0按正常路径处理；退出4只有具备本session严格匹配的recovery-saved回执及非空recovered.cst快照才能确认停止，记录WORKER_STOP_RECOVERED警告，不改写失败任务结果。其他非零、缺回执/快照或缺StopAck均拒绝确认。已退出的实例也按同一规则核对。
 

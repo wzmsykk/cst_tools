@@ -408,3 +408,21 @@ def test_stop_request_prevents_worker_rotation_and_new_dispatch(tmp_path):
     assert len(created) == 1
     manager.stop()
 from csttool.configuration import GlobalSettings, ProjectSettings
+
+
+def test_failed_hom_retry_uses_preprocessed_base_and_preserves_confirmed_snapshot(manager_factory, tmp_path):
+    manager, tracker = manager_factory(workers=1, outcomes=['Failure', 'Success'])
+    snapshot = tmp_path / 'last-confirmed.cst'
+    snapshot.write_bytes(b'confirmed results must survive')
+    slot = manager._slots[0]
+    slot.confirmed_snapshot = snapshot
+    manager._confirmed_snapshot = snapshot
+    result = manager.execute(SimulationTask({'fmin': 1165.82, 'fmax': 1215.82},
+        'retry-hom', retry_count=1, continue_from_snapshot=True))
+    assert result['TaskStatus'] == 'Success'
+    assert tracker['created'][0].stopped
+    assert len(tracker['created']) == 2
+    assert tracker['configs'][1].project_path == Path(manager.cstProjPath)
+    assert tracker['configs'][1].project_path != snapshot
+    assert snapshot.read_bytes() == b'confirmed results must survive'
+    assert manager.get_confirmed_snapshot() == snapshot

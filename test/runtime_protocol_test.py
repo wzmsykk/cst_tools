@@ -127,6 +127,44 @@ def test_stop_request_and_ack_are_session_scoped(tmp_path):
         protocol.read_stop_request(new_session_id())
 
 
+def test_stop_request_repetition_preserves_bytes_and_timestamp(tmp_path):
+    protocol = FileProtocol(tmp_path)
+    session = new_session_id()
+    path = protocol.request_stop(session)
+    before = path.read_bytes(), path.stat().st_mtime_ns
+    assert protocol.request_stop(session) == path
+    assert FileProtocol(tmp_path).request_stop(session) == path
+    assert before == (path.read_bytes(), path.stat().st_mtime_ns)
+
+
+@pytest.mark.parametrize('existing', ['foreign', 'truncated', 'temporary'])
+def test_conflicting_stop_is_not_overwritten_or_accepted(tmp_path, existing):
+    protocol = FileProtocol(tmp_path)
+    session = new_session_id()
+    path = tmp_path / ('stop.request.tmp' if existing == 'temporary' else 'stop.request')
+    path.write_text(encode_stop_request(StopRequest(new_session_id())) if existing == 'foreign' else 'CST_STOP_REQUEST_V1\n')
+    before = path.read_bytes()
+    with pytest.raises((ProtocolError, FileExistsError)):
+        protocol.request_stop(session)
+    assert path.read_bytes() == before
+
+
+def test_concurrent_stop_publication_across_protocol_instances(tmp_path):
+    from concurrent.futures import ThreadPoolExecutor
+    from threading import Barrier
+    session = new_session_id()
+    peers = [FileProtocol(tmp_path) for _ in range(8)]
+    gate = Barrier(len(peers))
+    def publish(peer):
+        gate.wait(timeout=3)
+        return peer.request_stop(session)
+    with ThreadPoolExecutor(max_workers=len(peers)) as pool:
+        paths = list(pool.map(publish, peers))
+    assert all(path == tmp_path / 'stop.request' for path in paths)
+    assert peers[0].read_stop_request(session) == StopRequest(session)
+    assert not (tmp_path / 'stop.request.tmp').exists()
+
+
 def test_wait_completion_has_a_bounded_timeout(tmp_path):
     protocol = FileProtocol(tmp_path)
     task = make_task()

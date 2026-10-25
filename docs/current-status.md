@@ -7,6 +7,23 @@
 
 ## 最新状态与近期TODO（2026-10-25）
 
+- 参数恢复热路径已改为[任务级撤销](task-parameter-undo.md)：只读任务名字及原表达式，跳过同表达式项，不再启动/成功时全量捕获。失败只批量恢复已尝试修改的原有参数并删除本任务新增项；setter前记意图，保留求解成功后不回滚门禁。旧208项全量验收为历史版本，新版真实副本已通过（artifacts/batch-restore-real-062f861b）：requested5/changed3、恢复2项/删除1项；原表达式/确认快照/processed.cst来源及关闭核验通过，Solver仅2次。离线137 passed（12.69s），索引/恢复6 passed（1.06s）。清理24066340字节原始数据，保留轻量证据，不宣称总收尾墙钟提速；详见任务级撤销文档。
+
+- 真实批量恢复/基准重试/迟到收尾副本验收：[本轮证据与边界](batch-restore-real-acceptance-20261025.md)。Pillbox cell8/nmodes1，208项原表达式批量8秒、删除1项5秒、校验通过，恢复批返回约19秒，严格恢复退出4；新Worker从processed.cst重试，两次503.49464359617MHz，Solver共2次，原确认快照哈希保留。无求解延迟用例0.3秒测试预算下重复stop约0.032秒，迟到退出0可确认；不改变600秒默认。首轮工具汇总参数错误已修正并原证据复核，无重算；不覆盖Start0/exit1或复杂CAD性能。
+- 本轮离线专项62 passed（8.88s）；实际同权限CST清单空、源夹具不变，清理约24.3MB原始副本/结果，保留轻量证据和哈希。真实数据已删除，复验需重新生成。
+
+- 专项回归130 passed（10.73s），报告artifacts/batch-close-verified-20261025.xml；覆盖Manager、Worker、假对端、停止恢复、关闭门禁、协议与文档/日志索引。初轮新增测试缺少FileProtocol夹具导致52 passed/1 failed，补夹具后复验；另一次测试文件名错误未收集测试，不计通过。未做真实WinWrap/CST验收。
+
+- 批量表达式恢复与单次收尾预算已实施：[实现及边界](parameter-restore-close-budget.md)。StoreParameters精确数组保留表达式、删除新增参数并核对；阶段begin/returned和有界日志观察。Worker默认600秒，重复stop共用期限，Solver无总超时。失败重试按用户选择从预处理基准新建Worker，确认覆盖/结果保留；旧会话关闭不确认则禁止替换。旧现场分析“未实施”为历史状态，真实CST兼容/性能仍待验收。
+
+- 新增output/close.receipt补证：[原生失败结论](solver-failure-native-analysis-20261025.md)。直接原因是求解最大迭代次数耗尽，nmodes=1、估计频率1165.82MHz，后续模板自动取消；非后处理失败。回执经现有v2解析及session/task身份核对，报告restored-saved、恢复快照1730521字节、无收尾错误；未取得快照本体/StopAck/现场进程证据，仍不接受退出1。下列早期“缺output/回执”保留为历史状态，以本条和补证章节为准。未启动真实CST。
+
+- 现场原生补证已读到：[Start=0与慢收尾](solver-failure-native-analysis-20261025.md)。diagnostics/lifecycle/cst三文件确认Start实际0（调用54分13秒），ACK后到恢复完成316秒，Rebuild56秒、Save7秒，总400秒后batch-return；并非永久卡Save，两个120秒等待均早于完成。CST stdout仍退出1，规则不放宽；求解内部原因仍缺output.txt、实际回执/StopAck和资源采样。官方Project文档支持StoreParameters批量表达式恢复，作为下一步优化/验收方向，未在本轮实施或启动CST。
+- 原生补证本轮文档/日志索引与现行VBA源码契约11 passed（0.88s），artifacts/solver-failure-stop-20261025/native-review-tests.xml；仅验证索引/源码，不代表批量方案、退出预算或真实CST补验。轻量三文件副本/SHA/时序分析保留，pytest临时目录清理；本轮未新增生产行为或操作现场工程。
+
+- 现场失败链诊断及局部修正：[求解/停止幂等](solver-failure-stop-idempotency-20261025.md)。旧版汇总报Start returned 0、任务约55分钟后失败并ACK退役，之后两次120秒退出未确认；重复发布stop.request的FileExistsError为独立后续缺陷，已修复同session有效停止请求幂等/并发、统一Worker和恢复入口，冲突/坏文件仍拒绝。VBA原先把非1写成0，改为实际返回值文案，wire/成功门槛/关闭门禁不变。现场F:及后续Desktop原生日志不可读，CST求解原因及收尾卡点仍待补证；无真实求解或现场进程操作。
+- 本轮协议/Worker/恢复/假对端/文档与日志索引/VBA源码契约专项115 passed（10.78s），报告artifacts/solver-failure-stop-20261025/tests-final.xml；原JSONL及summary.json轻量保留。初次旧契约固定要求returned 0导致114 passed/1 failed，已改为生产宏实际值契约后复验，不计旧失败为通过。未做全仓/真实WinWrap或CST补验，未提交/打包。
+
 - GUI启动自动找回：[项目/后台恢复](gui-session-restoration.md)。正常入口记忆最后项目至用户AppData，再开窗口自动填充持久设置、连接同一Runner并恢复日志/覆盖/模式/错误；后台已退出时仅启动Runner读取历史，不提交start/recover或求解。已有检查点禁止新扫描；损坏记录/丢失目录手动选择，不新建空项目。发布--smoke-test隔离用户记录；无记录首次需手动选择一次。
 - 本轮离线810 passed、21 integration deselected（204.81s），主窗口独立34 passed（1.49s），最终文档/日志索引3 passed（1.05s，重叠）；报告artifacts/gui-reopen-{offline,main,index}-20261025.xml，运行python gui_app.py --smoke-test通过。新增存储/GUI专项11 passed、独立GUI重开进程2 passed（均已包含在全套）：连接同一后台/原run_id、start仍一条、无自动recover；离线只启动Runner回放历史，无temp求解会话。没有真实CST或现场视觉验收；未提交/重打包。
 - 本轮测试Runner均已核实结束，pytest临时项目已清理；保留artifacts/gui-reopen-20261025内轻量进程日志、summary.json、cleanup.txt和XML，artifacts不保证随Git迁移。未写用户真实AppData、未修改原工程或结束用户进程。
