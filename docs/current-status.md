@@ -7,6 +7,10 @@
 
 ## 最新状态与近期TODO（2026-10-25）
 
+- GUI启动自动找回：[项目/后台恢复](gui-session-restoration.md)。正常入口记忆最后项目至用户AppData，再开窗口自动填充持久设置、连接同一Runner并恢复日志/覆盖/模式/错误；后台已退出时仅启动Runner读取历史，不提交start/recover或求解。已有检查点禁止新扫描；损坏记录/丢失目录手动选择，不新建空项目。发布--smoke-test隔离用户记录；无记录首次需手动选择一次。
+- 本轮离线810 passed、21 integration deselected（204.81s），主窗口独立34 passed（1.49s），最终文档/日志索引3 passed（1.05s，重叠）；报告artifacts/gui-reopen-{offline,main,index}-20261025.xml，运行python gui_app.py --smoke-test通过。新增存储/GUI专项11 passed、独立GUI重开进程2 passed（均已包含在全套）：连接同一后台/原run_id、start仍一条、无自动recover；离线只启动Runner回放历史，无temp求解会话。没有真实CST或现场视觉验收；未提交/重打包。
+- 本轮测试Runner均已核实结束，pytest临时项目已清理；保留artifacts/gui-reopen-20261025内轻量进程日志、summary.json、cleanup.txt和XML，artifacts不保证随Git迁移。未写用户真实AppData、未修改原工程或结束用户进程。
+
 - 退出逻辑与异常资源修正：[完整退出契约](gui-exit-resource-cleanup.md)。主GUI区分仅关闭界面与停止任务→等待收尾→shutdown Runner→关闭GUI；未知/只读/需要恢复/停止或关闭失败时持续显示原因和恢复方法，仍可明确选择仅关界面。detach等待本地在途通信/release后才让Qt关闭；部分构造和清理异常使用补偿清理，移除HOM无用result.log句柄。Runner快照新增可选runtime.cwd、后台管理显示双方PID/cwd及终端提示。Task/VBA/物理安全门禁不变。
 - 本轮最终离线797 passed、21 integration deselected（107.89s），主窗口独立34 passed（1.34s）；包含六组独立Qt GUI/假Runner进程的正常退出及Windows目录重命名/释放，含cmd /c和shutdown响应丢失。报告artifacts/gui-exit-offline-final-20261025.xml、artifacts/exit-main-20261025.xml。初轮旧测试仍假定detach立即接受close，795 passed/1 failed不计整套通过；修正为等待客户端收尾后复验。弹窗提示Qt原生崩溃和初版夹具失败另留知识库边界。本轮没有真实CST或现场视觉验收，未提交/重打包。
 - 最终文档/日志索引及资源专项8 passed（2.37s，重叠）；六组退出事实/日志和summary.json保留于artifacts/gui-exit-fix-20261025。已清理本轮pytest临时目录；offscreen字体集合0导致截图无文字，现场视觉仍pending，不把结构/退出测试当视觉通过。

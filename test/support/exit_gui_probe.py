@@ -17,11 +17,17 @@ def main():
     parser.add_argument('--project', required=True)
     parser.add_argument('--choice', choices=['stop', 'detach'], required=True)
     parser.add_argument('--lost-shutdown-response', action='store_true')
+    parser.add_argument('--restore-session')
     args = parser.parse_args()
     app = QApplication([])
-    backend = RunnerBackend()
+    if args.restore_session:
+        from GUI.session_store import GuiSessionStore
+        backend = RunnerBackend(session_store=GuiSessionStore(args.restore_session))
+    else:
+        backend = RunnerBackend()
     backend.supports_cst_backend_selection = False
-    backend.select_project_directory(args.project)
+    if not args.restore_session:
+        backend.select_project_directory(args.project)
     if args.lost_shutdown_response:
         original = backend.client.command
         def command(operation, *a, **kw):
@@ -52,7 +58,9 @@ def main():
     result = app.exec_()
     report = dict(pid=os.getpid(), choice=args.choice, controller_closed=window.controller.closed,
                   runner_stopped=window.controller.runner_stopped, timed_out=bool(timed_out),
-                  gui_resources_closed=getattr(window, '_gui_resources_closed', False))
+                  gui_resources_closed=getattr(window, '_gui_resources_closed', False),
+                  project=backend.project, runner_status=getattr(backend, 'runner_status', {}),
+                  log_messages=[row['message'] for row in window.logTextBox.model.rows])
     (Path(args.project) / 'gui-exit-probe.json').write_text(json.dumps(report), encoding='utf-8')
     return 23 if timed_out else result
 

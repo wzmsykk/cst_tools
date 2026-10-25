@@ -7,6 +7,9 @@
 
 ## 当前优先：生命周期协议L1–L5（2026-10-24更新）
 
+- [x] GUI重新打开自动找回最后项目、读取原设置、连接后台/回放历史；保留控制权/恢复/检查点防覆盖门禁，不自动start/recover。见[自动找回](gui-session-restoration.md)；新用户无记录需手动选择一次，损坏/丢失目录不创建空工程。
+- [ ] 自动找回的真实CST后台连接与现场视觉补验；当前独立进程计算为fake/无任务，不能代证实际CST运行环境。
+
 - [x] 退出契约统一：明确detach与stop→shutdown→关闭GUI，空闲/安全FAILED可完整退出，未知/停止或服务关闭失败显示持久错误及可选操作；仅关界面不停止后台。见[现行契约](gui-exit-resource-cleanup.md)，不以杀CST解决。
 - [x] 异常资源清理：LocalExecution部分构造/overview异常也补偿关闭日志，HOM移除无用result.log，detach收口在途通信，GUI本地日志关闭失败允许重试；补真实GUI/假Runner Python和Windows文件/目录释放测试。实际CST收尾不由这些测试代证。
 - [x] 当前应用目录诊断：Runner/GUI显示PID/cwd及启动父进程PID，提示外部终端离开目录；不枚举/结束其他shell。runtime.cwd为可选兼容字段。

@@ -10,6 +10,9 @@
 
 |ID|功能|源码|函数/类|测试或操作工具|说明文档|
 |---|---|---|---|---|---|
+|F81|每用户记忆最后项目选择|[session_store.py](../GUI/session_store.py)|`GuiSessionStore.last_project`, `GuiSessionStore.remember`|[损坏/缺失/跨实例测试](../test/gui_session_restore_test.py)|[自动找回使用与边界](gui-session-restoration.md)|
+|F82|只读恢复原项目设置并自动连接|[runner_backend.py](../GUI/runner_backend.py)|`RunnerBackend.restore_last_project`|[真实GUI重开测试](../test/gui_session_process_test.py)|[后台重连及无自动求解](gui-session-restoration.md)|
+|F83|启动填充项目与恢复显示|[main_window.py](../GUI/main_window.py)|`MainWindow._restore_previous_project`|[状态/日志回放测试](../test/gui_session_restore_test.py)|[持久项目与运行门禁](gui-session-restoration.md)|
 |F77|GUI完整退出编排与持久错误反馈|[main_window.py](../GUI/main_window.py)|`MainWindow._close_runner_window`, `MainWindow._close_local_resources`, `MainWindow._exit_failed`|[GUI退出状态测试](../test/gui_runner_test.py)|[退出契约](gui-exit-resource-cleanup.md)|
 |F78|部分构造和异常收尾资源补偿|[runner.py](../csttool/runner.py)|`LocalExecution.__init__`, `LocalExecution.close`, `working_directory`|[资源句柄测试](../test/exit_resources_test.py)|[资源/工作目录边界](gui-exit-resource-cleanup.md)|
 |F79|GUI断开时通信池收口|[runner_controller.py](../GUI/runner_controller.py)|`RunnerController.detach`, `RunnerController.poll`|[停止/取消/断开](../test/gui_runner_test.py)|[断开语义](gui-exit-resource-cleanup.md)|

@@ -159,6 +159,30 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.CalcDialogBox.setDefaultValues(self.service.get_algorithm_settings())
         self._sync_readiness()
         self.renderRunState(self.controller.state)
+        if getattr(self.service.backend, 'session_store', None) is not None:
+            QTimer.singleShot(0, self._restore_previous_project)
+
+    def _restore_previous_project(self):
+        backend = self.service.backend
+        if self.controller.closed or self.uiProjectDir:
+            return
+        if backend.restore_last_project():
+            self.uiProjectDir = backend.project
+            self.dirNameLineEdit.setText(backend.project)
+            self.uiCSTFilePath = backend.source
+            self.cstFilePathLineEdit.setText(backend.source or '')
+            try:
+                self.CalcDialogBox.setDefaultValues(backend.get_algorithm_settings())
+                self.PPSDialogBox.setPPSList(backend.get_postprocess_settings())
+                self.workerCountSpinBox.setValue(backend.restored_worker_count)
+            except (ValueError, TypeError, KeyError, AttributeError) as exc:
+                self.logger.warning('项目已找回，设置显示不完整，请检查原项目配置：%s', exc)
+            self.refreshCstBackends()
+            self._sync_readiness()
+            self.controller.inspect_recovery_state()
+        if backend.restore_message:
+            self.logger.info(backend.restore_message)
+            self.statusbar.showMessage(backend.restore_message)
 
     def _fit_initial_window_to_screen(self):
         screen = QApplication.primaryScreen()
@@ -482,7 +506,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def _sync_readiness(self):
         project_ready = bool(self.uiProjectDir and self._cst_backend_ready)
-        self._new_run_ready = bool(project_ready and self.uiCSTFilePath)
+        checkpoint = bool(getattr(self.service.backend, 'has_checkpoint', False))
+        self._new_run_ready = bool(project_ready and self.uiCSTFilePath and not checkpoint)
+        self.StartButton.setToolTip('已有项目进度，请继续未完成或选择新目录' if checkpoint else '从新项目开始计算')
         self._resume_ready = project_ready
         self.controller.set_inputs_ready(self._new_run_ready or self._resume_ready)
         self.renderRunState(self.controller.state)
