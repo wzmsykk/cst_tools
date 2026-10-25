@@ -77,3 +77,5 @@ Worker 通过 Stop Request/Ack、Save 和 Quit 退出。紧急进程终止不属
 # 异常结果重试与继续扫描
 
 每个区间按 `max_interval_attempts` 限制重算次数。无效频率、结果读取异常、重复模式或无法确认的窗口外结果在重试耗尽后，记录为未确认区间（`failed` 和 `failure_reasons`），并从该窗口上限继续向后扫描。未确认区间不计入已完成或已证明为空的区间；日志输出 `HOM_FAILED_INTERVAL`，检查点保留区间和原因。扫描结束时存在未确认区间会输出 `HOM_SCAN_COMPLETED_WITH_GAPS` 警告，正常返回结果，继续运行可补算这些区间。全局求解次数上限仍会终止扫描，用户停止仍保存待扫描区间。
+
+2026-10-25后续实现：[Mesh/扩窗/窄窗恢复](hom-solver-failure-recovery.md)。HOM默认恢复、正常任务不重复写cell，checkpoint v4读取旧v3；退出1仅可在严格已结束/恢复保存及协议证据齐全时按非标准失败退役，不改为标准成功，旧现场分析“仅拒绝/待实现”为历史状态。实际真实CST门禁仍以新文pending为准。

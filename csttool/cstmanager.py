@@ -80,6 +80,7 @@ class SimulationTask:
     job_name: str
     retry_count: int = 0
     continue_from_snapshot: bool = False
+    retire_failed_session: bool = False
 
     def __post_init__(self) -> None:
         if not self.job_name:
@@ -392,7 +393,7 @@ class CSTManager:
             return sequence
 
     def _replace_worker(
-        self, slot: _WorkerSlot, *, continue_from_snapshot: bool = False
+        self, slot: _WorkerSlot, *, continue_from_snapshot: bool = False, allow_failed_retirement: bool = False
     ) -> bool:
         slot.state = WorkerState.DRAINING
         self.logger.info("Worker 重建开始 | WORKER_RESTART_START worker=%s continue_snapshot=%s", slot.worker_id, continue_from_snapshot, extra={"event": "WORKER_RESTART_START", "phase": "restart", "worker": slot.worker_id, "continue_snapshot": continue_from_snapshot})
@@ -400,10 +401,20 @@ class CSTManager:
         try:
             old_worker.stop()
         except Exception:
-            self.logger.exception("Worker 关闭失败 | worker=%s project=%s", slot.worker_id, self.currProjectDir)
-            slot.state = WorkerState.DEAD
-            self.request_stop()
-            raise RuntimeError('worker drain failed; replacement is forbidden until session recovery')
+            retired = False
+            if allow_failed_retirement:
+                retire = getattr(old_worker, 'retire_failed_session', None)
+                if retire is not None:
+                    try:
+                        retired = retire()
+                    except Exception:
+                        self.logger.exception('失败会话退役核验异常；保留会话并停止调度')
+            if not retired:
+                self.logger.exception("Worker 关闭失败 | worker=%s project=%s", slot.worker_id, self.currProjectDir)
+                slot.state = WorkerState.DEAD
+                self.request_stop()
+                raise RuntimeError('worker drain failed; replacement is forbidden until session recovery')
+            self.logger.warning('失败CST已结束且恢复证据完整，按非标准退出退役，不改判任务成功 | worker=%s', slot.worker_id)
 
         slot.state = WorkerState.RESTARTING
 
@@ -547,6 +558,7 @@ class CSTManager:
             if not self._replace_worker(
                 slot,
                 continue_from_snapshot=False,
+                allow_failed_retirement=task.retire_failed_session,
             ):
                 break
 

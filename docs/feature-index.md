@@ -10,6 +10,8 @@
 
 |ID|功能|源码|函数/类|测试或操作工具|说明文档|
 |---|---|---|---|---|---|
+|F92|临时Mesh/扩窗/窄窗失败恢复与v4检查点|[hom_scan.py](../csttool/hom_scan.py)|`AdaptiveHomScanner._recover_interval`, `ScanCheckpointStore.save`, `ScanCheckpointStore._load_document`|[确定性恢复/中断/迁移](../test/hom_failure_recovery_test.py)|[恢复流程及边界](hom-solver-failure-recovery.md)|
+|F93|已结束失败退出1的严格退役|[managed_cstworker.py](../csttool/managed_cstworker.py)|`ManagedCSTWorker.retire_failed_session`|[协议假对端/篡改/缺ACK](../test/production_close_v2_test.py)、[默认隔离](../test/cstmanager_test.py)|[非标准退役](hom-solver-failure-recovery.md)|
 |F90|HOM检查点只读缓存与模式结果表|[hom_dashboard.py](../GUI/hom_dashboard.py)|`HomDisplayReader.read`, `HomModeTableModel.set_modes`, `HomDashboard.update_snapshot`|[数据/缓存/覆盖/大表测试](../test/hom_dashboard_test.py)|[工作台设计](gui-hom-workspace.md)|
 |F91|主工作台/详细信息分层及主界面异常摘要|[main_window.py](../GUI/main_window.py)|`MainWindow.__init__`, `MainWindow.renderRunnerSnapshot`, `MainWindow.renderCstProgress`, `MainWindow.onRunError`|[页面/错误测试](../test/hom_dashboard_test.py)、[主窗口回归](../test/gui_main_window_test.py)|[显示分层与边界](gui-hom-workspace.md)|
 |F88|有界失败诊断ZIP及源文件映射|[diagnostic_bundle.py](../csttool/diagnostic_bundle.py)|`export_failure_bundle`|[边界/大日志测试](../test/diagnostic_bundle_test.py)|[范围及API](failure-diagnostic-export.md)|
@@ -143,3 +145,5 @@ F40–F44历史审查边界：[2026-10-15本机分离审查](../knowledge-base/r
 设计入口D01：[GUI/Runner分离设计与TODO](gui-runner-process-separation-design.md)。历史拟议方案保留，当前接口见[本机Runner](local-runner.md)，实际实现映射见F40–F46。
 
 遵守根目录[AGENTS.md](../AGENTS.md)。索引测试检查本地链接和Python/VBA符号，不自动证明功能完整或更新 prose 内容；实现者必须同步状态、用途、限制与验收证据。
+
+F85/F86/F88现场补证：[2026-10-25 16:51诊断包](field-failure-bundle-20261025.md)。任务级恢复已在复杂用户模型观察到2项/5秒；阻断为退出1及顶层原因缺失，不是收尾预算超时。原包不含模型，不能在本机复核快照。

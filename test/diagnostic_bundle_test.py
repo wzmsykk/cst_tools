@@ -143,3 +143,14 @@ def test_large_log_reads_only_a_bounded_tail(tmp_path):
     assert record['captured_bytes'] == 4 * 1024**2
     assert record['truncated']
     assert files[record['archive']].endswith(b'TAIL')
+
+
+def test_checkpoint_and_failed_retirement_evidence_are_included(tmp_path):
+    _, worker = project_files(tmp_path)
+    checkpoint = tmp_path / 'save/csv/hom_scan_checkpoint.json'
+    checkpoint.parent.mkdir(parents=True)
+    checkpoint.write_text('{"schemaVersion":4,"report":{"recovery_states":{"0:5":{"phase":"probe"}}}}')
+    (worker / 'recovery-l1.json').write_text('{"disposition":"abandoned-dead"}')
+    manifest, files = read_bundle(export_failure_bundle(tmp_path))
+    assert 'files/save/csv/hom_scan_checkpoint.json' in files
+    assert 'files/temp/worker_0/session-a/recovery-l1.json' in files

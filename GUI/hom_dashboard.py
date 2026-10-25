@@ -1,5 +1,6 @@
 """Task-focused HOM display; checkpoint observation never submits work."""
 import json
+import hashlib
 from pathlib import Path
 
 from PyQt5.QtCore import QAbstractTableModel, QModelIndex, Qt
@@ -29,12 +30,17 @@ class HomDisplayReader:
                 raise ValueError('模式列表格式无效')
             if not isinstance(document.get('policy', {}), dict) or not isinstance(document.get('coverage', {}), dict):
                 raise ValueError('扫描策略或覆盖格式无效')
+            recovery = document['report'].get('recovery_states', {})
+            if not isinstance(recovery, dict) or not all(isinstance(v, dict) for v in recovery.values()):
+                raise ValueError('恢复阶段格式无效')
             value = {'available': True, 'policy': document.get('policy', {}),
                      'coverage': document.get('coverage', {}), 'modes': modes[-5000:],
                      'total_modes': len(modes), 'pending': len(document.get('pending', [])),
+                     'recovery': recovery,
                      'failed': len(document['report'].get('failed', [])),
                      'metrics_truncated': len({k for m in modes[-5000:] for k in m.get('values', {})}) > 32,
                      'signature': key, 'source': str(path)}
+            value['mode_signature'] = hashlib.sha256(json.dumps(modes[-5000:], sort_keys=True).encode()).hexdigest()
             self.key, self.value = key, value
             return value
         except FileNotFoundError:
@@ -50,11 +56,13 @@ class HomModeTableModel(QAbstractTableModel):
         self.modes = []
         self.metrics = []
         self.offset = 0
+        self.show_mesh = False
 
     def set_modes(self, modes, total):
         self.beginResetModel()
         self.modes = modes
         self.offset = max(0, total - len(modes))
+        self.show_mesh = any(m.get('mesh_cells_per_wavelength') is not None for m in modes)
         self.metrics = sorted({str(key) for mode in modes for key in mode.get('values', {})})[:32]
         self.endResetModel()
 
@@ -62,17 +70,20 @@ class HomModeTableModel(QAbstractTableModel):
         return 0 if parent.isValid() else len(self.modes)
 
     def columnCount(self, parent=QModelIndex()):
-        return 2 + len(self.metrics)
+        return 2 + len(self.metrics) + int(self.show_mesh)
 
     def headerData(self, section, orientation, role=Qt.DisplayRole):
         if role == Qt.DisplayRole and orientation == Qt.Horizontal:
-            return ['序号', '频率 / MHz', *self.metrics][section]
+            return ['序号', '频率 / MHz', *self.metrics, *(['cells/λ 设置'] if self.show_mesh else [])][section]
 
     def data(self, index, role=Qt.DisplayRole):
         if not index.isValid() or not 0 <= index.row() < len(self.modes):
             return None
         mode = self.modes[index.row()]
         if role == Qt.DisplayRole:
+            if self.show_mesh and index.column() == 2 + len(self.metrics):
+                value = mode.get('mesh_cells_per_wavelength')
+                return '—' if value is None else str(value)
             value = (index.row() + self.offset + 1 if index.column() == 0 else
                      mode.get('frequency') if index.column() == 1 else
                      mode.get('values', {}).get(self.metrics[index.column() - 2]))
@@ -155,11 +166,16 @@ class HomDashboard(QWidget):
                 if math.isfinite(fraction):
                     self.coverageBar.setValue(round(1000 * min(1, max(0, fraction))))
                     self.coverageBar.setFormat('已确认频率覆盖 %p%')
-            signature = display.get('signature')
+            signature = display.get('mode_signature', display.get('signature'))
             if signature is None or signature != self._signature:
                 self.model.set_modes(display.get('modes', []), display.get('total_modes', 0))
                 self._signature = signature
             suffix = f"待处理区间：{display.get('pending', 0)}　未解决区间：{display.get('failed', 0)}"
+            recovery = display.get('recovery') or {}
+            if recovery:
+                phase = next(iter(recovery.values())).get('phase')
+                suffix += '；恢复阶段：' + {'mesh': '临时加密网格重算', 'probe': '原密度扩窗探测',
+                                               'confirm': '原密度窄窗确认'}.get(str(phase), '检查恢复状态')
             if display.get('total_modes', 0) > 5000:
                 suffix += '；仅显示最近5000项'
             if display.get('metrics_truncated'):

@@ -16,6 +16,10 @@ class ScanConfigurationError(ValueError):
     pass
 
 
+class RecoverableSolveError(RuntimeError):
+    """Actual solver failure, not malformed output, communication or shutdown."""
+
+
 class IncompleteScanError(RuntimeError):
     def __init__(self, report: "ScanReport"):
         self.report = report
@@ -51,6 +55,10 @@ class ScanPolicy:
     frequency_rel_tol: float = 1e-9
     max_interval_attempts: int = 2
     max_solver_calls: int = 10000
+    failure_recovery: bool = False
+    base_mesh_cells: int | None = None
+    mesh_retry_factor: float = 1.5
+    max_probe_expansions: int = 3
 
     def __post_init__(self) -> None:
         finite = (
@@ -68,6 +76,12 @@ class ScanPolicy:
             raise ScanConfigurationError("window width and tolerance must be positive")
         if self.requested_modes != 1:
             raise ScanConfigurationError("single-mode scan requires requested_modes == 1")
+        if not math.isfinite(self.mesh_retry_factor) or self.mesh_retry_factor <= 1:
+            raise ScanConfigurationError("mesh retry factor must exceed one")
+        if self.base_mesh_cells is not None and (type(self.base_mesh_cells) is not int or self.base_mesh_cells < 1):
+            raise ScanConfigurationError("base mesh cells must be positive")
+        if type(self.max_probe_expansions) is not int or not 1 <= self.max_probe_expansions <= 8:
+            raise ScanConfigurationError("probe expansions must be between one and eight")
         if self.max_interval_attempts < 1 or self.max_solver_calls < 1:
             raise ScanConfigurationError("scan safety limits must be positive")
 
@@ -81,6 +95,8 @@ class SolveRequest:
     solve_lo: float
     solve_hi: float
     requested_modes: int
+    mesh_cells: int | None = None
+    recovery_phase: str = "normal"
 
 
 @dataclass(frozen=True, slots=True)
@@ -91,6 +107,7 @@ class ModeResult:
     project_snapshot: str | None = None
     task_name: str = ""
     task_id: str = ""
+    mesh_cells_per_wavelength: int | None = None
 
 
 @dataclass(slots=True)
@@ -102,6 +119,10 @@ class ScanReport:
     failure_reasons: dict[str, str] = field(default_factory=dict)
     solver_calls: int = 0
     adopted_task_ids: list[str] = field(default_factory=list)
+    probed: list[ScanInterval] = field(default_factory=list)
+    active_mesh_cells: int | None = None
+    recovery_states: dict = field(default_factory=dict)
+    recovery_events: list[dict] = field(default_factory=list)
 
 
 class TaskModeResults(list):
@@ -146,27 +167,40 @@ class AdaptiveHomScanner:
 
             modes = None
             last_error = None
+            recovery_key = self._interval_key(interval)
+            recovering = self.policy.failure_recovery and recovery_key in report.recovery_states
             for _attempt in range(self.policy.max_interval_attempts):
                 if should_stop is not None and should_stop():
                     pending_intervals = [interval] + queue
                     self._checkpoint(checkpoint, report, pending_intervals)
                     raise ScanInterrupted(report, pending_intervals)
+                if recovering:
+                    modes, task_id, interval, last_error = self._recover_interval(
+                        interval, solve, report, queue, checkpoint, should_stop)
+                    break
                 if report.solver_calls >= self.policy.max_solver_calls:
                     report.failed.append(interval)
                     report.failure_reasons[self._interval_key(interval)] = "solver call limit reached"
                     self._checkpoint(checkpoint, report, queue)
                     raise IncompleteScanError(report)
                 report.solver_calls += 1
-                request = SolveRequest(interval, interval.lo, interval.hi, 1)
+                request = SolveRequest(interval, interval.lo, interval.hi, 1,
+                    self.policy.base_mesh_cells if self.policy.failure_recovery else None)
+                self._checkpoint(checkpoint, report, [interval] + queue)
                 try:
                     returned = solve(request)
                     task_id = getattr(returned, 'task_id', '')
                     modes = self._validate_modes(returned)
+                    report.active_mesh_cells = request.mesh_cells
                 except Exception as exc:
                     if should_stop is not None and should_stop():
                         pending_intervals = [interval] + queue
                         self._checkpoint(checkpoint, report, pending_intervals)
                         raise ScanInterrupted(report, pending_intervals) from exc
+                    if self.policy.failure_recovery and isinstance(exc, RecoverableSolveError):
+                        modes, task_id, interval, last_error = self._recover_interval(
+                            interval, solve, report, queue, checkpoint, should_stop)
+                        break
                     last_error = f"{type(exc).__name__}: {exc}"
                     self.logger.warning(
                         "HOM_SOLVE_INVALID_RESULT 区间=[%.12g, %.12g] MHz 尝试=%d/%d 原因=%s",
@@ -262,6 +296,138 @@ class AdaptiveHomScanner:
 
         return report
 
+    def _recover_interval(self, original, solve, report, queue, checkpoint, should_stop):
+        key = self._interval_key(original)
+        state = report.recovery_states.setdefault(key, {
+            'phase': 'mesh' if self.policy.base_mesh_cells is not None else 'probe', 'level': 1})
+        if (not isinstance(state, dict) or not isinstance(state.get('phase'), str) or state.get('phase') not in {'mesh', 'probe', 'confirm'}
+                or type(state.get('level')) is not int
+                or not 1 <= state['level'] <= self.policy.max_probe_expansions + (state.get('phase') == 'probe')):
+            raise ScanConfigurationError('invalid recovery checkpoint phase or level')
+        if state['phase'] == 'mesh' and self.policy.base_mesh_cells is None:
+            raise ScanConfigurationError('mesh recovery requires a known fixed baseline density')
+        if state['phase'] == 'confirm':
+            try:
+                candidate = ModeResult(**state['candidate'])
+                self._validate_modes([candidate])
+                upper = state['probe_hi']
+                if not math.isfinite(upper) or not original.lo <= candidate.frequency <= upper:
+                    raise ValueError('candidate outside probe bounds')
+            except (KeyError, TypeError, ValueError) as exc:
+                raise ScanConfigurationError('invalid recovery candidate evidence') from exc
+        error = state.get('last_error', 'recovery exhausted')
+        while state['level'] <= self.policy.max_probe_expansions:
+            if should_stop is not None and should_stop():
+                self._checkpoint(checkpoint, report, [original] + queue)
+                raise ScanInterrupted(report, [original] + queue)
+            if report.solver_calls >= self.policy.max_solver_calls:
+                report.failed.append(original)
+                report.failure_reasons[key] = 'solver call limit reached during recovery'
+                self._checkpoint(checkpoint, report, queue)
+                raise IncompleteScanError(report)
+            phase = state['phase']
+            base = self.policy.base_mesh_cells
+            lo, hi = original.lo, original.hi
+            if phase == 'mesh':
+                cells = max(base + 1, math.ceil(base * self.policy.mesh_retry_factor))
+            else:
+                cells = base  # Restore original density before probing/confirmation.
+                hi = original.lo + (original.hi - original.lo) * 2 ** state['level']
+                if phase == 'confirm':
+                    frequency = state['candidate']['frequency']
+                    lo = max(original.lo, frequency - self.policy.window_width / 2)
+                    hi = lo + self.policy.window_width
+            request = SolveRequest(original, lo, hi, 1, cells, phase)
+            if not math.isfinite(lo) or not math.isfinite(hi) or hi <= lo:
+                error = 'invalid or overflowing recovery frequency bounds'
+                break
+            report.solver_calls += 1
+            self._checkpoint(checkpoint, report, [original] + queue)
+            self.logger.info('HOM_RECOVERY_STEP phase=%s original=[%g,%g] solve=[%g,%g] cell=%s level=%s',
+                             phase, original.lo, original.hi, lo, hi, cells, state['level'],
+                             extra={'event': 'HOM_RECOVERY_STEP', 'phase': 'hom-recovery',
+                                    'recovery_phase': phase, 'solve_lo': lo, 'solve_hi': hi,
+                                    'mesh_cells': cells, 'probe_level': state['level']})
+            try:
+                returned = solve(request)
+                task_id = getattr(returned, 'task_id', '')
+                modes = self._validate_modes(returned)
+                if modes:
+                    frequency = modes[0].frequency
+                    if frequency > hi:
+                        raise RecoverableSolveError('next mode lies above recovery probe upper bound')
+                    if frequency < lo or self._already_accepted(report.modes, frequency):
+                        raise ValueError('recovery result is below bounds or already accepted')
+                if phase == 'confirm' and not modes:
+                    raise ValueError('narrow confirmation did not reproduce a mode')
+            except (ScanInterrupted, IncompleteScanError):
+                raise
+            except Exception as exc:
+                if should_stop is not None and should_stop():
+                    self._checkpoint(checkpoint, report, [original] + queue)
+                    raise ScanInterrupted(report, [original] + queue) from exc
+                error = f'{type(exc).__name__}: {exc}'
+                state['last_error'] = error
+                self.logger.warning('HOM恢复步骤失败 | step=%s lo=%g hi=%g reason=%s', phase, lo, hi, error,
+                    extra={'event': 'HOM_RECOVERY_FAILED', 'phase': 'hom-recovery', 'recovery_phase': phase,
+                           'solve_lo': lo, 'solve_hi': hi, 'mesh_cells': cells, 'reason': error})
+                report.recovery_events.append(dict(interval=asdict(original), phase=phase,
+                    lo=lo, hi=hi, mesh_cells=cells, outcome='failed', reason=error))
+                # Communication/invalid postprocessing cannot prove emptiness.
+                if not isinstance(exc, RecoverableSolveError):
+                    break
+                state['phase'] = 'probe'
+                if phase != 'mesh':
+                    state['level'] += 1
+                state.pop('candidate', None)
+                self._checkpoint(checkpoint, report, [original] + queue)
+                continue
+            self.logger.info('HOM恢复步骤结果已核验 | step=%s task=%s modes=%s', phase, task_id,
+                [m.frequency for m in modes], extra={'event': 'HOM_RECOVERY_RESULT', 'phase': 'hom-recovery',
+                'recovery_phase': phase, 'task_id': task_id, 'mesh_cells': cells,
+                'frequencies': [m.frequency for m in modes]})
+            report.active_mesh_cells = cells
+            if phase == 'probe':
+                report.probed.append(ScanInterval(lo, hi))
+            report.recovery_events.append(dict(interval=asdict(original), phase=phase,
+                lo=lo, hi=hi, mesh_cells=cells, outcome='success', task_id=task_id,
+                frequencies=[m.frequency for m in modes]))
+            if phase == 'mesh' and not modes:
+                # Emptiness on a different density is not an empty baseline window.
+                if task_id and task_id not in report.adopted_task_ids:
+                    report.adopted_task_ids.append(task_id)
+                state['phase'] = 'probe'
+                self._checkpoint(checkpoint, report, [original] + queue)
+                continue
+            if phase == 'probe' and modes:
+                # Consume the successful probe as evidence, never as a final mode.
+                if task_id and task_id not in report.adopted_task_ids:
+                    report.adopted_task_ids.append(task_id)
+                state.update(phase='confirm', candidate=asdict(modes[0]), probe_hi=hi)
+                self._checkpoint(checkpoint, report, [original] + queue)
+                continue
+            effective = original
+            if phase == 'confirm':
+                candidate = state['candidate']['frequency']
+                if abs(modes[0].frequency - candidate) > max(self.policy.frequency_abs_tol,
+                                                           .05 * abs(candidate)):
+                    error = 'narrow confirmation differs from probe by more than five percent'
+                    break
+                if candidate > original.hi and modes[0].frequency > original.hi:
+                    report.empty.append(original)
+                    self.logger.info('原区间按扩窗首模与窄窗确认结果判空 | lo=%g hi=%g next=%g',
+                        original.lo, original.hi, modes[0].frequency,
+                        extra={'event': 'HOM_RECOVERY_EMPTY', 'phase': 'hom-recovery',
+                               'lo': original.lo, 'hi': original.hi, 'next_frequency': modes[0].frequency})
+                    report.recovery_events.append(dict(interval=asdict(original), phase='empty-inferred',
+                        outcome='confirmed', evidence='successful-lowest-mode-probe-and-narrow-confirmation',
+                        probe_frequency=candidate, frequency=modes[0].frequency))
+                effective = ScanInterval(original.lo, state['probe_hi'])
+            report.recovery_states.pop(key, None)
+            return modes, task_id, effective, None
+        report.recovery_states.pop(key, None)
+        return None, '', original, error
+
     @staticmethod
     def _format_results(mode: ModeResult) -> str:
         return ", ".join(f"{key}={value:.12g}" for key, value in mode.values.items())
@@ -324,7 +490,7 @@ class AdaptiveHomScanner:
 
 
 class ScanCheckpointStore:
-    SCHEMA_VERSION = 3
+    SCHEMA_VERSION = 4
 
     def __init__(self, path: str | Path):
         self.path = Path(path)
@@ -343,7 +509,7 @@ class ScanCheckpointStore:
                 "confirmed_frontier": (min([item.lo for item in pending + report.failed])
                      if pending or report.failed else min(policy.stop,
                         max([item.hi for item in report.completed], default=policy.start))),
-                "calculated_upper": max([item.hi for item in report.completed], default=policy.start),
+                "calculated_upper": max([item.hi for item in report.completed + report.probed], default=policy.start),
             },
             "schemaVersion": self.SCHEMA_VERSION,
             "policy": asdict(policy),
@@ -354,10 +520,14 @@ class ScanCheckpointStore:
                 "modes": [asdict(item) for item in report.modes],
                 "completed": [asdict(item) for item in report.completed],
                 "empty": [asdict(item) for item in report.empty],
+                "probed": [asdict(item) for item in report.probed],
                 "failed": [asdict(item) for item in report.failed],
                 "failure_reasons": report.failure_reasons,
                 "solver_calls": report.solver_calls,
                 "adopted_task_ids": report.adopted_task_ids,
+                "active_mesh_cells": report.active_mesh_cells,
+                "recovery_states": report.recovery_states,
+                "recovery_events": report.recovery_events,
             },
         }
         self.path.parent.mkdir(parents=True, exist_ok=True)
@@ -389,21 +559,35 @@ class ScanCheckpointStore:
     def _load_document(self, policy: ScanPolicy, project_fingerprint: dict):
         from .configuration import read_json
         document = read_json(self.path)
-        if document.get("schemaVersion") != self.SCHEMA_VERSION:
+        if document.get("schemaVersion") not in (3, self.SCHEMA_VERSION):
             raise ScanConfigurationError("unsupported HOM checkpoint version")
-        if document.get("policy") != asdict(policy):
+        stored_policy = dict(document.get("policy") or {})
+        # Old v3 checkpoints did not carry the new recovery controls; preserve
+        # their scan bounds/identity while filling only these additive fields.
+        if document.get('schemaVersion') == 3:
+            for name in ('failure_recovery', 'base_mesh_cells', 'mesh_retry_factor', 'max_probe_expansions'):
+                stored_policy.setdefault(name, getattr(policy, name))
+        if stored_policy != asdict(policy):
             raise ScanConfigurationError("checkpoint scan policy does not match")
         if document.get("projectFingerprint") != project_fingerprint:
             raise ScanConfigurationError("checkpoint project does not match")
         raw = document["report"]
+        if document.get('schemaVersion') == self.SCHEMA_VERSION:
+            if not isinstance(raw, dict) or not {'recovery_states', 'recovery_events', 'probed',
+                                                'active_mesh_cells'}.issubset(raw):
+                raise ScanConfigurationError('incomplete recovery checkpoint')
         report = ScanReport(
             modes=[ModeResult(**item) for item in raw["modes"]],
             completed=[ScanInterval(**item) for item in raw["completed"]],
             empty=[ScanInterval(**item) for item in raw["empty"]],
+            probed=[ScanInterval(**item) for item in raw.get("probed", [])],
             failed=[ScanInterval(**item) for item in raw["failed"]],
             failure_reasons=dict(raw.get("failure_reasons", {})),
             solver_calls=raw["solver_calls"],
             adopted_task_ids=list(raw.get('adopted_task_ids', [])),
+            active_mesh_cells=raw.get('active_mesh_cells'),
+            recovery_states=dict(raw.get('recovery_states', {})),
+            recovery_events=list(raw.get('recovery_events', [])),
         )
         pending = [ScanInterval(**item) for item in document["pending"]]
         return document, report, pending

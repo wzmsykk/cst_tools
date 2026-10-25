@@ -119,6 +119,31 @@ def test_bounded_details_never_drop_a_bad_session_from_summary(tmp_path):
     assert facts['sessions'][0]['process_state'] == 'unknown'
 
 
+def test_runner_recovery_gate_never_has_an_empty_top_level_reason(tmp_path):
+    from csttool.runner import Runner
+    from csttool.execution_contract import StopIntent
+    class Execution:
+        def __init__(self, *args): pass
+        def run(self, payload): pass
+        def close(self): pass
+        def recovery_required(self): return True
+        def session_safety(self): return 'exited-unverified'
+        def lifecycle_facts(self):
+            return dict(session_safety='exited-unverified', recovery_required=True,
+                        sessions=[dict(session_id='failed-session', needs_recovery=True,
+                                       missing_evidence=['exit-code-not-accepted'])])
+    runner = Runner(tmp_path, Execution)
+    runner.stop_intent = StopIntent()
+    try:
+        runner._execute('start', {})
+        status = runner.snapshot()
+        assert status['state'] == 'RECOVERY_REQUIRED'
+        assert 'exit-code-not-accepted' in status['error']
+        assert status['recovery_reason'] == status['error']
+    finally:
+        runner.close()
+
+
 @pytest.mark.parametrize('broken', [False, True])
 def test_final_probe_cannot_clear_recovery_and_keeps_cleanup_separate(tmp_path, broken):
     from csttool.runner import Runner

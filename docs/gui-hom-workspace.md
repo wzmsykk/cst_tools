@@ -35,3 +35,5 @@ Qt表格使用QAbstractTableModel，仅检查点身份变化时重建模型，�
 最终文档/日志索引3 passed（0.98s），artifacts/hom-dashboard-index-20261025.xml；索引只证明链接/符号，不替代显示语义或真实运行验收。
 
 最终工作台复核9 passed（0.85s，重叠），hom-dashboard-closeout-20261025.xml；已清理本轮pytest临时目录，保留轻量XML。未提交或打包。
+
+2026-10-25后续实现：[Mesh/扩窗/窄窗恢复](hom-solver-failure-recovery.md)。HOM默认恢复、正常任务不重复写cell，checkpoint v4读取旧v3；退出1仅可在严格已结束/恢复保存及协议证据齐全时按非标准失败退役，不改为标准成功，旧现场分析“仅拒绝/待实现”为历史状态。实际真实CST门禁仍以新文pending为准。

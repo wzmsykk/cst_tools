@@ -80,6 +80,10 @@ def export_failure_bundle(project, *, file_limit=4 * 1024**2,
     for name in ('project.ini', 'project.conf', 'params.json', 'pps.json'):
         if (project / name).is_file():
             add(project / name)
+    for name in ('save/csv/hom_scan_checkpoint.json', 'save/csv/scan_manifest.json',
+                 'save/csv/hom_scan_results.csv', 'save/standard_batch_checkpoint.json'):
+        if (project / name).is_file():
+            add(project / name)
 
     runs = []
     directory = status.get('log_directory')
@@ -147,6 +151,7 @@ def export_failure_bundle(project, *, file_limit=4 * 1024**2,
         if sessions and worker.name not in sessions:
             continue
         for name in ('worker.state', 'worker.pid', 'close-protocol.json', 'close-verification.json',
+                     'recovery-l1.json', 'recovery.json',
                      'task-context.json', 'worker-input.cst.last-good-parameters.tsv',
                      'worker-input.cst.recovery-saved', 'runtime_managed_worker_v1.bas',
                      'diagnostics.json', 'cst.log', 'lifecycle.log'):
@@ -199,7 +204,8 @@ def export_failure_bundle(project, *, file_limit=4 * 1024**2,
                     return 0
                 if '/resource_usage/' in relative:
                     return 3
-                return 1 if '/failures/' in relative or '/protocol/' in relative else 2
+                return 1 if ('/failures/' in relative or '/protocol/' in relative
+                             or relative.startswith('save/') or path.name == 'recovery-l1.json') else 2
 
             for relative, path in sorted(candidates.items(), key=priority):
                 record = {'source': str(path), 'archive': 'files/' + relative}

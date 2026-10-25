@@ -7,6 +7,11 @@
 
 ## 最新状态与近期TODO（2026-10-25）
 
+- 新增[HOM失败恢复链](hom-solver-failure-recovery.md)：原窄窗求解失败后临时cell×1.5重算一次（4→6），再恢复原密度扩窗2/4/8倍、窄窗确认后继续；按成功首模/确认结果判原区间空，失败不当空。正常任务仍只改3项，需恢复密度时才传cell；探测前沿与确认覆盖分开，checkpoint v4可读旧v3并保持指纹/快照核验。
+- HOM可严格退役“已结束且恢复/ACK/快照证据完整”的失败退出1会话，再从processed.cst建新Worker，保留abandoned-dead/standard_closed=false，不全局接受退出1；普通批任务默认不变。Runner补齐顶层恢复原因。核心/假Worker等167 passed，专项58 passed及GUI13 passed（重叠），详见新文；真实Mesh/数值恢复/退役串行副本仍pending。
+
+- 新[261012现场诊断包分析](field-failure-bundle-20261025.md)：当前Solver迭代耗尽，任务撤销仅fmin/fmax两项、5秒完成，原生恢复收尾74秒；Python记录进程已退出1、模型restored-saved，唯一阻断为exit-code-not-accepted，不是600秒超时，因此替换未执行。188项已确认模式/覆盖保持。顶层error为空而lifecycle有阻断原因，列为传播缺口；本轮只读分析，不放宽退出码或启动CST。
+
 - GUI默认改为[HOM扫频工作台](gui-hom-workspace.md)：目标/当前区间、确认覆盖与计算上界、模式及后处理值表；完整日志、Worker/CST局部进度、后台管理/控制权归入详细页，失败导出仍在默认页。通过本地只读缓存观察检查点，不按日志推断模式、不改控制协议。
 - 本轮主窗口+工作台43 passed（1.80s），Runner/重开/日志恢复39 passed（39.69s），事件/导出等专项19 passed（1.54s，重叠）；一次合并Qt运行退出1无XML不计通过，独立分组复验及边界见工作台说明。无真实CST/现场视觉验收。
 
@@ -337,3 +342,9 @@ Mesh 收敛分析是新项目启动前的可选阶段。默认按 `10, 15, 20, 2
 - 应用后端 API 与生命周期：[CST Application Backend](./application-backend.md)
 - HOM 扫描算法：[HOM 自适应区间扫描](./hom-scan-algorithm.md)
 - 历史完整 ABI 提案：[现代跨语言 ABI 设计](./modern-cross-language-abi-design.md)
+
+### 2026-10-25 最终离线复验补充
+
+正常用户权限的无CST协议/Runner回归92 passed（12.49s），扫描与恢复检查点73 passed（6.44s），GUI及假Worker流程15 passed（1.62s），诊断导出与索引27 passed（3.19s）；各组重叠，不相加。报告分别为artifacts/hom-recovery-native-final-20261025.xml、hom-recovery-closeout-20261025.xml、hom-recovery-gui-final-20261025.xml、hom-recovery-bundle-20261025.xml。此前受限环境协议夹具读文件出现PermissionError，88 passed/4 failed/4 errors；保留失败记录，不用重试掩盖原因，正常权限通过也不证明现场不存在瞬时文件访问异常。
+
+最终审计将生产接口的空后处理列表视为输出缺失，禁止据此确认空区间；通用扫描器的明确空结果契约保留。相关测试首次52 passed/2 failed：密度测试夹具以空后处理结束尾窗，更新为含终点模式的夹具后54 passed（3.10s），报告artifacts/hom-recovery-final-audit2-20261025.xml。未启动真实CST，临时加密是否实际生效及现场扩窗恢复仍待串行副本验收。轻量报告保留，临时测试副本清理；artifacts不保证随Git迁移。

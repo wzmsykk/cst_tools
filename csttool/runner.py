@@ -361,7 +361,13 @@ class Runner:
                         facts = probe()
                         values = dict(lifecycle=facts, session_safety=facts['session_safety'])
                         if facts.get('recovery_required'):
-                            values.update(state='RECOVERY_REQUIRED', phase='recovery-required')
+                            blocked = [item for item in facts.get('sessions', []) if item.get('needs_recovery')]
+                            reason = '; '.join(str(item.get('session_id', '?')) + ': ' + ','.join(
+                                item.get('missing_evidence') or ['session requires recovery']) for item in blocked)
+                            reason = reason or 'session lifecycle requires recovery'
+                            values.update(state='RECOVERY_REQUIRED', phase='recovery-required', recovery_reason=reason)
+                            if not self.status.get('error'):
+                                values['error'] = reason
                         self.update(**values)
                     except Exception as exc:
                         from .lifecycle_diagnostics import error_diagnostic

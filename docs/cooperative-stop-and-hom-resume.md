@@ -36,3 +36,5 @@ AdaptiveHomScanner在每个区间进入求解前原子保存检查点，将当�
 本批最终离线537 passed、19 integration deselected，包含文档与事件索引门禁。轻量报告artifacts/cooperative-stop-resume-20261014.xml不保证随Git迁移；本轮模型/pytest临时目录已清理，真实CST中断/保留/正常退出未执行。
 
 TODO：串行副本实测启动、参数、重建后、Solver返回后、后处理条目、Backup/Ack停止；核对interrupted-project.cst及同名结果目录、StopAck、正常进程退出；GUI加载期间即时取消、保留求解后的仅后处理恢复自动化仍待做。不得删除活跃工作副本或原工程，不把离线测试宣称真实中断验收。
+
+2026-10-25后续实现：[Mesh/扩窗/窄窗恢复](hom-solver-failure-recovery.md)。HOM默认恢复、正常任务不重复写cell，checkpoint v4读取旧v3；退出1仅可在严格已结束/恢复保存及协议证据齐全时按非标准失败退役，不改为标准成功，旧现场分析“仅拒绝/待实现”为历史状态。实际真实CST门禁仍以新文pending为准。

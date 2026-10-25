@@ -147,3 +147,31 @@ def test_project_selection_clears_old_results_and_cancel_keeps_selection(qapp, t
     window.read_dir()
     assert window.uiProjectDir == str(other)
     window.close()
+
+
+def test_recovery_phase_updates_without_resetting_unchanged_mode_table(qapp, tmp_path):
+    path = checkpoint(tmp_path)
+    reader = HomDisplayReader()
+    panel = HomDashboard()
+    panel.update_snapshot({'project': str(tmp_path), 'hom_display': reader.read(tmp_path)})
+    resets = []
+    panel.model.modelReset.connect(lambda: resets.append(True))
+    document = json.loads(path.read_text())
+    document['report']['recovery_states'] = {'700:750': {'phase': 'probe', 'level': 1}}
+    path.write_text(json.dumps(document))
+    panel.update_snapshot({'project': str(tmp_path), 'hom_display': reader.read(tmp_path)})
+    assert '原密度扩窗探测' in panel.notice.text()
+    assert not resets
+
+
+def test_mesh_provenance_is_shown_without_guessing_old_modes(qapp, tmp_path):
+    path = checkpoint(tmp_path)
+    document = json.loads(path.read_text())
+    document['report']['modes'][1]['mesh_cells_per_wavelength'] = 6
+    path.write_text(json.dumps(document))
+    panel = HomDashboard()
+    panel.update_snapshot({'project': str(tmp_path), 'hom_display': HomDisplayReader().read(tmp_path)})
+    last = panel.model.columnCount() - 1
+    assert panel.model.headerData(last, Qt.Horizontal) == 'cells/λ 设置'
+    assert panel.model.data(panel.model.index(0, last)) == '—'
+    assert panel.model.data(panel.model.index(1, last)) == '6'

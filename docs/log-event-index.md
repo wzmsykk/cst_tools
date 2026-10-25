@@ -16,6 +16,10 @@
 | `FIELD_DIAGNOSTIC_PERSIST_FAILED` | `csttool/managed_cstworker.py` |
 | `HOM_CHECKPOINT` | `csttool/hom_scan_algorithm.py` |
 | `HOM_INTERVAL` | `csttool/hom_scan_algorithm.py` |
+| `HOM_RECOVERY_EMPTY` | `csttool/hom_scan.py` |
+| `HOM_RECOVERY_FAILED` | `csttool/hom_scan.py` |
+| `HOM_RECOVERY_RESULT` | `csttool/hom_scan.py` |
+| `HOM_RECOVERY_STEP` | `csttool/hom_scan.py` |
 | `HOM_RESUMED` | `csttool/hom_scan_algorithm.py` |
 | `LOG_RECORD_INVALID` | `csttool/event_replay.py` |
 | `LOG_RECORD_SKIPPED` | `csttool/event_replay.py` |
@@ -55,6 +59,7 @@
 | `WORKER_CREATED` | `csttool/cstmanager.py` |
 | `WORKER_DIAGNOSTICS` | `csttool/managed_cstworker.py` |
 | `WORKER_DIAGNOSTICS_FAILED` | `csttool/managed_cstworker.py` |
+| `WORKER_FAILED_RETIRED` | `csttool/managed_cstworker.py` |
 | `WORKER_FAILURE_DIAGNOSTICS` | `csttool/managed_cstworker.py` |
 | `WORKER_RESTART_CANCELLED` | `csttool/cstmanager.py` |
 | `WORKER_RESTART_DONE` | `csttool/cstmanager.py` |

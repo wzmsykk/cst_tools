@@ -131,6 +131,36 @@ def test_failed_task_restarts_worker_and_retries(manager_factory, caplog):
     assert len({record.run_id for record in caplog.records if hasattr(record, "run_id")}) == 1
 
 
+def test_hom_opt_in_can_retire_verified_failed_worker_and_retry_from_base(manager_factory):
+    manager, tracker = manager_factory(workers=1, outcomes=['Failure', 'Success'])
+    first = tracker['created'][0]
+    original_stop = first.stop
+    called = []
+    first.stop = lambda: (_ for _ in ()).throw(RuntimeError('exit 1'))
+    first.retire_failed_session = lambda: called.append(True) or True
+    try:
+        result = manager.execute(SimulationTask({}, 'hom', retry_count=1,
+            continue_from_snapshot=True, retire_failed_session=True))
+        assert result['TaskStatus'] == 'Success' and called == [True]
+        assert tracker['configs'][1].project_path == Path(manager.cstProjPath)
+    finally:
+        first.stop = original_stop
+
+
+def test_standard_task_does_not_opt_into_failed_retirement(manager_factory):
+    manager, tracker = manager_factory(workers=1, outcomes=['Failure'])
+    first = tracker['created'][0]
+    original_stop = first.stop
+    first.stop = lambda: (_ for _ in ()).throw(RuntimeError('exit 1'))
+    first.retire_failed_session = lambda: pytest.fail('standard task may not auto-retire')
+    try:
+        with pytest.raises(RuntimeError, match='drain failed'):
+            manager.execute(SimulationTask({}, 'standard'))
+        assert len(tracker['created']) == 1
+    finally:
+        first.stop = original_stop
+
+
 def test_worker_is_recycled_after_job_limit(manager_factory):
     manager, tracker = manager_factory(workers=1, max_jobs=1)
 

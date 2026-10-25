@@ -270,7 +270,7 @@ def test_checkpoint_is_atomic_and_rejects_changed_policy(tmp_path):
     store.save(policy, fingerprint, report, [ScanInterval(5.000001, 15.000001)])
     restored, pending = store.load(policy, fingerprint)
 
-    assert json.loads(path.read_text(encoding="utf-8"))["schemaVersion"] == 3
+    assert json.loads(path.read_text(encoding="utf-8"))["schemaVersion"] == 4
     assert restored.modes == report.modes
     assert pending == [ScanInterval(5.000001, 15.000001)]
     assert not path.with_suffix(".json.tmp").exists()

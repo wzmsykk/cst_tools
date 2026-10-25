@@ -209,6 +209,39 @@ def test_solver_failure_diagnostic_keeps_actual_non_success_return():
     assert '"EigenmodeSolver.Start returned 0"' not in failed
 
 
+def test_verified_failed_exit_one_can_be_retired_but_not_declared_standard(peer_factory):
+    _, worker, peer, field = peer_factory('solver-failure', exit_code=1)
+    worker.run_task('failed', params={})
+    with pytest.raises(ManagedWorkerShutdownError):
+        worker.stop()
+    assert worker.retire_failed_session()
+    assert not worker._shutdown_assessment().standard_closed
+    assert worker._shutdown_assessment().exit_code == 1
+    assert json.loads((worker.root / 'recovery-l1.json').read_text())['disposition'] == 'abandoned-dead'
+    from csttool.project_session_recovery import _read_recovery_disposition
+    assert _read_recovery_disposition(worker.root) == 'abandoned-dead'
+
+
+def test_failed_retirement_rejects_changed_snapshot(peer_factory):
+    _, worker, peer, field = peer_factory('solver-failure', exit_code=1)
+    worker.run_task('failed', params={})
+    with pytest.raises(ManagedWorkerShutdownError):
+        worker.stop()
+    snapshot = worker.root / 'worker-input.cst.recovered.cst'
+    snapshot.write_bytes(b'changed!')  # Same byte count can never bypass recorded SHA.
+    assert not worker.retire_failed_session()
+    assert not (worker.root / 'recovery-l1.json').exists()
+
+
+def test_failed_retirement_rejects_missing_task_ack_receipt(peer_factory):
+    _, worker, peer, field = peer_factory('solver-failure', exit_code=1)
+    result = worker.run_task('failed', params={})
+    with pytest.raises(ManagedWorkerShutdownError):
+        worker.stop()
+    Path(str(worker.ack_path) + '.' + result.task_id + '.accepted').unlink()
+    assert not worker.retire_failed_session()
+
+
 @pytest.mark.parametrize('fault', ['restore', 'rebuild', 'backup', 'save', 'recovery-receipt', 'receipt'])
 def test_close_failure_preserves_evidence_and_blocks_positive_ack(peer_factory, fault):
     project, worker, peer, field = peer_factory('solver-failure', fault, exit_code=4)

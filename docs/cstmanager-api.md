@@ -209,3 +209,5 @@ python -m pytest -m integration -o addopts=""
 - 建议先完成一批任务，再提交下一批；不要依赖批次执行过程中追加任务的时序。
 - Manager 层尚未提供单任务取消或独立超时；实际仿真超时目前由 CST Worker 控制。
 - 默认测试使用假 Worker。发布前仍需在真实 CST 环境执行集成验收。
+
+2026-10-25后续实现：[Mesh/扩窗/窄窗恢复](hom-solver-failure-recovery.md)。HOM默认恢复、正常任务不重复写cell，checkpoint v4读取旧v3；退出1仅可在严格已结束/恢复保存及协议证据齐全时按非标准失败退役，不改为标准成功，旧现场分析“仅拒绝/待实现”为历史状态。实际真实CST门禁仍以新文pending为准。

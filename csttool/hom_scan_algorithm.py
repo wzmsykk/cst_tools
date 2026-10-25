@@ -352,11 +352,14 @@ class HomScanAlgorithm(Algorithm):
             stop=float(self.end_frequency),
             window_width=min(float(self.delta_frequency), initial_width),
             requested_modes=1,
+            failure_recovery=True,
+            base_mesh_cells=self.mesh_cells_per_wavelength if (self.preprocess_modify_mesh and
+                getattr(getattr(getattr(self.manager, 'pconfm', None), 'settings', None), 'fixed_mesh', True)) else None,
         )
 
     def _extract_scan_modes(self, result_list):
         if not result_list:
-            return []
+            raise ValueError("postprocess results are missing; cannot establish an empty interval")
         values = {}
         for item in result_list:
             result_name = item.get("resultName")
@@ -417,6 +420,7 @@ class HomScanAlgorithm(Algorithm):
         rows = [
             {
                 "mode": scan_index, "solverMode": mode.mode_index, **mode.values,
+                "meshCellsPerWavelength": mode.mesh_cells_per_wavelength,
                 "taskName": mode.task_name,
                 "taskId": mode.task_id,
                 "projectSnapshot": mode.project_snapshot or "",
@@ -438,6 +442,7 @@ class HomScanAlgorithm(Algorithm):
             "hom_scan_results.csv 每行对应一个已确认模态，按频率升序排列。\n"
             "mode：扫描模态序号；solverMode：该次求解中的模态编号。\n"
             "frequency：频率，单位 MHz。\n"
+            "meshCellsPerWavelength：产生该模式时的固定网格密度设置；旧结果缺失时不推测。\n"
             "taskName / taskId：产生该结果的任务名称和唯一编号。\n"
             "projectSnapshot：对应的 CST 存档文件；resultDirectory：后处理结果目录。\n"
             "这两列的路径均相对于项目根目录，不是 CSV 所在目录。\n"
@@ -519,7 +524,11 @@ class HomScanAlgorithm(Algorithm):
                         adopter(mode.task_id)
             self.logger.debug("HOM 检查点已保存 | HOM_CHECKPOINT modes=%d pending=%d path=%s snapshot=%s", len(current_report.modes), len(current_pending), checkpoint_store.path, snapshot, extra={"event": "HOM_CHECKPOINT", "phase": "lifecycle", "modes": len(current_report.modes), "pending": len(current_pending), "path": checkpoint_store.path, "snapshot": snapshot})
 
+        needs_mesh_restore = bool(report and report.active_mesh_cells not in (None, policy.base_mesh_cells))
+        density_recovery_used = bool(report and any(e.get('phase') == 'mesh' for e in report.recovery_events))
+
         def solve(request):
+            nonlocal needs_mesh_restore, density_recovery_used
             self.logger.debug("HOM 区间求解 | HOM_INTERVAL lo=%g hi=%g solve_lo=%g solve_hi=%g", request.interval.lo, request.interval.hi, request.solve_lo, request.solve_hi, extra={"event": "HOM_INTERVAL", "phase": "lifecycle", "lo": request.interval.lo, "hi": request.interval.hi, "solve_lo": request.solve_lo, "solve_hi": request.solve_hi})
             values = [
                 request.requested_modes,
@@ -529,15 +538,25 @@ class HomScanAlgorithm(Algorithm):
             job_name = (
                 f"hom_{request.interval.lo:g}_{request.interval.hi:g}"
             )
-            result = self._execute_simulation(
-                values,
-                job_name,
-                retry_count=1,
-                continue_from_snapshot=True,
-            )
+            params = dict(zip(self.input_name, values))
+            if request.recovery_phase == 'mesh':
+                density_recovery_used = True
+            multiple_workers = getattr(self.manager, 'maxParallelTasks', 1) > 1
+            if request.mesh_cells is not None and (request.recovery_phase != 'normal' or needs_mesh_restore
+                    or (multiple_workers and density_recovery_used)):
+                params['cell'] = request.mesh_cells
+            if request.recovery_phase != 'normal':
+                job_name += '_' + request.recovery_phase
+            result = self.manager.execute(cstmanager.SimulationTask(
+                params=params, job_name=job_name, retry_count=0,
+                continue_from_snapshot=True, retire_failed_session=True))
             if result.get("TaskStatus") != "Success":
                 reason = result.get("FailureReport", "unknown CST failure")
+                from .hom_scan import RecoverableSolveError
+                if str(reason).startswith('SOLVER_FAILED:'):
+                    raise RecoverableSolveError(reason)
                 raise RuntimeError(reason)
+            needs_mesh_restore = request.mesh_cells is not None and request.mesh_cells != policy.base_mesh_cells
             postprocess = result.get("PostProcessResult")
             if not isinstance(postprocess, list):
                 raise ValueError("CST task returned no postprocess result list")
@@ -550,6 +569,7 @@ class HomScanAlgorithm(Algorithm):
                 project_snapshot=snapshot,
                 task_name=result.get("RunName", job_name),
                 task_id=result.get("TaskID", ""),
+                mesh_cells_per_wavelength=request.mesh_cells,
             ) for mode in self._extract_scan_modes(postprocess)], result.get('TaskID', ''))
 
         started = time.monotonic()

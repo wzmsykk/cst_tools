@@ -837,6 +837,47 @@ class ManagedCSTWorker:
                 ) + '; missing=' + ', '.join(assessment.missing_evidence)
             )
 
+    def retire_failed_session(self):
+        """Narrow opt-in retirement; exit 1 remains a nonstandard task failure."""
+        from .close_receipt import read_close_receipt
+        from .session_closure import read_recorded_exit
+        from .runtime_protocol import decode_ack
+        from .project_session_recovery import _pending_result_task
+        assessment = self._shutdown_assessment()
+        if (getattr(self, 'close_protocol', None) != 'v2'
+                or assessment.process_state != 'exited' or assessment.exit_code != 1
+                or assessment.task_outcome != 'failure' or assessment.model_state != 'restored-saved'
+                or set(assessment.missing_evidence) != {'exit-code-not-accepted'}
+                or any(p.exists() for p in (self.task_path, self.completion_path, self.ack_path))):
+            return False
+        if read_recorded_exit(self.root, self.session_id, self._process.pid) != 1:
+            return False
+        receipt = read_close_receipt(self.root, self.session_id)
+        if receipt.close_outcome != 'restored-saved' or receipt.error_code != 'none' or receipt.last_task_id == 'none':
+            return False
+        try:
+            accepted = Path(str(self.ack_path) + '.' + receipt.last_task_id + '.accepted')
+            if decode_ack(accepted.read_text(encoding='ascii')) != Acknowledge(receipt.last_task_id, self.session_id):
+                return False
+        except (OSError, ValueError):
+            return False
+        if any(Path(str(p) + '.tmp').exists() for p in (self.task_path, self.completion_path, self.ack_path)):
+            return False
+        if self.protocol.read_stop_ack(self.session_id) is None or _pending_result_task(self.root) is not None:
+            return False
+        write_json_atomic(self.root / 'recovery-l1.json', {
+            'schema_version': 1, 'worker_id': str(self.ID), 'session_id': self.session_id,
+            'disposition': 'abandoned-dead', 'completion_task_id': None, 'received_task_id': None,
+            'reason': 'failed-task-exit-1-with-verified-restored-snapshot-and-stop-ack',
+            'standard_closed': False, 'exit_code': 1})
+        self.marker_path.write_text('abandoned-dead', encoding='ascii')
+        self.logger.warning('求解失败会话已退役，保留非标准退出1和恢复证据，不改判成功',
+            extra={'event': 'WORKER_FAILED_RETIRED', 'phase': 'shutdown', 'session': self.session_id,
+                   'returncode': 1, 'task_id': receipt.last_task_id,
+                   'disposition': 'abandoned-dead', 'standard_closed': False})
+        self._close_log()
+        return True
+
     def _observe_close_progress(self):
         """Read a bounded tail and emit only changed complete lifecycle lines."""
         path = getattr(self, 'observation_root', self.root) / 'lifecycle.log'
