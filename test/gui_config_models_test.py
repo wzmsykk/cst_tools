@@ -45,10 +45,29 @@ def test_algorithm_settings_are_typed_and_cross_validated():
         "mesh_convergence_step": 5,
         "mesh_convergence_tolerance": 0.01,
     }
-    with pytest.raises(ValueError, match="最低频率"):
+    with pytest.raises(ValueError, match="扫描目标下限必须小于首个求解窗口上限"):
         AlgorithmSettings.from_mapping(
             {"fmin": 800, "fmax": 700, "endfreq": 2500}
         )
+
+
+def test_frequency_labels_describe_window_and_target_without_changing_payload(qapp):
+    dialog = AlgorithmSettingsDialog()
+    dialog.setDefaultValues({'fmin': 500, 'fmax': 700, 'endfreq': 1000})
+    for label, editor, text in (
+        (dialog.fminlabel, dialog.fminLineEdit, '扫描目标下限'),
+        (dialog.fmaxlabel, dialog.fmaxLineEdit, '首个求解窗口上限'),
+        (dialog.dstFreqLabel, dialog.maxFreqThresholdLineEdit, '扫描目标上限'),
+    ):
+        assert label.text() == editor.placeholderText() == editor.accessibleName() == text
+        assert label.buddy() is editor
+        assert editor.toolTip()
+    dialog.setValues()
+    values = dialog.getValues()
+    assert (values['fmin'], values['fmax'], values['endfreq']) == (500, 700, 1000)
+    with pytest.raises(ValueError, match='扫描目标上限不能低于首个求解窗口上限'):
+        AlgorithmSettings.from_mapping({'fmin': 500, 'fmax': 700, 'endfreq': 600})
+    dialog.close()
 
 
 def test_preserve_mesh_dialog_disables_conflicting_controls_and_cancel_restores(qapp):

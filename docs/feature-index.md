@@ -147,3 +147,5 @@ F40–F44历史审查边界：[2026-10-15本机分离审查](../knowledge-base/r
 遵守根目录[AGENTS.md](../AGENTS.md)。索引测试检查本地链接和Python/VBA符号，不自动证明功能完整或更新 prose 内容；实现者必须同步状态、用途、限制与验收证据。
 
 F85/F86/F88现场补证：[2026-10-25 16:51诊断包](field-failure-bundle-20261025.md)。任务级恢复已在复杂用户模型观察到2项/5秒；阻断为退出1及顶层原因缺失，不是收尾预算超时。原包不含模型，不能在本机复核快照。
+
+|F94|GUI扫描目标与首窗频率命名|[algorithm_settings_dialog.py](../GUI/algorithm_settings_dialog.py)|`AlgorithmSettingsDialog.__init__`|[配置与标签测试](../test/gui_config_models_test.py)|[HOM工作台](gui-hom-workspace.md)|

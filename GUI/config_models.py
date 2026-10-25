@@ -61,11 +61,11 @@ class AlgorithmSettings:
             preprocess_modify_mesh=_as_bool(values.get('preprocess_modify_mesh', True)),
         )
         if settings.fmin >= settings.fmax:
-            raise ValueError("最低频率必须小于最高频率")
+            raise ValueError("扫描目标下限必须小于首个求解窗口上限")
         if settings.vacuum_domain_enabled and not settings.vacuum_domain_config:
             raise ValueError('启用真空域登记时必须选择域设置JSON')
         if settings.endfreq < settings.fmax:
-            raise ValueError("扫描频率上限不能低于最高频率")
+            raise ValueError("扫描目标上限不能低于首个求解窗口上限")
         if settings.mesh_cells_per_wavelength < 1:
             raise ValueError("每波长网格数必须是正整数")
         if not settings.preprocess_modify_mesh and settings.mesh_convergence_enabled:

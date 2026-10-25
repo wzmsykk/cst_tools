@@ -27,9 +27,19 @@ class AlgorithmSettingsDialog(QDialog, Ui_AlgoPopDialog):
         apply_theme(self)
         style_dialog_buttons(self.buttonBox)
         self.setWindowTitle("扫描与算法设置")
-        self.fminLineEdit.setPlaceholderText("最低扫描频率")
-        self.fmaxLineEdit.setPlaceholderText("最高扫描频率")
-        self.maxFreqThresholdLineEdit.setPlaceholderText("扫描停止频率")
+        self.fminLineEdit.setPlaceholderText("扫描目标下限")
+        self.fmaxLineEdit.setPlaceholderText("首个求解窗口上限")
+        self.maxFreqThresholdLineEdit.setPlaceholderText("扫描目标上限")
+        for label, editor, description in (
+            (self.fminlabel, self.fminLineEdit, "扫描目标下限（fmin）：整体扫描的起始频率。"),
+            (self.fmaxlabel, self.fmaxLineEdit, "首个求解窗口上限（fmax）：与扫描目标下限共同定义首次求解区间，不是整体扫描终点。"),
+            (self.dstFreqLabel, self.maxFreqThresholdLineEdit, "扫描目标上限（endfreq）：整体扫描的终止频率；失败恢复探测窗口可能临时超出此值。"),
+        ):
+            label.setBuddy(editor)
+            label.setWordWrap(True)
+            editor.setAccessibleName(label.text())
+            editor.setToolTip(description)
+            label.setToolTip(description)
         self.meshCellsLineEdit.setPlaceholderText("例如 20")
         self.logger = logger
         self.data = dict()
@@ -111,6 +121,9 @@ class AlgorithmSettingsDialog(QDialog, Ui_AlgoPopDialog):
                 fields.addWidget(unit, row, 2)
         fields.setColumnStretch(1, 1)
         layout.addLayout(fields)
+        frequency_hint = QLabel("先计算目标下限至首个求解窗口上限，再逐窗扫描至目标上限。", self)
+        frequency_hint.setWordWrap(True)
+        layout.addWidget(frequency_hint)
         layout.addWidget(self.preserveMeshCheckBox)
         mesh_hint = QLabel("勾选后保留网格密度、类型及自适应设置；仍会重建工程。", self)
         mesh_hint.setWordWrap(True)

@@ -348,3 +348,9 @@ Mesh 收敛分析是新项目启动前的可选阶段。默认按 `10, 15, 20, 2
 正常用户权限的无CST协议/Runner回归92 passed（12.49s），扫描与恢复检查点73 passed（6.44s），GUI及假Worker流程15 passed（1.62s），诊断导出与索引27 passed（3.19s）；各组重叠，不相加。报告分别为artifacts/hom-recovery-native-final-20261025.xml、hom-recovery-closeout-20261025.xml、hom-recovery-gui-final-20261025.xml、hom-recovery-bundle-20261025.xml。此前受限环境协议夹具读文件出现PermissionError，88 passed/4 failed/4 errors；保留失败记录，不用重试掩盖原因，正常权限通过也不证明现场不存在瞬时文件访问异常。
 
 最终审计将生产接口的空后处理列表视为输出缺失，禁止据此确认空区间；通用扫描器的明确空结果契约保留。相关测试首次52 passed/2 failed：密度测试夹具以空后处理结束尾窗，更新为含终点模式的夹具后54 passed（3.10s），报告artifacts/hom-recovery-final-audit2-20261025.xml。未启动真实CST，临时加密是否实际生效及现场扩窗恢复仍待串行副本验收。轻量报告保留，临时测试副本清理；artifacts不保证随Git迁移。
+
+### 2026-10-25 扫描频率命名澄清
+
+扫描与算法设置中，fmin显示为“扫描目标下限”，fmax显示为“首个求解窗口上限”，endfreq显示为“扫描目标上限”。例如500/700/1000表示目标500–1000 MHz，首次求解500–700 MHz；fmax不是整体终点。标签、占位提示、无障碍名称及校验消息保持一致，附用途说明；长标签换行并沿用可滚动布局。要求fmin < fmax <= endfreq。失败恢复探测可以暂时超出目标上限，结果准入仍受目标上限限制。
+
+本次仅调整GUI文案，不改配置键、持久化格式、扫描/错误恢复行为；续跑仍以检查点目标为准，无须迁移旧项目。GUI配置、HOM工作台和文档索引39 passed（1.87s），artifacts/gui-frequency-labels-20261025.xml。包含标签/提示/控件关联、数值传递及跨字段错误测试；offscreen测试不证明现场DPI和字体显示效果，无真实CST求解。轻量报告保留，临时目录清理，artifacts不保证随Git迁移。

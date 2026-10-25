@@ -57,11 +57,11 @@ class Ui_AlgoPopDialog(object):
     def retranslateUi(self, AlgoPopDialog):
         _translate = QtCore.QCoreApplication.translate
         AlgoPopDialog.setWindowTitle(_translate("AlgoPopDialog", "算法设置"))
-        self.fminlabel.setText(_translate("AlgoPopDialog", "fmin"))
-        self.fmaxlabel.setText(_translate("AlgoPopDialog", "fmax"))
+        self.fminlabel.setText(_translate("AlgoPopDialog", "扫描目标下限"))
+        self.fmaxlabel.setText(_translate("AlgoPopDialog", "首个求解窗口上限"))
         self.label.setText(_translate("AlgoPopDialog", "Mhz"))
         self.label_2.setText(_translate("AlgoPopDialog", "Mhz"))
-        self.dstFreqLabel.setText(_translate("AlgoPopDialog", "扫描频率上限"))
+        self.dstFreqLabel.setText(_translate("AlgoPopDialog", "扫描目标上限"))
         self.label_3.setText(_translate("AlgoPopDialog", "Mhz"))
         self.meshCellsLabel.setText(_translate("AlgoPopDialog", "固定网格：每波长单元数"))
         self.meshCellsLineEdit.setText(_translate("AlgoPopDialog", "20"))
