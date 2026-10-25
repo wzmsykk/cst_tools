@@ -149,6 +149,11 @@ def test_gui_reopen_loads_logs_timestamps_and_checkpoint_summary_without_start(a
         from PyQt5.QtGui import QCloseEvent
         repeated = QCloseEvent()
         window.closeEvent(repeated)
+        if not window.controller.closed:
+            assert not repeated.isAccepted()  # Client release must settle before Qt exits.
+        wait(app, lambda: window.controller.closed)
+        repeated = QCloseEvent()
+        window.closeEvent(repeated)
         assert repeated.isAccepted()
         window.controller.detach()
         window.controller.pool.shutdown(wait=True)

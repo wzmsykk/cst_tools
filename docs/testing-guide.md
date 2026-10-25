@@ -1,5 +1,7 @@
 # CST Tools 测试基础
 
+GUI退出/资源补偿门禁见[退出契约](gui-exit-resource-cleanup.md)：test/exit_resources_test.py为真实文件句柄；test/exit_process_test.py使用真实Qt GUI/Runner Python进程但明确fake执行器，无CST。运行/失败/仅断开/HTTP响应丢失/cmd启动链的正常退出和Windows目录释放独立断言，不用进程强杀制造成功。
+
 当前阶段和已通过 Gate 汇总见[当前状态与实施路线](./current-status.md)。
 
 ## 测试层级

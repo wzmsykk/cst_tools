@@ -7,6 +7,11 @@
 
 ## 当前优先：生命周期协议L1–L5（2026-10-24更新）
 
+- [x] 退出契约统一：明确detach与stop→shutdown→关闭GUI，空闲/安全FAILED可完整退出，未知/停止或服务关闭失败显示持久错误及可选操作；仅关界面不停止后台。见[现行契约](gui-exit-resource-cleanup.md)，不以杀CST解决。
+- [x] 异常资源清理：LocalExecution部分构造/overview异常也补偿关闭日志，HOM移除无用result.log，detach收口在途通信，GUI本地日志关闭失败允许重试；补真实GUI/假Runner Python和Windows文件/目录释放测试。实际CST收尾不由这些测试代证。
+- [x] 当前应用目录诊断：Runner/GUI显示PID/cwd及启动父进程PID，提示外部终端离开目录；不枚举/结束其他shell。runtime.cwd为可选兼容字段。
+- [ ] 退出修正的真实CST故障收尾与现场桌面视觉补验；用户现场占用PID确认、多窗口共享服务/外部交互终端的完整环境验收仍需另做。无固定总求解超时，不强杀。
+
 - [x] 2026-10-25真实HOM中断补验：小网格Pillbox基线及checkpoint/received/solver三个Runner退出窗口通过；每例实际Solver5次与基线提交序列一致，确认覆盖/旧结果/四场哈希不破坏、两次recover不改检查点、采用事件/CSV无重复。修复生产相对快照路径与cwd混淆。见[记录及范围](hom-interruption-l5-acceptance.md)；不扩大为长扫描/全后处理/掉电保证。
 - [ ] 评估小网格扩窗产生的频率漂移：本轮基线约503.495→503.583MHz被登记为近频结果，不能据此断言独立物理模式；需固定网格或场匹配另做物理判别验收，不与恢复幂等混为一谈。
 

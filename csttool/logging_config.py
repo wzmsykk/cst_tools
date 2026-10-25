@@ -1,6 +1,7 @@
 """Application logging configuration built on the Python standard library."""
 
 from __future__ import annotations
+from contextlib import ExitStack
 
 from dataclasses import dataclass
 import logging
@@ -222,9 +223,11 @@ class ApplicationLogSession:
     def close(self) -> None:
         if self._closed:
             return
-        for handler in self._handlers:
-            self.logger.removeHandler(handler)
-            handler.close()
+        handlers = list(self._handlers)
+        with ExitStack() as cleanup:
+            for handler in handlers:
+                cleanup.callback(handler.close)
+                cleanup.callback(self.logger.removeHandler, handler)
         self._handlers.clear()
         self._closed = True
 

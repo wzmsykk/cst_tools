@@ -749,12 +749,15 @@ class CstApplicationBackend:
                 "已释放项目运行锁 | PROJECT_LOCK_RELEASED project=%s", self.get_project_directory(), extra={"event": "PROJECT_LOCK_RELEASED", "phase": "lifecycle", "project": self.get_project_directory()})
 
     def close_logging(self) -> None:
-        if self._overview_handler is not None:
-            self._base_logger.removeHandler(self._overview_handler)
-            self._overview_handler.close()
-            self._overview_handler = None
-        if self._log_owner is not None:
-            self._log_owner.close()
+        from contextlib import ExitStack
+        handler = self._overview_handler
+        with ExitStack() as cleanup:
+            if self._log_owner is not None:
+                cleanup.callback(self._log_owner.close)
+            if handler is not None:
+                cleanup.callback(handler.close)
+                cleanup.callback(self._base_logger.removeHandler, handler)
+        self._overview_handler = None
 
     def _project_owned_elsewhere(self) -> bool:
         project_directory = self.get_project_directory()

@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox
+from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QLabel
 from GUI.algorithm_settings_dialog import AlgorithmSettingsDialog
 from GUI.application_service import CstApplicationService, ConfigurationService
 from GUI.run_controller import GuiRunController, RunState
@@ -69,6 +69,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     ):
         super().__init__()
         self.setupUi(self)
+        self.exitFailureLabel = QLabel(self.centralwidget)
+        self.exitFailureLabel.setObjectName('exitFailureLabel')
+        self.exitFailureLabel.setTextFormat(Qt.PlainText)
+        self.exitFailureLabel.setWordWrap(True)
+        self.exitFailureLabel.setTextInteractionFlags(Qt.TextSelectableByMouse | Qt.TextSelectableByKeyboard)
+        self.exitFailureLabel.setAccessibleName('完整退出失败及恢复方法')
+        self.exitFailureLabel.hide()
+        self.pageLayout.insertWidget(1, self.exitFailureLabel)
         apply_theme(self)
         self._fit_initial_window_to_screen()
         self.setWindowTitle("CST Batch Studio")
@@ -167,38 +175,29 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def closeEvent(self, event):
         if getattr(self.controller, 'closed', False):
+            try:
+                self._close_local_resources()
+            except Exception as exc:
+                self._exit_failed('本地界面资源关闭失败：' + str(exc) + '。后台状态未因此改变，可检查日志后重试退出。')
+                event.ignore()
+                return
             event.accept()
             return
         if self._confirmation_open:
             event.ignore()
             return
+        if hasattr(self.controller, 'detach'):
+            self._close_runner_window(event)
+            return
         if not self._close_confirmed:
-            if hasattr(self.controller, 'detach'):
-                choice = self._runner_close_choice()
-                if choice == 'cancel':
-                    event.ignore()
-                    return
-                if choice == 'detach':
-                    self.controller.detach()
-                    self.logger.info('关闭界面，后台Runner保持原运行状态')
-                    self.logger.removeHandler(self.logTextBox)
-                    self.logTextBox.close()
-                    event.accept()
-                    return
-                self._close_confirmed = True
-            else:
-                if not self._confirm_action("确认退出", "确定退出 CST Batch Studio？\n如有后台任务，将先请求安全停止，等待标准收尾完成后退出；不会强制结束 CST。\n阻塞中的 CST 操作可能需要等待较长时间。"):
-                    event.ignore()
-                    return
-                self._close_confirmed = True
+            if not self._confirm_action("确认退出", "确定退出 CST Batch Studio？\n如有后台任务，将先请求安全停止并等待标准收尾；不会强制结束 CST。"):
+                event.ignore()
+                return
+            self._close_confirmed = True
         if self.controller.has_active_work:
             self._close_pending = True
             self.logger.info("窗口等待关闭：正在安全停止后台任务")
-            accepted = self.controller.request_stop()
-            if hasattr(self.controller, 'detach') and not accepted and self.controller.state not in {RunState.STOPPING, RunState.RECOVERING}:
-                self._close_pending = False
-                self._close_confirmed = False
-                self.logger.warning('停止请求尚未发送：请确认连接/控制权后重试，或选择仅关闭界面')
+            self.controller.request_stop()
             event.ignore()
             return
         if self.controller.state is RunState.RECOVERY_REQUIRED:
@@ -209,22 +208,74 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             event.ignore()
             return
         self.logger.info("窗口已关闭")
-        self.logger.removeHandler(self.logTextBox)
-        self.logTextBox.close()
-        self.service.close_logging()
-        if hasattr(self.controller, 'detach'):
-            self.controller.detach()
+        self._close_local_resources()
         event.accept()
+
+    def _close_runner_window(self, event):
+        event.ignore()
+        if getattr(self.controller, 'detaching', False):
+            return
+        if not self._close_confirmed:
+            choice = self._runner_close_choice()
+            if choice == 'cancel':
+                return
+            if choice == 'detach':
+                self._close_pending = True
+                self.statusbar.showMessage('正在关闭界面：等待本地通信结束，后台保持原状态')
+                self.controller.detach()
+                self._finishPendingClose()
+                return
+            self.exitFailureLabel.hide()
+            self._close_confirmed = True
+        if self.controller.unknown or self.controller.read_only:
+            self._exit_failed('连接或控制权未确认，未停止任务或退出后台。可重新连接/申请控制权，或选择仅关闭界面。')
+            return
+        if self.controller.state is RunState.RECOVERY_REQUIRED:
+            self._exit_failed('后台仍需恢复，未确认完整退出。请先恢复；也可选择仅关闭界面并保留后台。')
+            return
+        self._close_pending = True
+        if self.controller.has_active_work:
+            if self.controller.pending_operation == 'shutdown':
+                return
+            if not getattr(self, '_close_stop_sent', False) and self.controller.state not in {RunState.STOPPING, RunState.RECOVERING}:
+                self._close_stop_sent = True
+                if not self.controller.request_stop():
+                    self._exit_failed('停止请求未被接受，后台保持原状态。请检查连接和控制权，或选择仅关闭界面。')
+            return
+        if self.controller.backend.client and not self.controller.runner_stopped:
+            if not self.controller.request_shutdown():
+                self._exit_failed('退出后台请求未被接受，尚未释放后台所有权。请检查后台管理。')
+            return
+        self.controller.detach()
+        self._finishPendingClose()
+
+    def _close_local_resources(self):
+        if getattr(self, '_gui_resources_closed', False):
+            return
+        try:
+            self.logger.removeHandler(self.logTextBox)
+            self.logTextBox.close()
+        finally:
+            self.service.close_logging()
+        self._gui_resources_closed = True
+
+    def _exit_failed(self, message):
+        self._close_pending = self._close_confirmed = self._close_stop_sent = False
+        self.logger.error('完整退出未完成 | reason=%s', message)
+        self.stateDetailLabel.setText('完整退出未完成：' + message)
+        self.statusbar.showMessage('完整退出未完成：' + message)
+        self.exitFailureLabel.setText('完整退出未完成：' + message)
+        self.exitFailureLabel.show()
 
     def _runner_close_choice(self):
         self._confirmation_open = True
         try:
             box = QMessageBox(self)
-            box.setWindowTitle('关闭界面或停止计算')
-            box.setText('仅关闭界面不会停止后台计算。后台状态未知时也可断开界面，但不代表任务已停止。')
+            box.setWindowTitle('选择退出方式')
+            box.setText('仅关闭界面：保留后台和计算，发布目录可能继续被占用。\n完整退出：停止任务并等待 CST 收尾，然后正常退出后台及界面。\n关闭前请保存其他窗口中的操作；不会强制结束 CST。')
             cancel = box.addButton('取消', QMessageBox.RejectRole)
-            background = box.addButton('仅关闭界面，后台继续', QMessageBox.AcceptRole)
-            stop = box.addButton('安全停止后退出', QMessageBox.DestructiveRole)
+            background = box.addButton('仅关闭界面（保留后台）', QMessageBox.AcceptRole)
+            stop = box.addButton('停止任务并退出后台及界面', QMessageBox.DestructiveRole)
             box.setDefaultButton(cancel)
             box.setEscapeButton(cancel)
             box.exec_()
@@ -275,6 +326,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.service.update_postprocess_settings(self.PPSDialogBox.getPPSList())
 
     def onRunError(self, message):
+        if self._close_pending and not getattr(self.controller, 'detaching', False):
+            self._exit_failed('后台操作失败：' + str(message) + '。可检查日志后恢复，或仅关闭界面。')
         self.logger.error("后台运行失败 | reason=%s", message)
         self.stateDetailLabel.setText(message)
         self.statusbar.showMessage(f"运行失败：{message}")
@@ -347,8 +400,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.statusbar.showMessage(label)
 
     def _finishPendingClose(self):
-        if self._close_pending and not self.controller.has_active_work:
-            self._close_pending = False
+        if self._close_pending and (getattr(self.controller, 'closed', False) or (
+                not getattr(self.controller, 'detaching', False) and not self.controller.has_active_work)):
+            if not hasattr(self.controller, 'detach'):
+                self._close_pending = False
             QTimer.singleShot(0, self.close)
 
     def showRunnerManagement(self):

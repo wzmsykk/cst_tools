@@ -4,8 +4,16 @@
 
 设计入口D03：[Python/VBA生命周期故障矩阵与L1–L5](python-vba-lifecycle-protocol-v2-plan.md)。L1–L4已接入，新会话生成v2；[真实收尾](close-v2-l5-acceptance.md)、[Controller退出](controller-exit-l5-acceptance.md)及[HOM恢复](hom-interruption-l5-acceptance.md)分别记录实际范围。完整L5仍pending，不把部分窗口通过扩大为全矩阵保证。
 
+审计入口D04：[GUI退出、异常资源与发布目录占用](gui-exit-and-directory-lock-audit.md)。定位F14/F44主窗口closeEvent、RunnerController.detach/request_shutdown，F43的RunnerClient.connect工作目录，F45/F12执行资源边界；只记录现状、受控复现及未实施修正，不能当作新退出接口。
+
+2026-10-25修正入口D05：[GUI完整退出与资源清理](gui-exit-resource-cleanup.md)；D04保留修正前证据，现行行为以D05及测试为准。
+
 |ID|功能|源码|函数/类|测试或操作工具|说明文档|
 |---|---|---|---|---|---|
+|F77|GUI完整退出编排与持久错误反馈|[main_window.py](../GUI/main_window.py)|`MainWindow._close_runner_window`, `MainWindow._close_local_resources`, `MainWindow._exit_failed`|[GUI退出状态测试](../test/gui_runner_test.py)|[退出契约](gui-exit-resource-cleanup.md)|
+|F78|部分构造和异常收尾资源补偿|[runner.py](../csttool/runner.py)|`LocalExecution.__init__`, `LocalExecution.close`, `working_directory`|[资源句柄测试](../test/exit_resources_test.py)|[资源/工作目录边界](gui-exit-resource-cleanup.md)|
+|F79|GUI断开时通信池收口|[runner_controller.py](../GUI/runner_controller.py)|`RunnerController.detach`, `RunnerController.poll`|[停止/取消/断开](../test/gui_runner_test.py)|[断开语义](gui-exit-resource-cleanup.md)|
+|F80|独立Qt进程完整退出与Windows目录释放|[exit_gui_probe.py](../test/support/exit_gui_probe.py)|`main`|[真实GUI/假Runner进程](../test/exit_process_test.py)|[验收范围](gui-exit-resource-cleanup.md)|
 |F76|真实小网格HOM中断恢复及无中断对照|[HOM退出探针](../test/support/validate_hom_exit_l5.py)|`run_case`, `adoption`, `evidence`, `submissions`, `verify_reports`|[探针断言测试](../test/hom_exit_l5_test.py)、[采用对账测试](../test/checkpoint_adoption_test.py)|[HOM验收及边界](hom-interruption-l5-acceptance.md)|
 |F62|L3任务级ACK与失败退役|[managed_cstworker.py](../csttool/managed_cstworker.py)|`ManagedCSTWorker._wait_task_ack`, `ManagedCSTWorker.retiring`, `ManagedCSTWorker._build_macro`|[L3假对端专项](../test/production_close_v2_test.py)|[L3状态/时序](production-close-v2-l3.md)|
 |F63|L3生产宏状态采集与v2实际发布|[生产宏](../data/runtime_managed_worker_v1_main.vb)|`Main`, `CSTPMW_PublishFailure`, `CSTPMW_CloseSession`, `CSTPMW_CheckStop`|[L3源码契约](../test/production_close_v2_test.py)|[L3保护与门禁](production-close-v2-l3.md)|

@@ -1,5 +1,6 @@
 """Project-scoped Runner controls; never operates on arbitrary Python/CST processes."""
 from pathlib import Path
+import os
 from PyQt5.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout, QLabel,
                             QPlainTextEdit, QPushButton)
 from GUI.run_controller import RunState
@@ -64,6 +65,10 @@ class RunnerManagementDialog(QDialog):
             f'PID：{runtime.get("pid", "旧版未提供")}',
             f'后台源码：{source or "旧版未提供"}',
             f'后台Python：{runtime.get("python", "旧版未提供")}',
+            f'后台工作目录：{runtime.get("cwd") or "未提供/无法读取"}',
+            f'GUI PID：{os.getpid()} / 启动父进程 PID：{os.getppid()}',
+            f'GUI工作目录：{os.getcwd()}',
+            '目录仍被占用时，请检查启动终端是否仍位于该目录；不会自动关闭其他终端。',
             f'GUI源码：{local}', f'代码位置对照：{match}',
             f'会话安全：{status.get("session_safety", "未知")}',
             f'项目状态：{status.get("project_task_status", "旧版未提供")}',

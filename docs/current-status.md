@@ -7,6 +7,13 @@
 
 ## 最新状态与近期TODO（2026-10-25）
 
+- 退出逻辑与异常资源修正：[完整退出契约](gui-exit-resource-cleanup.md)。主GUI区分仅关闭界面与停止任务→等待收尾→shutdown Runner→关闭GUI；未知/只读/需要恢复/停止或关闭失败时持续显示原因和恢复方法，仍可明确选择仅关界面。detach等待本地在途通信/release后才让Qt关闭；部分构造和清理异常使用补偿清理，移除HOM无用result.log句柄。Runner快照新增可选runtime.cwd、后台管理显示双方PID/cwd及终端提示。Task/VBA/物理安全门禁不变。
+- 本轮最终离线797 passed、21 integration deselected（107.89s），主窗口独立34 passed（1.34s）；包含六组独立Qt GUI/假Runner进程的正常退出及Windows目录重命名/释放，含cmd /c和shutdown响应丢失。报告artifacts/gui-exit-offline-final-20261025.xml、artifacts/exit-main-20261025.xml。初轮旧测试仍假定detach立即接受close，795 passed/1 failed不计整套通过；修正为等待客户端收尾后复验。弹窗提示Qt原生崩溃和初版夹具失败另留知识库边界。本轮没有真实CST或现场视觉验收，未提交/重打包。
+- 最终文档/日志索引及资源专项8 passed（2.37s，重叠）；六组退出事实/日志和summary.json保留于artifacts/gui-exit-fix-20261025。已清理本轮pytest临时目录；offscreen字体集合0导致截图无文字，现场视觉仍pending，不把结构/退出测试当视觉通过。
+
+- 退出行为审计（分析/复现，未修改生产逻辑）：[GUI退出与目录占用](gui-exit-and-directory-lock-audit.md)。当前“安全停止后退出”只stop+detach，不shutdown Runner；Runner明确以发布根目录为cwd，控制台也可独立占用目录。Windows受控子进程已复现cwd/日志句柄/线程池三类机制；真实非法INI的LocalExecution部分构造、HOM前置失败均复现未关闭日志。尚未取得用户现场PID/句柄，不认定唯一占用者；无CST求解或进程终止。修正项进入TODO。
+- 审计回归28 passed（39.91s）：既有GUI Runner/Runner进程及文档/日志索引，报告artifacts/gui-exit-audit-20261025/regression.xml。未修改生产关闭逻辑，不称为退出缺陷修复验收；探针进程正常返回、日志关闭、临时目录清理，保留轻量记录。
+
 - 2026-10-25真实HOM恢复补验通过：[小网格Pillbox记录](hom-interruption-l5-acceptance.md)。修复HOM检查点相对快照路径被误按cwd解析的问题；采用核验现以项目根目录解析，原路径/身份/SHA256门禁保留。cell=8、nmodes=1、480–530MHz，checkpoint/received/solver三个Runner退出窗口每例Solver均5次，与无中断基线的任务参数顺序一致；两次recover不改确认检查点、旧结果/四场哈希保留、采用事件/CSV无重复。汇总artifacts/hom-interruption-l5-verification-20261025.json，不保证随Git迁移。
 - 本轮离线其余套件776 passed、21 integration deselected（154.53s），主窗口34 passed（1.05s），专项79 passed（6.73s，重叠）。初次受限回归假对端ACK读取PermissionError未计通过，正常权限复验不证明偶发问题消失。实际孤立旧CST丢失退出码按abandoned-dead收口、不伪造标准退出；会话均无活跃进程/恢复阻断。基线扩窗存在近频结果漂移，独立物理模式判别仍TODO，未称十模/全复杂后处理/掉电通过。未提交/打包。
 - 本轮Runner全部离线、CST清单为空、原工程哈希不变；已清理193296796字节（约184.3MiB）模型/原始场及pytest临时目录，保留轻量报告/宏/日志/标记及cleanup.json哈希。原始模型需重新生成后才能严格复核，不能再直接使用验收目录旧路径恢复。

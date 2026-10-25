@@ -206,6 +206,7 @@ def test_shutdown_wait_confirms_real_runner_release(fake_runner, monkeypatch, lo
     assert runtime['pid'] == process.pid
     assert Path(runtime['source_root']) == Path(__file__).resolve().parents[1]
     assert runtime['python']
+    assert Path(runtime['cwd']) == Path(__file__).resolve().parents[1]
     original = client.command
     def command_with_loss(op, *args, **kwargs):
         result = original(op, *args, **kwargs)

@@ -37,7 +37,6 @@ class HomScanAlgorithm(Algorithm):
 
         # 读写
         # self.mode_location = 'result\\'
-        self.log = None
         self.mode_location = None
         self.relative_location = None  # 在setManager后实现
         self.ready = False
@@ -103,8 +102,6 @@ class HomScanAlgorithm(Algorithm):
         self.relative_location = str(manager.currProjectDir) + "\\save\\csv\\"
         if not os.path.exists(self.relative_location):
             os.makedirs(self.relative_location)
-        logpath = os.path.join(manager.result_directory, "result.log")
-        self.log = open(logpath, "w")
         self.check_and_set_ready()
 
     def set_editable_attributes(self, dict):
@@ -343,8 +340,8 @@ class HomScanAlgorithm(Algorithm):
         return samples.reset_index(drop=True)
 
     def get_value(self, file):
-        f = open(file)
-        text = f.read()
+        with open(file) as stream:
+            text = stream.read()
         return float(text[140:])
 
     def _scan_policy(self):
@@ -607,7 +604,4 @@ class HomScanAlgorithm(Algorithm):
                 self.manager.currProjectDir,
             )
             raise
-        finally:
-            if self.log is not None and not self.log.closed:
-                self.log.close()
 

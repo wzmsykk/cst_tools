@@ -1,5 +1,7 @@
 # 独立本机 Runner：API、使用和恢复
 
+2026-10-25：[GUI完整退出](gui-exit-resource-cleanup.md)现编排stop→收尾→shutdown/OS所有权确认→本地GUI清理；仅关界面不停止后台。runtime新增可选cwd诊断，旧服务缺字段按未知显示；停止和RECOVERY_REQUIRED门禁未改变，Task/ACK/VBA wire不变。
+
 L5[采用标记补写](checkpoint-adoption-l5.md)：显式recover和resume准备在项目锁内依据已确认检查点核验并补齐receipt及所属RunStore，不改变覆盖或重算；重复recover不增加同Task采用事件。日志CHECKPOINT_ADOPTION_RECONCILED表示核验/同步数量，非新增导入数量。缺/坏证据保留恢复阻断；wire不变，旧Runner仍须安全重启更新。
 
 L5实际进程退出补验：[六类记录](controller-exit-l5-acceptance.md)。HTTP快照增加execution_active实时线程/执行器状态，终态标签不等于可立即start；GUI保持收尾状态直至释放。归档结果旧路径仅通过身份/哈希匹配的既有索引修复，错误继续阻断，不重复计算。旧后台缺字段沿用旧展示和409门禁，更新需正常退出后重启。

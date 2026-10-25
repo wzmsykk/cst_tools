@@ -1,6 +1,7 @@
 """Independent, loopback-only local Runner. No Qt or GUI dependencies."""
 from __future__ import annotations
 import argparse
+from contextlib import ExitStack
 from dataclasses import asdict
 import hashlib
 import hmac
@@ -22,6 +23,13 @@ from .runner_ownership import RunnerOwnership, protect_directory
 from .project_recovery_state import EXPLICIT_RECOVERY_STATES, persisted_project_status
 
 ACTIVE = {'PREPARING', 'RUNNING', 'STOPPING', 'RECOVERING'}
+
+
+def working_directory():
+    try:
+        return os.getcwd()
+    except OSError:
+        return None
 
 
 class Runner:
@@ -135,6 +143,7 @@ class Runner:
                              or self.worker and self.worker.is_alive()
                              or self.stop_delivery and self.stop_delivery.is_alive()),
                          runtime={'pid': os.getpid(), 'python': sys.executable,
+                                  'cwd': working_directory(),
                                   'source_root': str(Path(__file__).resolve().parents[1])},
                          control_lease_valid=remaining > 0, control_lease_remaining=remaining,
                          control_revision=self.control_revision)
@@ -432,18 +441,24 @@ class LocalExecution:
         self.overview = RunOverview(project, run_id or uuid4().hex, purpose,
                                    resume=bool((payload or {}).get('resume')), settings=settings)
         self.log = ApplicationLogSession(self.overview.directory / 'application.log')
-        self.overview_handler = RunOverviewHandler(self.overview)
-        self.log.logger.addHandler(self.overview_handler)
-        self.update(log_directory=str(self.overview.directory))
-        self.backend = CstApplicationBackend(
-            global_config_manager=GlobalConfigManager(self.project / 'control/config/current.ini', logger=self.log.logger),
-            stop_intent=stop_intent, application_logger=self.log.logger, execution_run_id=run_id)
-        self.backend.select_project_directory(str(project))
-        self.backend._run_overview = self.overview
-        self.backend.alg.checkpoint_listener = lambda report, pending, coverage: self.update(
-            coverage=coverage, mode_count=len(report.modes))
-        self._last_lifecycle_observation = 0.
-        self.backend.add_progress_listener(self._progress)
+        with ExitStack() as cleanup:
+            cleanup.callback(self.log.close)
+            self.overview_handler = RunOverviewHandler(self.overview)
+            self.log.logger.addHandler(self.overview_handler)
+            cleanup.callback(self.overview_handler.close)
+            cleanup.callback(self.log.logger.removeHandler, self.overview_handler)
+            self.update(log_directory=str(self.overview.directory))
+            self.backend = CstApplicationBackend(
+                global_config_manager=GlobalConfigManager(self.project / 'control/config/current.ini', logger=self.log.logger),
+                stop_intent=stop_intent, application_logger=self.log.logger, execution_run_id=run_id)
+            cleanup.callback(self.backend.close_logging)
+            self.backend.select_project_directory(str(project))
+            self.backend._run_overview = self.overview
+            self.backend.alg.checkpoint_listener = lambda report, pending, coverage: self.update(
+                coverage=coverage, mode_count=len(report.modes))
+            self._last_lifecycle_observation = 0.
+            self.backend.add_progress_listener(self._progress)
+            cleanup.pop_all()
 
     def _progress(self, event):
         values = dict(last_progress=asdict(event))
@@ -536,13 +551,13 @@ class LocalExecution:
         return False
 
     def close(self):
-        try:
+        # Every cleanup runs even if overview publication or another close fails.
+        with ExitStack() as cleanup:
+            cleanup.callback(self.log.close)
+            cleanup.callback(self.overview_handler.close)
+            cleanup.callback(self.log.logger.removeHandler, self.overview_handler)
+            cleanup.callback(self.backend.close_logging)
             self.overview.update(status=self.backend.state.name)
-            self.backend.close_logging()
-        finally:
-            self.log.logger.removeHandler(self.overview_handler)
-            self.overview_handler.close()
-            self.log.close()
 
 
 def serve(project, executor_factory=None):

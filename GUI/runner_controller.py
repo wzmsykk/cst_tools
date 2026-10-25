@@ -49,6 +49,7 @@ class RunnerController(QObject):
         self.timer.start()
         self.closed = False
         self.runner_stopped = False
+        self.detaching = False
         self._restore_stop_request(self.context_client)
 
     def _restore_stop_request(self, client):
@@ -109,6 +110,19 @@ class RunnerController(QObject):
     def poll(self):
         if self.closed:
             return
+        if self.detaching:
+            # Drain already-running transport work without observing or submitting commands.
+            if self.future is None or self.future.done():
+                if self.future is not None:
+                    try:
+                        self.future.result()
+                    except Exception as exc:
+                        self.backend.logger.warning('界面断开请求收尾失败，控制权将按租约释放: %s', exc)
+                self.future = None
+                self.closed = True
+                self.timer.stop()
+                self.settled.emit()
+            return
         self._sync_context()
         if self.future:
             if not self.future.done():
@@ -134,6 +148,7 @@ class RunnerController(QObject):
                     self.state_changed.emit(self.state)
                     self.connection_changed.emit('后台 Runner 已退出；点击“连接/启动”可重新启动，不自动续算')
                     self.snapshot_changed.emit(self.backend.runner_status)
+                    self.settled.emit()
                     return
                 if status['project'] != self.backend.project:
                     return
@@ -217,7 +232,7 @@ class RunnerController(QObject):
     def _command(self, op, payload=None):
         self._sync_context()
         client = self.backend.client
-        if client is None or self.runner_stopped or self.unknown or self.pending or (self.read_only and op != 'claim'):
+        if self.closed or self.detaching or client is None or self.runner_stopped or self.unknown or self.pending or (self.read_only and op != 'claim'):
             return False
         run_id = self.run_id
         request_id = uuid4().hex
@@ -291,11 +306,21 @@ class RunnerController(QObject):
         self.state_changed.emit(self.state)
 
     def detach(self):
-        if self.closed:
+        if self.closed or self.detaching:
             return
-        self.closed = True
-        self.timer.stop()
+        self.detaching = True
+        self.queued_action = None
+        if self.future is not None and self.future.cancel():
+            self.future = None
         client = self.backend.client
-        if client:
-            self.pool.submit(lambda: client.command('release'))
+        # Release the current lease after transport finishes. Never execute queued starts.
+        if client and not self.runner_stopped:
+            def release():
+                try:
+                    client.command('release')
+                except Exception as exc:
+                    self.backend.logger.warning('界面控制权释放未确认，将等待租约到期: %s', exc)
+            self.future = self.pool.submit(release)
         self.pool.shutdown(wait=False, cancel_futures=False)
+        # Keep Qt alive until the serial transport and release have returned.
+        self.poll()

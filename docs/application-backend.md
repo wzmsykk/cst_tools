@@ -1,5 +1,7 @@
 # CST Application Backend
 
+2026-10-25：[异常资源清理](gui-exit-resource-cleanup.md)覆盖LocalExecution部分构造及概览/日志关闭失败；各关闭独立尝试，保留异常和重试能力。HOM不再创建无用途result.log，正式日志仍为application.log/jsonl。本轮没有修改CST收尾协议。
+
 L5[检查点采用对账](checkpoint-adoption-l5.md)由`_reconcile_checkpoint_adoptions`接入显式恢复（会话关闭/检查点核验之后）及resume准备（创建Manager之前），均持有项目锁。只补写已确认标记，不推进检查点、不导入结果或调用Solver；错误走既有准备/恢复失败门禁，日志可按CHECKPOINT_ADOPTION_RECONCILED追踪。
 
 L5 Controller意外退出：[恢复实测](controller-exit-l5-acceptance.md)。显式恢复核验已有成功接收快照，Completion已清理时也可按匹配归档索引重绑定旧路径；不改变模型或已确认检查点，不因缺路径重新求解。任务采用与控制进程标准退出仍独立。
