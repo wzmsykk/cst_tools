@@ -1,0 +1,166 @@
+{
+  "schema_version": 1,
+  "reader_sha256": "612eb6da9132ecf6aea8e2e0416877063c0bf70dfde1db3a4e01e7e9f52e23fc",
+  "navigation_decoder": "cstv.history_steps uses UTF-8 replacement; byte line counts cross-checked; not semantic trust",
+  "anchors": [
+    {
+      "id": "pillbox-root-step60",
+      "fixture": "pillbox-root-step60.mod",
+      "fixture_sha256": "856ce9c49a99678b6c3f5e9635312c854afaaa81739f972c05bbf33e625c6e9e",
+      "source": "model/Pillbox.cst",
+      "source_sha256": "f3a4673772d576730373a6310b5a10f7ab5ba79dad9014c2540ddb8ab0de1133",
+      "member": "Model/3D/Model.mod",
+      "member_sha256": "042bb4793d1757bb9a33a0915b5dead285172974ca517902b5c23ab8747d3adb",
+      "member_encoding": {
+        "strict_utf8": true,
+        "semantic_fallback_used": false
+      },
+      "scope": "root",
+      "step": 60,
+      "line_start": 795,
+      "line_end": 842,
+      "disabled": true,
+      "solver_metadata": "HF Eigenmode",
+      "parameters": [
+        {
+          "name": "fmin",
+          "expr": "400",
+          "value": "400",
+          "descr": ""
+        },
+        {
+          "name": "nmodes",
+          "expr": "1",
+          "value": "1",
+          "descr": ""
+        }
+      ]
+    },
+    {
+      "id": "pillbox-root-step61",
+      "fixture": "pillbox-root-step61.mod",
+      "fixture_sha256": "17bc9cbf9bb4d38a12b3e2724c43a301a359124e1829ea2a094e5d620a985f8a",
+      "source": "model/Pillbox.cst",
+      "source_sha256": "f3a4673772d576730373a6310b5a10f7ab5ba79dad9014c2540ddb8ab0de1133",
+      "member": "Model/3D/Model.mod",
+      "member_sha256": "042bb4793d1757bb9a33a0915b5dead285172974ca517902b5c23ab8747d3adb",
+      "member_encoding": {
+        "strict_utf8": true,
+        "semantic_fallback_used": false
+      },
+      "scope": "root",
+      "step": 61,
+      "line_start": 843,
+      "line_end": 890,
+      "disabled": false,
+      "solver_metadata": "HF Eigenmode",
+      "parameters": [
+        {
+          "name": "fmin",
+          "expr": "400",
+          "value": "400",
+          "descr": ""
+        },
+        {
+          "name": "nmodes",
+          "expr": "1",
+          "value": "1",
+          "descr": ""
+        }
+      ]
+    },
+    {
+      "id": "enlarged-root-step56",
+      "fixture": "enlarged-root-step56.mod",
+      "fixture_sha256": "18ca0c5363c8e89182746d47c27ac1c8eb2a3f5ee90f9cec80f69c7764eec696",
+      "source": "model/Enlarged.cst",
+      "source_sha256": "6a2c695ded0d18fb7e0abea442e079de7412d43c238a122af71a95bd5488dae3",
+      "member": "Model/3D/Model.mod",
+      "member_sha256": "c01e334408f464ebd94020c95ef28b4f371f006e812926742ff3058c1e15428e",
+      "member_encoding": {
+        "strict_utf8": false,
+        "first_error_offset": 9609,
+        "context_hex": "5c6162736f72625ca6b53134306162736f726228",
+        "semantic_fallback_used": false
+      },
+      "scope": "root",
+      "step": 56,
+      "line_start": 4063,
+      "line_end": 4110,
+      "disabled": false,
+      "solver_metadata": "HF Eigenmode",
+      "parameters": [
+        {
+          "name": "fmin",
+          "expr": "499",
+          "value": "499",
+          "descr": ""
+        },
+        {
+          "name": "nmodes",
+          "expr": "1",
+          "value": "1",
+          "descr": ""
+        }
+      ]
+    },
+    {
+      "id": "enlarged-SP-FMF-step23",
+      "fixture": "enlarged-SP-FMF-step23.mod",
+      "fixture_sha256": "cca86774b27d193fa5ce8d91cd3941bd1245eac34123df31d07465d9702400ca",
+      "source": "model/Enlarged.cst",
+      "source_sha256": "6a2c695ded0d18fb7e0abea442e079de7412d43c238a122af71a95bd5488dae3",
+      "member": "SP/FMF/Model/3D/Model.mod",
+      "member_sha256": "860ab886e0e3929a1fe8cb75751ad936fb80d3c8ed6b881e67f2467808e50d7f",
+      "member_encoding": {
+        "strict_utf8": false,
+        "first_error_offset": 11611,
+        "context_hex": "202e4e616d652022bdf0bacbc4f8d0bfccfad1f5",
+        "semantic_fallback_used": false
+      },
+      "scope": "SP/FMF",
+      "step": 23,
+      "line_start": 7619,
+      "line_end": 7666,
+      "disabled": false,
+      "solver_metadata": "HF Frequency Domain",
+      "parameters": [
+        {
+          "name": "fmin",
+          "expr": "498.5",
+          "value": "498.5",
+          "descr": ""
+        }
+      ]
+    },
+    {
+      "id": "enlarged-SP-FME-step23",
+      "fixture": "enlarged-SP-FME-step23.mod",
+      "fixture_sha256": "9515c1bbf35fc6d747784da7aa184392e3a89641bdce59612b397df665b89e40",
+      "source": "model/Enlarged.cst",
+      "source_sha256": "6a2c695ded0d18fb7e0abea442e079de7412d43c238a122af71a95bd5488dae3",
+      "member": "SP/FME/Model/3D/Model.mod",
+      "member_sha256": "dc665d3d6b97fae3dbc8d302597cb50608f14cca335f1021bf792ded2294aad9",
+      "member_encoding": {
+        "strict_utf8": false,
+        "first_error_offset": 11618,
+        "context_hex": "202e4e616d652022bdf0bacbc4f8d0bfccfad1f5",
+        "semantic_fallback_used": false
+      },
+      "scope": "SP/FME",
+      "step": 23,
+      "line_start": 7635,
+      "line_end": 7685,
+      "disabled": false,
+      "solver_metadata": "HF Eigenmode",
+      "parameters": [
+        {
+          "name": "fmin",
+          "expr": "498.5",
+          "value": "498.5",
+          "descr": ""
+        }
+      ]
+    }
+  ]
+}

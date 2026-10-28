@@ -53,3 +53,5 @@ CstFile的中央目录和CRC校验、scope/member读取、history_steps及参数
 以上为先前静态批次。新增实测见[V01–V06受控副本校准](cst-settings-calibration-20261028.md)：V03本机三分支可读请求数，V05现代分区可读但新旧密度映射未证；五项完整门禁及V06语义解释仍未通过。
 
 V01/02/04后续[执行数据库校准](cst-solver-settings-readback-calibration-20261028.md)已确认本版key与数值/开关映射，以及求解前缺失、Save仍陈旧、Rebuild清除、数值格式化边界；它不是通用当前live来源。
+
+V06新发现见[编码/作用域来源边界](cst-v06-source-boundaries-20261028.md)：Enlarged部分完整历史不是UTF-8；早期盘点使用共享replace解码作导航，不等于严格语义解码通过。原字段/行号需绑定原字节，未知编码不自动修复或认定工程损坏。

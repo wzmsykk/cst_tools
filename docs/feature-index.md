@@ -2,11 +2,13 @@
 
 日期：2026-10-28。这是维护中的核心功能索引，不是全仓符号清单。先按功能ID查实现，再查工具、日志和验收；历史方案不是现行运行保证。
 
-内部迭代决策：现代MCP协议与唯一共用底层优先；不维护旧API/客户端/协议兼容，所有入口同批迁移并删除旧路径。历史结果保护另行设计显式数据迁移，不以兼容名义保留双框架。当前仅设计，运行代码未改。
+内部迭代决策：现代MCP协议与唯一共用底层优先；不维护旧API/客户端/协议兼容，所有入口同批迁移并删除旧路径。历史结果保护另行设计显式数据迁移，不以兼容名义保留双框架。生产公共接口仍仅设计；测试用校准探针已存在，不是运行时API实现。
 
 设置验证D15：[验证器设计](cst-settings-verifier-design.md)、[静态证据](../knowledge-base/cst-settings-readback-20261028.md)、[基础V01–V06](../knowledge-base/cst-settings-calibration-20261028.md)、[V05实际网格](../knowledge-base/cst-tet-density-mesh-calibration-20261028.md)、[V01/02/04执行快照及陈旧值](../knowledge-base/cst-solver-settings-readback-calibration-20261028.md)。生产语义读取器/门禁未实现，原生执行快照不可冒充当前live设置。
 
 D15工具映射：[基础设置探针](../test/support/calibrate_cst_settings.py)的`cases`/`render`/`run`/`main`，[网格探针](../test/support/calibrate_tet_mesh.py)的`collect_mesh_evidence`及[有界CBOR](../test/support/tet_options_evidence.py)的`decode_options`，[求解配置探针](../test/support/calibrate_solver_readback.py)的`keys`/`render`/`render_staleness`/`main`，复用[归属门禁](../csttool/acceptance_session.py)。安全测试：[设置](../test/cst_settings_calibration_test.py)、[网格证据](../test/tet_options_evidence_test.py)、[求解读回](../test/solver_readback_calibration_test.py)。V03当前请求数已校准；V05现代通道实际生效、旧通道有上下文限制；V01/02/04可靠读取的是绑定某次尝试的执行快照，6位数字、缺失/陈旧性必须处理。
+
+D15/V06设计验收：[合同与B0–B4顺序](cst-settings-v06-acceptance-plan.md)、[人工用例](../test/fixtures/cst_settings_verifier_v06/cases.json)、[字节证据/来源hash](../test/fixtures/cst_settings_verifier_v06/evidence.json)、[编码/scope边界](../knowledge-base/cst-v06-source-boundaries-20261028.md)，检查入口[v06_casebook_test.py](../test/v06_casebook_test.py)。56项语义预期未执行、5个真实摘录仅证明来源；无生产解释器，V06/G03未通过。
 
 首阶段契约D14：[工程/建模/配置/单次求解/输出冻结](mcp-first-stage-interface-contract.md)、[官方文档与持久化核查](../knowledge-base/cst-first-stage-api-semantics-20261028.md)。九操作及typed变更、single-simulation、作用域/发布顺序/设置读回缺口；仅设计，创建通道/设置验证器未实现。现行映射[预处理](../csttool/cst_preprocessor.py)、[Managed](../csttool/managed_cstworker.py)、[后处理](../csttool/postprocess_cst.py)；既有测试[生成器](../test/postprocess_generator_test.py)、[Worker](../test/managed_cstworker_test.py)，不证明新建模Gate通过。
 

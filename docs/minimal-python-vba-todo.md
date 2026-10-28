@@ -337,5 +337,9 @@ P7 明确不做 Profile 文件格式、数据库/注册表、可扩展继承框�
 - [x] 验证执行数据库的缺失、带结果重开、设置改变后Save仍陈旧、Rebuild后清除；target字符串约6位有效数字，不改原表达式。
 - [ ] 实施公共execution_snapshot报告及attempt/run/revision/阶段/hash归属、未知枚举/字段缺失拒绝和数值分辨率比较；不得标为live或额外求解读取设置。
 - [ ] 求解前公共持久历史投影/重开/校准profile落地；当前三个实时getter仍无证据，不用上一次Model.db替代。
-- [ ] V06补公共语义解释器的Reset/条件/未知scope/严格JSON拒绝；已复现scope/停用/CRC及JSON宽松返回边界；nmodes+1经Rebuild读2、Reset读1，原表达式不变，不能当全部通过。
+- [x] [V06 B0用例/合同](cst-settings-v06-acceptance-plan.md)：56项人工预期和5个真实字节摘录/来源hash；仅结构/证据检查，语义全部not-run，不计V06通过。
+- [x] 记录真实Enlarged历史非UTF-8及共享scope默认/replace解码边界；区分未知旧编码unsupported与明确声明UTF-8违反malformed，不猜原编码。
+- [ ] V06 B1/B2：共用严格读取适配和公共有界历史/参数投影，实际执行H/S/M/D用例；未知控制流不执行，scope不fallback，Reset默认不猜。
+- [ ] V06 B3：公共execution_snapshot绑定/精度/陈旧判定实际执行E组；不能拿用例表结构检查当语义通过。
+- [ ] V06 B4：新实现获授权后做必要的最少真实副本复核；不追认旧nmodes+1/Rebuild/Reset读回为新解释器通过。
 - [ ] 校准profile与configure/save/submit门禁接入；未经校准持久匹配不能放行G03，不发明getter或数据库key。

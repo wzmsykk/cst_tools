@@ -7,11 +7,13 @@
 
 ## 首阶段通过标准：对话建模到结果（2026-10-28）
 
-[首阶段G01–G08](mcp-first-stage-conversational-gate.md)要求用户通过真实MCP宿主从空白副本完成参数化Pillbox建模、仿真设置、实际计算、频率与中心Z线R/Q输出、工程/结果文件保存及标准收尾；包括设置读回/保存重开和小网格频率解析对照。A1已改为该完整纵向闭环，14操作/只读/假Worker/HOM提交仅是内部基础，不足以通过。需新增单次simulation定义/提交，不能借HOM算法替代。当前只确定门禁，未运行CST或写运行代码。
+[首阶段G01–G08](mcp-first-stage-conversational-gate.md)要求用户通过真实MCP宿主从空白副本完成参数化Pillbox建模、仿真设置、实际计算、频率与中心Z线R/Q输出、工程/结果文件保存及标准收尾；包括设置读回/保存重开和小网格频率解析对照。A1已改为该完整纵向闭环，14操作/只读/假Worker/HOM提交仅是内部基础，不足以通过。需新增单次simulation定义/提交，不能借HOM算法替代。完整G01–G08仍未验，生产MCP/公共服务未实现；后续设置副本校准已实际运行，见下列分批记录。
 
 首阶段静态契约冻结：新增[D14九操作及typed变更](mcp-first-stage-interface-contract.md)，覆盖空工程、参数化圆柱、PEC背景/六面边界、文档化Tet设置、单次simulation、Frequency/RQ与JSON/CSV工件。[本轮14页官方帮助核查](../knowledge-base/cst-first-stage-api-semantics-20261028.md)明确Cylinder的WCS/组件材料前提、频段修改失效、AddToHistory立即执行/相邻标题替换、Solid包围盒查询阶段限制。创建bootstrap拟用安装自带Python接口，编辑在已加载Model.run，统一后台串行；部分设置缺可靠getter仍SETTING_UNVERIFIED，不能宣称ready。未启动CST/生成运行代码/修改依赖。本轮请求Schema13定义、17正例/25反例通过；既有文档/生成器/Managed/预处理离线53 passed（1.93s），报告artifacts/first-stage-contract-offline-20261028.xml。静态Schema不证明跨字段校验或CST新功能已实现。
 
 设置验证器静态补核：[五项读回设计](cst-settings-verifier-design.md)和[新知识库](../knowledge-base/cst-settings-readback-20261028.md)结合官方六页方法目录、cst_version源码及4个只读.cst/7个scope。确认AKSGetNumberOfModes是defined-modes候选但Default/Tet未证；target不能由GetFmin代替；Tet near/far/policy、Hex/Tet方法槽位、停用/Reset/表达式必须分开解释。cst_version现有方法只读元数据/历史，不是最终设置解释器；设计共用持久投影+会话/行为校准，不复制容器解析器。不宣称找到五个通用getter，G03仍受SETTING_UNVERIFIED及V01–V06未验门禁约束；无CST启动或运行代码修改。20项只读样本事实核对通过，源hash未变；文档索引2 passed（0.70s），artifacts/settings-readback-docs-20261028.xml，不证明live读回或新验证器实现。
+
+最新V06用例/设计：[验收合同](cst-settings-v06-acceptance-plan.md)已冻结56项人工预期，按历史26/scope7/mesh2/来源10/执行快照11分组；另保留5个真实历史字节片段及源/成员/片段hash。新发现Enlarged完整历史有非UTF-8字节，共享scope方便默认和replace解码不能当严格验证；未知旧编码unsupported与明确UTF-8损坏malformed分开。本轮按用户确认仅补用例与设计，无CST启动、生产解释器或MCP接入。用例语义全部not-run、ready=False；结构/来源检查不代表V06或G03通过。新结构/来源检查4项及既有安全/索引回归合计40 passed（2.24s），artifacts/v06-design-verified-20261028.xml；pytest临时目录已清理，固定原字节摘录保留，原模型hash未变。
 
 最新V01/V02/V04：[执行设置读回及陈旧值校准](../knowledge-base/cst-solver-settings-readback-calibration-20261028.md)。本机GetDataBaseValue完整路径objdata\EigenmodeParameter可在求解尝试后读Tet方法（1=Default、2=General Lossy）、target开关/值及自适应开关；6次小网格单模尝试5成功、1禁用target后迭代失败，失败亦有配置快照。新副本求解前/Save后不可读；带结果重开可读，但修改设置再Save仍返回旧执行值，Rebuild后字段消失，禁止当当前live读回。target的double字符串约6位有效数字，表达式保留。共8个受控会话全部确认进程退出，原工程/表达式不变。该轮查明阶段边界，不解锁G03；生产须实现公共历史投影及绑定attempt/revision的execution_snapshot，不能额外求解来读配置。最终离线36 passed（2.23s），artifacts/solver-readback-final-20261028.xml；副本/原始场网格已清理，保留日志、轻量配置数据库、宏/历史/哈希，重新访问原始结果需再生成。
 

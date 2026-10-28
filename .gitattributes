@@ -1,0 +1,2 @@
+# Immutable native history excerpts: preserve source bytes across checkouts.
+test/fixtures/cst_settings_verifier_v06/*.mod binary

@@ -1,0 +1,2292 @@
+{
+  "schema_version": 1,
+  "purpose": "design acceptance oracles; not a runtime schema or parser",
+  "semantic_implementation": "not-implemented",
+  "cases": [
+    {
+      "id": "H01",
+      "group": "history",
+      "title": "explicit mode setter",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "root",
+        "available_scopes": [
+          "root"
+        ],
+        "histories": {
+          "root": "EigenmodeSolver.SetNumberOfModes 2"
+        },
+        "parameters": {
+          "root": []
+        }
+      },
+      "expected": {
+        "status": "resolved",
+        "fields": {
+          "solver.requested_modes": 2
+        },
+        "reasons": [],
+        "evidence": "persisted-history",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "H02",
+      "group": "history",
+      "title": "With scope",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "root",
+        "available_scopes": [
+          "root"
+        ],
+        "histories": {
+          "root": "With EigenmodeSolver\n .SetNumberOfModes \"1\"\nEnd With"
+        },
+        "parameters": {
+          "root": []
+        }
+      },
+      "expected": {
+        "status": "resolved",
+        "fields": {
+          "solver.requested_modes": 1
+        },
+        "reasons": [],
+        "evidence": "persisted-history",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "H03",
+      "group": "history",
+      "title": "disabled final block is not last setter",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "root",
+        "available_scopes": [
+          "root"
+        ],
+        "histories": {
+          "root": "'@ active\nEigenmodeSolver.SetNumberOfModes 1\n''@ disabled\n'EigenmodeSolver.SetNumberOfModes 12"
+        },
+        "parameters": {
+          "root": []
+        }
+      },
+      "expected": {
+        "status": "resolved",
+        "fields": {
+          "solver.requested_modes": 1
+        },
+        "reasons": [],
+        "evidence": "persisted-history",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "H04",
+      "group": "history",
+      "title": "line comment does not write setting",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "root",
+        "available_scopes": [
+          "root"
+        ],
+        "histories": {
+          "root": "EigenmodeSolver.SetNumberOfModes 1 ' SetNumberOfModes 99"
+        },
+        "parameters": {
+          "root": []
+        }
+      },
+      "expected": {
+        "status": "resolved",
+        "fields": {
+          "solver.requested_modes": 1
+        },
+        "reasons": [],
+        "evidence": "persisted-history",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "H05",
+      "group": "history",
+      "title": "partly commented block retains active statements",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "root",
+        "available_scopes": [
+          "root"
+        ],
+        "histories": {
+          "root": "With EigenmodeSolver\n ' .SetNumberOfModes 12\n .SetNumberOfModes 2\nEnd With"
+        },
+        "parameters": {
+          "root": []
+        }
+      },
+      "expected": {
+        "status": "resolved",
+        "fields": {
+          "solver.requested_modes": 2
+        },
+        "reasons": [],
+        "evidence": "persisted-history",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "H06",
+      "group": "history",
+      "title": "Hex and Tet method slots are separate",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "root",
+        "available_scopes": [
+          "root"
+        ],
+        "histories": {
+          "root": "With EigenmodeSolver\n .SetMethodType \"AKS\", \"Hex\"\n .SetMethodType \"Default\", \"Tet\"\n .SetMeshType \"Tetrahedral Mesh\"\nEnd With"
+        },
+        "parameters": {
+          "root": []
+        }
+      },
+      "expected": {
+        "status": "resolved",
+        "fields": {
+          "solver.method_by_mesh.Hex": "AKS",
+          "solver.method_by_mesh.Tet": "Default",
+          "solver.selected_method": "Default"
+        },
+        "reasons": [],
+        "evidence": "persisted-history",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "H07",
+      "group": "history",
+      "title": "MeshSettings partition selector is not active solver mesh",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "root",
+        "available_scopes": [
+          "root"
+        ],
+        "histories": {
+          "root": "EigenmodeSolver.SetMeshType \"Tetrahedral Mesh\"\nMeshSettings.SetMeshType \"Hex\""
+        },
+        "parameters": {
+          "root": []
+        }
+      },
+      "expected": {
+        "status": "resolved",
+        "fields": {
+          "solver.selected_mesh": "Tet"
+        },
+        "reasons": [],
+        "evidence": "persisted-history",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "H08",
+      "group": "history",
+      "title": "Reset without explicit defaults stays unknown",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "root",
+        "available_scopes": [
+          "root"
+        ],
+        "histories": {
+          "root": "EigenmodeSolver.SetNumberOfModes 2\nEigenmodeSolver.Reset"
+        },
+        "parameters": {
+          "root": []
+        }
+      },
+      "expected": {
+        "status": "unresolved",
+        "fields": {},
+        "reasons": [
+          "reset-defaults-unverified"
+        ],
+        "evidence": "persisted-history",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "H09",
+      "group": "history",
+      "title": "explicit setter after Reset resolves only its field",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "root",
+        "available_scopes": [
+          "root"
+        ],
+        "histories": {
+          "root": "EigenmodeSolver.Reset\nEigenmodeSolver.SetNumberOfModes 2"
+        },
+        "parameters": {
+          "root": []
+        }
+      },
+      "expected": {
+        "status": "resolved",
+        "fields": {
+          "solver.requested_modes": 2
+        },
+        "reasons": [],
+        "evidence": "persisted-history",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "H10",
+      "group": "history",
+      "title": "mode expression preserves parameter dependency",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "root",
+        "available_scopes": [
+          "root"
+        ],
+        "histories": {
+          "root": "EigenmodeSolver.SetNumberOfModes \"nmodes+1\""
+        },
+        "parameters": {
+          "root": [
+            {
+              "name": "nmodes",
+              "expr": "1",
+              "cached_value": "1"
+            }
+          ]
+        }
+      },
+      "expected": {
+        "status": "resolved",
+        "fields": {
+          "solver.requested_modes": 2,
+          "expressions.solver.requested_modes": "nmodes+1"
+        },
+        "reasons": [],
+        "evidence": "persisted-history",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "H11",
+      "group": "history",
+      "title": "dependency graph uses expressions in same scope",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "root",
+        "available_scopes": [
+          "root"
+        ],
+        "histories": {
+          "root": "EigenmodeSolver.SetFrequencyTarget True, \"fmin*scale\""
+        },
+        "parameters": {
+          "root": [
+            {
+              "name": "base",
+              "expr": "400",
+              "cached_value": "400"
+            },
+            {
+              "name": "fmin",
+              "expr": "base",
+              "cached_value": "400"
+            },
+            {
+              "name": "scale",
+              "expr": "1.2",
+              "cached_value": "1.2"
+            }
+          ]
+        }
+      },
+      "expected": {
+        "status": "resolved",
+        "fields": {
+          "solver.frequency_target.value_mhz": 480
+        },
+        "reasons": [],
+        "evidence": "persisted-history",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "H12",
+      "group": "history",
+      "title": "cyclic dependencies are not evaluated",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "root",
+        "available_scopes": [
+          "root"
+        ],
+        "histories": {
+          "root": "EigenmodeSolver.SetNumberOfModes \"a\""
+        },
+        "parameters": {
+          "root": [
+            {
+              "name": "a",
+              "expr": "b+1",
+              "cached_value": "1"
+            },
+            {
+              "name": "b",
+              "expr": "a-1",
+              "cached_value": "0"
+            }
+          ]
+        }
+      },
+      "expected": {
+        "status": "unresolved",
+        "fields": {},
+        "reasons": [
+          "parameter-cycle"
+        ],
+        "evidence": "persisted-history",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "H13",
+      "group": "history",
+      "title": "stale parameter cache cannot become live evidence",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "root",
+        "available_scopes": [
+          "root"
+        ],
+        "histories": {
+          "root": "EigenmodeSolver.SetFrequencyTarget True, \"fmin*1.2\""
+        },
+        "parameters": {
+          "root": [
+            {
+              "name": "fmin",
+              "expr": "400",
+              "cached_value": "500"
+            }
+          ]
+        }
+      },
+      "expected": {
+        "status": "stale",
+        "fields": {},
+        "reasons": [
+          "stale-parameter-cache"
+        ],
+        "evidence": "persisted-history",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "H14",
+      "group": "history",
+      "title": "missing parameter has no default",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "root",
+        "available_scopes": [
+          "root"
+        ],
+        "histories": {
+          "root": "EigenmodeSolver.SetNumberOfModes \"not_defined\""
+        },
+        "parameters": {
+          "root": []
+        }
+      },
+      "expected": {
+        "status": "unresolved",
+        "fields": {},
+        "reasons": [
+          "missing-parameter"
+        ],
+        "evidence": "persisted-history",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "H15",
+      "group": "history",
+      "title": "conditional setting writes are unsupported even if condition looks constant",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "root",
+        "available_scopes": [
+          "root"
+        ],
+        "histories": {
+          "root": "If 1 = 1 Then\n EigenmodeSolver.SetNumberOfModes 2\nEnd If"
+        },
+        "parameters": {
+          "root": []
+        }
+      },
+      "expected": {
+        "status": "unsupported",
+        "fields": {},
+        "reasons": [
+          "unsupported-control-flow"
+        ],
+        "evidence": "persisted-history",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "H16",
+      "group": "history",
+      "title": "unknown call invalidates previously known settings",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "root",
+        "available_scopes": [
+          "root"
+        ],
+        "histories": {
+          "root": "EigenmodeSolver.SetNumberOfModes 1\nCall ApplySolverSettings"
+        },
+        "parameters": {
+          "root": []
+        }
+      },
+      "expected": {
+        "status": "unsupported",
+        "fields": {},
+        "reasons": [
+          "unknown-call-taints-settings"
+        ],
+        "evidence": "persisted-history",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "H17",
+      "group": "history",
+      "title": "loop is not interpreted",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "root",
+        "available_scopes": [
+          "root"
+        ],
+        "histories": {
+          "root": "For i = 1 To 2\n EigenmodeSolver.SetNumberOfModes i\nNext i"
+        },
+        "parameters": {
+          "root": []
+        }
+      },
+      "expected": {
+        "status": "unsupported",
+        "fields": {},
+        "reasons": [
+          "unsupported-control-flow"
+        ],
+        "evidence": "persisted-history",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "H18",
+      "group": "history",
+      "title": "unknown object alias is not guessed",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "root",
+        "available_scopes": [
+          "root"
+        ],
+        "histories": {
+          "root": "Set s = EigenmodeSolver\ns.SetNumberOfModes 2"
+        },
+        "parameters": {
+          "root": []
+        }
+      },
+      "expected": {
+        "status": "unsupported",
+        "fields": {},
+        "reasons": [
+          "unknown-object-alias"
+        ],
+        "evidence": "persisted-history",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "H19",
+      "group": "history",
+      "title": "dynamic macro generation is not evaluated",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "root",
+        "available_scopes": [
+          "root"
+        ],
+        "histories": {
+          "root": "Evaluate \"EigenmodeSolver.SetNumberOfModes 2\""
+        },
+        "parameters": {
+          "root": []
+        }
+      },
+      "expected": {
+        "status": "unsupported",
+        "fields": {},
+        "reasons": [
+          "dynamic-code"
+        ],
+        "evidence": "persisted-history",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "H20",
+      "group": "history",
+      "title": "unterminated With is malformed",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "root",
+        "available_scopes": [
+          "root"
+        ],
+        "histories": {
+          "root": "With EigenmodeSolver\n .SetNumberOfModes 2"
+        },
+        "parameters": {
+          "root": []
+        }
+      },
+      "expected": {
+        "status": "malformed",
+        "fields": {},
+        "reasons": [
+          "unbalanced-with"
+        ],
+        "evidence": "persisted-history",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "H21",
+      "group": "history",
+      "title": "continuation is joined outside strings",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "root",
+        "available_scopes": [
+          "root"
+        ],
+        "histories": {
+          "root": "EigenmodeSolver.SetFrequencyTarget _\n True, \"fmin*1.2\""
+        },
+        "parameters": {
+          "root": [
+            {
+              "name": "fmin",
+              "expr": "400",
+              "cached_value": "400"
+            }
+          ]
+        }
+      },
+      "expected": {
+        "status": "resolved",
+        "fields": {
+          "solver.frequency_target.value_mhz": 480
+        },
+        "reasons": [],
+        "evidence": "persisted-history",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "H22",
+      "group": "history",
+      "title": "noninteger request cannot be silently truncated",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "root",
+        "available_scopes": [
+          "root"
+        ],
+        "histories": {
+          "root": "EigenmodeSolver.SetNumberOfModes \"1.5\""
+        },
+        "parameters": {
+          "root": []
+        }
+      },
+      "expected": {
+        "status": "malformed",
+        "fields": {},
+        "reasons": [
+          "noninteger-mode-count"
+        ],
+        "evidence": "persisted-history",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "H23",
+      "group": "history",
+      "title": "MeshAdaption3D pass count is not Tet enable switch",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "root",
+        "available_scopes": [
+          "root"
+        ],
+        "histories": {
+          "root": "MeshAdaption3D.SetType \"HighFrequencyTet\"\nMeshAdaption3D.MinPasses 1"
+        },
+        "parameters": {
+          "root": []
+        }
+      },
+      "expected": {
+        "status": "unresolved",
+        "fields": {},
+        "reasons": [
+          "adaptation-switch-missing"
+        ],
+        "evidence": "persisted-history",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "H24",
+      "group": "history",
+      "title": "unsupported expression cannot invoke host Python",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "root",
+        "available_scopes": [
+          "root"
+        ],
+        "histories": {
+          "root": "EigenmodeSolver.SetNumberOfModes \"__import__('os').system('echo bad')\""
+        },
+        "parameters": {
+          "root": []
+        }
+      },
+      "expected": {
+        "status": "unsupported",
+        "fields": {},
+        "reasons": [
+          "unsupported-expression"
+        ],
+        "evidence": "persisted-history",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "H25",
+      "group": "history",
+      "title": "restricted A1 CInt Restore wrapper with integral input",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "root",
+        "available_scopes": [
+          "root"
+        ],
+        "histories": {
+          "root": "EigenmodeSolver.SetNumberOfModes CInt(RestoreDoubleParameter(\"nmodes\"))"
+        },
+        "parameters": {
+          "root": [
+            {
+              "name": "nmodes",
+              "expr": "2",
+              "cached_value": "2"
+            }
+          ]
+        }
+      },
+      "expected": {
+        "status": "resolved",
+        "fields": {
+          "solver.requested_modes": 2
+        },
+        "reasons": [],
+        "evidence": "persisted-history",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "H26",
+      "group": "history",
+      "title": "fractional CInt input is outside restricted A1 subset",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "root",
+        "available_scopes": [
+          "root"
+        ],
+        "histories": {
+          "root": "EigenmodeSolver.SetNumberOfModes CInt(RestoreDoubleParameter(\"nmodes\"))"
+        },
+        "parameters": {
+          "root": [
+            {
+              "name": "nmodes",
+              "expr": "1.5",
+              "cached_value": "1.5"
+            }
+          ]
+        }
+      },
+      "expected": {
+        "status": "unsupported",
+        "fields": {},
+        "reasons": [
+          "nonintegral-cint-input"
+        ],
+        "evidence": "persisted-history",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "S01",
+      "group": "scope",
+      "title": "explicit child cannot borrow root value",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "SP/FME",
+        "available_scopes": [
+          "root",
+          "SP/FME"
+        ],
+        "histories": {
+          "root": "EigenmodeSolver.SetNumberOfModes 1",
+          "SP/FME": "EigenmodeSolver.SetNumberOfModes 2"
+        },
+        "parameters": {
+          "root": [],
+          "SP/FME": []
+        }
+      },
+      "expected": {
+        "status": "resolved",
+        "fields": {
+          "solver.requested_modes": 2
+        },
+        "reasons": [],
+        "evidence": "persisted-history",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "S02",
+      "group": "scope",
+      "title": "unknown child does not fall back",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "SP/missing",
+        "available_scopes": [
+          "root",
+          "SP/FME"
+        ],
+        "histories": {
+          "root": "EigenmodeSolver.SetNumberOfModes 1",
+          "SP/FME": "EigenmodeSolver.SetNumberOfModes 2"
+        },
+        "parameters": {
+          "root": [],
+          "SP/FME": []
+        }
+      },
+      "expected": {
+        "status": "rejected",
+        "fields": {},
+        "reasons": [
+          "unknown-scope"
+        ],
+        "evidence": "none",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "S03",
+      "group": "scope",
+      "title": "missing resolved scope is rejected",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": null,
+        "available_scopes": [
+          "root",
+          "SP/FME"
+        ],
+        "histories": {
+          "root": "EigenmodeSolver.SetNumberOfModes 1",
+          "SP/FME": "EigenmodeSolver.SetNumberOfModes 2"
+        },
+        "parameters": {
+          "root": [],
+          "SP/FME": []
+        }
+      },
+      "expected": {
+        "status": "rejected",
+        "fields": {},
+        "reasons": [
+          "scope-required"
+        ],
+        "evidence": "none",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "S04",
+      "group": "scope",
+      "title": "reader convenience alias is not public identity",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "FME",
+        "available_scopes": [
+          "root",
+          "SP/FME"
+        ],
+        "histories": {
+          "root": "EigenmodeSolver.SetNumberOfModes 1",
+          "SP/FME": "EigenmodeSolver.SetNumberOfModes 2"
+        },
+        "parameters": {
+          "root": [],
+          "SP/FME": []
+        }
+      },
+      "expected": {
+        "status": "rejected",
+        "fields": {},
+        "reasons": [
+          "unknown-scope"
+        ],
+        "evidence": "none",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "S05",
+      "group": "scope",
+      "title": "parameter lookup stays in selected child",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "SP/FME",
+        "available_scopes": [
+          "root",
+          "SP/FME"
+        ],
+        "histories": {
+          "root": "EigenmodeSolver.SetNumberOfModes 1",
+          "SP/FME": "EigenmodeSolver.SetFrequencyTarget True, \"fmin*1.2\""
+        },
+        "parameters": {
+          "root": [
+            {
+              "name": "fmin",
+              "expr": "400",
+              "cached_value": "400"
+            }
+          ],
+          "SP/FME": [
+            {
+              "name": "fmin",
+              "expr": "500",
+              "cached_value": "500"
+            }
+          ]
+        }
+      },
+      "expected": {
+        "status": "resolved",
+        "fields": {
+          "solver.frequency_target.value_mhz": 600
+        },
+        "reasons": [],
+        "evidence": "persisted-history",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "S06",
+      "group": "scope",
+      "title": "missing child parameter does not borrow root cache",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "SP/FME",
+        "available_scopes": [
+          "root",
+          "SP/FME"
+        ],
+        "histories": {
+          "root": "EigenmodeSolver.SetNumberOfModes 1",
+          "SP/FME": "EigenmodeSolver.SetFrequencyTarget True, \"fmin*1.2\""
+        },
+        "parameters": {
+          "root": [
+            {
+              "name": "fmin",
+              "expr": "400",
+              "cached_value": "400"
+            }
+          ],
+          "SP/FME": []
+        }
+      },
+      "expected": {
+        "status": "unresolved",
+        "fields": {},
+        "reasons": [
+          "missing-parameter"
+        ],
+        "evidence": "persisted-history",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "S07",
+      "group": "scope",
+      "title": "eigenmode history does not establish active solver family",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "SP/FME",
+        "available_scopes": [
+          "root",
+          "SP/FME"
+        ],
+        "histories": {
+          "root": "EigenmodeSolver.SetNumberOfModes 1",
+          "SP/FME": "EigenmodeSolver.SetNumberOfModes 2"
+        },
+        "parameters": {
+          "root": [],
+          "SP/FME": []
+        },
+        "active_solver": {
+          "SP/FME": "HF Frequency Domain"
+        }
+      },
+      "expected": {
+        "status": "unsupported",
+        "fields": {},
+        "reasons": [
+          "a1-solver-family-unsupported"
+        ],
+        "evidence": "persisted-history",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "M01",
+      "group": "mesh",
+      "title": "near far and policy remain separate",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "root",
+        "available_scopes": [
+          "root"
+        ],
+        "histories": {
+          "root": "MeshSettings.SetMeshType \"Tet\"\nMeshSettings.Set \"Version\", 1\nMeshSettings.Set \"StepsPerWaveNear\", \"10\"\nMeshSettings.Set \"StepsPerWaveFar\", \"4\"\nMeshSettings.Set \"CellsPerWavelengthPolicy\", \"cellsperwavelength\""
+        },
+        "parameters": {
+          "root": []
+        }
+      },
+      "expected": {
+        "status": "resolved",
+        "fields": {
+          "mesh.tet.near": 10,
+          "mesh.tet.far": 4,
+          "mesh.tet.policy": "cellsperwavelength"
+        },
+        "reasons": [],
+        "evidence": "persisted-history",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "M02",
+      "group": "mesh",
+      "title": "mixed channels without matching context profile remain ambiguous",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "root",
+        "available_scopes": [
+          "root"
+        ],
+        "histories": {
+          "root": "MeshSettings.SetMeshType \"Tet\"\nMeshSettings.Set \"StepsPerWaveNear\", \"10\"\nMesh.StepsPerWavelengthTet 4"
+        },
+        "parameters": {
+          "root": []
+        }
+      },
+      "expected": {
+        "status": "ambiguous",
+        "fields": {},
+        "reasons": [
+          "uncalibrated-density-channels"
+        ],
+        "evidence": "persisted-history",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "D01",
+      "group": "source",
+      "title": "invalid JSON is not missing metadata",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "root",
+        "available_scopes": [
+          "root"
+        ],
+        "histories": {
+          "root": ""
+        },
+        "parameters": {
+          "root": []
+        },
+        "read_observation": {
+          "member": "Model/simulationproperties.json",
+          "text": "{"
+        }
+      },
+      "expected": {
+        "status": "malformed",
+        "fields": {},
+        "reasons": [
+          "malformed-json"
+        ],
+        "evidence": "none",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "D02",
+      "group": "source",
+      "title": "duplicate JSON keys are rejected",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "root",
+        "available_scopes": [
+          "root"
+        ],
+        "histories": {
+          "root": ""
+        },
+        "parameters": {
+          "root": []
+        },
+        "read_observation": {
+          "member": "Model/simulationproperties.json",
+          "text": "{\"version\":3,\"version\":4}"
+        }
+      },
+      "expected": {
+        "status": "malformed",
+        "fields": {},
+        "reasons": [
+          "duplicate-json-key"
+        ],
+        "evidence": "none",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "D03",
+      "group": "source",
+      "title": "wrong JSON top type is rejected",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "root",
+        "available_scopes": [
+          "root"
+        ],
+        "histories": {
+          "root": ""
+        },
+        "parameters": {
+          "root": []
+        },
+        "read_observation": {
+          "member": "Model/simulationproperties.json",
+          "text": "[]"
+        }
+      },
+      "expected": {
+        "status": "malformed",
+        "fields": {},
+        "reasons": [
+          "json-top-level-type"
+        ],
+        "evidence": "none",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "D05",
+      "group": "source",
+      "title": "CRC reader failure cannot become empty defaults",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "root",
+        "available_scopes": [
+          "root"
+        ],
+        "histories": {
+          "root": ""
+        },
+        "parameters": {
+          "root": []
+        },
+        "read_observation": {
+          "kind": "crc-mismatch",
+          "member": "Model/3D/Model.mod"
+        }
+      },
+      "expected": {
+        "status": "malformed",
+        "fields": {},
+        "reasons": [
+          "crc-mismatch"
+        ],
+        "evidence": "none",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "D06",
+      "group": "source",
+      "title": "declared UTF8 violation is not decoded with replacement",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "root",
+        "available_scopes": [
+          "root"
+        ],
+        "histories": {
+          "root": ""
+        },
+        "parameters": {
+          "root": []
+        },
+        "read_observation": {
+          "kind": "invalid-utf8",
+          "declared_encoding": "utf-8",
+          "member": "Model/3D/Model.mod",
+          "bytes_hex": "ff"
+        }
+      },
+      "expected": {
+        "status": "malformed",
+        "fields": {},
+        "reasons": [
+          "invalid-text-encoding"
+        ],
+        "evidence": "none",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "D07",
+      "group": "source",
+      "title": "changing immutable snapshot is stale",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "root",
+        "available_scopes": [
+          "root"
+        ],
+        "histories": {
+          "root": ""
+        },
+        "parameters": {
+          "root": []
+        },
+        "read_observation": {
+          "kind": "source-identity-changed",
+          "before_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "after_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        }
+      },
+      "expected": {
+        "status": "stale",
+        "fields": {},
+        "reasons": [
+          "source-identity-changed"
+        ],
+        "evidence": "none",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "D08",
+      "group": "source",
+      "title": "unsupported compression cannot use regex fallback",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "root",
+        "available_scopes": [
+          "root"
+        ],
+        "histories": {
+          "root": ""
+        },
+        "parameters": {
+          "root": []
+        },
+        "read_observation": {
+          "kind": "unsupported-compression"
+        }
+      },
+      "expected": {
+        "status": "unsupported",
+        "fields": {},
+        "reasons": [
+          "unsupported-compression"
+        ],
+        "evidence": "none",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "D09",
+      "group": "source",
+      "title": "member budget failure is not truncated success",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "root",
+        "available_scopes": [
+          "root"
+        ],
+        "histories": {
+          "root": ""
+        },
+        "parameters": {
+          "root": []
+        },
+        "read_observation": {
+          "kind": "member-budget-exceeded"
+        }
+      },
+      "expected": {
+        "status": "rejected",
+        "fields": {},
+        "reasons": [
+          "resource-budget-exceeded"
+        ],
+        "evidence": "none",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "D04",
+      "group": "source",
+      "title": "optional simulation metadata missing does not erase explicit history",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "root",
+        "available_scopes": [
+          "root"
+        ],
+        "histories": {
+          "root": "EigenmodeSolver.SetNumberOfModes 1"
+        },
+        "parameters": {
+          "root": []
+        },
+        "read_observation": {
+          "member": "Model/simulationproperties.json",
+          "state": "missing"
+        }
+      },
+      "expected": {
+        "status": "resolved",
+        "fields": {
+          "solver.requested_modes": 1
+        },
+        "reasons": [
+          "optional-metadata-missing"
+        ],
+        "evidence": "persisted-history",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "D10",
+      "group": "source",
+      "title": "undeclared legacy encoding is unsupported not corrupt CST",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "root",
+        "available_scopes": [
+          "root"
+        ],
+        "histories": {
+          "root": ""
+        },
+        "parameters": {
+          "root": []
+        },
+        "read_observation": {
+          "kind": "undetermined-text-encoding",
+          "member": "Model/3D/Model.mod",
+          "bytes_hex": "a6",
+          "declared_encoding": null
+        }
+      },
+      "expected": {
+        "status": "unsupported",
+        "fields": {},
+        "reasons": [
+          "encoding-profile-missing"
+        ],
+        "evidence": "none",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "E01",
+      "group": "execution",
+      "title": "configuration match is independent of failed solve",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "root",
+        "available_scopes": [
+          "root"
+        ],
+        "histories": {
+          "root": ""
+        },
+        "parameters": {
+          "root": []
+        },
+        "requested_binding": {
+          "project_id": "project-a",
+          "attempt_id": "attempt-a",
+          "definition_revision": "revision-a",
+          "database_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "cst_build": "2022.5 Release from 2022-06-03 (change 981760)",
+          "scope": "root"
+        },
+        "execution_snapshot": {
+          "binding": {
+            "project_id": "project-a",
+            "attempt_id": "attempt-a",
+            "definition_revision": "revision-a",
+            "database_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "cst_build": "2022.5 Release from 2022-06-03 (change 981760)",
+            "scope": "root"
+          },
+          "phase": "post-attempt",
+          "observed_at": "2026-10-28T08:00:00+00:00",
+          "values": {
+            "SolverTypeTet": "1",
+            "FrequencyTargetActive": "True",
+            "FrequencyTargetValue": "480",
+            "AdaptionActiveTet": "False",
+            "Modes": "1",
+            "MeshType": "1"
+          }
+        },
+        "result_success": false,
+        "expected_execution_config": {
+          "method": "Default",
+          "mesh": "Tet",
+          "target_enabled": true,
+          "target_value": "480",
+          "adaptation_enabled": false,
+          "requested_modes": 1
+        },
+        "calibration_profile": {
+          "id": "v06-oracle-root-tet-2022.5",
+          "cst_build": "2022.5 Release from 2022-06-03 (change 981760)",
+          "method_map": {
+            "1": "Default",
+            "2": "General (Lossy)"
+          },
+          "mesh_map": {
+            "1": "Tet"
+          },
+          "float_format": {
+            "significant_digits": 6,
+            "style": "g"
+          }
+        }
+      },
+      "expected": {
+        "status": "execution-match",
+        "fields": {
+          "execution.method": "Default",
+          "result_success": false
+        },
+        "reasons": [],
+        "evidence": "native-run-database",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "E02",
+      "group": "execution",
+      "title": "binding mismatch: definition_revision",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "root",
+        "available_scopes": [
+          "root"
+        ],
+        "histories": {
+          "root": ""
+        },
+        "parameters": {
+          "root": []
+        },
+        "requested_binding": {
+          "project_id": "project-a",
+          "attempt_id": "attempt-a",
+          "definition_revision": "revision-a",
+          "database_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "cst_build": "2022.5 Release from 2022-06-03 (change 981760)",
+          "scope": "root"
+        },
+        "execution_snapshot": {
+          "binding": {
+            "project_id": "project-a",
+            "attempt_id": "attempt-a",
+            "definition_revision": "revision-b",
+            "database_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "cst_build": "2022.5 Release from 2022-06-03 (change 981760)",
+            "scope": "root"
+          },
+          "phase": "post-attempt",
+          "observed_at": "2026-10-28T08:00:00+00:00",
+          "values": {
+            "SolverTypeTet": "1",
+            "FrequencyTargetActive": "True",
+            "FrequencyTargetValue": "480",
+            "AdaptionActiveTet": "False",
+            "Modes": "1",
+            "MeshType": "1"
+          }
+        },
+        "result_success": false,
+        "expected_execution_config": {
+          "method": "Default",
+          "mesh": "Tet",
+          "target_enabled": true,
+          "target_value": "480",
+          "adaptation_enabled": false,
+          "requested_modes": 1
+        },
+        "calibration_profile": {
+          "id": "v06-oracle-root-tet-2022.5",
+          "cst_build": "2022.5 Release from 2022-06-03 (change 981760)",
+          "method_map": {
+            "1": "Default",
+            "2": "General (Lossy)"
+          },
+          "mesh_map": {
+            "1": "Tet"
+          },
+          "float_format": {
+            "significant_digits": 6,
+            "style": "g"
+          }
+        }
+      },
+      "expected": {
+        "status": "stale",
+        "fields": {},
+        "reasons": [
+          "execution-binding-mismatch"
+        ],
+        "evidence": "native-run-database",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "E03",
+      "group": "execution",
+      "title": "binding mismatch: attempt_id",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "root",
+        "available_scopes": [
+          "root"
+        ],
+        "histories": {
+          "root": ""
+        },
+        "parameters": {
+          "root": []
+        },
+        "requested_binding": {
+          "project_id": "project-a",
+          "attempt_id": "attempt-a",
+          "definition_revision": "revision-a",
+          "database_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "cst_build": "2022.5 Release from 2022-06-03 (change 981760)",
+          "scope": "root"
+        },
+        "execution_snapshot": {
+          "binding": {
+            "project_id": "project-a",
+            "attempt_id": "attempt-b",
+            "definition_revision": "revision-a",
+            "database_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "cst_build": "2022.5 Release from 2022-06-03 (change 981760)",
+            "scope": "root"
+          },
+          "phase": "post-attempt",
+          "observed_at": "2026-10-28T08:00:00+00:00",
+          "values": {
+            "SolverTypeTet": "1",
+            "FrequencyTargetActive": "True",
+            "FrequencyTargetValue": "480",
+            "AdaptionActiveTet": "False",
+            "Modes": "1",
+            "MeshType": "1"
+          }
+        },
+        "result_success": false,
+        "expected_execution_config": {
+          "method": "Default",
+          "mesh": "Tet",
+          "target_enabled": true,
+          "target_value": "480",
+          "adaptation_enabled": false,
+          "requested_modes": 1
+        },
+        "calibration_profile": {
+          "id": "v06-oracle-root-tet-2022.5",
+          "cst_build": "2022.5 Release from 2022-06-03 (change 981760)",
+          "method_map": {
+            "1": "Default",
+            "2": "General (Lossy)"
+          },
+          "mesh_map": {
+            "1": "Tet"
+          },
+          "float_format": {
+            "significant_digits": 6,
+            "style": "g"
+          }
+        }
+      },
+      "expected": {
+        "status": "stale",
+        "fields": {},
+        "reasons": [
+          "execution-binding-mismatch"
+        ],
+        "evidence": "native-run-database",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "E04",
+      "group": "execution",
+      "title": "binding mismatch: database_sha256",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "root",
+        "available_scopes": [
+          "root"
+        ],
+        "histories": {
+          "root": ""
+        },
+        "parameters": {
+          "root": []
+        },
+        "requested_binding": {
+          "project_id": "project-a",
+          "attempt_id": "attempt-a",
+          "definition_revision": "revision-a",
+          "database_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "cst_build": "2022.5 Release from 2022-06-03 (change 981760)",
+          "scope": "root"
+        },
+        "execution_snapshot": {
+          "binding": {
+            "project_id": "project-a",
+            "attempt_id": "attempt-a",
+            "definition_revision": "revision-a",
+            "database_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "cst_build": "2022.5 Release from 2022-06-03 (change 981760)",
+            "scope": "root"
+          },
+          "phase": "post-attempt",
+          "observed_at": "2026-10-28T08:00:00+00:00",
+          "values": {
+            "SolverTypeTet": "1",
+            "FrequencyTargetActive": "True",
+            "FrequencyTargetValue": "480",
+            "AdaptionActiveTet": "False",
+            "Modes": "1",
+            "MeshType": "1"
+          }
+        },
+        "result_success": false,
+        "expected_execution_config": {
+          "method": "Default",
+          "mesh": "Tet",
+          "target_enabled": true,
+          "target_value": "480",
+          "adaptation_enabled": false,
+          "requested_modes": 1
+        },
+        "calibration_profile": {
+          "id": "v06-oracle-root-tet-2022.5",
+          "cst_build": "2022.5 Release from 2022-06-03 (change 981760)",
+          "method_map": {
+            "1": "Default",
+            "2": "General (Lossy)"
+          },
+          "mesh_map": {
+            "1": "Tet"
+          },
+          "float_format": {
+            "significant_digits": 6,
+            "style": "g"
+          }
+        }
+      },
+      "expected": {
+        "status": "stale",
+        "fields": {},
+        "reasons": [
+          "execution-binding-mismatch"
+        ],
+        "evidence": "native-run-database",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "E05",
+      "group": "execution",
+      "title": "unknown method enum is not Default",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "root",
+        "available_scopes": [
+          "root"
+        ],
+        "histories": {
+          "root": ""
+        },
+        "parameters": {
+          "root": []
+        },
+        "requested_binding": {
+          "project_id": "project-a",
+          "attempt_id": "attempt-a",
+          "definition_revision": "revision-a",
+          "database_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "cst_build": "2022.5 Release from 2022-06-03 (change 981760)",
+          "scope": "root"
+        },
+        "execution_snapshot": {
+          "binding": {
+            "project_id": "project-a",
+            "attempt_id": "attempt-a",
+            "definition_revision": "revision-a",
+            "database_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "cst_build": "2022.5 Release from 2022-06-03 (change 981760)",
+            "scope": "root"
+          },
+          "phase": "post-attempt",
+          "observed_at": "2026-10-28T08:00:00+00:00",
+          "values": {
+            "SolverTypeTet": "99",
+            "FrequencyTargetActive": "True",
+            "FrequencyTargetValue": "480",
+            "AdaptionActiveTet": "False",
+            "Modes": "1",
+            "MeshType": "1"
+          }
+        },
+        "result_success": false,
+        "expected_execution_config": {
+          "method": "Default",
+          "mesh": "Tet",
+          "target_enabled": true,
+          "target_value": "480",
+          "adaptation_enabled": false,
+          "requested_modes": 1
+        },
+        "calibration_profile": {
+          "id": "v06-oracle-root-tet-2022.5",
+          "cst_build": "2022.5 Release from 2022-06-03 (change 981760)",
+          "method_map": {
+            "1": "Default",
+            "2": "General (Lossy)"
+          },
+          "mesh_map": {
+            "1": "Tet"
+          },
+          "float_format": {
+            "significant_digits": 6,
+            "style": "g"
+          }
+        }
+      },
+      "expected": {
+        "status": "unsupported",
+        "fields": {},
+        "reasons": [
+          "unknown-method-enum"
+        ],
+        "evidence": "native-run-database",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "E06",
+      "group": "execution",
+      "title": "target matches quantized native string without flattening",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "root",
+        "available_scopes": [
+          "root"
+        ],
+        "histories": {
+          "root": ""
+        },
+        "parameters": {
+          "root": []
+        },
+        "requested_binding": {
+          "project_id": "project-a",
+          "attempt_id": "attempt-a",
+          "definition_revision": "revision-a",
+          "database_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "cst_build": "2022.5 Release from 2022-06-03 (change 981760)",
+          "scope": "root"
+        },
+        "execution_snapshot": {
+          "binding": {
+            "project_id": "project-a",
+            "attempt_id": "attempt-a",
+            "definition_revision": "revision-a",
+            "database_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "cst_build": "2022.5 Release from 2022-06-03 (change 981760)",
+            "scope": "root"
+          },
+          "phase": "post-attempt",
+          "observed_at": "2026-10-28T08:00:00+00:00",
+          "values": {
+            "SolverTypeTet": "1",
+            "FrequencyTargetActive": "True",
+            "FrequencyTargetValue": "493.827",
+            "AdaptionActiveTet": "False",
+            "Modes": "1",
+            "MeshType": "1"
+          }
+        },
+        "result_success": false,
+        "expected_execution_config": {
+          "method": "Default",
+          "mesh": "Tet",
+          "target_enabled": true,
+          "target_value": "493.827156",
+          "adaptation_enabled": false,
+          "requested_modes": 1
+        },
+        "calibration_profile": {
+          "id": "v06-oracle-root-tet-2022.5",
+          "cst_build": "2022.5 Release from 2022-06-03 (change 981760)",
+          "method_map": {
+            "1": "Default",
+            "2": "General (Lossy)"
+          },
+          "mesh_map": {
+            "1": "Tet"
+          },
+          "float_format": {
+            "significant_digits": 6,
+            "style": "g"
+          }
+        },
+        "expected_target_expr": "fmin*1.23456789"
+      },
+      "expected": {
+        "status": "execution-match",
+        "fields": {},
+        "reasons": [
+          "native-double-formatted"
+        ],
+        "evidence": "native-run-database",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "E07",
+      "group": "execution",
+      "title": "outside output rounding interval is mismatch",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "root",
+        "available_scopes": [
+          "root"
+        ],
+        "histories": {
+          "root": ""
+        },
+        "parameters": {
+          "root": []
+        },
+        "requested_binding": {
+          "project_id": "project-a",
+          "attempt_id": "attempt-a",
+          "definition_revision": "revision-a",
+          "database_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "cst_build": "2022.5 Release from 2022-06-03 (change 981760)",
+          "scope": "root"
+        },
+        "execution_snapshot": {
+          "binding": {
+            "project_id": "project-a",
+            "attempt_id": "attempt-a",
+            "definition_revision": "revision-a",
+            "database_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "cst_build": "2022.5 Release from 2022-06-03 (change 981760)",
+            "scope": "root"
+          },
+          "phase": "post-attempt",
+          "observed_at": "2026-10-28T08:00:00+00:00",
+          "values": {
+            "SolverTypeTet": "1",
+            "FrequencyTargetActive": "True",
+            "FrequencyTargetValue": "493.828",
+            "AdaptionActiveTet": "False",
+            "Modes": "1",
+            "MeshType": "1"
+          }
+        },
+        "result_success": false,
+        "expected_execution_config": {
+          "method": "Default",
+          "mesh": "Tet",
+          "target_enabled": true,
+          "target_value": "493.827156",
+          "adaptation_enabled": false,
+          "requested_modes": 1
+        },
+        "calibration_profile": {
+          "id": "v06-oracle-root-tet-2022.5",
+          "cst_build": "2022.5 Release from 2022-06-03 (change 981760)",
+          "method_map": {
+            "1": "Default",
+            "2": "General (Lossy)"
+          },
+          "mesh_map": {
+            "1": "Tet"
+          },
+          "float_format": {
+            "significant_digits": 6,
+            "style": "g"
+          }
+        },
+        "expected_target_expr": "fmin*1.23456789"
+      },
+      "expected": {
+        "status": "execution-mismatch",
+        "fields": {},
+        "reasons": [
+          "target-value-mismatch"
+        ],
+        "evidence": "native-run-database",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "E08",
+      "group": "execution",
+      "title": "fresh missing snapshot is not False or zero",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "root",
+        "available_scopes": [
+          "root"
+        ],
+        "histories": {
+          "root": ""
+        },
+        "parameters": {
+          "root": []
+        },
+        "requested_binding": {
+          "project_id": "project-a",
+          "attempt_id": "attempt-a",
+          "definition_revision": "revision-a",
+          "database_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "cst_build": "2022.5 Release from 2022-06-03 (change 981760)",
+          "scope": "root"
+        },
+        "execution_snapshot": {
+          "binding": {
+            "project_id": "project-a",
+            "attempt_id": "attempt-a",
+            "definition_revision": "revision-a",
+            "database_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "cst_build": "2022.5 Release from 2022-06-03 (change 981760)",
+            "scope": "root"
+          },
+          "phase": "pre-solver",
+          "observed_at": "2026-10-28T08:00:00+00:00",
+          "values": {}
+        },
+        "result_success": false,
+        "expected_execution_config": {
+          "method": "Default",
+          "mesh": "Tet",
+          "target_enabled": true,
+          "target_value": "480",
+          "adaptation_enabled": false,
+          "requested_modes": 1
+        },
+        "calibration_profile": {
+          "id": "v06-oracle-root-tet-2022.5",
+          "cst_build": "2022.5 Release from 2022-06-03 (change 981760)",
+          "method_map": {
+            "1": "Default",
+            "2": "General (Lossy)"
+          },
+          "mesh_map": {
+            "1": "Tet"
+          },
+          "float_format": {
+            "significant_digits": 6,
+            "style": "g"
+          }
+        }
+      },
+      "expected": {
+        "status": "unresolved",
+        "fields": {},
+        "reasons": [
+          "execution-snapshot-missing"
+        ],
+        "evidence": "none",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "E09",
+      "group": "execution",
+      "title": "same attempt label in other project is not proof",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "root",
+        "available_scopes": [
+          "root"
+        ],
+        "histories": {
+          "root": ""
+        },
+        "parameters": {
+          "root": []
+        },
+        "requested_binding": {
+          "project_id": "project-a",
+          "attempt_id": "attempt-a",
+          "definition_revision": "revision-a",
+          "database_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "cst_build": "2022.5 Release from 2022-06-03 (change 981760)",
+          "scope": "root"
+        },
+        "execution_snapshot": {
+          "binding": {
+            "project_id": "project-b",
+            "attempt_id": "attempt-a",
+            "definition_revision": "revision-a",
+            "database_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "cst_build": "2022.5 Release from 2022-06-03 (change 981760)",
+            "scope": "root"
+          },
+          "phase": "post-attempt",
+          "observed_at": "2026-10-28T08:00:00+00:00",
+          "values": {
+            "SolverTypeTet": "1",
+            "FrequencyTargetActive": "True",
+            "FrequencyTargetValue": "480",
+            "AdaptionActiveTet": "False",
+            "Modes": "1",
+            "MeshType": "1"
+          }
+        },
+        "result_success": false,
+        "expected_execution_config": {
+          "method": "Default",
+          "mesh": "Tet",
+          "target_enabled": true,
+          "target_value": "480",
+          "adaptation_enabled": false,
+          "requested_modes": 1
+        },
+        "calibration_profile": {
+          "id": "v06-oracle-root-tet-2022.5",
+          "cst_build": "2022.5 Release from 2022-06-03 (change 981760)",
+          "method_map": {
+            "1": "Default",
+            "2": "General (Lossy)"
+          },
+          "mesh_map": {
+            "1": "Tet"
+          },
+          "float_format": {
+            "significant_digits": 6,
+            "style": "g"
+          }
+        }
+      },
+      "expected": {
+        "status": "stale",
+        "fields": {},
+        "reasons": [
+          "execution-binding-mismatch"
+        ],
+        "evidence": "native-run-database",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "E10",
+      "group": "execution",
+      "title": "trimmed zeros retain six-digit format semantics: 480.4",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "root",
+        "available_scopes": [
+          "root"
+        ],
+        "histories": {
+          "root": ""
+        },
+        "parameters": {
+          "root": []
+        },
+        "requested_binding": {
+          "project_id": "project-a",
+          "attempt_id": "attempt-a",
+          "definition_revision": "revision-a",
+          "database_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "cst_build": "2022.5 Release from 2022-06-03 (change 981760)",
+          "scope": "root"
+        },
+        "execution_snapshot": {
+          "binding": {
+            "project_id": "project-a",
+            "attempt_id": "attempt-a",
+            "definition_revision": "revision-a",
+            "database_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "cst_build": "2022.5 Release from 2022-06-03 (change 981760)",
+            "scope": "root"
+          },
+          "phase": "post-attempt",
+          "observed_at": "2026-10-28T08:00:00+00:00",
+          "values": {
+            "SolverTypeTet": "1",
+            "FrequencyTargetActive": "True",
+            "FrequencyTargetValue": "480",
+            "AdaptionActiveTet": "False",
+            "Modes": "1",
+            "MeshType": "1"
+          }
+        },
+        "result_success": false,
+        "expected_execution_config": {
+          "method": "Default",
+          "mesh": "Tet",
+          "target_enabled": true,
+          "target_value": "480.4",
+          "adaptation_enabled": false,
+          "requested_modes": 1
+        },
+        "calibration_profile": {
+          "id": "v06-oracle-root-tet-2022.5",
+          "cst_build": "2022.5 Release from 2022-06-03 (change 981760)",
+          "method_map": {
+            "1": "Default",
+            "2": "General (Lossy)"
+          },
+          "mesh_map": {
+            "1": "Tet"
+          },
+          "float_format": {
+            "significant_digits": 6,
+            "style": "g"
+          }
+        }
+      },
+      "expected": {
+        "status": "execution-mismatch",
+        "fields": {},
+        "reasons": [
+          "native-double-formatted"
+        ],
+        "evidence": "native-run-database",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    },
+    {
+      "id": "E11",
+      "group": "execution",
+      "title": "trimmed zeros retain six-digit format semantics: 480.0001",
+      "origin": "normative-synthetic",
+      "input": {
+        "scope": "root",
+        "available_scopes": [
+          "root"
+        ],
+        "histories": {
+          "root": ""
+        },
+        "parameters": {
+          "root": []
+        },
+        "requested_binding": {
+          "project_id": "project-a",
+          "attempt_id": "attempt-a",
+          "definition_revision": "revision-a",
+          "database_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "cst_build": "2022.5 Release from 2022-06-03 (change 981760)",
+          "scope": "root"
+        },
+        "execution_snapshot": {
+          "binding": {
+            "project_id": "project-a",
+            "attempt_id": "attempt-a",
+            "definition_revision": "revision-a",
+            "database_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "cst_build": "2022.5 Release from 2022-06-03 (change 981760)",
+            "scope": "root"
+          },
+          "phase": "post-attempt",
+          "observed_at": "2026-10-28T08:00:00+00:00",
+          "values": {
+            "SolverTypeTet": "1",
+            "FrequencyTargetActive": "True",
+            "FrequencyTargetValue": "480",
+            "AdaptionActiveTet": "False",
+            "Modes": "1",
+            "MeshType": "1"
+          }
+        },
+        "result_success": false,
+        "expected_execution_config": {
+          "method": "Default",
+          "mesh": "Tet",
+          "target_enabled": true,
+          "target_value": "480.0001",
+          "adaptation_enabled": false,
+          "requested_modes": 1
+        },
+        "calibration_profile": {
+          "id": "v06-oracle-root-tet-2022.5",
+          "cst_build": "2022.5 Release from 2022-06-03 (change 981760)",
+          "method_map": {
+            "1": "Default",
+            "2": "General (Lossy)"
+          },
+          "mesh_map": {
+            "1": "Tet"
+          },
+          "float_format": {
+            "significant_digits": 6,
+            "style": "g"
+          }
+        }
+      },
+      "expected": {
+        "status": "execution-match",
+        "fields": {},
+        "reasons": [
+          "native-double-formatted"
+        ],
+        "evidence": "native-run-database",
+        "publish_ready": false
+      },
+      "semantic_execution": "not-run"
+    }
+  ]
+}
