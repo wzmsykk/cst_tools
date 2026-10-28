@@ -1,6 +1,30 @@
 # 功能—实现—验收映射入口
 
-日期：2026-10-25。这是维护中的核心功能索引，不是全仓符号清单。先按功能ID查实现，再查工具、日志和验收；历史方案不是现行运行保证。
+日期：2026-10-28。这是维护中的核心功能索引，不是全仓符号清单。先按功能ID查实现，再查工具、日志和验收；历史方案不是现行运行保证。
+
+内部迭代决策：现代MCP协议与唯一共用底层优先；不维护旧API/客户端/协议兼容，所有入口同批迁移并删除旧路径。历史结果保护另行设计显式数据迁移，不以兼容名义保留双框架。当前仅设计，运行代码未改。
+
+设置验证D15：[验证器设计](cst-settings-verifier-design.md)、[静态证据](../knowledge-base/cst-settings-readback-20261028.md)、[基础V01–V06](../knowledge-base/cst-settings-calibration-20261028.md)、[V05实际网格](../knowledge-base/cst-tet-density-mesh-calibration-20261028.md)、[V01/02/04执行快照及陈旧值](../knowledge-base/cst-solver-settings-readback-calibration-20261028.md)。生产语义读取器/门禁未实现，原生执行快照不可冒充当前live设置。
+
+D15工具映射：[基础设置探针](../test/support/calibrate_cst_settings.py)的`cases`/`render`/`run`/`main`，[网格探针](../test/support/calibrate_tet_mesh.py)的`collect_mesh_evidence`及[有界CBOR](../test/support/tet_options_evidence.py)的`decode_options`，[求解配置探针](../test/support/calibrate_solver_readback.py)的`keys`/`render`/`render_staleness`/`main`，复用[归属门禁](../csttool/acceptance_session.py)。安全测试：[设置](../test/cst_settings_calibration_test.py)、[网格证据](../test/tet_options_evidence_test.py)、[求解读回](../test/solver_readback_calibration_test.py)。V03当前请求数已校准；V05现代通道实际生效、旧通道有上下文限制；V01/02/04可靠读取的是绑定某次尝试的执行快照，6位数字、缺失/陈旧性必须处理。
+
+首阶段契约D14：[工程/建模/配置/单次求解/输出冻结](mcp-first-stage-interface-contract.md)、[官方文档与持久化核查](../knowledge-base/cst-first-stage-api-semantics-20261028.md)。九操作及typed变更、single-simulation、作用域/发布顺序/设置读回缺口；仅设计，创建通道/设置验证器未实现。现行映射[预处理](../csttool/cst_preprocessor.py)、[Managed](../csttool/managed_cstworker.py)、[后处理](../csttool/postprocess_cst.py)；既有测试[生成器](../test/postprocess_generator_test.py)、[Worker](../test/managed_cstworker_test.py)，不证明新建模Gate通过。
+
+首阶段门禁D13：[对话建模→仿真设定→计算→后处理输出](mcp-first-stage-conversational-gate.md)。A1必须完成空白副本Pillbox G01–G08；仅协议/控制工具通过不足，当前为验收设计而非已通过。
+
+总体目标D12：[COMSOL MCP功能对齐C01–C11与A0–A4](comsol-mcp-functional-alignment.md)。完整建模/配置/求解/结果链是目标，14运行操作只是A1子集；工程编辑扩展公共服务，未新增运行接口。参照源码/哈希和现行差距见该文。
+
+子契约入口D11：[后处理/优化策略冻结](postprocess-optimization-subschemas.md)、[官方SDK与目标宿主支持证据](../knowledge-base/mcp-sdk-host-support-20261028.md)。13项指标+3特殊操作按实际生成/消费链收敛，文档内JSON Schema及O01–O06阻断；mcp==2.3.0候选、Codex同版本tag的现代开关/stdio条件已核实，桌面握手未验。测试入口[生成器](../test/postprocess_generator_test.py)、[场工件](../test/field_artifacts_test.py)、[优化入口](../test/optimizer_entrypoint_test.py)，现有测试不是新接口实现验收。
+
+契约入口D10：[统一接口契约](unified-interface-contract.md)、[旧入口删除与同步迁移](unified-interface-migration.md)。覆盖14候选操作、公共控制/幂等/错误、结果revision及X01–X14删除清单；现状源码链接在迁移表。仅静态设计，尚无新API实现，子Schema冻结及SDK/宿主静态支持证据见D11；运行接入和握手仍pending。
+
+框架入口D09：[MCP静态框架设计与冻结清单](mcp-framework-static-design.md)。MCP优先、GUI/CLI/MCP共用公共应用服务；原mcp_service专属层提案已替代。模块、内部接口、状态权威及并发生命周期均为设计，未创建运行代码；先完成静态契约审查再进入实现。
+
+设计入口D06：[MCP接入设计与M0–M5计划](mcp-design-plan.md)（仅设计，未实现）。既有映射：[Runner状态/控制](../csttool/runner.py)、[无Qt客户端](../csttool/runner_client.py)、[JSON契约](../csttool/execution_contract.py)、[结果检查点](../csttool/hom_scan.py)、[诊断导出](../csttool/diagnostic_bundle.py)；现有测试入口[Runner](../test/runner_test.py)、[恢复](../test/runner_recovery_test.py)、[诊断](../test/diagnostic_bundle_test.py)。新MCP模块/测试/工具名称只在计划内标为拟定，实施后再登记F项，现有测试不证明MCP通过。
+
+作用域入口D08：[CST官方能力与MCP详细设计](mcp-cst-capability-scope-design.md)。映射[Managed实现](../csttool/managed_cstworker.py)、[生产宏](../data/runtime_managed_worker_v1_main.vb)、[预处理宏](../data/preprocess_hom_parameters_v1.vb)、[原生标量读取](../csttool/native_results.py)；验收入口[Managed离线测试](../test/managed_cstworker_test.py)、[原生结果测试](../test/hom_native_results_test.py)。仅设计审查，原生SDK后端未接入；预处理AddToHistory返回检查待补。
+
+标准入口D07：[MCP官方完整阅读记录](../knowledge-base/mcp-protocol-reading-20261028.md)、[固定来源及SHA256](../knowledge-base/mcp-protocol-sources-20261028.md)、[规范→设计→N01–N25验收矩阵](mcp-protocol-conformance.md)。基线2026-07-28，标准优先于D06第三方参考；矩阵用例尚未实施，当前仅文档链接/静态消息示例核查。
 
 设计入口D03：[Python/VBA生命周期故障矩阵与L1–L5](python-vba-lifecycle-protocol-v2-plan.md)。L1–L4已接入，新会话生成v2；[真实收尾](close-v2-l5-acceptance.md)、[Controller退出](controller-exit-l5-acceptance.md)及[HOM恢复](hom-interruption-l5-acceptance.md)分别记录实际范围。完整L5仍pending，不把部分窗口通过扩大为全矩阵保证。
 

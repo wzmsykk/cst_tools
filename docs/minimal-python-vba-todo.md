@@ -249,3 +249,93 @@ P7 明确不做 Profile 文件格式、数据库/注册表、可扩展继承框�
 以上项目只有出现真实失败样例或明确需求后才能移入实施列表。
 
 - [x] 2026-10-25 GUI频率命名明确区分目标下限、首个求解窗口上限与目标上限；配置键不变，GUI/工作台/文档索引39 passed，详见gui-hom-workspace.md。
+
+## MCP接入待办（2026-10-28，仅设计）
+
+完整契约、源码映射、外部参考及门禁以[MCP设计计划](mcp-design-plan.md)为准；不改变本文件原有Python/VBA优先级，不另建VBA ABI。
+
+- [x] M0前置阅读：完整阅读2026-07-28官方规范正文与TypeScript类型，补读Tasks正式扩展/安全指南，建立[符合性矩阵](mcp-protocol-conformance.md)；仅阅读与设计成果。
+- [x] M0 CST语义审查：核对安装版CLI/OLE/Python/结果/Eigenmode文档与现行调用链，形成[作用域与限制设计](mcp-cst-capability-scope-design.md)；不等于运行验收。
+- [ ] 前置缺口：预处理BindHomSolverSettings检查AddToHistory Boolean并回读配置，补失败分支测试；真实副本另行授权。
+- [ ] M0：确认SDK/宿主实际版本支持，再收敛工具/DTO/错误码/能力、授权及身份与去重契约；不能凭阅读记录当实施完成。
+- [ ] M1：本机stdio只读MCP与有限分页结果查询；真实协议客户端验收。
+- [ ] M2：显式控制权、提交/停止/取消未知提交/恢复/退出；假Worker子进程故障矩阵。
+- [ ] M3：幂等诊断导出、安装与宿主配置、发布包和真实宿主验收。
+- [ ] M4：按需求接标准批次、XYZ复杂后处理及场匹配结果；非首版前提。
+- [ ] M5：另获实际求解授权后进行小网格CST串行副本验收，保留原工程与既有结果。
+
+- [ ] MCP静态设计冻结：按[框架清单](mcp-framework-static-design.md)完成14工具Schema、源码故障分支、结果文件/revision和SDK/宿主支持审查；完成前不创建运行框架。
+
+- [ ] 共用底层静态迁移表：按MCP约束定义唯一业务契约，逐项映射GUI/CLI/Runner现有校验、查询、诊断及错误；明确替代入口与删除条件，避免新增MCP专属业务框架。
+
+- [ ] 按内部快速迭代规则重审所有MCP设计：删除旧接口/协议兼容条款，形成唯一契约与旧入口删除清单；GUI/CLI/后台同批迁移，历史结果的一次性数据迁移单列。
+
+
+### 统一接口静态收敛（2026-10-28）
+
+- [x] 完成[统一契约](unified-interface-contract.md)：14公共操作、身份/错误/控制/幂等、提交字段、分页和结果来源；安全枚举已从源码核实。
+- [x] 完成[迁移方案](unified-interface-migration.md)：X01–X14删除/替代清单、GUI/CLI/后台S0–S5同步批次、故障落点及数据切换要求；未实际删除。
+- [x] 核对checkpoint v4、manifest v3、ModeResult和RunStore现有字段；明确当前无统一revision、逐模式run/单位来源；查询禁止调用会写修复的RunStore日志方法。
+- [x] 后处理/WTC/TM020子Schema与预算已冻结；官方SDK/目标宿主源码支持已核实，见下方专题；有效桌面配置/运行握手及对应实现仍待验收。
+- [ ] 按S1–S4实施唯一契约/服务/客户端和所有入口迁移，删除重复路径；当前未获本轮运行代码实施要求。
+- [ ] 独立设计并验收一次性数据迁移；未知归属不得猜测，旧停止意图必须对账，活跃旧后台正常停止后切换。
+- [ ] 实现后执行跨入口去重/争用、响应丢失、结果分页及只读无副作用验收；真实CST另行授权。
+
+
+### 后处理/优化与SDK宿主静态冻结（2026-10-28）
+
+- [x] 冻结[算子与优化子Schema](postprocess-optimization-subschemas.md)：实际29旧方法归并为13指标+3操作的公共定义；不保留_All兼容别名（ModeRec_All为现行专用方法ID），明确轴/单位/采样/缺项策略及固定优化问题。
+- [x] 文档JSON Schema13定义与35正例/21反例校验通过；跨字段规则单列，未加入运行验证器。
+- [x] 核实[官方SDK/宿主支持](../knowledge-base/mcp-sdk-host-support-20261028.md)：mcp2.3.0、固定tag、Python下界差异，Codex本机版本及同名源码现代开关/stdio标记；未修改配置。
+- [ ] 处理O01–O06：TM020维数/失败/目标模、WTC有效性、显式新建/续跑、严格参数与单位转换；两优化策略暂不开放，不能以Schema通过解除。
+- [ ] 在实施阶段完成公共模型和跨字段/预算校验、注册原生结果与算子单位、ModeRec工程前提及物理适用性门禁。
+- [ ] 固定桌面实际runtime与有效配置，授权配置后做SDK2.3.0无CST现代握手/取消/EOF/旧版拒绝门禁；静态源码支持不等于当前宿主已通过。
+- [ ] 安装/解压发布环境的精确依赖解析与测试；当前不新增依赖或运行服务。
+
+
+### 总体功能对齐COMSOL MCP（2026-10-28）
+
+- [x] 基于两固定COMSOL MCP工具源码建立[能力矩阵C01–C11](comsol-mcp-functional-alignment.md)，明确A1十四操作不是完整范围。
+- [x] 扩展统一框架目标：工程定义/document revision、受控change set、不可变执行版本共用公共服务，不另造CAD/结果框架。
+- [ ] A0下一步：冻结C01工程生命周期与C02参数/表达式/结果失效契约，核对CST官方对象与实际调用作用域。
+- [ ] C03–C05：几何/选择/材料/边界/端口/mesh逐命令文档审查、历史持久化及读回设计；不得将通用建模永久排除在目标外。
+- [ ] C06–C10：通用simulation/参数扫参、结果目录/曲线/受控表达式/图片导出和版本工作流子契约；复用现有算子及cst_version能力。
+- [ ] A1空白Pillbox对话闭环、A2扩展建模、A3通用分析、A4广泛对齐分别实施验收；不将首次完整闭环推迟到A4，真实CST仍另行授权。
+
+
+### A1首阶段门禁调整（2026-10-28）
+
+- [x] 确定[对话建模→设定→求解→后处理G01–G08](mcp-first-stage-conversational-gate.md)，首阶段通过必须有实际模型/结果/标准收尾，不以14工具或假Worker替代。
+- [x] A0首阶段九操作/typed变更与single-simulation契约已静态冻结，参数历史/设置读回/失效/版本/工件归属见D14；具体运行实现未完成。
+- [ ] A1实施统一公共服务中的最小Pillbox闭环，真实宿主逐步驱动；需要修改输入半径/长度，禁止硬编码演示模型。
+- [ ] 执行现代协议、保存重开、实际求解、Frequency/RQ工件、解析频率≤5%及标准退出门禁；当前无本门禁运行证据。
+
+
+### A1官方接口静态冻结（2026-10-28）
+
+- [x] [九操作统一契约](mcp-first-stage-interface-contract.md)与[14页CST2022官方帮助语义核查](../knowledge-base/cst-first-stage-api-semantics-20261028.md)：工程创建、参数/全局圆柱、背景/边界、Tet与Eigenmode、普通单次求解、结果查询/JSON/CSV、关闭。
+- [x] 明确参数表/结构历史/框架PPS/Model.run/结果文件集/关闭事实分别持久化；不扁平化表达式、不在算后Rebuild；变更候选验证后原子发布定义指针。
+- [x] 查明五项设置的分阶段来源：V03当前请求数、V05现代Tet通道、V01/02/04执行快照与缺失/陈旧/精度边界；没有三个通用求解前实时getter，不猜key，不以旧快照放行新定义。
+- [ ] 实施前设计新建bootstrap及候选编辑/重开核验探针；仅用自有实例串行，官方Python.close与批宏返回分别处理，不把旧Gate作为新证据。
+- [x] V05验证旧Tet setter在本Version=1上下文无网格影响，现代通道有独立输入/网格证据；A1统一近远策略已调整设计。
+- [ ] 实施几何AST→历史参数读取；不在结构宏调用受限Solid包围盒查询。
+- [ ] 实施统一single-simulation后端路径和结果采用/工件导出，不调用HOM预处理重写用户定义；正反例/故障与真实G01–G08另行验收。
+
+
+### 五项设置读回静态核查（2026-10-28）
+
+- [x] [验证器设计](cst-settings-verifier-design.md)与[固定证据](../knowledge-base/cst-settings-readback-20261028.md)：官方6页方法目录、cst_version源码hash、4文件7scope、3文件历史定位；源hash未变，无CST启动。
+- [x] 分开算法Hex/Tet槽位、频段与target、请求/计算模式数、Tet自适应开关/细化策略、Tet近远密度/策略；持久读取与live证据等级分别定义。
+- [x] 明确cst_version只有容器/历史基础，无最终设置语义解释器；设计共享接入和严格missing/malformed/unsupported，拒绝正则last-match/宽松{}默认。
+- [ ] 实施公共有界历史投影、来源/哈希/作用域/严格类型报告及静态反例；仅按已支持语法读，未知控制流返回unresolved。
+- [x] [V03受控副本校准](../knowledge-base/cst-settings-calibration-20261028.md)：本机2022.5 Default/Tet、General (Lossy)/Tet、AKS/Hex设置1/2和重开查询一致，原表达式不变。
+- [x] V05新旧通道设置及重开对照：现代near/far/policy可读，legacy 4→6不改变该读数；不建立未经证实的等价映射。
+- [x] [V05小网格实际网格](../knowledge-base/cst-tet-density-mesh-calibration-20261028.md)：Version=1旧4/8及混用顺序不改变网格，现代near4→8产生1408→8720 cell；输入步长和网格hash补证；Version=0旧4/8均被网格器拒绝，禁止自动回退。
+- [x] A1统一密度请求明确写现代Version=1 near=n/far=n及策略；这是应用策略，不是旧setter转换。导入工程仍保留独立近/远配置，仅修改设计，生产未迁移。
+- [ ] V05扩展profile：其他CST版本/历史配置、材料/开放域far主导区域、其他policy/局部细化；查询最大边长与输入step关系仍需网格拓扑审查。不能由本次结果推出所有旧接口无效或固定精度。
+- [x] [V01/V02/V04执行配置校准](../knowledge-base/cst-solver-settings-readback-calibration-20261028.md)：Default/General、target0/480/禁用/表达式精度、自适应False/True；6次实际尝试5成功1失败，失败配置亦可读。
+- [x] 验证执行数据库的缺失、带结果重开、设置改变后Save仍陈旧、Rebuild后清除；target字符串约6位有效数字，不改原表达式。
+- [ ] 实施公共execution_snapshot报告及attempt/run/revision/阶段/hash归属、未知枚举/字段缺失拒绝和数值分辨率比较；不得标为live或额外求解读取设置。
+- [ ] 求解前公共持久历史投影/重开/校准profile落地；当前三个实时getter仍无证据，不用上一次Model.db替代。
+- [ ] V06补公共语义解释器的Reset/条件/未知scope/严格JSON拒绝；已复现scope/停用/CRC及JSON宽松返回边界；nmodes+1经Rebuild读2、Reset读1，原表达式不变，不能当全部通过。
+- [ ] 校准profile与configure/save/submit门禁接入；未经校准持久匹配不能放行G03，不发明getter或数据库key。

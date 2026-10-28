@@ -1,5 +1,7 @@
 # 独立本机 Runner：API、使用和恢复
 
+2026-10-28：[MCP接入设计](mcp-design-plan.md)仅为计划，以[官方规范阅读及符合性矩阵](mcp-protocol-conformance.md)为标准。拟通过本机stdio适配RunnerClient，不直接暴露当前HTTP为MCP；现代版本不是旧initialize握手。能力探测、结构化错误、显式控制句柄、身份前提和结果分页端点尚未实现。现有GUI/CLI用法与恢复门禁不变，不存在可直接运行的MCP启动命令。
+
 GUI正常重新打开会[自动找回最后项目](gui-session-restoration.md)，连接现有Runner，必要时只启动状态服务读取持久事实，不自动start/recover；当前窗口失联不因此反复重启后台。每用户选择记录不是运行权威；检查点/所有权和显式恢复门禁不变。
 
 2026-10-25：[GUI完整退出](gui-exit-resource-cleanup.md)现编排stop→收尾→shutdown/OS所有权确认→本地GUI清理；仅关界面不停止后台。runtime新增可选cwd诊断，旧服务缺字段按未知显示；停止和RECOVERY_REQUIRED门禁未改变，Task/ACK/VBA wire不变。

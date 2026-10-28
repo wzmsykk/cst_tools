@@ -1,9 +1,45 @@
 # CST Tools 当前状态与实施路线
 
-状态日期：2026-10-25
+状态日期：2026-10-28
 历史提交基线：`3717a04`（P0-1停止恢复、故障验收与文档索引）；后续提交包含场故障验收、共同域、Pillbox双网格与真空腔追踪第一版，准确提交身份以Git日志为准。
 
 本文是项目当前状态的权威入口。历史设计文档仍保留其分析价值；若与本文或[最小 Python/VBA 协议 TODO](./minimal-python-vba-todo.md)冲突，以本文和已经通过的真实 CST Gate 为准。
+
+## 首阶段通过标准：对话建模到结果（2026-10-28）
+
+[首阶段G01–G08](mcp-first-stage-conversational-gate.md)要求用户通过真实MCP宿主从空白副本完成参数化Pillbox建模、仿真设置、实际计算、频率与中心Z线R/Q输出、工程/结果文件保存及标准收尾；包括设置读回/保存重开和小网格频率解析对照。A1已改为该完整纵向闭环，14操作/只读/假Worker/HOM提交仅是内部基础，不足以通过。需新增单次simulation定义/提交，不能借HOM算法替代。当前只确定门禁，未运行CST或写运行代码。
+
+首阶段静态契约冻结：新增[D14九操作及typed变更](mcp-first-stage-interface-contract.md)，覆盖空工程、参数化圆柱、PEC背景/六面边界、文档化Tet设置、单次simulation、Frequency/RQ与JSON/CSV工件。[本轮14页官方帮助核查](../knowledge-base/cst-first-stage-api-semantics-20261028.md)明确Cylinder的WCS/组件材料前提、频段修改失效、AddToHistory立即执行/相邻标题替换、Solid包围盒查询阶段限制。创建bootstrap拟用安装自带Python接口，编辑在已加载Model.run，统一后台串行；部分设置缺可靠getter仍SETTING_UNVERIFIED，不能宣称ready。未启动CST/生成运行代码/修改依赖。本轮请求Schema13定义、17正例/25反例通过；既有文档/生成器/Managed/预处理离线53 passed（1.93s），报告artifacts/first-stage-contract-offline-20261028.xml。静态Schema不证明跨字段校验或CST新功能已实现。
+
+设置验证器静态补核：[五项读回设计](cst-settings-verifier-design.md)和[新知识库](../knowledge-base/cst-settings-readback-20261028.md)结合官方六页方法目录、cst_version源码及4个只读.cst/7个scope。确认AKSGetNumberOfModes是defined-modes候选但Default/Tet未证；target不能由GetFmin代替；Tet near/far/policy、Hex/Tet方法槽位、停用/Reset/表达式必须分开解释。cst_version现有方法只读元数据/历史，不是最终设置解释器；设计共用持久投影+会话/行为校准，不复制容器解析器。不宣称找到五个通用getter，G03仍受SETTING_UNVERIFIED及V01–V06未验门禁约束；无CST启动或运行代码修改。20项只读样本事实核对通过，源hash未变；文档索引2 passed（0.70s），artifacts/settings-readback-docs-20261028.xml，不证明live读回或新验证器实现。
+
+最新V01/V02/V04：[执行设置读回及陈旧值校准](../knowledge-base/cst-solver-settings-readback-calibration-20261028.md)。本机GetDataBaseValue完整路径objdata\EigenmodeParameter可在求解尝试后读Tet方法（1=Default、2=General Lossy）、target开关/值及自适应开关；6次小网格单模尝试5成功、1禁用target后迭代失败，失败亦有配置快照。新副本求解前/Save后不可读；带结果重开可读，但修改设置再Save仍返回旧执行值，Rebuild后字段消失，禁止当当前live读回。target的double字符串约6位有效数字，表达式保留。共8个受控会话全部确认进程退出，原工程/表达式不变。该轮查明阶段边界，不解锁G03；生产须实现公共历史投影及绑定attempt/revision的execution_snapshot，不能额外求解来读配置。最终离线36 passed（2.23s），artifacts/solver-readback-final-20261028.xml；副本/原始场网格已清理，保留日志、轻量配置数据库、宏/历史/哈希，重新访问原始结果需再生成。
+
+最新V05实际网格：[小网格Pillbox密度校准](../knowledge-base/cst-tet-density-mesh-calibration-20261028.md)。11个独立副本会话均正常退出：9个成功生成网格（含1先导），Version=1旧4/8均16236 cell且网格hash一致，现代4/4→1408、8/8→8720；far单独变化只改变网格器输入，本闭腔最终网格不变。两个Version=0负例均被网格器拒绝（宏退出0仍非成功），不能作兼容回退。原参数表达式和原工程hash不变；未启动本征模。A1统一密度n设计改为现代Version=1 near=n/far=n策略，不是旧API转换。生产验证器/其他五项缺口及G03仍未解锁；详见新记录及剩余边界。最终离线32 passed（2.23s），artifacts/v05-mesh-final-20261028.xml。
+
+最新受控校准：[V01–V06实测记录](../knowledge-base/cst-settings-calibration-20261028.md)。本机2022.5 Default/Tet、General (Lossy)/Tet及AKS/Hex的请求模式数1/2与保存重开查询一致；现代Tet near/far/policy可经版本限定MeshSettings.Get读取，旧4→6未改变现代near/far，等价映射仍不成立。方法/target/自适应独立读回及V06完整语义拒绝仍pending，未求解、未实现生产验证器，G03仍未通过。18组保存/重开读数一致，21个正常会话与1个启动失败会话均确认进程退出；V06参数表达式经Rebuild保持不变，Reset读1仅为本上下文观察。最终离线20 passed（2.16s），artifacts/settings-calibration-verified-20261028.xml；本轮原始副本已清理，留存轻量报告/宏/历史摘录/哈希，重开需再生成。前述未运行描述为先前静态批次记录，不是本次校准结论。
+
+## 总体目标：COMSOL MCP功能对齐（2026-10-28）
+
+[功能对齐矩阵](comsol-mcp-functional-alignment.md)明确C01–C11及A0–A4：完整覆盖工程/参数/几何/选择/材料/边界/端口/网格/求解/扫参/结果与工件工作流，按CST实际模块可用性记录差异。原14项操作改为A1基础运行子集，不再限制最终范围；公共服务补工程定义、受控变更和不可变执行版本，不另建建模框架。对齐参照为两项固定第三方COMSOL MCP，不是COMSOL官方标准，也未运行其软件。C01–C10新增子契约仍需官方CST逐项审查，本轮只写设计。
+
+## MCP设计计划（2026-10-28，仅设计）
+
+先完成[官方规范全文与类型阅读](../knowledge-base/mcp-protocol-reading-20261028.md)，以2026-07-28日期版本及固定官方Schema为标准，新增[符合性矩阵](mcp-protocol-conformance.md)。原计划仅引用旧版三篇文档，现修正现代server/discover/逐请求元数据/resultType/cache、显式控制句柄、错误分层及可选Tasks边界；COMSOL MCP降为实现参考。[接入计划](mcp-design-plan.md)仍为14业务工具、M0–M5阶段，SDK/目标宿主兼容证据尚缺，全部阶段未实施，没有新增依赖/端点/工具或启动CST；远程仍纳入E6–E9，不用文档验收代替真实协议/宿主验收。
+
+补充[CST接口/作用域详细设计](mcp-cst-capability-scope-design.md)：直接核对安装版Python/CLI/OLE/Eigenmode帮助与生产链。官方get_3d不代表三维场、随机实例连接不可用于归属、异步Solver接口不等于持久任务；当前native读取不是cst.results。登记预处理AddToHistory返回未检查的前置缺口，原生Python控制/abort/MPI HOM均不扩张为现有能力。本轮仅设计，不修改生产代码或启动CST。[知识库核查记录](../knowledge-base/cst-interface-scope-review-20261028.md)区分官方定义和源码事实。定向离线29 passed（3.46s），报告artifacts/mcp-cst-scope-20261028.xml；不证明真实CST或MCP符合性。
+
+内部迭代决策：现代MCP协议与唯一共用底层优先；不维护旧API/客户端/协议兼容，所有入口同批迁移并删除旧路径。历史结果保护另行设计显式数据迁移，不以兼容名义保留双框架。当前仅设计，运行代码未改。
+
+最新架构约束：MCP协议优先定义边界，统一公共业务契约驱动旧底层迁移；GUI/CLI/MCP共用应用服务、结果查询和客户端，不创建MCP专属框架。原mcp_service提案已由公共application_service取代；当前仍仅设计。
+
+设计先行：新增[静态框架与冻结清单](mcp-framework-static-design.md)，收敛三个模块、单向依赖、DTO/请求状态及存储权威。下一步先冻结逐工具Schema和源码分支映射，SDK/宿主兼容仍待核实；当前不创建服务骨架或修改计算链。
+
+统一契约静态分析：完成[公共操作与字段/状态/错误/幂等契约](unified-interface-contract.md)及[X01–X14旧入口删除、GUI/CLI/后台同步迁移方案](unified-interface-migration.md)。发现base.py直接执行、GUI进程内执行分支/检查点解析/诊断直调及专用停止文件等实际分叉。控制句柄移入公共服务，替代MCP代理层；结果revision采用检查点内容哈希，并设计run→scan/revision归属记录（当前尚无）。未删除运行代码、未新增Schema/依赖/端点，算子/优化策略子契约与SDK/宿主支持仍pending。本轮文档索引2 passed（0.68s），artifacts/unified-contract-design-20261028.xml；新增两文档本地链接逐一有效，diff空白检查通过。仅证明文档入口，不证明接口或CST实现。
+
+子契约冻结（2026-10-28）：[后处理/优化子Schema](postprocess-optimization-subschemas.md)已从生成器与实际消费者定义；13指标及3特殊操作，_All按实际模式数、积分beta=1/全范围/轴向偏移为0、原生引用受控、采样和响应预算明确。文档JSON含13定义，35正例/21反例静态通过；乘积/轴向等跨字段规则尚未实现。发现TM020目标维数/失败分支、WTC结果有效性及自动载旧种群等O01–O06缺口，两新优化能力在修复前不开放。
+
+[SDK/宿主核实](../knowledge-base/mcp-sdk-host-support-20261028.md)：官方mcp 2.3.0支持现代协议，固定候选使用Python3.12；与本机codex-cli 0.165.0-alpha.1.2同名tag明确现代feature默认false且stdio需版本环境标记。只读用户配置未见显式开关，当前桌面会话有效设置/实际握手未证明；未安装依赖或改宿主配置。官网Python下界与固定包元数据差异、main与本机tag分支差异均留档。本轮生成器/场工件/优化入口/文档定向离线28 passed（11.92s），artifacts/subschema-existing-tests-20261028.xml；不证明新接口或优化器缺口已修复。
 
 ## 本机生成文件管理（2026-10-28）
 

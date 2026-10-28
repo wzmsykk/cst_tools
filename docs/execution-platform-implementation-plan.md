@@ -1,5 +1,7 @@
 # 统一实施计划：独立 Runner → 远程控制 → 多节点任务执行
 
+2026-10-28新增[MCP适配计划M0–M5](mcp-design-plan.md)，当前仅设计：本机stdio复用既有Runner，与GUI同一控制权/检查点，不改变E0–E5既有范围；远程传输和认证仍归E6、节点执行归E7–E9，不能以MCP工具可调用宣称远程/分布式完成。M阶段只是接入面的实施顺序，不替代本计划的远程路线。
+
 L5后续[采用标记对账](checkpoint-adoption-l5.md)已完成最小实现：检查点权威核验后补齐receipt/RunStore，三个真实Runner退出窗口及重复恢复不重算通过；此前“标记补写TODO”是旧验收边界，其他L5/E6–E9待办不变。
 
 2026-10-24补验：[六类实际GUI/Runner进程退出](controller-exit-l5-acceptance.md)已在本机真实CST两任务副本中完成，修复活跃收尾状态与归档路径恢复。该范围不等于整机掉电、所有HOM窗口或远程E6–E9通过；采用标记补写仍列TODO。
