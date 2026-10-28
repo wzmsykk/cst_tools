@@ -1,13 +1,51 @@
+# Editor and Python caches
 .vs/
 .vscode/
 __pycache__/
+*.py[cod]
 .pytest_cache/
 .pytest-tmp/
 .pytest_tmp_*/
-build/
-dist/
-artifacts/
-log/*
+.mypy_cache/
+.ruff_cache/
+.tox/
+.nox/
+*.egg-info/
+/.venv/
+/venv/
+
+# Machine-specific settings; keep default.ini and examples versioned
+/config/current.ini
+/config/current.ini.*
+/config/*.local.ini
+/config/*.local.json
+.env
+.env.*
+!.env.example
+!.env.template
+
+# Build and test output
+/build/
+/dist/
+/artifacts/
+.coverage
+.coverage.*
+/coverage.xml
+/htmlcov/
+/integration-*.xml
+/offline-regression-*.xml
+/hom-offline-*.xml
+/controlled-cst-*.json
+
+# Local execution data
+/log/
+/logs/
+/result/
+/temp/
+/save/
+/control/
+/diagnostics/
+/runs/
 */result/*
 */temp/*
 */save/*

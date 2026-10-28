@@ -154,3 +154,5 @@ F85/F86/F88现场补证：[2026-10-25 16:51诊断包](field-failure-bundle-20261
 |F96|prepared工程与配套目录复制|[实现](../csttool/managed_cstworker.py)|`ManagedCSTWorker._prepare_project_copy`|[回归](../test/managed_cstworker_test.py)|[迁移对照](local-fix-migration-20261028.md)|
 |F97|前向优先HOM续扫与缺口补算|[实现](../csttool/hom_scan_algorithm.py)|`HomScanAlgorithm.start`|[回归](../test/hom_scan_test.py)|[迁移对照](local-fix-migration-20261028.md)|
 |F98|停止期间CST进度与旧会话过滤|[实现](../GUI/main_window.py)|`MainWindow.renderCstProgress`|[回归](../test/gui_main_window_test.py)|[迁移对照](local-fix-migration-20261028.md)|
+
+|F99|本机配置生成与忽略约定|[配置管理](../csttool/globalconfmanager.py)|`GlobalConfigManager.__init__`|[文档索引](../test/documentation_index_test.py)|[本机产物](local-generated-files.md)|
