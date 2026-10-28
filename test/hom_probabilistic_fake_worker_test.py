@@ -33,7 +33,7 @@ def solve_with(worker, algorithm):
     return solve
 
 
-def test_fake_worker_scans_empty_windows_and_close_physical_modes():
+def test_fake_worker_keeps_close_modes_but_does_not_confirm_missing_results_as_empty():
     worker = ProbabilisticHomWorker(
         spectrum=(2.0, 2.00005, 17.0),
         scripted_outcomes=(
@@ -50,7 +50,9 @@ def test_fake_worker_scans_empty_windows_and_close_physical_modes():
     report = AdaptiveHomScanner(policy).run(solve_with(worker, HomScanAlgorithm()))
 
     assert [item.frequency for item in report.modes] == [2.0, 2.00005, 17.0]
-    assert len(report.empty) == 3
+    assert report.empty == []
+    assert len(report.failed) == 3
+    assert all("postprocess results are missing" in reason for reason in report.failure_reasons.values())
     assert all(call[1]["nmodes"] == 1 for call in worker.calls)
 
 

@@ -16,6 +16,7 @@ from .hom_scan import (
     ModeResult,
     ScanCheckpointStore,
     ScanPolicy,
+    ScanInterval,
 )
 from .hom_run_manifest import HomRunManifest
 from .mesh_convergence import MeshConvergenceSettings
@@ -474,6 +475,7 @@ class HomScanAlgorithm(Algorithm):
         fingerprint = self._project_fingerprint()
         report = None
         pending = None
+        bounded_intervals = False
         if self.resume_requested:
             if not checkpoint_store.path.exists():
                 raise FileNotFoundError(checkpoint_store.path)
@@ -489,9 +491,34 @@ class HomScanAlgorithm(Algorithm):
                         "manager cannot restore the confirmed CST snapshot"
                     )
                 restore_snapshot(resume_snapshot)
-            pending = list(report.failed) + pending
-            report.failed.clear()
-            report.failure_reasons.clear()
+            bounded_intervals = checkpoint_store.pending_bounded
+            if pending and not bounded_intervals and not report.recovery_states:
+                # Preserve in-flight recovery evidence. Probe/window upper bounds
+                # alone do not establish that all modes below them were scanned.
+                frontier = max(
+                    [policy.start]
+                    + [max(math.nextafter(item.frequency, math.inf),
+                           item.frequency + policy.frequency_abs_tol) for item in report.modes]
+                    + [item.hi for item in report.empty]
+                    + [item.hi for item in report.failed]
+                )
+                frontier = max(frontier, min(item.lo for item in pending))
+                end = max([frontier + policy.window_width] + [
+                    item.hi for item in pending if item.lo <= frontier < item.hi
+                ])
+                pending = ([ScanInterval(frontier, min(end, policy.stop))]
+                           if frontier < policy.stop else [])
+            elif not pending and report.failed:
+                pending = list(report.failed)
+                report.failed.clear()
+                report.failure_reasons.clear()
+                bounded_intervals = True
+            if pending:
+                self.logger.info("HOM 继续区间=[%.12g, %.12g] MHz gaps_only=%s",
+                    pending[0].lo, pending[0].hi, bounded_intervals,
+                    extra={"event": "HOM_RESUME_INTERVAL", "phase": "lifecycle",
+                           "fmin": pending[0].lo, "fmax": pending[0].hi,
+                           "bounded_intervals": bounded_intervals})
             self.logger.info("HOM 检查点已恢复 | HOM_RESUMED modes=%d pending=%d snapshot=%s", len(report.modes), len(pending), resume_snapshot, extra={"event": "HOM_RESUMED", "phase": "lifecycle", "modes": len(report.modes), "pending": len(pending), "snapshot": resume_snapshot})
 
         def save_checkpoint(current_report, current_pending):
@@ -503,6 +530,7 @@ class HomScanAlgorithm(Algorithm):
                 current_report,
                 current_pending,
                 snapshot_path=snapshot,
+                bounded_intervals=bounded_intervals,
             )
             self._write_scan_results(current_report)
             listener = getattr(self, 'checkpoint_listener', None)
@@ -579,6 +607,7 @@ class HomScanAlgorithm(Algorithm):
                 pending=pending,
                 report=report,
                 checkpoint=save_checkpoint,
+                bounded_intervals=bounded_intervals,
                 should_stop=lambda: bool(
                     getattr(self.manager, "stop_requested", False)
                 ),

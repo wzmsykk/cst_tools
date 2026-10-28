@@ -145,7 +145,7 @@ class ManagedCSTWorker:
                                       context={"worker": worker_id, "session": self.session_id})
         self.logger.info("Worker 诊断入口已保存 | WORKER_DIAGNOSTICS path=%s", manifest,
                          extra={"event": "WORKER_DIAGNOSTICS", "phase": "prepare", "artifacts": {**artifacts, "manifest": manifest}})
-        shutil.copy2(self.source_project, self.project_path)
+        self._prepare_project_copy()
         self._build_macro()
         try:
             self._start()
@@ -187,6 +187,17 @@ class ManagedCSTWorker:
         except Exception:
             self.logger.exception("失败诊断收集失败，保留原始异常", extra={
                 "event": "WORKER_DIAGNOSTICS_FAILED", "phase": phase})
+
+    def _prepare_project_copy(self) -> None:
+        """Copy the persisted prepared project, keeping its companion data."""
+        shutil.copy2(self.source_project, self.project_path)
+        source_data = self.source_project.with_suffix("")
+        if source_data.is_dir():
+            shutil.copytree(source_data, self.project_path.with_suffix(""))
+        self.logger.info("预处理工程副本已就绪 | PROJECT_COPY_PREPARED worker=%s source=%s project=%s",
+            self.ID, self.source_project, self.project_path,
+            extra={"event": "PROJECT_COPY_PREPARED", "phase": "prepare", "worker": self.ID,
+                   "source": self.source_project, "project_copy": self.project_path})
 
     @classmethod
     def create(cls, worker_id, config, logger):

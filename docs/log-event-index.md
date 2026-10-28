@@ -21,6 +21,7 @@
 | `HOM_RECOVERY_RESULT` | `csttool/hom_scan.py` |
 | `HOM_RECOVERY_STEP` | `csttool/hom_scan.py` |
 | `HOM_RESUMED` | `csttool/hom_scan_algorithm.py` |
+| `HOM_RESUME_INTERVAL` | `csttool/hom_scan_algorithm.py` |
 | `LOG_RECORD_INVALID` | `csttool/event_replay.py` |
 | `LOG_RECORD_SKIPPED` | `csttool/event_replay.py` |
 | `MANAGER_READY` | `csttool/cstmanager.py` |
@@ -29,6 +30,7 @@
 | `MESH_CONVERGENCE_POINT` | `csttool/application_backend.py` |
 | `MESH_CONVERGENCE_RESULT` | `csttool/application_backend.py` |
 | `MESH_CONVERGENCE_START` | `csttool/application_backend.py` |
+| `PROJECT_COPY_PREPARED` | `csttool/managed_cstworker.py` |
 | `PROJECT_LOCK_ACQUIRED` | `csttool/application_backend.py` |
 | `PROJECT_LOCK_BUSY` | `csttool/application_backend.py` |
 | `PROJECT_LOCK_RELEASED` | `csttool/application_backend.py` |
@@ -61,6 +63,7 @@
 | `WORKER_DIAGNOSTICS_FAILED` | `csttool/managed_cstworker.py` |
 | `WORKER_FAILED_RETIRED` | `csttool/managed_cstworker.py` |
 | `WORKER_FAILURE_DIAGNOSTICS` | `csttool/managed_cstworker.py` |
+| `WORKER_REPLACED` | `csttool/cstmanager.py` |
 | `WORKER_RESTART_CANCELLED` | `csttool/cstmanager.py` |
 | `WORKER_RESTART_DONE` | `csttool/cstmanager.py` |
 | `WORKER_RESTART_FAILED` | `csttool/cstmanager.py` |

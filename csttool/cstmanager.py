@@ -216,6 +216,9 @@ class CSTManager:
         self._result_queue: Queue[tuple[int, dict]] = Queue()
         self._slots: list[_WorkerSlot] = []
         self._next_sequence = 0
+        existing_ids = [int(path.name[7:]) for path in self.tempDir.glob("worker_*")
+                        if path.is_dir() and path.name[7:].isdigit()]
+        self._next_worker_id = max(existing_ids, default=-1) + 1
         self._confirmed_snapshot: Path | None = None
         self._executor = ThreadPoolExecutor(
             max_workers=maxTask,
@@ -288,13 +291,21 @@ class CSTManager:
             self.logger,
         )
 
+    def _allocate_worker_id(self) -> str:
+        with self._state_lock:
+            worker_id = str(self._next_worker_id)
+            self._next_worker_id += 1
+            # Reserve even for injected workers and failed startup attempts.
+            (self.tempDir / f"worker_{worker_id}").mkdir(parents=True, exist_ok=True)
+            return worker_id
+
     def _start_initial_workers(self) -> None:
         try:
             for index in range(self.maxParallelTasks):
                 if self._external_stop_check():
                     self.request_stop()
                     break
-                worker_id = str(index)
+                worker_id = self._allocate_worker_id()
                 self._slots.append(_WorkerSlot(worker_id, self._create_worker(worker_id)))
                 if self._external_stop_check():
                     self.request_stop()
@@ -336,10 +347,11 @@ class CSTManager:
                 slot.worker.stop()
                 slot.state = WorkerState.DEAD
             for slot in slots:
-                worker = self._create_worker(slot.worker_id, source)
+                worker_id = self._allocate_worker_id()
+                worker = self._create_worker(worker_id, source)
                 replacements.append(
                     _WorkerSlot(
-                        slot.worker_id,
+                        worker_id,
                         worker,
                         confirmed_snapshot=source,
                     )
@@ -438,7 +450,13 @@ class CSTManager:
                     )
                     source = None
                     slot.confirmed_snapshot = None
-            slot.worker = self._create_worker(slot.worker_id, source)
+            old_worker_id = slot.worker_id
+            new_worker_id = self._allocate_worker_id()
+            slot.worker = self._create_worker(new_worker_id, source)
+            slot.worker_id = new_worker_id
+            self.logger.info("Worker 实例已替换 | WORKER_REPLACED old=%s new=%s",
+                old_worker_id, new_worker_id, extra={"event": "WORKER_REPLACED",
+                "phase": "restart", "old_worker": old_worker_id, "worker": new_worker_id})
         except Exception:
             slot.state = WorkerState.DEAD
             self.logger.exception("Worker 重建失败 | WORKER_RESTART_FAILED worker=%s", slot.worker_id, extra={"event": "WORKER_RESTART_FAILED", "phase": "restart", "worker": slot.worker_id})

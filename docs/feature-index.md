@@ -149,3 +149,8 @@ F40–F44历史审查边界：[2026-10-15本机分离审查](../knowledge-base/r
 F85/F86/F88现场补证：[2026-10-25 16:51诊断包](field-failure-bundle-20261025.md)。任务级恢复已在复杂用户模型观察到2项/5秒；阻断为退出1及顶层原因缺失，不是收尾预算超时。原包不含模型，不能在本机复核快照。
 
 |F94|GUI扫描目标与首窗频率命名|[algorithm_settings_dialog.py](../GUI/algorithm_settings_dialog.py)|`AlgorithmSettingsDialog.__init__`|[配置与标签测试](../test/gui_config_models_test.py)|[HOM工作台](gui-hom-workspace.md)|
+
+|F95|Worker递增实例身份|[实现](../csttool/cstmanager.py)|`CSTManager._allocate_worker_id`|[回归](../test/cstmanager_test.py)|[迁移对照](local-fix-migration-20261028.md)|
+|F96|prepared工程与配套目录复制|[实现](../csttool/managed_cstworker.py)|`ManagedCSTWorker._prepare_project_copy`|[回归](../test/managed_cstworker_test.py)|[迁移对照](local-fix-migration-20261028.md)|
+|F97|前向优先HOM续扫与缺口补算|[实现](../csttool/hom_scan_algorithm.py)|`HomScanAlgorithm.start`|[回归](../test/hom_scan_test.py)|[迁移对照](local-fix-migration-20261028.md)|
+|F98|停止期间CST进度与旧会话过滤|[实现](../GUI/main_window.py)|`MainWindow.renderCstProgress`|[回归](../test/gui_main_window_test.py)|[迁移对照](local-fix-migration-20261028.md)|

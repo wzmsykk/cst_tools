@@ -165,7 +165,7 @@ class Runner:
         self.update(state='STOPPING', phase='stopping')
         executor = self.executor
         if executor and not (self.stop_delivery and self.stop_delivery.is_alive()):
-            self.stop_delivery = threading.Thread(target=self._deliver_stop, args=(executor,), daemon=True)
+            self.stop_delivery = threading.Thread(target=self._deliver_stop, args=(executor,), name="RUNNER/STOP", daemon=True)
             self.stop_delivery.start()
 
     def events(self, cursor=0, limit=100):
@@ -297,7 +297,7 @@ class Runner:
                             lifecycle=None, error_diagnostic=None, cleanup_diagnostic=None,
                             session_safety='unknown', log_directory=None, last_progress=None,
                             completed_tasks=0, total_tasks=len(payload.get('tasks', [])))
-                self.worker = threading.Thread(target=self._execute, args=(op, payload), daemon=False)
+                self.worker = threading.Thread(target=self._execute, args=(op, payload), name="RUNNER/" + op.upper(), daemon=False)
                 self.worker.start()
             elif op == 'stop':
                 self._stop_run()

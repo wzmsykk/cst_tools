@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from enum import Enum, auto
+import threading
 
 from PyQt5.QtCore import QObject, QThread, pyqtSignal, pyqtSlot
 from GUI.application_service import CstApplicationService, RunRequest
@@ -40,6 +41,8 @@ class _BackendRunWorker(QObject):
 
     @pyqtSlot()
     def execute(self) -> None:
+        threading.current_thread().name = "GUI/RUN"
+        QThread.currentThread().setObjectName("GUI/RUN")
         try:
             self.stage_changed.emit("initializing")
             self._service.initialize_run(self._request)
@@ -65,6 +68,8 @@ class _BackendStopWorker(QObject):
 
     @pyqtSlot()
     def execute(self) -> None:
+        threading.current_thread().name = "GUI/STOP"
+        QThread.currentThread().setObjectName("GUI/STOP")
         try:
             self._service.request_stop()
         except Exception as exc:
@@ -83,6 +88,8 @@ class _BackendRecoveryWorker(QObject):
 
     @pyqtSlot()
     def execute(self) -> None:
+        threading.current_thread().name = "GUI/RECOVERY"
+        QThread.currentThread().setObjectName("GUI/RECOVERY")
         try:
             recovered = self._service.recover_project_sessions()
         except Exception as exc:
@@ -156,6 +163,7 @@ class GuiRunController(QObject):
         self._stop_thread: QThread | None = None
         self._stop_worker: _BackendStopWorker | None = None
         self._terminal_after_stop: RunState | None = None
+        self._terminal_stage_after_stop = None
         self._recovery_thread: QThread | None = None
         self._recovery_worker: _BackendRecoveryWorker | None = None
         self.service.add_progress_listener(self.cst_progress.emit)
@@ -281,32 +289,31 @@ class GuiRunController(QObject):
         self.stage_changed.emit(stage)
         self.progress_changed.emit(progress, 4)
 
-    def _run_succeeded(self) -> None:
-        self._on_stage("completed")
-        target = RunState.READY if self.inputs_ready else RunState.IDLE
+    def _finish_run(self, stage, target):
         if self.state is RunState.STOPPING:
-            self._terminal_after_stop = self._terminal_after_stop or target
+            if (self._terminal_after_stop not in {RunState.FAILED, RunState.RECOVERY_REQUIRED}
+                    or target is RunState.RECOVERY_REQUIRED):
+                self._terminal_after_stop = target
+                self._terminal_stage_after_stop = stage
         else:
+            self._on_stage(stage)
             self._transition(target)
 
+    def _run_succeeded(self) -> None:
+        self._finish_run("completed", RunState.READY if self.inputs_ready else RunState.IDLE)
+
     def _run_failed(self, message: str) -> None:
-        requires_recovery = self._backend_requires_recovery()
-        target = (
-            RunState.RECOVERY_REQUIRED if requires_recovery else RunState.FAILED
-        )
-        if self.state is RunState.STOPPING:
-            self._terminal_after_stop = self._terminal_after_stop or target
-        else:
-            self._transition(target)
+        required = self._backend_requires_recovery()
+        self._finish_run("recovery-required" if required else "failed",
+                         RunState.RECOVERY_REQUIRED if required else RunState.FAILED)
         self.error.emit(message)
 
     def _run_interrupted(self) -> None:
-        self._on_stage("interrupted")
-        target = RunState.READY if self.inputs_ready else RunState.IDLE
-        if self.state is RunState.STOPPING:
-            self._terminal_after_stop = self._terminal_after_stop or target
+        if self._backend_requires_recovery():
+            self._finish_run("recovery-required", RunState.RECOVERY_REQUIRED)
+            self.error.emit("停止未完成：CST 退出尚未确认，需要恢复会话")
         else:
-            self._transition(target)
+            self._finish_run("interrupted", RunState.READY if self.inputs_ready else RunState.IDLE)
 
     def _thread_finished(self) -> None:
         self._worker = None
@@ -315,6 +322,8 @@ class GuiRunController(QObject):
 
     def _stop_failed(self, message: str) -> None:
         self._terminal_after_stop = RunState.RECOVERY_REQUIRED
+        self._terminal_stage_after_stop = "recovery-required"
+        self._on_stage("recovery-required")
         self.error.emit(f"标准停止失败: {message}")
 
     def _stop_thread_finished(self) -> None:
@@ -375,7 +384,12 @@ class GuiRunController(QObject):
                 target = self._terminal_after_stop or (
                     RunState.READY if self.inputs_ready else RunState.IDLE
                 )
+                stage = self._terminal_stage_after_stop or "interrupted"
+                if self._backend_requires_recovery():
+                    target, stage = RunState.RECOVERY_REQUIRED, "recovery-required"
                 self._terminal_after_stop = None
+                self._terminal_stage_after_stop = None
+                self._on_stage(stage)
                 self._transition(target)
             self.settled.emit()
 

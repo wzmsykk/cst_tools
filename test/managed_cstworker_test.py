@@ -558,3 +558,23 @@ def test_close_stage_observation_is_bounded_deduplicated_and_complete(tmp_path, 
     assert len(records) == 2
     assert records[0].lifecycle_detail == 'now | stage=restore-batch; begin'
     assert records[1].lifecycle_detail == 'partial completed'
+
+def test_session_copies_preprocessed_project_and_companion(tmp_path):
+    source = tmp_path / "processed.cst"
+    source.write_bytes(b"preprocessed model")
+    data = source.with_suffix("") / "Model"
+    data.mkdir(parents=True)
+    (data / "mesh.dat").write_bytes(b"prepared mesh")
+    for worker_id in (0, 1):
+        worker = object.__new__(ManagedCSTWorker)
+        worker.ID = str(worker_id)
+        worker.logger = logging.getLogger("copy-test")
+        worker.source_project = source
+        worker.root = tmp_path / f"worker_{worker_id}" / "new-session"
+        worker.root.mkdir(parents=True)
+        worker.project_path = worker.root / "worker-input.cst"
+        worker._prepare_project_copy()
+        assert worker.project_path.read_bytes() == b"preprocessed model"
+        assert (worker.project_path.with_suffix("") / "Model" / "mesh.dat").read_bytes() == b"prepared mesh"
+        worker.project_path.write_bytes(b"task changed copy")
+        assert source.read_bytes() == b"preprocessed model"

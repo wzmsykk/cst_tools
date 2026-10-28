@@ -115,7 +115,9 @@ def test_hom_checkpoints_refresh_live_summary_not_only_terminal_state(tmp_path):
     algorithm.set_editable_attributes({'fmin':100,'fmax':110,'endfreq':120})
     report = algorithm.start()
     summary = json.loads((overview.directory/'run.json').read_text(encoding='utf-8'))
-    assert summary['coverage']['confirmed_frontier'] == 120
+    # Missing postprocess output leaves a real gap; no false full coverage.
+    assert report.failed and report.failed[0].lo == 114.000001
+    assert summary['coverage']['confirmed_frontier'] == report.failed[0].lo
     assert summary['mode_count'] == len(report.modes)
     assert summary['pending_count'] == 0
     assert summary['status'] == 'RUNNING'  # Observer never invents terminal success.

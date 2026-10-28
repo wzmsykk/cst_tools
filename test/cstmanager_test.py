@@ -456,3 +456,25 @@ def test_failed_hom_retry_uses_preprocessed_base_and_preserves_confirmed_snapsho
     assert tracker['configs'][1].project_path != snapshot
     assert snapshot.read_bytes() == b'confirmed results must survive'
     assert manager.get_confirmed_snapshot() == snapshot
+
+
+def test_worker_replacement_allocates_new_instance_id(manager_factory):
+    manager, tracker = manager_factory(workers=1, outcomes=(RuntimeError("failed"), "Success"))
+    manager.execute(SimulationTask({}, "retry", retry_count=1))
+    assert [worker.ID for worker in tracker["created"]] == ["0", "1"]
+
+
+def test_new_manager_continues_worker_ids_in_existing_project(manager_factory):
+    first, tracker = manager_factory(workers=1)
+    first.stop()
+    second, second_tracker = manager_factory(workers=1)
+    assert tracker["created"][0].ID == "0"
+    assert second_tracker["created"][0].ID == "1"
+
+
+def test_snapshot_restore_uses_new_worker_ids(manager_factory, tmp_path):
+    manager, tracker = manager_factory(workers=2)
+    snapshot = tmp_path / "confirmed.cst"
+    snapshot.write_bytes(b"confirmed")
+    manager.restore_project_snapshot(snapshot)
+    assert [worker.ID for worker in tracker["created"]] == ["0", "1", "2", "3"]

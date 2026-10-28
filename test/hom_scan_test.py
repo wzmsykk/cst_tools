@@ -559,3 +559,66 @@ def test_scanner_stops_between_solves_and_preserves_pending_interval():
 
     assert [item.frequency for item in raised.value.report.modes] == [105]
     assert raised.value.pending == [ScanInterval(105.000001, 115.000001)]
+
+def test_resume_uses_confirmed_frontier_instead_of_old_gap_chain(tmp_path):
+    manager = ScanManager(tmp_path)
+    manager.physical_modes = [119.0, 126.0]
+    algorithm = HomScanAlgorithm(manager=manager, params=[])
+    algorithm.set_cst_parameters([])
+    algorithm.set_editable_attributes({"fmin": 100, "fmax": 110, "endfreq": 125})
+    algorithm.set_resume(True)
+    checkpoint = ScanCheckpointStore(tmp_path / "save/csv/hom_scan_checkpoint.json")
+    gap = ScanInterval(100, 102)
+    checkpoint.save(
+        algorithm._scan_policy(), algorithm._project_fingerprint(),
+        ScanReport(modes=[mode(105), mode(114)],
+                   completed=[ScanInterval(100, 110), ScanInterval(105.000001, 115.000001)],
+                   failed=[gap], failure_reasons={"100:102": "old failure"}, solver_calls=2),
+        [ScanInterval(105.000001, 115.000001), ScanInterval(114.000001, 124.000001)],
+    )
+    report = algorithm.start()
+    assert manager.tasks[0].params["fmin"] == pytest.approx(114.000001)
+    assert all(task.params["fmin"] > 114 for task in manager.tasks)
+    assert [item.frequency for item in report.modes] == [105, 114, 119]
+    assert gap in report.failed
+    assert report.failure_reasons["100:102"] == "old failure"
+
+
+def test_gap_retry_does_not_generate_scan_through_completed_band():
+    policy = ScanPolicy(100, 110, 300, window_width=10)
+    requests = []
+
+    def solve(request):
+        requests.append(request)
+        return []
+
+    AdaptiveHomScanner(policy).run(
+        solve, pending=[ScanInterval(120, 130), ScanInterval(200, 210)],
+        bounded_intervals=True,
+    )
+    assert [(item.solve_lo, item.solve_hi) for item in requests] == [(120, 130), (200, 210)]
+
+
+def test_gap_checkpoint_preserves_bounded_resume_mode(tmp_path):
+    policy = ScanPolicy(100, 110, 300, window_width=10)
+    store = ScanCheckpointStore(tmp_path / "checkpoint.json")
+    store.save(policy, {}, ScanReport(), [ScanInterval(120, 130)], bounded_intervals=True)
+    restored = ScanCheckpointStore(store.path)
+    restored.load(policy, {})
+    assert restored.pending_bounded is True
+
+
+def test_completed_search_window_upper_bound_is_not_resume_frontier(tmp_path):
+    manager = ScanManager(tmp_path)
+    manager.physical_modes = [114.0, 121.0]
+    algorithm = HomScanAlgorithm(manager=manager, params=[])
+    algorithm.set_cst_parameters([])
+    algorithm.set_editable_attributes({"fmin": 100, "fmax": 110, "endfreq": 120})
+    algorithm.set_resume(True)
+    checkpoint = ScanCheckpointStore(tmp_path / "save/csv/hom_scan_checkpoint.json")
+    checkpoint.save(algorithm._scan_policy(), algorithm._project_fingerprint(),
+                    ScanReport(modes=[mode(105)], completed=[ScanInterval(100, 119)]),
+                    [ScanInterval(105.000001, 115.000001)])
+    report = algorithm.start()
+    assert manager.tasks[0].params["fmin"] == pytest.approx(105.000001)
+    assert [item.frequency for item in report.modes] == [105, 114]

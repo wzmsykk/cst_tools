@@ -151,15 +151,18 @@ class AdaptiveHomScanner:
         report: ScanReport | None = None,
         checkpoint: CheckpointCallback | None = None,
         should_stop: Callable[[], bool] | None = None,
+        bounded_intervals: bool = False,
     ) -> ScanReport:
         report = report or ScanReport()
         queue = list(pending if pending is not None else self.policy.initial_intervals())
 
+        limits = [item.hi if bounded_intervals else self.policy.stop for item in queue]
         while queue:
             if should_stop is not None and should_stop():
                 self._checkpoint(checkpoint, report, queue)
                 raise ScanInterrupted(report, list(queue))
             interval = queue.pop(0)
+            scan_limit = limits.pop(0)
             # Persist the in-flight interval before any solver side effect.
             self._checkpoint(checkpoint, report, [interval] + queue)
             if not interval.lo < interval.hi:
@@ -284,11 +287,12 @@ class AdaptiveHomScanner:
                 report.completed.append(interval)
                 if task_id and task_id not in report.adopted_task_ids:
                     report.adopted_task_ids.append(task_id)
-            if next_lo < self.policy.stop:
-                next_hi = min(next_lo + self.policy.window_width, self.policy.stop)
+            if next_lo < scan_limit:
+                next_hi = min(next_lo + self.policy.window_width, scan_limit)
                 if next_hi <= next_lo:
                     raise ScanConfigurationError("scan interval did not make progress")
                 queue.insert(0, ScanInterval(next_lo, next_hi))
+                limits.insert(0, scan_limit)
             self._checkpoint(checkpoint, report, queue)
 
             if should_stop is not None and should_stop():
@@ -494,6 +498,7 @@ class ScanCheckpointStore:
 
     def __init__(self, path: str | Path):
         self.path = Path(path)
+        self.pending_bounded = False
 
     def save(
         self,
@@ -502,6 +507,7 @@ class ScanCheckpointStore:
         report: ScanReport,
         pending: list[ScanInterval],
         snapshot_path: str | Path | None = None,
+        bounded_intervals: bool = False,
     ) -> None:
         snapshot = self._encode_snapshot(snapshot_path)
         document = {
@@ -515,6 +521,7 @@ class ScanCheckpointStore:
             "policy": asdict(policy),
             "projectFingerprint": project_fingerprint,
             "pending": [asdict(item) for item in pending],
+            "pendingBounded": bounded_intervals,
             "confirmedSnapshot": snapshot,
             "report": {
                 "modes": [asdict(item) for item in report.modes],
@@ -571,6 +578,9 @@ class ScanCheckpointStore:
             raise ScanConfigurationError("checkpoint scan policy does not match")
         if document.get("projectFingerprint") != project_fingerprint:
             raise ScanConfigurationError("checkpoint project does not match")
+        self.pending_bounded = document.get("pendingBounded", False)
+        if type(self.pending_bounded) is not bool:
+            raise ScanConfigurationError("invalid pendingBounded checkpoint flag")
         raw = document["report"]
         if document.get('schemaVersion') == self.SCHEMA_VERSION:
             if not isinstance(raw, dict) or not {'recovery_states', 'recovery_events', 'probed',

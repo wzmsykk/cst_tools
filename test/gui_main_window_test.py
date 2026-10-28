@@ -773,3 +773,49 @@ def test_repeated_close_does_not_duplicate_stop_request(
     assert not first.isAccepted()
     assert not second.isAccepted()
     assert tool.stop_count == 1
+
+
+def test_stop_keeps_current_cst_progress_visible_and_updates(qapp):
+    window, _ = make_window(qapp)
+    window.controller.state = RunState.RUNNING
+    window.renderCstProgress(CstProgressEvent("10", "task", 100, 150, "mesh", None, 35,
+        "Mesh", 1.0, "session", "progress.log"))
+    label = window.stageLabel.text()
+    window.controller.state = RunState.STOPPING
+    window.renderStage("stopping")
+    window.renderProgress(3, 4)
+    assert window.stageLabel.text() == label
+    assert window.runProgressBar.value() == 35
+    window.renderCstProgress(CstProgressEvent("10", "task", 100, 150, "eigenmode-solver", None, 45,
+        "Calculating", 2.0, "session", "progress.log"))
+    assert window.runProgressBar.value() == 45
+    window.controller.state = RunState.IDLE
+    window.close()
+
+
+def test_retired_session_cannot_overwrite_replacement_progress(qapp):
+    window, _ = make_window(qapp)
+    window.controller.state = RunState.RUNNING
+    for session, timestamp, percent in (("old", 1., 10), ("new", 2., 20), ("old", 3., 90)):
+        window.renderCstProgress(CstProgressEvent("10", session, 100, 150, "mesh", None, percent,
+            "Mesh", timestamp, session, "progress.log"))
+    assert window.runProgressBar.value() == 20
+    window.controller.state = RunState.IDLE
+    window.close()
+
+
+def test_stop_failure_never_emits_safe_interrupted_stage(qapp):
+    window, _ = make_window(qapp)
+    controller = window.controller
+    stages = []
+    controller.stage_changed.connect(stages.append)
+    controller.state = RunState.STOPPING
+    controller._stop_failed("unconfirmed")
+    controller._run_interrupted()
+    controller._emit_settled_if_idle()
+    assert "interrupted" not in stages
+    assert "completed" not in stages
+    assert stages[-1] == "recovery-required"
+    assert controller.state is RunState.RECOVERY_REQUIRED
+    controller.state = RunState.IDLE
+    window.close()

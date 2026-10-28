@@ -426,12 +426,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def renderStage(self, stage):
         self._stage = stage
         stage_text = STAGE_PRESENTATION.get(stage, stage)
-        self.stageLabel.setText(stage_text)
+        if not (stage == "stopping" and getattr(self, "_cst_observations", {})):
+            self.stageLabel.setText(stage_text)
         brief = STAGE_PRESENTATION.get(stage, '正在处理任务，详细步骤见运行信息')
         self.stateDetailLabel.setText(brief)
         self.statusbar.showMessage(brief)
 
     def renderProgress(self, current, total):
+        if self.controller.state is RunState.STOPPING and getattr(self, "_cst_observations", {}):
+            return
         self.runProgressBar.setRange(0, total)
         self.runProgressBar.setValue(current)
         self.runProgressBar.setFormat(f"%v / %m　{STAGE_PRESENTATION.get(self._stage, self._stage)}")
@@ -455,11 +458,20 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.stateDetailLabel.setText(' · '.join(part for part in parts if part))
 
     def renderCstProgress(self, event):
-        if self.controller.state is not RunState.RUNNING:
+        if self.controller.state not in {RunState.RUNNING, RunState.STOPPING}:
             return
         if not hasattr(self, '_cst_observations'):
             self._cst_observations = {}
         previous = self._cst_observations.get(event.worker_id)
+        retired = getattr(self, '_retired_cst_sessions', set())
+        key = (event.worker_id, event.session_id)
+        if key in retired:
+            return
+        if previous is not None and event.timestamp < previous.timestamp:
+            return
+        if previous is not None and previous.session_id != event.session_id:
+            retired.add((previous.worker_id, previous.session_id))
+        self._retired_cst_sessions = retired
         if previous is not None and event.timestamp < previous.timestamp:
             return
         if (previous is not None and previous.task_id == event.task_id

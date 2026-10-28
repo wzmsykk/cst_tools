@@ -1,8 +1,9 @@
 """CST Tools desktop application entry point."""
 
 import sys
+import threading
 
-from PyQt5.QtCore import QTimer
+from PyQt5.QtCore import QTimer, QThread
 from PyQt5.QtWidgets import QApplication
 
 from GUI.main_window import MainWindow
@@ -16,6 +17,8 @@ def main(argv=None) -> int:
     smoke_test = SMOKE_TEST_FLAG in arguments
     arguments = [item for item in arguments if item != SMOKE_TEST_FLAG]
     app = QApplication(arguments)
+    threading.current_thread().name = "GUI/MAIN"
+    QThread.currentThread().setObjectName("GUI/MAIN")
     if smoke_test:
         window = MainWindow()  # Packaging must not restore a real user project or Runner.
     else:
