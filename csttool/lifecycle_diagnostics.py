@@ -14,6 +14,7 @@ def lifecycle_facts(records):
     for record in records:
         assessment = record.closure
         sessions.append(dict(asdict(assessment), worker_id=record.worker_id,
+                             process_identity_reason=getattr(record, 'identity_reason', ''),
                              workspace=str(record.root),
                              evidence_path=str(record.root / 'close-verification.json'),
                              receipt_path=str(record.root / 'protocol/close.receipt')))

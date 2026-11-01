@@ -442,3 +442,17 @@ def test_resume_restores_original_mesh_scan_backend_workers_and_postprocess(tmp_
     assert backend.state is BackendState.PREPARED
     backend.execute_run()
     assert ProjectRunLock.active_owner(tmp_path) is None
+
+
+def test_recovery_publishes_stage_sequence_without_starting_worker(tmp_path):
+    backend, _, project, *_ = make_backend()
+    project.currProjectDir = tmp_path
+    backend._set_state(BackendState.RECOVERY_REQUIRED)
+    events=[]
+    backend.recovery_progress_callback=events.append
+    assert backend.recover_project_sessions()==[]
+    assert events[0]['stage']=='configuration'
+    assert events[-1]['stage']=='complete'
+    assert 'session-discovery' in [event['stage'] for event in events]
+    assert 'checkpoint-validation' in [event['stage'] for event in events]
+    assert backend.state is BackendState.INTERRUPTED

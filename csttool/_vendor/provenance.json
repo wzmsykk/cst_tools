@@ -1,0 +1,6 @@
+{
+  "source": "cst_version/cstv.py",
+  "source_sha256": "612eb6da9132ecf6aea8e2e0416877063c0bf70dfde1db3a4e01e7e9f52e23fc",
+  "extraction": "CstFormatError; CstFile through member_list; project_scopes/_scope_prefix/scoped_member; methods unchanged",
+  "extracted_sha256": "701e7a805857cce973a90b423fc56c84baf822cb809d6cc7b900f10dcd97bab3"
+}

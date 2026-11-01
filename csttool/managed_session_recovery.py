@@ -23,10 +23,14 @@ def recover_and_stop_session(
     timeout: float = 1200.0,
     poll_interval: float = 0.1,
     peer_exited=None,
+    progress=None,
 ) -> Completion | None:
     """Await StopAck or an owned peer's observed exit; caller must verify closure."""
     protocol = FileProtocol(protocol_root)
     protocol.request_stop(session_id)
+    if progress:
+        progress({'stage': 'waiting-stop', 'session_id': session_id,
+                  'reason': '已发布停止请求，等待任务Completion或停止回执StopAck'})
     completion_path = protocol.root / "current.completion"
     ack_path = protocol.root / "current.ack"
     deadline = time.monotonic() + timeout
@@ -42,6 +46,10 @@ def recover_and_stop_session(
             publish_ack_idempotently(
                 ack_path, Acknowledge(completion.task_id, completion.session_id)
             )
+            if progress:
+                progress({'stage': 'waiting-stop', 'session_id': session_id,
+                          'task_id': completion.task_id,
+                          'reason': '已确认Completion并发送ACK，等待StopAck及模型收尾'})
         if protocol.read_stop_ack(session_id) is not None:
             return completion
         if peer_exited is not None and peer_exited():

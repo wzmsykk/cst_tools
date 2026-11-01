@@ -259,6 +259,8 @@ class ManagedCSTWorker:
             **self._background_startup_options(),
         )
         self.pid_path.write_text(str(self._process.pid), encoding="ascii")
+        from .process_identity import capture_process_identity
+        capture_process_identity(self.root, self._process.pid, self.executable, self.project_path)
         if callable(self._progress_callback):
             parser = CstLogProgressParser(self.ID, self._progress_context)
             self._progress_monitor = CstLogProgressMonitor(

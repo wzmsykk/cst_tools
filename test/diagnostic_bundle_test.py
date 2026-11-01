@@ -154,3 +154,14 @@ def test_checkpoint_and_failed_retirement_evidence_are_included(tmp_path):
     manifest, files = read_bundle(export_failure_bundle(tmp_path))
     assert 'files/save/csv/hom_scan_checkpoint.json' in files
     assert 'files/temp/worker_0/session-a/recovery-l1.json' in files
+
+
+def test_core_run_logs_survive_worker_discovery_limit(tmp_path):
+    run, worker = project_files(tmp_path)
+    (run/'application.log').write_text('PRIMARY ERROR',encoding='utf-8')
+    for i in range(30):
+        (worker/'protocol'/f'extra-{i}.json').write_text('{}')
+    manifest, files = read_bundle(export_failure_bundle(tmp_path,max_files=20))
+    assert files['files/logs/current/application.log'] == b'PRIMARY ERROR'
+    assert 'files/logs/current/application.jsonl' in files
+    assert 'file-count-limit' in manifest['warnings']

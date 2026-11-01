@@ -84,6 +84,8 @@ def test_project_recovery_stops_and_acks_an_active_session(tmp_path, monkeypatch
     (root / 'worker.pid').write_text('12345', encoding='ascii')
     from threading import Event
     exited = Event()
+    monkeypatch.setattr(project_session_recovery, 'observe_process_identity',
+                        lambda *args: ('matched', 'verified fake launcher'))
     monkeypatch.setattr(project_session_recovery, '_process_tree_is_alive', lambda pid: not exited.is_set())
     task_id = new_session_id()
 
@@ -109,7 +111,8 @@ def test_project_recovery_stops_and_acks_an_active_session(tmp_path, monkeypatch
 
     thread = Thread(target=worker_side, daemon=True)
     thread.start()
-    recovered = recover_project_sessions(project, timeout_per_session=2)
+    events = []
+    recovered = recover_project_sessions(project, timeout_per_session=2, progress=events.append)
     thread.join(2)
 
     assert [item.session_id for item in recovered] == [session_id]
@@ -117,6 +120,7 @@ def test_project_recovery_stops_and_acks_an_active_session(tmp_path, monkeypatch
         item for item in discover_managed_sessions(project) if item.needs_recovery
     ]
     assert not thread.is_alive()
+    assert any('ACK' in event.get('reason', '') for event in events)
     receipt = json.loads((root / "recovery.json").read_text(encoding="utf-8"))
     assert receipt["disposition"] == "abandoned-dead"  # No original process exit code was observed.
     assert receipt["completion_task_id"] == task_id

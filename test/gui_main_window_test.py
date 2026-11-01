@@ -819,3 +819,18 @@ def test_stop_failure_never_emits_safe_interrupted_stage(qapp):
     assert controller.state is RunState.RECOVERY_REQUIRED
     controller.state = RunState.IDLE
     window.close()
+
+
+def test_recovery_snapshot_shows_stage_session_reason_and_task_count(qapp):
+    window, tool = make_window(qapp)
+    window.renderRunnerSnapshot({'state':'RECOVERING','phase':'recovering',
+        'recovery_progress':{'stage':'waiting-stop','session_id':'session-42',
+            'reason':'等待已确认归属的CST退出','timeout_seconds':1200}})
+    text=window.stateDetailLabel.text()
+    assert 'session-42' in text and '1200' in text and '等待已确认归属' in text
+    window.renderRunnerSnapshot({'state':'RECOVERING','phase':'recovering',
+        'recovery_progress':{'stage':'adoption-validation','task_id':'task-7',
+            'current':7,'total':430,'reason':'核验快照'}})
+    assert '7/430' in window.stateDetailLabel.text()
+    assert 'task-7' in window.stateDetailLabel.text()
+    window.close()

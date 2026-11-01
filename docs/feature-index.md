@@ -1,5 +1,13 @@
 # 功能—实现—验收映射入口
 
+## B1更新（2026-11-02）
+
+已实现[保存来源严格适配](saved-project-source.md)：固定复用cst_version只读方法、精确scope、原字节/哈希、严格编码/JSON、预算/CRC/读取变化校验及便携发布。旧文“B1待实现/未接入”是本批次之前状态；B2/B3生产语义与G03仍未通过，56项oracle仍not-run，无真实CST启动。来源复用采用随包固定上游摘取，未修改兄弟仓库，也未迁移所有旧入口。
+
+|功能ID|目的|源码|符号|测试|说明|
+|---|---|---|---|---|---|
+|F100|B1保存工程严格只读快照|[saved_project_source.py](../csttool/saved_project_source.py)|`read_saved_source`, `SavedSource`, `SourceError`, `ReadLimits`|[来源测试](../test/saved_project_source_test.py)|[边界](saved-project-source.md)|
+
 日期：2026-10-28。这是维护中的核心功能索引，不是全仓符号清单。先按功能ID查实现，再查工具、日志和验收；历史方案不是现行运行保证。
 
 内部迭代决策：现代MCP协议与唯一共用底层优先；不维护旧API/客户端/协议兼容，所有入口同批迁移并删除旧路径。历史结果保护另行设计显式数据迁移，不以兼容名义保留双框架。生产公共接口仍仅设计；测试用校准探针已存在，不是运行时API实现。
@@ -182,3 +190,19 @@ F85/F86/F88现场补证：[2026-10-25 16:51诊断包](field-failure-bundle-20261
 |F98|停止期间CST进度与旧会话过滤|[实现](../GUI/main_window.py)|`MainWindow.renderCstProgress`|[回归](../test/gui_main_window_test.py)|[迁移对照](local-fix-migration-20261028.md)|
 
 |F99|本机配置生成与忽略约定|[配置管理](../csttool/globalconfmanager.py)|`GlobalConfigManager.__init__`|[文档索引](../test/documentation_index_test.py)|[本机产物](local-generated-files.md)|
+
+2026-11-02：[261020恢复诊断包分析](recovery-bundle-261020-20261102.md)。现场仍RECOVERING，根因未确证；已确认导出先枚举历史worker耗尽1000候选，主日志未收录。TODO：主日志优先预算与恢复分阶段/逐任务可观测性；未修改运行逻辑、未做现场恢复。
+
+|功能ID|目的|源码|符号|测试|说明|
+|---|---|---|---|---|---|
+|F101|持久CST进程身份|[process_identity.py](../csttool/process_identity.py)|`capture_process_identity`, `observe_process_identity`|[身份模拟](../test/process_identity_test.py)|[恢复边界](recovery-process-identity.md)|
+|F102|恢复归属核验及逐会话进度|[project_session_recovery.py](../csttool/project_session_recovery.py)|`_owned_alive`, `recover_project_sessions`, `discover_managed_sessions`|[恢复测试](../test/project_session_recovery_test.py)|[恢复边界](recovery-process-identity.md)|
+|F103|GUI恢复阶段和会话原因|[main_window.py](../GUI/main_window.py)|`MainWindow.renderRunnerSnapshot`|[GUI恢复显示](../test/gui_main_window_test.py)|[恢复进度](recovery-process-identity.md)|
+
+F88/F89导出修正：主运行日志先占候选名额和字节预算，新增进程身份记录；小预算回归见[诊断测试](../test/diagnostic_bundle_test.py)。Runner/Backend回调和采用进度见[恢复说明](recovery-process-identity.md)、[采用测试](../test/checkpoint_adoption_test.py)。
+
+|功能ID|目的|源码|符号|测试|说明|
+|---|---|---|---|---|---|
+|F104|恢复ACK与收尾等待原因传播|[managed_session_recovery.py](../csttool/managed_session_recovery.py)|`recover_and_stop_session`|[协议恢复](../test/managed_session_recovery_test.py)、[阶段断言](../test/project_session_recovery_test.py)|[恢复进度](recovery-process-identity.md)|
+
+恢复回调生产接线：[Runner LocalExecution](../csttool/runner.py)→[CstApplicationBackend.recover_project_sessions](../csttool/application_backend.py)→[逐任务核验及采用](../csttool/checkpoint_adoption.py)。进程记录写入：[ManagedCSTWorker._start](../csttool/managed_cstworker.py)；生命周期展示：[lifecycle_facts](../csttool/lifecycle_diagnostics.py)。

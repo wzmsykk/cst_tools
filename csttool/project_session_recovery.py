@@ -15,6 +15,7 @@ from .configuration import ProjectSettings, read_ini
 from .runtime_protocol import atomic_publish, decode_completion
 from .session_closure import (collect_close_evidence, evaluate_closure,
                               read_recorded_exit)
+from .process_identity import observe_process_identity
 
 
 @dataclass(frozen=True, slots=True)
@@ -31,6 +32,7 @@ class ManagedSessionRecord:
     recovery_disposition: str | None
     exit_code: int | None = None
     pending_result_task_id: str | None = None
+    identity_reason: str = ''
 
     @property
     def closure(self):
@@ -137,16 +139,35 @@ def _read_completion(record: ManagedSessionRecord):
     return completion if completion.session_id == record.session_id else None
 
 
+def _owned_alive(root, pid):
+    state, reason = observe_process_identity(root, pid)
+    # A verified durable exit proof is stronger than a newly reused numeric PID.
+    if read_recorded_exit(root, Path(root).name, pid) is not None:
+        return False, '已核验历史退出及保存证据'
+    if state == 'matched':
+        return _process_tree_is_alive(pid), reason
+    if state == 'absent':
+        # Without a matching parent identity, raw parent-PID ancestry cannot
+        # attribute orphan children safely. Require explicit verification.
+        children = _windows_descendant_process_ids(pid)
+        return (False if children == set() else None), reason
+    if state == 'unknown' and not (Path(root) / 'process-identity.json').exists():
+        # Absence can be observed without claiming ownership of a live PID.
+        if _process_tree_is_alive(pid) is False:
+            return False, '旧会话PID及子进程均已不存在'
+    return None, reason
+
+
 def _wait_for_process_exit(record: ManagedSessionRecord, timeout: float) -> None:
     if record.process_id is None:
         raise RuntimeError('CST process identity is unknown; exit cannot be confirmed')
     deadline = time.monotonic() + timeout
     while True:
-        alive = _process_tree_is_alive(record.process_id)
+        alive, reason = _owned_alive(record.root, record.process_id)
         if alive is False:
             return
         if alive is None:
-            raise RuntimeError('CST process tree state is unknown; exit cannot be confirmed')
+            raise RuntimeError('CST process identity is unknown: ' + reason)
         remaining = deadline - time.monotonic()
         if remaining <= 0:
             break
@@ -250,7 +271,7 @@ def project_runtime_directory(project_directory: str | Path) -> Path:
     return project_directory / "temp"
 
 
-def discover_managed_sessions(project_directory: str | Path) -> list[ManagedSessionRecord]:
+def discover_managed_sessions(project_directory: str | Path, *, progress=None) -> list[ManagedSessionRecord]:
     runtime = project_runtime_directory(project_directory)
     records = []
     if not runtime.is_dir():
@@ -263,13 +284,17 @@ def discover_managed_sessions(project_directory: str | Path) -> list[ManagedSess
             marker_path = session_root / "worker.state"
             if not session_root.is_dir() or not protocol.is_dir():
                 continue
+            if progress:
+                progress({'stage': 'session-discovery', 'session_id': session_root.name,
+                          'reason': '核验进程身份、历史退出和协议证据'})
             pid_path = session_root / "worker.pid"
             process_id = None
             process_alive = None
+            identity_reason = '缺少进程PID，需人工核实'
             if pid_path.is_file():
                 try:
                     process_id = int(pid_path.read_text(encoding="ascii").strip())
-                    process_alive = _process_tree_is_alive(process_id)
+                    process_alive, identity_reason = _owned_alive(session_root, process_id)
                 except (OSError, ValueError):
                     process_id = None
                     process_alive = None
@@ -291,6 +316,7 @@ def discover_managed_sessions(project_directory: str | Path) -> list[ManagedSess
                     recovery_disposition=_read_recovery_disposition(session_root),
                     exit_code=read_recorded_exit(session_root, session_root.name, process_id),
                       pending_result_task_id=_pending_result_task(session_root),
+                    identity_reason=identity_reason,
                 )
             )
     return records
@@ -300,17 +326,24 @@ def recover_project_sessions(
     project_directory: str | Path,
     *,
     timeout_per_session: float = 1200.0,
+    progress=None,
 ) -> list[ManagedSessionRecord]:
+    if progress:
+        progress({'stage': 'session-discovery', 'reason': '核验会话身份与收尾证据'})
     records = [
-        item for item in discover_managed_sessions(project_directory) if item.needs_recovery
+        item for item in (discover_managed_sessions(project_directory, progress=progress)
+                         if progress else discover_managed_sessions(project_directory)) if item.needs_recovery
     ]
     failures = []
     for item in records:
         try:
+            if progress:
+                progress({'stage': 'session-recovery', 'session_id': item.session_id,
+                          'reason': item.identity_reason})
             from .result_reconciliation import recover_completed_result
             deadline = time.monotonic() + timeout_per_session
             if item.process_alive is None:
-                raise RuntimeError('CST process identity/state is unknown; manual verification required')
+                raise RuntimeError('CST process identity/state is unknown; manual verification required: ' + item.identity_reason)
             closure = item.closure
             blocked = ('stop-ack-invalid', 'close-protocol-invalid')
             if item.process_alive is False:
@@ -322,13 +355,25 @@ def recover_project_sessions(
             if item.has_completion and completion is None:
                 raise RuntimeError('invalid Completion; preserve protocol evidence')
             if item.process_alive is True:
+                alive, reason = _owned_alive(item.root, item.process_id)
+                if alive is None:
+                    raise RuntimeError('CST ownership changed before recovery: ' + reason)
+                if progress:
+                    progress({'stage': 'waiting-stop', 'session_id': item.session_id,
+                              'reason': '等待已确认归属的CST完成协议收尾并退出',
+                              'timeout_seconds': max(0., deadline - time.monotonic())})
                 def peer_exited():
-                    alive = _process_tree_is_alive(item.process_id)
+                    alive, reason = _owned_alive(item.root, item.process_id)
                     if alive is None:
-                        raise RuntimeError('CST process state became unknown during recovery')
+                        raise RuntimeError('CST process identity became unknown during recovery: ' + reason)
                     return alive is False
                 completion = recover_and_stop_session(item.root / 'protocol', item.session_id,
-                    timeout=max(0., deadline - time.monotonic()), peer_exited=peer_exited)
+                    timeout=max(0., deadline - time.monotonic()), peer_exited=peer_exited,
+                    **({'progress': progress} if progress else {}))
+                if progress:
+                    progress({'stage': 'waiting-stop', 'session_id': item.session_id,
+                              'reason': '协议等待结束，核验CST进程退出',
+                              'timeout_seconds': max(0., deadline - time.monotonic())})
                 _wait_for_process_exit(item, max(0., deadline - time.monotonic()))
             recover_completed_result(item.root)
             # Re-observe after waiting. No return code is invented after losing

@@ -30,3 +30,6 @@ testpaths = ["test"]
 markers = [
     "integration: requires a local CST installation and may start external processes",
 ]
+
+[tool.setuptools.package-data]
+"csttool._vendor" = ["provenance.json"]

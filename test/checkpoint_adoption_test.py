@@ -204,3 +204,15 @@ def test_all_evidence_is_validated_before_first_marker_changes(tmp_path):
     before = receipt.read_bytes(), other_receipt.read_bytes(), (store.directory / 'events.jsonl').read_bytes()
     with pytest.raises(ValueError): reconcile_checkpoint_adoptions(tmp_path)
     assert before == (receipt.read_bytes(), other_receipt.read_bytes(), (store.directory / 'events.jsonl').read_bytes())
+
+
+def test_reconciliation_progress_does_not_reimport_or_modify_snapshots(tmp_path):
+    task, store, receipt, snapshot, checkpoint=fixture(tmp_path)
+    before=snapshot.read_bytes(),checkpoint.read_bytes()
+    events=[]
+    assert reconcile_checkpoint_adoptions(tmp_path,progress=events.append)==[task]
+    assert [e['stage'] for e in events]==['adoption-validation','adoption-apply']
+    assert all(e['task_id']==task and e['current']==e['total']==1 for e in events)
+    assert before==(snapshot.read_bytes(),checkpoint.read_bytes())
+    reconcile_checkpoint_adoptions(tmp_path,progress=events.append)
+    assert len(adoptions(store,task))==1

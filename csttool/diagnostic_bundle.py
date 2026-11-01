@@ -112,6 +112,12 @@ def export_failure_bundle(project, *, file_limit=4 * 1024**2,
             if prior.resolve().is_relative_to(project / 'logs') and prior.is_dir() and prior not in runs:
                 runs.append(prior)
     sessions = set()
+    # Reserve core run evidence before historic worker enumeration consumes
+    # the discovery budget. Final ZIP priority cannot recover undiscovered files.
+    for run in runs:
+        for name in ('application.log', 'application.jsonl', 'run.json', 'summary.json'):
+            if (run / name).is_file():
+                add(run / name)
     run_metadata = {}
     if runs:
         metadata = runs[0] / 'run.json'
@@ -154,7 +160,7 @@ def export_failure_bundle(project, *, file_limit=4 * 1024**2,
                      'recovery-l1.json', 'recovery.json',
                      'task-context.json', 'worker-input.cst.last-good-parameters.tsv',
                      'worker-input.cst.recovery-saved', 'runtime_managed_worker_v1.bas',
-                     'diagnostics.json', 'cst.log', 'lifecycle.log'):
+                     'diagnostics.json', 'process-identity.json', 'cst.log', 'lifecycle.log'):
             add(worker / name)
         tree(worker / 'protocol')
         tree(worker / 'failures')
@@ -200,6 +206,9 @@ def export_failure_bundle(project, *, file_limit=4 * 1024**2,
         with zipfile.ZipFile(temporary, 'w', zipfile.ZIP_DEFLATED) as archive:
             def priority(item):
                 relative, path = item
+                if relative.startswith('control/') or (relative.startswith('logs/') and
+                        path.name in {'application.log', 'application.jsonl', 'run.json', 'summary.json'}):
+                    return -1
                 if path.name in {'output.txt', 'progress.log', 'lifecycle.log', 'cst.log'}:
                     return 0
                 if '/resource_usage/' in relative:

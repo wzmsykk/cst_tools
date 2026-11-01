@@ -34,6 +34,7 @@
 | `PROJECT_LOCK_ACQUIRED` | `csttool/application_backend.py` |
 | `PROJECT_LOCK_BUSY` | `csttool/application_backend.py` |
 | `PROJECT_LOCK_RELEASED` | `csttool/application_backend.py` |
+| `RECOVERY_PROGRESS` | `csttool/application_backend.py` |
 | `RECOVERY_REQUIRED` | `csttool/application_backend.py` |
 | `RECOVERY_START` | `csttool/application_backend.py` |
 | `RESULT_READ_DONE` | `csttool/managed_cstworker.py` |

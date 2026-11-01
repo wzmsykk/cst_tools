@@ -293,7 +293,7 @@ class Runner:
                 self.stop_intent = StopIntent(self.control / 'runs' / str(run_id or 'recovery') / 'stop.json')
                 self.update(run_id=run_id, state='PREPARING' if op == 'start' else 'RECOVERING',
                             phase='initializing' if op == 'start' else 'recovering', error=None,
-                            recovery_reason=None,
+                            recovery_reason=None, recovery_progress=None,
                             lifecycle=None, error_diagnostic=None, cleanup_diagnostic=None,
                             session_safety='unknown', log_directory=None, last_progress=None,
                             completed_tasks=0, total_tasks=len(payload.get('tasks', [])))
@@ -464,6 +464,7 @@ class LocalExecution:
                 coverage=coverage, mode_count=len(report.modes))
             self._last_lifecycle_observation = 0.
             self.backend.add_progress_listener(self._progress)
+            self.backend.recovery_progress_callback = lambda event: self.update(recovery_progress=event)
             cleanup.pop_all()
 
     def _progress(self, event):
@@ -517,6 +518,7 @@ class LocalExecution:
         self.backend.request_stop()
 
     def recover(self):
+        self.update(recovery_progress=dict(stage='preprocessor-check', reason='核验预处理会话归属'))
         if self._preprocessor_recovery_required():
             raise RuntimeError('任务归属的预处理CST进程尚未确认退出，不能清除项目恢复状态')
         self.backend.recover_project_sessions()

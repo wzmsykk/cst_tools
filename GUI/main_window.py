@@ -446,6 +446,22 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.resultReadDetails.setText('结果读取诊断：' + diagnostic if diagnostic else '')
         self.resultReadDetails.setVisible(bool(diagnostic))
         parts = [STAGE_PRESENTATION.get(status.get('phase', ''), '正在处理任务')]
+        recovery = status.get('recovery_progress') or {}
+        if status.get('state') == 'RECOVERING' and recovery:
+            stages = {'configuration': '读取配置', 'preprocessor-check': '检查预处理',
+                      'session-discovery': '发现与核验会话', 'session-recovery': '恢复会话',
+                      'waiting-stop': '等待正常收尾', 'checkpoint-validation': '校验检查点',
+                      'adoption-reconciliation': '对账结果', 'adoption-validation': '核验结果',
+                      'adoption-apply': '同步采用记录',
+                      'complete': '恢复完成'}
+            parts.append(stages.get(recovery.get('stage'), recovery.get('stage', '恢复中')))
+            for key, label in [('session_id', '会话'), ('task_id', '任务'), ('reason', '原因')]:
+                if recovery.get(key):
+                    parts.append(f'{label}：{recovery[key]}')
+            if recovery.get('total'):
+                parts.append(f"{recovery.get('current', 0)}/{recovery['total']}")
+            if recovery.get('timeout_seconds') is not None:
+                parts.append(f"本会话等待预算 {recovery['timeout_seconds']:.0f} 秒")
         coverage = status.get('coverage') or {}
         frontier = coverage.get('confirmed_frontier')
         if frontier is not None:

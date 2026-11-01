@@ -42,7 +42,7 @@ def confirmed_tasks(project):
     return confirmed
 
 
-def reconcile_checkpoint_adoptions(project):
+def reconcile_checkpoint_adoptions(project, *, progress=None):
     """Caller holds project ownership and has reconciled physical sessions first."""
     from .project_session_recovery import project_runtime_directory
     from .runtime_protocol import _validate_uuid
@@ -55,7 +55,10 @@ def reconcile_checkpoint_adoptions(project):
         for path in base.glob(pattern):
             if path.stem in receipts: receipts[path.stem].add(path.resolve())
     stores, plan = {}, []
-    for task, (checkpoint, records, kind) in sorted(tasks.items()):
+    for index, (task, (checkpoint, records, kind)) in enumerate(sorted(tasks.items()), 1):
+        if progress:
+            progress({'stage': 'adoption-validation', 'task_id': task, 'current': index,
+                      'total': len(tasks), 'reason': '核验结果回执、快照哈希及RunStore归属'})
         _validate_uuid('checkpoint task_id', task)
         if kind == 'standard' and records[0].get('ReceiptPath'):
             receipts[task].add(Path(records[0]['ReceiptPath']).resolve())
@@ -96,7 +99,10 @@ def reconcile_checkpoint_adoptions(project):
     # Validate every task before modifying any adoption metadata.
     proofs = {checkpoint: {'path': str(checkpoint.resolve()), 'sha256': file_hash(checkpoint)}
               for checkpoint in {item[2] for item in plan}}
-    for task, path, checkpoint, directories in plan:
+    for index, (task, path, checkpoint, directories) in enumerate(plan, 1):
+        if progress:
+            progress({'stage': 'adoption-apply', 'task_id': task, 'current': index,
+                      'total': len(plan), 'reason': '补齐采用索引与回执，不重复导入结果'})
         proof = proofs[checkpoint]
         for directory in sorted(directories):
             mark_adopted(path, stores[directory], task, checkpoint=proof)

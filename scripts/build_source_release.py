@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 def included(name):
     path = Path(name)
     if path.parts[0] in {'csttool', 'GUI', 'algs', 'utils', 'test', 'scripts'}:
-        return path.suffix in {'.py', '.ui', '.csv'} and '__pycache__' not in path.parts
+        return (name == 'csttool/_vendor/provenance.json' or path.suffix in {'.py', '.ui', '.csv'}) and '__pycache__' not in path.parts
     if path.parts[0] in {'data', 'template'}:
         return path.suffix in {'.py', '.vb', '.bas', '.json', '.def', '.txt', '.ini'}
     if path.parts[0] == 'docs':

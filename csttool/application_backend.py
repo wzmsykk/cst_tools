@@ -84,6 +84,7 @@ class CstApplicationBackend:
         self._lifecycle_lock = threading.RLock()
         self.stop_intent = stop_intent or StopIntent()
         self.execution_run_id = execution_run_id
+        self.recovery_progress_callback = None
         self.state = BackendState.CREATED
         self.worker_count = 1
         self.resume = False
@@ -609,6 +610,14 @@ class CstApplicationBackend:
         if project_directory is None:
             raise BackendLifecycleError("project directory is not selected")
         try:
+            def report(stage, **fields):
+                event = dict(stage=stage, **fields)
+                self.logger.info('恢复阶段 | stage=%s session=%s reason=%s', stage,
+                                 fields.get('session_id', '—'), fields.get('reason', ''),
+                                 extra={'event': 'RECOVERY_PROGRESS', 'phase': 'recovery', **event})
+                if self.recovery_progress_callback:
+                    self.recovery_progress_callback(event)
+            report('configuration', reason='加载恢复配置')
             self._acquire_project_run_lock()
         except BackendPreparationError as exc:
             raise BackendLifecycleError(str(exc)) from exc
@@ -622,12 +631,17 @@ class CstApplicationBackend:
             loaded_configuration = None
             if load_configuration is not None:
                 loaded_configuration = load_configuration()
-            recovered = recover_project_sessions(project_directory)
+            recovered = (recover_project_sessions(project_directory,
+                          progress=lambda event: report(**event)) if self.recovery_progress_callback
+                         else recover_project_sessions(project_directory))
+            report('checkpoint-validation', reason='核验检查点与确认快照')
             validate_recovery_checkpoint(project_directory)
+            report('adoption-reconciliation', reason='核对已确认结果及采用记录')
             self._reconcile_checkpoint_adoptions()
             if load_configuration is None or loaded_configuration is not None:
                 self._update_task_status(projectconfmanager.TaskStatus.INTERRUPTED)
             self._set_state(BackendState.INTERRUPTED)
+            report('complete', reason='恢复完成，可继续未完成计算')
             self.logger.info("会话恢复完成 | project=%s closed_sessions=%d", project_directory, len(recovered))
             return recovered
         except Exception:
@@ -639,7 +653,9 @@ class CstApplicationBackend:
 
     def _reconcile_checkpoint_adoptions(self):
         from .checkpoint_adoption import reconcile_checkpoint_adoptions
-        tasks = reconcile_checkpoint_adoptions(self.get_project_directory())
+        tasks = (reconcile_checkpoint_adoptions(self.get_project_directory(),
+                  progress=self.recovery_progress_callback) if self.recovery_progress_callback
+                 else reconcile_checkpoint_adoptions(self.get_project_directory()))
         if tasks:
             self.logger.info('检查点采用标记已核验并同步 | tasks=%d', len(tasks), extra={
                 'event': 'CHECKPOINT_ADOPTION_RECONCILED', 'phase': 'recovery',

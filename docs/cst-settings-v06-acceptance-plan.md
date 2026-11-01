@@ -1,5 +1,9 @@
 # V06验收用例与实施前合同
 
+## B1更新（2026-11-02）
+
+已实现[保存来源严格适配](saved-project-source.md)：固定复用cst_version只读方法、精确scope、原字节/哈希、严格编码/JSON、预算/CRC/读取变化校验及便携发布。旧文“B1待实现/未接入”是本批次之前状态；B2/B3生产语义与G03仍未通过，56项oracle仍not-run，无真实CST启动。来源复用采用随包固定上游摘取，未修改兄弟仓库，也未迁移所有旧入口。
+
 日期：2026-10-28。按用户确认，本轮只补用例和设计；没有实现生产语义解释器、接入MCP、启动CST或自动提交。前置实测见[设置读回设计](cst-settings-verifier-design.md)及[执行快照校准](../knowledge-base/cst-solver-settings-readback-calibration-20261028.md)。
 
 ## 交付和证据分层
