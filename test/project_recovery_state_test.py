@@ -178,6 +178,7 @@ def test_preprocessing_process_blocks_recovery_before_project_status_changes(tmp
     backend, _, _ = real_project_backend(tmp_path)
     execution = object.__new__(LocalExecution)
     execution.project, execution.backend = tmp_path, backend
+    execution.update = lambda **values: None
     monkeypatch.setattr(execution, '_preprocessor_recovery_required', lambda: True)
     with pytest.raises(RuntimeError, match='预处理'):
         execution.recover()

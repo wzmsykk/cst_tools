@@ -257,7 +257,7 @@ class Ui_MainWindow(object):
         self.workerHintLabel.setText(_translate("MainWindow", "实例"))
         self.ResumeButton.setText(_translate("MainWindow", "继续未完成扫描"))
         self.StartButton.setText(_translate("MainWindow", "开始新扫描"))
-        self.RecoverButton.setText(_translate("MainWindow", "清理残留会话"))
+        self.RecoverButton.setText(_translate("MainWindow", "恢复项目"))
         self.StopButton.setText(_translate("MainWindow", "安全停止"))
         self.logHeaderLabel.setText(_translate("MainWindow", "运行活动"))
         self.stageLabel.setText(_translate("MainWindow", "尚未开始"))

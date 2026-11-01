@@ -14,13 +14,22 @@ PROTOCOL_NAMES = {'current.task', 'current.completion', 'current.ack', 'stop.req
                   'stage.txt', 'completion.txt', 'parameters.txt', 'output.txt'}
 
 
+class ExportCancelled(RuntimeError):
+    pass
+
+
 def export_failure_bundle(project, *, file_limit=4 * 1024**2,
-                          total_limit=64 * 1024**2, max_files=1000):
+                          total_limit=64 * 1024**2, max_files=1000,
+                          cancel_check=None, progress=None):
     """Export current run and linked worker evidence, even with Runner offline.
 
     Large files contain a tail snapshot, not a valid complete JSON document.
     All omissions/errors are recorded. Source metadata is never changed.
     """
+    def check():
+        if cancel_check and cancel_check():
+            raise ExportCancelled('诊断导出已取消')
+    check()
     project = Path(project).resolve(strict=True)
     if not project.is_dir():
         raise ValueError('project must be an existing directory')
@@ -34,6 +43,7 @@ def export_failure_bundle(project, *, file_limit=4 * 1024**2,
     warnings = []
 
     def add(path):
+        check()
         path = Path(path)
         if not path.resolve().is_relative_to(project):
             warnings.append('outside-project: ' + str(path))
@@ -43,6 +53,9 @@ def export_failure_bundle(project, *, file_limit=4 * 1024**2,
                 warnings.append('file-count-limit')
             return
         candidates.setdefault(path.relative_to(project).as_posix(), path)
+        if progress and (len(candidates) == 1 or len(candidates) % 25 == 0):
+            progress(dict(phase='discover', current=len(candidates), total=None,
+                          file=path.relative_to(project).as_posix()))
 
     def tree(root):
         if not root.is_dir() or not root.resolve().is_relative_to(project):
@@ -50,6 +63,7 @@ def export_failure_bundle(project, *, file_limit=4 * 1024**2,
         def inaccessible(error):
             warnings.append('discovery unreadable: ' + str(error))
         for visited, (directory, dirs, names) in enumerate(os.walk(root, followlinks=False, onerror=inaccessible)):
+            check()
             if visited >= max_files:
                 warnings.append('directory-discovery-limit: ' + str(root))
                 break
@@ -216,7 +230,10 @@ def export_failure_bundle(project, *, file_limit=4 * 1024**2,
                 return 1 if ('/failures/' in relative or '/protocol/' in relative
                              or relative.startswith('save/') or path.name == 'recovery-l1.json') else 2
 
-            for relative, path in sorted(candidates.items(), key=priority):
+            for index, (relative, path) in enumerate(sorted(candidates.items(), key=priority), 1):
+                check()
+                if progress:
+                    progress(dict(phase='capture', current=index, total=len(candidates), file=relative))
                 record = {'source': str(path), 'archive': 'files/' + relative}
                 manifest['files'].append(record)
                 try:
@@ -231,6 +248,7 @@ def export_failure_bundle(project, *, file_limit=4 * 1024**2,
                         offset = max(0, before.st_size - amount)
                         stream.seek(offset)
                         data = stream.read(amount)
+                    check()
                     after = path.stat()
                     record.update(status='included', original_bytes=before.st_size,
                                   captured_bytes=len(data), offset=offset,
@@ -250,10 +268,15 @@ def export_failure_bundle(project, *, file_limit=4 * 1024**2,
                 'is a raw tail, not necessarily parseable. Models and 3D fields are excluded.\n'
                 'This package can contain local paths, parameter expressions and log contents.\n')
         # Exclusive publication never overwrites an earlier diagnostic package.
+        check()
         with open(temporary, 'rb') as source, destination.open('xb') as target:
             published = True
-            import shutil
-            shutil.copyfileobj(source, target)
+            while True:
+                check()
+                chunk = source.read(1024 * 1024)
+                if not chunk:
+                    break
+                target.write(chunk)
     except BaseException:
         if published and destination.exists():
             destination.unlink()

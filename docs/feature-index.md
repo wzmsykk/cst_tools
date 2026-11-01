@@ -206,3 +206,22 @@ F88/F89导出修正：主运行日志先占候选名额和字节预算，新增�
 |F104|恢复ACK与收尾等待原因传播|[managed_session_recovery.py](../csttool/managed_session_recovery.py)|`recover_and_stop_session`|[协议恢复](../test/managed_session_recovery_test.py)、[阶段断言](../test/project_session_recovery_test.py)|[恢复进度](recovery-process-identity.md)|
 
 恢复回调生产接线：[Runner LocalExecution](../csttool/runner.py)→[CstApplicationBackend.recover_project_sessions](../csttool/application_backend.py)→[逐任务核验及采用](../csttool/checkpoint_adoption.py)。进程记录写入：[ManagedCSTWorker._start](../csttool/managed_cstworker.py)；生命周期展示：[lifecycle_facts](../csttool/lifecycle_diagnostics.py)。
+
+|功能ID|目的|源码|符号|测试|说明|
+|---|---|---|---|---|---|
+|F105|最大化错误提示与工作区伸展分配|[main_window.py](../GUI/main_window.py)|`MainWindow.__init__`, `MainWindow._close_runner_window`|[尺寸及tab回归](../test/gui_main_window_test.py)|[布局和退出](gui-maximize-and-recovery-exit.md)|
+|F106|逻辑待恢复时物理安全核验后退出|[runner.py](../csttool/runner.py)|`Runner.command`, `preprocessor_recovery_required`|[HTTP/安全状态](../test/runner_test.py)、[独立进程/目录释放](../test/exit_process_test.py)|[退出边界](gui-maximize-and-recovery-exit.md)|
+
+F77/F56/F57退出接线更新：[RunnerController.request_shutdown](../GUI/runner_controller.py)、[后台管理](../GUI/runner_management_dialog.py)允许RECOVERY_REQUIRED提交检查请求，最终授权由Runner新鲜物理事实决定；[GUI回归](../test/gui_runner_test.py)验证拒绝后仍能detach。
+
+恢复/退出审计入口：[A01–A08及现行链](recovery-exit-system-audit-20261102.md)。涉及F77/F82/F101–F106；是未修缺陷清单，非新功能完成映射。复现来源见该文，尚无新运行API。
+
+本次审计补充A08：恢复按钮的会话数实际是状态布尔值，应改为真实统计并说明还包含结果对账。文档/日志索引3 passed（0.63s），仅证明映射有效，不代表上述缺陷已修复。
+
+|功能ID|目的|源码|符号|测试|说明|
+|---|---|---|---|---|---|
+|F107|全部历史启动意图及退出核验并发收口|[runner.py](../csttool/runner.py)|`Runner._unfinished_start_intents`, `Runner._reconcile_start_intents`, `Runner.command`, `verify_shutdown_safety`|[故障验收](../test/recovery_exit_audit_test.py)|[A01–A08实施](recovery-exit-audit-implementation.md)|
+|F108|恢复安全暂停信号|[recovery_control.py](../csttool/recovery_control.py)|`RecoveryPaused`|[协议/采用暂停](../test/recovery_exit_audit_test.py)、[GUI暂停按钮](../test/gui_main_window_test.py)|[暂停边界](recovery-exit-audit-implementation.md)|
+|F109|明确拒绝与已离线退出核验|[runner_client.py](../csttool/runner_client.py)|`RunnerRejected`, `RunnerClient.request`, `RunnerClient.shutdown_and_wait`|[故障验收](../test/recovery_exit_audit_test.py)、[GUI分类](../test/gui_runner_test.py)|[错误与退出](recovery-exit-audit-implementation.md)|
+
+A01–A08已实施；原审计未修清单保留为历史证据。F88/F89新增[导出取消和进度](../GUI/diagnostic_export.py)，[核心导出](../csttool/diagnostic_bundle.py)的ExportCancelled/export_failure_bundle；验证[Qt取消/延期关闭](../test/gui_diagnostic_export_test.py)。F102/F104使用[单会话读取与Solver等待核验](../csttool/project_session_recovery.py)的_read_session/_solver_call_active及可选pause_check；[采用](../csttool/checkpoint_adoption.py)逐任务安全暂停。F103用[生命周期](../csttool/lifecycle_diagnostics.py)的physical_pending_count，未知/历史不冒充实时数量；[UI源](../GUI/ui_main.ui)和[生成UI](../GUI/ui_main.py)同步“恢复项目”。

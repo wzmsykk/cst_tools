@@ -28,3 +28,5 @@ Backend的RECOVERY_PROGRESS事件提供阶段与当前会话；逐任务采用�
 
 
 最终离线证据：核心136 passed（69.98s），报告artifacts/recovery-final-20261102.xml；随后补充协议ACK阶段回调/身份/Backend/导出/采用及索引76 passed（7.39s，与核心重叠），报告artifacts/recovery-supplement-20261102.xml。GUI恢复相关5 passed（0.45s），artifacts/recovery-gui-focused-20261102.xml。整组主窗口测试一次Qt中途退出1且无XML，不能计为整组通过；独立新显示测试及相关5项复验通过，不作为完整GUI或现场视觉验收。首轮核心77 passed/1 failed是旧假对端没有身份模拟，改为明确matched假身份后复验通过，未放宽生产核验。磁盘约11.49GiB空余，本轮不产生CST/原始场；清理本轮pytest目录，保留轻量报告。没有提交、推送或现场恢复操作。
+
+2026-11-02后续：[A01–A08实施合同](recovery-exit-audit-implementation.md)补齐停止意图/历史意图、恢复暂停、已离线退出核验及导出取消。连接未知时允许明确请求核验退出，真正退出仍由物理证据决定；导出按钮不再禁用而是可取消。旧文对应禁止/等待描述属于先前版本，当前以该合同为准。

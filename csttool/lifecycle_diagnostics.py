@@ -27,6 +27,7 @@ def lifecycle_facts(records):
     selected = sorted(sessions, key=lambda s: not s['needs_recovery'])[:100]
     return dict(schema_version=1, observed_at=datetime.now(timezone.utc).isoformat(),
                 session_safety=safety, session_count=len(sessions),
+                physical_pending_count=sum(s['process_state'] != 'exited' for s in sessions),
                 recovery_required=any(s['needs_recovery'] for s in sessions),
                 omitted_sessions=max(0, len(sessions) - len(selected)),
                 sessions=selected, source='csttool.session_closure.evaluate_closure')

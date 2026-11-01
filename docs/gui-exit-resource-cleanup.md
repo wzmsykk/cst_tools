@@ -43,3 +43,9 @@ Runner仍以发布根目录为cwd，不能在运行时随意删除它依赖的�
 本轮最终离线797 passed、21 integration deselected（107.89s），主窗口另34 passed（1.34s），最终文档/日志索引及资源专项8 passed（2.37s，重叠）。汇总artifacts/gui-exit-fix-20261025/summary.json，原始XML为artifacts/gui-exit-offline-final-20261025.xml和artifacts/exit-main-20261025.xml；六例GUI/Runner日志及退出事实已另留轻量副本。
 
 已清理本轮.pytest-exit-*目录（只读测试夹具用原生Force删除，先核实任务结束和绝对路径，不终止进程），保留成功/失败轻量记录。offscreen截图字体集合为0、未绘制文本；受限及正常用户权限均如此，不能以此宣称现场视觉通过，记录visual-boundary.json。
+
+## 2026-11-02 布局与恢复状态退出修正
+
+[最大化布局与待恢复退出](gui-maximize-and-recovery-exit.md)：修正插入错误标签后stretch索引错位；完整退出改为Runner重新核验物理会话，不再无条件要求逻辑恢复完成。确认所有进程已退出时保留待恢复标记退出；running/unknown仍阻断，允许仅关界面。旧文“RECOVERY_REQUIRED一律不能shutdown”由本批替代。真实CST/现场DPI仍待验，不清除检查点或强杀。
+
+2026-11-02后续：[A01–A08实施合同](recovery-exit-audit-implementation.md)补齐停止意图/历史意图、恢复暂停、已离线退出核验及导出取消。连接未知时允许明确请求核验退出，真正退出仍由物理证据决定；导出按钮不再禁用而是可取消。旧文对应禁止/等待描述属于先前版本，当前以该合同为准。

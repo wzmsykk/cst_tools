@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QLabel, QTabWidget, QWidget, QVBoxLayout, QHBoxLayout
+from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QLabel, QTabWidget, QWidget, QVBoxLayout, QHBoxLayout, QSizePolicy
 from GUI.algorithm_settings_dialog import AlgorithmSettingsDialog
 from GUI.application_service import CstApplicationService, ConfigurationService
 from GUI.run_controller import GuiRunController, RunState
@@ -33,9 +33,10 @@ STAGE_PRESENTATION = {
     "preparing": "准备工程副本",
     "running": "执行仿真任务",
     "stopping": "安全停止 Worker",
-    "recovering": "恢复残留 CST 会话",
+    "recovering": "核验并恢复项目",
+    "pausing-recovery": "正在安全暂停恢复",
     "recovered": "会话恢复完成",
-    "recovery-required": "需要恢复残留会话，未重新开始计算",
+    "recovery-required": "项目需要恢复核验，未重新开始计算",
     "completed": "本次运行已完成",
     "interrupted": "已安全停止，可从检查点继续",
 }
@@ -73,6 +74,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.exitFailureLabel.setObjectName('exitFailureLabel')
         self.exitFailureLabel.setTextFormat(Qt.PlainText)
         self.exitFailureLabel.setWordWrap(True)
+        self.exitFailureLabel.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Maximum)
         self.exitFailureLabel.setTextInteractionFlags(Qt.TextSelectableByMouse | Qt.TextSelectableByKeyboard)
         self.exitFailureLabel.setAccessibleName('完整退出失败及恢复方法')
         self.exitFailureLabel.hide()
@@ -89,14 +91,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.refreshCstBackendsButton.setToolTip("重新扫描本机 CST 安装")
         self.StartButton.setToolTip("使用当前工程、算法与后处理设置启动任务")
         self.StopButton.setToolTip("请求 Worker 保存当前状态并通过标准流程退出")
-        self.RecoverButton.setToolTip("通过标准协议关闭项目中未闭合的 Managed CST 会话")
+        self.RecoverButton.setToolTip("核验会话、检查点及已确认结果归属；恢复完成后由用户继续计算")
+        self.RecoverButton.setAccessibleName('恢复项目')
         self.ResumeButton.setToolTip("立即使用已有项目、HOM 检查点和已确认安全快照续跑")
         set_visual_role(self.StartButton, "primary")
         set_visual_role(self.StopButton, "danger")
         set_visual_role(self.RecoverButton, "quiet")
         set_visual_role(self.AlgSettingButton, "quiet")
         set_visual_role(self.postProcessButton, "quiet")
-        self.pageLayout.setStretch(1, 1)
+        self.pageLayout.setStretch(self.pageLayout.indexOf(self.workspaceSplitter), 1)
         self.workspaceSplitter.setSizes([560, 860])
 
         self.logTextBox = StructuredLogHandler(self)
@@ -227,7 +230,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def closeEvent(self, event):
         if self._diagnostic_thread is not None and self._diagnostic_thread.isRunning():
-            self.statusbar.showMessage('正在导出失败日志，请等待完成后退出')
+            self._diagnostic_close_pending = True
+            self._diagnostic_thread.requestInterruption()
+            self.statusbar.showMessage('正在取消诊断导出，等待当前文件操作返回后继续退出')
             event.ignore()
             return
         if getattr(self.controller, 'closed', False):
@@ -283,17 +288,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 return
             self.exitFailureLabel.hide()
             self._close_confirmed = True
-        if self.controller.unknown or self.controller.read_only:
+        if self.controller.read_only:
             self._exit_failed('连接或控制权未确认，未停止任务或退出后台。可重新连接/申请控制权，或选择仅关闭界面。')
             return
-        if self.controller.state is RunState.RECOVERY_REQUIRED:
-            self._exit_failed('后台仍需恢复，未确认完整退出。请先恢复；也可选择仅关闭界面并保留后台。')
-            return
         self._close_pending = True
-        if self.controller.has_active_work:
+        if self.controller.unknown:
+            if not self.controller.pending and not self.controller.request_shutdown():
+                self._exit_failed('后台状态未知，未能提交退出核验；可重试或仅关闭界面。')
+            return
+        if getattr(self.controller, 'has_execution_work', self.controller.has_active_work):
             if self.controller.pending_operation == 'shutdown':
                 return
-            if not getattr(self, '_close_stop_sent', False) and self.controller.state not in {RunState.STOPPING, RunState.RECOVERING}:
+            if not getattr(self, '_close_stop_sent', False) and self.controller.state is not RunState.STOPPING:
                 self._close_stop_sent = True
                 if not self.controller.request_stop():
                     self._exit_failed('停止请求未被接受，后台保持原状态。请检查连接和控制权，或选择仅关闭界面。')
@@ -385,23 +391,27 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def onRunError(self, message):
         if self._close_pending and not getattr(self.controller, 'detaching', False):
             self._exit_failed('后台操作失败：' + str(message) + '。可检查日志后恢复，或仅关闭界面。')
-        self.logger.error("后台运行失败 | reason=%s", message)
+        self.logger.error("后台操作未完成 | reason=%s", message)
         brief = str(message).splitlines()[0]
         self.stateDetailLabel.setText(brief + '；详细原因见运行信息，可导出失败日志')
-        self.statusbar.showMessage(f"运行失败：{brief}；可点击“导出失败日志”")
+        self.statusbar.showMessage(f"操作未完成：{brief}；可点击“导出失败日志”")
 
     def exportFailureLogs(self):
         if self._diagnostic_thread is not None:
+            self._diagnostic_thread.requestInterruption()
+            self.logTextBox.export_button.setText('正在取消导出…')
             return
         if not self.uiProjectDir:
             self.statusbar.showMessage('请先选择需要导出诊断的项目目录')
             return
         from GUI.diagnostic_export import DiagnosticExportThread
-        self.logTextBox.export_button.setEnabled(False)
-        self.logTextBox.export_button.setText('正在导出…')
+        self.logTextBox.export_button.setText('取消导出')
         self.statusbar.showMessage('正在收集失败诊断；后台任务保持原状态')
         thread = DiagnosticExportThread(str(self.uiProjectDir), self)
         self._diagnostic_thread = thread
+        thread.progress.connect(lambda event: self.statusbar.showMessage(
+            (f"发现诊断文件 {event['current']}：{event['file']}（可取消）" if event.get('phase') == 'discover'
+             else f"诊断导出 {event['current']}/{event['total']}：{event['file']}（可取消）")))
         thread.finished.connect(self._diagnosticsFinished)
         thread.start()
 
@@ -412,7 +422,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         thread.deleteLater()
         self.logTextBox.export_button.setEnabled(True)
         self.logTextBox.export_button.setText('导出失败日志')
-        if 'error' in outcome:
+        if outcome.get('cancelled'):
+            message = '诊断导出已取消，临时文件已清理'
+            self.logger.info(message)
+        elif 'error' in outcome:
             message = '失败日志导出失败：' + outcome['error']
             self.logger.error(message)
         else:
@@ -422,6 +435,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.logger.info('%s | 文件记录=%s 提示=%s', message, result['files'], result['warnings'])
         self.stateDetailLabel.setText(message)
         self.statusbar.showMessage(message)
+        if getattr(self, '_diagnostic_close_pending', False):
+            self._diagnostic_close_pending = False
+            QTimer.singleShot(0, self.close)
 
     def renderStage(self, stage):
         self._stage = stage
@@ -447,13 +463,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.resultReadDetails.setVisible(bool(diagnostic))
         parts = [STAGE_PRESENTATION.get(status.get('phase', ''), '正在处理任务')]
         recovery = status.get('recovery_progress') or {}
-        if status.get('state') == 'RECOVERING' and recovery:
+        if recovery and (status.get('state') == 'RECOVERING' or recovery.get('stage') == 'paused'):
             stages = {'configuration': '读取配置', 'preprocessor-check': '检查预处理',
                       'session-discovery': '发现与核验会话', 'session-recovery': '恢复会话',
-                      'waiting-stop': '等待正常收尾', 'checkpoint-validation': '校验检查点',
+                      'waiting-stop': '等待正常收尾', 'waiting-solver': '等待当前求解返回', 'checkpoint-validation': '校验检查点',
                       'adoption-reconciliation': '对账结果', 'adoption-validation': '核验结果',
                       'adoption-apply': '同步采用记录',
-                      'complete': '恢复完成'}
+                      'complete': '恢复完成', 'pausing': '正在暂停恢复', 'paused': '恢复已暂停'}
             parts.append(stages.get(recovery.get('stage'), recovery.get('stage', '恢复中')))
             for key, label in [('session_id', '会话'), ('task_id', '任务'), ('reason', '原因')]:
                 if recovery.get(key):
@@ -726,7 +742,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             and self._resume_ready
             and state in {RunState.READY, RunState.FAILED}
         )
-        self.StopButton.setEnabled(state is RunState.RUNNING)
+        self.StopButton.setEnabled(state in {RunState.RUNNING, RunState.RECOVERING})
+        self.StopButton.setText('暂停恢复' if state is RunState.RECOVERING else '安全停止')
+        self.StopButton.setToolTip('在安全边界暂停恢复并保留证据，不强制结束CST' if state is RunState.RECOVERING
+                                  else '请求Worker保存并正常退出；求解可能需要等待')
         self.RecoverButton.setEnabled(
             bool(self.uiProjectDir)
             and (
@@ -741,11 +760,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 RunState.RECOVERY_REQUIRED,
             }
         )
-        self.RecoverButton.setText(
-            f"清理残留会话 ({self.controller.recovery_count})"
-            if self.controller.recovery_count
-            else "清理残留会话"
-        )
+        count = self.controller.recovery_count
+        self.RecoverButton.setText('恢复项目' + (f'（未确认退出 {count}）' if count is not None else '（会话数待核验）'))
         self.StartButton.setText(
             "重新开始新扫描" if state is RunState.FAILED else "开始新扫描"
         )
@@ -760,6 +776,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 widget.setEnabled(False)
 
     def requestStop(self):
+        if self.controller.state is RunState.RECOVERING:
+            if self._confirm_action('确认暂停恢复', '在协议及对账的安全边界暂停恢复，保留所有证据。\n不会强制结束CST；可再次点击“恢复项目”继续核验。'):
+                if self.controller.request_stop():
+                    self.logger.info('用户请求在安全边界暂停恢复')
+            return
         if self.controller.state is not RunState.RUNNING:
             return
         if not self._confirm_action("确认停止", "确定停止当前运行？\n将请求 Worker 安全收尾，不强制结束 CST；当前阻塞操作返回前仍需等待。\nHOM 后续应通过“继续未完成”恢复已记录的计算进度，不要从头覆盖结果。"):
@@ -769,7 +790,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def requestRecovery(self):
         if self.controller.request_recovery():
-            self.logger.info("用户请求清理项目中的残留 CST 会话")
+            self.logger.info("用户请求恢复项目：核验会话、检查点及结果归属")
 
     def run(self, resume=False):
         if not self.uiProjectDir or (not resume and not self.uiCSTFilePath):

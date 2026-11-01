@@ -14,6 +14,13 @@ from .runner_ownership import RunnerOwnership
 from .execution_contract import RunnerSnapshot
 
 
+class RunnerRejected(RuntimeError):
+    """The peer replied with an explicit rejection; transport is not lost."""
+    def __init__(self, message, path='/commands'):
+        self.path = path
+        super().__init__(message)
+
+
 class RunnerClient:
     def __init__(self, project, client_id=None):
         self.project = Path(project).resolve()
@@ -38,7 +45,7 @@ class RunnerClient:
             with self.opener.open(request, timeout=2) as response:
                 result = json.load(response)
         except HTTPError as exc:
-            raise RuntimeError(json.loads(exc.read()).get('error', f'HTTP {exc.code}')) from exc
+            raise RunnerRejected(json.loads(exc.read()).get('error', f'HTTP {exc.code}'), path) from exc
         if path == '/status' and result['instance_id'] != endpoint['instance_id']:
             raise ValueError('Runner instance changed')
         return result
@@ -113,7 +120,18 @@ class RunnerClient:
 
     def shutdown_and_wait(self, *, run_id=None, timeout=10):
         """Standard shutdown; confirm OS ownership release, never kill or relaunch."""
-        self.connect(launch=False)
+        try:
+            self.connect(launch=False)
+        except OSError:
+            # No automatic restart. Lock absence alone does not prove CST safety.
+            lease = RunnerOwnership(self.project / 'control/runner.lock').acquire()
+            try:
+                from .runner import verify_shutdown_safety
+                facts = verify_shutdown_safety(self.project)
+            finally:
+                lease.close()
+            return {'runner_stopped': True, 'already_offline': True,
+                    'session_safety': facts['session_safety']}
         self.command('claim')
         try:
             self.command('shutdown', run_id=run_id)
@@ -141,6 +159,10 @@ def main():
     parser.add_argument('--client-id', help='Stable UI-control identity, not an authentication token')
     args = parser.parse_args()
     client = RunnerClient(args.project, args.client_id)
+    if args.operation == 'shutdown':
+        result = client.shutdown_and_wait()
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+        return
     status = client.connect(launch=False)
     if args.operation == 'status':
         result = status

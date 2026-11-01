@@ -127,3 +127,7 @@ GUI/runner_backend.py、runner_controller.py。功能映射见[功能索引](fea
 生产HOM链的checkpoint/received/solver中断对照见[小网格HOM](hom-interruption-l5-acceptance.md)。恢复继续使用既有显式recover和resume；HOM模式快照的项目相对路径由采用核验正确解析，不按Runner cwd解析。不改变HTTP命令、Task/ACK或VBA wire；旧Runner需正常停止并更新，不能靠替换文件热修复已导入模块。
 
 2026-10-25新增[一键导出失败诊断](failure-diagnostic-export.md)：日志区按钮直接生成项目diagnostics ZIP，即使Runner离线也可收集本地证据；不发控制指令，不读取endpoint认证文件，不是新增HTTP接口。
+
+2026-11-02后续：[A01–A08实施合同](recovery-exit-audit-implementation.md)补齐停止意图/历史意图、恢复暂停、已离线退出核验及导出取消。连接未知时允许明确请求核验退出，真正退出仍由物理证据决定；导出按钮不再禁用而是可取消。旧文对应禁止/等待描述属于先前版本，当前以该合同为准。
+
+A01–A08最终补核：CLI shutdown亦复用所有权释放及物理核验；故障/协议/CLI/文档索引21 passed（5.44s），主窗口暂停按钮与恢复显示7 passed（0.73s）。本批轻量报告保留，pytest临时工程已清理；未启动CST，未提交推送打包。

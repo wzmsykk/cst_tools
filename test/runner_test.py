@@ -354,3 +354,64 @@ def test_runner_crash_restarts_as_recovery_required(fake_runner, tmp_path):
             restarted.kill()
             restarted.wait(5)
         log.close()
+
+
+def test_shutdown_preserves_recovery_markers_when_all_processes_are_gone(tmp_path):
+    runner=Runner(tmp_path,WaitingExecution)
+    marker=tmp_path/'save/csv/retained-evidence.txt'
+    marker.parent.mkdir(parents=True);marker.write_text('do not change')
+    try:
+        runner.command(command('claim'))
+        runner.update(state='RECOVERY_REQUIRED',phase='recovery-required',error='checkpoint needs reconciliation')
+        assert runner.command(command('shutdown'))['accepted']
+        assert runner.shutdown_requested.is_set()
+        assert runner.status['state']=='RECOVERY_REQUIRED'
+        assert marker.read_text()=='do not change'
+    finally:runner.close()
+
+
+@pytest.mark.parametrize('physical_state',['running','unknown'])
+def test_shutdown_rechecks_physical_safety_even_in_recovery_state(tmp_path,monkeypatch,physical_state):
+    runner=Runner(tmp_path,WaitingExecution)
+    monkeypatch.setattr('csttool.lifecycle_diagnostics.project_lifecycle',lambda p:dict(
+        session_safety=physical_state,sessions=[dict(session_id='sid',process_state=physical_state,
+        process_identity_reason='identity not confirmed')]))
+    try:
+        runner.command(command('claim'))
+        runner.update(state='RECOVERY_REQUIRED')
+        with pytest.raises(ValueError,match='session safety unresolved'):
+            runner.command(command('shutdown'))
+        assert not runner.shutdown_requested.is_set()
+    finally:runner.close()
+
+
+def test_http_runner_can_shutdown_with_unreconciled_intent_and_release_directory(fake_runner):
+    client, process=fake_runner
+    project=Path(client.project)
+    intent=project/'control/commands'/('f'*32+'.json')
+    start=command('start')
+    write_json_atomic(intent,dict(command=start,result=dict(accepted=True,run_id='unfinished-run')))
+    # A fresh process normally discovers this gap on restart; use a persisted
+    # project status to exercise the same gate through real HTTP ownership.
+    from csttool.configuration import ProjectSettings,write_ini_atomic
+    write_ini_atomic(project/'project.ini',ProjectSettings(name='test',task_status='RECOVERY_REQUIRED').to_parser())
+    before=intent.read_bytes()
+    assert client.status()['state']=='RECOVERY_REQUIRED'
+    client.command('claim')
+    assert client.shutdown_and_wait()=={'runner_stopped':True}
+    process.wait(5)
+    assert before==intent.read_bytes()
+    assert 'RECOVERY_REQUIRED' in (project/'project.ini').read_text()
+
+
+@pytest.mark.parametrize('report',[{}, {'exit_confirmed':'false'}, {'owned':[]}])
+def test_shutdown_blocks_unconfirmed_preprocessor_report(tmp_path,report):
+    probe=tmp_path/'temp/cst-preprocess-test/session-status.json'
+    write_json_atomic(probe,report)
+    runner=Runner(tmp_path,WaitingExecution)
+    try:
+        runner.command(command('claim'))
+        with pytest.raises(ValueError,match='session safety unresolved'):
+            runner.command(command('shutdown'))
+        assert not runner.shutdown_requested.is_set()
+    finally:runner.close()

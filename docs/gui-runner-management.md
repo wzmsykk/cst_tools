@@ -29,3 +29,5 @@
 本轮分组验收：相关链91 passed，主窗口34 passed，主题5 passed。此前主窗口/主题组合Qt提前退出、没有正常pytest结果，不计通过。轻量报告位于artifacts/runner-management{,-window,-theme}-20261020.xml，不保证随Git迁移；通过不证明Qt原生退出隐患消除。测试临时目录结束后清理，可重新生成。
 
 离线后仍可选其他项目的补充GUI/文档检查12 passed（上述集合内重叠专项），报告artifacts/runner-management-touchup-20261020.xml。
+
+2026-11-02后续：[A01–A08实施合同](recovery-exit-audit-implementation.md)补齐停止意图/历史意图、恢复暂停、已离线退出核验及导出取消。连接未知时允许明确请求核验退出，真正退出仍由物理证据决定；导出按钮不再禁用而是可取消。旧文对应禁止/等待描述属于先前版本，当前以该合同为准。

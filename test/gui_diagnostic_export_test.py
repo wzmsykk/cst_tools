@@ -18,7 +18,8 @@ def test_gui_one_click_exports_offline_project(qapp, tmp_path):
     window, _ = make_window(qapp)
     window.uiProjectDir = str(tmp_path)
     window.logTextBox.export_button.click()
-    assert not window.logTextBox.export_button.isEnabled()
+    assert window.logTextBox.export_button.isEnabled()
+    assert window.logTextBox.export_button.text()=='取消导出'
     until(qapp, lambda: window._diagnostic_thread is None)
     assert len(list((tmp_path / 'diagnostics').glob('*.zip'))) == 1
     assert window.logTextBox.export_button.isEnabled()
@@ -28,7 +29,7 @@ def test_gui_one_click_exports_offline_project(qapp, tmp_path):
 
 def test_export_failure_reenables_button_and_does_not_exit(qapp, tmp_path, monkeypatch):
     import GUI.diagnostic_export as module
-    def failed(project):
+    def failed(project, **kwargs):
         raise OSError('disk full')
     monkeypatch.setattr(module, 'export_failure_bundle', failed)
     window, _ = make_window(qapp)
@@ -43,7 +44,7 @@ def test_export_failure_reenables_button_and_does_not_exit(qapp, tmp_path, monke
 def test_export_is_nonblocking_and_close_preserves_thread(qapp, tmp_path, monkeypatch):
     import GUI.diagnostic_export as module
     release = Event()
-    def blocked(project):
+    def blocked(project, **kwargs):
         assert release.wait(3)
         return {'path': str(tmp_path / 'evidence.zip'), 'files': 1, 'warnings': 0}
     monkeypatch.setattr(module, 'export_failure_bundle', blocked)
@@ -62,3 +63,21 @@ def test_export_is_nonblocking_and_close_preserves_thread(qapp, tmp_path, monkey
         release.set()
         until(qapp, lambda: window._diagnostic_thread is None)
         window.close()
+
+
+def test_close_cancels_export_at_safe_boundary_and_resumes_close(qapp,tmp_path,monkeypatch):
+    import GUI.diagnostic_export as module
+    from csttool.diagnostic_bundle import ExportCancelled
+    from threading import Event
+    entered=Event()
+    def export(project,*,cancel_check,progress):
+        entered.set()
+        while not cancel_check():time.sleep(.005)
+        raise ExportCancelled()
+    monkeypatch.setattr(module,'export_failure_bundle',export)
+    window,_=make_window(qapp);window.uiProjectDir=str(tmp_path)
+    window.exportFailureLogs();until(qapp,entered.is_set)
+    event=QCloseEvent();window.closeEvent(event)
+    assert not event.isAccepted()
+    until(qapp,lambda:window._diagnostic_thread is None)
+    assert getattr(window,'_gui_resources_closed',False)

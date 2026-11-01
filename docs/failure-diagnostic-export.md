@@ -37,3 +37,5 @@ csttool.diagnostic_bundle.export_failure_bundle(project, *, file_limit=4*1024**2
 2026-10-25：一键导出补充save/csv下hom_scan_checkpoint.json、scan_manifest.json、hom_scan_results.csv及save/standard_batch_checkpoint.json，Worker补充recovery-l1.json和recovery.json。检查点与退役证据优先收集，沿用限额和截断标记；导出不等于可自动恢复或标准安全退出。对应导出/恢复/索引27 passed（3.19s），artifacts/hom-recovery-bundle-20261025.xml，未启动CST。
 
 2026-11-02修正：当前/历史run主日志与元数据在worker历史枚举前优先进入候选，ZIP也优先写入核心文件。新增process-identity.json；见[恢复与预算边界](recovery-process-identity.md)。旧文原生日志优先为本次之前策略。
+
+2026-11-02后续：[A01–A08实施合同](recovery-exit-audit-implementation.md)补齐停止意图/历史意图、恢复暂停、已离线退出核验及导出取消。连接未知时允许明确请求核验退出，真正退出仍由物理证据决定；导出按钮不再禁用而是可取消。旧文对应禁止/等待描述属于先前版本，当前以该合同为准。

@@ -6,6 +6,7 @@ import logging
 from uuid import uuid4
 from PyQt5.QtCore import QObject, QTimer, pyqtSignal
 from csttool.cst_progress import CstProgressEvent
+from csttool.runner_client import RunnerRejected
 from GUI.run_controller import RunState
 
 
@@ -25,7 +26,7 @@ class RunnerController(QObject):
         self.backend = service.backend
         self.state = RunState.IDLE
         self.inputs_ready = False
-        self.recovery_count = 0
+        self.recovery_count = None
         self.run_id = None
         self.pool = ThreadPoolExecutor(max_workers=1, thread_name_prefix='runner-client')
         self.future = None
@@ -39,6 +40,7 @@ class RunnerController(QObject):
         self.queued_action = None
         self.pending_operation = None
         self.stop_after_start = False
+        self._stop_reconciliation_blocked = False
         self.start_request_id = None
         self.context_client = self.backend.client
         self.generation = 0
@@ -64,6 +66,10 @@ class RunnerController(QObject):
     @property
     def has_active_work(self):
         return self.stop_after_start or self.pending or self.unknown or self.state in {RunState.RUNNING, RunState.STOPPING, RunState.RECOVERING}
+
+    @property
+    def has_execution_work(self):
+        return self.pending or self.unknown or self.state in {RunState.RUNNING, RunState.STOPPING, RunState.RECOVERING}
 
     def set_inputs_ready(self, ready):
         self.inputs_ready = bool(ready)
@@ -97,6 +103,7 @@ class RunnerController(QObject):
         self.instance = self.run_id = self.observed_run = self.start_request_id = None
         self.cursor = 0
         self.pending = self.unknown = self.read_only = False
+        self._stop_reconciliation_blocked = False
         self.queued_action = self.pending_operation = self.last_error = None
         self.state = RunState.IDLE
         self.backend.log_directory = None
@@ -142,8 +149,9 @@ class RunnerController(QObject):
             try:
                 status, events = future.result()
                 if status.get('runner_stopped'):
-                    self.backend.logger.info('后台服务已正常退出，已确认项目Runner所有权释放 | project=%s', self.backend.project)
+                    self.backend.logger.info('后台已离线，已确认项目Runner所有权释放 | project=%s', self.backend.project)
                     self.runner_stopped = True
+                    self.stop_after_start = False
                     self.unknown = False
                     self.backend.runner_status = dict(getattr(self.backend, 'runner_status', {}),
                                                       state='OFFLINE')
@@ -171,8 +179,11 @@ class RunnerController(QObject):
                 if status.get('execution_active') and status['state'] not in {
                         'PREPARING', 'RUNNING', 'STOPPING', 'RECOVERING'}:
                     self.state = RunState.RECOVERING if previous_state is RunState.RECOVERING else RunState.STOPPING
-                self.recovery_count = int(self.state is RunState.RECOVERY_REQUIRED)
-                if self.state is not previous_state:
+                lifecycle = status.get('lifecycle') or {}
+                previous_count = self.recovery_count
+                self.recovery_count = (None if lifecycle.get('historical')
+                                       else lifecycle.get('physical_pending_count'))
+                if self.state is not previous_state or self.recovery_count != previous_count:
                     self.state_changed.emit(self.state)
                 self.stage_changed.emit(status.get('phase', ''))
                 owner = status.get('owner_client')
@@ -182,15 +193,17 @@ class RunnerController(QObject):
                           else '已连接（其他窗口持有控制权，仅查看）'))
                 self.snapshot_changed.emit(status)
                 from GUI.lifecycle_display import runner_error_text
-                error = runner_error_text(status)
+                error = (None if (status.get('recovery_progress') or {}).get('stage') == 'paused'
+                         and not status.get('error') and not status.get('cleanup_diagnostic')
+                         else runner_error_text(status))
                 if error and error != self.last_error:
                     self.error.emit(error)
                 self.last_error = error
                 if finished_operation == 'cancel_start':
                     self.backend.client.clear_stop_request(self.start_request_id)
                     self.stop_after_start = False  # Runner durably owns the intent now.
-                if self.stop_after_start and not self.pending and self.state not in {
-                        RunState.RECOVERY_REQUIRED, RunState.RECOVERING}:
+                if (self.stop_after_start and not self._stop_reconciliation_blocked
+                        and not self.pending and self.state is not RunState.RECOVERING):
                     self._command('cancel_start', {'start_request_id': self.start_request_id})
                 progress = status.get('last_progress')
                 if progress:
@@ -218,8 +231,12 @@ class RunnerController(QObject):
                 if not self.has_active_work:
                     self.settled.emit()
             except Exception as exc:
-                self.unknown = True
-                self.connection_changed.emit('后台状态未知，正在重连；未确认任务停止')
+                rejected = isinstance(exc, RunnerRejected) and exc.path == '/commands'
+                if rejected and finished_operation == 'cancel_start':
+                    self._stop_reconciliation_blocked = True
+                self.unknown = not rejected
+                self.connection_changed.emit('后台已响应，操作被拒绝：' + str(exc) if rejected
+                    else '后台状态未知，正在重连；未确认任务停止')
                 if str(exc) != self.last_error:
                     self.error.emit(str(exc))
                     self.last_error = str(exc)
@@ -268,6 +285,7 @@ class RunnerController(QObject):
                 self.error.emit(f'停止意图保存失败，尚未确认停止: {exc}')
                 return False
             self.stop_after_start = True
+            self._stop_reconciliation_blocked = False
             self.poll()
             return True
         return self._command('stop')
@@ -276,11 +294,28 @@ class RunnerController(QObject):
         return self._command('claim')
 
     def request_shutdown(self):
-        if (self.has_active_work or self.read_only or self.runner_stopped
-                or self.state is RunState.RECOVERY_REQUIRED or not self.backend.client):
+        active = self.state in {RunState.RUNNING, RunState.STOPPING, RunState.RECOVERING}
+        if (self.closed or self.detaching or self.pending or (active and not self.unknown) or self.read_only or self.runner_stopped
+                or not self.backend.client):
             return False
         client, run_id = self.backend.client, self.run_id
-        self.queued_action = lambda: (client.shutdown_and_wait(run_id=run_id), {'cursor': self.cursor, 'events': []})
+        def shutdown():
+            if self.stop_after_start and self.start_request_id:
+                try:
+                    client.connect(launch=False)
+                except OSError:
+                    # Keep the unresolved stop intent on disk; verify offline
+                    # safety without relaunching or inventing a cancellation.
+                    return client.shutdown_and_wait(run_id=run_id), {'cursor': self.cursor, 'events': []}
+                client.command('claim')
+                try:
+                    client.command('cancel_start', {'start_request_id': self.start_request_id})
+                except (RunnerRejected, OSError) as exc:
+                    self.backend.logger.warning('停止意图未收口，保留记录并请求物理退出核验：%s', exc)
+                else:
+                    client.clear_stop_request(self.start_request_id)
+            return client.shutdown_and_wait(run_id=run_id), {'cursor': self.cursor, 'events': []}
+        self.queued_action = shutdown
         self.pending = True
         self.pending_operation = 'shutdown'
         self.backend.logger.info('请求后台服务正常退出 | project=%s instance=%s run_id=%s',

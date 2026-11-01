@@ -116,8 +116,8 @@ def test_shutdown_stays_offline_until_explicit_connection(app, tmp_path, monkeyp
 
 
 @pytest.mark.parametrize('state,unknown,read_only', [
-    (RunState.RUNNING, False, False), (RunState.RECOVERY_REQUIRED, False, False),
-    (RunState.READY, True, False), (RunState.READY, False, True)])
+    (RunState.RUNNING, False, False),
+    (RunState.READY, False, True)])
 def test_unsafe_runner_shutdown_is_not_sent(app, tmp_path, state, unknown, read_only):
     backend = RunnerBackend()
     backend.select_project_directory(str(tmp_path))
@@ -165,7 +165,8 @@ def test_runner_management_confirmation_and_legacy_identity(app, tmp_path, monke
         assert calls == ['shutdown']
         window.controller.unknown = True
         dialog.refresh()
-        assert not dialog.shutdownButton.isEnabled()
+        assert dialog.shutdownButton.isEnabled()
+        assert '核验' in dialog.shutdownButton.text()
         window.controller.unknown = False
         window.controller.runner_stopped = True
         window.connectionLabelChanged('后台已退出')
@@ -192,7 +193,7 @@ def test_persisted_recovery_gate_keeps_gui_recovery_entry(app, tmp_path):
     try:
         controller.set_inputs_ready(True)
         wait(app, lambda: controller.state is RunState.RECOVERY_REQUIRED)
-        assert controller.recovery_count == 1
+        assert controller.recovery_count is None
         assert runner.snapshot()['project_task_status'] == 'RECOVERY_REQUIRED'
     finally:
         controller.detach()
@@ -306,17 +307,22 @@ def test_shutdown_error_is_visible_and_gui_can_still_detach(app, tmp_path, monke
     wait(app, lambda: window.controller.closed)
 
 
-def test_recovery_required_blocks_full_exit_but_allows_detach(app, tmp_path, monkeypatch):
+def test_unresolved_physical_safety_blocks_full_exit_but_allows_detach(app, tmp_path, monkeypatch):
     backend = RunnerBackend()
     backend.supports_cst_backend_selection = False
     backend.select_project_directory(str(tmp_path))
     backend.client = client = Client(backend.project)
     client.state = 'RECOVERY_REQUIRED'
+    def reject_shutdown(**kwargs):
+        client.ops.append('shutdown')
+        raise ValueError('session safety unresolved: unknown process')
+    client.shutdown_and_wait = reject_shutdown
     window = MainWindow(engine=backend)
     monkeypatch.setattr(window, '_runner_close_choice', lambda: 'stop')
     wait(app, lambda: window.controller.state is RunState.RECOVERY_REQUIRED)
     window.closeEvent(QCloseEvent())
-    assert 'shutdown' not in client.ops and 'stop' not in client.ops
+    wait(app, lambda: 'session safety unresolved' in window.exitFailureLabel.text())
+    assert 'shutdown' in client.ops and 'stop' not in client.ops
     assert not window._close_pending
     monkeypatch.setattr(window, '_runner_close_choice', lambda: 'detach')
     window.closeEvent(QCloseEvent())
@@ -344,7 +350,7 @@ def test_detach_discards_unsubmitted_start_after_observation(app, tmp_path):
     assert 'start' not in client.ops and client.ops.count('release') == 1
 
 
-@pytest.mark.parametrize('blocker', ['unknown', 'read_only'])
+@pytest.mark.parametrize('blocker', ['read_only'])
 def test_unconfirmed_full_exit_shows_persistent_guidance(app, tmp_path, monkeypatch, blocker):
     backend = RunnerBackend()
     backend.supports_cst_backend_selection = False
@@ -380,3 +386,97 @@ def test_local_logging_close_error_can_be_retried_after_transport_is_closed(app,
     event = QCloseEvent()
     window.closeEvent(event)
     assert event.isAccepted() and window._gui_resources_closed
+
+
+def test_recovery_marker_without_live_cst_can_exit_runner_and_gui(app, tmp_path, monkeypatch):
+    backend = RunnerBackend()
+    backend.supports_cst_backend_selection = False
+    backend.select_project_directory(str(tmp_path))
+    backend.client = client = Client(backend.project)
+    client.state = 'RECOVERY_REQUIRED'
+    window = MainWindow(engine=backend)
+    monkeypatch.setattr(window,'_runner_close_choice',lambda:'stop')
+    wait(app,lambda:window.controller.state is RunState.RECOVERY_REQUIRED)
+    window.closeEvent(QCloseEvent())
+    wait(app,lambda:window.controller.closed)
+    assert client.ops.count('shutdown')==1
+    assert 'stop' not in client.ops
+
+
+def test_pending_ui_stop_does_not_block_recovery_state_shutdown(app,tmp_path):
+    backend=RunnerBackend();backend.select_project_directory(str(tmp_path))
+    backend.client=client=Client(backend.project);client.state='RECOVERY_REQUIRED'
+    controller=RunnerController(ConfigurationService(backend));controller.timer.stop()
+    controller.state=RunState.RECOVERY_REQUIRED
+    controller.start_request_id='old-start';controller.stop_after_start=True
+    try:
+        assert controller.has_active_work and not controller.has_execution_work
+        assert controller.request_shutdown()
+        wait(app,lambda:(controller.poll() or controller.runner_stopped))
+        assert client.ops.index('cancel_start')<client.ops.index('shutdown')
+        assert not controller.stop_after_start
+    finally:controller.detach();controller.pool.shutdown(wait=True);controller.poll()
+
+
+def test_explicit_command_rejection_does_not_mark_transport_unknown(app,tmp_path):
+    from csttool.runner_client import RunnerRejected
+    backend=RunnerBackend();backend.select_project_directory(str(tmp_path))
+    class Rejected(Client):
+        def command(self,op,*a,**kw):
+            if op=='stop':raise RunnerRejected('known safety rejection')
+            return super().command(op,*a,**kw)
+    backend.client=Rejected(backend.project);backend.client.state='RUNNING'
+    controller=RunnerController(ConfigurationService(backend));controller.timer.stop();observed=[]
+    controller.error.connect(lambda text:observed.append((text,controller.unknown)))
+    try:
+        assert controller.request_stop()
+        wait(app,lambda:(controller.poll() or bool(observed)))
+        assert observed[0]==('known safety rejection',False)
+    finally:controller.detach();controller.pool.shutdown(wait=True);controller.poll()
+
+
+def test_unknown_transport_can_verify_already_offline_without_starting_runner(app,tmp_path,monkeypatch):
+    from csttool.runner_client import RunnerClient
+    backend=RunnerBackend();backend.select_project_directory(str(tmp_path));client=backend.client
+    monkeypatch.setattr(client,'connect',lambda **kw:(_ for _ in ()).throw(OSError('offline')))
+    controller=RunnerController(ConfigurationService(backend));controller.timer.stop();controller.unknown=True
+    try:
+        assert controller.request_shutdown()
+        wait(app,lambda:(controller.poll() or controller.runner_stopped))
+        assert not client.launch_attempted
+    finally:controller.detach();controller.pool.shutdown(wait=True);controller.poll()
+
+
+def test_lifecycle_count_is_not_boolean_or_historical(app,tmp_path):
+    backend=RunnerBackend();backend.select_project_directory(str(tmp_path))
+    class Snap(Client):
+        historical=True
+        def connect(self,**kw):
+            return dict(super().connect(**kw),state='RECOVERY_REQUIRED',lifecycle=dict(
+                physical_pending_count=3,historical=self.historical))
+    backend.client=client=Snap(backend.project)
+    controller=RunnerController(ConfigurationService(backend));controller.timer.stop()
+    try:
+        controller.poll();wait(app,lambda:(controller.poll() or controller.instance is not None))
+        assert controller.recovery_count is None
+        client.historical=False
+        wait(app,lambda:(controller.poll() or controller.recovery_count==3))
+        assert controller.recovery_count==3
+    finally:controller.detach();controller.pool.shutdown(wait=True);controller.poll()
+
+
+def test_unreconciled_stop_record_is_preserved_but_physical_exit_can_complete(app,tmp_path):
+    from csttool.runner_client import RunnerRejected
+    backend=RunnerBackend();backend.select_project_directory(str(tmp_path))
+    class Unreconciled(Client):
+        def command(self,op,*a,**kw):
+            if op=='cancel_start':raise RunnerRejected('invalid historical start')
+            return super().command(op,*a,**kw)
+    backend.client=client=Unreconciled(backend.project);client.save_stop_request('old-start')
+    controller=RunnerController(ConfigurationService(backend));controller.timer.stop();controller.state=RunState.RECOVERY_REQUIRED
+    try:
+        assert controller.request_shutdown()
+        wait(app,lambda:(controller.poll() or controller.runner_stopped))
+        assert client.pending_stop_request()=='old-start'
+        assert 'shutdown' in client.ops
+    finally:controller.detach();controller.pool.shutdown(wait=True);controller.poll()

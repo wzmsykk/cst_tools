@@ -23,7 +23,7 @@ def wait(predicate, timeout=15):
     raise AssertionError('process acceptance timed out')
 
 
-@pytest.mark.parametrize('scenario', ['idle', 'running', 'failed', 'detach', 'lost-response', 'console'])
+@pytest.mark.parametrize('scenario', ['idle', 'running', 'failed', 'detach', 'lost-response', 'console', 'recovery'])
 def test_gui_exit_releases_owned_processes_and_directory(tmp_path, scenario):
     release, project = tmp_path / 'release', tmp_path / 'project'
     release.mkdir(); project.mkdir()
@@ -49,6 +49,12 @@ def test_gui_exit_releases_owned_processes_and_directory(tmp_path, scenario):
             client.command('start', payload)
             wait(lambda: client.status()['state'] == ('FAILED' if scenario == 'failed' else 'RUNNING'))
             client.command('release')
+        if scenario == 'recovery':
+            from csttool.configuration import ProjectSettings, write_ini_atomic
+            write_ini_atomic(project / 'project.ini', ProjectSettings(name='retained',
+                             task_status='RECOVERY_REQUIRED').to_parser())
+            wait(lambda: client.status()['state'] == 'RECOVERY_REQUIRED')
+            preserved = (project / 'project.ini').read_bytes()
         command = [sys.executable, str(ROOT / 'test/support/exit_gui_probe.py'), '--project', str(project),
                    '--choice', 'detach' if scenario == 'detach' else 'stop']
         if scenario == 'lost-response': command.append('--lost-shutdown-response')
@@ -68,6 +74,8 @@ def test_gui_exit_releases_owned_processes_and_directory(tmp_path, scenario):
         else:
             assert report['runner_stopped']
         assert runner.wait(timeout=10) == 0
+        if scenario == 'recovery':
+            assert (project / 'project.ini').read_bytes() == preserved
         release.rename(moved)  # GUI and Runner cwd handles must both have gone away.
         shutil.rmtree(moved)
     finally:

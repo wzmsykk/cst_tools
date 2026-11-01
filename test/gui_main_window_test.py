@@ -353,7 +353,7 @@ def test_pending_session_enters_sticky_recovery_state_and_blocks_run(
     window.read_dir()
 
     assert window.controller.state is RunState.RECOVERY_REQUIRED
-    assert window.RecoverButton.text() == "清理残留会话 (2)"
+    assert window.RecoverButton.text() == "恢复项目（未确认退出 2）"
     assert window.RecoverButton.isEnabled()
     assert not window.StartButton.isEnabled()
     assert not window.selectProjectDirButton.isEnabled()
@@ -362,7 +362,7 @@ def test_pending_session_enters_sticky_recovery_state_and_blocks_run(
     process_until(qapp, lambda: tool.recovery_count == 1)
     process_until(qapp, lambda: not window.controller.has_active_work)
     assert window.controller.state is RunState.READY
-    assert window.RecoverButton.text() == "清理残留会话"
+    assert window.RecoverButton.text() == "恢复项目（未确认退出 0）"
     assert not window.StartButton.isEnabled()
     assert window.ResumeButton.isEnabled()
     window.close()
@@ -834,3 +834,38 @@ def test_recovery_snapshot_shows_stage_session_reason_and_task_count(qapp):
     assert '7/430' in window.stateDetailLabel.text()
     assert 'task-7' in window.stateDetailLabel.text()
     window.close()
+
+
+def test_error_banner_never_steals_workspace_height_on_resize_or_tab_switch(qapp):
+    window, _ = make_window(qapp)
+    window.show()
+    for size in [(1480,920),(2048,1200),(1480,920)]:
+        window.resize(*size)
+        window._exit_failed('后台归属未知，请检查日志；也可仅关闭界面并保留后台。')
+        for index in (0,1,0):
+            window.resultTabs.setCurrentIndex(index)
+            qapp.processEvents()
+            layout=window.pageLayout
+            assert layout.stretch(layout.indexOf(window.workspaceSplitter))==1
+            assert layout.stretch(layout.indexOf(window.exitFailureLabel))==0
+            assert window.exitFailureLabel.height()<100
+            assert window.workspaceSplitter.height()>window.centralwidget.height()*.65
+    window.showMaximized()
+    for index in (1, 0):
+        window.resultTabs.setCurrentIndex(index)
+        qapp.processEvents()
+        assert window.exitFailureLabel.height()<100
+        assert window.workspaceSplitter.height()>window.centralwidget.height()*.65
+    window.showNormal()
+    qapp.processEvents()
+    window.close()
+
+
+def test_pause_recovery_button_dispatches_and_preserves_task_semantics(qapp,monkeypatch):
+    window,_=make_window(qapp);window.controller.state=RunState.RECOVERING
+    calls=[];monkeypatch.setattr(window.controller,'request_stop',lambda:(calls.append('pause') or True))
+    monkeypatch.setattr(window,'_confirm_action',lambda *a:True)
+    window.renderRunState(RunState.RECOVERING)
+    assert window.StopButton.isEnabled() and window.StopButton.text()=='暂停恢复'
+    window.StopButton.click();assert calls==['pause']
+    window.controller.state=RunState.IDLE;window._close_confirmed=True;window.close()

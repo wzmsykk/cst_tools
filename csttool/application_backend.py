@@ -21,6 +21,7 @@ from csttool.run_overview import RunOverview, RunOverviewHandler
 from csttool.managed_cstworker import ManagedCSTWorker
 from csttool import projectconfmanager
 from csttool.hom_scan import ScanInterrupted
+from csttool.recovery_control import RecoveryPaused
 from csttool.hom_run_manifest import HomRunManifest
 from csttool.configuration import read_json
 from csttool.project_recovery_state import (
@@ -631,11 +632,17 @@ class CstApplicationBackend:
             loaded_configuration = None
             if load_configuration is not None:
                 loaded_configuration = load_configuration()
-            recovered = (recover_project_sessions(project_directory,
-                          progress=lambda event: report(**event)) if self.recovery_progress_callback
-                         else recover_project_sessions(project_directory))
+            def pause_check():
+                if self.stop_intent.is_set():
+                    raise RecoveryPaused('恢复已暂停；会话及结果证据保留，可再次恢复')
+            self._recovery_pause_check = pause_check
+            pause_check()
+            recovered = recover_project_sessions(project_directory,
+                progress=lambda event: report(**event), pause_check=pause_check)
+            pause_check()
             report('checkpoint-validation', reason='核验检查点与确认快照')
             validate_recovery_checkpoint(project_directory)
+            pause_check()
             report('adoption-reconciliation', reason='核对已确认结果及采用记录')
             self._reconcile_checkpoint_adoptions()
             if load_configuration is None or loaded_configuration is not None:
@@ -644,18 +651,26 @@ class CstApplicationBackend:
             report('complete', reason='恢复完成，可继续未完成计算')
             self.logger.info("会话恢复完成 | project=%s closed_sessions=%d", project_directory, len(recovered))
             return recovered
+        except RecoveryPaused:
+            self._set_state(BackendState.RECOVERY_REQUIRED)
+            self.logger.info("恢复已暂停，保留会话和检查点，可再次恢复")
+            raise
         except Exception:
             self._set_state(BackendState.RECOVERY_REQUIRED)
             self.logger.exception("会话恢复失败 | project=%s status=RECOVERY_REQUIRED", project_directory, extra={"event": "RECOVERY_REQUIRED", "phase": "recovery", "project": project_directory})
             raise
         finally:
+            self._recovery_pause_check = None
             self._release_project_run_lock()
 
     def _reconcile_checkpoint_adoptions(self):
         from .checkpoint_adoption import reconcile_checkpoint_adoptions
-        tasks = (reconcile_checkpoint_adoptions(self.get_project_directory(),
-                  progress=self.recovery_progress_callback) if self.recovery_progress_callback
-                 else reconcile_checkpoint_adoptions(self.get_project_directory()))
+        options = {}
+        if self.recovery_progress_callback:
+            options['progress'] = self.recovery_progress_callback
+        if getattr(self, '_recovery_pause_check', None):
+            options['pause_check'] = self._recovery_pause_check
+        tasks = reconcile_checkpoint_adoptions(self.get_project_directory(), **options)
         if tasks:
             self.logger.info('检查点采用标记已核验并同步 | tasks=%d', len(tasks), extra={
                 'event': 'CHECKPOINT_ADOPTION_RECONCILED', 'phase': 'recovery',

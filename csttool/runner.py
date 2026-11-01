@@ -19,6 +19,7 @@ from uuid import uuid4
 from .configuration import read_json, write_json_atomic
 from .execution_contract import StopIntent, validate_command
 from .hom_scan import ScanInterrupted
+from .recovery_control import RecoveryPaused
 from .runner_ownership import RunnerOwnership, protect_directory
 from .project_recovery_state import EXPLICIT_RECOVERY_STATES, persisted_project_status
 
@@ -30,6 +31,44 @@ def working_directory():
         return os.getcwd()
     except OSError:
         return None
+
+
+def preprocessor_recovery_required(project):
+    # Preprocessing owns CST too, but is not a Managed session.
+    import psutil
+    from .project_session_recovery import project_runtime_directory
+    for path in project_runtime_directory(project).glob('cst-preprocess-*/session-status.json'):
+        try:
+            report = read_json(path)
+            if not isinstance(report, dict):
+                return True
+        except (OSError, ValueError):
+            return True
+        if report.get('exit_confirmed') is True:
+            continue
+        if not isinstance(report.get('owned'), list) or not report['owned']:
+            return True
+        for owned in report['owned']:
+            try:
+                process = psutil.Process(owned['pid'])
+                if abs(process.create_time() - owned['create_time']) < .01 and process.is_running():
+                    return True
+            except psutil.NoSuchProcess:
+                continue
+            except (psutil.AccessDenied, OSError, ValueError, KeyError, TypeError):
+                return True
+    return False
+
+
+def verify_shutdown_safety(project):
+    from .lifecycle_diagnostics import project_lifecycle
+    facts = project_lifecycle(project)
+    blocked = [item for item in facts['sessions'] if item['process_state'] != 'exited']
+    if blocked or facts['session_safety'] in {'unknown', 'running'} or preprocessor_recovery_required(project):
+        detail = '; '.join(str(item['session_id']) + ': ' +
+            str(item.get('process_identity_reason') or item['process_state']) for item in blocked[:5])
+        raise ValueError('session safety unresolved: ' + (detail or 'preprocessor requires verification'))
+    return facts
 
 
 class Runner:
@@ -79,15 +118,11 @@ class Runner:
             if legacy:
                 self.status['log_history'] = [dict(run_id=None, directory=str(path)) for path in legacy[:-1]]
                 self.status['log_directory'] = str(legacy[-1])
-        for command_path in (self.control / 'commands').glob('*.json'):
-            intent = read_json(command_path)
-            if intent['command']['operation'] == 'start':
-                run_id = intent['result']['run_id']
-                if not run_id:
-                    continue
-                if not (self.control / 'runs' / run_id / 'outcome.json').exists():
-                    self.status.update(state='RECOVERY_REQUIRED', run_id=run_id,
-                                       error='Unfinished durable start intent requires reconciliation')
+        unfinished, errors = self._unfinished_start_intents()
+        if unfinished or errors:
+            self.status.update(state='RECOVERY_REQUIRED', phase='recovery-required',
+                unfinished_intents=unfinished, intent_diagnostics=errors,
+                error='Unfinished durable start intent requires reconciliation')
         checkpoint = self.project / 'save/csv/hom_scan_checkpoint.json'
         if checkpoint.exists():
             document = read_json(checkpoint)
@@ -95,6 +130,43 @@ class Runner:
                                mode_count=len(document.get('report', {}).get('modes', [])))
         self._reconcile_project_state()
         self._save_status()
+
+    def _unfinished_start_intents(self):
+        pending, errors = [], []
+        for path in sorted((self.control / 'commands').glob('*.json')):
+            try:
+                record = read_json(path)
+                if record['command']['operation'] != 'start':
+                    continue
+                run = record['result'].get('run_id')
+                if run is None:
+                    continue
+                if not isinstance(run, str) or Path(run).name != run or run in ('.', '..'):
+                    raise ValueError('invalid run identity')
+                outcome = self.control / 'runs' / run / 'outcome.json'
+                if not outcome.exists():
+                    pending.append(dict(request_id=path.stem, run_id=run))
+                else:
+                    terminal = read_json(outcome)
+                    if (not isinstance(terminal, dict) or terminal.get('run_id') != run
+                            or terminal.get('state') not in {'IDLE', 'INTERRUPTED', 'COMPLETED', 'FAILED', 'RECOVERY_REQUIRED'}):
+                        raise ValueError('invalid or mismatched durable outcome: ' + str(outcome))
+            except (OSError, ValueError, KeyError, TypeError) as exc:
+                errors.append(dict(path=str(path), reason=str(exc)))
+        return pending, errors
+
+    def _reconcile_start_intents(self):
+        pending, errors = self._unfinished_start_intents()
+        if errors:
+            raise ValueError('invalid durable intent records: ' + str(errors))
+        for item in pending:
+            if self.stop_intent.is_set():
+                raise RecoveryPaused('恢复已暂停；旧启动意图收口可幂等续做')
+            write_json_atomic(self.control / 'runs' / item['run_id'] / 'outcome.json',
+                dict(schema_version=1, run_id=item['run_id'], state='INTERRUPTED',
+                     phase='reconciled', operation='recovery-reconciliation',
+                     result_outcome='not-inferred', reconciled_by=self.status['run_id']))
+        self.update(unfinished_intents=[], intent_diagnostics=[])
 
     def _reconcile_project_state(self):
         """Project recovery and session closure are separate facts, not aliases."""
@@ -162,6 +234,10 @@ class Runner:
 
     def _stop_run(self):
         self.stop_intent.request()
+        if self.status['state'] == 'RECOVERING':
+            self.update(phase='pausing-recovery', recovery_progress=dict(stage='pausing',
+                reason='正在等待恢复操作到达安全暂停点；不强制结束CST'))
+            return
         self.update(state='STOPPING', phase='stopping')
         executor = self.executor
         if executor and not (self.stop_delivery and self.stop_delivery.is_alive()):
@@ -216,6 +292,26 @@ class Runner:
 
     def command(self, command):
         validate_command(command)
+        if command['operation'] != 'shutdown':
+            return self._command(command)
+        with self.lock:
+            path = self.control / 'commands' / (command['request_id'] + '.json')
+            if path.exists():
+                return self._command(command)
+            if self.owner_client != command['client_id'] or time.monotonic() - self.owner_seen >= 10:
+                raise ValueError('claim control before modifying the project')
+            if self.status['state'] in ACTIVE or self.executor is not None or (self.worker and self.worker.is_alive()):
+                raise ValueError('run still active')
+            generation = (self.owner_client, self.control_revision, self.status['run_id'])
+        verify_shutdown_safety(self.project)
+        with self.lock:
+            if generation != (self.owner_client, self.control_revision, self.status['run_id']):
+                raise ValueError('ownership or run changed during shutdown verification; retry')
+            self.owner_seen = time.monotonic()
+            return self._command(command, shutdown_verified=True)
+
+    def _command(self, command, *, shutdown_verified=False):
+        validate_command(command)
         encoded = json.dumps(command, sort_keys=True, separators=(',', ':'), allow_nan=False).encode()
         digest = hashlib.sha256(encoded).hexdigest()
         path = self.control / 'commands' / (command['request_id'] + '.json')
@@ -231,6 +327,8 @@ class Runner:
                 if command['operation'] != 'claim' or existing['result']['instance_id'] == self.instance_id:
                     return existing['result']
             op = command['operation']
+            if self.shutdown_requested.is_set():
+                raise ValueError('Runner shutting down; no new operations accepted')
             client = command['client_id']
             payload = command.get('payload', {})
             if op == 'claim':
@@ -251,8 +349,8 @@ class Runner:
                     target_run = record['result']['run_id']
                     if target_run and target_run == self.status['run_id'] and self.status['state'] in ACTIVE:
                         self._stop_run()
-                    elif target_run and not (self.control / 'runs' / target_run / 'outcome.json').exists():
-                        raise ValueError('target start requires session reconciliation')
+                    # A stop tombstone records intent only, never invents a run outcome.
+                    # Stable unfinished runs remain explicitly recovery-required.
                 else:
                     target_run = None
                 result = dict(request_id=command['request_id'], accepted=True, run_id=target_run,
@@ -273,8 +371,8 @@ class Runner:
                 raise ValueError('recover previous sessions first')
             if op == 'stop' and (command.get('run_id') != self.status['run_id'] or state not in ACTIVE):
                 raise ValueError('stale run_id or no active run')
-            if op == 'shutdown' and state == 'RECOVERY_REQUIRED':
-                raise ValueError('session safety unresolved')
+            if op == 'shutdown' and not shutdown_verified:
+                raise ValueError('shutdown requires fresh safety verification')
             if op == 'start':
                 validate_run_payload(payload)
                 if not payload.get('resume', False) and any(path.exists() for path in (
@@ -282,7 +380,7 @@ class Runner:
                         self.project / 'save/csv/scan_manifest.json',
                         self.project / 'save/standard_batch_checkpoint.json')):
                     raise ValueError('checkpoint exists; resume or use a new project')
-            run_id = uuid4().hex if op == 'start' else self.status['run_id']
+            run_id = uuid4().hex if op in {'start', 'recover'} else self.status['run_id']
             result = {'request_id': command['request_id'], 'accepted': True, 'run_id': run_id,
                       'instance_id': self.instance_id}
             # Persist intent before any execution. A crash here is not replayed blindly.
@@ -315,6 +413,7 @@ class Runner:
 
     def _execute(self, operation, payload):
         executor = None
+        recovery_paused = False
         try:
             options = {'payload': payload if operation == 'start' else None} if self.executor_factory is LocalExecution else {}
             executor = self.executor_factory(self.project, self.stop_intent, self.status['run_id'], self.update, **options)
@@ -332,14 +431,20 @@ class Runner:
                     raise RuntimeError('stop delivery not confirmed')
             if self._needs_recovery(executor):
                 target = 'RECOVERY_REQUIRED'
+            elif operation == 'recover':
+                self._reconcile_start_intents()
             with self.lock:
                 if self.status['state'] == 'RECOVERY_REQUIRED':
                     target = 'RECOVERY_REQUIRED'
                 self.update(state=target, phase=target.lower(),
                             session_safety=self._session_safety(executor, target == 'RECOVERY_REQUIRED'))
         except Exception as exc:
-            interrupted = isinstance(exc, ScanInterrupted)
-            recovery = self._needs_recovery(executor)
+            paused = isinstance(exc, RecoveryPaused)
+            recovery_paused = paused
+            interrupted = isinstance(exc, (ScanInterrupted, RecoveryPaused))
+            recovery = operation == 'recover' or paused or self._needs_recovery(executor)
+            if paused:
+                self.update(recovery_reason=str(exc), recovery_progress=dict(stage='paused', reason=str(exc)))
             from .lifecycle_diagnostics import error_diagnostic
             self.update(state='RECOVERY_REQUIRED' if recovery else ('INTERRUPTED' if interrupted else 'FAILED'),
                         phase='recovery-required' if recovery else ('interrupted' if interrupted else 'failed'),
@@ -356,7 +461,7 @@ class Runner:
                             cleanup_diagnostic=error_diagnostic(exc, 'cleanup'))
             finally:
                 probe = getattr(executor, 'lifecycle_facts', None)
-                if callable(probe):
+                if callable(probe) and not recovery_paused:
                     try:
                         facts = probe()
                         values = dict(lifecycle=facts, session_safety=facts['session_safety'])
@@ -365,6 +470,8 @@ class Runner:
                             reason = '; '.join(str(item.get('session_id', '?')) + ': ' + ','.join(
                                 item.get('missing_evidence') or ['session requires recovery']) for item in blocked)
                             reason = reason or 'session lifecycle requires recovery'
+                            if (self.status.get('recovery_progress') or {}).get('stage') == 'paused':
+                                reason = self.status.get('recovery_reason') or reason
                             values.update(state='RECOVERY_REQUIRED', phase='recovery-required', recovery_reason=reason)
                             if not self.status.get('error'):
                                 values['error'] = reason
@@ -541,22 +648,7 @@ class LocalExecution:
         return facts
 
     def _preprocessor_recovery_required(self):
-        # Preprocessing owns CST too, but is not a Managed session.
-        import psutil
-        for path in self.project.glob('temp/cst-preprocess-*/session-status.json'):
-            report = read_json(path)
-            if report.get('exit_confirmed'):
-                continue
-            for owned in report.get('owned', []):
-                try:
-                    process = psutil.Process(owned['pid'])
-                    if abs(process.create_time() - owned['create_time']) < .01 and process.is_running():
-                        return True
-                except psutil.NoSuchProcess:
-                    continue
-                except (psutil.AccessDenied, OSError, ValueError, KeyError):
-                    return True
-        return False
+        return preprocessor_recovery_required(self.project)
 
     def close(self):
         # Every cleanup runs even if overview publication or another close fails.

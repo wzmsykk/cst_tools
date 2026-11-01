@@ -85,8 +85,10 @@ class RunnerManagementDialog(QDialog):
         self.claimButton.setEnabled(usable)
         self.stopButton.setEnabled(usable and not controller.read_only and controller.state is RunState.RUNNING)
         self.recoverButton.setEnabled(usable and idle and not controller.read_only and controller.state is RunState.RECOVERY_REQUIRED)
-        self.shutdownButton.setEnabled(usable and idle and not controller.read_only and controller.state is not RunState.RECOVERY_REQUIRED)
-        self.shutdownButton.setToolTip('运行中、状态未知、需要恢复或仅查看时不能退出；先停止/恢复并确认安全。')
+        self.shutdownButton.setEnabled(project and not controller.pending and not controller.runner_stopped
+            and not controller.read_only and (idle or controller.unknown))
+        self.shutdownButton.setText('核验并退出后台…' if controller.unknown else '退出后台…')
+        self.shutdownButton.setToolTip('由后台重新核验CST均已退出后正常退出；保留检查点及待恢复状态。运行中、归属未知或仅查看时不能退出。')
 
     def request_shutdown(self):
         if self.window._confirm_action('退出后台 Runner',

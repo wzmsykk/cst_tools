@@ -42,7 +42,7 @@ def confirmed_tasks(project):
     return confirmed
 
 
-def reconcile_checkpoint_adoptions(project, *, progress=None):
+def reconcile_checkpoint_adoptions(project, *, progress=None, pause_check=None):
     """Caller holds project ownership and has reconciled physical sessions first."""
     from .project_session_recovery import project_runtime_directory
     from .runtime_protocol import _validate_uuid
@@ -56,6 +56,8 @@ def reconcile_checkpoint_adoptions(project, *, progress=None):
             if path.stem in receipts: receipts[path.stem].add(path.resolve())
     stores, plan = {}, []
     for index, (task, (checkpoint, records, kind)) in enumerate(sorted(tasks.items()), 1):
+        if pause_check:
+            pause_check()
         if progress:
             progress({'stage': 'adoption-validation', 'task_id': task, 'current': index,
                       'total': len(tasks), 'reason': '核验结果回执、快照哈希及RunStore归属'})
@@ -100,6 +102,8 @@ def reconcile_checkpoint_adoptions(project, *, progress=None):
     proofs = {checkpoint: {'path': str(checkpoint.resolve()), 'sha256': file_hash(checkpoint)}
               for checkpoint in {item[2] for item in plan}}
     for index, (task, path, checkpoint, directories) in enumerate(plan, 1):
+        if pause_check:
+            pause_check()
         if progress:
             progress({'stage': 'adoption-apply', 'task_id': task, 'current': index,
                       'total': len(plan), 'reason': '补齐采用索引与回执，不重复导入结果'})

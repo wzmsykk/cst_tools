@@ -24,8 +24,12 @@ def recover_and_stop_session(
     poll_interval: float = 0.1,
     peer_exited=None,
     progress=None,
+    pause_check=None,
+    wait_remaining=None,
 ) -> Completion | None:
     """Await StopAck or an owned peer's observed exit; caller must verify closure."""
+    if pause_check:
+        pause_check()
     protocol = FileProtocol(protocol_root)
     protocol.request_stop(session_id)
     if progress:
@@ -36,7 +40,9 @@ def recover_and_stop_session(
     deadline = time.monotonic() + timeout
     completion = None
 
-    while time.monotonic() < deadline:
+    while (wait_remaining() if wait_remaining else deadline - time.monotonic()) > 0:
+        if pause_check:
+            pause_check()
         if completion is None and completion_path.exists():
             completion = decode_completion(
                 completion_path.read_text(encoding="utf-8")
