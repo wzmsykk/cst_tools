@@ -4,6 +4,7 @@ import hashlib
 from pathlib import Path
 import shutil
 import subprocess
+import psutil
 from uuid import uuid4
 
 from .acceptance_session import cst_processes, wait_probe
@@ -20,10 +21,10 @@ def digest(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
-def render_definition_probe(model, directory, nonce):
+def render_definition_probe(model, directory, nonce, projection=None):
     """Loaded 3D Model.run scope, using documented/calibrated read calls only."""
     def q(path): return quote_vb_string(path)
-    return f'''#Language "WWB-COM"
+    macro=f''''#Language "WWB-COM"
 Option Explicit
 Sub Main
     Dim f As Integer, message As String
@@ -61,6 +62,11 @@ Failed:
     Close #f
 End Sub
 '''
+    if projection is not None:
+        from .definition_geometry import render_geometry_observer
+        macro=macro.replace('    Save\n','    Save\n    CSTToolsObserveGeometry\n',1)
+        macro+='\n'+render_geometry_observer(projection,directory,nonce)
+    return macro
 
 
 def run_definition_probe(executable, model, directory, macro):
@@ -79,8 +85,15 @@ def run_definition_probe(executable, model, directory, macro):
         process = subprocess.Popen([str(executable), '-m', '-b', str(model)],
             stdout=stream, stderr=subprocess.STDOUT, cwd=directory,
             env=cst_process_environment(), **options)
+        identity=psutil.Process(process.pid)
+        write_json_atomic(directory/'session-status.json',dict(exit_confirmed=False,
+            launcher_pid=process.pid,owned=[dict(pid=process.pid,create_time=identity.create_time())],
+            model_path=str(model),phase='launch'))
         session = wait_probe(process, directory, task_project=model,
-                             preexisting_processes=baseline, stage_timeout=180, exit_timeout=60)
+                             preexisting_processes=baseline, stage_timeout=180, exit_timeout=60,
+                             expected_launcher_identity=(process.pid,identity.create_time()))
+    session.update(exit_code=process.returncode)
+    write_json_atomic(directory/'session-status.json',session)
     return dict(exit_code=process.returncode, exit_confirmed=session['exit_confirmed'])
 
 
@@ -124,11 +137,11 @@ class NativeDefinitionVerifier:
                 nonce = uuid4().hex
                 write_json_atomic(directory/'session-status.json', dict(exit_confirmed=False, phase=phase))
                 result = self.runner(executable, model, directory,
-                                     render_definition_probe(model, directory, nonce))
+                                     render_definition_probe(model, directory, nonce, expected))
                 proof['sessions'].append(dict(phase=phase, **result))
                 status_path = directory/'session-status.json'
                 status = read_json(status_path)
-                status.update(exit_confirmed=result.get('exit_confirmed') is True)
+                status.update(exit_confirmed=result.get('exit_confirmed') is True,exit_code=result.get('exit_code'))
                 write_json_atomic(status_path, status)
                 if (result.get('exit_confirmed') is not True or result.get('exit_code') != 0
                         or (directory/'failed.txt').exists()
@@ -159,7 +172,9 @@ class NativeDefinitionVerifier:
                         or dict(observed.exact_values) != dict(expected.exact_values)
                         or saved.json(PARAMETERS) != source.json(PARAMETERS)):
                     raise ValueError('G03 saved settings or parameter expressions changed')
-                proof.setdefault('observations', []).append(dict(phase=phase, sha256=saved.sha256, native=rows))
+                from .definition_geometry import verify_geometry_observation
+                geometry=verify_geometry_observation(directory/'geometry.tsv',expected,model,nonce)
+                proof.setdefault('observations', []).append(dict(phase=phase, sha256=saved.sha256, native=rows,geometry=geometry))
                 previous = model
             if digest(candidate) != source.sha256 or verify_capture_installation(executable) != installation:
                 raise ValueError('G03 definition or installation changed during verification')

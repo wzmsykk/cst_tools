@@ -1,0 +1,50 @@
+[
+  {
+    "file": "current-status.md",
+    "original_sha256": "b051e177d4b911c3e13f0394f918dbc697eb03d51d484d347e3da159ba9405f4"
+  },
+  {
+    "file": "minimal-python-vba-todo.md",
+    "original_sha256": "97cd42098c00c6240e77485a49b2afd6a2410e4e7e410c94376e526b6cadda9b"
+  },
+  {
+    "file": "feature-index.md",
+    "original_sha256": "2d59d911e4be77946ad13304714f8b35e84bf6f4897f62fa7f57309ed1e94e16"
+  },
+  {
+    "file": "single-simulation-service.md",
+    "original_sha256": "836e98117a32c29f08ece6bad2889b227f454aa1bbcf1138b52e6cc5eafe4384"
+  },
+  {
+    "file": "cst-settings-verifier-design.md",
+    "original_sha256": "622a3d94a5403709e1a7f786d03e1810e6cec554915845f4a9c9e7bf08947aa1"
+  },
+  {
+    "file": "mcp-framework-static-design.md",
+    "original_sha256": "5191710df71f79a614e803d8a0c99882005190ac6ff2206117b50edc457984f5"
+  },
+  {
+    "file": "mcp-first-stage-interface-contract.md",
+    "original_sha256": "22fbdeaec427d8974bd63894b299a109f5d64561ed649b87ed1d0d9cbfab9644"
+  },
+  {
+    "file": "unified-interface-contract.md",
+    "original_sha256": "dc1f1ad2fca92889e3923295d17d8b31e86ed4f2a1c187e9cf5e5a76c953be12"
+  },
+  {
+    "file": "native-execution-capture.md",
+    "original_sha256": "44818656635bd08365efc98b36d84c195bab23cdbea8c88a9300c0f4f30193b3"
+  },
+  {
+    "file": "settings-history-projection.md",
+    "original_sha256": "2f37ee13ec5468b016a175fde28bece6241baf3f5daedb7e2b8953b14a110ae4"
+  },
+  {
+    "file": "execution-snapshot-verification.md",
+    "original_sha256": "dbb4c05fd4c93ef3235a906008d6857942d174a6d793fa4d8a5364bd85d4d077"
+  },
+  {
+    "file": "mcp-first-stage-conversational-gate.md",
+    "original_sha256": "3c91113c341922346739b35f56195b030c52018fd07a5a0f6199f2b85152b065"
+  }
+]

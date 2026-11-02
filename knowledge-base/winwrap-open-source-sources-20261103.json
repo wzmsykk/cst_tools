@@ -1,0 +1,49 @@
+{
+  "date": "2026-11-03",
+  "evidence": "Static source inspection only; no parser installation, native checking or CST launch",
+  "sources": [
+    {
+      "repo": "antlr/grammars-v4",
+      "commit": "b96e04db9d54bb313e542cc3e6ee913900a21520",
+      "path": "vb6/VisualBasic6Parser.g4",
+      "blob_sha": "88fef59435cc6848ecc684bed3db14da9e70b10c"
+    },
+    {
+      "repo": "antlr/grammars-v4",
+      "commit": "b96e04db9d54bb313e542cc3e6ee913900a21520",
+      "path": "vb6/VisualBasic6Lexer.g4",
+      "blob_sha": "bdcc5769a3dfca93c24f9e227bce19b40ed1c279"
+    },
+    {
+      "repo": "antlr/grammars-v4",
+      "commit": "b96e04db9d54bb313e542cc3e6ee913900a21520",
+      "path": "vba/vba6/vba.g4",
+      "blob_sha": "1f6c1527cd5bfe620f12678a94e5094270d7840a"
+    },
+    {
+      "repo": "antlr/grammars-v4",
+      "commit": "b96e04db9d54bb313e542cc3e6ee913900a21520",
+      "path": "vba/vba7_1/README.md",
+      "blob_sha": "dcbc3fe1606ec854e9b7eb95e929f5ec461ca4b4"
+    },
+    {
+      "repo": "antlr/grammars-v4",
+      "commit": "b96e04db9d54bb313e542cc3e6ee913900a21520",
+      "path": "vba/vba7_1/vbaParser.g4",
+      "blob_sha": "cf6e17f25a4212745a10af612d9c52db0ddab1e3"
+    },
+    {
+      "repo": "rubberduck-vba/Rubberduck",
+      "commit": "fae50adab188126a5e7d2a1cefc3328cc18af482",
+      "path": "Rubberduck.Parsing/Grammar/VBAParser.g4",
+      "blob_sha": "01c7efa0bb00c0ed3d04729dd9e99d0a821dd8ec"
+    },
+    {
+      "repo": "decalage2/ViperMonkey",
+      "commit": "73547cef7f82dbcb10e22e36b84b558a07f7d21d",
+      "path": "README.md",
+      "blob_sha": "bdf23edbe6247f27d07385566060e43a2470e9ca"
+    }
+  ],
+  "finding": "No confirmed open-source WinWrap v9 compatible compiler found in this search; VB6/VBA parsers remain candidates"
+}

@@ -2,7 +2,7 @@
 
 2026-11-02。共用实现`csttool/native_execution_capture.py`、`RunStore.prepare_execution_attempt/finalize_execution_attempt`；依赖[B3验证内核](execution-snapshot-verification.md)。不新建Worker或调度框架，不在MCP中另建采集层。
 
-后续服务接入：[公共single-simulation](single-simulation-service.md)现可显式配置Managed单次采集，definition_revision直接沿用公共定义，另存configuration_digest。默认G03原生验证端口未注册，普通候选仍不可执行；HOM/standard保持关闭本采集选项。下文“当前消费者仅B4/公共服务待实施”是较早批次状态；本轮新组合只有离线/假对端证据，没有追加真实CST验收。
+[公共single-simulation](single-simulation-service.md)已接入Managed单次采集，definition_revision贯穿公共定义，configuration_digest独立核对；默认生产G03显式验证后才能执行。新组合真实正常链已通过[G04](single-simulation-g04-acceptance.md)。HOM/standard默认不启用此采集选项。
 
 ## 执行所有者的接入顺序
 
@@ -34,30 +34,8 @@ WWB Print当前使用宿主编码，本首版只接受ASCII采集目录/模型�
 
 result_success在本采集回执中特指Start=1且实际模式数>0的求解事实；不代表R/Q、所有产物、结果采用或安全收尾总成功。process_exit_code、batch_exit_zero、exit_confirmed、database_verified分别记录，不将退出0命名为standard_closed，也不把失败退出1改写为正常退出。publish_ready始终false。
 
-## 本轮真实副本证据
+## 验收与当前接入
 
-工具：[validate_execution_capture.py](../test/support/validate_execution_capture.py)。只复制model/Pillbox.cst，cell near/far=4/4、box=2/1、nmodes=1、2线程、关闭外部Q与热损耗，参数表达式不改固定值。source hash逐次核对，只有本轮受控副本写设置历史。求解阶段无固定总超时，启动/退出有界；不强杀或操作其他实例。
+该模块已由[公共single-simulation服务](single-simulation-service.md)复用；生产G03及新Managed组合真实子链见[G04记录](single-simulation-g04-acceptance.md)。模块本身的静态/快照报告不单独证明live设置、求解、结果或退出。未知编码/历史及未校准组合继续保守拒绝。
 
-|用例/目录后缀|实际行为|结论|
-|---|---|---|
-|正常/a093f33b|Start=1、实际1模式，约503.4633MHz；配置match，DB源/归档hash一致；Save/batch-return，归属进程退出0|原生采集与RunStore两次对账一致，表达式保持|
-|旧库/5fb2741d|完整结果副本pre六项均存在；在Start前抛明确拒绝，无started/post|不把旧库重新标注为新attempt；0次求解调用，归属进程退出0|
-|实际求解失败/9e07a24a|禁用target，Start=0、实际0模式；原生日志最大迭代耗尽，配置仍match；归属进程退出1|求解失败与配置匹配独立，表达式保持；不当空频段、不视标准退出|
-
-运行根前缀为artifacts/execution-capture-normal-、execution-capture-preexisting-及execution-capture-solver-failure-。成功和失败回执均保留在logs/run/tasks/<task>/execution；原生帧、CST日志、stage、session/源检查在各根。人工删除两次artifacts.json再调用当前finalize，回执SHA与events.jsonl字节均未变，索引补回；证据artifacts/execution-capture-b4-summary-20261102/reconcile-gap.json，不重复求解或采用结果。
-
-前置问题也保留：受限环境首轮新宏921e2363与旧无求解宏51c79610均在宏前退出5；相同旧宏在非受限环境893146be正常退出0。支持“与启动执行环境有关”，尚未定位具体受限权限；不能泛称退出5都是此原因。随后新宏1ed27301因版本显示串与完整build直接比较而在Start前拒绝，归属退出0，修正显式身份解释后才运行正常/失败副本。
-
-2022大版本策略修改后另用旧库副本ca3f5462验证最终WinWrap辅助函数编译/门禁，预期不求解。具体最终结果、离线回归及清理范围由当前状态和下方补记记录；这些过程不等于G01–G08完整MCP验收。
-
-最终补记：ca3f5462明确以preexisting拒绝，无started/post，归属退出0。共8次串行会话均确认归属退出，只有2次实际求解（一次成功、一次最大迭代失败）；没有强杀。完整矩阵`artifacts/execution-capture-b4-summary-20261102/acceptance-matrix.json`，两次真实索引补写见reconcile-gap.json。当前代码对原真实回执重复对账未改变回执hash或事件字节；在清理后再用B3读取归档DB，正常/失败配置均仍match且结果状态保持独立，见archive-readback-after-cleanup.json。
-
-最终离线288 passed（10.00s），报告artifacts/b4-final-20261102.xml，覆盖采集/RunStore、检查点采用、B1–B3、原校准安全和文档索引。早期一次测试因helper名setup被pytest当作模块setup执行而12项错误，改名后重跑；不算生产故障或通过数。各轮数字重叠不累加。
-
-已核对进程身份及路径，清理20个模型/结果目标及8个本轮pytest目录，保留原字节历史/参数、宏、帧、原生日志、轻量DB和RunStore记录；cleanup.json记录明确删除目标。原model/Pillbox.cst hash不变；原始副本/场不再存在，重开须重生成，不能继续使用旧运行路径finalize；已归档证据可独立只读核验。artifact不保证随Git迁移。本轮未提交或推送。
-
-## 测试与剩余工作
-
-[故障测试](../test/native_execution_capture_test.py)覆盖意图幂等/冲突、身份/nonce、旧库、退出未确认、snapshot/receipt冲突、发布中断及补写、定义hash和预算、同attempt安装变化。B3另增加2022小版本规则复用与精确绑定仍不互换的用例。既有RunStore/检查点采用回归保持。
-
-B4本轮范围是采集/绑定/故障与关闭事实，不是首阶段完整历史投影发布、从空工程建模、原生Save/Rebuild所有陈旧性组合或GUI/MCP宿主验收。没有迁移普通Manager/Worker的ACK、结果采用或退出状态机。后续将本入口接入公共single-simulation执行所有者，并补完整定义服务、候选发布/重开和B4余项，G03仍未解锁。
+原批次离线数字、故障修正、B4正常/失败/旧库副本及清理记录完整移至[历史验收](archive/20261102-progress-consolidation/native-execution-capture.md)。旧not-run/下一步只在原批次成立；当前未完成项查[TODO](minimal-python-vba-todo.md)。

@@ -1,0 +1,32 @@
+{
+  "date": "2026-11-03",
+  "evidence": "static local documentation and source review, no CST launch this batch",
+  "sources": [
+    {
+      "path": "D:\\Program Files (x86)\\CST Studio Suite 2022\\Online Help\\advanced\\commandlineoptions.htm",
+      "sha256": "216dafaff7fc477d922169fef741663baf564cc76650125424b6da18e31f781b"
+    },
+    {
+      "path": "D:\\Program Files (x86)\\CST Studio Suite 2022\\Online Help\\advanced\\vbaapplicationobject.htm",
+      "sha256": "3d6fbe97702e44dcc20590ba990a538e0456aa1bb421c2a8cdb46c3f193d759a"
+    },
+    {
+      "path": "D:\\Program Files (x86)\\CST Studio Suite 2022\\Online Help\\Python\\source\\cst.interface.html",
+      "sha256": "91f0ed305e691e579284fe68182e5cbb34e0018bc2f110b1363c4be7c0d55fa0"
+    },
+    {
+      "path": "csttool\\native_definition_builder.py",
+      "sha256": "cc1d3ccdfb4a6afdd800d6c9713ff029a340af730e43f10d59c257d894158c90"
+    },
+    {
+      "path": "csttool\\managed_cstworker.py",
+      "sha256": "c0458011cfdf4445b4d04fff7b44f71b81214301a7eaf284ff1b00bf5079e39c"
+    },
+    {
+      "path": "csttool\\cst_process_env.py",
+      "sha256": "d5ae05fda6399c2c9cc1e282eeb9824070dcebfc79812ab2f7392ebb458aade9"
+    }
+  ],
+  "online_reference": "https://updates.cst.com/downloads/Cluster_Integration_Guide_2025.pdf",
+  "boundary": "2025 deployment reference does not establish Windows2022 universal headless support; quiet excludes input dialogs"
+}

@@ -1,0 +1,70 @@
+{
+  "case": "publication-after-adoption",
+  "real_cst": true,
+  "solver_start_calls": 1,
+  "recovery_solver_calls": 0,
+  "duplicate_adoption": false,
+  "source_sha256": "f7cb79cf8bf236aea9ab0de86537fc505d8830214949796942f9fdced58b54c4",
+  "result": {
+    "schema_version": 1,
+    "run_id": "recover-one",
+    "definition_revision": "862039833659e477680166bcd1fdfe574b0ecec328953cc69e7aff4aa5d62169",
+    "task_id": "3cb27de8-4117-4590-9089-a98a5ee59b73",
+    "status": "success",
+    "frequency_mhz": 1147.42692991921,
+    "rq_ohm": 223.541439593231,
+    "snapshot": "D:\\work\\cst_tools\\artifacts\\single-recovery-e819a0d9\\result\\simulation\\recover-one\\worker_single\\single-simulation__f_1147.426930MHz__3cb27de8-4117-4590-9089-a98a5ee59b73\\single-simulation__f_1147.426930MHz.cst",
+    "snapshot_sha256": "dce361c45d08d399f0e32f1a58115b8ec589c2ee7137616c547b7100ca283e27",
+    "capture": {
+      "schema_version": 1,
+      "task_id": "3cb27de8-4117-4590-9089-a98a5ee59b73",
+      "nonce": "6a6eab2379854082989d54d2370dbfc9",
+      "binding": {
+        "project_id": "single-recovery",
+        "attempt_id": "3cb27de8-4117-4590-9089-a98a5ee59b73",
+        "definition_revision": "862039833659e477680166bcd1fdfe574b0ecec328953cc69e7aff4aa5d62169",
+        "database_sha256": "8b42b6a44e936875fe9281518dc22019bf05a88f146a6870084371cc5fc27b1c",
+        "cst_build": "2022.5 Release from 2022-06-03 (change 981760)",
+        "scope": "root"
+      },
+      "frame_hashes": {
+        "pre": "16c32f4882182e911d095c29ce8ad5b1999e8c59babb16988deadf89fe211e76",
+        "started": "e4f30d1ead1e3d2bded71f38644c0b52b021a79345a327a175626da7740fcb77",
+        "post": "2e736963db00f3a4159bb6baf1d18f6fa7a75a4f3e8d87b97b4a499f0f3d5d3c"
+      },
+      "status": "execution-snapshot-match",
+      "reasons": [],
+      "result_success": true,
+      "database_verified": true,
+      "exit_confirmed": true,
+      "solver_return": 1,
+      "calculated_modes": 1,
+      "process_exit_code": 0,
+      "batch_exit_zero": true,
+      "snapshot_sha256": "4a1b6cdf747d9de427d7b73fda85394c82a6ab2a392a7abbea02bf9da241848e",
+      "publish_ready": false
+    },
+    "received_sha256": "07d7b422f027d38079576319e685d8d6ac6a4bfec117e351d0bb2fc9c51a407d",
+    "result_revision": "693056b171c3d3141ac8f25e2be8329b4d86320b7391e4a90ed2f254601d2141"
+  },
+  "exports": {
+    "run_id": "recover-one",
+    "result_revision": "693056b171c3d3141ac8f25e2be8329b4d86320b7391e4a90ed2f254601d2141",
+    "artifacts": [
+      {
+        "path": "result\\exports\\recover-one\\693056b171c3d3141ac8f25e2be8329b4d86320b7391e4a90ed2f254601d2141\\results.csv",
+        "relative_to": "project",
+        "sha256": "5b5be7f036ee5c920bd06c8acc23b4574276ab8c4035cf8abb6fb8546e8217a5",
+        "size_bytes": 529,
+        "format": "csv"
+      },
+      {
+        "path": "result\\exports\\recover-one\\693056b171c3d3141ac8f25e2be8329b4d86320b7391e4a90ed2f254601d2141\\results.json",
+        "relative_to": "project",
+        "sha256": "73b0f0286cd96476d143dce662d9652a47379f635a39be168a4944f99c214357",
+        "size_bytes": 1997,
+        "format": "json"
+      }
+    ]
+  }
+}

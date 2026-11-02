@@ -1,0 +1,539 @@
+{
+  "body_execution_marker_absent": true,
+  "footprint": {
+    "inputs": {
+      "total": 2168725,
+      "python_source": 0,
+      "bytecode": 0
+    },
+    "runtime": {
+      "total": 1034423,
+      "python_source": 471711,
+      "bytecode": 445218
+    },
+    "generated": {
+      "total": 1965530,
+      "python_source": 722044,
+      "bytecode": 1047604
+    }
+  },
+  "python": "3.12.7 | packaged by Anaconda, Inc. | (main, Oct  4 2024, 13:17:27) [MSC v.1929 64 bit (AMD64)]",
+  "runtime_version": "4.13.2",
+  "runtime_requirements": [
+    "typing ; python_version < \"3.5\""
+  ],
+  "parse_only": true,
+  "native_execution": false,
+  "build": {
+    "grammar_commit": "b96e04db9d54bb313e542cc3e6ee913900a21520",
+    "antlr_version": "4.13.2",
+    "python": "3.12.7 | packaged by Anaconda, Inc. | (main, Oct  4 2024, 13:17:27) [MSC v.1929 64 bit (AMD64)]",
+    "java": "C:\\Program Files\\Java\\jdk-25.0.3\\bin\\java.exe",
+    "java_version": "java version \"25.0.3\" 2026-04-21 LTS\nJava(TM) SE Runtime Environment (build 25.0.3+9-LTS-195)\nJava HotSpot(TM) 64-Bit Server VM (build 25.0.3+9-LTS-195, mixed mode, sharing)\n",
+    "command": [
+      "C:\\Program Files\\Java\\jdk-25.0.3\\bin\\java.exe",
+      "-jar",
+      "D:\\work\\cst_tools\\artifacts\\antlr-vb6-poc-20261103\\inputs\\antlr-4.13.2-complete.jar",
+      "-Dlanguage=Python3",
+      "-no-listener",
+      "-no-visitor",
+      "-o",
+      "D:\\work\\cst_tools\\artifacts\\antlr-vb6-poc-20261103\\generated",
+      "VisualBasic6Lexer.g4",
+      "VisualBasic6Parser.g4"
+    ],
+    "generation_seconds": 0.9691795000107959,
+    "inputs": [
+      {
+        "path": "inputs\\VisualBasic6Lexer.g4",
+        "url": "https://raw.githubusercontent.com/antlr/grammars-v4/b96e04db9d54bb313e542cc3e6ee913900a21520/vb6/VisualBasic6Lexer.g4",
+        "sha256": "eba344e6cb3f94f180b6b0296647a2e4a5ed272d2cd6cf20ce4bac97b34f75a5",
+        "bytes": 5387
+      },
+      {
+        "path": "inputs\\VisualBasic6Parser.g4",
+        "url": "https://raw.githubusercontent.com/antlr/grammars-v4/b96e04db9d54bb313e542cc3e6ee913900a21520/vb6/VisualBasic6Parser.g4",
+        "sha256": "727042c85556c8f90921ec0222a9282b67e539dbc7675f9ac2aa5d9a900b4884",
+        "bytes": 21813
+      },
+      {
+        "path": "inputs\\antlr-4.13.2-complete.jar",
+        "url": "https://www.antlr.org/download/antlr-4.13.2-complete.jar",
+        "sha256": "eae2dfa119a64327444672aff63e9ec35a20180dc5b8090b7a6ab85125df4d76",
+        "bytes": 2140045
+      },
+      {
+        "path": "inputs\\ANTLR-LICENSE.txt",
+        "url": "https://raw.githubusercontent.com/antlr/antlr4/4.13.2/LICENSE.txt",
+        "sha256": "3db1fb3ee79a4b4f9918fc4d0f6133bf18a3cf787f126cd22f8aa9b862281c0c",
+        "bytes": 1480
+      }
+    ]
+  },
+  "import_seconds": 0.06685149998520501,
+  "repeat_count": 5,
+  "directory_bytes": {
+    "inputs": 2168725,
+    "runtime": 1034423,
+    "generated": 1965530
+  },
+  "cases": [
+    {
+      "fast_median_ms": 0.5827000131830573,
+      "fast_fallback_ll": false,
+      "fast_fallback_at": null,
+      "diagnostic_variants": [
+        []
+      ],
+      "name": "body-not-executed",
+      "source": "cases\\body-not-executed.bas",
+      "sha256": "fe58f0bf27889d69695eb3dd6985a3fb8828d72f74636a7ff66efd5c17421871",
+      "bytes": 168,
+      "prior_native_evidence": "offline-parse-only",
+      "expected_general_syntax": true,
+      "first_ms": 231.8164999887813,
+      "warm_median_ms": 34.966699982760474,
+      "warm_p95_ms": 35.606799996457994,
+      "accepted": true,
+      "eof": true,
+      "errors": [],
+      "tokens": 32,
+      "fallback_ll": false
+    },
+    {
+      "fast_median_ms": 0.7456000021193177,
+      "fast_fallback_ll": false,
+      "fast_fallback_at": null,
+      "diagnostic_variants": [
+        []
+      ],
+      "name": "zrange-original",
+      "source": "cases\\zrange-original.bas",
+      "sha256": "0849c2c014c1a02886b976394ee36d8a21ca3ea87a8d7ee00f7080cb1ed53917",
+      "bytes": 133,
+      "prior_native_evidence": "reconstructed-original-native-rejected",
+      "expected_general_syntax": null,
+      "first_ms": 478.47729999921285,
+      "warm_median_ms": 116.6287999949418,
+      "warm_p95_ms": 118.86869999580085,
+      "accepted": true,
+      "eof": true,
+      "errors": [],
+      "tokens": 40,
+      "fallback_ll": false
+    },
+    {
+      "fast_median_ms": 0.8266999793704599,
+      "fast_fallback_ll": false,
+      "fast_fallback_at": null,
+      "diagnostic_variants": [
+        []
+      ],
+      "name": "zrange-fixed",
+      "source": "cases\\zrange-fixed.bas",
+      "sha256": "866cd9ecfc21359706a533f3ddd4f6df379a14ae52fd823022d35ad23caffdc7",
+      "bytes": 137,
+      "prior_native_evidence": "prior-native-accepted-call-shape",
+      "expected_general_syntax": true,
+      "first_ms": 223.6904999881517,
+      "warm_median_ms": 111.6207999875769,
+      "warm_p95_ms": 114.81260001892224,
+      "accepted": true,
+      "eof": true,
+      "errors": [],
+      "tokens": 44,
+      "fallback_ll": false
+    },
+    {
+      "fast_median_ms": 1.9280000124126673,
+      "fast_fallback_ll": false,
+      "fast_fallback_at": null,
+      "diagnostic_variants": [
+        []
+      ],
+      "name": "zrange-call",
+      "source": "cases\\zrange-call.bas",
+      "sha256": "bb9e8dcc934a82841dcb27fb43ea74773c0884efcbc753a8a6555d2781993b68",
+      "bytes": 135,
+      "prior_native_evidence": "not-native-tested",
+      "expected_general_syntax": null,
+      "first_ms": 395.1949999900535,
+      "warm_median_ms": 338.9504999795463,
+      "warm_p95_ms": 346.4422999823,
+      "accepted": true,
+      "eof": true,
+      "errors": [],
+      "tokens": 39,
+      "fallback_ll": false
+    },
+    {
+      "fast_median_ms": 1.2725999986287206,
+      "fast_fallback_ll": true,
+      "fast_fallback_at": {
+        "line_1based": 1,
+        "column_0based": 0,
+        "token": "Option Explicit"
+      },
+      "diagnostic_variants": [
+        [
+          {
+            "column_0based": 4,
+            "line_1based": 4,
+            "message": "token recognition error at: '\"oops\\n'",
+            "stage": "lexer",
+            "token": null
+          },
+          {
+            "column_0based": 0,
+            "line_1based": 5,
+            "message": "no viable alternative at input 'Option Explicit\\nSub Main\\nDim s As String\\ns = End Sub'",
+            "stage": "parser",
+            "token": "End Sub"
+          }
+        ]
+      ],
+      "name": "missing-quote",
+      "source": "cases\\missing-quote.bas",
+      "sha256": "8fccabab8a5566d96f5d7a2760648a0c0bf93ea1a0b6880f64b1ed5824267ca0",
+      "bytes": 59,
+      "prior_native_evidence": "not-native-tested",
+      "expected_general_syntax": false,
+      "first_ms": 34.47130002314225,
+      "warm_median_ms": 0.9762999834492803,
+      "warm_p95_ms": 1.069399993866682,
+      "accepted": false,
+      "eof": true,
+      "errors": [
+        {
+          "stage": "lexer",
+          "line_1based": 4,
+          "column_0based": 4,
+          "message": "token recognition error at: '\"oops\\n'",
+          "token": null
+        },
+        {
+          "stage": "parser",
+          "line_1based": 5,
+          "column_0based": 0,
+          "message": "no viable alternative at input 'Option Explicit\\nSub Main\\nDim s As String\\ns = End Sub'",
+          "token": "End Sub"
+        }
+      ],
+      "tokens": 21,
+      "fallback_ll": false
+    },
+    {
+      "fast_median_ms": 2.5104999949689955,
+      "fast_fallback_ll": true,
+      "fast_fallback_at": {
+        "line_1based": 1,
+        "column_0based": 0,
+        "token": "Option Explicit"
+      },
+      "diagnostic_variants": [
+        [
+          {
+            "column_0based": 0,
+            "line_1based": 5,
+            "message": "no viable alternative at input 'Option Explicit\\nSub Main\\nWith Cylinder\\n .Reset\\nEnd Sub'",
+            "stage": "parser",
+            "token": "End Sub"
+          }
+        ]
+      ],
+      "name": "missing-end-with",
+      "source": "cases\\missing-end-with.bas",
+      "sha256": "45066368c3944b35f6dd8e51023e5a9f17e58fe8f573e656757c2135f1949e3b",
+      "bytes": 55,
+      "prior_native_evidence": "not-native-tested",
+      "expected_general_syntax": false,
+      "first_ms": 13.234300015028566,
+      "warm_median_ms": 0.5691999976988882,
+      "warm_p95_ms": 0.6329999887384474,
+      "accepted": false,
+      "eof": true,
+      "errors": [
+        {
+          "stage": "parser",
+          "line_1based": 5,
+          "column_0based": 0,
+          "message": "no viable alternative at input 'Option Explicit\\nSub Main\\nWith Cylinder\\n .Reset\\nEnd Sub'",
+          "token": "End Sub"
+        }
+      ],
+      "tokens": 16,
+      "fallback_ll": false
+    },
+    {
+      "fast_median_ms": 15.957199997501448,
+      "fast_fallback_ll": true,
+      "fast_fallback_at": {
+        "line_1based": 4,
+        "column_0based": 0,
+        "token": "<EOF>"
+      },
+      "diagnostic_variants": [
+        [
+          {
+            "column_0based": 0,
+            "line_1based": 4,
+            "message": "extraneous input '<EOF>' expecting {'END SUB', NEWLINE}",
+            "stage": "parser",
+            "token": "<EOF>"
+          }
+        ],
+        [
+          {
+            "column_0based": 0,
+            "line_1based": 4,
+            "message": "missing 'END SUB' at '<EOF>'",
+            "stage": "parser",
+            "token": "<EOF>"
+          }
+        ]
+      ],
+      "name": "missing-end-sub",
+      "source": "cases\\missing-end-sub.bas",
+      "sha256": "d264a5fbe37465160018e733b93a68ab2f0c874704ae4568d08254de2ef55596",
+      "bytes": 29,
+      "prior_native_evidence": "not-native-tested",
+      "expected_general_syntax": false,
+      "first_ms": 274.1197999857832,
+      "warm_median_ms": 16.836099995998666,
+      "warm_p95_ms": 17.772499995771796,
+      "accepted": false,
+      "eof": true,
+      "errors": [
+        {
+          "stage": "parser",
+          "line_1based": 4,
+          "column_0based": 0,
+          "message": "extraneous input '<EOF>' expecting {'END SUB', NEWLINE}",
+          "token": "<EOF>"
+        }
+      ],
+      "tokens": 19,
+      "fallback_ll": false
+    },
+    {
+      "fast_median_ms": 85.46430000569671,
+      "fast_fallback_ll": true,
+      "fast_fallback_at": {
+        "line_1based": 6,
+        "column_0based": 0,
+        "token": "@"
+      },
+      "diagnostic_variants": [
+        [
+          {
+            "column_0based": 0,
+            "line_1based": 6,
+            "message": "mismatched input '@' expecting <EOF>",
+            "stage": "parser",
+            "token": "@"
+          }
+        ]
+      ],
+      "name": "trailing-garbage",
+      "source": "cases\\trailing-garbage.bas",
+      "sha256": "d93111f5392c08ea98260ddcaf16d07358fd51d3ddb0d6dc78f650b9632442a7",
+      "bytes": 57,
+      "prior_native_evidence": "not-native-tested",
+      "expected_general_syntax": false,
+      "first_ms": 91.4082000090275,
+      "warm_median_ms": 84.29950001300313,
+      "warm_p95_ms": 84.98690000851639,
+      "accepted": false,
+      "eof": true,
+      "errors": [
+        {
+          "stage": "parser",
+          "line_1based": 6,
+          "column_0based": 0,
+          "message": "mismatched input '@' expecting <EOF>",
+          "token": "@"
+        }
+      ],
+      "tokens": 27,
+      "fallback_ll": false
+    },
+    {
+      "fast_median_ms": 1.8493000243324786,
+      "fast_fallback_ll": false,
+      "fast_fallback_at": null,
+      "diagnostic_variants": [
+        []
+      ],
+      "name": "unicode-continuation",
+      "source": "cases\\unicode-continuation.bas",
+      "sha256": "388a4ad39261382e0bf734e98ad80db277edda631f2ae9ddb7ec09be77271bfa",
+      "bytes": 93,
+      "prior_native_evidence": "not-native-tested",
+      "expected_general_syntax": true,
+      "first_ms": 165.01000002608635,
+      "warm_median_ms": 90.39190001203679,
+      "warm_p95_ms": 96.94190000300296,
+      "accepted": true,
+      "eof": true,
+      "errors": [],
+      "tokens": 27,
+      "fallback_ll": false
+    },
+    {
+      "fast_median_ms": 1.9466999801807106,
+      "fast_fallback_ll": false,
+      "fast_fallback_at": null,
+      "diagnostic_variants": [
+        []
+      ],
+      "name": "byref-array",
+      "source": "cases\\byref-array.bas",
+      "sha256": "3b60d199930b44c6092192c643694ae5c6ef374410cebbbd66711156613b12fa",
+      "bytes": 136,
+      "prior_native_evidence": "not-native-tested",
+      "expected_general_syntax": true,
+      "first_ms": 399.7609000070952,
+      "warm_median_ms": 96.092799998587,
+      "warm_p95_ms": 116.17819999810308,
+      "accepted": true,
+      "eof": true,
+      "errors": [],
+      "tokens": 56,
+      "fallback_ll": false
+    },
+    {
+      "fast_median_ms": 0.6495999987237155,
+      "fast_fallback_ll": false,
+      "fast_fallback_at": null,
+      "diagnostic_variants": [
+        []
+      ],
+      "name": "duplicate-declaration",
+      "source": "cases\\duplicate-declaration.bas",
+      "sha256": "c536c061b57c159bc1efb3aa23723ca62ee528814493213608879b33d9c1de26",
+      "bytes": 66,
+      "prior_native_evidence": "semantic-only-not-native-tested",
+      "expected_general_syntax": null,
+      "first_ms": 169.7449999919627,
+      "warm_median_ms": 56.98249998386018,
+      "warm_p95_ms": 58.29570000059903,
+      "accepted": true,
+      "eof": true,
+      "errors": [],
+      "tokens": 25,
+      "fallback_ll": false
+    },
+    {
+      "fast_median_ms": 1.4740999904461205,
+      "fast_fallback_ll": false,
+      "fast_fallback_at": null,
+      "diagnostic_variants": [
+        []
+      ],
+      "name": "unknown-cst-member",
+      "source": "cases\\unknown-cst-member.bas",
+      "sha256": "b63fe7ca053cd0762804f0c3c91ff709490f7ca05a123f3adcea3e0500486391",
+      "bytes": 80,
+      "prior_native_evidence": "semantic-only-not-native-tested",
+      "expected_general_syntax": null,
+      "first_ms": 59.07280000974424,
+      "warm_median_ms": 60.490400006528944,
+      "warm_p95_ms": 64.29400001070462,
+      "accepted": true,
+      "eof": true,
+      "errors": [],
+      "tokens": 20,
+      "fallback_ll": false
+    },
+    {
+      "fast_median_ms": 0.884100008988753,
+      "fast_fallback_ll": false,
+      "fast_fallback_at": null,
+      "diagnostic_variants": [
+        []
+      ],
+      "name": "wwb-header",
+      "source": "cases\\wwb-header.bas",
+      "sha256": "1d5a9da92bd7945f120cad1322062d28d6775d9e84e71cdabe1a26fe6b8b6c1a",
+      "bytes": 76,
+      "prior_native_evidence": "prior-native-header-form",
+      "expected_general_syntax": true,
+      "first_ms": 193.0337999947369,
+      "warm_median_ms": 106.35980000370182,
+      "warm_p95_ms": 118.87659999774769,
+      "accepted": true,
+      "eof": true,
+      "errors": [],
+      "tokens": 24,
+      "fallback_ll": false
+    },
+    {
+      "fast_median_ms": 2176.7445000004955,
+      "fast_fallback_ll": true,
+      "fast_fallback_at": {
+        "line_1based": 36,
+        "column_0based": 38,
+        "token": "("
+      },
+      "diagnostic_variants": [
+        []
+      ],
+      "name": "retained-history-wrapped",
+      "source": "cases\\retained-history-wrapped.bas",
+      "sha256": "7850fcc5caeab223c6f41c03e26b45d6a8807f78a2a23abdaf28989f3d792d71",
+      "bytes": 1266,
+      "prior_native_evidence": "retained-successful-candidate-history",
+      "expected_general_syntax": true,
+      "first_ms": 4860.5712999997195,
+      "warm_median_ms": 2459.1179999988526,
+      "warm_p95_ms": 2479.494600003818,
+      "accepted": true,
+      "eof": true,
+      "errors": [],
+      "tokens": 333,
+      "fallback_ll": false
+    },
+    {
+      "fast_median_ms": 888.8799999840558,
+      "fast_fallback_ll": true,
+      "fast_fallback_at": {
+        "line_1based": 39,
+        "column_0based": 39,
+        "token": "("
+      },
+      "diagnostic_variants": [
+        []
+      ],
+      "name": "a1-fixture-wrapped",
+      "source": "cases\\a1-fixture-wrapped.bas",
+      "sha256": "9e1c938f9c9216cf6e8ce83710349b0ea7cbd8cff45f2e0101985cfd2a56b805",
+      "bytes": 1588,
+      "prior_native_evidence": "synthetic-offline-fixture-not-native-evidence",
+      "expected_general_syntax": true,
+      "first_ms": 1967.2844000160694,
+      "warm_median_ms": 924.0972000116017,
+      "warm_p95_ms": 1015.1481000066269,
+      "accepted": true,
+      "eof": true,
+      "errors": [],
+      "tokens": 332,
+      "fallback_ll": false
+    }
+  ],
+  "cold_process_ms": [
+    437.18719997559674,
+    401.0077000129968,
+    391.7488000006415,
+    369.8207999987062,
+    377.8796000115108
+  ],
+  "cold_process_median_ms": 391.7488000006415,
+  "tool_sha256": "adc9c64d0ac88cc999e2a79b5861c32bff16543bd1afe170bfe2277f941a19fb",
+  "fixture_provenance": {
+    "path": "test/fixtures/antlr-vb6-poc/retained-history.vb",
+    "original": "artifacts/typed-public-676d2b63/control/definitions/834cfb1427f448099a65bd8a88ca983d/f0ff89a538aa4c9498b21c83496f9d35/verification-edit/saved/history.vb",
+    "sha256": "d4aec3252d5eaed6a4c9453df873081460fae5ed0c960e127b84f67b868e2ad7",
+    "original_zrange": "reconstructed minimal failing call shape, not byte-identical original full macro"
+  },
+  "verification": "8 explicit real-parser tests plus 2 documentation checks; no CST execution"
+}

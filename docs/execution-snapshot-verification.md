@@ -1,6 +1,6 @@
 # B3 执行配置快照验证内核
 
-2026-11-02。公共实现`csttool/execution_snapshot.py`，GUI/CLI/MCP将共用本模块，不新增CST调度、数据库私有格式解析器或协议服务。[原生采集与RunStore/B4子集](native-execution-capture.md)已接入；默认Managed/HOM、公共single-simulation定义服务及完整B4/G03仍未完成，publish_ready不解锁。下文较早B3验收和后续范围按分批记录阅读。
+2026-11-02。公共实现`csttool/execution_snapshot.py`，GUI/CLI/MCP将共用本模块，不新增CST调度、数据库私有格式解析器或协议服务。[原生采集与RunStore/B4子集](native-execution-capture.md)已接入；公共single-simulation与生产G03已接入，真实正常链见[G04](single-simulation-g04-acceptance.md)。HOM默认不启用此选项。低层报告publish_ready始终false，不承担公共定义授权职责。
 
 ## 来源与信任边界
 
@@ -20,7 +20,7 @@
 
 路径必须由所有者解析为已关闭工件，不是暴露任意路径的MCP能力。JSON预算可显式设为1字节至1MiB，数据库预算须为正整数；超限拒绝，不截断。函数均不修改源文件、不启动CST、不补算、不采用结果、不改Runner状态。数据库消失/权限等错误unresolved；变化或hash不符stale；预算超限rejected。
 
-后续后台接入应将文件读取/hash放在控制锁之外，再核对所有权与revision，不能让大工件I/O阻塞status、停止或恢复暂停。本模块尚未接入Runner；字节预算不是对故障文件系统阻塞时间的保证。
+后续后台接入应将文件读取/hash放在控制锁之外，再核对所有权与revision，不能让大工件I/O阻塞status、停止或恢复暂停。Runner现经公共服务接入；字节预算不是对故障文件系统阻塞时间的保证。
 
 快照JSON恰含binding、phase、observed_at、values；phase只接受post-attempt，带时区观测时间须落在所有者提供的attempt窗口内（窗口须包含采集完成阶段，而不是仅Solver.Start调用区间）。values恰含六个已知键，所有值均保留原始字符串：SolverTypeTet、FrequencyTargetActive、FrequencyTargetValue、AdaptionActiveTet、Modes、MeshType。不给任意数据库key扩展口，不从空串补Default/False/0。
 
@@ -42,14 +42,8 @@ result_success来自独立运行事实。false或null均可与execution-snapshot
 
 stale需重新取得与正确定义/attempt绑定的证据，不能改标签后重试；缺失数据保持unresolved；profile不支持需先校准，不能自定义map放行。不得为了读设置额外求解，也不因本报告去Rebuild破坏结果。Save不刷新旧快照、Rebuild后证据可能消失的原有边界保持。
 
-## 验收与下一步
+## 验收与当前接入
 
-[离线测试](../test/execution_snapshot_test.py)实际执行全部11项E oracle，以及绑定/时间/阶段故障、未知profile/枚举、缺失值、严格JSON、双hash变化与预算、B2精确值冻结。不是只检查用例表自身。
+该模块已由[公共single-simulation服务](single-simulation-service.md)复用；生产G03及新Managed组合真实子链见[G04记录](single-simulation-g04-acceptance.md)。模块本身的静态/快照报告不单独证明live设置、求解、结果或退出。未知编码/历史及未校准组合继续保守拒绝。
 
-另从既有2026-10-28校准目录原字节复制6组database.tsv/solver.tsv，共34982字节，固定在[test fixtures](../test/fixtures/execution_snapshot_native/manifest.json)，每文件hash及原来源记录齐备，TSV禁止换行转换。预期取独立校准计划；离线重放涵盖Default/General、零target、禁用target求解失败、自适应和精度。重放使用显式人工绑定/时间窗口，验证原生字符串能被解析比较，**不认证历史attempt绑定或原始CST工程可重开**。原始模型/场已在旧批次清理，本轮未启动CST；现存历史数据库未复制进fixtures，也未删除。
-
-本批文档同步前合并235 passed（4.56s），报告artifacts/b3-native-verified-20261102.xml：92项B3测试（含11项E、6项历史字符串重放）及143项前置/索引回归，数字重叠不累加。B0历史not-run标记不改为运行数据库；当前已实际执行H/S/M 35项、E 11项及D04组合行为，不能宣称56项全部通过。
-
-文档同步后最终235 passed（5.57s），报告artifacts/b3-final-20261102.xml；diff空白检查通过。本轮已结束的pytest临时目录已清理，只保留轻量XML、源码和固定原生TSV/manifest。未删除原有校准数据库或其他任务产物，artifact不保证随Git迁移；本轮未提交或推送。
-
-后续已按用户授权完成[RunStore绑定及B4采集子集](native-execution-capture.md)：正确3D scope的六字段、正常/实际求解失败及旧库重标拒绝，均由副本串行取得证据。默认生产调用方与公共定义服务仍未迁移，Save/Rebuild全部时间组合及完整G03/MCP端到端未通过；后续新求解须按明确副本范围执行，不自动追认旧证据为所有新实现通过。
+原批次离线数字、故障修正、B4正常/失败/旧库副本及清理记录完整移至[历史验收](archive/20261102-progress-consolidation/execution-snapshot-verification.md)。旧not-run/下一步只在原批次成立；当前未完成项查[TODO](minimal-python-vba-todo.md)。

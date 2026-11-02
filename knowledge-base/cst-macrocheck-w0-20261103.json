@@ -1,0 +1,353 @@
+{
+  "acceptance_passed": true,
+  "closure": {
+    "exit_code": 0,
+    "exit_confirmed": true
+  },
+  "marker_absent": true,
+  "parameter_expression_after": "2 * W0Base",
+  "cases": [
+    {
+      "name": "body-marker",
+      "expected": true,
+      "statuses": [
+        "accepted"
+      ],
+      "error": null,
+      "source_sha256": "91cdae52fa5c853f2e020eec7dd9d009b5aa3a20c21c4dd04d493d646003ac07",
+      "diagnostic": null
+    },
+    {
+      "name": "parameter-write",
+      "expected": true,
+      "statuses": [
+        "accepted"
+      ],
+      "error": null,
+      "source_sha256": "700f4dd02d327cee8e2eb75e552cf7b6d0137add7185f100d3daaf90ce83bfec",
+      "diagnostic": null
+    },
+    {
+      "name": "obvious-syntax-error",
+      "expected": false,
+      "statuses": [
+        "rejected"
+      ],
+      "error": "10586\nExpecting ')'\n[*xMacroRunThis3*#5] w0x = (\n\n",
+      "source_sha256": "f4ab050ae3d736374daf9d70567d8432a2d5ab5f7a2f23f9acff468e2f245ebf",
+      "diagnostic": {
+        "number": 10586,
+        "description": "Expecting ')'",
+        "source": "[*xMacroRunThis3*#5] w0x = (",
+        "module": "*xMacroRunThis3*",
+        "wrapped_line_1based": 5,
+        "original_statement": "w0x = (",
+        "column": null
+      }
+    },
+    {
+      "name": "zrange-original",
+      "expected": false,
+      "statuses": [
+        "rejected"
+      ],
+      "error": "10576\nUnexpected text.\n[*xMacroRunThis4*#5]  .Zrange ((-RestoreDoubleParameter(\"L\"))/2), (RestoreDoubleParameter(\"L\")/2)\n\n",
+      "source_sha256": "976327ec066b3db825736bdd2f893ffe5afc018d21a110fe20941c947182078e",
+      "diagnostic": {
+        "number": 10576,
+        "description": "Unexpected text.",
+        "source": "[*xMacroRunThis4*#5]  .Zrange ((-RestoreDoubleParameter(\"L\"))/2), (RestoreDoubleParameter(\"L\")/2)",
+        "module": "*xMacroRunThis4*",
+        "wrapped_line_1based": 5,
+        "original_statement": " .Zrange ((-RestoreDoubleParameter(\"L\"))/2), (RestoreDoubleParameter(\"L\")/2)",
+        "column": null
+      }
+    },
+    {
+      "name": "zrange-fixed",
+      "expected": true,
+      "statuses": [
+        "accepted"
+      ],
+      "error": null,
+      "source_sha256": "c103f099b9b4ab1335b5a98b0fb9ad89654f82b7c7e9a1ca3dce17eed91d839a",
+      "diagnostic": null
+    },
+    {
+      "name": "zrange-call",
+      "expected": null,
+      "statuses": [
+        "accepted"
+      ],
+      "error": null,
+      "source_sha256": "cebbab94b7a928187f1e3c25d8fa6084b0b50166f97879011b6b1316494cbdd4",
+      "diagnostic": null
+    },
+    {
+      "name": "duplicate-declaration",
+      "expected": false,
+      "statuses": [
+        "rejected"
+      ],
+      "error": "10519\nIdentifier is already in use.\n[*xMacroRunThis7*#5] Dim w0x As Integer\n\n",
+      "source_sha256": "0ce3f69c7de40c0d77a6f584381d87c3bc8b6043ec52ffa4a636e1e6b9f0b143",
+      "diagnostic": {
+        "number": 10519,
+        "description": "Identifier is already in use.",
+        "source": "[*xMacroRunThis7*#5] Dim w0x As Integer",
+        "module": "*xMacroRunThis7*",
+        "wrapped_line_1based": 5,
+        "original_statement": "Dim w0x As Integer",
+        "column": null
+      }
+    },
+    {
+      "name": "missing-end-with",
+      "expected": false,
+      "statuses": [
+        "rejected"
+      ],
+      "error": "10587\nUnterminated block statement. 'With'\n[*xMacroRunThis8*#6] End Sub\n\n",
+      "source_sha256": "f5399c5c622a7819dfe55fecba5900e69582e889f1df9bb1ee90141b85485699",
+      "diagnostic": {
+        "number": 10587,
+        "description": "Unterminated block statement. 'With'",
+        "source": "[*xMacroRunThis8*#6] End Sub",
+        "module": "*xMacroRunThis8*",
+        "wrapped_line_1based": 6,
+        "original_statement": "End Sub",
+        "column": null
+      }
+    },
+    {
+      "name": "unicode",
+      "expected": true,
+      "statuses": [
+        "accepted"
+      ],
+      "error": null,
+      "source_sha256": "25dcadfda08e6eca11de7ca8abe206b12a70d87ca0b83b918637246d7c81e4b0",
+      "diagnostic": null
+    },
+    {
+      "name": "parameter-read",
+      "expected": true,
+      "statuses": [
+        "accepted"
+      ],
+      "error": null,
+      "source_sha256": "427bc721a2594ce3a2c43a0ce58255530d6f1e96032971316e1ab0f480a747c8",
+      "diagnostic": null
+    },
+    {
+      "name": "inner-history-text",
+      "expected": true,
+      "statuses": [
+        "accepted"
+      ],
+      "error": null,
+      "source_sha256": "75e052d139cae38e133ea6cb2a935b178dc59bd1b4cd200cd49eaf162f46bcfd",
+      "diagnostic": null
+    },
+    {
+      "name": "xrange-fixed",
+      "expected": true,
+      "statuses": [
+        "accepted"
+      ],
+      "error": null,
+      "source_sha256": "cf151713a25a4240573317dfe0277a54ee015b83ca83b39193d264222c18140f",
+      "diagnostic": null
+    },
+    {
+      "name": "yrange-fixed",
+      "expected": true,
+      "statuses": [
+        "accepted"
+      ],
+      "error": null,
+      "source_sha256": "5fea9b87df6576294012f0f6a0a70f009fc539fc0ee538e146de73f39c617de5",
+      "diagnostic": null
+    },
+    {
+      "name": "retained-history-wrapped",
+      "expected": true,
+      "statuses": [
+        "accepted"
+      ],
+      "error": null,
+      "source_sha256": "1a7b436333dce94e309aaaed5c0c1943f36b21089609485f8b3189927c2ef218",
+      "diagnostic": null
+    }
+  ],
+  "checks": 14,
+  "solver_start_calls": 0,
+  "failure": null,
+  "after_cst": [],
+  "date": "2026-11-03",
+  "evidence_scope": "Actual CST 2022 single new copy, single RunScript, 14 MacroCheckThis calls, zero solves; Call form compiled only, not executed",
+  "root": "artifacts\\cst-macrocheck-84eeb1af",
+  "session": {
+    "launcher_pid": 30004,
+    "owned": [
+      {
+        "pid": 30004,
+        "create_time": 1793644970.0150833
+      },
+      {
+        "pid": 68936,
+        "create_time": 1793644970.0480137
+      },
+      {
+        "pid": 63392,
+        "create_time": 1793644970.3677733
+      },
+      {
+        "pid": 76760,
+        "create_time": 1793644972.610559
+      },
+      {
+        "pid": 61600,
+        "create_time": 1793644973.7209473
+      },
+      {
+        "pid": 31508,
+        "create_time": 1793644975.0222957
+      },
+      {
+        "pid": 47620,
+        "create_time": 1793644975.2700663
+      },
+      {
+        "pid": 75444,
+        "create_time": 1793644975.7705107
+      },
+      {
+        "pid": 74520,
+        "create_time": 1793644972.624097
+      }
+    ],
+    "active_pids": [],
+    "elapsed_seconds": 32.98399999999674,
+    "exit_confirmed": true,
+    "foreign_processes": [],
+    "preexisting_processes": [],
+    "ownership_scope": "task-project",
+    "task_project": "D:\\work\\cst_tools\\artifacts\\cst-macrocheck-84eeb1af\\definition.cst",
+    "stage": "awaiting-macro",
+    "exit_code": 0
+  },
+  "source_map": {
+    "nonce": "335f63ea1aa14b13938e40876140aa02",
+    "wrapper_lines": 3,
+    "cases": [
+      {
+        "name": "body-marker",
+        "expected": true,
+        "sha256": "91cdae52fa5c853f2e020eec7dd9d009b5aa3a20c21c4dd04d493d646003ac07"
+      },
+      {
+        "name": "parameter-write",
+        "expected": true,
+        "sha256": "700f4dd02d327cee8e2eb75e552cf7b6d0137add7185f100d3daaf90ce83bfec"
+      },
+      {
+        "name": "obvious-syntax-error",
+        "expected": false,
+        "sha256": "f4ab050ae3d736374daf9d70567d8432a2d5ab5f7a2f23f9acff468e2f245ebf"
+      },
+      {
+        "name": "zrange-original",
+        "expected": false,
+        "sha256": "976327ec066b3db825736bdd2f893ffe5afc018d21a110fe20941c947182078e"
+      },
+      {
+        "name": "zrange-fixed",
+        "expected": true,
+        "sha256": "c103f099b9b4ab1335b5a98b0fb9ad89654f82b7c7e9a1ca3dce17eed91d839a"
+      },
+      {
+        "name": "zrange-call",
+        "expected": null,
+        "sha256": "cebbab94b7a928187f1e3c25d8fa6084b0b50166f97879011b6b1316494cbdd4"
+      },
+      {
+        "name": "duplicate-declaration",
+        "expected": false,
+        "sha256": "0ce3f69c7de40c0d77a6f584381d87c3bc8b6043ec52ffa4a636e1e6b9f0b143"
+      },
+      {
+        "name": "missing-end-with",
+        "expected": false,
+        "sha256": "f5399c5c622a7819dfe55fecba5900e69582e889f1df9bb1ee90141b85485699"
+      },
+      {
+        "name": "unicode",
+        "expected": true,
+        "sha256": "25dcadfda08e6eca11de7ca8abe206b12a70d87ca0b83b918637246d7c81e4b0"
+      },
+      {
+        "name": "parameter-read",
+        "expected": true,
+        "sha256": "427bc721a2594ce3a2c43a0ce58255530d6f1e96032971316e1ab0f480a747c8"
+      },
+      {
+        "name": "inner-history-text",
+        "expected": true,
+        "sha256": "75e052d139cae38e133ea6cb2a935b178dc59bd1b4cd200cd49eaf162f46bcfd"
+      },
+      {
+        "name": "xrange-fixed",
+        "expected": true,
+        "sha256": "cf151713a25a4240573317dfe0277a54ee015b83ca83b39193d264222c18140f"
+      },
+      {
+        "name": "yrange-fixed",
+        "expected": true,
+        "sha256": "5fea9b87df6576294012f0f6a0a70f009fc539fc0ee538e146de73f39c617de5"
+      },
+      {
+        "name": "retained-history-wrapped",
+        "expected": true,
+        "sha256": "1a7b436333dce94e309aaaed5c0c1943f36b21089609485f8b3189927c2ef218"
+      }
+    ]
+  },
+  "files": [
+    {
+      "path": "artifacts\\cst-macrocheck-84eeb1af\\probe.bas",
+      "sha256": "b1d7c0813325af731d206c9365556c7f3b144264a10f5c58012805e9cb36eec2",
+      "bytes": 15829
+    },
+    {
+      "path": "artifacts\\cst-macrocheck-84eeb1af\\build.ps1",
+      "sha256": "f42d6f2efe806d4186437c222d88901042ad47b757b58c86b6b58d62ff3468af",
+      "bytes": 1548
+    },
+    {
+      "path": "artifacts\\cst-macrocheck-84eeb1af\\definition.cst",
+      "sha256": "58f80627ff5b0baf2cfbb6886ac7007586b34261b1af1699a0c3ade0f5656668",
+      "bytes": 17351
+    },
+    {
+      "path": "artifacts\\cst-macrocheck-84eeb1af\\acceptance.json",
+      "sha256": "582c26e15b8e1c78cb275a34bf038708a5522f646cc788c5fbfdd0d571dc53ac",
+      "bytes": 3949
+    },
+    {
+      "path": "artifacts\\cst-macrocheck-84eeb1af\\checks.tsv",
+      "sha256": "db75ad2ef7118b21bcf057818c340d5cc3a5444d42444dd4de250a389c973078",
+      "bytes": 362
+    }
+  ],
+  "earlier_attempts": [
+    {
+      "root": "artifacts/cst-macrocheck-393f2615",
+      "outcome": "COM activation E_ACCESSDENIED under restricted environment, no macro; launcher exited1, no remaining CST"
+    },
+    {
+      "root": "artifacts/cst-macrocheck-490aa5b7",
+      "outcome": "MacroCheckThis callable; missing apostrophe in checked-module language header, all rejected at line1; not valid positive/negative acceptance; closed normally"
+    }
+  ]
+}

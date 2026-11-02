@@ -1,6 +1,6 @@
 # MCP协议适用性与验收矩阵
 
-日期：2026-10-28。状态：**规范阅读与设计审查完成，服务端符合性验收未开始**。关联[MCP设计计划](mcp-design-plan.md)、[完整阅读范围/固定来源](../knowledge-base/mcp-protocol-reading-20261028.md)。下列测试编号是拟定用例，不是已经通过的工具测试。
+日期：2026-10-28。状态：**规范阅读与设计审查完成，已有官方SDK现代stdio子集验收，完整符合性/宿主验收未完成**。关联[MCP设计计划](mcp-design-plan.md)、[完整阅读范围/固定来源](../knowledge-base/mcp-protocol-reading-20261028.md)。下列测试编号是拟定用例，不是已经通过的工具测试。
 
 ## 1. 标准版本与职责边界
 
@@ -129,3 +129,9 @@ stdio可采用固定项目服务配置，但不能把连接身份当对话身份
 最终文档修订后复验：documentation_index_test.py 2 passed（0.64s），artifacts/mcp-standard-final-docs-20261028.xml；新增文档本地引用逐一核实通过，diff空白检查通过。
 
 2026-10-28 SDK/宿主静态补核：固定mcp 2.3.0及Codex rust-v0.165.0-alpha.1.2源码现代路径，见[支持记录](../knowledge-base/mcp-sdk-host-support-20261028.md)。本机CLI版本已核实但非当前桌面runtime可复现身份/已开启证明；N01–N25仍未执行。SDK默认兼容行为必须在本项目modern-only门禁中限制，不能因版本支持自动勾选符合性。
+
+## 2026-11-02实施子集
+
+可选mcp==2.3.0入口、现代版本门禁、SDK自动发现、stdio列表/调用/EOF、严格工具字段和structuredContent/resultType子集已验；详情见[本批](g01-g08-progress.md)。不将这些小测试映射为N01–N25全部通过。本机Codex CLI身份0.166.0-alpha.5.1，验收服务已登记启用，桌面端实际调用证据仍缺。旧“未安装SDK/未变更配置”为原时点记录。
+
+本轮后续：当前桌面九工具空工程调用已验；源码新增14工具、目录排序/private零TTL、tools-only、嵌套输入Schema及限流/句柄上限。SDK6项测试通过，不等于N01–N25全验，真实整链与当前限制见[逐项进度](g01-g08-progress.md)。

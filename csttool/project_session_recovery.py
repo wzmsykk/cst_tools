@@ -381,6 +381,8 @@ def recover_project_sessions(
     progress=None,
     pause_check=None,
 ) -> list[ManagedSessionRecord]:
+    from .definition_sessions import recover_definition_sessions
+    recover_definition_sessions(project_directory,timeout=min(timeout_per_session,60),progress=progress,pause_check=pause_check)
     if progress:
         progress({'stage': 'session-discovery', 'reason': '核验会话身份与收尾证据'})
     records = [

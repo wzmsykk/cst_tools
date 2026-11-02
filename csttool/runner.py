@@ -292,7 +292,7 @@ class Runner:
 
     def command(self, command):
         validate_command(command)
-        if command['operation']=='start' and command.get('payload',{}).get('kind')=='simulation':
+        if command['operation']=='start' and command.get('payload',{}).get('kind') in ('simulation','definition'):
             from .application_service import ApplicationService
             validate_run_payload(command['payload'])
             with self.lock:
@@ -307,7 +307,7 @@ class Runner:
             if service is None:
                 service=ApplicationService(self.project,self.project_id)
                 self.application_service=service
-            service.preflight(command['payload'])  # Hash outside the control lock.
+            (service.preflight_definition_operation if command['payload'].get('kind')=='definition' else service.preflight)(command['payload'])  # Outside the control lock.
             with self.lock:
                 if generation!=(self.owner_client,self.control_revision,self.status['run_id']):
                     raise ValueError('ownership or run changed during simulation verification')
@@ -395,13 +395,25 @@ class Runner:
                 raise ValueError('run still active')
             if op == 'start' and state == 'RECOVERY_REQUIRED':
                 raise ValueError('recover previous sessions first')
+            if op == 'export_simulation_results':
+                if state in ACTIVE or state == 'RECOVERY_REQUIRED':
+                    raise ValueError('run active or requires recovery')
+                if set(payload) != {'run_id','result_revision','formats'}:
+                    raise ValueError('invalid result export payload')
+                from .application_service import ApplicationService
+                service = getattr(self,'application_service',None) or ApplicationService(self.project,self.project_id)
+                exported = service.export_simulation_results(payload['run_id'],payload['result_revision'],payload['formats'])
+                result = dict(request_id=command['request_id'],accepted=True,instance_id=self.instance_id,**exported)
+                # Deterministic export is safe to retry after response/receipt loss.
+                write_json_atomic(path,dict(digest=digest,command=command,result=result))
+                return result
             if op == 'stop' and (command.get('run_id') != self.status['run_id'] or state not in ACTIVE):
                 raise ValueError('stale run_id or no active run')
             if op == 'shutdown' and not shutdown_verified:
                 raise ValueError('shutdown requires fresh safety verification')
             if op == 'start':
                 validate_run_payload(payload)
-                if payload.get('kind')!='simulation' and not payload.get('resume', False) and any(path.exists() for path in (
+                if payload.get('kind') not in ('simulation','definition') and not payload.get('resume', False) and any(path.exists() for path in (
                         self.project / 'save/csv/hom_scan_checkpoint.json',
                         self.project / 'save/csv/scan_manifest.json',
                         self.project / 'save/standard_batch_checkpoint.json')):
@@ -420,9 +432,9 @@ class Runner:
                             recovery_reason=None, recovery_progress=None,
                             lifecycle=None, error_diagnostic=None, cleanup_diagnostic=None,
                             session_safety='unknown', log_directory=None, last_progress=None,
-                            completed_tasks=0, total_tasks=1 if payload.get('kind')=='simulation' else len(payload.get('tasks', [])),
+                            completed_tasks=0, total_tasks=1 if payload.get('kind') in ('simulation','definition') else len(payload.get('tasks', [])),
                             run_kind=payload.get('kind','hom') if op=='start' else self.status.get('run_kind','hom'),
-                            **({'coverage':None,'mode_count':0} if payload.get('kind')=='simulation' else {}))
+                            **({'coverage':None,'mode_count':0} if payload.get('kind') in ('simulation','definition') else {}))
                 self.worker = threading.Thread(target=self._execute, args=(op, payload), name="RUNNER/" + op.upper(), daemon=False)
                 self.worker.start()
             elif op == 'stop':
@@ -447,6 +459,13 @@ class Runner:
             if operation=='start' and payload.get('kind')=='simulation' and self.executor_factory is LocalExecution:
                 executor=self.application_service.execute_simulation(payload,run_id=self.status['run_id'],
                     stop=self.stop_intent,update=self.update)
+            elif operation=='start' and payload.get('kind')=='definition' and self.executor_factory is LocalExecution:
+                from .application_service import DefinitionOperationExecution
+                executor=DefinitionOperationExecution(self.application_service,self.status['run_id'],self.stop_intent,self.update)
+            elif operation=='recover' and self.status.get('run_kind')=='definition' and self.executor_factory is LocalExecution:
+                from .application_service import ApplicationService,DefinitionOperationExecution
+                service=getattr(self,'application_service',None) or ApplicationService(self.project,self.project_id)
+                executor=DefinitionOperationExecution(service,self.status['run_id'],self.stop_intent,self.update)
             elif operation=='recover' and self.status.get('run_kind')=='simulation' and self.executor_factory is LocalExecution:
                 from .application_service import ApplicationService,SimulationRecoveryExecution
                 service=getattr(self,'application_service',None) or ApplicationService(self.project,self.project_id)
@@ -549,6 +568,14 @@ class Runner:
 
 
 def validate_run_payload(payload):
+    if payload.get('kind')=='definition':
+        if payload.get('operation')=='create_project':
+            from .application_service import validate_project_creation
+            validate_project_creation(payload)
+        else:
+            from .definition_editing import validate_edit
+            validate_edit(payload)
+        return
     if payload.get('kind')=='simulation':
         from .application_service import validate_simulation_submission
         validate_simulation_submission(payload)
@@ -731,6 +758,24 @@ def serve(project, executor_factory=None):
                     result = runner.events(json.loads(query.get('cursor', ['0'])[0]))
                 elif self.path.startswith('/commands/') and self.command == 'GET':
                     result = runner.command_record(self.path.removeprefix('/commands/'))
+                elif self.path.startswith('/definition-result?') and self.command=='GET':
+                    from urllib.parse import parse_qs,urlsplit
+                    query=parse_qs(urlsplit(self.path).query,strict_parsing=True)
+                    if set(query)!={'run_id'} or len(query['run_id'])!=1:raise ValueError('invalid definition query')
+                    from .application_service import ApplicationService
+                    service=getattr(runner,'application_service',None) or ApplicationService(runner.project,runner.project_id)
+                    result=service.definition_operation_result(query['run_id'][0])
+                elif self.path=='/installations' and self.command=='GET':
+                    from .application_service import ApplicationService
+                    service=getattr(runner,'application_service',None) or ApplicationService(runner.project,runner.project_id)
+                    result={'installations':[{'installation_ref':key,'name':path.parent.name} for key,path in service.installations.items()]}
+                elif self.path.startswith('/model?') and self.command=='GET':
+                    from urllib.parse import parse_qs,urlsplit
+                    query=parse_qs(urlsplit(self.path).query,strict_parsing=True)
+                    if set(query)!={'document_id','document_revision'} or any(len(v)!=1 for v in query.values()):raise ValueError('invalid model query')
+                    from .application_service import ApplicationService
+                    service=getattr(runner,'application_service',None) or ApplicationService(runner.project,runner.project_id)
+                    result=service.inspect_model(query['document_id'][0],query['document_revision'][0])
                 elif self.path.startswith('/simulation-results?') and self.command=='GET':
                     from urllib.parse import parse_qs,urlsplit
                     query=parse_qs(urlsplit(self.path).query)

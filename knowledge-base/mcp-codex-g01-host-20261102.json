@@ -1,0 +1,93 @@
+{
+  "date": "2026-11-02",
+  "host": "Codex desktop",
+  "protocol": "2026-07-28",
+  "scope": "Actual discovery and basic calls; not all N01-N25",
+  "connected": {
+    "control_handle": "[redacted]",
+    "status": {
+      "schema_version": 1,
+      "instance_id": "31fa0f44b2114da6ab0aea8c380ecd0c",
+      "project_id": "dbc1abb0dea0487497a5e37bb40c2195",
+      "project": "D:\\work\\cst_tools\\artifacts\\mcp-host-acceptance",
+      "run_id": null,
+      "version": 1,
+      "state": "IDLE",
+      "phase": "",
+      "error": null,
+      "session_safety": "unknown",
+      "last_progress": null,
+      "project_task_status": null,
+      "owner_client": null,
+      "execution_active": false,
+      "runtime": {
+        "pid": 18920,
+        "python": "D:\\work\\cst_tools\\artifacts\\mcp-runtime\\Scripts\\python.exe",
+        "cwd": "D:\\work\\cst_tools",
+        "source_root": "D:\\work\\cst_tools"
+      },
+      "control_lease_valid": false,
+      "control_lease_remaining": 0,
+      "control_revision": 0
+    }
+  },
+  "claim": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\n  \"request_id\": \"g01-claim-20261102\",\n  \"accepted\": true,\n  \"run_id\": null,\n  \"instance_id\": \"31fa0f44b2114da6ab0aea8c380ecd0c\"\n}"
+      }
+    ],
+    "structuredContent": {
+      "request_id": "g01-claim-20261102",
+      "accepted": true,
+      "run_id": null,
+      "instance_id": "31fa0f44b2114da6ab0aea8c380ecd0c"
+    },
+    "isError": false
+  },
+  "shutdown": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\n  \"request_id\": \"g01-shutdown-20261102\",\n  \"accepted\": true,\n  \"run_id\": null,\n  \"instance_id\": \"31fa0f44b2114da6ab0aea8c380ecd0c\"\n}"
+      }
+    ],
+    "structuredContent": {
+      "request_id": "g01-shutdown-20261102",
+      "accepted": true,
+      "run_id": null,
+      "instance_id": "31fa0f44b2114da6ab0aea8c380ecd0c"
+    },
+    "isError": false
+  },
+  "tools": [
+    "mcp__cst_tools_acceptance__connect_project",
+    "mcp__cst_tools_acceptance__control_project",
+    "mcp__cst_tools_acceptance__get_project_status",
+    "mcp__cst_tools_acceptance__get_simulation_results",
+    "mcp__cst_tools_acceptance__submit_run"
+  ],
+  "rejected_invalid_handle": {
+    "content": [
+      {
+        "type": "text",
+        "text": "Error executing tool submit_run"
+      }
+    ],
+    "isError": true
+  },
+  "host_configuration": {
+    "feature": "mcp_2026_07_28",
+    "enabled": true,
+    "server_env": {
+      "CODEX_MCP_PROTOCOL_VERSION": "2026-07-28"
+    },
+    "stdio_requires_both": true
+  },
+  "initial_failure": {
+    "code": -32022,
+    "reason": "modern feature disabled and explicit server marker absent",
+    "source": "Codex desktop startup logs 2026-11-02"
+  }
+}

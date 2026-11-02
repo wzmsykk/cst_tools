@@ -1,30 +1,19 @@
-# 生产G03后端接入（2026-11-02）
+# 公共single-simulation服务与G03验证
 
-默认ApplicationService现在注册NativeDefinitionVerifier；历史下文“未注册”是此前状态。stage_definition仍不启动CST、ready=false；所有者显式调用verify_definition才启动验证。可信测试端口仍可注入，客户端不能提供验证证明。
+默认ApplicationService现在注册NativeDefinitionVerifier；stage_definition仍不启动CST、ready=false；所有者显式调用verify_definition才启动验证。可信测试端口仍可注入，客户端不能提供验证证明。
 
 后端从冻结definition.cst复制，不复制同名结果目录；两个串行batch会话分别保存、退出，以及从保存后的.cst重新打开、再保存退出。每阶段在已加载3D Model.run中调用Save、GetOwnProject作用域下已有工程的全局身份/单位/频率读回接口，无OpenFile、参数写入、AddToHistory、Rebuild或Solver.Start。核对CST 2022大版本、精确副本路径、HF Eigenmode、mm/MHz、Tet及频率范围。频率读回按已校准六位有效数字容差；有效历史投影及精确表达式/参数JSON必须与冻结定义一致。方法、模式数、目标开关和自适应等以保存重开后的完整允许表历史为定义证明；不将不存在的live getter或旧执行DB伪装为证明，实际执行配置仍由B3独立核验。
 
-只有每次完成nonce、无宏错误、退出码0、归属进程全部退出、保存后设置和表达式未变、安装hash及源hash未变，才生成四组G03门禁。验证记录及宏/日志/状态位于定义目录verification-<id>；文件夹ID由definition.json的verification.diagnostics映射。失败不更新ready，不强杀；前次会话退出未确认则禁止重试，需要核实session-status及现场进程后对账。本批没有新增GUI验证按钮、HTTP验证命令或自动恢复验证会话，属后续接线范围。现有项目退出恢复扫描尚不自动采用这些验证会话，不能将关闭GUI当作其已退出。
+只有每次完成nonce、无宏错误、退出码0、归属进程全部退出、保存后设置和表达式未变、安装hash及源hash未变，才生成四组G03门禁。验证记录及宏/日志/状态位于定义目录verification-<id>；文件夹ID由definition.json的verification.diagnostics映射。失败不更新ready，不强杀；前次会话退出未确认则禁止重试，需要核实session-status及现场进程后对账。当前验证会话已纳入项目恢复及退出核验，GUI生命周期文本显示G03；恢复仅等待正常退出或记录已退出但未验证成功，不授予ready。GUI验证按钮、HTTP验证命令和真实中断矩阵仍待完成。
 
-本批为生产执行代码及离线假对端验证，真实WinWrap语法、保存格式变化和完整组合仍需串行副本验收；不能追认既有B4为本轮验收。
-
-# 公共 single-simulation 服务接入
-
-2026-11-02。实现`csttool/application_service.py`，由现有Runner托管。共享[B1/B2保存读取](settings-history-projection.md)、[B3执行验证](execution-snapshot-verification.md)、[原生采集/RunStore](native-execution-capture.md)及Managed Worker，未增加MCP专属执行框架、第二个Worker或后台队列。
-
-## 当前可用边界
-
-已实现公共定义登记/检查、严格单次提交、Runner分发、Managed可选采集、ACK后结果核验/采用、查询和发布缺口对账。**默认生产G03原生定义验证端口尚未注册**：普通登记只产生ready=false，提交返回DEFINITION_NOT_READY，不因B2解析成功、旧B4样例或客户端自报ready而计算。本批正例使用显式可信假验证端口和假Worker，不证明G03、真实新组合或MCP宿主可用。
-
-首阶段只接受root、mm/MHz、单个XYZ真空圆柱/PEC/electric、Default/Tet、关闭自适应、现代网格Version=1、请求1模式、target=min及仅后处理损耗。结果固定为Mode 1的Frequency和中心全范围beta=1的R/Q。继承当前原生采集ASCII路径限制，在预检拒绝非ASCII项目路径。GUI没有新增仿真模式选择；旧HOM/standard入口保持原路径。
 
 ## 服务与传输接口
 
 |入口|职责及副作用|
 |---|---|
 |ApplicationService(project, project_id, installations=..., definition_verifier=..., worker_factory=...)|服务器构造，安装映射为授权引用→路径；默认使用本机发现。两个端口由可信后端注入，不是HTTP/MCP用户字段|
-|stage_definition(document_id, source_project, installation_ref)|所有者内部登记，不开放任意路径工具；B1/B2读回、冻结副本及配置、派生revision，调用已注册验证端口后存储证据。不会在缺端口时伪造证明|
-|verify_definition(document_id, revision)|显式所有者验证操作；缺端口SETTING_UNVERIFIED，原生实现可能有受控副本副作用。冻结候选被修改即STALE_DOCUMENT，不修改旧定义指针|
+|stage_definition(document_id, source_project, installation_ref)|所有者内部登记，不开放任意路径工具；B1/B2读回、冻结副本及配置、派生revision；默认生产后端不在登记时启动，保存pending。显式可信测试端口可选择登记时验证，不开放客户端注入|
+|verify_definition(document_id, revision)|显式所有者验证操作；默认接入生产验证器，原生实现可能有受控副本副作用。冻结候选被修改即STALE_DOCUMENT，不修改旧定义指针|
 |inspect_definition / preflight|只读校验完整性、元数据摘要、project/document/revision、安装及G03状态，不启动CST|
 |execute_simulation(payload, run_id, stop, update)|仅构造Runner执行适配器；在Runner线程run时获取现有项目锁并启动Managed Worker|
 |get_simulation_results(run_id, result_revision=None)|只读已采用结果及稳定内容revision，核对接收记录与快照hash；缺结果RESULT_NOT_READY，旧revision RESULT_CHANGED|
@@ -38,11 +27,11 @@ Loopback Runner继续使用Bearer认证、client_id控制租约、request_id幂�
 
 示例省略schema_version/request_id/client_id等既有命令信封字段。simulation payload**恰含这三项**；source_project、installation路径、参数覆盖、algorithm、postprocess、resume、worker_count、ready等都拒绝。模式是明确新执行，重连不得隐式重算。公共D14 submit_run将来映射到此内部传输，不宣称完整九操作或现代MCP信封已经实现。
 
-GET `/simulation-results?run_id=...&result_revision=...`以及`RunnerClient.simulation_results`查询同一服务。业务错误仍通过明确HTTP响应返回，新增code字段；不把DEFINITION_NOT_READY/RESULT_CHANGED当作丢失连接。MCP SDK、server/discover及GUI/CLI完整迁移仍未实施。
+GET `/simulation-results?run_id=...&result_revision=...`以及`RunnerClient.simulation_results`查询同一服务。业务错误仍通过明确HTTP响应返回，新增code字段；不把DEFINITION_NOT_READY/RESULT_CHANGED当作丢失连接。现代MCP适配器九工具已在当前桌面调用通过；新增五个typed/导出工具的SDK真实链已验，桌面完整调用和GUI/CLI完整迁移尚未完成。
 
 ## 定义、验证与身份
 
-定义在control/definitions/<document>/<revision>/保存definition.cst与definition.json。revision覆盖document、源hash、配置、安装引用及积分轴；元数据被改、文件变化、跨project或目录逃逸均拒绝。验证端口的proof须绑定同一source_sha256、root和verified状态，具备saved-reopened/identity/settings/standard-close四组门禁。此端口负责真实证据，不能通过客户端JSON注册回调或注入字段。当前没有提供默认真实端口；假端口的测试标签不构成验收。
+定义在control/definitions/<document>/<revision>/保存definition.cst与definition.json。revision覆盖document、源hash、配置、安装引用及积分轴；元数据被改、文件变化、跨project或目录逃逸均拒绝。验证端口的proof须绑定同一source_sha256、root和verified状态，具备saved-reopened/identity/settings/standard-close四组门禁。此端口负责真实证据，不能通过客户端JSON注册回调或注入字段。默认提供NativeDefinitionVerifier；可信假端口仅用于测试，不构成真实验收。
 
 stage_definition不是完整create_project/apply_model_changes/configure_simulation实现；document_revision编辑与候选发布事务仍待后续。冻结候选只复制.cst，不继承外部同名结果；执行时保存的结构/设置由原有历史重建。参数表达式保留，不传运行中参数覆盖或HOM窗口。
 
@@ -71,18 +60,20 @@ Runner的simulation恢复分支先调用现有recover_project_sessions，再对�
 
 回归发现既有停止线程发布竞态：_stop_run在锁内赋值后start，而执行线程原先无锁读取并join，可能出现“cannot join thread before it is started”。现使用同一锁取得已启动线程，再在锁外join，防止与停止线程状态更新死锁；新增确定性故障测试。
 
-## 验收与剩余门禁
+## 当前验收与剩余范围
 
-[服务测试](../test/single_simulation_service_test.py)覆盖pending拒绝、假端口完整链、原生RunStore真实函数、ACK/采用、严格字段、坏回执/快照/指标/关闭、请求重放、HTTP认证查询、revision变化、发布补写和Runner恢复；Managed测试只检查宏组合与空参数路径，未启动CST。
+生产G03及公共单次Managed链已经通过一次真实串行Pillbox验收，见[G04记录](single-simulation-g04-acceptance.md)。该次1个模式、一次Start、ACK/DB/采用/标准关闭通过；不推广为全部失败矩阵、所有旧工程或完整MCP宿主闭环。
 
-本轮新服务/新组合未做真实WinWrap/CST验收；此前B4仅证明采集辅助组件，不能追认为本组合通过。下一步实现生产G03定义验证端口、实际保存/重开和新Managed单次链副本验收，再接完整建模操作与MCP宿主；当前生产候选默认不可执行。
+367项公共服务离线回归、109项G03扩展回归和40项G04最终相关回归分别属于不同批次且有重叠，详情见各报告，不相加。真实校准修正语言声明为带前导单引号的WWB注释；启动前模型SHA256、Decimal范围精度和项目级未知验证会话阻断保持有效。
 
-## 2026-11-02 本轮验收
+未完成：验证会话真实中断矩阵/GUI显式操作入口、MCP桌面完整调用及剩余真实故障扩展；公开类型化建模和定义发布已实现并通过SDK真实链。重新验证开始先撤销旧ready并落盘，失败不保留旧证明；退出未知返回RECOVERY_REQUIRED。
 
-公共服务、Managed宏生成、Runner/HTTP、恢复、RunStore、B2/B3及文档索引合计367项通过（79.689秒）；报告：`artifacts/single-acceptance-20261102.xml`。均为离线/假对端验收，本轮未启动真实CST。原生G03定义验证端口仍未注册；缺少该证明的定义不能启动。新Managed组合仍需真实串行副本验收，既有B4记录不能替代。
+[旧阶段全文及原测试数字](archive/20261102-progress-consolidation/single-simulation-service.md)保留供追溯，已经替代的“未注册/未验收”不再作为当前结论。
 
-启动前Worker对复制后的工程再次核对冻结definition SHA256，防止预检后文件变化再启动CST。频率目标与下限用Decimal精确值比较，避免float舍入将不同定义误判相同。本轮pytest临时副本清理后需重新生成；轻量XML报告保留。
+新增所有者入口export_simulation_results(run_id,result_revision,formats)：只导出已采用结果，受控目录result/exports/<run>/<revision>，格式仅json/csv，CSV保留原始数值、单位和来源ID；重复请求内容一致，有坏工件或旧revision明确拒绝，不重新求解。现已开放Runner鉴权命令及MCP写操作，见[G01–G08记录](g01-g08-progress.md)。
 
-G03补充：重新验证先持久化ready=false并撤销旧proof，异常不遗留旧授权。项目目录内任何G03会话退出未确认，preflight返回RECOVERY_REQUIRED，禁止后续单次提交；这不等于现有GUI恢复已能自动处理验证会话。
+G02新建/检查空文档子集参见[创建服务](project-creation-service.md)，不与已验证仿真definition_revision混用；空document_revision不会自动ready。
 
-验收：扩展回归109项通过（25.66秒，g03-accepted-20261102.xml）；最后项目级阻断修改后相关服务/故障与文档索引39项通过（23.95秒，g03-latest-20261102.xml），两组覆盖重叠，不相加。均未启动真实CST。
+## 结果/定义v2与公开导出
+
+新定义schema_version=2将postprocess列表与metric_id纳入definition_revision；旧v1不自动提升/兼容为ready，须从源重新登记并显式G03，旧验收按原日期保留。新结果schema_version=2在派发前冻结参数模型hash、中心积分线端点/轴/beta、能量/公式、算法和实际宏证据，metrics保留请求的metric_id，供JSON/CSV一致输出。查询验证冻结文件，篡改返回RESULT_INVALID。Runner命令export_simulation_results及MCP同名工具已接线，写请求需claim/request_id；不启动CST，不宣称远程工件下载。详见[类型化服务](typed-definition-service.md)。

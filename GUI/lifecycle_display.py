@@ -14,7 +14,7 @@ def lifecycle_lines(status):
         lines.append(f"另有 {facts['omitted_sessions']} 个会话未展开；安全汇总仍包含全部会话，待恢复优先显示")
     for item in facts.get('sessions', []):
         lines.extend([
-            f"Worker {item['worker_id']} / 会话 {item['session_id']}",
+            f"{'G03定义验证' if item.get('kind') == 'definition-verification' else 'G02工程创建' if item.get('kind') == 'project-bootstrap' else 'Worker ' + str(item['worker_id'])} / 会话 {item['session_id']}",
             f"  进程：{item['process_state']}；退出码：{item['exit_code'] if item['exit_code'] is not None else '未观测'} ({item['exit_classification']})",
             f"  任务：{item['task_outcome']}；模型：{item['model_state']}",
             f"  标准收尾：{'已确认' if item['standard_closed'] else '未确认'}；处置：{item['disposition']}",

@@ -13,10 +13,12 @@ dependencies = [
     "pandas",
     "PyQt5",
     "psutil>=5.9",
+    "jsonschema>=4",
 ]
 
 [project.optional-dependencies]
 test = ["pytest>=8"]
+mcp = ["mcp==2.3.0"]
 field-analysis = ["h5py>=3.9"]
 
 [tool.setuptools.packages.find]

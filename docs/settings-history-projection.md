@@ -1,6 +1,6 @@
 # B2 保存设置的受限历史投影
 
-2026-11-02。MCP共用底层实施批次，接续[B1来源](saved-project-source.md)。首阶段完整历史子集现已补齐，详见[51项命令与身份校验](a1-history-command-profile.md)；不是任意VBA解释器、生产MCP服务器或完整设置验证器。B3执行快照、B4真实副本与G03仍未完成。后文“第一版”验收是本日较早批次记录。
+2026-11-02。MCP共用底层实施批次，接续[B1来源](saved-project-source.md)。首阶段完整历史子集现已补齐，详见[51项命令与身份校验](a1-history-command-profile.md)；不是任意VBA解释器、生产MCP服务器或完整设置验证器。B3原生采集/RunStore、生产G03及G04公共单次子链已接入，见[当前状态](current-status.md)；不代表全部设置或任意工程均通过。
 
 ## 接口与作用域
 
@@ -10,7 +10,7 @@
 
 `Projection`保留status、只读fields/origins、reasons、scope/source_hash/parser_profile；`publish_ready`始终false，`live_value`始终null。resolved仅表示列出的字段可确定；`missing_fields`列出未取得的首阶段配置，包括Reset后缺失字段。不能用resolved直接允许提交计算。
 
-B3更新：新增只读exact_values，保留solver.frequency_target.value_mhz及solver.frequency_range的上下限Decimal求值字符串；展示float不再作为执行快照预期的精度来源。原表达式与精确求值分别保留，EigenmodeSolver.Reset同步清除其精确值。[B3工厂](execution-snapshot-verification.md)核对发布定义hash/scope后冻结预期；尚未接入实际采集或RunStore。
+B3更新：新增只读exact_values，保留solver.frequency_target.value_mhz及solver.frequency_range的上下限Decimal求值字符串；展示float不再作为执行快照预期的精度来源。原表达式与精确求值分别保留，EigenmodeSolver.Reset同步清除其精确值。[B3工厂](execution-snapshot-verification.md)核对发布定义hash/scope后冻结预期；现已由公共采集及RunStore接入。
 
 ## 支持子集及安全性
 
@@ -23,16 +23,8 @@ B3更新：新增只读exact_values，保留solver.frequency_target.value_mhz及
 
 资源上限：历史2MiB/20000语句、参数4096项、表达式4096字符/256 AST节点/64层依赖或语法深度、幂指数绝对值≤32，数值数量级≤100。超限拒绝，不截断；这些是初始实现限制，不是CST格式极限。无写文件、宏调用、CST启动、后台接入或新依赖。
 
-## 验收与未完成
+## 验收与当前接入
 
-`test/settings_projection_test.py`实际运行V06 H01–H26、S01–S07、M01–M02共35项语义oracle；另验证D04缺失可选元数据行为、B1组合读取、来源字节定位、未知代码污染、Reset通道隔离、单位/编码/JSON拒绝及预算。原cases.json仍保留B0历史not-run标记，不将其改成运行时状态数据库；本批结果以测试及报告为准。
+该模块已由[公共single-simulation服务](single-simulation-service.md)复用；生产G03及新Managed组合真实子链见[G04记录](single-simulation-g04-acceptance.md)。模块本身的静态/快照报告不单独证明live设置、求解、结果或退出。未知编码/历史及未校准组合继续保守拒绝。
 
-本批离线75 passed（2.40s）：54项新投影测试、17项B1、4项B0结构/来源检查。报告`artifacts/b2-projection-final-20261102.xml`。首轮43 passed/5 failed暴露错误分类被ValueError覆盖及对象名数字遗漏，已修正重跑；首轮报告保留，不能当最终结果。无真实CST验收。
-
-文档同步后最终合并验收77 passed（3.65s），包含上述75项及2项文档索引检查，报告`artifacts/b2-verified-20261102.xml`；数字重叠，不累加。本轮pytest临时目录已清理，保留轻量XML；可再生成合成容器，不保留临时源文件路径可用性。
-
-完整旧Pillbox仍因模板附带的其他命令而unsupported；Units.Geometry/Frequency已支持。Enlarged完整历史仍因未知编码unsupported。这些真实源测试仅证明保守拒绝，不证明任意工程设置已读回。五个原始历史摘录未修改。
-
-本批已补首阶段完整人工历史的精确允许表与持久units/solver身份锚点，见[新增验收](a1-history-command-profile.md)。D组来源故障仍由B1实际测试覆盖，不宣称已逐项执行全部D oracle。下一步B3实现attempt/revision/数据库hash绑定与数值格式profile，再做B4受控副本。任意旧历史/其他单位和编码支持不属于已完成范围。MCP宿主握手/公共服务/建模到结果尚未接入；本模块不暴露任意VBA接口。
-
-出错恢复：修正来源、scope、明确单位或经审查的语法后重新只读投影；不自动求解、不修改参数或项目状态，不放宽Runner退出/恢复门禁。GUI/CLI暂未迁移到此模块，不建立第二条执行链。artifacts报告不保证随Git迁移；临时模型均为测试合成容器，可重新生成。
+原批次离线数字、故障修正、B4正常/失败/旧库副本及清理记录完整移至[历史验收](archive/20261102-progress-consolidation/settings-history-projection.md)。旧not-run/下一步只在原批次成立；当前未完成项查[TODO](minimal-python-vba-todo.md)。

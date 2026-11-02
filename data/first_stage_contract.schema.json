@@ -1,0 +1,875 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:csttools:design:first-stage:1",
+  "type": "object",
+  "properties": {
+    "operation": {
+      "enum": [
+        "create_project",
+        "inspect_model",
+        "apply_model_changes",
+        "configure_simulation",
+        "save_project",
+        "close_project",
+        "submit_run",
+        "get_simulation_results",
+        "export_simulation_results"
+      ]
+    },
+    "project_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,99}$"
+    },
+    "request_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,99}$"
+    },
+    "control_handle": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,99}$"
+    },
+    "expected_instance_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,99}$"
+    },
+    "arguments": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "operation",
+    "project_id",
+    "arguments"
+  ],
+  "additionalProperties": false,
+  "oneOf": [
+    {
+      "properties": {
+        "operation": {
+          "const": "create_project"
+        },
+        "arguments": {
+          "$ref": "#/$defs/create_project"
+        }
+      },
+      "required": [
+        "request_id",
+        "control_handle",
+        "expected_instance_id"
+      ]
+    },
+    {
+      "properties": {
+        "operation": {
+          "const": "inspect_model"
+        },
+        "arguments": {
+          "$ref": "#/$defs/inspect_model"
+        }
+      },
+      "not": {
+        "anyOf": [
+          {
+            "required": [
+              "request_id"
+            ]
+          },
+          {
+            "required": [
+              "control_handle"
+            ]
+          },
+          {
+            "required": [
+              "expected_instance_id"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "properties": {
+        "operation": {
+          "const": "apply_model_changes"
+        },
+        "arguments": {
+          "$ref": "#/$defs/apply_model_changes"
+        }
+      },
+      "required": [
+        "request_id",
+        "control_handle",
+        "expected_instance_id"
+      ]
+    },
+    {
+      "properties": {
+        "operation": {
+          "const": "configure_simulation"
+        },
+        "arguments": {
+          "$ref": "#/$defs/configure_simulation"
+        }
+      },
+      "required": [
+        "request_id",
+        "control_handle",
+        "expected_instance_id"
+      ]
+    },
+    {
+      "properties": {
+        "operation": {
+          "const": "save_project"
+        },
+        "arguments": {
+          "$ref": "#/$defs/save_project"
+        }
+      },
+      "required": [
+        "request_id",
+        "control_handle",
+        "expected_instance_id"
+      ]
+    },
+    {
+      "properties": {
+        "operation": {
+          "const": "close_project"
+        },
+        "arguments": {
+          "$ref": "#/$defs/close_project"
+        }
+      },
+      "required": [
+        "request_id",
+        "control_handle",
+        "expected_instance_id"
+      ]
+    },
+    {
+      "properties": {
+        "operation": {
+          "const": "submit_run"
+        },
+        "arguments": {
+          "$ref": "#/$defs/submit_run"
+        }
+      },
+      "required": [
+        "request_id",
+        "control_handle",
+        "expected_instance_id"
+      ]
+    },
+    {
+      "properties": {
+        "operation": {
+          "const": "get_simulation_results"
+        },
+        "arguments": {
+          "$ref": "#/$defs/get_simulation_results"
+        }
+      },
+      "not": {
+        "anyOf": [
+          {
+            "required": [
+              "request_id"
+            ]
+          },
+          {
+            "required": [
+              "control_handle"
+            ]
+          },
+          {
+            "required": [
+              "expected_instance_id"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "properties": {
+        "operation": {
+          "const": "export_simulation_results"
+        },
+        "arguments": {
+          "$ref": "#/$defs/export_simulation_results"
+        }
+      },
+      "required": [
+        "request_id",
+        "control_handle",
+        "expected_instance_id"
+      ]
+    }
+  ],
+  "$defs": {
+    "Parameter": {
+      "type": "object",
+      "properties": {
+        "expression": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192
+        },
+        "quantity": {
+          "enum": [
+            "length",
+            "frequency",
+            "dimensionless"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 1024
+        }
+      },
+      "required": [
+        "expression",
+        "quantity",
+        "description"
+      ],
+      "additionalProperties": false
+    },
+    "Change": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "op": {
+              "const": "set_parameters"
+            },
+            "values": {
+              "type": "object",
+              "minProperties": 1,
+              "maxProperties": 1024,
+              "propertyNames": {
+                "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"
+              },
+              "additionalProperties": {
+                "$ref": "#/$defs/Parameter"
+              }
+            }
+          },
+          "required": [
+            "op",
+            "values"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "op": {
+              "const": "ensure_component"
+            },
+            "component_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,99}$"
+            }
+          },
+          "required": [
+            "op",
+            "component_id"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "op": {
+              "const": "create_cylinder"
+            },
+            "object_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,99}$"
+            },
+            "component_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,99}$"
+            },
+            "axis": {
+              "enum": [
+                "x",
+                "y",
+                "z"
+              ]
+            },
+            "center": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 8192
+              },
+              "minItems": 3,
+              "maxItems": 3
+            },
+            "axial_range": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 8192
+              },
+              "minItems": 2,
+              "maxItems": 2
+            },
+            "outer_radius": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 8192
+            },
+            "inner_radius": {
+              "const": "0"
+            },
+            "material": {
+              "const": "Vacuum"
+            },
+            "segments": {
+              "const": 0
+            }
+          },
+          "required": [
+            "op",
+            "object_id",
+            "component_id",
+            "axis",
+            "center",
+            "axial_range",
+            "outer_radius",
+            "inner_radius",
+            "material",
+            "segments"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "op": {
+              "const": "set_background"
+            },
+            "material": {
+              "const": "PEC"
+            },
+            "padding_mm": {
+              "type": "array",
+              "items": {
+                "const": 0
+              },
+              "minItems": 6,
+              "maxItems": 6
+            }
+          },
+          "required": [
+            "op",
+            "material",
+            "padding_mm"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "op": {
+              "const": "set_boundaries"
+            },
+            "faces": {
+              "type": "array",
+              "items": {
+                "const": "electric"
+              },
+              "minItems": 6,
+              "maxItems": 6
+            },
+            "symmetry": {
+              "type": "array",
+              "items": {
+                "const": "none"
+              },
+              "minItems": 3,
+              "maxItems": 3
+            }
+          },
+          "required": [
+            "op",
+            "faces",
+            "symmetry"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "Simulation": {
+      "type": "object",
+      "properties": {
+        "solver": {
+          "const": "eigenmode"
+        },
+        "method": {
+          "const": "default"
+        },
+        "mesh": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "tet"
+            },
+            "cells_per_wavelength": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1000
+            },
+            "adaptive": {
+              "const": false
+            }
+          },
+          "required": [
+            "type",
+            "cells_per_wavelength",
+            "adaptive"
+          ],
+          "additionalProperties": false
+        },
+        "frequency_range_mhz": {
+          "type": "object",
+          "properties": {
+            "min": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "max": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          },
+          "required": [
+            "min",
+            "max"
+          ],
+          "additionalProperties": false
+        },
+        "frequency_lower_target_mhz": {
+          "type": "number",
+          "minimum": 0
+        },
+        "requested_modes": {
+          "const": 1
+        },
+        "losses": {
+          "const": "postprocess_only"
+        }
+      },
+      "required": [
+        "solver",
+        "method",
+        "mesh",
+        "frequency_range_mhz",
+        "frequency_lower_target_mhz",
+        "requested_modes",
+        "losses"
+      ],
+      "additionalProperties": false
+    },
+    "PPS": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "metric_id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,99}$"
+              },
+              "method_id": {
+                "const": "Frequency"
+              },
+              "settings": {
+                "type": "object",
+                "properties": {
+                  "mode": {
+                    "type": "object",
+                    "properties": {
+                      "selection": {
+                        "const": "one"
+                      },
+                      "index": {
+                        "const": 1
+                      }
+                    },
+                    "required": [
+                      "selection",
+                      "index"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "mode"
+                ],
+                "additionalProperties": false
+              },
+              "on_unavailable": {
+                "const": "fail",
+                "default": "fail"
+              }
+            },
+            "required": [
+              "metric_id",
+              "method_id",
+              "settings"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "metric_id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,99}$"
+              },
+              "method_id": {
+                "const": "R_over_Q"
+              },
+              "settings": {
+                "type": "object",
+                "properties": {
+                  "mode": {
+                    "type": "object",
+                    "properties": {
+                      "selection": {
+                        "const": "one"
+                      },
+                      "index": {
+                        "const": 1
+                      }
+                    },
+                    "required": [
+                      "selection",
+                      "index"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "integration_line": {
+                    "type": "object",
+                    "properties": {
+                      "axis": {
+                        "enum": [
+                          "x",
+                          "y",
+                          "z"
+                        ]
+                      },
+                      "offset_mm": {
+                        "type": "array",
+                        "items": {
+                          "const": 0
+                        },
+                        "minItems": 3,
+                        "maxItems": 3
+                      },
+                      "beta": {
+                        "const": 1
+                      },
+                      "range": {
+                        "const": "full"
+                      }
+                    },
+                    "required": [
+                      "axis",
+                      "offset_mm",
+                      "beta",
+                      "range"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "mode",
+                  "integration_line"
+                ],
+                "additionalProperties": false
+              },
+              "on_unavailable": {
+                "const": "fail",
+                "default": "fail"
+              }
+            },
+            "required": [
+              "metric_id",
+              "method_id",
+              "settings"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      }
+    },
+    "create_project": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,99}$"
+        },
+        "installation_ref": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,99}$"
+        },
+        "module": {
+          "const": "mws"
+        },
+        "units": {
+          "type": "object",
+          "properties": {
+            "length": {
+              "const": "mm"
+            },
+            "frequency": {
+              "const": "MHz"
+            }
+          },
+          "required": [
+            "length",
+            "frequency"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "name",
+        "installation_ref",
+        "module",
+        "units"
+      ],
+      "additionalProperties": false
+    },
+    "inspect_model": {
+      "type": "object",
+      "properties": {
+        "document_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,99}$"
+        },
+        "document_revision": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "parameter_cursor": {
+          "type": "string",
+          "maxLength": 4096
+        },
+        "parameter_limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 500,
+          "default": 100
+        }
+      },
+      "required": [
+        "document_id",
+        "document_revision"
+      ],
+      "additionalProperties": false
+    },
+    "apply_model_changes": {
+      "type": "object",
+      "properties": {
+        "document_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,99}$"
+        },
+        "expected_document_revision": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "changes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Change"
+          },
+          "minItems": 1,
+          "maxItems": 64
+        },
+        "invalidate_results": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "required": [
+        "document_id",
+        "expected_document_revision",
+        "changes"
+      ],
+      "additionalProperties": false
+    },
+    "configure_simulation": {
+      "type": "object",
+      "properties": {
+        "document_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,99}$"
+        },
+        "expected_document_revision": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "simulation": {
+          "$ref": "#/$defs/Simulation"
+        },
+        "postprocess": {
+          "$ref": "#/$defs/PPS"
+        }
+      },
+      "required": [
+        "document_id",
+        "expected_document_revision",
+        "simulation",
+        "postprocess"
+      ],
+      "additionalProperties": false
+    },
+    "save_project": {
+      "type": "object",
+      "properties": {
+        "document_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,99}$"
+        },
+        "expected_document_revision": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "verify_reopen": {
+          "const": true,
+          "default": true
+        }
+      },
+      "required": [
+        "document_id",
+        "expected_document_revision"
+      ],
+      "additionalProperties": false
+    },
+    "close_project": {
+      "type": "object",
+      "properties": {
+        "document_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,99}$"
+        },
+        "expected_document_revision": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "disposition": {
+          "enum": [
+            "save",
+            "discard_candidate"
+          ]
+        }
+      },
+      "required": [
+        "document_id",
+        "expected_document_revision",
+        "disposition"
+      ],
+      "additionalProperties": false
+    },
+    "submit_run": {
+      "type": "object",
+      "properties": {
+        "submission": {
+          "type": "object",
+          "properties": {
+            "mode": {
+              "const": "new"
+            },
+            "kind": {
+              "const": "simulation"
+            },
+            "document_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,99}$"
+            },
+            "definition_revision": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          },
+          "required": [
+            "mode",
+            "kind",
+            "document_id",
+            "definition_revision"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "submission"
+      ],
+      "additionalProperties": false
+    },
+    "get_simulation_results": {
+      "type": "object",
+      "properties": {
+        "run_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,99}$"
+        },
+        "result_revision": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "mode_index": {
+          "const": 1,
+          "default": 1
+        }
+      },
+      "required": [
+        "run_id"
+      ],
+      "additionalProperties": false
+    },
+    "export_simulation_results": {
+      "type": "object",
+      "properties": {
+        "run_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,99}$"
+        },
+        "result_revision": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "formats": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "json",
+              "csv"
+            ]
+          },
+          "uniqueItems": true,
+          "minItems": 1,
+          "maxItems": 2
+        }
+      },
+      "required": [
+        "run_id",
+        "result_revision",
+        "formats"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

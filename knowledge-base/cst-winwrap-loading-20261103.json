@@ -1,0 +1,146 @@
+{
+  "date": "2026-11-03",
+  "scope": "PE import/delay-import names and XML RT_MANIFEST only; no code disassembly, licence files or embedded activation material inspected",
+  "files": [
+    {
+      "name": "modeler_AMD64.exe",
+      "sha256": "a1cb2ec6316592020e81129fa0687343db2c650d82286c79a22ef4e08310db98",
+      "imports": [
+        "AcisInterface_AMD64.dll",
+        "MeshImportLib_AMD64.dll",
+        "MeshAnalysis_AMD64.dll",
+        "MeshImportParser_AMD64.dll",
+        "SolverControl_AMD64.dll",
+        "ModelerRenderer_AMD64.dll",
+        "ADVAPI32.dll",
+        "WS2_32.dll",
+        "eda_interface_AMD64.dll",
+        "layoutdb_AMD64.dll",
+        "SlimMeshTools_AMD64.dll",
+        "VERSION.dll",
+        "NETAPI32.dll",
+        "COMCTL32.dll",
+        "WSOCK32.dll",
+        "dhcpcsvc.DLL",
+        "DSLWrapper_AMD64.dll",
+        "NMSerialization_AMD64.dll",
+        "HexMeshEngine_AMD64.dll",
+        "TraceActivity_AMD64.dll",
+        "MKLWrapper_AMD64.dll",
+        "mkl_intel_thread.dll",
+        "MKLWrapper_LargeInt_AMD64.dll",
+        "boost_serialization-vc140-mt-x64-1_68.dll",
+        "QuasiModel_AMD64.dll",
+        "AcisTools_AMD64.dll",
+        "AbaqusTemperatureParser_AMD64.dll",
+        "CSTRenderer_AMD64.dll",
+        "ModellingIO_AMD64.dll",
+        "CSTArchive_AMD64.dll",
+        "WTSAPI32.dll",
+        "USER32.dll",
+        "MPR.dll",
+        "CSTApplicationSettings_AMD64.dll",
+        "bcrypt.dll",
+        "doc_store_AMD64.dll",
+        "slang_parse_AMD64.dll",
+        "OPENGL32.dll",
+        "GLU32.dll",
+        "embree.dll",
+        "tbbmalloc.dll",
+        "libiomp5md.dll",
+        "mfc140.dll",
+        "KERNEL32.dll"
+      ],
+      "manifest_summaries": [
+        {
+          "resource_id": 1,
+          "sha256": "1d8a782b70eaa4d474727b0c68e8dfb3105966bac2fd3ed0c23df96388957674",
+          "assembly_names": [
+            "Microsoft.Windows.Common-Controls"
+          ],
+          "files": []
+        }
+      ]
+    },
+    {
+      "name": "CST DESIGN ENVIRONMENT_AMD64.exe",
+      "sha256": "d23b713fe7cc8c5631202e6ced8872a771b2ae1b013e7e5f8c51712c751c2d0b",
+      "imports": [
+        "MPR.dll",
+        "WTSAPI32.dll",
+        "CSTApplicationSettings_AMD64.dll",
+        "bcrypt.dll",
+        "CSTArchive_AMD64.dll",
+        "WS2_32.dll",
+        "USER32.dll",
+        "WININET.dll",
+        "RPCRT4.dll",
+        "msi.dll",
+        "CRYPT32.dll",
+        "IPHLPAPI.DLL",
+        "Qt5WidgetsCST_AMD64.dll",
+        "Qt5GuiCST_AMD64.dll",
+        "Qt5CoreCST_AMD64.dll"
+      ],
+      "manifest_summaries": [
+        {
+          "resource_id": 1,
+          "sha256": "645de41c4ee37b11c1bb038e13f78d6374f9fc90b0e23621d118c8fcae196c6e",
+          "assembly_names": [
+            "Microsoft.Windows.Common-Controls"
+          ],
+          "files": []
+        }
+      ]
+    },
+    {
+      "name": "WB9ENT64.OCX",
+      "sha256": "02d837de08df68df929035f2935df3ac324bd71fcaf09ffd89f3c6f5acf4a8f8",
+      "imports": [
+        "COMCTL32.dll",
+        "KERNEL32.dll",
+        "USER32.dll",
+        "GDI32.dll",
+        "ADVAPI32.dll",
+        "SHELL32.dll",
+        "ole32.dll",
+        "OLEAUT32.dll"
+      ],
+      "manifest_summaries": [
+        {
+          "resource_id": 2,
+          "sha256": "388f75e900f0c15fd66249d7b2e7edf6e14eeefb859e6f766b75058e44f27af6",
+          "assembly_names": [],
+          "files": []
+        }
+      ]
+    },
+    {
+      "name": "wwb9_64.dll",
+      "sha256": "3012ebe4dcb805a93ee3f8a627a07e88736b947997ff747cf3761271df599ff4",
+      "imports": [
+        "IMM32.dll",
+        "KERNEL32.dll",
+        "USER32.dll",
+        "GDI32.dll",
+        "comdlg32.dll",
+        "ADVAPI32.dll",
+        "SHELL32.dll",
+        "ole32.dll",
+        "OLEAUT32.dll",
+        "VERSION.dll"
+      ],
+      "manifest_summaries": [
+        {
+          "resource_id": 2,
+          "sha256": "388f75e900f0c15fd66249d7b2e7edf6e14eeefb859e6f766b75058e44f27af6",
+          "assembly_names": [],
+          "files": []
+        }
+      ]
+    }
+  ],
+  "standalone_initialize_contract": "v9 Initialize expects SerialNumber, not a licence-file path; documented development token not portable runtime authorization",
+  "cst_specific_initialize_sequence": "not established by this static inspection",
+  "new_cst_launched": false
+}

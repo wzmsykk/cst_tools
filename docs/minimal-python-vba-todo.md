@@ -1,410 +1,122 @@
-# 最小 Python / VBA 协议 TODO
+# 现行计划与TODO
 
-## 原生采集/RunStore及B4子集（2026-11-02）
+更新：2026-11-03。以[当前状态](current-status.md)确认能力与验收边界；实现入口见[功能索引](feature-index.md)。历史P0–P7、L1–L5及阶段勾选完整保留于[旧TODO归档](archive/20261102-progress-consolidation/minimal-python-vba-todo.md)，不删除未决项，也不把已完成项重复当下一步。
 
-[共享采集链](native-execution-capture.md)已冻结意图/nonce/来源和安装，三阶段固定原生帧，六字段pre必须不存在才能Start，退出后归档DB并绑定对账。真实小网格Pillbox正常1模式、实际Start=0/0模式且配置匹配、旧库拒绝均取得副本证据，回执不将失败退出1写成正常成功；索引缺失可补且不重算。按用户要求2022大版本共用行为规则，精确版本/hash仍留档。默认Managed/HOM及公共single-simulation服务未自动接入，完整B4/G03/MCP闭环仍待完成。此前“采集/RunStore未实现”是较早阶段记录。
+## 已完成的当前基础
 
+- [x] B1共享严格只读来源、B2完整A1受限历史投影、B3执行快照内核和B4原生采集/RunStore绑定子集。
+- [x] 公共single-simulation服务、Runner分发/查询、ACK后采用、证据齐全时的幂等补写；离线/假对端回归。
+- [x] 生产G03显式验证后端、重验证撤销旧ready、退出未知阻断；真实小网格保存重开通过。
+- [x] G04新公共单次组合真实副本通过，一次Start/1模式及标准关闭；生成宏语言声明修正。
+- [x] A01–A08恢复/退出审计修复及故障测试。已有实现不等于所有真实远端/GUI场景通过。
 
-## B3执行快照内核实施（2026-11-02）
+## 近期顺序
 
-[公共只读验证器](execution-snapshot-verification.md)已实现六维绑定、固定2022.5/root/Tet profile、时间/阶段核对、6位g精度、严格快照JSON及实际数据库双hash。11项E oracle实际执行，另重放6组历史原生字符串；B2新增exact_values避免预期先转float丢精度。B3采集/RunStore权威接入及B4新副本未验，publish_ready始终false；不证明live、求解/结果/退出成功。下文B3未实现及56项全部not-run是历史阶段记录。
+1. [x] G03验证会话统一恢复/退出核验/GUI事实接线，离线异常、PID复用、有界等待及暂停测试通过。真实中断矩阵仍待独立验收，不用全局Active3D。
+2. [ ] 补齐公共单次真实故障矩阵：采用后发布缺口已真实验收通过；求解失败、ACK各时点及更多采集缺口仍待完成。
+3. [ ] 完成公开工程创建、参数化建模、typed修改、定义编辑/发布事务，复用同一ApplicationService；验收工具不能替代公开功能。
+4. [ ] 接入MCP SDK/协议与目标宿主，完成G01发现/调用、错误分层和幂等；GUI/CLI/后台迁移与旧入口删除同批进行。
+5. [ ] 按G01–G08从真实对话完成建模到结果交付。G04已验子链，不提前宣称完整首阶段通过。
 
+## 保留的长期及未完成验收
 
-## B2首阶段历史与身份完成（2026-11-02）
+- [ ] HOM新加密一次→恢复原密度扩窗→窄窗确认/证据判空的真实CST串行验收与阶段中断矩阵，见[恢复策略](hom-solver-failure-recovery.md)。
+- [ ] 完整Save/Rebuild陈旧性、未知编码/复杂历史及跨版本矩阵，保持unsupported/未确认边界。
+- [ ] 更长Warm运行的性能、内存增长和失败率统计；既有少量验收不当长期统计。
+- [ ] 更广后处理算子等价性、多材料/复杂CAD共同域、完整模式追踪及COMSOL能力对齐，依各专题门禁推进。
+- [ ] 远程/分布式E6–E9、SDK宿主兼容矩阵与完整跨入口验收，按原设计继续，不另建第二底层。
+ww
+历史未决原文均保存在归档；若恢复某个旧条目，先核对现代码和最新专题验收再转入近期队列。未知旧条目不因文档整理标为已完成。
 
-[51项命令profile](a1-history-command-profile.md)已实现完整人工Pillbox XYZ历史投影：从同一scope有效历史核验mm/MHz、显式ChangeSolverType；不再接收调用者frequency_unit，元数据/注释不能补缺。修正Reset对象归属并拒绝无依据Mesh/MeshSettings.Reset，保留表达式、逐字段来源与失败语句定位。首阶段静态子集完成，不代表任意旧模板、实际保存重建、live身份或MCP服务器通过；B3/B4/G03仍待验。下文“完整历史允许表和单位身份pending”是本批之前状态。
+## 文档同步要求
 
+功能实现/边界变化同批更新API/使用设计、TODO、当前状态和功能映射；真实现象同步知识库，区分定义/实测/推测。执行documentation_index_test.py及相关功能测试。旧测试数字只归属原批次，artifacts清理后注明可重生成边界。
 
-## B2子集实施更新（2026-11-02）
+本批官方SDK现代stdio入口与本机Codex服务登记已完成，但实际桌面调用/公开建模未验，不能勾选G01–G08全通过。详见[逐项记录](g01-g08-progress.md)。
 
-已新增[受限历史投影](settings-history-projection.md)：H/S/M共35项语义oracle实际执行通过，保留表达式、逐字段来源与缺失配置，未知调用清空字段并拒绝。B1与新投影组合只读入口已实现；完整历史允许表、单位/solver身份锚点及B3仍pending，G03未通过，MCP服务器未实现。下文56项not-run是B0历史记录，不代表本轮35项仍未执行；未实施执行快照、启动CST或迁移GUI/CLI。
+最新推进：G01当前桌面基本发现/调用/错误拒绝/Runner退出已验，完整N矩阵保留；G02 create_project/inspect空文档子集及原生bootstrap已实现/实测。近期第3项的typed建模、配置与发布仍未完成，不能勾选整项完成。新版四工具刷新后的公开创建调用待验。
 
+## 类型化定义批次后的近期顺序
 
-## B1更新（2026-11-02）
+- [x] 当前Codex九工具公开create/inspect/同ID重发、Runner标准退出。
+- [x] 首阶段类型化草稿、仿真配置、save副本/G03发布、close、冻结PPS/算法结果来源与鉴权JSON/CSV导出实现及离线测试；不是整链真实通过。
+- [x] 核实原DE40732/存储/Runner原身份退出，退役未发布候选；未补造退出码、未重放原生操作。
+- [x] 14工具公开SDK小网格Pillbox从新建/建模到实际一次求解、采用恢复、导出/正常退出；G03原生几何/边界观察已补。
+- [ ] 当前桌面重载新增五工具后实际对话完成全流程；SDK客户端不代替指定宿主。
+- [ ] 完整N01–N25及G03/G04/G08真实故障矩阵继续逐项验收；不一次勾选。
 
-已实现[保存来源严格适配](saved-project-source.md)：固定复用cst_version只读方法、精确scope、原字节/哈希、严格编码/JSON、预算/CRC/读取变化校验及便携发布。旧文“B1待实现/未接入”是本批次之前状态；B2/B3生产语义与G03仍未通过，56项oracle仍not-run，无真实CST启动。来源复用采用随包固定上游摘取，未修改兄弟仓库，也未迁移所有旧入口。
+旧“typed仍待实现/只注册五工具”为前批时点。当前API、错误、兼容性及恢复见[类型化事务](typed-definition-service.md)。
 
-状态：历史P0–P7已完成；生命周期L1–L4已接入，L5已有部分真实CST验收；2026-10-25追加真实HOM恢复对照，完整矩阵仍有未完成项，以本页勾选项及当前状态为准。
-当前总览：[CST Tools 当前状态与实施路线](./current-status.md)
+## 当前真正下一步（2026-11-03）
 
-设计依据：[最小 Python / VBA Runtime Protocol](./minimal-python-vba-protocol.md)
+1. [ ] 用户方便时重载cst-tools-acceptance后，在指定Codex桌面对话调用新增五工具并完成真实闭环；用户已选择稍后进行，不阻塞本批收口。
+2. [ ] 扩充单次CST求解失败/ACK/控制器退出矩阵及N01–N25；本轮已覆盖真实采用回执缺口，不能替代其它故障。
+3. [ ] 继续A2能力/跨入口使用；真实XYZ、其它材料/几何/后处理/优化按独立门禁推进。
 
-## 当前优先：生命周期协议L1–L5（2026-10-24更新）
+类型化实现与首次构造作用域已按实测修订；对空工程批宏和二次RunScript的旧前提不再当可用接口。见[本轮报告](typed-public-acceptance-20261103.md)。
 
-- [x] [HOM失败恢复链](hom-solver-failure-recovery.md)：临时加密一次、恢复原密度扩窗、窄窗确认、证据判空、v4阶段检查点/密度及探测上界；仅明确求解失败触发，不把ACK/异常输出当空。
-- [x] HOM显式启用严格失败会话退役；退出1仍非标准退出且需进程/后代结束、快照SHA/回执/StopAck/任务ACK完整；标准模式不变，补顶层恢复原因。
-- [ ] 新恢复链真实CST串行副本验收：Mesh实际密度变化/恢复、迭代失败退出1退役、扩窗首模/窄窗对照和阶段中断；旧Pillbox验收不能代证新策略。
+## 生成器语法防线（优先于继续扩充动态宏）
 
-- [x] 分析16:51用户诊断包：迭代上限、2项撤销5秒、74秒原生收尾、退出1单一门禁阻断；回执/StopAck及可取得哈希核验，见[现场记录](field-failure-bundle-20261025.md)。
-- [ ] 新版失败退役/迭代耗尽恢复链仍需真实CST受控对照；顶层原因传播和恢复状态机源码已实现，不能用旧现场包或假对端结果代替真实求解验收。
+- [x] W0静态核查：WWB-COM调用/With/ByRef/参数重名规范、首阶段历史/参数/结果边界、MacroCheckThis候选与控件诊断边界，见[核查契约](winwrap-w0-contract.md)。
+- [x] W0核心宿主校准：MacroCheckThis在本机2022.5的14项正反例、CST上下文子集、错误Source、正文不执行及标准关闭已通过，见[记录](cst-macrocheck-w0-20261103.md)。Call实际执行/持久化、行长与ByRef等扩展仍待验。
+- [ ] W1：定义构造迁移到受限共享语法发射器，统一调用/参数/声明；候选全部属性成功且G03通过才发布；固定模块传数据，不另建队列；经验证后替换0+局部修复。
+- [ ] W2：独立启动前检查及本次真实失败反例、表达式组合/声明冲突测试；不把B2投影当编译器。
+- [ ] W3：生成器变更的真实无求解宿主门禁，再迁移其它动态生成点；保留原有G03。
 
-- [x] GUI默认HOM扫频/已确认结果表，技术日志/后台管理移详细页；只读缓存检查点，区分确认覆盖/计算上界，不自动求解或恢复，见[工作台说明](gui-hom-workspace.md)。
-- [ ] 工作台现场DPI/字体/长时间刷新、真实CST重连及远程结果读取验收；跨Qt模块合并测试异常根因仍待独立定位，不扩大独立回归通过范围。
+设计与完成标准见[WinWrap语法防线](winwrap-codegen-safety-plan.md)。本轮仅保存方案，不表示新检查器已经实现。
 
-- [x] 一键导出失败诊断ZIP、原生日志/回执/撤销/预处理证据及来源清单；离线可用、后台压缩、长日志限量/缺失显式记录，见[导出说明](failure-diagnostic-export.md)。
-- [ ] 诊断导出的实际远端共享盘、文件锁/掉电及桌面视觉验收；当前不提供远程Runner下载接口。
+同类项目源码调研见[MCP/Skill实践对照](mcp-skill-codegen-practices.md)：W1优先固定库/结构化数据，W2限制为受限生成规则检查，不自研完整WinWrap编译器；补充可查询的CST调用卡片与错误源映射。
 
-- [x] 实现任务级参数撤销、相同表达式跳过、setter前记录已尝试前缀、仅批量恢复修改项/删除新增项，取消每轮全表检查点；见[实现边界](task-parameter-undo.md)。
-- [x] 新版真实副本：requested5/changed3、恢复2项/删除1项、旧快照/基准输入/正常关闭/迟到核验通过；见任务级撤销文档，不复用旧全表版本通过结论。
-- [ ] 零参数真实任务、setter部分生效后异常/撤销文件写失败的真实注入、复杂CAD副作用和Start0/exit1仍未验收；当前仅源码契约/既有门禁覆盖部分执行边界。
+### 2026-11-03 COMSOL MCP 对照补充
 
-- [x] 现场暴露的重复stop.request发布错误：同session有效意图幂等、进程内跨实例串行，坏/异会话/临时文件不覆盖；Worker/恢复共用入口。VBA失败文案改为实际返回值，见[记录](solver-failure-stop-idempotency-20261025.md)。不是现场求解/退出问题整体修复。
-- [x] 补取110caff3的diagnostics/lifecycle/cst：实际Start=0、ACK后恢复完成316秒、Rebuild56秒、Save7秒，400秒后批返回且退出1，见[原生对照](solver-failure-native-analysis-20261025.md)。不是受控重现或合法回执/退出码接受验证。
-- [x] 补output.txt及close.receipt：最大迭代次数耗尽；v2严格解析和session/task身份一致，回执报告恢复保存成功。
-- [ ] 补stop.ack、资源samples和快照本体/哈希及进程退出事实；迭代耗尽的数值根因和退出1受控对照仍待验收，不确认OOM/泄漏，不自动推进覆盖。
-- [x] 实施StoreParameters精确数组批量恢复原表达式、删除新增参数/校验/Rebuild、阶段诊断；重复stop共用600秒预算，失败重试从预处理基准新建Worker，见[实现边界](parameter-restore-close-budget.md)。
-- [x] 真实WinWrap/CST小网格副本编译与208项依赖表达式恢复/删除新增参数/校验、失败从processed.cst重试及短预算迟到关闭通过，见[验收记录](batch-restore-real-acceptance-20261025.md)。
-- [ ] 实际零参数工程、复杂CAD同模型性能对照、真实长恢复及Start=0/退出1语义仍pending；本轮失败为Rebuild=False，不作为数值不收敛验收。
+- [x] 固定版本审阅两项社区实现的建模与求解路径，见[源码对照](comsol-mcp-codegen-practices.md)；未运行 COMSOL。
+- [x] 将COMSOL分析纳入方案执行边界、失败不变量与分阶段验收矩阵（设计完成，不代表实现）。
+- [ ] W2 增加属性部分失败阻止发布、对象身份错误零次求解、响应丢失/求解异常不重复Start、停止超时保留未确认状态的故障测试。
 
-- [x] GUI重新打开自动找回最后项目、读取原设置、连接后台/回放历史；保留控制权/恢复/检查点防覆盖门禁，不自动start/recover。见[自动找回](gui-session-restoration.md)；新用户无记录需手动选择一次，损坏/丢失目录不创建空工程。
-- [ ] 自动找回的真实CST后台连接与现场视觉补验；当前独立进程计算为fake/无任务，不能代证实际CST运行环境。
+### 轻量离线语法检查选型
 
-- [x] 退出契约统一：明确detach与stop→shutdown→关闭GUI，空闲/安全FAILED可完整退出，未知/停止或服务关闭失败显示持久错误及可选操作；仅关界面不停止后台。见[现行契约](gui-exit-resource-cleanup.md)，不以杀CST解决。
-- [x] 异常资源清理：LocalExecution部分构造/overview异常也补偿关闭日志，HOM移除无用result.log，detach收口在途通信，GUI本地日志关闭失败允许重试；补真实GUI/假Runner Python和Windows文件/目录释放测试。实际CST收尾不由这些测试代证。
-- [x] 当前应用目录诊断：Runner/GUI显示PID/cwd及启动父进程PID，提示外部终端离开目录；不枚举/结束其他shell。runtime.cwd为可选兼容字段。
-- [ ] 退出修正的真实CST故障收尾与现场桌面视觉补验；用户现场占用PID确认、多窗口共享服务/外部交互终端的完整环境验收仍需另做。无固定总求解超时，不强杀。
+- [x] 核查开源候选及许可证差异，见[选型依据](winwrap-open-source-checker-options.md)；未发现经确认兼容WinWrap v9的开源编译器。
+- [x] ANTLR离线技术PoC已完成，见下方结果；逐文件分发许可仍待确认，当前不纳入生产依赖。
+- [ ] W0少量真实宿主校准仍待进行；本轮在启动前按用户新方向转为开源调查，无CST新结果。
 
-- [x] 2026-10-25真实HOM中断补验：小网格Pillbox基线及checkpoint/received/solver三个Runner退出窗口通过；每例实际Solver5次与基线提交序列一致，确认覆盖/旧结果/四场哈希不破坏、两次recover不改检查点、采用事件/CSV无重复。修复生产相对快照路径与cwd混淆。见[记录及范围](hom-interruption-l5-acceptance.md)；不扩大为长扫描/全后处理/掉电保证。
-- [ ] 评估小网格扩窗产生的频率漂移：本轮基线约503.495→503.583MHz被登记为近频结果，不能据此断言独立物理模式；需固定网格或场匹配另做物理判别验收，不与恢复幂等混为一谈。
+### 2026-11-03离线PoC后的顺序
 
-完整语义、故障矩阵、兼容范围与门禁见[生命周期修订计划](python-vba-lifecycle-protocol-v2-plan.md)。不把退出1加入白名单，不把旧Gate数字当新增情形验收。
+- [x] ANTLR VB6 Python目标离线PoC：15样本、原始反例/正例、lexer/parser诊断及EOF、SLL/LL性能和隔离依赖测量，见[报告](antlr-vb6-poc-20261103.md)；接受原始反例，尚不采纳为生产门禁。parser MIT/runtime BSD已识别，lexer及整体分发许可未完成确认。
+- [x] 静态核查本机WinWrap9.21.027类型库，确认BasicNoUIObj及Code/SyntaxCheck/诊断成员；未调用，见[入口](winwrap-v9-installed-entry.md)。
+- [ ] W0优先核实v9 NoUI文档化初始化/本机使用前提，在独立轻量进程验证语法、诊断、无正文执行和Shutdown；不注册全局组件、不复制许可材料、不走未核实底层绕行。
+- [ ] 将轻量原生检查与少量真实CST扩展上下文/历史门禁对照；不能只因引擎版本一致授予原生语义通过。
 
-- [x] L1：统一证据事实模型及关闭核验，正常stop/发现/显式恢复共用；修复活跃/未知进程误排除、解析匹配StopAck，记录Python退出观测；历史无退出码已死会话显式放弃。任务/采用无可靠来源仍unknown，完整采集属于L4。见[L1实施](session-closure-l1.md)，不代表v2或真实CST已验收。
-- [x] L2：静态close_protocol版本和close.receipt v2两端codec、四组golden；原子发布、严格身份/冲突检查，损坏v2不降级v1。见[v2说明](close-receipt-v2.md)；隔离契约宏已生成/检查，真实WinWrap执行和生产启用仍pending，不代表L3–L5完成。
-- [x] L3：新生产会话生成v2、实际收尾writer及分阶段事实；失败ACK后retiring；求解后失败保留产物不盲目Rebuild；Python任务级ACK与退役配套。见[L3边界](production-close-v2-l3.md)，仅离线/假对端及源码契约，不是L5真实CST通过。
-- [x] L4：正常stop/发现/显式恢复/Runner使用同一核验规则；ACK清理完成关联task，错误/缺证据与源码展示，物理安全独立于结果待对账，覆盖/采用不由诊断修改。见[实现与边界](runner-lifecycle-l4.md)，不代表L5真实验收。
-- [ ] L5完整矩阵：真实启动/正常单模/无结果/重建失败恢复退出4和七阶段故障已核验，修复活动文件变化导致的快照失配。已有[十二个停止/ACK时点](stop-ack-l5-acceptance.md)及[六类实际Controller/GUI进程退出](controller-exit-l5-acceptance.md)，修复未采用received漏发现、收尾活跃状态及归档旧路径。真正Start=0/Start异常、退出1、整机掉电/文件系统崩溃、索引未发布的部分rename窗口、任意指令级停止、API自身Save/恢复失败及大文件仍pending。
-- [x] 采用标记对账：标准检查点与HOM已采用TaskID核验后补齐receipt/RunStore；普通采用也幂等，事件/索引/receipt部分写入可续补。真实标准双任务三个退出窗口、两次recover、不重复导入候选/采用事件/求解已通过；HOM多模式/空任务为离线验证。见[采用对账](checkpoint-adoption-l5.md)。不将此范围扩大为任意算法切换、真实HOM、掉电/文件系统损坏的全组合保证。
+### NoUI独立校准结果（2026-11-03）
 
-10月20日仅文档修订；10月24日L1改变Python停止/发现/恢复核验，VBA wire仍v1。以下P0–P7及“明确不做”为历史阶段范围，不能解释为禁止当前已出现实际需求的持久恢复、产物校验或后续生命周期扩展；也不表示通用RPC/多Transport已进入范围。
+- [x] 免注册独立NoUI激活/属性访问及未初始化对象正常Shutdown/Disconnect验收，见[证据](winwrap-noui-acceptance-20261103.md)。
+- [x] 记录文档化开发token初始化仍False及用户观察eval expired；IgnoreDialogs不能保证屏蔽该提示。停止重复尝试，不复制许可材料。
+- [ ] 具备独立宿主有效初始化条件后，再验SyntaxCheck、Zrange正反例、错误行列、正文不执行及成功检查后关闭；本轮检查0次。
+- [ ] 若暂不具备该条件，另按少量真实CST MacroCheckThis校准推进W0；本轮没有启动CST，不自动切换宿主。
 
-## P0：修复现有确定缺陷
+### CST宿主初始化链
 
-- [x] 已存在 `.failure` 时立即返回 Failure。
-- [x] 修复成功返回 TaskIndex 加一偏移。
-- [x] `.rd0` 缺失时返回明确失败，不返回成功 `None`。
-- [x] Worker v1 每个任务使用独立结果目录；legacy Worker 等迁移时再切换。
+- [x] 核对本机manifest、主程序导入/延迟导入与v9 Initialize参数；区分开发示例token测试与CST宿主初始化，见[记录](cst-winwrap-host-loading.md)。未查明完整内部调用链。
+- [ ] 核实供应商是否支持独立NoUI借用本机CST使用条件的公开接口；未核实前不实现许可目录参数。
+- [x] 一次宿主/固定驱动批量MacroCheckThis真实核心校准已通过，详见本页W0收口；不假设多次RunScript可复用。
 
-## P1：最小协议
+### W0核心宿主校准收口（2026-11-03）
 
-- [x] 定义 Task、Completion、Ack 三个 dataclass。
-- [x] 实现键/值双行 Codec。
-- [x] 实现 `.tmp -> final` 原子提交。
-- [x] 增加 task UUID 和 Worker session UUID。
-- [x] 保留 literal/expression 参数语义。
-- [x] 定义最小错误码；P6 追加 `PROFILE_CAPABILITY_MISSING` 用于求解前能力拒绝。
+- [x] 一次无求解CST新副本/单次RunScript批量14次MacroCheckThis；原始Zrange拒绝、已验正例接受，见[记录](cst-macrocheck-w0-20261103.md)。首个实际批次包装错误未通过，修复后串行复验通过；不合并成首次成功。
+- [x] ErrObject.Number/Description/Source采集；观察格式的行号/语句映射，未知格式保留原文，不虚构列号。
+- [x] 标记文件与参数表达式双证据正文未执行；nonce完成标记、正常Quit/COM释放、退出0及无遗留。
+- [ ] W1实施受限共享发射器，先定义构造，保留0+和保守分段；不因Call语法通过立即替换。
+- [ ] W0扩展样本/后续门禁：Call实际执行/重放、数组ByRef、物理行/续行边界与对象初始化副作用。W3仍需独立验证。
 
-## P2：fake Worker 安全网
+### 后台与无弹窗验收
 
-- [x] 冻结 Task、成功/失败 Completion、Ack golden vectors。
-- [x] 实现独立 VBA v1 Task decoder、Completion writer 和 Ack decoder。
-- [x] VBA Codec 无 `Sub Main`，尚未接入生产 Worker。
-- [x] 不读取 `.tmp`。
-- [x] 拒绝错误 session。
-- [x] Completion 必须匹配 task。
-- [x] Ack 前不得读取下一任务。
-- [x] failure 不进入结果读取。
-- [x] 超时后停止 Worker；成功 Completion 不停止 Worker。
+- [x] 核实2022 CLI、COM/Python quiet及Linux参数边界，见[方案](cst-background-headless-boundary.md)。
+- [x] 首批公共空工程/类型化构造已接入归属后的quiet及DE/modeler观察，默认隔离桌面；其余CLI入口见后续迁移，不将此扩大为全链通过。
+- [x] W0无求解副本已验证正常/语法错误的窗口、焦点和退出事实；需要输入的对话框等扩展仍待验，不承诺全部静默。
 
-## P2.5：接入前 Gate
+### 后台首批收口（2026-11-03）
 
-- [x] 使用目标 CST 2022.5 的 VBA/WWB 解释器执行 golden vectors，而不仅是静态检查。
-- [x] 把 VBA Codec 编译进一份独立测试宏，验证 ASCII 文件读写和 `Name temp As final`。
-- [x] 使用标准 OLE `Project.Quit` / `Application.Quit` 关闭测试项目和应用，并验证无 CST/UI 残留；强制清场发生时 Gate 失败。
-- [x] Gate 已通过；允许进入 P3 的独立 Worker v1 接入。失败期间只修 Codec，未改 legacy `worker.vb` 生命周期。
-
-验证记录：真实 Contract Test 已在包含完整 P2 的当前实现上通过（2026-09-16，`1 passed in 24.32s`）。外部控制器通过版本化 `CSTStudio.Application` OLE 接口创建并持有项目，宏写出成功 marker 后正常返回，再依次调用标准 `Project.Quit` 和 `Application.Quit`。由 OLE 持有项目的 Contract 宏内不得调用 `Quit`；P3 的应用级 `-m` Worker 则在 Ack 后自行 `Save`、`Quit`。只有标准退出成功且未留下需要用户通过 UI 处理的窗口或进程，Gate 才能通过；强制结束仅用于失败清场。
-
-P2.5 至此完成。下一步 P3 使用独立 Worker v1 路径验证 default 工程、参数、Rebuild/Solve/Flush 和一个 `.rd0`；在 P3 通过前不替换现有 legacy `worker.vb`，新旧协议不得共用 Worker 目录。
-
-## P3：真实 CST 最小验证
-
-- [x] default Pillbox 工程的独立临时副本。
-- [x] 一个 literal 参数：`nmodes=1`。
-- [x] 一个 expression 参数：`L=R + 30`。
-- [x] 一次 Rebuild/Eigenmode Solve/Backup Flush。
-- [x] 一个 `.rd0` 结果：`Result/Frequency (Multiple Modes)/Mode 1.rd0`。
-- [x] Python 读取完成后 Ack。
-
-验证记录：真实 Worker v1 Gate 已在 CST Studio Suite 2022 上通过（2026-09-17，`1 passed in 54.13s`）。CST 通过应用级 `-m` 执行独立 Worker v1；Worker 打开临时工程副本，应用参数并完成求解和 Backup，确认 `.rd0` 已落盘后才发布 Completion。Python 使用现有 `cst0dreadout` 读得 `503.782` 后发布 Ack，Worker 随后调用官方 `Save`、`Quit`，测试确认未留下需要用户处理的 CST/UI 进程。
-
-P3 没有替换 legacy `worker.vb`，也没有引入 Result Manifest、通用 Operation ABI 或新 Transport。真实 CST 产物证明该结果是目录化路径，而不是早先假设的扁平 `Result/<name>.rd0`。
-
-## P4：最小 Warm Worker 双任务验证
-
-- [x] 同一 CST 进程连续执行两个任务。
-- [x] 每个任务使用 `results/<task-uuid>/` 独立结果目录。
-- [x] 第一任务 Ack 前不读取或执行第二任务。
-- [x] 两个任务分别使用 literal 和 expression 参数。
-- [x] 两个 `.rd0` 均由 Python 在对应 Completion 后读取。
-- [x] 第二个 Ack 后发送 session-scoped Stop Request。
-- [x] Worker 写出 Stop Ack 后执行官方 `Save`、`Quit`。
-- [x] 记录每个任务的 Rebuild、Solve、Backup Flush 时间。
-
-验证记录：真实 Warm Worker Gate 已在 CST Studio Suite 2022 上通过（2026-09-17，`1 passed in 241.76s`）。`R=229, L=R+30` 得到 `503.782`；`R=230, L=R+29` 得到 `501.576`，因此第二次读取不是第一任务残留。两次计时分别约为 `Rebuild 0.608s / Solve 104.498s / Flush 0.819s` 和 `Rebuild 1.059s / Solve 105.670s / Flush 2.310s`。本样本证明了串行时序、结果隔离和可控退出，但没有证明 Solve 加速；Warm/Cold 性能结论仍需多点对照。
-
-P4 使用独立的有界双任务 Worker Gate，不替换 legacy `worker.vb`。Stop 协议仅包含 session ID，不扩展为通用控制或恢复协议。
-
-## P4.5：固定 HOM 结构扫频基准
-
-- [x] 使用 `HOM analysis_clean.cst`，所有几何参数保持不变。
-- [x] 仅改变 `fmin/fmax`：`720–800 MHz`、`800–880 MHz`。
-- [x] 两个频段分别执行独立 Cold 进程。
-- [x] 同一 CST 进程串行执行两个 Warm 频段。
-- [x] Cold/Warm 使用相同 Task/Completion/Ack 和独立结果目录。
-- [x] 比较每个频段的原生 Frequency `.rd0`。
-- [x] 记录 Rebuild、Solve、Flush 和进程墙钟时间。
-- [x] Stop Ack 后标准 Save/Quit，无 CST/UI 残留。
-
-验证记录：真实 HOM Cold/Warm Gate 已在 CST Studio Suite 2022 上通过（2026-09-17，`1 passed in 446.68s`）。Cold 两次墙钟合计 `270.062s`，Warm 双任务墙钟 `172.796s`，整体加速 `1.563x`。`720–800 MHz` 的 Cold/Warm Frequency 均为 `765.981`；`800–880 MHz` 均为 `826.770`。第二频段 Solve 从 Cold `41.012s` 降至 Warm `26.477s`。结果支持“复杂 HOM 结构不变、只改变频率范围”时保留 Warm CST 的价值。
-
-该双点结果是可重复基准的起点，不外推为所有工程或所有频段的固定加速比。后续性能结论仍应使用更多频段和重复运行统计。
-
-## P5：HOM 原生结果最小闭环
-
-- [x] 为已验证的 HOM 工程定义固定结果映射，不引入通用 Result Manifest 或 Operation ABI。
-- [x] 直接读取 CST 工程快照中的 5 个原生 `.rd0`：Frequency、Q-Factor、轴上 R/Q、5 mm 偏轴 R/Q、10 mm 偏轴 R/Q。
-- [x] 结果对象携带稳定 key、数值、单位和来源路径。
-- [x] 缺失、空文件、多行、非数值及非有限值均返回明确错误。
-- [x] Cold/Warm 两个频段逐项比较全部 5 个原生指标。
-- [x] 将当前工程中不存在原生 `.rd0` 的 Shunt Impedance、Total Loss、Voltage 明确归类为 `runtime-vba`。
-
-验证记录：扩展后的真实 HOM Gate 已在 CST Studio Suite 2022 上通过（2026-09-17，`1 passed in 523.97s`）。`720–800 MHz` 的 Cold/Warm 结果完全一致：Frequency `765.981 MHz`、Q-Factor `229.748`、R/Q `0.125728 ohm`、5 mm 偏轴 R/Q `0.243961 ohm`、10 mm 偏轴 R/Q `0.457261 ohm`；`800–880 MHz` 对应为 `826.770 MHz`、`54.0335`、`0.00750064 ohm`、`0.00747065 ohm`、`0.0432976 ohm`。Cold 两次墙钟合计 `307.860s`，Warm 双任务墙钟 `213.031s`，整体加速 `1.445x`。
-
-P5 证明的是“现有 CST 原生标量的严格读取”和 Cold/Warm 一致性。它尚未证明这些原生 R/Q 与 `EigenResult_Complex.vb` 自定义算法数值等价，因此暂不删除复杂 R/Q VBA；若业务仍依赖该算法，应先建立同参数基线再决定迁移。
-
-## P5.5：固定 Result Template 与动态运行时后处理边界
-
-- [x] 将 R/Q 能力按积分位置路由，而不是把整个指标统一标记为 `native`。
-- [x] 按官方 `coordinates=0/1/2` 和 `u/v/w` 设置建模 x/y/z 任意积分轴与三维偏移。
-- [x] 任意轴上与工程内预定义模板精确匹配的积分线使用原生 Result Template 输出；当前 HOM Profile 实际预装 z 轴 0/5/10 mm。
-- [x] 未预定义的任意轴、任意积分位置继续使用 `EigenResult_Complex` 运行时 VBA。
-- [x] 显式拒绝求解后通过修改工程参数驱动 Result Template；`Update Params` 会使当前求解结果失效。
-- [x] 使用同一次 Solver 结果运行 x/y/z 三个方向和 5/7.5 mm 复杂 R/Q 后处理，不执行第二次 Rebuild/Solver。
-- [x] 5 mm 运行时 VBA 与工程内预安装 Result Template 数值对照。
-- [x] Completion/Ack 后标准 Save/Quit，无 CST/UI 残留。
-
-验证记录：真实多轴 P5.5 Gate 已在 CST Studio Suite 2022 上通过（2026-09-17，`1 passed in 165.78s`）。同一次求解后，x 轴（y=5 mm）得到 `0.343891121231489 ohm`，y 轴（x=5 mm）得到 `7.10848179256522 ohm`，z 轴（y=5 mm）得到 `0.243960805493713 ohm`，z 轴（y=7.5 mm）得到 `0.338608596491386 ohm`。其中 z 轴 5 mm 与原生 Result Template 的 `0.243961 ohm` 在输出精度内一致。本次 Rebuild、Solve、Flush 分别约 `5.023s`、`46.850s`、`5.182s`，运行时后处理阶段没有修改工程参数。
-
-Result Template 生命周期由此分为两类：求解前可安装模板并设置随后参与本次求解的参数；求解后只能直接 Evaluate 已注册模板、修改不触发工程参数更新的模板实例设置，或调用运行时 VBA。禁止以工程参数变化模拟求解后的动态积分位置。
-
-## P5.6：已注册 Result Template 的运行期边界
-
-- [x] 使用 CST 官方 `ResetTemplateIterator` / `GetNextTemplate` 盘点项目已注册模板，而不是用 `.r0d/.r1d` 文件存在性冒充注册状态。
-- [x] 使用官方 `EvaluateResultTemplates` 对当前 Run 重新评估全部已注册模板。
-- [x] 显式评估前后 inventory 必须一致，代表运行期没有偷偷新增、删除或改名。
-- [x] 显式评估前后的原生 Frequency `.rd0` 必须一致。
-- [x] 整个 Gate 只运行一次 Solver，求解后不调用 `StoreParameter`、`Update Params` 或 Rebuild。
-- [x] Completion/Ack 后仍使用标准 Save/Quit；强制清理发生时 Gate 失败。
-
-CST 2022 的公开 VBA API 提供模板枚举和评估，但不提供新增、复制、删除模板的方法；官方自带 `Import Result Templates` 宏也已废弃，并要求在 Template Based Post-Processing 对话框中复制/粘贴。因此 P5.6 不把 GUI 自动化包装成运行协议：模板安装属于一次性的 Project Profile 制备与版本评审，运行期只验证声明能力并执行评估。`.r0d/.r1d` 修改器仍只用于读取、diff 和受控实验，不能声称完成模板注册。
-
-验证记录：真实 P5.6 Gate 已在 CST Studio Suite 2022 上通过（2026-09-17，`1 passed in 178.71s`）。官方 iterator 返回 5 个已注册 M0D 模板，均由 `3D Eigenmode Result` 提供；显式 `EvaluateResultTemplates` 前后 inventory 完全一致，Frequency 均为 `765.981 MHz`。本次只调用一次 Solver，求解后没有参数更新，并在 Completion/Ack 后标准 Save/Quit；只保留运行前即存在的 `cstd.exe` 许可服务。
-
-## P6：最小 HOM Project Profile
-
-- [x] 只定义一个 `hom-2022-v1` Profile，不引入通用 Schema 或动态能力协商。
-- [x] 声明 CST 2022、prepared 源工程和 Warm 任务只允许修改 `fmin/fmax`。
-- [x] 集中声明 5 个必需 M0D Result Template 的完整注册身份。
-- [x] 集中声明 5 个原生标量路径、单位和 3 条固定 R/Q 积分线。
-- [x] 声明动态 R/Q、Shunt Impedance、Total Loss 和 Voltage 继续使用运行时 VBA。
-- [x] Python 在生成 Worker 前拒绝 Profile 未允许的任务参数。
-- [x] Worker 在参数更新、Rebuild 和 Solver 前使用 CST 官方 iterator 校验模板能力。
-- [x] 缺少能力时发布 `PROFILE_CAPABILITY_MISSING`，不启动 Solver，并标准退出。
-- [x] 现有 HOM reader 和 R/Q 路由从 Profile 派生，同时保留兼容常量。
-
-P6 仍不自动安装 Result Template，也不引入 Profile 哈希、Manifest 或通用 Operation ABI。prepared 工程是 Profile 的权威载体；运行期只做确定性预检。
-
-验证记录：真实 P6 Gate 已在 CST Studio Suite 2022 上通过（2026-09-17，`2 passed in 292.90s`）。正向 `hom-2022-v1` Profile 在参数更新前确认五个模板后完成唯一一次 Solver，显式模板评估前后 Frequency 均为 `765.981 MHz`。负向 Profile 临时声明一个不存在的模板，Worker 返回 `PROFILE_CAPABILITY_MISSING`，未生成 timing/result 文件，并以 CST 批处理退出码 0 标准结束；两次测试均未留下新增 CST/UI 进程。
-
-## P6.5 I：HOM Profile 接入有界 Warm Worker
-
-- [x] `prepare_warm_worker_workspace` 接受可选 Profile；未传 Profile 时保留 P4 Pillbox 行为。
-- [x] Python 在生成宏前用同一 Profile 校验整批任务，HOM 任务仍只允许 `fmin/fmax`。
-- [x] Worker 打开 prepared 工程后、进入任务循环前只盘点一次注册模板。
-- [x] 预检通过后，同一 CST 进程继续执行两个 Warm 频段，不在任务间重复能力协商。
-- [x] 缺模板时首个任务返回 `PROFILE_CAPABILITY_MISSING`，不产生 timing/result、不进入 Solver，也不读取第二任务。
-- [x] HOM Cold/Warm 基准显式传入 `HOM_PROFILE_V1`，并记录 Profile ID、预检次数和模板数。
-- [x] Completion/Ack/Stop 后保持标准 Save/Quit，未留下新增 CST/UI 进程。
-
-验证记录：真实正向 HOM Gate 已在 CST Studio Suite 2022 上通过（2026-09-17，`1 passed in 570.44s`）。Profile `hom-2022-v1` 在会话启动时预检一次，共确认 5 个注册模板；两个频段的五项原生结果分别与 Cold 完全一致。Cold 两次墙钟合计 `328.828s`，Warm 双任务墙钟 `238.484s`，本次整体加速 `1.379x`。负向缺模板 Gate 亦通过（`1 passed in 93.22s`）：在首个 Solver 前返回规定错误，第二任务没有 Completion，并正常退出。
-
-P6.5 I 只把既有 Profile 作为 Warm 会话的可选启动前置条件，没有增加 Profile 文件格式、哈希、动态协商或通用 Operation ABI。下一步进入 P6.5 II 时，应优先清除剩余 HOM 硬编码入口，使原生结果读取和运行时 R/Q 路由也直接由同一 Profile 驱动。
-
-## P6.5 II：同一 Profile 驱动结果读取与 R/Q 路由
-
-- [x] 原生 `.rd0` 读取器接受显式 `HomProjectProfile`，从该实例取得结果 key、路径和单位。
-- [x] 结果分类由传入 Profile 的原生标量和运行时 VBA 能力生成。
-- [x] R/Q 路由接受显式 Profile，从其固定积分线能力选择 `native` 或 `runtime-vba`。
-- [x] 同时传入 Profile 和旧式映射时明确拒绝，避免两个能力来源产生歧义。
-- [x] 运行时 R/Q Workspace 校验任务参数及 `r_over_q_dynamic` 能力声明。
-- [x] HOM Cold/Warm 与多轴运行时 Gate 显式贯穿同一个 `HOM_PROFILE_V1`；原兼容常量和默认调用仍保留。
-- [x] 使用变体 Profile 单元测试证明读取路径、单位、结果分类和积分线路由不再偷用默认 HOM 常量。
-
-验证记录：默认测试为 `84 passed, 12 deselected`。真实多轴 Gate 已在 CST Studio Suite 2022 上通过（2026-09-17，`1 passed in 209.16s`）：x/y/z 四条运行时积分线结果与既有基线一致，其中 z 轴 5 mm 的运行时值 `0.243960805493702 ohm` 与同一 Profile 声明的原生结果 `0.243961 ohm` 一致；求解后没有参数更新，Completion/Ack 后标准退出，未留下新增 CST/UI 进程。
-
-P6.5 II 没有删除兼容常量，也没有建立通用 Profile Schema。当前 HOM 执行、读取和路由已经共享一个 Profile 能力来源。
-
-## P7：单 Profile 基础上的通用核心抽取
-
-当前暂不建设多个工程 Profile。P7 的目标是把已经通过真实 CST Gate 的机制从 HOM 命名中解耦，而不是通过增加第二个工程扩大需求面。
-
-- [x] 将通用字段抽入领域无关的 `ProjectProfile`；`HomProjectProfile` 仅作为携带 R/Q 路由元数据的兼容扩展。
-- [x] 将严格标量读取器抽成接受 `NativeScalarCapability` 集合的通用函数；HOM reader 只作为兼容包装。
-- [x] 将结果分类抽成通用 Profile 能力查询，通用模块不引用 `HOM_PROFILE_V1`。
-- [x] 将 Warm Worker Profile 参数改为通用类型，保持无 Profile 的 P4 路径不变。
-- [x] 保留 `IntegrationLine` 和 R/Q 路由为 HOM/电磁领域适配层，底层 Provider 选择改用通用接口。
-- [x] 保持现有 P6.5 I–II 真实 Gate 数值、fail-fast、Completion/Ack 和标准退出行为不变。
-- [x] 保留旧公开常量和函数作为兼容层；本阶段不强制删除。
-
-P7 明确不做 Profile 文件格式、数据库/注册表、可扩展继承框架、插件发现、动态 capability negotiation、通用 Operation ABI 或多 Transport。当前单层 `HomProjectProfile` 仅为兼容扩展。验收标准是“核心模块不依赖 HOM 单例且现有 HOM 行为不变”，不是“能够描述任意 CST 工作流”。
-
-实现记录：通用核心拆为 `project_profile.py`、`native_results.py` 和 `result_provider.py`。默认测试为 `88 passed, 12 deselected`，其中包含直接使用基础 `ProjectProfile` 构建 Warm Worker 的测试。真实缺模板 Gate 通过（2026-09-17，`1 passed in 127.38s`），仍在首个 Solver 前 fail-fast；真实多轴 Gate 通过（`1 passed in 178.02s`），z 轴 5 mm 原生结果 `0.243961 ohm` 与运行时结果 `0.243960805493711 ohm` 一致。两次均标准退出且未留下新增 CST/UI 进程。
-
-## 明确不做
-
-- [ ] 不做 Result Asset Manifest。
-- [ ] 不做参数或结果 SHA-256。
-- [ ] 不做动态 capability negotiation。
-- [ ] 不做多 Transport 抽象。
-- [ ] 不做通用 Operation/插件 ABI。
-- [ ] 不做跨主机和断点恢复。
-
-以上项目只有出现真实失败样例或明确需求后才能移入实施列表。
-
-- [x] 2026-10-25 GUI频率命名明确区分目标下限、首个求解窗口上限与目标上限；配置键不变，GUI/工作台/文档索引39 passed，详见gui-hom-workspace.md。
-
-## MCP接入待办（2026-10-28，仅设计）
-
-完整契约、源码映射、外部参考及门禁以[MCP设计计划](mcp-design-plan.md)为准；不改变本文件原有Python/VBA优先级，不另建VBA ABI。
-
-- [x] M0前置阅读：完整阅读2026-07-28官方规范正文与TypeScript类型，补读Tasks正式扩展/安全指南，建立[符合性矩阵](mcp-protocol-conformance.md)；仅阅读与设计成果。
-- [x] M0 CST语义审查：核对安装版CLI/OLE/Python/结果/Eigenmode文档与现行调用链，形成[作用域与限制设计](mcp-cst-capability-scope-design.md)；不等于运行验收。
-- [ ] 前置缺口：预处理BindHomSolverSettings检查AddToHistory Boolean并回读配置，补失败分支测试；真实副本另行授权。
-- [ ] M0：确认SDK/宿主实际版本支持，再收敛工具/DTO/错误码/能力、授权及身份与去重契约；不能凭阅读记录当实施完成。
-- [ ] M1：本机stdio只读MCP与有限分页结果查询；真实协议客户端验收。
-- [ ] M2：显式控制权、提交/停止/取消未知提交/恢复/退出；假Worker子进程故障矩阵。
-- [ ] M3：幂等诊断导出、安装与宿主配置、发布包和真实宿主验收。
-- [ ] M4：按需求接标准批次、XYZ复杂后处理及场匹配结果；非首版前提。
-- [ ] M5：另获实际求解授权后进行小网格CST串行副本验收，保留原工程与既有结果。
-
-- [ ] MCP静态设计冻结：按[框架清单](mcp-framework-static-design.md)完成14工具Schema、源码故障分支、结果文件/revision和SDK/宿主支持审查；完成前不创建运行框架。
-
-- [ ] 共用底层静态迁移表：按MCP约束定义唯一业务契约，逐项映射GUI/CLI/Runner现有校验、查询、诊断及错误；明确替代入口与删除条件，避免新增MCP专属业务框架。
-
-- [ ] 按内部快速迭代规则重审所有MCP设计：删除旧接口/协议兼容条款，形成唯一契约与旧入口删除清单；GUI/CLI/后台同批迁移，历史结果的一次性数据迁移单列。
-
-
-### 统一接口静态收敛（2026-10-28）
-
-- [x] 完成[统一契约](unified-interface-contract.md)：14公共操作、身份/错误/控制/幂等、提交字段、分页和结果来源；安全枚举已从源码核实。
-- [x] 完成[迁移方案](unified-interface-migration.md)：X01–X14删除/替代清单、GUI/CLI/后台S0–S5同步批次、故障落点及数据切换要求；未实际删除。
-- [x] 核对checkpoint v4、manifest v3、ModeResult和RunStore现有字段；明确当前无统一revision、逐模式run/单位来源；查询禁止调用会写修复的RunStore日志方法。
-- [x] 后处理/WTC/TM020子Schema与预算已冻结；官方SDK/目标宿主源码支持已核实，见下方专题；有效桌面配置/运行握手及对应实现仍待验收。
-- [ ] 按S1–S4实施唯一契约/服务/客户端和所有入口迁移，删除重复路径；当前未获本轮运行代码实施要求。
-- [ ] 独立设计并验收一次性数据迁移；未知归属不得猜测，旧停止意图必须对账，活跃旧后台正常停止后切换。
-- [ ] 实现后执行跨入口去重/争用、响应丢失、结果分页及只读无副作用验收；真实CST另行授权。
-
-
-### 后处理/优化与SDK宿主静态冻结（2026-10-28）
-
-- [x] 冻结[算子与优化子Schema](postprocess-optimization-subschemas.md)：实际29旧方法归并为13指标+3操作的公共定义；不保留_All兼容别名（ModeRec_All为现行专用方法ID），明确轴/单位/采样/缺项策略及固定优化问题。
-- [x] 文档JSON Schema13定义与35正例/21反例校验通过；跨字段规则单列，未加入运行验证器。
-- [x] 核实[官方SDK/宿主支持](../knowledge-base/mcp-sdk-host-support-20261028.md)：mcp2.3.0、固定tag、Python下界差异，Codex本机版本及同名源码现代开关/stdio标记；未修改配置。
-- [ ] 处理O01–O06：TM020维数/失败/目标模、WTC有效性、显式新建/续跑、严格参数与单位转换；两优化策略暂不开放，不能以Schema通过解除。
-- [ ] 在实施阶段完成公共模型和跨字段/预算校验、注册原生结果与算子单位、ModeRec工程前提及物理适用性门禁。
-- [ ] 固定桌面实际runtime与有效配置，授权配置后做SDK2.3.0无CST现代握手/取消/EOF/旧版拒绝门禁；静态源码支持不等于当前宿主已通过。
-- [ ] 安装/解压发布环境的精确依赖解析与测试；当前不新增依赖或运行服务。
-
-
-### 总体功能对齐COMSOL MCP（2026-10-28）
-
-- [x] 基于两固定COMSOL MCP工具源码建立[能力矩阵C01–C11](comsol-mcp-functional-alignment.md)，明确A1十四操作不是完整范围。
-- [x] 扩展统一框架目标：工程定义/document revision、受控change set、不可变执行版本共用公共服务，不另造CAD/结果框架。
-- [ ] A0下一步：冻结C01工程生命周期与C02参数/表达式/结果失效契约，核对CST官方对象与实际调用作用域。
-- [ ] C03–C05：几何/选择/材料/边界/端口/mesh逐命令文档审查、历史持久化及读回设计；不得将通用建模永久排除在目标外。
-- [ ] C06–C10：通用simulation/参数扫参、结果目录/曲线/受控表达式/图片导出和版本工作流子契约；复用现有算子及cst_version能力。
-- [ ] A1空白Pillbox对话闭环、A2扩展建模、A3通用分析、A4广泛对齐分别实施验收；不将首次完整闭环推迟到A4，真实CST仍另行授权。
-
-
-### A1首阶段门禁调整（2026-10-28）
-
-- [x] 确定[对话建模→设定→求解→后处理G01–G08](mcp-first-stage-conversational-gate.md)，首阶段通过必须有实际模型/结果/标准收尾，不以14工具或假Worker替代。
-- [x] A0首阶段九操作/typed变更与single-simulation契约已静态冻结，参数历史/设置读回/失效/版本/工件归属见D14；具体运行实现未完成。
-- [ ] A1实施统一公共服务中的最小Pillbox闭环，真实宿主逐步驱动；需要修改输入半径/长度，禁止硬编码演示模型。
-- [ ] 执行现代协议、保存重开、实际求解、Frequency/RQ工件、解析频率≤5%及标准退出门禁；当前无本门禁运行证据。
-
-
-### A1官方接口静态冻结（2026-10-28）
-
-- [x] [九操作统一契约](mcp-first-stage-interface-contract.md)与[14页CST2022官方帮助语义核查](../knowledge-base/cst-first-stage-api-semantics-20261028.md)：工程创建、参数/全局圆柱、背景/边界、Tet与Eigenmode、普通单次求解、结果查询/JSON/CSV、关闭。
-- [x] 明确参数表/结构历史/框架PPS/Model.run/结果文件集/关闭事实分别持久化；不扁平化表达式、不在算后Rebuild；变更候选验证后原子发布定义指针。
-- [x] 查明五项设置的分阶段来源：V03当前请求数、V05现代Tet通道、V01/02/04执行快照与缺失/陈旧/精度边界；没有三个通用求解前实时getter，不猜key，不以旧快照放行新定义。
-- [ ] 实施前设计新建bootstrap及候选编辑/重开核验探针；仅用自有实例串行，官方Python.close与批宏返回分别处理，不把旧Gate作为新证据。
-- [x] V05验证旧Tet setter在本Version=1上下文无网格影响，现代通道有独立输入/网格证据；A1统一近远策略已调整设计。
-- [ ] 实施几何AST→历史参数读取；不在结构宏调用受限Solid包围盒查询。
-- [ ] 实施统一single-simulation后端路径和结果采用/工件导出，不调用HOM预处理重写用户定义；正反例/故障与真实G01–G08另行验收。
-
-
-### 五项设置读回静态核查（2026-10-28）
-
-- [x] [验证器设计](cst-settings-verifier-design.md)与[固定证据](../knowledge-base/cst-settings-readback-20261028.md)：官方6页方法目录、cst_version源码hash、4文件7scope、3文件历史定位；源hash未变，无CST启动。
-- [x] 分开算法Hex/Tet槽位、频段与target、请求/计算模式数、Tet自适应开关/细化策略、Tet近远密度/策略；持久读取与live证据等级分别定义。
-- [x] 明确cst_version只有容器/历史基础，无最终设置语义解释器；设计共享接入和严格missing/malformed/unsupported，拒绝正则last-match/宽松{}默认。
-- [ ] 实施公共有界历史投影、来源/哈希/作用域/严格类型报告及静态反例；仅按已支持语法读，未知控制流返回unresolved。
-- [x] [V03受控副本校准](../knowledge-base/cst-settings-calibration-20261028.md)：本机2022.5 Default/Tet、General (Lossy)/Tet、AKS/Hex设置1/2和重开查询一致，原表达式不变。
-- [x] V05新旧通道设置及重开对照：现代near/far/policy可读，legacy 4→6不改变该读数；不建立未经证实的等价映射。
-- [x] [V05小网格实际网格](../knowledge-base/cst-tet-density-mesh-calibration-20261028.md)：Version=1旧4/8及混用顺序不改变网格，现代near4→8产生1408→8720 cell；输入步长和网格hash补证；Version=0旧4/8均被网格器拒绝，禁止自动回退。
-- [x] A1统一密度请求明确写现代Version=1 near=n/far=n及策略；这是应用策略，不是旧setter转换。导入工程仍保留独立近/远配置，仅修改设计，生产未迁移。
-- [ ] V05扩展profile：其他CST版本/历史配置、材料/开放域far主导区域、其他policy/局部细化；查询最大边长与输入step关系仍需网格拓扑审查。不能由本次结果推出所有旧接口无效或固定精度。
-- [x] [V01/V02/V04执行配置校准](../knowledge-base/cst-solver-settings-readback-calibration-20261028.md)：Default/General、target0/480/禁用/表达式精度、自适应False/True；6次实际尝试5成功1失败，失败配置亦可读。
-- [x] 验证执行数据库的缺失、带结果重开、设置改变后Save仍陈旧、Rebuild后清除；target字符串约6位有效数字，不改原表达式。
-- [ ] 实施公共execution_snapshot报告及attempt/run/revision/阶段/hash归属、未知枚举/字段缺失拒绝和数值分辨率比较；不得标为live或额外求解读取设置。
-- [ ] 求解前公共持久历史投影/重开/校准profile落地；当前三个实时getter仍无证据，不用上一次Model.db替代。
-- [x] [V06 B0用例/合同](cst-settings-v06-acceptance-plan.md)：56项人工预期和5个真实字节摘录/来源hash；仅结构/证据检查，语义全部not-run，不计V06通过。
-- [x] 记录真实Enlarged历史非UTF-8及共享scope默认/replace解码边界；区分未知旧编码unsupported与明确声明UTF-8违反malformed，不猜原编码。
-- [x] V06 B1严格来源；B2第一版受限历史/参数投影，实际执行H/S/M 35项，D04组合行为与来源故障测试；见[本批范围](settings-history-projection.md)。不代表完整B2/G03。
-- [x] V06 B2首阶段：51项精确历史规则、同scope mm/MHz及显式solver身份、完整人工Pillbox XYZ历史与合成保存来源组合；删除调用者单位信任和无依据Reset。见[本批验收](a1-history-command-profile.md)，不是任意工程历史或真实CST通过。
-- [ ] V06 B2/B4剩余：首阶段实际CST保存工程与原生单位/solver锚点交叉复核、适用D组逐项语义映射；未知旧模板/编码/单位保持unsupported，不靠宽松允许表放行。
-- [x] V06 B3只读内核：六维绑定、固定版本profile、观测窗口/阶段、6位g格式、严格JSON与数据库双hash，实际执行11项E及6组历史原生字符串重放；[接口与边界](execution-snapshot-verification.md)。不代表当前live或真实新采集验收。
-- [x] V06 B3/B4采集子集：RunStore冻结意图/nonce/安装及来源，原生pre-start-post帧、旧库Start前拒绝、关闭后DB归档/hash、幂等回执及索引补写；真实正常/Start=0失败/旧库副本已验，见[本批](native-execution-capture.md)。2022大版本共用规则，精确身份仍记录。
-- [x] [公共single-simulation服务](single-simulation-service.md)：Runner分发与查询、定义冻结/G03拒绝、可选Managed单次采集、既有ACK/采用/退出、结果发布与已收取记录补写；假Worker/HTTP与故障测试。HOM/standard默认不启用。
-- [ ] 生产G03定义验证端口及新Managed单次组合真实副本；缺端口默认ready=false，不让客户端自报ready。补保存重开/Save-Rebuild全部组合、完整document_revision编辑发布与MCP宿主闭环；旧B4不代替新组合。
-- [ ] V06 B4：新实现获授权后做必要的最少真实副本复核；不追认旧nmodes+1/Rebuild/Reset读回为新解释器通过。
-- [ ] 校准profile与configure/save/submit门禁接入；未经校准持久匹配不能放行G03，不发明getter或数据库key。
-
-B1最终离线验收：42 passed（2.64s），含17项来源适配测试、4项B0结构检查及既有校准/索引回归；不是56项语义通过。报告 artifacts/b1-offline-20261102.xml。源码打包完整性/哈希、编译/无Qt Runner导入、GUI smoke及隔离进程读取Pillbox通过；不启动CST。artifacts不保证随Git迁移，本轮pytest临时目录已清理。
-
-2026-11-02：[261020恢复诊断包分析](recovery-bundle-261020-20261102.md)。现场仍RECOVERING，根因未确证；已确认导出先枚举历史worker耗尽1000候选，主日志未收录。TODO：主日志优先预算与恢复分阶段/逐任务可观测性；未修改运行逻辑、未做现场恢复。
-
-恢复阻塞补充TODO：旧worker.pid的进程存活未校验create_time/工程归属，存在PID复用误等每会话1200秒的风险；实现持久身份核验、旧记录明确处置及恢复阶段进度。离线决策已复现，现场根因仍待日志/进程身份补证。
-
-## 恢复修正（2026-11-02）
-
-已实现[进程身份、GUI恢复进度与主日志优先](recovery-process-identity.md)：新会话持久身份，旧有效退出证据核验优先，PID复用/身份未知立即报错不误等；Runner逐阶段/会话/任务传播，导出先保留主日志候选。对应前述修复TODO已实现，真实远端CST/孤儿进程及现场重导出仍待验收；没有追认现场根因为PID复用。
-
-本批验收：核心136 passed，协议/索引补充76 passed（重叠），GUI恢复相关5 passed；整组GUI中途退出未计通过。测试与剩余现场边界见[恢复修正](recovery-process-identity.md)。原模型/确认结果未改，未提交推送。
-
-## 2026-11-02 布局与恢复状态退出修正
-
-[最大化布局与待恢复退出](gui-maximize-and-recovery-exit.md)：修正插入错误标签后stretch索引错位；完整退出改为Runner重新核验物理会话，不再无条件要求逻辑恢复完成。确认所有进程已退出时保留待恢复标记退出；running/unknown仍阻断，允许仅关界面。旧文“RECOVERY_REQUIRED一律不能shutdown”由本批替代。真实CST/现场DPI仍待验，不清除检查点或强杀。
-
-本批验收：核心36 passed、GUI Runner21 passed、布局/恢复显示2 passed、独立GUI/Runner及目录释放7 passed；HTTP/物理安全专项7 passed（重叠）。详情见[本批记录](gui-maximize-and-recovery-exit.md)。真实CST/现场字体DPI仍待验，未提交推送打包。
-
-## 2026-11-02 恢复/退出整体审计（未实施修复）
-
-[整体审计A01–A08](recovery-exit-system-audit-20261102.md)发现待停止意图阻断shutdown、多个未完成启动意图恢复后重启再现、重复hash及全局锁I/O、恢复stop未消费、已离线退出确认、拒绝误报断线、导出阻止关闭。三项离线复现留档；优先修A01/A03，再做A02/A04。前批修正仍有效但覆盖不完整；本批只分析/同步文档，不修改运行逻辑或操作CST。
-
-本次审计补充A08：恢复按钮的会话数实际是状态布尔值，应改为真实统计并说明还包含结果对账。文档/日志索引3 passed（0.63s），仅证明映射有效，不代表上述缺陷已修复。
-
-## A01–A08实施（2026-11-02）
-
-[实施、持久化与验收记录](recovery-exit-audit-implementation.md)：停止意图和全部历史启动意图幂等收口；重型退出核验移出控制锁、单会话读取；恢复协作暂停及正常求解等待剔除；已离线核验、业务拒绝分类；导出取消/延期关闭；真实会话计数与“恢复项目”。A01–A08实现TODO完成，原审计“未修”是历史状态。核心147、GUI27、独立进程/目录释放7通过；另有重叠专项，详情见实施文档。真实CST/远端慢盘/人工旧数据复核仍待验；未提交推送打包。
-
-A01–A08最终补核：CLI shutdown亦复用所有权释放及物理核验；故障/协议/CLI/文档索引21 passed（5.44s），主窗口暂停按钮与恢复显示7 passed（0.73s）。本批轻量报告保留，pytest临时工程已清理；未启动CST，未提交推送打包。
-
-## G03生产后端接入 2026-11-02
-
-- [x] 默认注册生产后端、显式验证才启动、双副本保存重开、原生身份/范围及持久历史/表达式核验、失败诊断与不ready门禁。
-- [ ] 真实WinWrap/CST串行副本验收及完整single-simulation组合验收。
-- [ ] 验证会话纳入通用恢复/退出诊断；GUI/MCP显式验证入口；退出未确认时保留并人工核实，不自动清理或重试。
+- [x] 公共空工程/类型化构造归属后quiet；前者原生读回True，后者记录官方COM setter成功，不虚构读回。
+- [x] WinEvent用户前台事件与50ms归属窗口观察；PID复用、路径、未知弹窗和观测失败防护。
+- [x] 显式CreateProcessW临时非活动桌面，无SwitchDesktop；纯Python桌面名/句柄测试及真实CST14项正常/语法错误、无人工交互和正常退出通过，见[记录](cst-background-acceptance-20261103.md)。
+- [ ] 后续G03 CLI、预处理、Managed/HOM迁移隔离策略时同步桌面租约、恢复/诊断和退出门禁；本轮不将旧最小化等同于零抢焦点。
+- [ ] 更广许可/保存输入框/外层编译错误等故障验收；不因本轮错误对象测试通过就承诺所有弹窗均静默。

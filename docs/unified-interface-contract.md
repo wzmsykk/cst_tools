@@ -1,11 +1,10 @@
 # 统一接口契约：GUI、CLI、MCP与后台
 
-## 公共single-simulation服务接入（2026-11-02）
+## 阅读范围（2026-11-02）
 
-[application_service单次子集](single-simulation-service.md)已接入现有Runner和Managed Worker：严格document/definition引用、控制租约/幂等、空参数单Task、原生采集/RunStore统一revision、ACK后核验采用、只读查询、发布缺口补写与专用恢复。复用双日志和项目锁，HOM/standard默认行为保留。默认生产G03定义验证端口未注册，候选ready=false、提交DEFINITION_NOT_READY；本轮仅假对端/离线，不追认旧B4为新组合实测。完整建模/定义编辑与MCP宿主仍未完成。
+以下编号章节为冻结的设计契约，保留其字段、作用域与迁移细节；其中“本轮/尚未实现/下一步”描述设计时点，不作为现代码状态。已实现并真实验收的是[公共单次/G03及G04子链](single-simulation-service.md)，未完成的是公开建模/发布、MCP宿主与完整迁移。实施进度统一查[当前状态](current-status.md)和[TODO](minimal-python-vba-todo.md)。不把设计接口当已上线API。
 
-
-日期：2026-10-28。状态：静态设计，未实施。优先级：现代MCP协议 → 本文唯一业务契约 → 共用应用服务 → 执行实现。本文收敛[框架设计](mcp-framework-static-design.md)，覆盖旧计划中MCP专属DTO、控制句柄及兼容条款；不宣称协议标准规定本项目的业务字段。协议信封依据[符合性矩阵](mcp-protocol-conformance.md)，CST语义依据[作用域审查](mcp-cst-capability-scope-design.md)。
+原阶段更新与验收流水已移至[历史全文](archive/20261102-progress-consolidation/unified-interface-contract.md)。
 
 ## 1. 唯一契约与执行路径
 

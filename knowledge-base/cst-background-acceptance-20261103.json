@@ -1,0 +1,473 @@
+{
+  "date": "2026-11-03",
+  "scope": "Actual owned Windows CST2022 no-solve copies; normal and captured MacroCheckThis syntax failures; not all modal/solver failures",
+  "accepted_root": "artifacts\\cst-macrocheck-ce858a55",
+  "acceptance": {
+    "acceptance_passed": true,
+    "closure": {
+      "exit_code": 0,
+      "exit_confirmed": true,
+      "quiet": {
+        "nonce": "4c2ea4f981b74e4cb2ddbc837a12e122",
+        "readback": "not-exposed-by-COM",
+        "setter_returned": true,
+        "requested": true
+      },
+      "window_observation": {
+        "baseline_foreground": {
+          "hwnd": 2695562,
+          "pid": 32176,
+          "visible": true,
+          "minimized": false,
+          "owner": 0,
+          "window_class": "Chrome_WidgetWin_1"
+        },
+        "observation": "WinEvent foreground/show hooks plus 50ms window polling",
+        "owned_foreground_events": 0,
+        "errors": [],
+        "dropped_events": 0,
+        "window_enumeration_gaps": 0,
+        "private_desktop": "CstTools_f732c7e462ec4e6cb7210de8864a67e6",
+        "desktop_handle_closed": true,
+        "owned_window_events": 168,
+        "minimize_actions": 0
+      },
+      "window_observation_path": "D:\\work\\cst_tools\\artifacts\\cst-macrocheck-ce858a55\\window-observation.json"
+    },
+    "marker_absent": true,
+    "parameter_expression_after": "2 * W0Base",
+    "cases": [
+      {
+        "name": "body-marker",
+        "expected": true,
+        "statuses": [
+          "accepted"
+        ],
+        "error": null,
+        "diagnostic": null,
+        "source_sha256": "87f979709f55653d59ac1b24190675965767f8021bb115ae25861d5c713fb001"
+      },
+      {
+        "name": "parameter-write",
+        "expected": true,
+        "statuses": [
+          "accepted"
+        ],
+        "error": null,
+        "diagnostic": null,
+        "source_sha256": "700f4dd02d327cee8e2eb75e552cf7b6d0137add7185f100d3daaf90ce83bfec"
+      },
+      {
+        "name": "obvious-syntax-error",
+        "expected": false,
+        "statuses": [
+          "rejected"
+        ],
+        "error": "10586\nExpecting ')'\n[*xMacroRunThis3*#5] w0x = (\n\n",
+        "diagnostic": {
+          "number": 10586,
+          "description": "Expecting ')'",
+          "source": "[*xMacroRunThis3*#5] w0x = (",
+          "module": "*xMacroRunThis3*",
+          "wrapped_line_1based": 5,
+          "original_statement": "w0x = (",
+          "column": null
+        },
+        "source_sha256": "f4ab050ae3d736374daf9d70567d8432a2d5ab5f7a2f23f9acff468e2f245ebf"
+      },
+      {
+        "name": "zrange-original",
+        "expected": false,
+        "statuses": [
+          "rejected"
+        ],
+        "error": "10576\nUnexpected text.\n[*xMacroRunThis4*#5]  .Zrange ((-RestoreDoubleParameter(\"L\"))/2), (RestoreDoubleParameter(\"L\")/2)\n\n",
+        "diagnostic": {
+          "number": 10576,
+          "description": "Unexpected text.",
+          "source": "[*xMacroRunThis4*#5]  .Zrange ((-RestoreDoubleParameter(\"L\"))/2), (RestoreDoubleParameter(\"L\")/2)",
+          "module": "*xMacroRunThis4*",
+          "wrapped_line_1based": 5,
+          "original_statement": " .Zrange ((-RestoreDoubleParameter(\"L\"))/2), (RestoreDoubleParameter(\"L\")/2)",
+          "column": null
+        },
+        "source_sha256": "976327ec066b3db825736bdd2f893ffe5afc018d21a110fe20941c947182078e"
+      },
+      {
+        "name": "zrange-fixed",
+        "expected": true,
+        "statuses": [
+          "accepted"
+        ],
+        "error": null,
+        "diagnostic": null,
+        "source_sha256": "c103f099b9b4ab1335b5a98b0fb9ad89654f82b7c7e9a1ca3dce17eed91d839a"
+      },
+      {
+        "name": "zrange-call",
+        "expected": null,
+        "statuses": [
+          "accepted"
+        ],
+        "error": null,
+        "diagnostic": null,
+        "source_sha256": "cebbab94b7a928187f1e3c25d8fa6084b0b50166f97879011b6b1316494cbdd4"
+      },
+      {
+        "name": "duplicate-declaration",
+        "expected": false,
+        "statuses": [
+          "rejected"
+        ],
+        "error": "10519\nIdentifier is already in use.\n[*xMacroRunThis7*#5] Dim w0x As Integer\n\n",
+        "diagnostic": {
+          "number": 10519,
+          "description": "Identifier is already in use.",
+          "source": "[*xMacroRunThis7*#5] Dim w0x As Integer",
+          "module": "*xMacroRunThis7*",
+          "wrapped_line_1based": 5,
+          "original_statement": "Dim w0x As Integer",
+          "column": null
+        },
+        "source_sha256": "0ce3f69c7de40c0d77a6f584381d87c3bc8b6043ec52ffa4a636e1e6b9f0b143"
+      },
+      {
+        "name": "missing-end-with",
+        "expected": false,
+        "statuses": [
+          "rejected"
+        ],
+        "error": "10587\nUnterminated block statement. 'With'\n[*xMacroRunThis8*#6] End Sub\n\n",
+        "diagnostic": {
+          "number": 10587,
+          "description": "Unterminated block statement. 'With'",
+          "source": "[*xMacroRunThis8*#6] End Sub",
+          "module": "*xMacroRunThis8*",
+          "wrapped_line_1based": 6,
+          "original_statement": "End Sub",
+          "column": null
+        },
+        "source_sha256": "f5399c5c622a7819dfe55fecba5900e69582e889f1df9bb1ee90141b85485699"
+      },
+      {
+        "name": "unicode",
+        "expected": true,
+        "statuses": [
+          "accepted"
+        ],
+        "error": null,
+        "diagnostic": null,
+        "source_sha256": "25dcadfda08e6eca11de7ca8abe206b12a70d87ca0b83b918637246d7c81e4b0"
+      },
+      {
+        "name": "parameter-read",
+        "expected": true,
+        "statuses": [
+          "accepted"
+        ],
+        "error": null,
+        "diagnostic": null,
+        "source_sha256": "427bc721a2594ce3a2c43a0ce58255530d6f1e96032971316e1ab0f480a747c8"
+      },
+      {
+        "name": "inner-history-text",
+        "expected": true,
+        "statuses": [
+          "accepted"
+        ],
+        "error": null,
+        "diagnostic": null,
+        "source_sha256": "75e052d139cae38e133ea6cb2a935b178dc59bd1b4cd200cd49eaf162f46bcfd"
+      },
+      {
+        "name": "xrange-fixed",
+        "expected": true,
+        "statuses": [
+          "accepted"
+        ],
+        "error": null,
+        "diagnostic": null,
+        "source_sha256": "cf151713a25a4240573317dfe0277a54ee015b83ca83b39193d264222c18140f"
+      },
+      {
+        "name": "yrange-fixed",
+        "expected": true,
+        "statuses": [
+          "accepted"
+        ],
+        "error": null,
+        "diagnostic": null,
+        "source_sha256": "5fea9b87df6576294012f0f6a0a70f009fc539fc0ee538e146de73f39c617de5"
+      },
+      {
+        "name": "retained-history-wrapped",
+        "expected": true,
+        "statuses": [
+          "accepted"
+        ],
+        "error": null,
+        "diagnostic": null,
+        "source_sha256": "1a7b436333dce94e309aaaed5c0c1943f36b21089609485f8b3189927c2ef218"
+      }
+    ],
+    "checks": 14,
+    "solver_start_calls": 0,
+    "background_verified": true,
+    "failure": null,
+    "after_cst": []
+  },
+  "window_summary": {
+    "baseline_foreground": {
+      "hwnd": 2695562,
+      "pid": 32176,
+      "visible": true,
+      "minimized": false,
+      "owner": 0,
+      "window_class": "Chrome_WidgetWin_1"
+    },
+    "observation": "WinEvent foreground/show hooks plus 50ms window polling",
+    "owned_foreground_events": 0,
+    "errors": [],
+    "dropped_events": 0,
+    "window_enumeration_gaps": 0,
+    "private_desktop": "CstTools_f732c7e462ec4e6cb7210de8864a67e6",
+    "desktop_handle_closed": true
+  },
+  "owned_window_events": 168,
+  "window_actions": 0,
+  "session": {
+    "launcher_pid": 75472,
+    "owned": [
+      {
+        "pid": 75472,
+        "create_time": 1793647019.6520288
+      },
+      {
+        "pid": 53348,
+        "create_time": 1793647019.6956413
+      },
+      {
+        "pid": 66676,
+        "create_time": 1793647020.3558736
+      },
+      {
+        "pid": 72828,
+        "create_time": 1793647023.5867445
+      },
+      {
+        "pid": 77684,
+        "create_time": 1793647024.9373212
+      },
+      {
+        "pid": 78472,
+        "create_time": 1793647026.213688
+      },
+      {
+        "pid": 51948,
+        "create_time": 1793647026.443654
+      },
+      {
+        "pid": 41548,
+        "create_time": 1793647026.998551
+      }
+    ],
+    "active_pids": [],
+    "elapsed_seconds": 28.296999999991385,
+    "exit_confirmed": true,
+    "foreign_processes": [],
+    "preexisting_processes": [],
+    "ownership_scope": "task-project",
+    "task_project": "D:\\work\\cst_tools\\artifacts\\cst-macrocheck-ce858a55\\definition.cst",
+    "stage": "awaiting-macro",
+    "exit_code": 0
+  },
+  "source_hashes": [
+    {
+      "path": "csttool/cst_background.py",
+      "sha256": "868759ac579630be33d5885f76ec2840f9b5bc0164ee8978a1cd52844bda7e2c"
+    },
+    {
+      "path": "csttool/windows_desktop_process.py",
+      "sha256": "77b2d7da8ddb0dbaa4800567126ee9fa1e37ffeec8c7f068f31648d92383ca51"
+    },
+    {
+      "path": "csttool/native_definition_builder.py",
+      "sha256": "be74dddc26a7d2a435755f235b1b6f5543f1b2d60e429d27a0398a0b14973d7e"
+    },
+    {
+      "path": "csttool/project_creation.py",
+      "sha256": "f988f305a9657e295e2af2e88e083eca363abe586e23ed0b99ca41ddf3eef91f"
+    },
+    {
+      "path": "test/support/calibrate_cst_macrocheck.py",
+      "sha256": "46c2be14c0d0ca4498313acbe6171d626753752b0743d2429bc1fb76afa43b38"
+    }
+  ],
+  "artifact_hashes": [
+    {
+      "path": "artifacts\\cst-macrocheck-ce858a55\\probe.bas",
+      "sha256": "0878745b9d5dcc6576f854f4b4713c79281ca5dc38177acbfa28bca72c2a6e4e"
+    },
+    {
+      "path": "artifacts\\cst-macrocheck-ce858a55\\build.ps1",
+      "sha256": "c1bb0166a314874552ada4cba48f593d6ea22bf43e0a7226939597004b1b74fd"
+    },
+    {
+      "path": "artifacts\\cst-macrocheck-ce858a55\\window-observation.json",
+      "sha256": "8350639c5963b5c1019c91e5ad6b168603e629098f84a7b6a3d0d0865e618f7b"
+    },
+    {
+      "path": "artifacts\\cst-macrocheck-ce858a55\\acceptance.json",
+      "sha256": "846b14d0239d75353ee4b5438f9d0b3b0a0da4767bfccef81d3e915fa1911ac3"
+    },
+    {
+      "path": "artifacts\\cst-macrocheck-ce858a55\\quiet-ready.json",
+      "sha256": "e5b9b1bbb0ef99cb621ff8c2cae46757a9d4f46c16e14d7fb45cdda2d5022b84"
+    },
+    {
+      "path": "artifacts\\cst-macrocheck-ce858a55\\server-process.json",
+      "sha256": "5ff793fa4119f9862566f86332f39161a76f863b74a82adece1055ac04b21ceb"
+    },
+    {
+      "path": "artifacts\\cst-macrocheck-ce858a55\\source-map.json",
+      "sha256": "e45f9bd0f8ac43c3f99d2020113a9326156dc371d2119efbc161b2af9d2a48e0"
+    }
+  ],
+  "controls": [
+    {
+      "root": "artifacts\\cst-macrocheck-5ac13ce0",
+      "accepted": false,
+      "checks": 14,
+      "foreground_events": 1,
+      "errors": [],
+      "exit_code": 0,
+      "exit_confirmed": true
+    },
+    {
+      "root": "artifacts\\cst-macrocheck-8ac99988",
+      "accepted": false,
+      "checks": 14,
+      "foreground_events": 0,
+      "errors": [
+        "[WinError 0] 操作成功完成。"
+      ],
+      "exit_code": 0,
+      "exit_confirmed": true
+    },
+    {
+      "root": "artifacts\\cst-macrocheck-6cdbe03d",
+      "accepted": false,
+      "checks": 14,
+      "foreground_events": 3,
+      "errors": [],
+      "exit_code": 0,
+      "exit_confirmed": true
+    },
+    {
+      "root": "artifacts\\cst-macrocheck-6259a650",
+      "accepted": false,
+      "checks": 14,
+      "foreground_events": 2,
+      "errors": [],
+      "exit_code": 0,
+      "exit_confirmed": true
+    },
+    {
+      "root": "artifacts\\cst-macrocheck-970d0a35",
+      "accepted": true,
+      "checks": 14,
+      "foreground_events": 0,
+      "errors": [],
+      "exit_code": 0,
+      "exit_confirmed": true
+    }
+  ],
+  "native_empty_creation": {
+    "root": "artifacts/project-create-baaa340e",
+    "session_path": "artifacts\\project-create-baaa340e\\control\\definitions\\0b5e9fb1d4034238a53e3856631152d7\\g02-create\\verification-bootstrap\\created\\session-status.json",
+    "quiet": {
+      "nonce": "b90161b92c9e4ec396baa81cdba0fdbf",
+      "requested": true,
+      "readback": true
+    },
+    "exit_code": 0,
+    "exit_confirmed": true,
+    "window_summary": {
+      "baseline_foreground": {
+        "hwnd": 2695562,
+        "pid": 32176,
+        "visible": true,
+        "minimized": false,
+        "owner": 0,
+        "window_class": "Chrome_WidgetWin_1"
+      },
+      "observation": "WinEvent foreground/show hooks plus 50ms window polling",
+      "owned_foreground_events": 0,
+      "errors": [],
+      "dropped_events": 0,
+      "window_enumeration_gaps": 0,
+      "private_desktop": "CstTools_7ec1a3314ff9420480b04fc04a0d4cd7",
+      "desktop_handle_closed": true
+    },
+    "zero_solves": true
+  },
+  "desktop_process_check": {
+    "expected": "CstTools_a4a5dd09c436450087cb617213ca73d9",
+    "exit_code": 0,
+    "stdout": "{\"desktop\": \"CstTools_a4a5dd09c436450087cb617213ca73d9\", \"query_ok\": true}"
+  },
+  "offline_checks": {
+    "related_passed": 63,
+    "seconds": 12.59,
+    "report": "artifacts/background-verified-20261103.xml",
+    "native_windows_passed": 1,
+    "native_report": "artifacts/desktop-native-20261103.xml"
+  },
+  "source_after_native_note": "After final native run only ownership/quiet timeout error wording was clarified; emitted native macro hash remains separately recorded.",
+  "cleanup": {
+    "model_copies_removed": true,
+    "models": [
+      {
+        "model": "D:\\work\\cst_tools\\artifacts\\cst-macrocheck-5ac13ce0\\definition.cst",
+        "sha256": "906a90fbe00b07ed2a3bee2e0ef498736d3d0a5ee161e4650e6bcf39053c791f",
+        "companion": "D:\\work\\cst_tools\\artifacts\\cst-macrocheck-5ac13ce0\\definition"
+      },
+      {
+        "model": "D:\\work\\cst_tools\\artifacts\\cst-macrocheck-8ac99988\\definition.cst",
+        "sha256": "43c06ba301043e54f39770d1ce4ba47be809dabda814cbcf8a20607bf5a92c1a",
+        "companion": "D:\\work\\cst_tools\\artifacts\\cst-macrocheck-8ac99988\\definition"
+      },
+      {
+        "model": "D:\\work\\cst_tools\\artifacts\\cst-macrocheck-6cdbe03d\\definition.cst",
+        "sha256": "69021ced530c4aeb551b5a817929ac3ac5001133255ecfa9adcadc75c0cf31cc",
+        "companion": "D:\\work\\cst_tools\\artifacts\\cst-macrocheck-6cdbe03d\\definition"
+      },
+      {
+        "model": "D:\\work\\cst_tools\\artifacts\\cst-macrocheck-6259a650\\definition.cst",
+        "sha256": "f7e3abf43681e95c2c3842340e27cc89301dba874d2ad29b6378a20d98ffa0d7",
+        "companion": "D:\\work\\cst_tools\\artifacts\\cst-macrocheck-6259a650\\definition"
+      },
+      {
+        "model": "D:\\work\\cst_tools\\artifacts\\cst-macrocheck-970d0a35\\definition.cst",
+        "sha256": "d8e6276119844301fc58e76ae67f09aa182ba35dd9133d1d387b20e63acc5c80",
+        "companion": "D:\\work\\cst_tools\\artifacts\\cst-macrocheck-970d0a35\\definition"
+      },
+      {
+        "model": "D:\\work\\cst_tools\\artifacts\\cst-macrocheck-ce858a55\\definition.cst",
+        "sha256": "b652bcd9426ec61656d6b1fd506e74f876520294e3aa170fe28f31cc09af2568",
+        "companion": "D:\\work\\cst_tools\\artifacts\\cst-macrocheck-ce858a55\\definition"
+      },
+      {
+        "model": "D:\\work\\cst_tools\\artifacts\\project-create-baaa340e\\control\\definitions\\0b5e9fb1d4034238a53e3856631152d7\\g02-create\\verification-bootstrap\\created\\definition.cst",
+        "sha256": "7d7ea9dc1a6846058d20eaf4401a60ff2abb0d6430ca5a0e72788b6eb793517b",
+        "companion": "D:\\work\\cst_tools\\artifacts\\project-create-baaa340e\\control\\definitions\\0b5e9fb1d4034238a53e3856631152d7\\g02-create\\verification-bootstrap\\created\\definition"
+      }
+    ],
+    "retained": "macro drivers, sampled sources, window events, quiet/binding receipts, logs and lightweight reports; model regeneration required"
+  },
+  "final_wording_and_index_checks": {
+    "passed": 8,
+    "seconds": 1.12,
+    "report": "artifacts/background-doc-final-20261103.xml"
+  }
+}

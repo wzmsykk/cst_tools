@@ -6,7 +6,22 @@ from datetime import datetime, timezone
 
 def project_lifecycle(project):
     from .project_session_recovery import discover_managed_sessions
-    return lifecycle_facts(discover_managed_sessions(project))
+    from .definition_sessions import definition_session_facts
+    facts=lifecycle_facts(discover_managed_sessions(project))
+    definitions=definition_session_facts(project)
+    if not definitions:return facts
+    all_sessions=facts['sessions']+definitions
+    facts['session_count']+=len(definitions)
+    facts['physical_pending_count']+=sum(s['process_state']!='exited' for s in definitions)
+    facts['recovery_required']=facts['recovery_required'] or any(s['needs_recovery'] for s in definitions)
+    states={s['process_state'] for s in definitions}
+    if 'unknown' in states or facts['session_safety']=='unknown':facts['session_safety']='unknown'
+    elif 'running' in states or facts['session_safety']=='running':facts['session_safety']='running'
+    elif any(not s['standard_closed'] for s in definitions):facts['session_safety']='exited-unverified'
+    ordered=sorted(all_sessions,key=lambda s:not s['needs_recovery'])
+    facts['sessions']=ordered[:100]
+    facts['omitted_sessions']+=max(0,len(ordered)-100)
+    return facts
 
 
 def lifecycle_facts(records):

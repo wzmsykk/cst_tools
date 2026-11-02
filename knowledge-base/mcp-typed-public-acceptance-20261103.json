@@ -1,0 +1,295 @@
+{
+  "date": "2026-11-03",
+  "scope": "public modern SDK/stdio and real CST2022; Codex desktop full flow deferred by user",
+  "base_commit": "00e0da363cdf7bf0b0904c81be8ee26968622995",
+  "working_tree": true,
+  "source_hashes": {
+    "csttool/definition_editing.py": "51ee339a2b434d65cb18f4311c42ac6714683350651d5028d60cfd168d0cd905",
+    "csttool/native_definition_builder.py": "cc1d3ccdfb4a6afdd800d6c9713ff029a340af730e43f10d59c257d894158c90",
+    "csttool/definition_geometry.py": "f7a8405ae5cd6d2fc60c3fdffa17afcf0ee6000a9bb7cbd8f1ce5c1af00a9d8b",
+    "csttool/application_service.py": "a5e5a8f1e2789affad8eea0a63b48a1c84b7155d4b53e4726bce8d24773538e1",
+    "csttool/definition_verifier.py": "01fd251a6e47fb4a0902f4118ca2e3e4a56050934b039e53a8174ead4983fad4",
+    "csttool/mcp_server.py": "cc1dc1a73eb34028ab961cd4cde0eca9e7f54bea56cfdcfccaaa4bff701a294a",
+    "csttool/result_provenance.py": "eed46241a6be1109340e48d014e80f7f88c4c1f3b0f10983be092695db178622",
+    "data/first_stage_contract.schema.json": "74594ef1b44ee2695b1f599a7217f1def33aa4874c1d515d90bab0238c5ba23d"
+  },
+  "project": "D:\\work\\cst_tools\\artifacts\\typed-public-676d2b63",
+  "document_id": "834cfb1427f448099a65bd8a88ca983d",
+  "document_revision": "79e72e9d0a5b2feaf1b1117661540b6cbdd059fe416092befb5636093e24fcc9",
+  "definition_revision": "5e6237005e7ac8cee34664599ce4807b60f7628c2fc98d751dc844b113d93e0c",
+  "source_sha256": "e67e8e025fd2c1bb4133709f538ccf8184a85e36fabf5021265224bef5d76130",
+  "parameter_expressions": {
+    "R": "100",
+    "L": "R"
+  },
+  "units": {
+    "length": "mm",
+    "frequency": "MHz"
+  },
+  "geometry_observations": [
+    {
+      "status": "verified",
+      "source": "native-query",
+      "solid": "cavity:pillbox",
+      "material": "Vacuum",
+      "volume_mm3": 3141593.79277443,
+      "bounds_mm": {
+        "xmin": -100.0,
+        "xmax": 100.0,
+        "ymin": -100.0,
+        "ymax": 100.0,
+        "zmin": -50.0,
+        "zmax": 50.0
+      },
+      "boundaries": {
+        "xmin": "electric",
+        "xmax": "electric",
+        "ymin": "electric",
+        "ymax": "electric",
+        "zmin": "electric",
+        "zmax": "electric"
+      },
+      "background_evidence": "persisted-and-replayed-history-only",
+      "raw": {
+        "nonce": "91c05bb269334193b08c3259bbd09e02",
+        "project": "D:\\work\\cst_tools\\artifacts\\typed-public-676d2b63\\control\\definitions\\834cfb1427f448099a65bd8a88ca983d\\5e6237005e7ac8cee34664599ce4807b60f7628c2fc98d751dc844b113d93e0c\\verification-e8fc93bd8d204f45bfaaa38b4d4a210a\\saved\\definition",
+        "solid": "cavity:pillbox",
+        "exists": "-1",
+        "material": "Vacuum",
+        "volume_mm3": "3141593.79277443",
+        "xmin_mm": "-100",
+        "xmax_mm": "100",
+        "ymin_mm": "-100",
+        "ymax_mm": "100",
+        "zmin_mm": "-50",
+        "zmax_mm": "50",
+        "calculation_xmin_mm": "-100",
+        "calculation_xmax_mm": "100",
+        "calculation_ymin_mm": "-100",
+        "calculation_ymax_mm": "100",
+        "calculation_zmin_mm": "-50",
+        "calculation_zmax_mm": "50",
+        "boundary.xmin": "electric",
+        "boundary.xmax": "electric",
+        "boundary.ymin": "electric",
+        "boundary.ymax": "electric",
+        "boundary.zmin": "electric",
+        "boundary.zmax": "electric"
+      }
+    },
+    {
+      "status": "verified",
+      "source": "native-query",
+      "solid": "cavity:pillbox",
+      "material": "Vacuum",
+      "volume_mm3": 3141593.79277443,
+      "bounds_mm": {
+        "xmin": -100.0,
+        "xmax": 100.0,
+        "ymin": -100.0,
+        "ymax": 100.0,
+        "zmin": -50.0,
+        "zmax": 50.0
+      },
+      "boundaries": {
+        "xmin": "electric",
+        "xmax": "electric",
+        "ymin": "electric",
+        "ymax": "electric",
+        "zmin": "electric",
+        "zmax": "electric"
+      },
+      "background_evidence": "persisted-and-replayed-history-only",
+      "raw": {
+        "nonce": "75ef9fde78e04088b2ad0317ee585eb9",
+        "project": "D:\\work\\cst_tools\\artifacts\\typed-public-676d2b63\\control\\definitions\\834cfb1427f448099a65bd8a88ca983d\\5e6237005e7ac8cee34664599ce4807b60f7628c2fc98d751dc844b113d93e0c\\verification-e8fc93bd8d204f45bfaaa38b4d4a210a\\reopened\\definition",
+        "solid": "cavity:pillbox",
+        "exists": "-1",
+        "material": "Vacuum",
+        "volume_mm3": "3141593.79277443",
+        "xmin_mm": "-100",
+        "xmax_mm": "100",
+        "ymin_mm": "-100",
+        "ymax_mm": "100",
+        "zmin_mm": "-50",
+        "zmax_mm": "50",
+        "calculation_xmin_mm": "-100",
+        "calculation_xmax_mm": "100",
+        "calculation_ymin_mm": "-100",
+        "calculation_ymax_mm": "100",
+        "calculation_zmin_mm": "-50",
+        "calculation_zmax_mm": "50",
+        "boundary.xmin": "electric",
+        "boundary.xmax": "electric",
+        "boundary.ymin": "electric",
+        "boundary.ymax": "electric",
+        "boundary.zmin": "electric",
+        "boundary.zmax": "electric"
+      }
+    }
+  ],
+  "solver_start_calls": 1,
+  "recovery_solver_calls": 0,
+  "adoption_journal_unchanged": true,
+  "run_id": "627af85d91634c06945129b96e48ab93",
+  "task_id": "490f451b-ef90-4374-8fe6-b562ed6a7103",
+  "frequency_mhz": 1147.42692991921,
+  "rq_ohm": 223.541439593232,
+  "analytic_tm010_mhz": 1147.4252783521006,
+  "frequency_relative_error": 1.4393678964275125e-06,
+  "postprocess": {
+    "schema_version": 1,
+    "mode_index": 1,
+    "source_sha256": "e67e8e025fd2c1bb4133709f538ccf8184a85e36fabf5021265224bef5d76130",
+    "requested_postprocess": [
+      {
+        "metric_id": "frequency",
+        "method_id": "Frequency",
+        "settings": {
+          "mode": {
+            "selection": "one",
+            "index": 1
+          }
+        }
+      },
+      {
+        "metric_id": "rq",
+        "method_id": "R_over_Q",
+        "settings": {
+          "mode": {
+            "selection": "one",
+            "index": 1
+          },
+          "integration_line": {
+            "axis": "z",
+            "offset_mm": [
+              0,
+              0,
+              0
+            ],
+            "beta": 1,
+            "range": "full"
+          }
+        }
+      }
+    ],
+    "frequency": {
+      "method": "Frequency",
+      "native_call": "GetModeFrequencyInHz",
+      "unit": "MHz",
+      "scale_from_hz": 1e-06
+    },
+    "r_over_q": {
+      "method": "R_over_Q",
+      "implementation": "EigenResult_Complex",
+      "unit": "ohm",
+      "integration_line": {
+        "axis": "z",
+        "offset_mm": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "endpoints_mm": [
+          [
+            0.0,
+            0.0,
+            -50.0
+          ],
+          [
+            0.0,
+            0.0,
+            50.0
+          ]
+        ],
+        "beta": 1.0,
+        "range": "full"
+      },
+      "voltage": "complex line integral with transit phase",
+      "energy": "QFactor.GetTotalEnergy",
+      "formula": "abs(V)^2/(omega*W)",
+      "algorithm": {
+        "path": "rq-algorithm.vb",
+        "sha256": "3c9fdf812a7b53f550bf9c2077b4af858db13048a92d19b3e58941fef40cd71d"
+      }
+    },
+    "generated_macro": {
+      "path": "execution-worker.bas",
+      "sha256": "533bb9ed1c38f446bd9485ed1fe5a5d006893bc61e0b35d2fafdba6f175d1904"
+    },
+    "generated_macro_evidence": "archived"
+  },
+  "result_revision": "486dd745674c9269ccba1bb8d6da5e6e6d4da6b2ddb38811ec7e4024be61c4d2",
+  "exports": {
+    "request_id": "fc0004cd05d14df2a599017bf5b23615",
+    "accepted": true,
+    "instance_id": "65329a4028604f5b95f8431381babfa5",
+    "run_id": "627af85d91634c06945129b96e48ab93",
+    "result_revision": "486dd745674c9269ccba1bb8d6da5e6e6d4da6b2ddb38811ec7e4024be61c4d2",
+    "artifacts": [
+      {
+        "path": "result\\exports\\627af85d91634c06945129b96e48ab93\\486dd745674c9269ccba1bb8d6da5e6e6d4da6b2ddb38811ec7e4024be61c4d2\\results.csv",
+        "relative_to": "project",
+        "sha256": "acf50f14ed0209ebaf1c461dbe2d8a6a14b538187fd775d0574a37b37dce47fb",
+        "size_bytes": 565,
+        "format": "csv"
+      },
+      {
+        "path": "result\\exports\\627af85d91634c06945129b96e48ab93\\486dd745674c9269ccba1bb8d6da5e6e6d4da6b2ddb38811ec7e4024be61c4d2\\results.json",
+        "relative_to": "project",
+        "sha256": "c64960a9f7df257d12aff417e56cfa48c8ccb3041d7ebdfd42b9231aacab0600",
+        "size_bytes": 4573,
+        "format": "json"
+      }
+    ]
+  },
+  "runner_exit_confirmed": true,
+  "physical_pending_count": 0,
+  "lifecycle_note": "accepted worker standard-closed; old failed candidate retained abandoned-dead, not fabricated exit-zero",
+  "desktop_tools_loaded": 9,
+  "source_tools": 14,
+  "desktop_full_gate": "deferred",
+  "full_fault_matrix": "pending",
+  "raw_artifacts": "raw fields/mesh companions removed after completed acceptance; saved cst, macros, logs, TSV, native DB, parameters and exports retained",
+  "code_hash_scope": "final working tree; actual executed VBA is archived and hashed in postprocess provenance",
+  "cleanup": {
+    "model_companions_removed": 19,
+    "pytest_temporaries_removed": true,
+    "saved_cst_files": 14,
+    "mcp_runtime_retained": true
+  },
+  "parameters_native": {
+    "parameters": [
+      {
+        "descr": "radius in mm",
+        "expr": "100",
+        "name": "R",
+        "value": "100"
+      },
+      {
+        "descr": "preserved expression: length equals radius",
+        "expr": "R",
+        "name": "L",
+        "value": "100"
+      }
+    ],
+    "version": 1
+  },
+  "tests": {
+    "related_regression": {
+      "passed": 154,
+      "seconds": 83.15,
+      "report": "artifacts/g01-g08-final-20261103.xml"
+    },
+    "sdk": {
+      "passed": 6,
+      "seconds": 4.04,
+      "report": "artifacts/gates-sdk-final.xml"
+    },
+    "last_targeted": {
+      "passed": 41,
+      "seconds": 18.62,
+      "report": "artifacts/gates-last-20261103.xml"
+    }
+  }
+}

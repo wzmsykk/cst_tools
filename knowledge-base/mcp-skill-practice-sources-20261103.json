@@ -1,0 +1,82 @@
+{
+  "date": "2026-11-03",
+  "method": "Read primary repository source, pinned commit/blob identities; did not install or run third-party projects",
+  "scope": "Targeted code-generation, typed dispatch, validation and error-handling comparison; not full security or protocol conformance audit",
+  "sources": [
+    {
+      "repo": "microsoft/playwright",
+      "commit": "6117130d63434286287a50c6ea8d32050a818b36",
+      "path": "packages/playwright-core/src/tools/backend/mouse.ts",
+      "blob": "ec46c2adcddf8bac5709309712159a7f051828e0",
+      "matches_reviewed": true
+    },
+    {
+      "repo": "microsoft/playwright",
+      "commit": "6117130d63434286287a50c6ea8d32050a818b36",
+      "path": "packages/playwright-core/src/tools/backend/runCode.ts",
+      "blob": "80c038a7667a0f8aeae55d7d1eeae644425d14a1",
+      "matches_reviewed": true
+    },
+    {
+      "repo": "microsoft/playwright",
+      "commit": "6117130d63434286287a50c6ea8d32050a818b36",
+      "path": "packages/playwright-core/src/tools/backend/codegen.ts",
+      "blob": "e3ceb56673aa649a0886fd14608b78583908e408",
+      "matches_reviewed": true
+    },
+    {
+      "repo": "ahujasid/mcp-for-blender",
+      "commit": "992233bb258975a05eec8b5691465c50c2831e34",
+      "path": "src/blender_mcp/safe_mode.py",
+      "blob": "812d954f1e7dee0e3ad898a77cbe404b3817b8d0",
+      "matches_reviewed": true
+    },
+    {
+      "repo": "ahujasid/mcp-for-blender",
+      "commit": "992233bb258975a05eec8b5691465c50c2831e34",
+      "path": "addon.py",
+      "blob": "e79ce98df20f3be893c5357b1d8ba345d9716e11",
+      "matches_reviewed": true
+    },
+    {
+      "repo": "anthropics/skills",
+      "commit": "ca45fc496a3436251f191354091d557da31c15b5",
+      "path": "skills/mcp-builder/SKILL.md",
+      "blob": "d61a9056202a0f8b2d064c896e62f415c45b1bf1",
+      "matches_reviewed": true
+    },
+    {
+      "repo": "anthropics/skills",
+      "commit": "ca45fc496a3436251f191354091d557da31c15b5",
+      "path": "skills/docx/scripts/office/validate.py",
+      "blob": "29ca186a12e5c102702029ab9e51e6c3b71b1403",
+      "matches_reviewed": true
+    },
+    {
+      "repo": "modelcontextprotocol/servers",
+      "commit": "194cc86e3ae6400958555bd4116849d822d69263",
+      "path": "src/filesystem/server.ts",
+      "blob": "a5127f8dbff059342467c2709020fbe1b6543e34"
+    },
+    {
+      "repo": "modelcontextprotocol/servers",
+      "commit": "194cc86e3ae6400958555bd4116849d822d69263",
+      "path": "src/filesystem/lib.ts",
+      "blob": "775145e7082405d62675f760006be607f2b3b645"
+    },
+    {
+      "repo": "anthropics/skills",
+      "commit": "ca45fc496a3436251f191354091d557da31c15b5",
+      "path": "skills/docx/SKILL.md",
+      "blob": "fb954a460a1ea2294e9595e87fecce8df043eeba",
+      "matches_reviewed": true
+    },
+    {
+      "repo": "anthropics/skills",
+      "commit": "ca45fc496a3436251f191354091d557da31c15b5",
+      "path": "skills/mcp-builder/reference/node_mcp_server_v2.md",
+      "blob": "5d61f896d9707c8797c33ac8ac03c5aebf9b163f",
+      "matches_reviewed": true
+    }
+  ]
+}

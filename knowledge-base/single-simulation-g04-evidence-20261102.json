@@ -1,0 +1,52 @@
+{
+  "gate": "G04",
+  "result": {
+    "schema_version": 1,
+    "run_id": "g04-single",
+    "definition_revision": "862039833659e477680166bcd1fdfe574b0ecec328953cc69e7aff4aa5d62169",
+    "task_id": "159a4c19-b18c-4efa-9bb3-18bc83ddc39a",
+    "status": "success",
+    "frequency_mhz": 1147.42692991921,
+    "rq_ohm": 223.541439593232,
+    "snapshot": "D:\\work\\cst_tools\\artifacts\\single-g04-24e6dd99\\result\\simulation\\g04-single\\worker_single\\single-simulation__f_1147.426930MHz__159a4c19-b18c-4efa-9bb3-18bc83ddc39a\\single-simulation__f_1147.426930MHz.cst",
+    "snapshot_sha256": "d98e01a804b38d1316cf686b4913a43376ce37e56fe188ad6e25f8c889d36b4e",
+    "capture": {
+      "schema_version": 1,
+      "task_id": "159a4c19-b18c-4efa-9bb3-18bc83ddc39a",
+      "nonce": "53141ccfdc6e459f99a2f08381be22c7",
+      "binding": {
+        "project_id": "g04-pillbox",
+        "attempt_id": "159a4c19-b18c-4efa-9bb3-18bc83ddc39a",
+        "definition_revision": "862039833659e477680166bcd1fdfe574b0ecec328953cc69e7aff4aa5d62169",
+        "database_sha256": "945056c64c7baec91b69da083ee293b9ac0e90a15eb8b34f515979e914eee2aa",
+        "cst_build": "2022.5 Release from 2022-06-03 (change 981760)",
+        "scope": "root"
+      },
+      "frame_hashes": {
+        "pre": "714218d7670ae39a35252c111d6cee913adea219c72080a65bede662e2a2e257",
+        "started": "9528f9a2f65be07c81c9e8582bb2bd45fde5ffe00ec18ac99b47207af871c148",
+        "post": "ee3bc95f2b2e2742d7cc5fe9c10d1823dc82d39b55221e02b73405043453baa4"
+      },
+      "status": "execution-snapshot-match",
+      "reasons": [],
+      "result_success": true,
+      "database_verified": true,
+      "exit_confirmed": true,
+      "solver_return": 1,
+      "calculated_modes": 1,
+      "process_exit_code": 0,
+      "batch_exit_zero": true,
+      "snapshot_sha256": "1619a8fa48edf47325b2bd42e4cd3f1e43fba79cac8d238461af7c4589a0ce07",
+      "publish_ready": false
+    },
+    "received_sha256": "d59b2a81cb040de8ea2653168b9f4ac54b2644ad919345386c1ebc95e0a89b0c",
+    "result_revision": "eb75e7a4b946c8ccdac4628fd615ff35854aaf285a439b85022d65369ae6b88e"
+  },
+  "real_cst": true,
+  "analytic_tm010_mhz": 1147.4252783541176,
+  "relative_frequency_error": 1.43936613872242e-06,
+  "solver_start_calls": 1,
+  "g03_verified": true,
+  "owned_processes_exit_confirmed": true,
+  "scope": "G03 and G04 shared-service serial copy; not MCP host/full modeling gate"
+}

@@ -1,0 +1,143 @@
+{
+  "date": "2026-11-03",
+  "evidence": "static local vendor documentation and source review; no CST execution",
+  "files": [
+    {
+      "path": "knowledge-base/vendor/cst-2022-vba-help/chm/wb9ent.chm",
+      "sha256": "496aad36818a29c591680e3b37bbd4f4c66797d6dc0c987e51104ac82bd9fd88"
+    },
+    {
+      "path": "knowledge-base/vendor/cst-2022-vba-help/chm/wwb9_000.chm",
+      "sha256": "23019f07c0b4a604ca9c2259b947ccb2a354542eb673219d0d820609970cc3bd"
+    },
+    {
+      "path": "knowledge-base/vendor/cst-2022-vba-help/chm/wwb9_v90.chm",
+      "sha256": "f7d76f9cd00d515ef73e0be6e50df43654f2a3a7226d1aa32057d1c5d3e8a3b5"
+    },
+    {
+      "path": "knowledge-base/vendor/cst-2022-vba-help/vba/vba_macro_language_overview.htm",
+      "sha256": "dfd8b7502ecaa31d50aa482194d8d6ca69c957cf0d06d1989ced07338f28fedb"
+    },
+    {
+      "path": "knowledge-base/vendor/cst-2022-vba-help/VBA_3D/common_vbaapp/common_vbaappapplication_object.htm",
+      "sha256": "349d17d1d0a058b50642c6b281d4942185b77235bbb44f4bdb2f15c5615226be"
+    },
+    {
+      "path": "csttool/definition_editing.py",
+      "sha256": "51ee339a2b434d65cb18f4311c42ac6714683350651d5028d60cfd168d0cd905"
+    },
+    {
+      "path": "csttool/native_definition_builder.py",
+      "sha256": "cc1d3ccdfb4a6afdd800d6c9713ff029a340af730e43f10d59c257d894158c90"
+    }
+  ],
+  "topics": [
+    {
+      "chm": "wwb9_000.chm",
+      "topic": "wwb9_000htm/doc_call_instr.htm",
+      "sha256": "0b104df6505051c511cf57d3d6d8e2a17d95059724dddfd2d6f686d3b3197c5e"
+    },
+    {
+      "chm": "wwb9_000.chm",
+      "topic": "wwb9_000htm/doc_sub_def.htm",
+      "sha256": "fa1bea1d292028b64be76f61249c967c27cfb2689d8083c1bb059dfeda6185e1"
+    },
+    {
+      "chm": "wwb9_000.chm",
+      "topic": "wwb9_000htm/doc_with_stmt.htm",
+      "sha256": "a1e34237ccba117203aff9933030f6dbc3a9098424218b69cf7382f3bf80cc6c"
+    },
+    {
+      "chm": "wwb9_000.chm",
+      "topic": "wwb9_000htm/pop_paramz_popup.htm",
+      "sha256": "7f53e697efb6a44f4cdea5db3678c86f7946752112228f1cecaa8ac5f0ae3ec4"
+    },
+    {
+      "chm": "wwb9_000.chm",
+      "topic": "wwb9_000htm/pop_arglistz_popup.htm",
+      "sha256": "03df4a52820e989931bf503559ea6a1ace99bbf6e2859eb814d318afdafd3992"
+    },
+    {
+      "chm": "wwb9_000.chm",
+      "topic": "wwb9_000htm/doc_option_def.htm",
+      "sha256": "450df7457a775c53a713d3b1490975ddc9cfd1624115ad257f56a6cc1be640c0"
+    },
+    {
+      "chm": "wwb9_000.chm",
+      "topic": "wwb9_000htm/doc_onerror_instr.htm",
+      "sha256": "8daa838816de177181ff5df91467beba35329e857e32506ee4df993710ccf4ab"
+    },
+    {
+      "chm": "wwb9_000.chm",
+      "topic": "wwb9_000htm/doc_err_object.htm",
+      "sha256": "2aab71e32c1050c63ff8defc32cf4e93a86b013d903042addb5b3c83eb288328"
+    },
+    {
+      "chm": "wwb9_000.chm",
+      "topic": "wwb9_000htm/doc_macrocheck_func.htm",
+      "sha256": "fea176a632d432d573b83faa8c3d4ec9f96a7ed42a0fd81d1d6ccbfb356e627b"
+    },
+    {
+      "chm": "wwb9_000.chm",
+      "topic": "wwb9_000htm/doc_macrocheckthis_func.htm",
+      "sha256": "bb860c67c99d583ec911481c17e053754d7bdd5ac6dcc4a9cbb21f8a0daedbc2"
+    },
+    {
+      "chm": "wwb9_000.chm",
+      "topic": "wwb9_000htm/doc_errors_def.htm",
+      "sha256": "003417c03af8706beab1045637e92bab704d339bb5f4ef308f55b7e6ded15d2b"
+    },
+    {
+      "chm": "wb9ent.chm",
+      "topic": "wbenthtm/doc_syntaxcheck_property.htm",
+      "sha256": "8e5c3ca16737a80e567e9ac67c21c0428d34ce78deb6efed890fccd45c908e10"
+    },
+    {
+      "chm": "wb9ent.chm",
+      "topic": "wbenthtm/doc_tn0021_technote.htm",
+      "sha256": "0597f3044682b8a77ed9b6f0cf54b1054346e191450a01777683a1e48ce67f37"
+    },
+    {
+      "chm": "wb9ent.chm",
+      "topic": "wbenthtm/doc_tn0217_technote.htm",
+      "sha256": "21e7074064c29c5009f215b6440d4dbc0333b74f22341bf2abf1a9700035af1e"
+    },
+    {
+      "chm": "wb9ent.chm",
+      "topic": "wbenthtm/doc_tn0220_technote.htm",
+      "sha256": "cb04e8cab360188f51222748e6f88f6a770ae85c73fb5b3eb344f42b7eee1bfb"
+    },
+    {
+      "chm": "wb9ent.chm",
+      "topic": "wbenthtm/doc_errorline_property.htm",
+      "sha256": "ec0460bc4172dfc4dc02a391c1b28a3aa7cfb95b7f32e1fc7fe4ad05441f6be6"
+    },
+    {
+      "chm": "wb9ent.chm",
+      "topic": "wbenthtm/doc_erroroffset_property.htm",
+      "sha256": "1020a8cf283e2e6a83a370baa600df52378028cf7c27d75b2161340776631d00"
+    },
+    {
+      "chm": "wb9ent.chm",
+      "topic": "wbenthtm/doc_errortext_property.htm",
+      "sha256": "0bf8c4bb459b120ec8757307900a8f461f90e6ea77a74cd2e0fe9875e56bb800"
+    },
+    {
+      "chm": "wb9ent.chm",
+      "topic": "wbenthtm/doc_erroralert_event.htm",
+      "sha256": "4486cfd39aad639b16d5b51c5fbdb09fd5c3bf42e2a60d86d0476173adeb9cb2"
+    },
+    {
+      "chm": "wb9ent.chm",
+      "topic": "wbenthtm/doc_errorlog_event.htm",
+      "sha256": "cc09a413b20c1ee6e6590fa4303d1fabbd95adcf0c103c108b0db834a4febacb"
+    }
+  ],
+  "extraction": "Windows hh.exe -decompile; Start-Process Hidden -Wait; extracted temporary trees are regenerable and removed after review",
+  "native_check_candidate": "WWB-COM MacroCheckThis; availability and error fields in CST 2022 await host calibration",
+  "embedding_boundary": "SyntaxCheck/ErrorLine belong to embedding controls; no verified public CST handle to those controls",
+  "online_crosscheck": [
+    "https://winwrap.com/web2/doc-basic/",
+    "https://www.winwrap.com/web2/solution/WinWrap-Basic"
+  ]
+}

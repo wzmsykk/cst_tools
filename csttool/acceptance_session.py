@@ -65,7 +65,7 @@ def exclusive_probe(root):
 
 def wait_probe(process, directory, *, stage_timeout=180, exit_timeout=60,
                completion_names=('completed.txt', 'failed.txt'), unbounded_stages=(),
-               on_observation=None, preexisting_processes=(), task_project=None):
+               on_observation=None, preexisting_processes=(), task_project=None, expected_launcher_identity=None, bound_roots=()):
     """Bound idle probe phases, not normal solves. Keep failures for intervention."""
     directory = Path(directory)
     started = changed = time.monotonic()
@@ -75,7 +75,7 @@ def wait_probe(process, directory, *, stage_timeout=180, exit_timeout=60,
     foreign = {}
     baseline = {(record['pid'], record['create_time']): record
                 for record in preexisting_processes}
-    launcher_identity = None
+    launcher_identity = expected_launcher_identity
     while True:
         try:
             root = psutil.Process(process.pid)
@@ -88,6 +88,14 @@ def wait_probe(process, directory, *, stage_timeout=180, exit_timeout=60,
                 owned[(child.pid, child.create_time())] = child
         except psutil.NoSuchProcess:
             pass
+        for bound_pid,bound_created in tuple(bound_roots):
+            try:
+                peer=psutil.Process(bound_pid)
+                if abs(peer.create_time()-bound_created)<.001:
+                    for member in [peer,*peer.children(recursive=True)]:
+                        owned[(member.pid,member.create_time())]=member
+            except psutil.NoSuchProcess:
+                pass
         if task_project is not None:
             for related in task_project_processes(task_project):
                 try:

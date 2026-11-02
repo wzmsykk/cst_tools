@@ -12,6 +12,15 @@ def peer(executable, model, directory, macro):
               solver='HF Eigenmode',length='mm',frequency='MHz',mesh='Tetrahedral',fmin='500',fmax='1000',end='G03V1')
     (directory/'identity.tsv').write_text(''.join(k+'\t'+v+'\n' for k,v in rows.items()),encoding='ascii')
     (directory/'completed.txt').write_text(nonce)
+    from csttool.saved_project_source import read_saved_source
+    from csttool.settings_projection import project_saved_settings
+    from csttool.definition_geometry import geometry_expectation
+    geometry=geometry_expectation(project_saved_settings(read_saved_source(model,scope='root')))
+    observed=dict(nonce=nonce,project=str(model.with_suffix('')),solid=geometry['solid'],exists='True',material='Vacuum',
+                  volume_mm3=str(geometry['volume_mm3']))
+    for key,value in geometry['bounds_mm'].items():
+        observed[key+'_mm']=str(value);observed['calculation_'+key+'_mm']=str(value);observed['boundary.'+key]='electric'
+    (directory/'geometry.tsv').write_text(''.join(k+'\t'+v+'\n' for k,v in observed.items()),encoding='ascii')
     return dict(exit_code=0,exit_confirmed=True)
 
 
@@ -70,3 +79,12 @@ def test_unconfirmed_close_blocks_next_verification(tmp_path):
     for _ in range(2):
         with pytest.raises(ValueError):service.verify_definition(payload['document_id'],payload['definition_revision'])
     assert len(calls)==1
+
+
+def test_native_probe_language_directive_is_wwb_comment(tmp_path):
+    from csttool.definition_verifier import render_definition_probe
+    macro=render_definition_probe(tmp_path/'copy.cst',tmp_path,'a'*32)
+    assert macro.startswith("'#Language ")
+    assert 'EigenmodeSolver.Start' not in macro
+    from test.support.validate_single_simulation import render_model
+    assert render_model(tmp_path).startswith("'#Language ")

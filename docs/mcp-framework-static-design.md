@@ -1,8 +1,10 @@
 # CST Tools共用底层：MCP优先的静态框架设计
 
-2026-11-02实施更新：[application_service单次子集](single-simulation-service.md)已由Runner托管，复用Managed/RunStore/原生采集；不是仅设计。默认生产G03验证端口、完整编辑发布、result_query完整范围、MCP服务器及宿主仍未实现；下文拟定模块/未创建的描述属于原设计阶段。
+## 阅读范围（2026-11-02）
 
-日期：2026-10-28。状态：设计草案，未实现。本文收敛[接入计划](mcp-design-plan.md)的结构；CST语义以[能力/作用域审查](mcp-cst-capability-scope-design.md)为依据，协议以[符合性矩阵](mcp-protocol-conformance.md)为依据。当前优先完成静态设计，不创建服务骨架、添加依赖或启动求解。
+以下编号章节为冻结的设计契约，保留其字段、作用域与迁移细节；其中“本轮/尚未实现/下一步”描述设计时点，不作为现代码状态。已实现并真实验收的是[公共单次/G03及G04子链](single-simulation-service.md)，未完成的是公开建模/发布、MCP宿主与完整迁移。实施进度统一查[当前状态](current-status.md)和[TODO](minimal-python-vba-todo.md)。不把设计接口当已上线API。
+
+原阶段更新与验收流水已移至[历史全文](archive/20261102-progress-consolidation/mcp-framework-static-design.md)。
 
 ## 1. 框架决策
 

@@ -70,3 +70,7 @@ M4/M5及真实CST门禁不废弃：它们是A1或相应能力的验收子项。�
 本轮检查只证明参照源码中存在相应操作和现有CST差距；并未运行COMSOL或CST，也未证明所有第三方操作正确。功能对齐按上述端到端任务完成情况验收，不以工具数或同名函数数计完成率。
 
 A1静态子契约已冻结：[工程创建/参数化建模/配置/single-simulation/结果输出](mcp-first-stage-interface-contract.md)，官方来源和持久化边界见[本轮核查](../knowledge-base/cst-first-stage-api-semantics-20261028.md)。九操作复用公共身份/控制/幂等；不再仅靠14控制操作实现首阶段。partial readback及新创建通道仍是未验实现门禁，不把字段冻结当功能可用。
+
+## 2026-11-03 语言边界复核
+
+新增[COMSOL MCP 源码对照](comsol-mcp-codegen-practices.md)，使用其中固定版本重新检查建模与异步求解。旧日期的能力目标和验收证据保持不变；本次是静态审阅，不提升端到端通过状态。

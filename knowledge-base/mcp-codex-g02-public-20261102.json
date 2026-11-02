@@ -1,0 +1,80 @@
+{
+  "gate": "G02-empty-public-subset",
+  "date": "2026-11-02",
+  "host": "Codex desktop current conversation",
+  "tools_loaded": 9,
+  "record": {
+    "schema_version": 1,
+    "document_id": "1d3af22e36ed4c11b70a13842b76647a",
+    "name": "g02-live-empty-20261102",
+    "installation_ref": "cst-2022-c25466fe473c",
+    "source_sha256": "a0fa440074c1e46c578828130633133982d19863ce090622498ac712498aad01",
+    "units": {
+      "length": "mm",
+      "frequency": "MHz"
+    },
+    "state": "empty",
+    "project_id": "dbc1abb0dea0487497a5e37bb40c2195",
+    "document_revision": "bcf97aa28a862328f775b3c73f0323a35e1447c231c40699c3bc6279661bf6fa",
+    "model_path": "D:\\work\\cst_tools\\artifacts\\mcp-host-acceptance\\control\\definitions\\1d3af22e36ed4c11b70a13842b76647a\\389bd860a83645f796717f1c7327b971\\verification-bootstrap\\created\\definition.cst",
+    "bootstrap": {
+      "status": "created",
+      "model_path": "D:\\work\\cst_tools\\artifacts\\mcp-host-acceptance\\control\\definitions\\1d3af22e36ed4c11b70a13842b76647a\\389bd860a83645f796717f1c7327b971\\verification-bootstrap\\created\\definition.cst",
+      "closure": {
+        "launcher_pid": 12268,
+        "owned": [
+          {
+            "pid": 12268,
+            "create_time": 1793631942.5099313
+          },
+          {
+            "pid": 66684,
+            "create_time": 1793631942.8074503
+          },
+          {
+            "pid": 45168,
+            "create_time": 1793631945.2274787
+          },
+          {
+            "pid": 72988,
+            "create_time": 1793631946.1963832
+          },
+          {
+            "pid": 54012,
+            "create_time": 1793631947.8104544
+          },
+          {
+            "pid": 32828,
+            "create_time": 1793631949.0298188
+          },
+          {
+            "pid": 73264,
+            "create_time": 1793631949.2927139
+          },
+          {
+            "pid": 68356,
+            "create_time": 1793631949.872362
+          }
+        ],
+        "active_pids": [],
+        "elapsed_seconds": 24.469000000011874,
+        "exit_confirmed": true,
+        "foreign_processes": [],
+        "preexisting_processes": [],
+        "ownership_scope": "task-project",
+        "task_project": "D:\\work\\cst_tools\\artifacts\\mcp-host-acceptance\\control\\definitions\\1d3af22e36ed4c11b70a13842b76647a\\389bd860a83645f796717f1c7327b971\\verification-bootstrap\\created\\definition.cst",
+        "stage": "de-close",
+        "exit_code": 0,
+        "kind": "project-bootstrap"
+      },
+      "runtime_sha256": "46405d25ef79208a5ec9b8e40c0cae6098c6113bb2bbe28ffa51ad7d0f4e27b4"
+    },
+    "ready": false
+  },
+  "inspect_matched": true,
+  "request_replay_same_run_id": true,
+  "runner_pid": 60284,
+  "runner_exit_observed": true,
+  "solver_start_calls": 0,
+  "full_modeling_gate_passed": false
+}

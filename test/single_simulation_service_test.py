@@ -65,6 +65,7 @@ class FakeWorker:
         receipt=self.root/'received.json'
         write_json_atomic(receipt,dict(task_id=self.task_id,session_id=self.root.name,phase='acknowledged',status='Success',
             postprocess=post,snapshot_sha256=hashlib.sha256(result.read_bytes()).hexdigest()))
+        self.store.artifacts(self.task_id,received=receipt)
         return SimulationResult('single','Success',name,{},post,snapshot=result,task_id=self.task_id,receipt_path=receipt)
 
     def stop(self):
@@ -121,6 +122,8 @@ def test_fake_single_run_uses_native_runstore_ack_and_adoption_then_query(tmp_pa
     assert '连续确认计算边界' not in (execution.overview.directory/'summary.md').read_text(encoding='utf-8')
     task=read_json(tmp_path/'control/runs/run-a/tasks'/result['task_id']/'attempt.json')
     assert task['event']=='algorithm_adopted'
+    artifacts=read_json(tmp_path/'control/runs/run-a/tasks'/result['task_id']/'artifacts.json')
+    assert read_json(tmp_path/artifacts['received']['path'])['phase']=='algorithm_adopted'
     with pytest.raises(ServiceError,match='RUN_RECONCILIATION_REQUIRED'):
         service.execute_simulation(payload,run_id='run-a',stop=StopIntent(),update=lambda **kw:None).run(payload)
     assert FakeWorker.calls==1
@@ -317,6 +320,12 @@ def test_authenticated_http_shared_result_query_and_lost_response_replay(tmp_pat
         instances[0].worker.join()
         result=client.simulation_results(receipt['run_id'])
         assert result['rq_ohm']==1.2 and FakeWorker.calls==1
+        exported=client.command('export_simulation_results',dict(run_id=result['run_id'],
+            result_revision=result['result_revision'],formats=['json','csv']),request_id='export-http')
+        assert exported['accepted'] and len(exported['artifacts'])==2
+        assert client.command('export_simulation_results',dict(run_id=result['run_id'],
+            result_revision=result['result_revision'],formats=['json','csv']),request_id='export-http')==exported
+        assert FakeWorker.calls==1
         from csttool.runner_client import RunnerRejected
         with pytest.raises(RunnerRejected) as rejected:client.simulation_results(receipt['run_id'],'stale')
         assert rejected.value.code=='RESULT_CHANGED'
@@ -392,3 +401,23 @@ def test_definition_changed_after_preflight_is_rejected_before_cst_launch(tmp_pa
     def forbidden(worker):raise AssertionError('CST must not launch')
     monkeypatch.setattr(ManagedCSTWorker,'_start',forbidden)
     with pytest.raises(ValueError,match='refuse CST launch'):ManagedCSTWorker('single',config)
+
+
+def test_export_adopted_result_is_stable_and_never_recomputes(tmp_path):
+    import csv
+    service,payload,_=make_service(tmp_path)
+    service.execute_simulation(payload,run_id='export-one',stop=StopIntent(),update=lambda **kw:None).run(payload)
+    result=service.get_simulation_results('export-one')
+    exported=service.export_simulation_results('export-one',result['result_revision'],['json','csv'])
+    assert exported==service.export_simulation_results('export-one',result['result_revision'],['csv','json'])
+    assert FakeWorker.calls==1
+    csvpath=next(tmp_path/a['path'] for a in exported['artifacts'] if a['format']=='csv')
+    rows=list(csv.DictReader(csvpath.open(encoding='utf-8',newline='')))
+    assert [r['unit'] for r in rows]==['MHz','ohm']
+    with pytest.raises(ServiceError,match='RESULT_CHANGED'):
+        service.export_simulation_results('export-one','wrong',['json'])
+    with pytest.raises(ServiceError,match='INVALID_ARGUMENT'):
+        service.export_simulation_results('export-one',result['result_revision'],['csv','csv'])
+    csvpath.write_text('corrupted')
+    with pytest.raises(ServiceError,match='RESULT_CHANGED'):
+        service.export_simulation_results('export-one',result['result_revision'],['csv'])

@@ -1,0 +1,232 @@
+{
+  "activation_mode": "manifest",
+  "baseline_cst": [],
+  "no_cst_launch_requested": true,
+  "child_normal_exit": true,
+  "inputs": [
+    {
+      "name": "WB9ENT64.OCX",
+      "sha256": "02d837de08df68df929035f2935df3ac324bd71fcaf09ffd89f3c6f5acf4a8f8"
+    },
+    {
+      "name": "wwb9_64.dll",
+      "sha256": "3012ebe4dcb805a93ee3f8a627a07e88736b947997ff747cf3761271df599ff4"
+    }
+  ],
+  "child_pid": 21312,
+  "child_exit_code": 0,
+  "after_cst": [],
+  "new_cst": [],
+  "child": {
+    "pid": 21312,
+    "stages": [
+      {
+        "name": "activation-context",
+        "time": 1793643617.9262488
+      },
+      {
+        "name": "create-inproc-noui",
+        "time": 1793643617.9385128
+      },
+      {
+        "name": "ignore-dialogs",
+        "time": 1793643617.9562466
+      },
+      {
+        "name": "initialize-state",
+        "time": 1793643617.9582462
+      },
+      {
+        "name": "initialize-documented-development-token",
+        "time": 1793643617.960248
+      },
+      {
+        "name": "shutdown",
+        "time": 1793643625.757663
+      },
+      {
+        "name": "disconnect",
+        "time": 1793643625.7620347
+      },
+      {
+        "name": "child-return",
+        "time": 1793643625.7686691
+      }
+    ],
+    "cases": [],
+    "initialized": false,
+    "shutdown": 0,
+    "disconnect": true,
+    "initialized_before": false,
+    "error": {
+      "type": "RuntimeError",
+      "message": "documented initialization did not initialize object",
+      "hresult": null
+    },
+    "activation_context_deactivated": true
+  },
+  "verification": {
+    "object_close_confirmed": true,
+    "initialized": false,
+    "syntax_checks": 0,
+    "calibration_complete": false
+  },
+  "date": "2026-11-03",
+  "user_observation": {
+    "message": "This eval copy is expired",
+    "source": "user report during standalone NoUI initialization; not a captured ErrorText value",
+    "boundary": "does not establish that CST application licence is expired"
+  },
+  "executed_tool_sha256": "dbb5b0966d86ce82369dc78d8476d968491bb9be5bda18f67c5e28c469db0f85",
+  "current_tool_sha256": "c56dfe5e4f4b4ce1296721cef16dd2328a0b1c4744b968c409e133fa7950d5d2",
+  "earlier_attempts": [
+    {
+      "directory": "winwrap-noui-20261103",
+      "facts": {
+        "baseline_cst": [],
+        "no_cst_launch_requested": true,
+        "child_normal_exit": true,
+        "inputs": [
+          {
+            "name": "WB9ENT64.OCX",
+            "sha256": "02d837de08df68df929035f2935df3ac324bd71fcaf09ffd89f3c6f5acf4a8f8"
+          },
+          {
+            "name": "wwb9_64.dll",
+            "sha256": "3012ebe4dcb805a93ee3f8a627a07e88736b947997ff747cf3761271df599ff4"
+          }
+        ],
+        "child_pid": 75544,
+        "child_exit_code": 0,
+        "after_cst": [],
+        "new_cst": [],
+        "child": {
+          "pid": 75544,
+          "stages": [
+            {
+              "name": "activation-context",
+              "time": 1793643438.3111541
+            },
+            {
+              "name": "create-inproc-noui",
+              "time": 1793643438.315664
+            },
+            {
+              "name": "child-return",
+              "time": 1793643438.3186638
+            }
+          ],
+          "cases": [],
+          "initialized": false,
+          "shutdown": null,
+          "disconnect": null,
+          "error": {
+            "type": "com_error",
+            "message": "(-2147024770, '找不到指定的模块。', None, None)",
+            "hresult": -2147024770
+          },
+          "activation_context_deactivated": true
+        }
+      }
+    },
+    {
+      "directory": "winwrap-noui-factory-20261103",
+      "facts": {
+        "activation_mode": "class-factory",
+        "baseline_cst": [],
+        "no_cst_launch_requested": true,
+        "child_normal_exit": true,
+        "inputs": [
+          {
+            "name": "WB9ENT64.OCX",
+            "sha256": "02d837de08df68df929035f2935df3ac324bd71fcaf09ffd89f3c6f5acf4a8f8"
+          },
+          {
+            "name": "wwb9_64.dll",
+            "sha256": "3012ebe4dcb805a93ee3f8a627a07e88736b947997ff747cf3761271df599ff4"
+          }
+        ],
+        "child_pid": 31924,
+        "child_exit_code": 0,
+        "after_cst": [],
+        "new_cst": [],
+        "child": {
+          "pid": 31924,
+          "stages": [
+            {
+              "name": "create-from-installed-class-factory",
+              "time": 1793643505.110279
+            },
+            {
+              "name": "ignore-dialogs",
+              "time": 1793643505.1314723
+            },
+            {
+              "name": "shutdown",
+              "time": 1793643505.133852
+            },
+            {
+              "name": "child-return",
+              "time": 1793643505.1397035
+            }
+          ],
+          "cases": [],
+          "initialized": false,
+          "shutdown": null,
+          "disconnect": null,
+          "error": {
+            "type": "AttributeError",
+            "message": "Property '<unknown>.IgnoreDialogs' can not be set.",
+            "hresult": null
+          },
+          "close_error": "<unknown>.Shutdown"
+        }
+      }
+    },
+    {
+      "directory": "winwrap-noui-linked-20261103",
+      "facts": {
+        "activation_mode": "manifest",
+        "baseline_cst": [],
+        "no_cst_launch_requested": true,
+        "child_normal_exit": true,
+        "inputs": [
+          {
+            "name": "WB9ENT64.OCX",
+            "sha256": "02d837de08df68df929035f2935df3ac324bd71fcaf09ffd89f3c6f5acf4a8f8"
+          },
+          {
+            "name": "wwb9_64.dll",
+            "sha256": "3012ebe4dcb805a93ee3f8a627a07e88736b947997ff747cf3761271df599ff4"
+          }
+        ],
+        "child_pid": 56600,
+        "child_exit_code": 0,
+        "after_cst": [],
+        "new_cst": [],
+        "child": {
+          "pid": 56600,
+          "stages": [
+            {
+              "name": "activation-context",
+              "time": 1793643583.7297041
+            },
+            {
+              "name": "child-return",
+              "time": 1793643583.741723
+            }
+          ],
+          "cases": [],
+          "initialized": false,
+          "shutdown": null,
+          "disconnect": null,
+          "error": {
+            "type": "PermissionError",
+            "message": "[WinError 5] 拒绝访问。: 'D:\\\\Program Files (x86)\\\\CST Studio Suite 2022\\\\AMD64\\\\WB9ENT64.OCX' -> 'D:\\\\work\\\\cst_tools\\\\artifacts\\\\winwrap-noui-linked-20261103\\\\WB9ENT64.OCX'",
+            "hresult": null
+          }
+        }
+      }
+    }
+  ]
+}

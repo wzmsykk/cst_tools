@@ -68,7 +68,7 @@ def validate_command(value):
         if not isinstance(text, str) or not 1 <= len(text) <= 100 or not all(
                 c.isalnum() or c in '-_' for c in text):
             raise ValueError('invalid ' + name)
-    if value.get('operation') not in {'claim', 'release', 'start', 'stop', 'cancel_start', 'recover', 'shutdown'}:
+    if value.get('operation') not in {'claim', 'release', 'start', 'stop', 'cancel_start', 'recover', 'shutdown', 'export_simulation_results'}:
         raise ValueError('unknown operation')
     if not isinstance(value.get('payload', {}), dict):
         raise ValueError('payload must be an object')

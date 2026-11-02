@@ -1,0 +1,70 @@
+{
+  "gate": "G02-empty-subset",
+  "record": {
+    "schema_version": 1,
+    "document_id": "13d00238c7164ceb997935fbe684feb3",
+    "name": "empty-mws",
+    "installation_ref": "local",
+    "source_sha256": "d34e8b5aa88477b872bcfe57ecef734e88b507d8164e7caa07551222c8251e1a",
+    "units": {
+      "length": "mm",
+      "frequency": "MHz"
+    },
+    "state": "empty",
+    "project_id": "g02-project",
+    "document_revision": "24e3fb238bbfd87f9b48874e179e2bed9fd539d99002100fb6e3d1107997551e",
+    "model_path": "D:\\work\\cst_tools\\artifacts\\project-create-9cfc72e4\\control\\definitions\\13d00238c7164ceb997935fbe684feb3\\g02-create\\verification-bootstrap\\created\\definition.cst",
+    "bootstrap": {
+      "status": "created",
+      "model_path": "D:\\work\\cst_tools\\artifacts\\project-create-9cfc72e4\\control\\definitions\\13d00238c7164ceb997935fbe684feb3\\g02-create\\verification-bootstrap\\created\\definition.cst",
+      "closure": {
+        "launcher_pid": 47096,
+        "owned": [
+          {
+            "pid": 47096,
+            "create_time": 1793629444.0210917
+          },
+          {
+            "pid": 62940,
+            "create_time": 1793629445.0995495
+          },
+          {
+            "pid": 32172,
+            "create_time": 1793629449.898898
+          },
+          {
+            "pid": 31016,
+            "create_time": 1793629457.5275016
+          },
+          {
+            "pid": 66776,
+            "create_time": 1793629459.223582
+          },
+          {
+            "pid": 48808,
+            "create_time": 1793629459.5816903
+          },
+          {
+            "pid": 45560,
+            "create_time": 1793629460.393408
+          }
+        ],
+        "active_pids": [],
+        "elapsed_seconds": 44.515999999974156,
+        "exit_confirmed": true,
+        "foreign_processes": [],
+        "preexisting_processes": [],
+        "ownership_scope": "task-project",
+        "task_project": "D:\\work\\cst_tools\\artifacts\\project-create-9cfc72e4\\control\\definitions\\13d00238c7164ceb997935fbe684feb3\\g02-create\\verification-bootstrap\\created\\definition.cst",
+        "stage": "awaiting-macro",
+        "exit_code": 0,
+        "kind": "project-bootstrap"
+      },
+      "runtime_sha256": "46405d25ef79208a5ec9b8e40c0cae6098c6113bb2bbe28ffa51ad7d0f4e27b4"
+    },
+    "ready": false
+  },
+  "real_cst": true,
+  "solver_calls": 0,
+  "scope": "Native CST2022 Python empty-project bootstrap and owner service only; public MCP creation not yet called"
+}

@@ -68,6 +68,16 @@ class RunnerClient:
         if result_revision is not None:query['result_revision']=result_revision
         return self.request('/simulation-results?'+urlencode(query))
 
+    def definition_result(self,run_id):
+        from urllib.parse import urlencode
+        return self.request('/definition-result?'+urlencode({'run_id':run_id}))
+
+    def inspect_model(self,document_id,document_revision):
+        from urllib.parse import urlencode
+        return self.request('/model?'+urlencode(dict(document_id=document_id,document_revision=document_revision)))
+
+    def installations(self):return self.request('/installations')
+
     @property
     def stop_request_path(self):
         return self.project / 'control/pending-ui-stop.json'
