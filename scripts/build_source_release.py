@@ -22,7 +22,7 @@ def included(name):
     if path.parts[0] in {'data', 'template'}:
         return path.suffix in {'.py', '.vb', '.bas', '.json', '.def', '.txt', '.ini'}
     if path.parts[0] == 'docs':
-        return path.suffix == '.md'
+        return path.suffix == '.md' or name in {'docs/project-map.json','docs/project-map.schema.json'}
     if path.parts[0] == 'knowledge-base':
         return len(path.parts) == 2 and path.suffix == '.md'
     return name in {'gui_app.py', 'install_compat.py', 'pyproject.toml', 'AGENTS.md',

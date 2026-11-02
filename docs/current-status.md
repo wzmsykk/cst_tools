@@ -99,3 +99,8 @@ W0–W3方案已按COMSOL等源码分析修订为可执行分阶段计划：先�
 ### 后台调用首批实施与真实验收（2026-11-03）
 
 [验收](cst-background-acceptance-20261103.md)：类型化构造默认临时非活动桌面、显式拥有的COM服务器、归属后quiet再放行单次RunScript；公共空工程原生API也在绑定后设置/读回quiet。最终无求解副本14项正常/语法错误通过，用户CST前台事件0、窗口观察无错误/丢失，正常退出0且桌面句柄释放。普通COM曾测到抢焦点，旧失败保留；没有切换用户桌面、强杀或改系统注册。G03独立CLI/预处理/Managed仍原有最小化策略，不扩大全链保证。
+
+
+## 2026-11-03 文档与定位工具草案（未完成）
+
+已保存[实施计划](project-documentation-tooling-plan.md)、[工具草案说明](project-map-guide.md)、Schema 和 `scripts/project_inspect.py`。当前没有 `docs/project-map.json`，现行功能索引尚未迁移；工具专用测试及 D1–D4 验收待完成。本批仅保存 WIP，不改变生产调用链，不代表工具已可用。发布脚本已预留包含契约 JSON/Schema 的规则，未重新打包。

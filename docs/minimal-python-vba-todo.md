@@ -120,3 +120,8 @@ ww
 - [x] 显式CreateProcessW临时非活动桌面，无SwitchDesktop；纯Python桌面名/句柄测试及真实CST14项正常/语法错误、无人工交互和正常退出通过，见[记录](cst-background-acceptance-20261103.md)。
 - [ ] 后续G03 CLI、预处理、Managed/HOM迁移隔离策略时同步桌面租约、恢复/诊断和退出门禁；本轮不将旧最小化等同于零抢焦点。
 - [ ] 更广许可/保存输入框/外层编译错误等故障验收；不因本轮错误对象测试通过就承诺所有弹窗均静默。
+
+
+## 2026-11-03 文档与定位工具草案（未完成）
+
+已保存[实施计划](project-documentation-tooling-plan.md)、[工具草案说明](project-map-guide.md)、Schema 和 `scripts/project_inspect.py`。当前没有 `docs/project-map.json`，现行功能索引尚未迁移；工具专用测试及 D1–D4 验收待完成。本批仅保存 WIP，不改变生产调用链，不代表工具已可用。发布脚本已预留包含契约 JSON/Schema 的规则，未重新打包。

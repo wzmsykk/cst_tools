@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "baseline", "domains", "features", "documents", "tools", "relations", "source_fingerprints"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "baseline": {"type": "object", "required": ["commit", "tracked_files", "evidence_scope"], "properties": {"commit": {"type": "string"}, "tracked_files": {"type": "integer"}, "evidence_scope": {"type": "string"}}},
+    "domains": {"type": "array", "items": {"type": "object", "required": ["id", "purpose", "patterns", "lifecycle_owner"], "properties": {"id": {"type": "string"}, "purpose": {"type": "string"}, "patterns": {"type": "array", "items": {"type": "string"}}, "lifecycle_owner": {"type": "string"}}}},
+    "features": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["id", "purpose", "sources", "tests", "docs", "provenance"], "properties": {
+      "id": {"type": "string", "pattern": "^F[0-9]+$"}, "purpose": {"type": "string", "minLength": 1},
+      "sources": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/source"}},
+      "tests": {"type": "array", "items": {"$ref": "#/$defs/link"}}, "docs": {"type": "array", "items": {"$ref": "#/$defs/link"}},
+      "verification_note": {"type": "string"}, "provenance": {"type": "string"}
+    }}},
+    "documents": {"type": "array", "items": {"type": "object", "required": ["path", "role", "authority", "provenance"], "properties": {"path": {"type": "string"}, "role": {"type": "string"}, "authority": {"type": "string"}, "provenance": {"type": "string"}}}},
+    "tools": {"type": "array", "items": {"type": "object", "required": ["path", "effect", "authorization", "arguments", "review_status"], "properties": {"path": {"type": "string"}, "effect": {"type": "string"}, "authorization": {"type": "string"}, "arguments": {"type": "array", "items": {"type": "string"}}, "review_status": {"type": "string"}}}},
+    "relations": {"type": "array", "items": {"type": "object", "required": ["id", "source", "targets", "type", "trigger", "lifecycle", "cleanup", "evidence", "unknown"], "properties": {
+      "id": {"type": "string"}, "source": {"$ref": "#/$defs/locator"}, "targets": {"type": "array", "items": {"$ref": "#/$defs/locator"}},
+      "type": {"type": "string"}, "trigger": {"type": "string"}, "lifecycle": {"type": "string"}, "cleanup": {"type": "string"}, "evidence": {"type": "string"}, "unknown": {"type": ["string", "null"]}
+    }}},
+    "source_fingerprints": {"type": "object", "additionalProperties": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}
+  },
+  "$defs": {
+    "link": {"type": "object", "additionalProperties": false, "required": ["path", "label"], "properties": {"path": {"type": "string"}, "label": {"type": "string"}, "anchor": {"type": "string"}}},
+    "source": {"type": "object", "additionalProperties": false, "required": ["path", "label", "symbols"], "properties": {"path": {"type": "string"}, "label": {"type": "string"}, "symbols": {"type": "array", "items": {"type": "string"}}, "anchor": {"type": "string"}}},
+    "locator": {"type": "object", "additionalProperties": false, "required": ["path"], "properties": {"path": {"type": "string"}, "symbol": {"type": "string"}}}
+  }
+}
