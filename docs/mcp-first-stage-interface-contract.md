@@ -1,5 +1,7 @@
 # 首阶段统一接口契约：参数化建模到单次仿真结果
 
+2026-11-02实施更新：[single-simulation公共服务子集](single-simulation-service.md)接入Runner/Managed、严格定义引用、结果查询与补写。所有者stage/verify登记接口不等于九操作已完成；默认G03生产端口未注册，候选pending，MCP信封/宿主及新组合真实验收未通过。下文“运行未实现”是原静态批次状态。
+
 日期：2026-10-28。**静态冻结，运行未实现。** 本文细化[首阶段G01–G08门禁](mcp-first-stage-conversational-gate.md)，与[公共控制/错误/幂等契约](unified-interface-contract.md)共同组成A1接口。CST依据见[本轮官方文档与作用域核查](../knowledge-base/cst-first-stage-api-semantics-20261028.md)。GUI/CLI/MCP使用同一业务模型/服务，不维护旧调用兼容。
 
 ## 1. 首阶段可表达的物理问题

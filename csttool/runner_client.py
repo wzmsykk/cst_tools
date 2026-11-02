@@ -16,8 +16,9 @@ from .execution_contract import RunnerSnapshot
 
 class RunnerRejected(RuntimeError):
     """The peer replied with an explicit rejection; transport is not lost."""
-    def __init__(self, message, path='/commands'):
+    def __init__(self, message, path='/commands', code=None):
         self.path = path
+        self.code = code
         super().__init__(message)
 
 
@@ -45,7 +46,8 @@ class RunnerClient:
             with self.opener.open(request, timeout=2) as response:
                 result = json.load(response)
         except HTTPError as exc:
-            raise RunnerRejected(json.loads(exc.read()).get('error', f'HTTP {exc.code}'), path) from exc
+            error=json.loads(exc.read())
+            raise RunnerRejected(error.get('error', f'HTTP {exc.code}'), path, error.get('code')) from exc
         if path == '/status' and result['instance_id'] != endpoint['instance_id']:
             raise ValueError('Runner instance changed')
         return result
@@ -59,6 +61,12 @@ class RunnerClient:
 
     def command_record(self, request_id):
         return self.request('/commands/' + request_id)
+
+    def simulation_results(self,run_id,result_revision=None):
+        from urllib.parse import urlencode
+        query={'run_id':run_id}
+        if result_revision is not None:query['result_revision']=result_revision
+        return self.request('/simulation-results?'+urlencode(query))
 
     @property
     def stop_request_path(self):

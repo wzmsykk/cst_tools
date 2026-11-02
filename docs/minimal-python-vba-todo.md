@@ -1,5 +1,25 @@
 # 最小 Python / VBA 协议 TODO
 
+## 原生采集/RunStore及B4子集（2026-11-02）
+
+[共享采集链](native-execution-capture.md)已冻结意图/nonce/来源和安装，三阶段固定原生帧，六字段pre必须不存在才能Start，退出后归档DB并绑定对账。真实小网格Pillbox正常1模式、实际Start=0/0模式且配置匹配、旧库拒绝均取得副本证据，回执不将失败退出1写成正常成功；索引缺失可补且不重算。按用户要求2022大版本共用行为规则，精确版本/hash仍留档。默认Managed/HOM及公共single-simulation服务未自动接入，完整B4/G03/MCP闭环仍待完成。此前“采集/RunStore未实现”是较早阶段记录。
+
+
+## B3执行快照内核实施（2026-11-02）
+
+[公共只读验证器](execution-snapshot-verification.md)已实现六维绑定、固定2022.5/root/Tet profile、时间/阶段核对、6位g精度、严格快照JSON及实际数据库双hash。11项E oracle实际执行，另重放6组历史原生字符串；B2新增exact_values避免预期先转float丢精度。B3采集/RunStore权威接入及B4新副本未验，publish_ready始终false；不证明live、求解/结果/退出成功。下文B3未实现及56项全部not-run是历史阶段记录。
+
+
+## B2首阶段历史与身份完成（2026-11-02）
+
+[51项命令profile](a1-history-command-profile.md)已实现完整人工Pillbox XYZ历史投影：从同一scope有效历史核验mm/MHz、显式ChangeSolverType；不再接收调用者frequency_unit，元数据/注释不能补缺。修正Reset对象归属并拒绝无依据Mesh/MeshSettings.Reset，保留表达式、逐字段来源与失败语句定位。首阶段静态子集完成，不代表任意旧模板、实际保存重建、live身份或MCP服务器通过；B3/B4/G03仍待验。下文“完整历史允许表和单位身份pending”是本批之前状态。
+
+
+## B2子集实施更新（2026-11-02）
+
+已新增[受限历史投影](settings-history-projection.md)：H/S/M共35项语义oracle实际执行通过，保留表达式、逐字段来源与缺失配置，未知调用清空字段并拒绝。B1与新投影组合只读入口已实现；完整历史允许表、单位/solver身份锚点及B3仍pending，G03未通过，MCP服务器未实现。下文56项not-run是B0历史记录，不代表本轮35项仍未执行；未实施执行快照、启动CST或迁移GUI/CLI。
+
+
 ## B1更新（2026-11-02）
 
 已实现[保存来源严格适配](saved-project-source.md)：固定复用cst_version只读方法、精确scope、原字节/哈希、严格编码/JSON、预算/CRC/读取变化校验及便携发布。旧文“B1待实现/未接入”是本批次之前状态；B2/B3生产语义与G03仍未通过，56项oracle仍not-run，无真实CST启动。来源复用采用随包固定上游摘取，未修改兄弟仓库，也未迁移所有旧入口。
@@ -343,8 +363,13 @@ P7 明确不做 Profile 文件格式、数据库/注册表、可扩展继承框�
 - [ ] 求解前公共持久历史投影/重开/校准profile落地；当前三个实时getter仍无证据，不用上一次Model.db替代。
 - [x] [V06 B0用例/合同](cst-settings-v06-acceptance-plan.md)：56项人工预期和5个真实字节摘录/来源hash；仅结构/证据检查，语义全部not-run，不计V06通过。
 - [x] 记录真实Enlarged历史非UTF-8及共享scope默认/replace解码边界；区分未知旧编码unsupported与明确声明UTF-8违反malformed，不猜原编码。
-- [ ] V06 B1/B2：共用严格读取适配和公共有界历史/参数投影，实际执行H/S/M/D用例；未知控制流不执行，scope不fallback，Reset默认不猜。
-- [ ] V06 B3：公共execution_snapshot绑定/精度/陈旧判定实际执行E组；不能拿用例表结构检查当语义通过。
+- [x] V06 B1严格来源；B2第一版受限历史/参数投影，实际执行H/S/M 35项，D04组合行为与来源故障测试；见[本批范围](settings-history-projection.md)。不代表完整B2/G03。
+- [x] V06 B2首阶段：51项精确历史规则、同scope mm/MHz及显式solver身份、完整人工Pillbox XYZ历史与合成保存来源组合；删除调用者单位信任和无依据Reset。见[本批验收](a1-history-command-profile.md)，不是任意工程历史或真实CST通过。
+- [ ] V06 B2/B4剩余：首阶段实际CST保存工程与原生单位/solver锚点交叉复核、适用D组逐项语义映射；未知旧模板/编码/单位保持unsupported，不靠宽松允许表放行。
+- [x] V06 B3只读内核：六维绑定、固定版本profile、观测窗口/阶段、6位g格式、严格JSON与数据库双hash，实际执行11项E及6组历史原生字符串重放；[接口与边界](execution-snapshot-verification.md)。不代表当前live或真实新采集验收。
+- [x] V06 B3/B4采集子集：RunStore冻结意图/nonce/安装及来源，原生pre-start-post帧、旧库Start前拒绝、关闭后DB归档/hash、幂等回执及索引补写；真实正常/Start=0失败/旧库副本已验，见[本批](native-execution-capture.md)。2022大版本共用规则，精确身份仍记录。
+- [x] [公共single-simulation服务](single-simulation-service.md)：Runner分发与查询、定义冻结/G03拒绝、可选Managed单次采集、既有ACK/采用/退出、结果发布与已收取记录补写；假Worker/HTTP与故障测试。HOM/standard默认不启用。
+- [ ] 生产G03定义验证端口及新Managed单次组合真实副本；缺端口默认ready=false，不让客户端自报ready。补保存重开/Save-Rebuild全部组合、完整document_revision编辑发布与MCP宿主闭环；旧B4不代替新组合。
 - [ ] V06 B4：新实现获授权后做必要的最少真实副本复核；不追认旧nmodes+1/Rebuild/Reset读回为新解释器通过。
 - [ ] 校准profile与configure/save/submit门禁接入；未经校准持久匹配不能放行G03，不发明getter或数据库key。
 
@@ -377,3 +402,9 @@ B1最终离线验收：42 passed（2.64s），含17项来源适配测试、4项B
 [实施、持久化与验收记录](recovery-exit-audit-implementation.md)：停止意图和全部历史启动意图幂等收口；重型退出核验移出控制锁、单会话读取；恢复协作暂停及正常求解等待剔除；已离线核验、业务拒绝分类；导出取消/延期关闭；真实会话计数与“恢复项目”。A01–A08实现TODO完成，原审计“未修”是历史状态。核心147、GUI27、独立进程/目录释放7通过；另有重叠专项，详情见实施文档。真实CST/远端慢盘/人工旧数据复核仍待验；未提交推送打包。
 
 A01–A08最终补核：CLI shutdown亦复用所有权释放及物理核验；故障/协议/CLI/文档索引21 passed（5.44s），主窗口暂停按钮与恢复显示7 passed（0.73s）。本批轻量报告保留，pytest临时工程已清理；未启动CST，未提交推送打包。
+
+## G03生产后端接入 2026-11-02
+
+- [x] 默认注册生产后端、显式验证才启动、双副本保存重开、原生身份/范围及持久历史/表达式核验、失败诊断与不ready门禁。
+- [ ] 真实WinWrap/CST串行副本验收及完整single-simulation组合验收。
+- [ ] 验证会话纳入通用恢复/退出诊断；GUI/MCP显式验证入口；退出未确认时保留并人工核实，不自动清理或重试。

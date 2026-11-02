@@ -1,5 +1,10 @@
 # 统一接口契约：GUI、CLI、MCP与后台
 
+## 公共single-simulation服务接入（2026-11-02）
+
+[application_service单次子集](single-simulation-service.md)已接入现有Runner和Managed Worker：严格document/definition引用、控制租约/幂等、空参数单Task、原生采集/RunStore统一revision、ACK后核验采用、只读查询、发布缺口补写与专用恢复。复用双日志和项目锁，HOM/standard默认行为保留。默认生产G03定义验证端口未注册，候选ready=false、提交DEFINITION_NOT_READY；本轮仅假对端/离线，不追认旧B4为新组合实测。完整建模/定义编辑与MCP宿主仍未完成。
+
+
 日期：2026-10-28。状态：静态设计，未实施。优先级：现代MCP协议 → 本文唯一业务契约 → 共用应用服务 → 执行实现。本文收敛[框架设计](mcp-framework-static-design.md)，覆盖旧计划中MCP专属DTO、控制句柄及兼容条款；不宣称协议标准规定本项目的业务字段。协议信封依据[符合性矩阵](mcp-protocol-conformance.md)，CST语义依据[作用域审查](mcp-cst-capability-scope-design.md)。
 
 ## 1. 唯一契约与执行路径

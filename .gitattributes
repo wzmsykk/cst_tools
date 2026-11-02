@@ -3,3 +3,9 @@ test/fixtures/cst_settings_verifier_v06/*.mod binary
 
 # Stable vendored source identity on Windows checkouts.
 csttool/_vendor/cstv_readonly.py text eol=lf
+
+# Synthetic A1 profile fixture identity is recorded in its provenance manifest.
+test/fixtures/a1-pillbox-history.vb text eol=lf
+
+# Native captured readback strings retain original bytes and line endings.
+test/fixtures/execution_snapshot_native/*.tsv binary

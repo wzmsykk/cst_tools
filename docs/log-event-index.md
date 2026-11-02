@@ -48,6 +48,9 @@
 | `RUN_PREPARED` | `csttool/application_backend.py` |
 | `RUN_SHUTDOWN_FAILED` | `csttool/application_backend.py` |
 | `RUN_STOP_REQUESTED` | `csttool/application_backend.py` |
+| `SIMULATION_ADOPTED` | `csttool/application_service.py` |
+| `SIMULATION_FAILED` | `csttool/application_service.py` |
+| `SIMULATION_START` | `csttool/application_service.py` |
 | `TASK_ABANDONED` | `csttool/cstmanager.py` |
 | `TASK_ACK_FAILED` | `csttool/managed_cstworker.py` |
 | `TASK_ACK_PUBLISHED` | `csttool/managed_cstworker.py` |

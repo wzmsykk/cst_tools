@@ -27,6 +27,16 @@ def logical_job_id(name, parameters, definition):
 
 
 class RunStore:
+    def prepare_execution_attempt(self, task_id, **definition):
+        """Owner-only freeze before native launch; separate from result adoption."""
+        from .native_execution_capture import prepare_execution
+        return prepare_execution(self,task_id,**definition)
+
+    def finalize_execution_attempt(self, task_id, *, observations, closure):
+        """Close-first native reconciliation, never solver replay or result adoption."""
+        from .native_execution_capture import finalize_execution
+        return finalize_execution(self,task_id,observations=observations,closure=closure)
+
     def __init__(self, project, directory, *, run_id=None):
         self.project = Path(project).resolve()
         self.directory = Path(directory)

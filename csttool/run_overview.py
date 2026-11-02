@@ -128,7 +128,8 @@ class RunOverview:
             self.data.update(fields)
             checkpoint = self.project/'save/csv/hom_scan_checkpoint.json'
             try:
-                checkpoint_data = json.loads(checkpoint.read_text(encoding='utf-8'))
+                checkpoint_data = ({} if self.data.get('settings',{}).get('kind')=='simulation'
+                                   else json.loads(checkpoint.read_text(encoding='utf-8')))
                 self.data['coverage'] = checkpoint_data.get('coverage', {})
                 self.data['mode_count'] = len(checkpoint_data.get('report', {}).get('modes', []))
                 self.data['pending_count'] = len(checkpoint_data.get('pending', []))
@@ -164,6 +165,10 @@ class RunOverview:
                 '## 文件入口', '', '[应用日志](application.log) · [结构化日志](application.jsonl) · [元数据](run.json)',
                 '', '任务记录见 tasks/，路径映射见各任务 artifacts.json。',
                 '旧回执及原始大文件可能已清理；链接不保证产物仍存在。']
+            if self.data.get('settings',{}).get('kind')=='simulation':
+                lines=[line for line in lines if not line.startswith(('- 连续确认计算边界','- 已完成计算窗口最高上限','- 已接收模式'))]
+                lines=[('单次计算任务与结果见 execution-index.json 指向的 RunStore。'
+                        if line=='任务记录见 tasks/，路径映射见各任务 artifacts.json。' else line) for line in lines]
             write_text_atomic(self.directory/'summary.md', '\n'.join(lines)+'\n')
             rebuild_log_index(self.project)
 

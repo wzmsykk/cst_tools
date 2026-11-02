@@ -1,5 +1,7 @@
 # V01/V02/V04：求解设置数据库读回校准
 
+2026-11-02实施补记：[B3只读内核](../docs/execution-snapshot-verification.md)已按本记录固定profile实现，实际执行E组并重放本记录6组原始字符串。没有新CST运行；旧实测不追认为新生产采集/绑定或G03通过。原始TSV已另存轻量fixtures及hash，模型/场仍需重生成。
+
 ## 结论及作用域
 
 本机CST 2022.5 Release（2022-06-03，change 981760）可以通过官方`Project.GetDataBaseValue(key)`读取本征模执行配置，但实测这些字段属于**求解尝试生成的设置快照**，并非当前未计算工程的通用live getter。新工程求解前及Save后字段不存在；执行后出现；修改当前设置再Save仍可能返回旧值；Rebuild会清除这些字段。

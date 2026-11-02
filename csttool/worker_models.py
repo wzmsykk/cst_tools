@@ -2,6 +2,7 @@
 
 from dataclasses import dataclass, field
 from .cst_memory_guard import MemoryGuardPolicy
+from .execution_snapshot import ExecutionConfig
 from pathlib import Path
 from typing import Any, Callable, Mapping, Sequence
 
@@ -24,6 +25,10 @@ class WorkerConfig:
     field_match_policy: Mapping[str, Any] | None = None
     vacuum_domain: Mapping[str, Any] | None = None
     vacuum_reference_store: Path | None = None
+    execution_config: ExecutionConfig | None = None  # Owner-only immutable definition.
+    execution_project_id: str | None = None
+    execution_definition_revision: str | None = None
+    execution_definition_sha256: str | None = None
 
     @classmethod
     def from_mapping(cls, values):

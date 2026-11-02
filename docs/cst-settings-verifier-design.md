@@ -1,4 +1,31 @@
+2026-11-02 更新：生产G03定义验证后端已默认注册，登记不启动CST，显式verify_definition执行两个保存/重开副本会话。失败不ready；真实副本验收及验证会话自动恢复/GUI接线待做。见[现行G03说明](single-simulation-service.md)。此前“未注册”为历史状态。
+
 # CST设置验证器：读回来源、作用域与门禁
+
+## 公共single-simulation服务接入（2026-11-02）
+
+[application_service单次子集](single-simulation-service.md)已接入现有Runner和Managed Worker：严格document/definition引用、控制租约/幂等、空参数单Task、原生采集/RunStore统一revision、ACK后核验采用、只读查询、发布缺口补写与专用恢复。复用双日志和项目锁，HOM/standard默认行为保留。默认生产G03定义验证端口未注册，候选ready=false、提交DEFINITION_NOT_READY；本轮仅假对端/离线，不追认旧B4为新组合实测。完整建模/定义编辑与MCP宿主仍未完成。
+
+
+## 原生采集/RunStore及B4子集（2026-11-02）
+
+[共享采集链](native-execution-capture.md)已冻结意图/nonce/来源和安装，三阶段固定原生帧，六字段pre必须不存在才能Start，退出后归档DB并绑定对账。真实小网格Pillbox正常1模式、实际Start=0/0模式且配置匹配、旧库拒绝均取得副本证据，回执不将失败退出1写成正常成功；索引缺失可补且不重算。按用户要求2022大版本共用行为规则，精确版本/hash仍留档。默认Managed/HOM及公共single-simulation服务未自动接入，完整B4/G03/MCP闭环仍待完成。此前“采集/RunStore未实现”是较早阶段记录。
+
+
+## B3执行快照内核实施（2026-11-02）
+
+[公共只读验证器](execution-snapshot-verification.md)已实现六维绑定、固定2022.5/root/Tet profile、时间/阶段核对、6位g精度、严格快照JSON及实际数据库双hash。11项E oracle实际执行，另重放6组历史原生字符串；B2新增exact_values避免预期先转float丢精度。B3采集/RunStore权威接入及B4新副本未验，publish_ready始终false；不证明live、求解/结果/退出成功。下文B3未实现及56项全部not-run是历史阶段记录。
+
+
+## B2首阶段历史与身份完成（2026-11-02）
+
+[51项命令profile](a1-history-command-profile.md)已实现完整人工Pillbox XYZ历史投影：从同一scope有效历史核验mm/MHz、显式ChangeSolverType；不再接收调用者frequency_unit，元数据/注释不能补缺。修正Reset对象归属并拒绝无依据Mesh/MeshSettings.Reset，保留表达式、逐字段来源与失败语句定位。首阶段静态子集完成，不代表任意旧模板、实际保存重建、live身份或MCP服务器通过；B3/B4/G03仍待验。下文“完整历史允许表和单位身份pending”是本批之前状态。
+
+
+## B2子集实施更新（2026-11-02）
+
+已新增[受限历史投影](settings-history-projection.md)：H/S/M共35项语义oracle实际执行通过，保留表达式、逐字段来源与缺失配置，未知调用清空字段并拒绝。B1与新投影组合只读入口已实现；完整历史允许表、单位/solver身份锚点及B3仍pending，G03未通过，MCP服务器未实现。下文56项not-run是B0历史记录，不代表本轮35项仍未执行；未实施执行快照、启动CST或迁移GUI/CLI。
+
 
 ## B1更新（2026-11-02）
 

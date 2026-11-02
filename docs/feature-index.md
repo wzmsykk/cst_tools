@@ -1,11 +1,44 @@
 # 功能—实现—验收映射入口
 
+## 公共single-simulation服务接入（2026-11-02）
+
+[application_service单次子集](single-simulation-service.md)已接入现有Runner和Managed Worker：严格document/definition引用、控制租约/幂等、空参数单Task、原生采集/RunStore统一revision、ACK后核验采用、只读查询、发布缺口补写与专用恢复。复用双日志和项目锁，HOM/standard默认行为保留。默认生产G03定义验证端口未注册，候选ready=false、提交DEFINITION_NOT_READY；本轮仅假对端/离线，不追认旧B4为新组合实测。完整建模/定义编辑与MCP宿主仍未完成。
+
+
+## 原生采集/RunStore及B4子集（2026-11-02）
+
+[共享采集链](native-execution-capture.md)已冻结意图/nonce/来源和安装，三阶段固定原生帧，六字段pre必须不存在才能Start，退出后归档DB并绑定对账。真实小网格Pillbox正常1模式、实际Start=0/0模式且配置匹配、旧库拒绝均取得副本证据，回执不将失败退出1写成正常成功；索引缺失可补且不重算。按用户要求2022大版本共用行为规则，精确版本/hash仍留档。默认Managed/HOM及公共single-simulation服务未自动接入，完整B4/G03/MCP闭环仍待完成。此前“采集/RunStore未实现”是较早阶段记录。
+
+
+## B3执行快照内核实施（2026-11-02）
+
+[公共只读验证器](execution-snapshot-verification.md)已实现六维绑定、固定2022.5/root/Tet profile、时间/阶段核对、6位g精度、严格快照JSON及实际数据库双hash。11项E oracle实际执行，另重放6组历史原生字符串；B2新增exact_values避免预期先转float丢精度。B3采集/RunStore权威接入及B4新副本未验，publish_ready始终false；不证明live、求解/结果/退出成功。下文B3未实现及56项全部not-run是历史阶段记录。
+
+
+## B2首阶段历史与身份完成（2026-11-02）
+
+[51项命令profile](a1-history-command-profile.md)已实现完整人工Pillbox XYZ历史投影：从同一scope有效历史核验mm/MHz、显式ChangeSolverType；不再接收调用者frequency_unit，元数据/注释不能补缺。修正Reset对象归属并拒绝无依据Mesh/MeshSettings.Reset，保留表达式、逐字段来源与失败语句定位。首阶段静态子集完成，不代表任意旧模板、实际保存重建、live身份或MCP服务器通过；B3/B4/G03仍待验。下文“完整历史允许表和单位身份pending”是本批之前状态。
+
+
+## B2子集实施更新（2026-11-02）
+
+已新增[受限历史投影](settings-history-projection.md)：H/S/M共35项语义oracle实际执行通过，保留表达式、逐字段来源与缺失配置，未知调用清空字段并拒绝。B1与新投影组合只读入口已实现；完整历史允许表、单位/solver身份锚点及B3仍pending，G03未通过，MCP服务器未实现。下文56项not-run是B0历史记录，不代表本轮35项仍未执行；未实施执行快照、启动CST或迁移GUI/CLI。
+
+
 ## B1更新（2026-11-02）
 
 已实现[保存来源严格适配](saved-project-source.md)：固定复用cst_version只读方法、精确scope、原字节/哈希、严格编码/JSON、预算/CRC/读取变化校验及便携发布。旧文“B1待实现/未接入”是本批次之前状态；B2/B3生产语义与G03仍未通过，56项oracle仍not-run，无真实CST启动。来源复用采用随包固定上游摘取，未修改兄弟仓库，也未迁移所有旧入口。
 
 |功能ID|目的|源码|符号|测试|说明|
 |---|---|---|---|---|---|
+|F115|公共single-simulation定义/提交/查询/补写|[application_service.py](../csttool/application_service.py)|`ApplicationService`, `SingleSimulationExecution`, `SimulationRecoveryExecution`, `validate_simulation_submission`|[服务与HTTP假对端](../test/single_simulation_service_test.py)|[接口与G03边界](single-simulation-service.md)|
+|F116|Managed单次空参数Task及原生采集组合|[managed_cstworker.py](../csttool/managed_cstworker.py)|`ManagedCSTWorker.execution_identity`, `ManagedCSTWorker.finalize_execution_capture`|[组合与覆盖拒绝](../test/single_simulation_service_test.py)|[执行链](single-simulation-service.md)|
+|F117|Runner单次分发/恢复及公共查询|[runner.py](../csttool/runner.py)|`Runner.command`, `Runner.simulation_results`, `validate_run_payload`|[租约/重放/停止回归](../test/runner_test.py)|[公共服务](single-simulation-service.md)|
+|F113|RunStore冻结执行意图及关闭后对账|[run_store.py](../csttool/run_store.py)|`RunStore.prepare_execution_attempt`, `RunStore.finalize_execution_attempt`|[幂等与故障](../test/native_execution_capture_test.py)|[采集绑定与B4](native-execution-capture.md)|
+|F114|固定原生采集辅助宏、身份/旧库门禁|[native_execution_capture.py](../csttool/native_execution_capture.py)|`prepare_execution`, `render_capture_runtime`, `read_native_frame`, `finalize_execution`, `verify_capture_installation`|[串行副本工具](../test/support/validate_execution_capture.py)|[新观察](../knowledge-base/cst-native-capture-boundaries-20261102.md)|
+|F112|B3执行快照绑定/精度/陈旧性及工件hash|[execution_snapshot.py](../csttool/execution_snapshot.py)|`ExecutionBinding`, `ExecutionConfig`, `ExecutionExpectation`, `SnapshotReport`, `expectation_from_projection`, `validate_execution_snapshot`, `read_snapshot_record`, `verify_execution_artifact`|[E组及故障/历史字符串重放](../test/execution_snapshot_test.py)|[接口与信任边界](execution-snapshot-verification.md)|
+|F111|首阶段历史允许表及同scope单位/solver身份|[settings_projection.py](../csttool/settings_projection.py)|`project_saved_settings`, `project_history`|[完整A1与故障测试](../test/a1_history_profile_test.py)|[51项规则与边界](a1-history-command-profile.md)|
+|F110|B2受限保存设置投影及来源|[settings_projection.py](../csttool/settings_projection.py)|`project_saved_settings`, `project_history`, `Projection`|[语义与故障测试](../test/settings_projection_test.py)|[支持范围与待办](settings-history-projection.md)|
 |F100|B1保存工程严格只读快照|[saved_project_source.py](../csttool/saved_project_source.py)|`read_saved_source`, `SavedSource`, `SourceError`, `ReadLimits`|[来源测试](../test/saved_project_source_test.py)|[边界](saved-project-source.md)|
 
 日期：2026-10-28。这是维护中的核心功能索引，不是全仓符号清单。先按功能ID查实现，再查工具、日志和验收；历史方案不是现行运行保证。
@@ -225,3 +258,7 @@ F77/F56/F57退出接线更新：[RunnerController.request_shutdown](../GUI/runne
 |F109|明确拒绝与已离线退出核验|[runner_client.py](../csttool/runner_client.py)|`RunnerRejected`, `RunnerClient.request`, `RunnerClient.shutdown_and_wait`|[故障验收](../test/recovery_exit_audit_test.py)、[GUI分类](../test/gui_runner_test.py)|[错误与退出](recovery-exit-audit-implementation.md)|
 
 A01–A08已实施；原审计未修清单保留为历史证据。F88/F89新增[导出取消和进度](../GUI/diagnostic_export.py)，[核心导出](../csttool/diagnostic_bundle.py)的ExportCancelled/export_failure_bundle；验证[Qt取消/延期关闭](../test/gui_diagnostic_export_test.py)。F102/F104使用[单会话读取与Solver等待核验](../csttool/project_session_recovery.py)的_read_session/_solver_call_active及可选pause_check；[采用](../csttool/checkpoint_adoption.py)逐任务安全暂停。F103用[生命周期](../csttool/lifecycle_diagnostics.py)的physical_pending_count，未知/历史不冒充实时数量；[UI源](../GUI/ui_main.ui)和[生成UI](../GUI/ui_main.py)同步“恢复项目”。
+
+|功能ID|目的|源码|符号|测试|说明|
+|---|---|---|---|---|---|
+|F118|显式生产G03保存重开验证|[definition_verifier.py](../csttool/definition_verifier.py)|`NativeDefinitionVerifier`, `render_definition_probe`, `run_definition_probe`|[G03离线故障](../test/definition_verifier_test.py)|[服务与G03](single-simulation-service.md)|

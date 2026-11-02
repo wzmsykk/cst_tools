@@ -88,6 +88,9 @@ class ManagedCSTWorker:
         self._field_match_policy = config.field_match_policy
         self._vacuum_domain = config.vacuum_domain
         self._vacuum_reference_store = config.vacuum_reference_store
+        self._single_execution_config = config.execution_config
+        self._single_task = None
+        self._single_dispatched = False
         self._domain_jobs = []
         if config.vacuum_domain is not None:
             from .vacuum_domain_registry import validate_managed_domain_options
@@ -146,6 +149,22 @@ class ManagedCSTWorker:
         self.logger.info("Worker 诊断入口已保存 | WORKER_DIAGNOSTICS path=%s", manifest,
                          extra={"event": "WORKER_DIAGNOSTICS", "phase": "prepare", "artifacts": {**artifacts, "manifest": manifest}})
         self._prepare_project_copy()
+        if self._single_execution_config is not None:
+            if (not isinstance(config.execution_definition_sha256,str)
+                    or file_hash(self.project_path)!=config.execution_definition_sha256):
+                raise ValueError('single-simulation copy differs from frozen definition; refuse CST launch')
+            if self.run_store is None:
+                raise ValueError('single simulation requires an owned RunStore')
+            from .execution_snapshot import ExecutionConfig
+            if not isinstance(self._single_execution_config, ExecutionConfig):
+                raise ValueError('typed immutable execution config required')
+            self._single_task = Task.create(self.session_id,{})
+            self._native_capture_root = self.observation_root / 'native-execution'
+            self._native_capture_root.mkdir()
+            self._native_capture_intent = self.run_store.prepare_execution_attempt(
+                self._single_task.task_id, definition_path=self.source_project, model_path=self.project_path,
+                config=self._single_execution_config, project_id=config.execution_project_id,
+                executable=self.executable,definition_revision=config.execution_definition_revision)
         self._build_macro()
         try:
             self._start()
@@ -211,6 +230,23 @@ class ManagedCSTWorker:
         main = Path(resource_path("data/runtime_managed_worker_v1_main.vb")).read_text(
             encoding="utf-8"
         )
+        capture_runtime = ''
+        if getattr(self,'_single_task',None) is not None:
+            from .native_execution_capture import render_capture_runtime
+            capture_runtime = render_capture_runtime(self._native_capture_intent,self._native_capture_root)
+            # Immutable single task has no parameter changes. Failure must not
+            # rebuild away the freshly captured native database during close.
+            calling='            CSTPMW_Trace stage, "%PROJECT_PATH%", "calling EigenmodeSolver.Start"'
+            if main.count(calling)!=1 or main.count('            solverReturn = EigenmodeSolver.Start')!=1:
+                raise ValueError('single-simulation capture hooks do not match managed template')
+            main = main.replace(calling,
+                '            stage = "native-capture-pre"\n            modelNeedsRecovery = False\n'
+                '            CaptureBeforeSolver\n            stage = "solver-start"\n'+calling)
+            main = main.replace('            solverReturn = EigenmodeSolver.Start',
+                '            solverReturn = EigenmodeSolver.Start\n'
+                '            If solverReturn = 1 Then solverReturnedSuccess = True\n'
+                '            stage = "native-capture-post"\n            CaptureAfterSolver solverReturn\n'
+                '            stage = "solver-start"')
         replacements = {
             "%PROJECT_PATH%": quote_vb_string(self.project_path),
             "%SESSION_ID%": self.session_id,
@@ -234,6 +270,7 @@ class ManagedCSTWorker:
             + main
             + "\n"
             + generated
+            + capture_runtime
         )
         if "%" in main or output.lower().count("sub main") != 1:
             raise ValueError("managed worker macro contains unresolved placeholders")
@@ -412,13 +449,18 @@ class ManagedCSTWorker:
         with self._lock:
             if self._stopping or self.retiring:
                 raise RuntimeError("managed CST worker is stopping or retiring")
+            single = getattr(self,'_single_task',None)
+            if single is not None and (params or self._single_dispatched):
+                raise ValueError('single simulation forbids overrides or repeat dispatch')
             self._wait_for_marker("ready", self.START_TIMEOUT)
-            task = Task.create(
+            task = single or Task.create(
                 self.session_id,
                 params,
                 expression_names=self._expression_names(params),
             )
             payload = archive_task(self.root, task, result_name)
+            if single is not None:
+                self._single_dispatched = True
             if hasattr(self, 'postprocess_settings'):
                 write_json_atomic(self.root / 'task-context.json', {
                     'schema_version': 1, 'task_id': task.task_id, 'session_id': task.session_id,
@@ -431,7 +473,7 @@ class ManagedCSTWorker:
                     'optional_analysis_pending': bool(getattr(self, '_field_reference_result', None)
                                                       or getattr(self, '_vacuum_domain', None)),
                 })
-            if getattr(self, 'run_store', None) is not None:
+            if getattr(self, 'run_store', None) is not None and single is None:
                 self.run_store.event(task.task_id, 'submitted', worker=self.ID,
                                      session=self.session_id, job=result_name, parameters=dict(params),
                                      **getattr(self, '_attempt_context', {}))
@@ -803,6 +845,26 @@ class ManagedCSTWorker:
     def request_stop(self) -> None:
         """Publish cancellation without waiting for the running task's lock."""
         self.protocol.request_stop(self.session_id)
+
+    def finalize_execution_capture(self):
+        """Owner-only, after the normal stop protocol; never restart a solver."""
+        if self._single_task is None:
+            raise ValueError('native capture not enabled')
+        assessment = self._shutdown_assessment()
+        if assessment.process_state != 'exited':
+            raise ManagedWorkerShutdownError('native capture requires confirmed process exit')
+        identity = read_json(self.root/'process-identity.json')
+        closure = dict(exit_confirmed=True,active_pids=[],task_project=str(self.project_path),
+                       owned=[dict(pid=identity['pid'],create_time=identity['create_time'])],
+                       exit_code=assessment.exit_code)
+        return self.run_store.finalize_execution_attempt(self._single_task.task_id,
+            observations=self._native_capture_root,closure=closure)
+
+    @property
+    def execution_identity(self):
+        intent=self._native_capture_intent
+        return dict({key:intent[key] for key in ('task_id','project_id','definition_revision','definition_sha256')},
+                    session_id=self.session_id)
 
     def stop(self) -> bool:
         with self._lock:

@@ -1,0 +1,15 @@
+# CST首阶段历史允许表：文档核查与拒绝边界
+
+2026-11-02。本轮仅静态阅读安装版CST2022帮助及现行契约，没有新CST运行证据。[来源文件hash](cst-a1-history-sources-20261102.json)固定11页官方帮助及人工样例身份；不是厂家接口自动抓取服务，该JSON属于仓库证据，源码发布包不保证携带它。
+
+文档定义：Project Object的ChangeSolverType切换求解器，GetSolverType查询当前类别；不能靠EigenmodeSolver对象的出现推断切换已经发生。Project是帮助的对象标题，本轮不据标题假设宏内存在名为Project的全局变量，首阶段只支持已核查的全局调用形式。GetSolverType是未来原生验证环节，不以保存历史代替live读数。
+
+文档定义：Units.Geometry及Frequency决定工程长度/频率单位；Cylinder坐标和范围受当前WCS影响，而且每个range只对相应轴起作用。Cylinder.Create前组件、材料须存在；Reset只重置Cylinder局部内部设置。Segments=0表示解析光滑面。Background的ApplyInAllDirections当前用于对话框识别，不等于程序已显式设置六面padding。本轮因此保留独立六面命令，不用猜测的简写替代。
+
+文档定义：EigenmodeSolver.Reset重置其设置，不是项目ResetAll；Solver.FrequencyRange属于另一对象，且更改会影响网格并删除旧结果。此前投影按solver前缀全清会错误删除family和frequency_range，已按归属修正。Mesh帮助未列Reset，MeshSettings也未有本轮可确认的Reset依据；移除此前的推测性接受，不把解析成功当厂商存在该调用。
+
+文档定义：MeshAdaption3D.SetType选择策略类型，MinPasses为最少自适应轮次；本征模开关由SetMeshAdaptationTet/Hex控制。即使某命令不直接影响关注字段，其参数中的未知调用也可能产生副作用，不能直接跳过；投影仍验证其参数。
+
+实现决定：[51项允许表](../docs/a1-history-command-profile.md)只接受可枚举命令与参数，严格要求同scope保存历史中的mm/MHz和HF Eigenmode身份，拒绝调用者单位声明、旧元数据补缺、未知副作用和无依据Reset。任意用户宏、复杂旧模板、未知编码及非首阶段坐标/单位都不在支持范围。
+
+证据边界：人工完整历史与合成容器的离线通过只证明解释器接受/拒绝及来源定位；不证明CST接受该新宏、实际生成圆柱、材料存在、网格设置生效或安全关闭。实际构造/重建/原生身份锚点交叉核对仍属于B4/G03验收，须另有受控副本证据，不追认旧校准为新代码已验。

@@ -102,7 +102,7 @@ class Runner:
             old = read_json(previous)
             for key in ('run_id', 'state', 'phase', 'error', 'session_safety', 'last_progress',
                         'log_directory', 'log_history', 'coverage', 'mode_count',
-                        'completed_tasks', 'total_tasks', 'artifacts', 'lifecycle', 'error_diagnostic', 'cleanup_diagnostic'):
+                        'completed_tasks', 'total_tasks', 'artifacts', 'lifecycle', 'error_diagnostic', 'cleanup_diagnostic', 'run_kind'):
                 if key in old:
                     self.status[key] = old[key]
             if self.status.get('lifecycle'):
@@ -292,6 +292,27 @@ class Runner:
 
     def command(self, command):
         validate_command(command)
+        if command['operation']=='start' and command.get('payload',{}).get('kind')=='simulation':
+            from .application_service import ApplicationService
+            validate_run_payload(command['payload'])
+            with self.lock:
+                cached=self.control/'commands'/(command['request_id']+'.json')
+                if cached.exists():return self._command(command)
+                if self.owner_client!=command['client_id'] or time.monotonic()-self.owner_seen>=10:
+                    raise ValueError('claim control before modifying the project')
+                if self.status['state'] in ACTIVE or self.status['state']=='RECOVERY_REQUIRED':
+                    raise ValueError('run active or requires recovery')
+                generation=(self.owner_client,self.control_revision,self.status['run_id'])
+            service=getattr(self,'application_service',None)
+            if service is None:
+                service=ApplicationService(self.project,self.project_id)
+                self.application_service=service
+            service.preflight(command['payload'])  # Hash outside the control lock.
+            with self.lock:
+                if generation!=(self.owner_client,self.control_revision,self.status['run_id']):
+                    raise ValueError('ownership or run changed during simulation verification')
+                self.owner_seen=time.monotonic()
+                return self._command(command)
         if command['operation'] != 'shutdown':
             return self._command(command)
         with self.lock:
@@ -309,6 +330,11 @@ class Runner:
                 raise ValueError('ownership or run changed during shutdown verification; retry')
             self.owner_seen = time.monotonic()
             return self._command(command, shutdown_verified=True)
+
+    def simulation_results(self,run_id,result_revision=None):
+        from .application_service import ApplicationService
+        service=getattr(self,'application_service',None) or ApplicationService(self.project,self.project_id)
+        return service.get_simulation_results(run_id,result_revision)
 
     def _command(self, command, *, shutdown_verified=False):
         validate_command(command)
@@ -375,7 +401,7 @@ class Runner:
                 raise ValueError('shutdown requires fresh safety verification')
             if op == 'start':
                 validate_run_payload(payload)
-                if not payload.get('resume', False) and any(path.exists() for path in (
+                if payload.get('kind')!='simulation' and not payload.get('resume', False) and any(path.exists() for path in (
                         self.project / 'save/csv/hom_scan_checkpoint.json',
                         self.project / 'save/csv/scan_manifest.json',
                         self.project / 'save/standard_batch_checkpoint.json')):
@@ -394,7 +420,9 @@ class Runner:
                             recovery_reason=None, recovery_progress=None,
                             lifecycle=None, error_diagnostic=None, cleanup_diagnostic=None,
                             session_safety='unknown', log_directory=None, last_progress=None,
-                            completed_tasks=0, total_tasks=len(payload.get('tasks', [])))
+                            completed_tasks=0, total_tasks=1 if payload.get('kind')=='simulation' else len(payload.get('tasks', [])),
+                            run_kind=payload.get('kind','hom') if op=='start' else self.status.get('run_kind','hom'),
+                            **({'coverage':None,'mode_count':0} if payload.get('kind')=='simulation' else {}))
                 self.worker = threading.Thread(target=self._execute, args=(op, payload), name="RUNNER/" + op.upper(), daemon=False)
                 self.worker.start()
             elif op == 'stop':
@@ -416,7 +444,15 @@ class Runner:
         recovery_paused = False
         try:
             options = {'payload': payload if operation == 'start' else None} if self.executor_factory is LocalExecution else {}
-            executor = self.executor_factory(self.project, self.stop_intent, self.status['run_id'], self.update, **options)
+            if operation=='start' and payload.get('kind')=='simulation' and self.executor_factory is LocalExecution:
+                executor=self.application_service.execute_simulation(payload,run_id=self.status['run_id'],
+                    stop=self.stop_intent,update=self.update)
+            elif operation=='recover' and self.status.get('run_kind')=='simulation' and self.executor_factory is LocalExecution:
+                from .application_service import ApplicationService,SimulationRecoveryExecution
+                service=getattr(self,'application_service',None) or ApplicationService(self.project,self.project_id)
+                executor=SimulationRecoveryExecution(service,self.stop_intent,self.update)
+            else:
+                executor = self.executor_factory(self.project, self.stop_intent, self.status['run_id'], self.update, **options)
             with self.lock:
                 self.executor = executor
             if operation == 'recover':
@@ -425,9 +461,13 @@ class Runner:
             else:
                 executor.run(payload)
                 target = 'INTERRUPTED' if self.stop_intent.is_set() else 'COMPLETED'
-            if self.stop_delivery:
-                self.stop_delivery.join(5)
-                if self.stop_delivery.is_alive():
+            # _stop_run publishes and starts this thread while holding the lock.
+            # Read under the same lock, then join outside it (delivery may update).
+            with self.lock:
+                delivery=self.stop_delivery
+            if delivery:
+                delivery.join(5)
+                if delivery.is_alive():
                     raise RuntimeError('stop delivery not confirmed')
             if self._needs_recovery(executor):
                 target = 'RECOVERY_REQUIRED'
@@ -509,6 +549,10 @@ class Runner:
 
 
 def validate_run_payload(payload):
+    if payload.get('kind')=='simulation':
+        from .application_service import validate_simulation_submission
+        validate_simulation_submission(payload)
+        return
     if payload.get('kind', 'hom') not in {'hom', 'standard'}:
         raise ValueError('unsupported execution kind')
     if payload.get('kind') == 'standard':
@@ -687,6 +731,12 @@ def serve(project, executor_factory=None):
                     result = runner.events(json.loads(query.get('cursor', ['0'])[0]))
                 elif self.path.startswith('/commands/') and self.command == 'GET':
                     result = runner.command_record(self.path.removeprefix('/commands/'))
+                elif self.path.startswith('/simulation-results?') and self.command=='GET':
+                    from urllib.parse import parse_qs,urlsplit
+                    query=parse_qs(urlsplit(self.path).query)
+                    if set(query)-{'run_id','result_revision'} or len(query.get('run_id',[]))!=1:
+                        raise ValueError('invalid simulation result query')
+                    result=runner.simulation_results(query['run_id'][0],query.get('result_revision',[None])[0])
                 elif self.path == '/commands' and self.command == 'POST':
                     length = int(self.headers.get('Content-Length', '0'))
                     if not 0 < length <= 262144:
@@ -701,7 +751,7 @@ def serve(project, executor_factory=None):
                 body = json.dumps(result, ensure_ascii=False, allow_nan=False).encode()
                 self.send_response(200)
             except (ValueError, OSError, RuntimeError) as exc:
-                body = json.dumps({'error': str(exc)}).encode()
+                body = json.dumps({'error': str(exc), 'code':getattr(exc,'code',None)}).encode()
                 self.send_response(409)
             self.send_header('Content-Type', 'application/json; charset=utf-8')
             self.send_header('Content-Length', str(len(body)))

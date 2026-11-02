@@ -1,0 +1,164 @@
+{
+  "origin": "historical native strings from 2026-10-28 controlled calibration; no new CST run",
+  "replay_binding": "synthetic offline harness only; not authenticating historical attempts",
+  "cst_build": "2022.5 Release from 2022-06-03 (change 981760)",
+  "real_cst_started_this_batch": false,
+  "cases": [
+    {
+      "id": "V01-default",
+      "source_root": "artifacts/solver-readback-calibration-e6b894c0",
+      "expected_config": {
+        "method": "Default",
+        "mesh": "Tet",
+        "target_enabled": true,
+        "target_value": "480",
+        "adaptation_enabled": false,
+        "requested_modes": 1
+      },
+      "expected_result_success": true,
+      "files": [
+        {
+          "fixture": "V01-default-database.tsv",
+          "source": "artifacts/solver-readback-calibration-e6b894c0/database.tsv",
+          "sha256": "4920d20c98387665a48a62c7138275d9ff8b545886788b53f9b8290299ae027d"
+        },
+        {
+          "fixture": "V01-default-solver.tsv",
+          "source": "artifacts/solver-readback-calibration-e6b894c0/solver.tsv",
+          "sha256": "ce30391a1203a9324bbda8f884c7e007e3c776591d77a2cb6dbf1377255808a1"
+        }
+      ],
+      "historical_database_sha256": "a0730c2d4f1e7b3eb6d677e51452d5b917e31b9a915e15675c81bf33190068fc"
+    },
+    {
+      "id": "V01-general",
+      "source_root": "artifacts/solver-readback-calibration-af00e0db",
+      "expected_config": {
+        "method": "General (Lossy)",
+        "mesh": "Tet",
+        "target_enabled": true,
+        "target_value": "480",
+        "adaptation_enabled": false,
+        "requested_modes": 1
+      },
+      "expected_result_success": true,
+      "files": [
+        {
+          "fixture": "V01-general-database.tsv",
+          "source": "artifacts/solver-readback-calibration-af00e0db/database.tsv",
+          "sha256": "456f469264fa87e873be28d75f43e8fbfeab02277915e3bf93d0c4c907f3c246"
+        },
+        {
+          "fixture": "V01-general-solver.tsv",
+          "source": "artifacts/solver-readback-calibration-af00e0db/solver.tsv",
+          "sha256": "474cfd049a6332767e9031c941b8645ed3571310b5e8556ca25cbb8e86076935"
+        }
+      ],
+      "historical_database_sha256": "6705576eb247c06f4d99ab8b4070931215838cd2d1676af14a37762b01075424"
+    },
+    {
+      "id": "V02-zero",
+      "source_root": "artifacts/solver-readback-calibration-2e55f5b7",
+      "expected_config": {
+        "method": "Default",
+        "mesh": "Tet",
+        "target_enabled": true,
+        "target_value": "0",
+        "adaptation_enabled": false,
+        "requested_modes": 1
+      },
+      "expected_result_success": true,
+      "files": [
+        {
+          "fixture": "V02-zero-database.tsv",
+          "source": "artifacts/solver-readback-calibration-2e55f5b7/database.tsv",
+          "sha256": "682bbe8a8c36d3d52f370f36427361d13dad24d9842045173f5a1c502d3c8dab"
+        },
+        {
+          "fixture": "V02-zero-solver.tsv",
+          "source": "artifacts/solver-readback-calibration-2e55f5b7/solver.tsv",
+          "sha256": "43ee3d80370c9110a822fd0e1284154a4b08886287b8c1ea358d5a70ba493258"
+        }
+      ],
+      "historical_database_sha256": "c205dc1c81a07b26b72a8b003d83c610078e80655ea7d9559d2c151f4e2ad007"
+    },
+    {
+      "id": "V02-disabled",
+      "source_root": "artifacts/solver-readback-calibration-347a0c50",
+      "expected_config": {
+        "method": "Default",
+        "mesh": "Tet",
+        "target_enabled": false,
+        "target_value": "480",
+        "adaptation_enabled": false,
+        "requested_modes": 1
+      },
+      "expected_result_success": false,
+      "files": [
+        {
+          "fixture": "V02-disabled-database.tsv",
+          "source": "artifacts/solver-readback-calibration-347a0c50/database.tsv",
+          "sha256": "5f421d39f0ee16cd88cf6a850a394e0a8f2fd34389160ec3c394c3a709f46ff4"
+        },
+        {
+          "fixture": "V02-disabled-solver.tsv",
+          "source": "artifacts/solver-readback-calibration-347a0c50/solver.tsv",
+          "sha256": "14537b994ced0f78e39d6ef4692b8a6159b9d6eaa7b5a3ff9aaff42b23947e4e"
+        }
+      ],
+      "historical_database_sha256": "4d9a96df3ac1b4aff59482a041ba9bd7f42c327215f6955ca7d11367f36145ca"
+    },
+    {
+      "id": "V04-true",
+      "source_root": "artifacts/solver-readback-calibration-9c13f691",
+      "expected_config": {
+        "method": "Default",
+        "mesh": "Tet",
+        "target_enabled": true,
+        "target_value": "480",
+        "adaptation_enabled": true,
+        "requested_modes": 1
+      },
+      "expected_result_success": true,
+      "files": [
+        {
+          "fixture": "V04-true-database.tsv",
+          "source": "artifacts/solver-readback-calibration-9c13f691/database.tsv",
+          "sha256": "f505d32ed03ace22ba752969000f38f961ac5c0e4611e4becf75bb38e5c8f1f3"
+        },
+        {
+          "fixture": "V04-true-solver.tsv",
+          "source": "artifacts/solver-readback-calibration-9c13f691/solver.tsv",
+          "sha256": "5b7a03ff4d9ab345156b8042f8623afb59136533e755fb85a6077efd8d3969fa"
+        }
+      ],
+      "historical_database_sha256": "492a70cd4dd3fe6c09eb75e890c7bb458d72f4b8a6b68f87ddbee9f253c6afee"
+    },
+    {
+      "id": "V02-precision",
+      "source_root": "artifacts/solver-readback-calibration-c5722491",
+      "expected_config": {
+        "method": "Default",
+        "mesh": "Tet",
+        "target_enabled": true,
+        "target_value": "493.827156",
+        "adaptation_enabled": false,
+        "requested_modes": 1
+      },
+      "expected_result_success": true,
+      "files": [
+        {
+          "fixture": "V02-precision-database.tsv",
+          "source": "artifacts/solver-readback-calibration-c5722491/database.tsv",
+          "sha256": "e9ab74728c764f05f06ef5e2a0082559fc728c170cb210c671837f63ed771345"
+        },
+        {
+          "fixture": "V02-precision-solver.tsv",
+          "source": "artifacts/solver-readback-calibration-c5722491/solver.tsv",
+          "sha256": "ce30391a1203a9324bbda8f884c7e007e3c776591d77a2cb6dbf1377255808a1"
+        }
+      ],
+      "historical_database_sha256": "e7b70ccd4f0d5e19e42bac8458d764da7b4466d23d7bdde499dc5153ce1146b1"
+    }
+  ]
+}
