@@ -6,7 +6,7 @@
 
 ## 执行所有者的接入顺序
 
-1. 所有者持有现有项目单写权限，调用prepare_execution_attempt冻结源码CST hash、明确配置、批准的设置历史、project/run/task、模型副本路径和安装指纹。候选初始字节必须与冻结来源一致；setup_history只是所有者批准计划的记录，不是接收任意用户VBA的工具。定义revision为来源hash、配置及批准历史的稳定摘要，尚不是MCP公共定义服务的发布事务。
+1. 所有者持有现有项目单写权限，调用prepare_execution_attempt冻结源码CST hash、明确配置、批准的设置历史、project/run/task、模型副本路径和安装指纹。候选初始字节必须与冻结来源一致；setup_history只是所有者批准计划的记录，不是接收任意用户VBA的工具。独立采集未传公共revision时保留配置摘要；公共单次已传入已发布definition_revision，并另存configuration_digest，不把两个身份混用。
 2. intent写入现有RunStore任务下execution/intent.json，并生成独立nonce；重复相同准备返回原记录，冲突拒绝。RunStore任务只记录submitted，不伪造received/ACK/algorithm_adopted。
 3. 现有已加载工程Model.run合入render_capture_runtime生成的固定辅助函数。主宏仍由执行所有者控制，按CaptureBeforeSolver→真实EigenmodeSolver.Start→CaptureAfterSolver执行；辅助函数没有Main、Start、OpenFile、Save或Quit，不启动第二套执行链。
 4. 原生先输出完整pre帧，再检查工程路径、2022版本、HF Eigenmode、mm/MHz，以及六个数据库key全部明确MISSING。任何已有值或未知读取错误均在Start前拒绝。仅已实测的错误号及完整missing消息可认作不存在，不能将任意异常吞成missing。
@@ -30,7 +30,7 @@ GetProjectPath("Project")官方返回工程计算目录（无.cst后缀），不
 
 WWB Print当前使用宿主编码，本首版只接受ASCII采集目录/模型路径；不将未知ANSI误当UTF-8身份。需要非ASCII路径时须新增明确编码通道。帧64KiB、intent批准历史总32KiB，来源CST 256MiB、归档DB 64MiB；超限拒绝。
 
-原生post采集在Start返回后、后处理/恢复前；observed_at记录所有者在关闭后收取证据的UTC时间，不声称VBA写出了UTC。数据库须从该明确新生attempt采集，不能仅补改revision/nonce包装旧Model.db。缺帧保持未确认，不重新计算。默认Managed/HOM生产路径尚未自动调用此可选采集链；当前消费者为B4受控单次执行工具，公共single-simulation服务接入仍待实施。
+原生post采集在Start返回后、后处理/恢复前；observed_at记录所有者在关闭后收取证据的UTC时间，不声称VBA写出了UTC。数据库须从该明确新生attempt采集，不能仅补改revision/nonce包装旧Model.db。缺帧保持未确认，不重新计算。Managed在显式execution_config选项下集成该链；公共single-simulation通过此选项采集并由finalize_execution_capture归档。HOM/standard默认不启用；B4工具是另一受控消费者，不是唯一消费者。
 
 result_success在本采集回执中特指Start=1且实际模式数>0的求解事实；不代表R/Q、所有产物、结果采用或安全收尾总成功。process_exit_code、batch_exit_zero、exit_confirmed、database_verified分别记录，不将退出0命名为standard_closed，也不把失败退出1改写为正常退出。publish_ready始终false。
 

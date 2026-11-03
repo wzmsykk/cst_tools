@@ -1,5 +1,7 @@
 # GUI退出修正与资源释放实测
 
+> 适用性复审（2026-11-03）：按本条原日期、来源/样本范围引用；原当前/未实现/进程或artifact存在性不作实时保证。本次不复验原数据或外部结论，现行执行见[当前状态](../docs/current-status.md)。
+
 2026-10-25，[现行设计/API/验收范围](../docs/gui-exit-resource-cleanup.md)。未启动真实CST，不修改用户原工程，不结束用户进程。
 
 修正前证据保留在[目录占用审计](gui-exit-directory-lock-20261025.md)。本轮使用ExitStack覆盖LocalExecution部分构造及正常close异常；真实非法INI产生错误后application.log/jsonl可在同一Python进程内重命名，HOM前置拒绝不再打开无用result.log。

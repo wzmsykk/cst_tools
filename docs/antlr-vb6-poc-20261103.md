@@ -1,5 +1,7 @@
 # ANTLR VB6 离线 PoC 验收
 
+> 适用性复审（2026-11-03）：原批次实施/故障/验收记录；旧当前、未提交、待做及现场进程状态不代表本次实时事实。现行实现见[当前状态](current-status.md)、[功能索引](feature-index.md)及对应API；不重算或追认旧证据。
+
 2026-11-03。只进行词法/语法解析，不执行宏、不启动CST。**能发现一般语法错误，但接受了原始Zrange故障形态，不能独立作为WinWrap语法门禁。**
 
 工具：[antlr_vb6_poc.py](../test/support/antlr_vb6_poc.py)，测试：[antlr_vb6_poc_test.py](../test/antlr_vb6_poc_test.py)，轻量证据：[JSON](../knowledge-base/antlr-vb6-poc-20261103.json)。完整下载/生成文件和报告位于artifacts/antlr-vb6-poc-20261103，不保证随Git迁移；固定成功历史片段保存在test/fixtures/antlr-vb6-poc/retained-history.vb，来源/hash见JSON。

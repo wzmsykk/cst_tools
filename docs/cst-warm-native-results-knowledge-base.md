@@ -1,6 +1,8 @@
 # Warm CST 与原生结果知识库
 
-状态：当前架构认知；HOM 已验证到 P6
+> 适用性复审（2026-11-03）：按原日期/样本/固定来源保留的研究，不是通用格式规范、现行运行合同或新实测。现行实现见[当前状态](current-status.md)、[功能索引](feature-index.md)及对应API；不重算或追认旧证据。
+
+状态：2026-09-17架构研究快照；P6仅指原批次。当前执行见current-status.md和minimal-python-vba-protocol.md，不按本文旧Profile/Provider提案调用。
 日期：2026-09-17
 
 实施状态和 Gate 汇总见[当前状态与实施路线](./current-status.md)。

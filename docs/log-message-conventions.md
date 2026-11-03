@@ -6,7 +6,7 @@ JSONL schema_version=1：timestamp（UTC）、record_id、level、logger、threa
 
 源码位置已通过嵌套 LoggerAdapter 测试验证。错误发生位置读取 error.traceback，相关协议文件或快照查看 artifacts。详细事件入口见 [log-event-index.md](log-event-index.md)。
 
-消息格式采用“动作或结果 | key=value”。面向用户的说明使用中文，字段名与已有事件标识保持稳定，便于搜索。
+新消息采用简短动作/结果摘要；上下文由extra进入JSONL及DiagnosticTextFormatter独立context行，不要求在message重复“| key=value”或事件码。未迁移旧消息仍可保留旧格式，不能靠解析其文本决定协议状态。面向用户说明用中文，结构化字段和事件身份保持稳定。
 
 - INFO：运行开始、就绪、任务开始与结束、安全停止、会话恢复、HOM 和 mesh 分析结果。
 - DEBUG：资源路径、配置逐项打印、文件存在性检查、Worker 创建、配置保存、重复状态确认。

@@ -1,185 +1,33 @@
-# 最小 Python / VBA Runtime Protocol
+# Python/VBA现行运行协议
 
-L5采用补写的现行实现见[检查点对账](checkpoint-adoption-l5.md)：已确认TaskID的元数据幂等同步，不增加跨语言消息或运行时文档服务。
+2026-11-03按runtime_protocol.py、ManagedCSTWorker、生产VB模板及close_receipt.py核对。Task/Completion/ACK/Stop为v1，生产新会话收尾回执为v2；不是只有三种消息/五个阶段的初始切片。原始完整切片与延期项见[归档](archive/20261103-semantic-review/minimal-python-vba-protocol.md)，架构提案不能替代本页或codec。
 
-L5新增[十二个停止/ACK时点](stop-ack-l5-acceptance.md)，Completion清理后当前成功接收记录仍参与恢复判定；只是内部发现/恢复元数据修正，wire不变。
+## 字节与身份
 
-L5当前部分真实验收与固定收尾快照token修订见[串行记录](close-v2-l5-acceptance.md)；未触发矩阵仍pending，以下L5待做为历史范围。
+任务采用CST_TASK_V1，完成CST_COMPLETION_V1，确认CST_ACK_V1；键和值分行，严格枚举/字段/数量/UUID和编码，由codec及[test/data/runtime_protocol_v1](../test/data/runtime_protocol_v1/task.txt)等golden定义，不按key=value架构示例解析。值中的CR/LF等非法文本拒绝；表达式与literal类型分别保留，不扁平化CST参数。
 
-2026-10-24当前进度：L1–L4源码接入，新增[Runner/GUI事实与诊断](runner-lifecycle-l4.md)，L5真实WinWrap/CST待验收。下面历史规范不覆盖新验收范围。
+生产Managed会话串行使用protocol/current.task、current.completion、current.ack和任务级accepted凭据；FileProtocol类的inbox/completed/ack目录是低层契约工具路径，不把它说成生产current槽的文件布局。每个Worker独占session目录；任务/session匹配，原子发布与身份核验缺一不可。
 
-状态：下文主体为2026-09-17第一切片历史规范；生产迁移进度见当前状态。2026-10-20新增生命周期修订设计，尚未实现，不以历史Gate追认新范围。
-日期：2026-09-17
+## 任务、接收和采用
 
-当前实现、HOM Profile 和后续顺序见[当前状态与实施路线](./current-status.md)。
+1. Python准备任务上下文和原子Task；VBA校验，采集本任务实际修改项的原表达式，在写入前记录撤销意图。
+2. VBA参数→Rebuild→Solver→结果检查→必需后处理→快照→Completion。Start=1或退出0单独不足；失败Completion不等同空区间。
+3. Python核对Completion/后处理/快照，先持久保存received及RunStore事件，再发布ACK。失败Completion或必需结果读取失败也可在保存失败记录后ACK；ACK是消费/清理授权，不是成功票据。
+4. VBA写任务级accepted后清理current文件，发布ready:<task>或retiring:<task>；Python同时核对身份、accepted及清理事实。坏ACK阻断，不循环解释坏内容或重入求解。
+5. 算法确认后写检查点及采用屏障；received/acknowledged不是algorithm_adopted。恢复对账只补已确认元数据，不为补标记重算Solver。
 
-## 2026-10-20：范围修订入口
+ACK待定触发ManagedAcknowledgmentPending并停止派发，保留结果/回执，不普通盲重试。任务成功但可选纯Python分析未完成仍有独立pending状态，不能复用为完整分析结果。
 
-2026-10-24 L3：[生产宏](production-close-v2-l3.md)现为新会话生成v2收尾，失败后retiring、task级ACK清理、求解后结果保护均已接入；旧会话及Task/Completion/ACK仍v1。以下“待L3”为之前阶段快照，真实WinWrap/CST仍待L5。
+## 停止和关闭
 
-2026-10-24进度：L1及[L2收尾回执v2 codec/静态门禁](close-receipt-v2.md)已实现；生产Worker仍v1，v2实际状态采集/宏调用/真实验收属L3–L5。下段“尚未实现”为10月20日设计状态，当前接口以L2专页为准。
+StopRequest/StopAck绑定session。安全点检查不抢占阻塞Solver/Rebuild/单个后处理。合法停止或失败收尾按模型状态：仅必要时恢复本任务已尝试修改的表达式并删除新增参数；Solver已返回成功后保留结果，不为清理而Rebuild。
 
-当前Task/Completion/Ack仍为v1，生产另有StopRequest/StopAck及恢复机制。新增[生命周期协议故障矩阵与L1–L5计划](python-vba-lifecycle-protocol-v2-plan.md)：任务/模型/进程/采用四维事实、收尾回执v2、统一停止与恢复判定、失败Worker退役及求解后结果保护。该文是待实施设计，不改变当前退出0/有条件退出4门禁。
+收尾依次恢复/保存、独立Backup、close.receipt v2，合法停止请求才发布StopAck，然后返回批执行器。生产CSTPMW_CloseSession不调用Quit关闭自己正在运行的宏页；Python另核对实际进程退出。正常快照token为worker-input.cst.closed.cst，恢复为worker-input.cst.recovered.cst；详见[回执v2](close-receipt-v2.md)。
 
-下文“五阶段”“三种消息”“只做第一切片”“全部成功后Ack”等表述只描述当时的最小阶段。当前失败Completion或必需结果读取失败也需先保存失败接收记录再ACK，ACK表示消费与清理授权，不表示成功。字段顺序/编码以runtime_protocol.py和golden vectors为准，不按架构提案的key=value示例推断实现。历史延期项不再是拒绝有证据的生命周期修订的理由。
+任务、模型、进程和采用独立判断。退出0/严格恢复4可按证据确认标准关闭；退出1不能改判标准成功，HOM仅显式严格失败退役后新建基准Worker。未知/活跃身份、损坏回执或待采用成功结果继续阻断。旧空间按静态声明处理，不热替换活跃宏，不因缺v2声明/回执自动降级。
 
-## 1. 只解决当前真实问题
+## API与等待
 
-当前协议真正必须解决的只有：
+FileProtocol.submit(Task)、wait_completion(Task, timeout)、acknowledge(Completion)、request_stop(session_id)、read_stop_ack(session_id)是实际低层方法，不是历史submit()->task_id或wait(task_id)占位接口。生产Managed使用自己的current槽及无固定总时限完成等待；启动/ACK120秒，stop共享600秒。低层契约工具的显式timeout不定义生产总求解期限。
 
-1. VBA 不能读取尚未写完的任务；
-2. Python 必须知道完成信号属于哪个任务；
-3. Completion 必须晚于 Solver 完成和结果刷新；
-4. Python 读完 Warm 结果前，Worker 不能开始下一任务；
-5. 失败不能被当成成功继续读取。
-
-第一阶段不建设通用 RPC、通用 Result Manifest、插件系统、能力协商或多 Transport。协议只服务当前本机、单 CST 进程、单 Worker 串行任务。
-
-## 2. 最小消息
-
-每个 Worker 使用独立目录，并在启动时生成一个 `session_id`。只定义三种消息。
-
-### Task
-
-```text
-CST_TASK_V1
-task_id
-8f30...
-session_id
-3b17...
-parameter_count
-2
-param.0.name
-Rx
-param.0.kind
-literal
-param.0.value
-90.0
-param.1.name
-L
-param.1.kind
-expression
-param.1.value
-2*Rx
-```
-
-采用“键一行、值一行”，避免实现 percent-decoder；v1 禁止名称和值包含 CR/LF。Task 先写 `.tmp`，关闭后原子改名为 `.task`。
-
-### Completion
-
-```text
-CST_COMPLETION_V1
-task_id
-8f30...
-session_id
-3b17...
-status
-success
-```
-
-失败时增加：
-
-```text
-error_code
-REBUILD_FAILED
-error_message
-...
-```
-
-Completion 不列举每个结果。结果位置、Codec 和单位仍由现有 PPS/Profile 配置决定；Python 在读取时负责检查存在性和格式。
-
-### Ack
-
-```text
-CST_ACK_V1
-task_id
-8f30...
-session_id
-3b17...
-```
-
-Worker 看到匹配 Ack 后才处理下一 Task。
-
-## 3. 保留与延期
-
-### 现在保留
-
-- `task_id`：防止旧 flag 和同名任务混淆；
-- `session_id`：防止 Worker 重启后消费旧任务；
-- `literal/expression`：这是 CST 参数的真实语义差异；
-- `.tmp -> final` 原子发布；
-- Completion/Ack 顺序；
-- 少量稳定错误码；
-- 单 Worker 独占目录。
-
-### 延期到有证据需要时
-
-- 参数 SHA-256：UUID、独占目录和不可复用文件已足够；
-- 每个结果的 SHA-256、size 和资产清单；
-- `build_id`、Profile ID 每任务重复传输；
-- deadline、attempt、parent task 写入 VBA 协议；这些由 Python Manager 管理；
-- `x-` 扩展字段和通用未知字段机制；
-- 通用 Provider 协商；先沿用静态 PPS/Profile；
-- COM、Named Pipe、sidecar 等多 Transport；
-- 通用 Operation 插件 ABI；仅在确有残余 VBA 后处理时设计；
-- 分布式、跨主机、断点恢复和 exactly-once。
-
-## 4. 最小状态机
-
-```text
-Python: write task -> wait completion -> read results -> write ack
-VBA:    wait task -> apply -> rebuild -> solve -> flush
-        -> write completion -> wait ack -> next
-```
-
-只有五个 VBA 阶段：`apply`、`rebuild`、`solve`、`flush`、`publish`。错误只需报告失败阶段和错误码。
-
-## 5. Python API
-
-第一阶段只需要：
-
-```python
-submit(task) -> task_id
-wait(task_id, timeout) -> Completion
-acknowledge(task_id) -> None
-```
-
-不创建通用 Message Bus、Transport 抽象层或依赖注入框架。文件操作可以放在一个 `FileProtocol` 类中；确认出现第二种 Transport 后再抽象接口。
-
-Python 编排层使用 `wait_completion_or_stop(...)` 等待单个任务。等待超时必须先调用该任务所属 Worker 的 `stop()`，然后继续抛出 `TimeoutError`；成功收到 Completion 时不得停止 Worker。该函数只绑定最小的 `stop()` 生命周期接口，不把重试、结果读取或生产 Worker 实现塞进文件协议。
-
-## 6. 结果读取
-
-暂不让 VBA 枚举结果。Python 根据当前 Project Profile 获取期望结果：
-
-```text
-Completion success
--> NativeResultProvider 读取已知 .rd0
--> PythonDerivedProvider 计算可派生值
--> 必要时读取固定 VBA Extension 输出
--> 全部成功后 Ack
-```
-
-任何必需结果缺失或解析失败，Python 不发送成功 Ack，而是把任务判为结果失败并重建或停止 Worker。首版可以停止 Worker，不必设计复杂恢复。
-
-## 7. 实施切片
-
-1. 修复旧 Worker 的 failure 分支和 TaskIndex 偏移。
-2. 实现最小 Task/Completion/Ack Codec 与原子文件操作。
-3. 使用 fake Worker 测半文件、旧 session、failure、Ack 前不得推进。
-4. 已用 Pillbox 工程副本运行一个 literal 参数、一个 expression 参数和一个原生 `.rd0` 结果；Python 读取后 Ack，Worker 再 Save/Quit。
-5. 通过后再决定是否迁移 TM020/WTC。
-
-完成第 4 步之前，不开发 Result Manifest、Operation Manifest 或通用 Extension ABI。
-
-## 8. 增量触发条件
-
-只有满足以下条件才扩展协议：
-
-- 实际发生过结果目录污染，才增加结果摘要；
-- 同一 Worker 必须支持多个动态 Profile，才增加 capability handshake；
-- 确认存在无法直读的后处理，才实现 Extension ABI；
-- 出现第二种传输方式，才抽象 Transport；
-- 需要跨进程恢复，才增加持久化 attempt/parent task。
-
-每项扩展必须附带失败样例或真实需求，禁止为假设场景预留框架。
+[任务级撤销](task-parameter-undo.md)、[ACK契约](managed-ack-state-contract.md)、[采用补写](checkpoint-adoption-l5.md)、[收尾证据](session-closure-l1.md)说明不同责任。源码/假对端和真实L5证据分别记录；本页不累加历史测试数字，也不把部分L5通过当全部指令级中断验收。

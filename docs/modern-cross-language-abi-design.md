@@ -1,5 +1,7 @@
 # CST Python / VBA 现代跨语言 ABI 设计
 
+> 适用性复审（2026-11-03）：冻结设计/验收目标，非生产API清单；原候选名称、旧尚未实现及待办只在设计时点成立。现行实现见[当前状态](current-status.md)、[功能索引](feature-index.md)及对应API；不重算或追认旧证据。
+
 状态：历史完整 ABI 提案；当前延期，不对应当前 wire format
 日期：2026-09-17
 当前实现依据：[CST Tools 当前状态与实施路线](./current-status.md)与[最小 Python/VBA Runtime Protocol](./minimal-python-vba-protocol.md)

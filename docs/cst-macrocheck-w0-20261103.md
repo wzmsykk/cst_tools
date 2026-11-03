@@ -1,5 +1,7 @@
 # W0：CST宿主内批量MacroCheckThis验收
 
+> 适用性复审（2026-11-03）：原批次实施/故障/验收记录；旧当前、未提交、待做及现场进程状态不代表本次实时事实。现行实现见[当前状态](current-status.md)、[功能索引](feature-index.md)及对应API；不重算或追认旧证据。
+
 日期：2026-11-03。本机CST 2022.5（文件版本2022,5,0,0），**核心宿主校准通过**：一个新3D副本、一次RunScript、14次MacroCheckThis，0次求解。无需人工确认完成检查及标准关闭。该结论不覆盖任意宏、完整WinWrap语言或Call形式的实际几何执行。
 
 工具：[calibrate_cst_macrocheck.py](../test/support/calibrate_cst_macrocheck.py)，[离线回归](../test/cst_macrocheck_probe_test.py)，[轻量证据](../knowledge-base/cst-macrocheck-w0-20261103.json)。本轮通过目录artifacts/cst-macrocheck-84eeb1af；原始目录不保证随Git迁移，必要源码/hash/结果保存在轻量证据。未修改用户原工程，没有复制宿主授权材料。

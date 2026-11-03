@@ -1,5 +1,7 @@
 # L5 小网格 Pillbox：真实 HOM 中断与恢复
 
+> 适用性复审（2026-11-03）：原批次实施/故障/验收记录；旧当前、未提交、待做及现场进程状态不代表本次实时事实。现行实现见[当前状态](current-status.md)、[功能索引](feature-index.md)及对应API；不重算或追认旧证据。
+
 日期：2026-10-25。此记录针对生产 Runner → Backend → HomScanAlgorithm → Manager → Managed Worker → CST 链路，不以标准批次或假 Worker 代替 HOM 验收。
 
 ## 范围与方法

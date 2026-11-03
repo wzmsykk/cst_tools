@@ -1,0 +1,22 @@
+{
+  "profile": "cst-2022-a1-sub-w23-v1",
+  "accepted": true,
+  "sources": {
+    "csttool/definition_editing.py": "a233de7cd98e5740f92e489282d51beae49452c5eb09d7fedd09b20a2020c08b",
+    "csttool/winwrap_emitter.py": "1fa6396327f909c5aa40dca5c53415fd2138aaf325003d2950d9c736d4cdd3a7",
+    "csttool/winwrap_checks.py": "3500f9153bc0c883f9b16ff36a4e3bc481015fcd96edfb5e1c6878aae8a86360",
+    "csttool/settings_projection.py": "9d8d381be9ced2bba93f5d466445909280ab5313ff21e142fe18ef944fcae521",
+    "csttool/vb_codec.py": "5f824f464cb93927434005b5868b8dc960c284fcd155d06fad163ee393bd5407",
+    "csttool/native_definition_builder.py": "ba4e3a6ee2e8c2a824b97b35abd9ed309a1ab6d21151cb06139676ab6489be48",
+    "data/first_stage_contract.schema.json": "f18e3cf36d6ea23e017e13be10c0189d716deaae962591e03dfebde9c305a843"
+  },
+  "axes": [
+    "x",
+    "y",
+    "z"
+  ],
+  "solver_start_calls": 0,
+  "standard_closed": true,
+  "evidence_file": "knowledge-base/winwrap-w23-20261103.json",
+  "evidence_sha256": "ac3362636a9e8a514e9511e0c40dad20402c8b41d0a3319412da5d418f1346e5"
+}

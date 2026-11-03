@@ -1,0 +1,64 @@
+{
+  "date": "2026-11-03",
+  "sources_before_fix": {
+    "csttool/definition_editing.py": "90fad9e92c17ac96fed65846e6f8ab157a27aa5dd839ea6142560467e4239ceb",
+    "csttool/winwrap_emitter.py": "2481cad4001567ae905adc0bf167ede5db5056bd02299ea75d48bb17f3d38519",
+    "csttool/winwrap_checks.py": "3500f9153bc0c883f9b16ff36a4e3bc481015fcd96edfb5e1c6878aae8a86360",
+    "csttool/settings_projection.py": "9d8d381be9ced2bba93f5d466445909280ab5313ff21e142fe18ef944fcae521",
+    "csttool/vb_codec.py": "5f824f464cb93927434005b5868b8dc960c284fcd155d06fad163ee393bd5407",
+    "csttool/native_definition_builder.py": "ba4e3a6ee2e8c2a824b97b35abd9ed309a1ab6d21151cb06139676ab6489be48",
+    "data/first_stage_contract.schema.json": "f18e3cf36d6ea23e017e13be10c0189d716deaae962591e03dfebde9c305a843"
+  },
+  "attempts": [
+    {
+      "root": "artifacts\\winwrap-w23-34feed88",
+      "sessions": [
+        {
+          "path": "artifacts\\winwrap-w23-34feed88\\compile\\session-status.json",
+          "exit_confirmed": true,
+          "exit_code": 0
+        }
+      ]
+    },
+    {
+      "root": "artifacts\\winwrap-w23-bbef090c",
+      "sessions": [
+        {
+          "path": "artifacts\\winwrap-w23-bbef090c\\compile\\session-status.json",
+          "exit_confirmed": true,
+          "exit_code": 0
+        },
+        {
+          "path": "artifacts\\winwrap-w23-bbef090c\\project\\control\\definitions\\fault-partial\\attempt\\verification-edit\\saved\\session-status.json",
+          "exit_confirmed": true,
+          "exit_code": 0
+        },
+        {
+          "path": "artifacts\\winwrap-w23-bbef090c\\project\\control\\definitions\\fault-syntax\\attempt\\verification-edit\\saved\\session-status.json",
+          "exit_confirmed": true,
+          "exit_code": 0
+        },
+        {
+          "path": "artifacts\\winwrap-w23-bbef090c\\project\\x\\candidate\\session-status.json",
+          "exit_confirmed": true,
+          "exit_code": 0
+        }
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "kind": "MacroCheckThis-result",
+      "sample": "outer missing closing quote",
+      "observed": "accepted, Main marker absent; not execution proof"
+    },
+    {
+      "kind": "parameter-description-persistence",
+      "expected": "长说明 \"R\" 😀 长说明 \"R\" 😀 长说明 \"R\" 😀 长说明 \"R\" 😀 长说明 \"R\" 😀 长说明 \"R\" 😀 长说明 \"R\" 😀 长说明 \"R\" 😀 长说明 \"R\" 😀 长说明 \"R\" 😀 长说明 \"R\" 😀 长说明 \"R\" 😀 长说明 \"R\" 😀 长说明 \"R\" 😀 长说明 \"R\" 😀 长说明 \"R\" 😀 长说明 \"R\" 😀 长说明 \"R\" 😀 长说明 \"R\" 😀 长说明 \"R\" 😀 ",
+      "observed": "长说明 \"R\" ?? 长说明 \"R\" ?? 长说明 \"R\" ?? 长说明 \"R\" ?? 长说明 \"R\" ?? 长说明 \"R\" ?? 长说明 \"R\" ?? 长说明 \"R\" ?? 长说明 \"R\" ?? 长说明 \"R\" ?? 长说明 \"R\" ?? 长说明 \"R\" ?? 长说明 \"R\" ?? 长说明 \"R\" ?? 长说明 \"R\" ?? 长说明 \"R\" ?? 长说明 \"R\" ?? 长说明 \"R\" ?? 长说明 \"R\" ?? 长说明 \"R\" ??",
+      "source_sha256": "73ac734cf69ea5f7d2b7c62fdab82d7a2bbba32c3ff8adaca645a4662f52260a",
+      "L_expression": "(R^2)/R + R",
+      "publication": "blocked before G03 and calibration stamp"
+    }
+  ]
+}

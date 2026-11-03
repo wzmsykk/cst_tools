@@ -1,5 +1,7 @@
 # CST首阶段历史允许表：文档核查与拒绝边界
 
+> 适用性复审（2026-11-03）：按本条原日期、来源/样本范围引用；原当前/未实现/进程或artifact存在性不作实时保证。本次不复验原数据或外部结论，现行执行见[当前状态](../docs/current-status.md)。
+
 2026-11-02。本轮仅静态阅读安装版CST2022帮助及现行契约，没有新CST运行证据。[来源文件hash](cst-a1-history-sources-20261102.json)固定11页官方帮助及人工样例身份；不是厂家接口自动抓取服务，该JSON属于仓库证据，源码发布包不保证携带它。
 
 文档定义：Project Object的ChangeSolverType切换求解器，GetSolverType查询当前类别；不能靠EigenmodeSolver对象的出现推断切换已经发生。Project是帮助的对象标题，本轮不据标题假设宏内存在名为Project的全局变量，首阶段只支持已核查的全局调用形式。GetSolverType是未来原生验证环节，不以保存历史代替live读数。

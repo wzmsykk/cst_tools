@@ -44,8 +44,6 @@ rebuild_log_index(project)只补总览及有旧run.json的目录中缺失的summ
 
 RunOverview(project, run_id, purpose, resume=False, settings=None)创建/复用身份对应目录；update更新状态/摘要；RunOverviewHandler观察首个ERROR；rebuild_log_index仅索引已有目录。RunStore新增可选run_id，已有metadata不被覆盖。
 
-离线测试覆盖可读命名/非法字符、身份复用与短ID冲突、旧目录原路径和字节不变、损坏元数据索引、首错误/源码/计算覆盖、默认Backend日志绑定及关闭清理。真实服务器日志权限、网络盘原子替换和多窗口最终索引一致性仍待验收。后续可增加GUI“打开运行摘要/总览”入口，不新增日志服务。
+源码RunOverview.update读取检查点并写run.json/summary.md，RunOverviewHandler截取首ERROR，rebuild_log_index只索引/补旧摘要。公共单次settings.kind=simulation不展示HOM覆盖，任务结果定位到execution-index.json；不能从其它运行的HOM账本推断单次成功。
 
-本批最终全套离线543 passed、19 integration deselected，报告artifacts/readable-log-directories-20261014.xml（不保证随Git迁移）。另测HOM检查点实时刷新摘要，确认日志目录与Manager任务目录共用完整身份/路径。测试临时目录已清理，未启动真实CST。
-
-过程中两次既有文件操作出现Windows WinError 5：project.ini原子替换、结果目录归档重命名。后者代码保留原目录；单例及最终全套复跑通过。根因未确定，不能据此断定沙箱、同步软件或文件占用；本批没有增加盲目重试或强制删除来掩盖异常，服务器文件权限/占用压力验收仍需补充。
+[原批次完整记录](archive/20261103-semantic-review/readable-log-directories.md)保留10月14日543项及WinError5原现象，根因未定；现行回归见test/run_overview_test.py。真实共享盘权限、并发跨进程索引和现场占用仍需验，不以原子替换称强事务。

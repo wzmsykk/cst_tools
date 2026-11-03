@@ -1,5 +1,7 @@
 # L4 Runner / GUI 生命周期事实与诊断
 
+> 适用性复审（2026-11-03）：原批次实施/故障/验收记录；旧当前、未提交、待做及现场进程状态不代表本次实时事实。现行实现见[当前状态](current-status.md)、[功能索引](feature-index.md)及对应API；不重算或追认旧证据。
+
 L5真实Controller退出发现终态标签可能早于线程释放。HTTP快照增加execution_active，GUI保持收尾状态；关闭确认不由GUI标签推断，见[六类验收](controller-exit-l5-acceptance.md)。
 
 L5真实停止/ACK补验修复：Completion清理后，当前任务未采用的成功received/acknowledged也进入恢复发现；显示received-result-not-reconciled而非伪称Completion存在，result_state为received-unadopted。标准进程关闭仍可独立为confirmed-closed，详见[真实记录](stop-ack-l5-acceptance.md)。

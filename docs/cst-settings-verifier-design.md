@@ -22,4 +22,4 @@ B1共用cst_version严格只读核心 → B2冻结完整A1定义 → 显式G03�
 
 重新验证先撤销旧ready；失败/未知退出保留诊断并阻断提交。未知原始编码、完整旧模板或不可解释控制流继续unsupported。方法/target等没有通用live getter，不把执行库伪装为持久定义读回。
 
-验证会话已接入统一恢复、退出核验及GUI事实展示；真实中断矩阵/显式GUI验证操作、完整Save/Rebuild故障矩阵、跨版本与公开建模发布仍未完成。V01–V06原始逐项校准和56项人工用例身份不改写为全通过；具体来源、数值及原时点结论保留在[归档设计](archive/20261102-progress-consolidation/cst-settings-verifier-design.md)。归档是分析与证据，不是当前接口。
+验证会话已接入统一恢复、退出核验及GUI事实展示；真实中断矩阵/显式GUI验证操作、完整Save/Rebuild故障矩阵、跨版本和指定桌面建模闭环仍未完成；公共类型化建模发布与SDK纵向链已有[11月3日验收](typed-public-acceptance-20261103.md)。V01–V06原始逐项校准和56项人工用例身份不改写为全通过；具体来源、数值及原时点结论保留在[归档设计](archive/20261102-progress-consolidation/cst-settings-verifier-design.md)。归档是分析与证据，不是当前接口。

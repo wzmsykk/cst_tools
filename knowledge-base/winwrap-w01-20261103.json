@@ -1,0 +1,639 @@
+{
+  "date": "2026-11-03",
+  "baseline": "2705935 plus W01 working changes",
+  "solver_start_calls": 0,
+  "acceptance_passed": true,
+  "w0": {
+    "acceptance_passed": true,
+    "closure": {
+      "exit_code": 0,
+      "exit_confirmed": true,
+      "quiet": {
+        "nonce": "32a812796a174529a40e63733ee75ca7",
+        "readback": "not-exposed-by-COM",
+        "setter_returned": true,
+        "requested": true
+      },
+      "window_observation": {
+        "baseline_foreground": {
+          "hwnd": 3614216,
+          "pid": 77768,
+          "visible": true,
+          "minimized": false,
+          "owner": 0,
+          "window_class": "Chrome_WidgetWin_1"
+        },
+        "observation": "WinEvent foreground/show hooks plus 50ms window polling",
+        "owned_foreground_events": 0,
+        "errors": [],
+        "dropped_events": 0,
+        "window_enumeration_gaps": 0,
+        "private_desktop": "CstTools_36f93a5f49624907979472e01bca482c",
+        "desktop_handle_closed": true,
+        "owned_window_events": 175,
+        "minimize_actions": 0
+      },
+      "window_observation_path": "D:\\work\\cst_tools\\artifacts\\winwrap-w01-0627823e\\w0\\window-observation.json"
+    },
+    "marker_absent": true,
+    "parameter_expression_after": "2 * W0Base",
+    "cases": [
+      {
+        "name": "body-marker",
+        "expected": true,
+        "statuses": [
+          "accepted"
+        ],
+        "error": null,
+        "diagnostic": null,
+        "source_sha256": "bdecb32a43fb950abe0fa848c3ae5fe5a1e9fab45f63647cfc990e5609d0078a",
+        "maximum_physical_line_characters": 101
+      },
+      {
+        "name": "parameter-write",
+        "expected": true,
+        "statuses": [
+          "accepted"
+        ],
+        "error": null,
+        "diagnostic": null,
+        "source_sha256": "700f4dd02d327cee8e2eb75e552cf7b6d0137add7185f100d3daaf90ce83bfec",
+        "maximum_physical_line_characters": 25
+      },
+      {
+        "name": "obvious-syntax-error",
+        "expected": false,
+        "statuses": [
+          "rejected"
+        ],
+        "error": "10586\nExpecting ')'\n[*xMacroRunThis3*#5] w0x = (\n\n",
+        "diagnostic": {
+          "number": 10586,
+          "description": "Expecting ')'",
+          "source": "[*xMacroRunThis3*#5] w0x = (",
+          "module": "*xMacroRunThis3*",
+          "wrapped_line_1based": 5,
+          "original_statement": "w0x = (",
+          "column": null
+        },
+        "source_sha256": "f4ab050ae3d736374daf9d70567d8432a2d5ab5f7a2f23f9acff468e2f245ebf",
+        "maximum_physical_line_characters": 20
+      },
+      {
+        "name": "zrange-original",
+        "expected": false,
+        "statuses": [
+          "rejected"
+        ],
+        "error": "10576\nUnexpected text.\n[*xMacroRunThis4*#5]  .Zrange ((-RestoreDoubleParameter(\"L\"))/2), (RestoreDoubleParameter(\"L\")/2)\n\n",
+        "diagnostic": {
+          "number": 10576,
+          "description": "Unexpected text.",
+          "source": "[*xMacroRunThis4*#5]  .Zrange ((-RestoreDoubleParameter(\"L\"))/2), (RestoreDoubleParameter(\"L\")/2)",
+          "module": "*xMacroRunThis4*",
+          "wrapped_line_1based": 5,
+          "original_statement": " .Zrange ((-RestoreDoubleParameter(\"L\"))/2), (RestoreDoubleParameter(\"L\")/2)",
+          "column": null
+        },
+        "source_sha256": "976327ec066b3db825736bdd2f893ffe5afc018d21a110fe20941c947182078e",
+        "maximum_physical_line_characters": 76
+      },
+      {
+        "name": "zrange-fixed",
+        "expected": true,
+        "statuses": [
+          "accepted"
+        ],
+        "error": null,
+        "diagnostic": null,
+        "source_sha256": "c103f099b9b4ab1335b5a98b0fb9ad89654f82b7c7e9a1ca3dce17eed91d839a",
+        "maximum_physical_line_characters": 80
+      },
+      {
+        "name": "zrange-call",
+        "expected": null,
+        "statuses": [
+          "accepted"
+        ],
+        "error": null,
+        "diagnostic": null,
+        "source_sha256": "cebbab94b7a928187f1e3c25d8fa6084b0b50166f97879011b6b1316494cbdd4",
+        "maximum_physical_line_characters": 82
+      },
+      {
+        "name": "duplicate-declaration",
+        "expected": false,
+        "statuses": [
+          "rejected"
+        ],
+        "error": "10519\nIdentifier is already in use.\n[*xMacroRunThis7*#5] Dim w0x As Integer\n\n",
+        "diagnostic": {
+          "number": 10519,
+          "description": "Identifier is already in use.",
+          "source": "[*xMacroRunThis7*#5] Dim w0x As Integer",
+          "module": "*xMacroRunThis7*",
+          "wrapped_line_1based": 5,
+          "original_statement": "Dim w0x As Integer",
+          "column": null
+        },
+        "source_sha256": "0ce3f69c7de40c0d77a6f584381d87c3bc8b6043ec52ffa4a636e1e6b9f0b143",
+        "maximum_physical_line_characters": 20
+      },
+      {
+        "name": "missing-end-with",
+        "expected": false,
+        "statuses": [
+          "rejected"
+        ],
+        "error": "10587\nUnterminated block statement. 'With'\n[*xMacroRunThis8*#6] End Sub\n\n",
+        "diagnostic": {
+          "number": 10587,
+          "description": "Unterminated block statement. 'With'",
+          "source": "[*xMacroRunThis8*#6] End Sub",
+          "module": "*xMacroRunThis8*",
+          "wrapped_line_1based": 6,
+          "original_statement": "End Sub",
+          "column": null
+        },
+        "source_sha256": "f5399c5c622a7819dfe55fecba5900e69582e889f1df9bb1ee90141b85485699",
+        "maximum_physical_line_characters": 20
+      },
+      {
+        "name": "unicode",
+        "expected": true,
+        "statuses": [
+          "accepted"
+        ],
+        "error": null,
+        "diagnostic": null,
+        "source_sha256": "25dcadfda08e6eca11de7ca8abe206b12a70d87ca0b83b918637246d7c81e4b0",
+        "maximum_physical_line_characters": 20
+      },
+      {
+        "name": "parameter-read",
+        "expected": true,
+        "statuses": [
+          "accepted"
+        ],
+        "error": null,
+        "diagnostic": null,
+        "source_sha256": "427bc721a2594ce3a2c43a0ce58255530d6f1e96032971316e1ab0f480a747c8",
+        "maximum_physical_line_characters": 33
+      },
+      {
+        "name": "inner-history-text",
+        "expected": true,
+        "statuses": [
+          "accepted"
+        ],
+        "error": null,
+        "diagnostic": null,
+        "source_sha256": "75e052d139cae38e133ea6cb2a935b178dc59bd1b4cd200cd49eaf162f46bcfd",
+        "maximum_physical_line_characters": 50
+      },
+      {
+        "name": "xrange-fixed",
+        "expected": true,
+        "statuses": [
+          "accepted"
+        ],
+        "error": null,
+        "diagnostic": null,
+        "source_sha256": "cf151713a25a4240573317dfe0277a54ee015b83ca83b39193d264222c18140f",
+        "maximum_physical_line_characters": 80
+      },
+      {
+        "name": "yrange-fixed",
+        "expected": true,
+        "statuses": [
+          "accepted"
+        ],
+        "error": null,
+        "diagnostic": null,
+        "source_sha256": "5fea9b87df6576294012f0f6a0a70f009fc539fc0ee538e146de73f39c617de5",
+        "maximum_physical_line_characters": 80
+      },
+      {
+        "name": "retained-history-wrapped",
+        "expected": true,
+        "statuses": [
+          "accepted"
+        ],
+        "error": null,
+        "diagnostic": null,
+        "source_sha256": "1a7b436333dce94e309aaaed5c0c1943f36b21089609485f8b3189927c2ef218",
+        "maximum_physical_line_characters": 80
+      },
+      {
+        "name": "literal-511",
+        "expected": null,
+        "statuses": [
+          "accepted"
+        ],
+        "error": null,
+        "diagnostic": null,
+        "source_sha256": "894bd0ef5b73adb328483dd017de476d0d86d1c560abcb692c864792b6c0d3b4",
+        "maximum_physical_line_characters": 526
+      },
+      {
+        "name": "literal-799",
+        "expected": null,
+        "statuses": [
+          "accepted"
+        ],
+        "error": null,
+        "diagnostic": null,
+        "source_sha256": "c4d3bbadd00c60bb6e4fd29795c136b263b83ee5c58e2e2983d4eefe2272adeb",
+        "maximum_physical_line_characters": 814
+      },
+      {
+        "name": "literal-1023",
+        "expected": null,
+        "statuses": [
+          "rejected"
+        ],
+        "error": "10576\nUnexpected text.\n[*xMacroRunThis17*#5] sampleText = \"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\"\n\n",
+        "diagnostic": {
+          "number": 10576,
+          "description": "Unexpected text.",
+          "source": "[*xMacroRunThis17*#5] sampleText = \"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\"",
+          "module": "*xMacroRunThis17*",
+          "wrapped_line_1based": 5,
+          "original_statement": "sampleText = \"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\"",
+          "column": null
+        },
+        "source_sha256": "ebe8c53d3b75786ea804788267859871b9b12ebbb8d6a4be308a0737ccf40b13",
+        "maximum_physical_line_characters": 1038
+      },
+      {
+        "name": "literal-2047",
+        "expected": null,
+        "statuses": [
+          "rejected"
+        ],
+        "error": "10576\nUnexpected text.\n[*xMacroRunThis18*#5] sampleText = \"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\"\n\n",
+        "diagnostic": {
+          "number": 10576,
+          "description": "Unexpected text.",
+          "source": "[*xMacroRunThis18*#5] sampleText = \"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\"",
+          "module": "*xMacroRunThis18*",
+          "wrapped_line_1based": 5,
+          "original_statement": "sampleText = \"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\"",
+          "column": null
+        },
+        "source_sha256": "e6d69ec4832bd8d9ef92c207ab3347d542f2ebf6ded94e534df1fdaebc127f5d",
+        "maximum_physical_line_characters": 2062
+      },
+      {
+        "name": "literal-4095",
+        "expected": null,
+        "statuses": [
+          "rejected"
+        ],
+        "error": "10576\nUnexpected text.\n[*xMacroRunThis19*#5] sampleText = \"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\"\n\n",
+        "diagnostic": {
+          "number": 10576,
+          "description": "Unexpected text.",
+          "source": "[*xMacroRunThis19*#5] sampleText = \"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\"",
+          "module": "*xMacroRunThis19*",
+          "wrapped_line_1based": 5,
+          "original_statement": "sampleText = \"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\"",
+          "column": null
+        },
+        "source_sha256": "92cfb6b6b04f72cc35f82f42af51f54f469420bb4e341280a804c462767e90ad",
+        "maximum_physical_line_characters": 4110
+      },
+      {
+        "name": "continuations-1",
+        "expected": null,
+        "statuses": [
+          "accepted"
+        ],
+        "error": null,
+        "diagnostic": null,
+        "source_sha256": "5b06761234449a45b7a8586e168a9f73c02a055718e465a916b791749eeae8aa",
+        "maximum_physical_line_characters": 26
+      },
+      {
+        "name": "continuations-10",
+        "expected": null,
+        "statuses": [
+          "accepted"
+        ],
+        "error": null,
+        "diagnostic": null,
+        "source_sha256": "1e45dc77c93259691658376223ed11c3d0254e71995993cd0ac0b6952f5a46a2",
+        "maximum_physical_line_characters": 26
+      },
+      {
+        "name": "continuations-24",
+        "expected": null,
+        "statuses": [
+          "accepted"
+        ],
+        "error": null,
+        "diagnostic": null,
+        "source_sha256": "d1ecf3d55d2209fb6b31793e2446b02144e3c394aaba13713a9905a5b57383d0",
+        "maximum_physical_line_characters": 26
+      },
+      {
+        "name": "continuations-50",
+        "expected": null,
+        "statuses": [
+          "accepted"
+        ],
+        "error": null,
+        "diagnostic": null,
+        "source_sha256": "d04a8e2bf38f93be39311223e0cdfee55288eaf1b2103dd392d08e33d32cc658",
+        "maximum_physical_line_characters": 26
+      }
+    ],
+    "checks": 23,
+    "solver_start_calls": 0,
+    "background_verified": true,
+    "failure": null,
+    "execution": "byref-array\tafter\nbyref-scalar\t3\nzmin\t-3\nzmax\t3\n",
+    "call_saved_in_history": true
+  },
+  "w1": {
+    "closure": {
+      "exit_code": 0,
+      "exit_confirmed": true,
+      "quiet": {
+        "nonce": "6d2fd9f6da3b4c1ba029da8c15f1e4e0",
+        "readback": "not-exposed-by-COM",
+        "setter_returned": true,
+        "requested": true
+      },
+      "window_observation": {
+        "baseline_foreground": {
+          "hwnd": 2695562,
+          "pid": 32176,
+          "visible": true,
+          "minimized": false,
+          "owner": 0,
+          "window_class": "Chrome_WidgetWin_1"
+        },
+        "observation": "WinEvent foreground/show hooks plus 50ms window polling",
+        "owned_foreground_events": 0,
+        "errors": [],
+        "dropped_events": 0,
+        "window_enumeration_gaps": 0,
+        "private_desktop": "CstTools_6ecfc8b8b1c6488aa294f5ae02d442f1",
+        "desktop_handle_closed": true,
+        "owned_window_events": 174,
+        "minimize_actions": 0
+      },
+      "window_observation_path": "D:\\work\\cst_tools\\artifacts\\winwrap-w01-0627823e\\project\\documents\\candidate\\window-observation.json"
+    },
+    "proof": {
+      "schema_version": 1,
+      "status": "verified",
+      "scope": "root",
+      "source_sha256": "b06a87b60cba785373c0c86d8edc1755b1f732490fcbfd8204a6a0ade911cb22",
+      "gates": [
+        "saved-reopened",
+        "identity",
+        "settings",
+        "standard-close"
+      ],
+      "diagnostics": "D:\\work\\cst_tools\\artifacts\\winwrap-w01-0627823e\\project\\documents\\candidate\\verification-e26b45c52f6c46e5a63199c74871b5be",
+      "installation": {
+        "executable": "D:\\Program Files (x86)\\CST Studio Suite 2022\\CST DESIGN ENVIRONMENT.exe",
+        "launcher_sha256": "bde34d5ad5b7ec46500ab8d0a1da2eb04b198e27ed06d1d7de3ffe8ec55c397e",
+        "modeler_sha256": "a1cb2ec6316592020e81129fa0687343db2c650d82286c79a22ef4e08310db98",
+        "profile_major": "2022"
+      },
+      "sessions": [
+        {
+          "phase": "saved",
+          "exit_code": 0,
+          "exit_confirmed": true
+        },
+        {
+          "phase": "reopened",
+          "exit_code": 0,
+          "exit_confirmed": true
+        }
+      ],
+      "observations": [
+        {
+          "phase": "saved",
+          "sha256": "4ee4fb274784bcc6e119eacc7375dba610080c87be85e9f1e7c7df7131575d0d",
+          "native": {
+            "nonce": "41a01c336e244b329a13c426eebcce49",
+            "project": "D:\\work\\cst_tools\\artifacts\\winwrap-w01-0627823e\\project\\documents\\candidate\\verification-e26b45c52f6c46e5a63199c74871b5be\\saved\\definition",
+            "build": "Version 2022.5 - Jun 03 2022",
+            "solver": "HF Eigenmode",
+            "length": "mm",
+            "frequency": "MHz",
+            "mesh": "Tetrahedral",
+            "fmin": "500",
+            "fmax": "2000",
+            "end": "G03V1"
+          },
+          "geometry": {
+            "status": "verified",
+            "source": "native-query",
+            "solid": "cavity:pillbox",
+            "material": "Vacuum",
+            "volume_mm3": 50.2654824574367,
+            "bounds_mm": {
+              "xmin": -2.0,
+              "xmax": 2.0,
+              "ymin": -2.0,
+              "ymax": 2.0,
+              "zmin": -2.0,
+              "zmax": 2.0
+            },
+            "boundaries": {
+              "xmin": "electric",
+              "xmax": "electric",
+              "ymin": "electric",
+              "ymax": "electric",
+              "zmin": "electric",
+              "zmax": "electric"
+            },
+            "background_evidence": "persisted-and-replayed-history-only",
+            "raw": {
+              "nonce": "41a01c336e244b329a13c426eebcce49",
+              "project": "D:\\work\\cst_tools\\artifacts\\winwrap-w01-0627823e\\project\\documents\\candidate\\verification-e26b45c52f6c46e5a63199c74871b5be\\saved\\definition",
+              "solid": "cavity:pillbox",
+              "exists": "-1",
+              "material": "Vacuum",
+              "volume_mm3": "50.2654824574367",
+              "xmin_mm": "-2",
+              "xmax_mm": "2",
+              "ymin_mm": "-2",
+              "ymax_mm": "2",
+              "zmin_mm": "-2",
+              "zmax_mm": "2",
+              "calculation_xmin_mm": "-2",
+              "calculation_xmax_mm": "2",
+              "calculation_ymin_mm": "-2",
+              "calculation_ymax_mm": "2",
+              "calculation_zmin_mm": "-2",
+              "calculation_zmax_mm": "2",
+              "boundary.xmin": "electric",
+              "boundary.xmax": "electric",
+              "boundary.ymin": "electric",
+              "boundary.ymax": "electric",
+              "boundary.zmin": "electric",
+              "boundary.zmax": "electric"
+            }
+          }
+        },
+        {
+          "phase": "reopened",
+          "sha256": "23b4c99018a465f124518e489bc526865f147dd0a0bca72d3f9605b004984f9e",
+          "native": {
+            "nonce": "b57eedd52a9b4718a63b7a8fc57b152f",
+            "project": "D:\\work\\cst_tools\\artifacts\\winwrap-w01-0627823e\\project\\documents\\candidate\\verification-e26b45c52f6c46e5a63199c74871b5be\\reopened\\definition",
+            "build": "Version 2022.5 - Jun 03 2022",
+            "solver": "HF Eigenmode",
+            "length": "mm",
+            "frequency": "MHz",
+            "mesh": "Tetrahedral",
+            "fmin": "500",
+            "fmax": "2000",
+            "end": "G03V1"
+          },
+          "geometry": {
+            "status": "verified",
+            "source": "native-query",
+            "solid": "cavity:pillbox",
+            "material": "Vacuum",
+            "volume_mm3": 50.2654824574367,
+            "bounds_mm": {
+              "xmin": -2.0,
+              "xmax": 2.0,
+              "ymin": -2.0,
+              "ymax": 2.0,
+              "zmin": -2.0,
+              "zmax": 2.0
+            },
+            "boundaries": {
+              "xmin": "electric",
+              "xmax": "electric",
+              "ymin": "electric",
+              "ymax": "electric",
+              "zmin": "electric",
+              "zmax": "electric"
+            },
+            "background_evidence": "persisted-and-replayed-history-only",
+            "raw": {
+              "nonce": "b57eedd52a9b4718a63b7a8fc57b152f",
+              "project": "D:\\work\\cst_tools\\artifacts\\winwrap-w01-0627823e\\project\\documents\\candidate\\verification-e26b45c52f6c46e5a63199c74871b5be\\reopened\\definition",
+              "solid": "cavity:pillbox",
+              "exists": "-1",
+              "material": "Vacuum",
+              "volume_mm3": "50.2654824574367",
+              "xmin_mm": "-2",
+              "xmax_mm": "2",
+              "ymin_mm": "-2",
+              "ymax_mm": "2",
+              "zmin_mm": "-2",
+              "zmax_mm": "2",
+              "calculation_xmin_mm": "-2",
+              "calculation_xmax_mm": "2",
+              "calculation_ymin_mm": "-2",
+              "calculation_ymax_mm": "2",
+              "calculation_zmin_mm": "-2",
+              "calculation_zmax_mm": "2",
+              "boundary.xmin": "electric",
+              "boundary.xmax": "electric",
+              "boundary.ymin": "electric",
+              "boundary.ymax": "electric",
+              "boundary.zmin": "electric",
+              "boundary.zmax": "electric"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "after_cst": [],
+  "root": "D:\\work\\cst_tools\\artifacts\\winwrap-w01-0627823e",
+  "raw_artifacts_migration_guaranteed": false,
+  "sources": {
+    "csttool/winwrap_emitter.py": "6ace438dbe8b92e104fea7a4c725f3be5124ffa9500f986793530a264f922a96",
+    "csttool/definition_editing.py": "4a8aaef21d84421dcd6ffde812104f4e28c13fb7736c9ca14f020681c3ead65f",
+    "csttool/settings_projection.py": "9d8d381be9ced2bba93f5d466445909280ab5313ff21e142fe18ef944fcae521",
+    "test/support/calibrate_winwrap_calls.py": "8ca3d86870b070d8e9f1c47213d372aba2e74fff49fbc918bd101e213901614d"
+  },
+  "limits": "Sub-only generated profile. No object/class initialization hooks, no universal line-length or continuation limit, no complete W2/W3 gate.",
+  "initial_failure": "PrivateDesktop creation denied before native launch in restricted environment; controlled run completed in normal user environment.",
+  "post_calibration_review": {
+    "change": "Python error formatting and remaining dynamic outer statement/array serialization centralized; unsafe bare first-argument shape now rejected. Accepted W1 generated source remains identical.",
+    "current_w1_macro_matches_native_input": true,
+    "native_macro_raw_sha256": "6daee76c0e97ac7b8a4c892c6825279c641d9562537fb189b6ced79e91ff2e2a",
+    "current_sources": {
+      "csttool/winwrap_emitter.py": "ba6aa233eb9b09ff4976a2771b3ad6b1a4ed02edc8b2986d045e82c3248d6ffd",
+      "csttool/definition_editing.py": "d8212eb1faeccc4610cc4d673ba86d8de0782bce6a81580c30c9b64e2d0e108a",
+      "csttool/settings_projection.py": "9d8d381be9ced2bba93f5d466445909280ab5313ff21e142fe18ef944fcae521",
+      "test/support/calibrate_winwrap_calls.py": "8ca3d86870b070d8e9f1c47213d372aba2e74fff49fbc918bd101e213901614d"
+    }
+  },
+  "model_cleanup": {
+    "task_finished": true,
+    "regeneration_required": true,
+    "models": [
+      {
+        "path": "w0\\definition.cst",
+        "sha256": "249118332d4e7a9e551d1109eaffea6f9f3bd5719da01df026a7563f755441d8",
+        "bytes": 34384,
+        "retained": {
+          "Model/Parameters.json": "w0\\retained-Parameters.json",
+          "Model/3D/Model.mod": "w0\\retained-Model.mod",
+          "Model/simulationproperties.json": "w0\\retained-simulationproperties.json"
+        }
+      },
+      {
+        "path": "project\\documents\\candidate\\definition.cst",
+        "sha256": "b06a87b60cba785373c0c86d8edc1755b1f732490fcbfd8204a6a0ade911cb22",
+        "bytes": 34307,
+        "retained": {
+          "Model/Parameters.json": "project\\documents\\candidate\\retained-Parameters.json",
+          "Model/3D/Model.mod": "project\\documents\\candidate\\retained-Model.mod",
+          "Model/simulationproperties.json": "project\\documents\\candidate\\retained-simulationproperties.json"
+        }
+      },
+      {
+        "path": "project\\documents\\candidate\\verification-e26b45c52f6c46e5a63199c74871b5be\\reopened\\definition.cst",
+        "sha256": "23b4c99018a465f124518e489bc526865f147dd0a0bca72d3f9605b004984f9e",
+        "bytes": 36163,
+        "retained": {
+          "Model/Parameters.json": "project\\documents\\candidate\\verification-e26b45c52f6c46e5a63199c74871b5be\\reopened\\retained-Parameters.json",
+          "Model/3D/Model.mod": "project\\documents\\candidate\\verification-e26b45c52f6c46e5a63199c74871b5be\\reopened\\retained-Model.mod",
+          "Model/simulationproperties.json": "project\\documents\\candidate\\verification-e26b45c52f6c46e5a63199c74871b5be\\reopened\\retained-simulationproperties.json"
+        }
+      },
+      {
+        "path": "project\\documents\\candidate\\verification-e26b45c52f6c46e5a63199c74871b5be\\saved\\definition.cst",
+        "sha256": "4ee4fb274784bcc6e119eacc7375dba610080c87be85e9f1e7c7df7131575d0d",
+        "bytes": 36150,
+        "retained": {
+          "Model/Parameters.json": "project\\documents\\candidate\\verification-e26b45c52f6c46e5a63199c74871b5be\\saved\\retained-Parameters.json",
+          "Model/3D/Model.mod": "project\\documents\\candidate\\verification-e26b45c52f6c46e5a63199c74871b5be\\saved\\retained-Model.mod",
+          "Model/simulationproperties.json": "project\\documents\\candidate\\verification-e26b45c52f6c46e5a63199c74871b5be\\saved\\retained-simulationproperties.json"
+        }
+      }
+    ],
+    "raw_models_removed": true,
+    "companion_directories_removed": true,
+    "pytest_temporary_directories_removed": true
+  },
+  "offline_validation": {
+    "passed": 232,
+    "skipped": 1,
+    "seconds": 83.05,
+    "xml": "artifacts/w01-final-verified.xml",
+    "skip_reason": "test.mcp_sdk_test module: optional mcp dependency absent in this Python environment",
+    "earlier_sets_overlap": true
+  },
+  "closeout_validation": {
+    "passed": 11,
+    "seconds": 16.49,
+    "xml": "artifacts/w01-closeout.xml"
+  }
+}

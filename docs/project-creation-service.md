@@ -28,11 +28,11 @@
 
 ## 验收
 
-[真实轻量证据](../knowledge-base/cst-project-bootstrap-g02-20261102.json)：artifacts/project-create-9cfc72e4；官方CST2022自带Python新建、单位历史保存、close/退出核验、源只读检查及重放一致；0次Solver。该条为当时owner API/原生bootstrap证据；后续当前桌面九工具create/inspect已通过，见最新类型化验收。候选和原始日志在artifacts，不保证随Git迁移。
+[真实轻量证据](../knowledge-base/cst-project-bootstrap-g02-20261102.json)：artifacts/project-create-9cfc72e4；官方CST2022自带Python新建、单位历史保存、close/退出核验、源只读检查及重放一致；0次Solver。该条为当时owner API/原生bootstrap证据；后续2026-11-02桌面九工具create/inspect有通过记录，见最新类型化验收。候选和原始日志在artifacts，不保证随Git迁移。
 
 离线测试覆盖重复操作、冲突/重名/路径与未知字段、失败保留、不可变检查、提交后的发布缺口补写、同Runner槽及带认证HTTP读取。首批目录9项是原5项加4个创建/检查辅助工具；当前源码已扩展为14项，新增完整typed操作见当前服务。
 
-后续：typed参数/几何/配置/G03发布与关闭已实现，见当前服务；通用结构inspect、指定桌面整链仍待验；首阶段单圆柱的原生材质/体积/盒/边界和SDK真实计算已经通过。当前Codex九工具创建/检查已通过，不能扩展成新增五工具已在宿主调用。
+后续：typed参数/几何/配置/G03发布与关闭已实现，见当前服务；通用结构inspect、指定桌面整链仍待验；首阶段单圆柱的原生材质/体积/盒/边界和SDK真实计算已经通过。2026-11-02的Codex九工具创建/检查已有证据，本次未重新盘点宿主，不能扩展成新增五工具已在宿主调用。
 
 最终扩展回归96 passed（63.46秒，artifacts/g02-final-20261102.xml）；阶段诊断修改后22项定向复验通过（4.34秒，g02-stage-20261102.xml）；官方SDK/stdio5项另验。阶段现在分别上报create-environment/new-mws/units-history/save/project-close/de-close，仅阶段变化才更新状态，不刷重复日志。集合重叠且代码时点不同，不相加。
 

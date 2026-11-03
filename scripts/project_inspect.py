@@ -404,6 +404,7 @@ def query(root,catalog,*,feature=None,path=None,symbol=None,question=None,delete
     for p in sorted(docs):
         doc=registry.get(p,{})
         required.append(dict(path=p,role=doc.get('role','unreviewed'),authority=doc.get('authority','unreviewed'),
+                             review=doc.get('review'),
                              headings=headings(root,p) if p.endswith('.md') and (root/p).is_file() else []))
     result=dict(matches=matched,match_reasons=reasons,selected_paths=selected_paths,
                 symbol_declarations=declarations_found,ambiguous_symbol=len(declarations_found)>1,

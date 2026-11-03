@@ -4,12 +4,13 @@
 
 |用途|入口|
 |---|---|
+|逐篇适用性、旧语义修正及归档边界|[语义复审](documentation-semantic-review.md)|
 |当前能力、实际验收和限制|[当前状态](current-status.md)|
 |下一步与保留的长期待办|[现行TODO](minimal-python-vba-todo.md)|
 |功能→源码/函数/工具/说明|[生成索引](feature-index.md)、[机器映射及维护指南](project-map-guide.md)|
 |开发工具、副作用、动态关系与维护步骤|[定位指南](project-map-guide.md#d3工具清单与人工动态关系)、[实施与验收计划](project-documentation-tooling-plan.md)、[源码包故障与校验边界](project-map-guide.md#d4故障矩阵与源码包边界)|
 |公共单次API/G03、恢复/错误行为|[公共服务](single-simulation-service.md)|
-|最新真实CST组合验收|[G03/G04记录](single-simulation-g04-acceptance.md)|
+|2026-11-02真实CST组合验收|[G03/G04记录](single-simulation-g04-acceptance.md)|
 |设置定义/执行事实分层|[验证器](cst-settings-verifier-design.md)、[B2投影](settings-history-projection.md)、[B3快照](execution-snapshot-verification.md)、[原生采集](native-execution-capture.md)|
 |MCP目标与冻结设计，非全部已实现|[G01–G08](mcp-first-stage-conversational-gate.md)、[首阶段契约](mcp-first-stage-interface-contract.md)、[统一接口](unified-interface-contract.md)、[静态框架](mcp-framework-static-design.md)|
 |既有生产运行协议与恢复|[Python/VBA协议](minimal-python-vba-protocol.md)、[恢复退出实现](recovery-exit-audit-implementation.md)|
@@ -23,4 +24,8 @@ G02首子集：[空工程创建、不可变文档与官方Python ABI](project-cr
 
 首阶段当前建模/配置/保存与结果来源API：[类型化定义服务](typed-definition-service.md)。
 
+指定Codex桌面正常纵向链：[2026-11-03桌面验收](codex-desktop-acceptance-20261103.md)。
+
 最新纵向结果与范围：[2026-11-03类型化公开链验收](typed-public-acceptance-20261103.md)。
+
+WinWrap现行生成检查/源图/校准与发布门禁：[W23受限A1链](winwrap-w23-implementation.md)；[W01](winwrap-w01-implementation.md)保留原批次证据。

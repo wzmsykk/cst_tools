@@ -16,6 +16,6 @@
 
 源码从main_window移至log_view，main_window保留导入名以兼容原调用。日志刷新是异步的，测试应处理GUI事件或主动flush_pending；不再承诺emit后立即可读。历史被淘汰时只可锚定仍在缓存内的内容。
 
-TODO：实际Windows桌面长时间拖动、DPI/字体和日志洪峰验收；必要时增加日志文件入口和可配置显示限制。不把offscreen耗时当目标机器帧率或鼠标流畅度证明。
+TODO：实际Windows桌面长时间拖动、DPI/字体和日志洪峰验收；现有文件日志入口见结构化日志页；可配置显示限制仍可另行评估。不把offscreen耗时当目标机器帧率或鼠标流畅度证明。
 
-本批离线518 passed、19 integration deselected；GUI专项34项通过，新增四项日志洪峰、队列/字符上限、拖动暂停、历史锚点/淘汰、清空及关闭测试。2万条offscreen输入与排空实测约0.177秒，省略18000条界面记录后保留最新2000条，只发送一次唤醒；这是本机模拟耗时，不是实际鼠标流畅度保证。轻量报告artifacts/gui-log-performance-20261014.xml，原始临时目录已清理；artifacts报告不保证随Git迁移。
+[原批次完整记录](archive/20261103-semantic-review/gui-log-performance.md)保留原518项/34项及2万条0.177秒的实验条件；这些是10月14日离屏镜像测试，不是现行全仓或现场流畅度结论。对应回归见test/gui_log_view_test.py。

@@ -4,9 +4,11 @@
 
 `config/default.ini`、`config/project.example.ini` 和 `.env.example` / `.env.template` 继续允许入库。缺少 current.ini 时，GlobalConfigManager 从 default.ini 初始化并保存本机配置。机器安装路径、最近项目等不再随提交传播。
 
-current.ini 已从索引移除，磁盘原文件保留；不再依赖单机 skip-worktree 标记。此索引删除需随之后的提交一并提交，才能在其他检出中生效。
+当前检出不跟踪config/current.ini；其原索引删除属于历史变更，不再是待提交动作。是否存在磁盘本机文件另行观察，不据旧记录保证仍存在。忽略规则不依赖skip-worktree。
 
 Git 忽略规则只约束未跟踪文件。历史已经提交的验收 XML/JSON、模型和数据不会因新增规则自动退出版本跟踪；本次不批量删除历史验收资料。未使用全局 *.cst、*.json、*.ini、*.xml 规则，以免掩盖新模型夹具、配置模板和文档数据。
+
+2026-11-03复审核对.gitignore与GlobalConfigManager初始化；config/current.ini不在Git跟踪清单。历史清理的字节/进程仅属于下方原日期记录，本次不重新执行清理。
 
 验证：git check-ignore 核对本机配置/运行产物命中及模板/测试夹具不命中；文档索引专项校验链接和符号，不代表实际 CST 验收。
 

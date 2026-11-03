@@ -37,6 +37,27 @@ COMMAND_ARITIES = MappingProxyType({
     ('meshadaption3d', 'settype'): 1, ('meshadaption3d', 'minpasses'): 1,
 })
 
+
+def history_call_contract(obj, command):
+    """Calling card derived from the sole A1 command registry.
+
+    This is an owned 3D-history statement, not a DE method/live getter. Values,
+    enums, units, numeric-string forms and order remain checked by projection.
+    """
+    obj, command = obj.lower(), command.lower()
+    arity = COMMAND_ARITIES.get((obj, command))
+    if arity is None:
+        raise ValueError('unknown A1 history command')
+    topic = {'project': 'B03', 'units': 'B09', 'wcs': 'B06', 'component': 'B05',
+             'background': 'B07', 'boundary': 'B08', 'cylinder': 'B04',
+             'solver': 'B11', 'mesh': 'B10', 'eigenmodesolver': 'B12',
+             'meshsettings': 'V05', 'meshadaption3d': 'MeshAdaption3D'}[obj]
+    return MappingProxyType(dict(arity=arity, scope='loaded-3D', call_kind='statement',
+        argument_rule='typed-expression; command-specific values checked by A1 projection',
+        return_use='discarded', persistence='AddToHistory; immediate execution and later replay',
+        side_effect='candidate geometry or settings mutation; not transactional',
+        version='CST2022 A1 profile', documentation=topic))
+
 IDENTITY_FIELDS = ('units.length', 'units.frequency', 'solver.family')
 
 

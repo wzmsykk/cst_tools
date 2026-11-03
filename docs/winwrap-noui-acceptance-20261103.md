@@ -1,5 +1,7 @@
 # BasicNoUIObj独立进程校准：初始化未通过
 
+> 适用性复审（2026-11-03）：原批次实施/故障/验收记录；旧当前、未提交、待做及现场进程状态不代表本次实时事实。现行实现见[当前状态](current-status.md)、[功能索引](feature-index.md)及对应API；不重算或追认旧证据。
+
 日期：2026-11-03。**成功创建NoUI对象并正常收尾，但初始化未通过，SyntaxCheck及Zrange正反例未执行。** 用户在本轮独立初始化期间观察到提示：`This eval copy is expired`。该提示属于用户现场证据，不是程序成功读回的ErrorText字段；不能据此断言CST自身授权过期。
 
 工具：[validate_winwrap_noui.py](../test/support/validate_winwrap_noui.py)，[回归测试](../test/winwrap_noui_probe_test.py)，[轻量证据](../knowledge-base/winwrap-noui-acceptance-20261103.json)。没有启动CST、修改系统注册表、读取/复制许可文件或修改原工程。原始阶段日志及当时执行的工具快照在artifacts/winwrap-noui-local-20261103，不保证随Git迁移。

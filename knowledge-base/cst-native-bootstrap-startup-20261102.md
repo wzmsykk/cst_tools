@@ -1,5 +1,7 @@
 # 2026-11-02 原生 bootstrap 启动失败与退出边界
 
+> 适用性复审（2026-11-03）：按本条原日期、来源/样本范围引用；原当前/未实现/进程或artifact存在性不作实时保证。本次不复验原数据或外部结论，现行执行见[当前状态](../docs/current-status.md)。
+
 ## 实测
 
 当前 Codex MCP 服务（九工具）创建一个空 MWS 并正常关闭通过：Runner PID60284 已退出，run389bd860a83645f796717f1c7327b971，记录见[mcp-codex-g02-public-20261102.json](mcp-codex-g02-public-20261102.json)。源和文档 hash 已核对，同 request_id 返回同 run，0次 Solver。

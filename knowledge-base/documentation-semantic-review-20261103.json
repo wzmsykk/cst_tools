@@ -1,0 +1,473 @@
+{
+  "date": "2026-11-03",
+  "baseline": "2705935",
+  "evidence_layer": "static documentation/source comparison; no new runtime acceptance",
+  "archives": [
+    {
+      "source": "docs/current-status.md",
+      "archive": "docs/archive/20261103-semantic-review/current-status.md",
+      "original_sha256": "ab7436db6d5b63e08acb4c668b2fd9a92fd1b791cd8f3cdf6181f76eb43bdeb8",
+      "transformation": "prepend dated historical scope and rebase Markdown links; original prose retained",
+      "original_git_blob_sha256": "f83c8dc4790aa9c7008ab9c82a132f612fdd28e368324a9eced0382a52b36e9a"
+    },
+    {
+      "source": "docs/minimal-python-vba-todo.md",
+      "archive": "docs/archive/20261103-semantic-review/minimal-python-vba-todo.md",
+      "original_sha256": "3ee2a3b9d3e5dbdb96a7933e199a811d68ef37885b9218a6ca3415af7e86e1b5",
+      "transformation": "prepend dated historical scope and rebase Markdown links; original prose retained",
+      "original_git_blob_sha256": "4ce5eb0b6842bf1da2c89a86568f3d81116de415d03d70031233d5993a8416c6"
+    },
+    {
+      "source": "docs/cstmanager-api.md",
+      "archive": "docs/archive/20261103-semantic-review/cstmanager-api.md",
+      "original_sha256": "58148cef7bf9e166ac84027dca5cc43dfb428d4ad06dbc3a0de606eb8883ac6b",
+      "transformation": "prepend dated historical scope and rebase Markdown links; original prose retained",
+      "original_git_blob_sha256": "446e809b596b4aa1482f0361bffe7e093f24d960944708601f677469a4532360"
+    },
+    {
+      "source": "docs/cstmanager-design.md",
+      "archive": "docs/archive/20261103-semantic-review/cstmanager-design.md",
+      "original_sha256": "9e984d9e523ed1f6e648257190e232b6645e1312fe683e3686c639b67ba1ee72",
+      "transformation": "prepend dated historical scope and rebase Markdown links; original prose retained",
+      "original_git_blob_sha256": "f6d01f3d7102455241b5e1a748641b9e0561524e1b3887323d0575e531084d83"
+    },
+    {
+      "source": "docs/application-backend.md",
+      "archive": "docs/archive/20261103-semantic-review/application-backend.md",
+      "original_sha256": "e259404043676de16ee83d41fc91740c3ce17dc9604b89d55b1cdd0a9551399b",
+      "transformation": "prepend dated historical scope and rebase Markdown links; original prose retained",
+      "original_git_blob_sha256": "313edb6d8af6d4fcb7c80c225a29c75e8832d507ef2aacfb19ce8093738a7ec2"
+    },
+    {
+      "source": "docs/local-runner.md",
+      "archive": "docs/archive/20261103-semantic-review/local-runner.md",
+      "original_sha256": "6481caedf706c5695e4b986f40851af60b66ebc8691a2a0e30dcfff73c9bbbec",
+      "transformation": "prepend dated historical scope and rebase Markdown links; original prose retained",
+      "original_git_blob_sha256": "1ac4e552c4a0bba201f2329b6bf323fe4da814dbc54d5d9c22d17652cea1e0f4"
+    },
+    {
+      "source": "docs/testing-guide.md",
+      "archive": "docs/archive/20261103-semantic-review/testing-guide.md",
+      "original_sha256": "9639f88f5cad7cd1daf35bb4e77c9be3360f2c23d24b4a19c5ebfb629f521338",
+      "transformation": "prepend dated historical scope and rebase Markdown links; original prose retained",
+      "original_git_blob_sha256": "9639f88f5cad7cd1daf35bb4e77c9be3360f2c23d24b4a19c5ebfb629f521338"
+    },
+    {
+      "source": "docs/gui-refactor-todo.md",
+      "archive": "docs/archive/20261103-semantic-review/gui-refactor-todo.md",
+      "original_sha256": "8d88b26236bbdb60bc4a75010672c189188e63c2be6fe1b5ed64afd9bbe500c3",
+      "transformation": "prepend dated historical scope and rebase Markdown links; original prose retained",
+      "original_git_blob_sha256": "5d3b8b288578558443d63685de38243b76215e10bcac6d428a762afd43ba964f"
+    },
+    {
+      "source": "docs/g01-g08-progress.md",
+      "archive": "docs/archive/20261103-semantic-review/g01-g08-progress.md",
+      "original_sha256": "0969b1c7d89304bc620bd8b9872b435326dac614553c61e751cac6a3da8dec6b",
+      "transformation": "prepend dated historical scope and rebase Markdown links; original prose retained",
+      "original_git_blob_sha256": "0c966ff9b84cd830e9f71ad6a97279925a3a88c1c1a53dab4b933e744bc7410f"
+    },
+    {
+      "source": "docs/project-documentation-tooling-plan.md",
+      "archive": "docs/archive/20261103-semantic-review/project-documentation-tooling-plan.md",
+      "original_sha256": "95abc27567798195b019bbc51cb266e25c1693542c213fc7b536a93ef9e5aeee",
+      "transformation": "prepend dated historical scope and rebase Markdown links; original prose retained",
+      "original_git_blob_sha256": "dce3083a1e283138607f32e91a5622633d1dfa0adf50a7dbcc359176a2098c11"
+    },
+    {
+      "source": "docs/project-map-guide.md",
+      "archive": "docs/archive/20261103-semantic-review/project-map-guide.md",
+      "original_sha256": "3eaec579cf7ec0053aa3ddec043f802913e4dbf4811586e700b37da183281f41",
+      "transformation": "prepend dated historical scope and rebase Markdown links; original prose retained",
+      "original_git_blob_sha256": "242cfb15fa8861e21eafeb7d205b5bce240e35fb52534cd74507945c86ee712f"
+    },
+    {
+      "source": "docs/minimal-python-vba-protocol.md",
+      "archive": "docs/archive/20261103-semantic-review/minimal-python-vba-protocol.md",
+      "original_sha256": "5492ff695ed730ec8dcbb6e11a415f444b17867b723c7e116605438bff7d6c5d",
+      "transformation": "dated header and relative links only",
+      "original_git_blob_sha256": "5492ff695ed730ec8dcbb6e11a415f444b17867b723c7e116605438bff7d6c5d"
+    },
+    {
+      "source": "docs/close-receipt-v2.md",
+      "archive": "docs/archive/20261103-semantic-review/close-receipt-v2.md",
+      "original_sha256": "745ab5bbeed467ab01bf5a85b87bee326dc8832b17d7b200d94b4c639dd66b53",
+      "transformation": "dated header and relative links only",
+      "original_git_blob_sha256": "745ab5bbeed467ab01bf5a85b87bee326dc8832b17d7b200d94b4c639dd66b53"
+    },
+    {
+      "source": "docs/hom-scan-algorithm.md",
+      "archive": "docs/archive/20261103-semantic-review/hom-scan-algorithm.md",
+      "original_sha256": "db90e1c9fd032c162c4a0ee709fb2d7ac1ff27d090bc7d090a16a1df2dfc48f8",
+      "transformation": "dated header and relative links only",
+      "original_git_blob_sha256": "44c8d0db558209fd0395c436ead800263a871565ca9c97c4170de24cbb4756d6"
+    },
+    {
+      "source": "docs/parameter-restore-close-budget.md",
+      "archive": "docs/archive/20261103-semantic-review/parameter-restore-close-budget.md",
+      "original_sha256": "fbeca382f86e3753ea1b8e03aa01518ed9ccb1a051d81c09970ca91286e5cc40",
+      "transformation": "dated header and relative links only",
+      "original_git_blob_sha256": "2c43a2a6aeb21db713998accfae90b1ad3f36b117fc5fddf75cbf69e82789654"
+    },
+    {
+      "source": "docs/saved-project-source.md",
+      "archive": "docs/archive/20261103-semantic-review/saved-project-source.md",
+      "original_sha256": "0e18b0a0e887480958b419b26995816d7353805ac17a87cd3875d085a6bf14ac",
+      "transformation": "dated header and relative links only",
+      "original_git_blob_sha256": "0e18b0a0e887480958b419b26995816d7353805ac17a87cd3875d085a6bf14ac"
+    },
+    {
+      "source": "docs/mode-field-selection-implementation-status.md",
+      "archive": "docs/archive/20261103-semantic-review/mode-field-selection-implementation-status.md",
+      "original_sha256": "eb2a6a181f0fdd8789abd7aae40c02ed1f2bf8cda0ab13910ac406aeb4e46410",
+      "transformation": "dated header and relative links only",
+      "original_git_blob_sha256": "eb2a6a181f0fdd8789abd7aae40c02ed1f2bf8cda0ab13910ac406aeb4e46410"
+    },
+    {
+      "source": "docs/a1-history-command-profile.md",
+      "archive": "docs/archive/20261103-semantic-review/a1-history-command-profile.md",
+      "original_sha256": "d77ed1339e27f8dd42e6bd92f5ed7f291b71ed4bb5ca1677e75f086fc24c1e10",
+      "original_git_blob_sha256": "d77ed1339e27f8dd42e6bd92f5ed7f291b71ed4bb5ca1677e75f086fc24c1e10",
+      "transformation": "prepend dated historical scope and rebase Markdown links; original prose retained"
+    },
+    {
+      "source": "docs/native-execution-capture.md",
+      "archive": "docs/archive/20261103-semantic-review/native-execution-capture.md",
+      "original_sha256": "645f896c67ccd5dc973424627432cc181ef4f77b5ce9449840826cb3768bfaea",
+      "original_git_blob_sha256": "645f896c67ccd5dc973424627432cc181ef4f77b5ce9449840826cb3768bfaea",
+      "transformation": "prepend dated historical scope and rebase Markdown links; original prose retained"
+    },
+    {
+      "source": "docs/winwrap-codegen-safety-plan.md",
+      "archive": "docs/archive/20261103-semantic-review/winwrap-codegen-safety-plan.md",
+      "original_sha256": "46d3285290fa1c53430aefcaabb44d698ea3666b9872e87287add52610c5cb13",
+      "original_git_blob_sha256": "46d3285290fa1c53430aefcaabb44d698ea3666b9872e87287add52610c5cb13",
+      "transformation": "prepend dated historical scope and rebase Markdown links; original prose retained"
+    },
+    {
+      "source": "docs/winwrap-w0-contract.md",
+      "archive": "docs/archive/20261103-semantic-review/winwrap-w0-contract.md",
+      "original_sha256": "b14cbb3318280b1ea95adae054749a280ae7a24fde71e534bca9d324691734b7",
+      "original_git_blob_sha256": "b14cbb3318280b1ea95adae054749a280ae7a24fde71e534bca9d324691734b7",
+      "transformation": "prepend dated historical scope and rebase Markdown links; original prose retained"
+    },
+    {
+      "source": "docs/checkpoint-adoption-l5.md",
+      "archive": "docs/archive/20261103-semantic-review/checkpoint-adoption-l5.md",
+      "original_sha256": "9580fdc25a308f1e71db06b0a354e0f11368534268b6800cd4b73b2af0701a37",
+      "original_git_blob_sha256": "9580fdc25a308f1e71db06b0a354e0f11368534268b6800cd4b73b2af0701a37",
+      "transformation": "prepend dated historical scope and rebase Markdown links; original prose retained"
+    },
+    {
+      "source": "docs/failure-diagnostic-export.md",
+      "archive": "docs/archive/20261103-semantic-review/failure-diagnostic-export.md",
+      "original_sha256": "e78d2c4890c90f8a691ff3d4a37d08a84f2cb4b096c5c56d43626521a39c7720",
+      "original_git_blob_sha256": "e78d2c4890c90f8a691ff3d4a37d08a84f2cb4b096c5c56d43626521a39c7720",
+      "transformation": "prepend dated historical scope and rebase Markdown links; original prose retained"
+    },
+    {
+      "source": "docs/gui-hom-workspace.md",
+      "archive": "docs/archive/20261103-semantic-review/gui-hom-workspace.md",
+      "original_sha256": "6d13399933d2d3d1d98cfe0b8924019650a49d8d200c084bdbd28d42b0198efc",
+      "original_git_blob_sha256": "6d13399933d2d3d1d98cfe0b8924019650a49d8d200c084bdbd28d42b0198efc",
+      "transformation": "prepend dated historical scope and rebase Markdown links; original prose retained"
+    },
+    {
+      "source": "docs/gui-structured-log.md",
+      "archive": "docs/archive/20261103-semantic-review/gui-structured-log.md",
+      "original_sha256": "7080a1570267e24e4eddc98cc039531d2458aa1ca9a93f534d0261fa78c532b8",
+      "original_git_blob_sha256": "7080a1570267e24e4eddc98cc039531d2458aa1ca9a93f534d0261fa78c532b8",
+      "transformation": "prepend dated historical scope and rebase Markdown links; original prose retained"
+    },
+    {
+      "source": "docs/gui-log-performance.md",
+      "archive": "docs/archive/20261103-semantic-review/gui-log-performance.md",
+      "original_sha256": "2793a2f0c4f0c09992e15b76d8886a5b419ff4fdc65d307aba0dd2adeb45e2b0",
+      "original_git_blob_sha256": "2793a2f0c4f0c09992e15b76d8886a5b419ff4fdc65d307aba0dd2adeb45e2b0",
+      "transformation": "prepend dated historical scope and rebase Markdown links; original prose retained"
+    },
+    {
+      "source": "docs/project-recovery-state-reconciliation.md",
+      "archive": "docs/archive/20261103-semantic-review/project-recovery-state-reconciliation.md",
+      "original_sha256": "9a9e033bfe7ef0f7ae2b7dac87634a1592c4b97f71c41fbf21325ec831187bc8",
+      "original_git_blob_sha256": "9a9e033bfe7ef0f7ae2b7dac87634a1592c4b97f71c41fbf21325ec831187bc8",
+      "transformation": "prepend dated historical scope and rebase Markdown links; original prose retained"
+    },
+    {
+      "source": "docs/readable-log-directories.md",
+      "archive": "docs/archive/20261103-semantic-review/readable-log-directories.md",
+      "original_sha256": "ed6486867d80b69e2fc27ab654666beafb3ac3d7d55442af843260880f4ea951",
+      "original_git_blob_sha256": "ed6486867d80b69e2fc27ab654666beafb3ac3d7d55442af843260880f4ea951",
+      "transformation": "prepend dated historical scope and rebase Markdown links; original prose retained"
+    },
+    {
+      "source": "docs/recovery-exit-audit-implementation.md",
+      "archive": "docs/archive/20261103-semantic-review/recovery-exit-audit-implementation.md",
+      "original_sha256": "69dca6cff6d500f5af0ec7f7561d0cb547723c56e201ec433a7f67e4d1c6e52f",
+      "original_git_blob_sha256": "69dca6cff6d500f5af0ec7f7561d0cb547723c56e201ec433a7f67e4d1c6e52f",
+      "transformation": "prepend dated historical scope and rebase Markdown links; original prose retained"
+    }
+  ],
+  "findings": [
+    {
+      "id": "S01",
+      "documents": [
+        "docs/current-status.md",
+        "docs/minimal-python-vba-todo.md",
+        "docs/g01-g08-progress.md",
+        "docs/project-documentation-tooling-plan.md",
+        "docs/project-map-guide.md",
+        "docs/mode-field-selection-implementation-status.md"
+      ],
+      "resolution": "revised current operational text; original dated prose retained or explicitly scoped"
+    },
+    {
+      "id": "S02",
+      "documents": [
+        "docs/cstmanager-api.md"
+      ],
+      "resolution": "revised current operational text; original dated prose retained or explicitly scoped"
+    },
+    {
+      "id": "S03",
+      "documents": [
+        "docs/cstmanager-design.md",
+        "docs/cstmanager-api.md"
+      ],
+      "resolution": "revised current operational text; original dated prose retained or explicitly scoped"
+    },
+    {
+      "id": "S04",
+      "documents": [
+        "docs/application-backend.md",
+        "docs/cst-memory-protection.md",
+        "docs/worker-resource-usage.md"
+      ],
+      "resolution": "revised current operational text; original dated prose retained or explicitly scoped"
+    },
+    {
+      "id": "S05",
+      "documents": [
+        "docs/minimal-python-vba-protocol.md",
+        "docs/python-vba-runtime-protocol.md"
+      ],
+      "resolution": "revised current operational text; original dated prose retained or explicitly scoped"
+    },
+    {
+      "id": "S06",
+      "documents": [
+        "docs/minimal-python-vba-protocol.md",
+        "docs/managed-ack-state-contract.md",
+        "docs/close-receipt-v2.md",
+        "docs/hom-scan-algorithm.md"
+      ],
+      "resolution": "revised current operational text; original dated prose retained or explicitly scoped"
+    },
+    {
+      "id": "S07",
+      "documents": [
+        "docs/hom-scan-algorithm.md"
+      ],
+      "resolution": "revised current operational text; original dated prose retained or explicitly scoped"
+    },
+    {
+      "id": "S08",
+      "documents": [
+        "docs/configuration-design.md",
+        "docs/configuration-reference.md"
+      ],
+      "resolution": "revised current operational text; original dated prose retained or explicitly scoped"
+    },
+    {
+      "id": "S09",
+      "documents": [
+        "docs/local-runner.md",
+        "docs/single-simulation-service.md",
+        "docs/unified-interface-contract.md",
+        "docs/mcp-first-stage-interface-contract.md",
+        "docs/mcp-framework-static-design.md"
+      ],
+      "resolution": "revised current operational text; original dated prose retained or explicitly scoped"
+    },
+    {
+      "id": "S10",
+      "documents": [
+        "docs/g01-g08-progress.md",
+        "docs/current-status.md",
+        "docs/typed-definition-service.md",
+        "docs/project-creation-service.md"
+      ],
+      "resolution": "revised current operational text; original dated prose retained or explicitly scoped"
+    },
+    {
+      "id": "S11",
+      "documents": [
+        "docs/gui-runner-management.md",
+        "docs/gui-exit-resource-cleanup.md",
+        "docs/failure-diagnostic-export.md"
+      ],
+      "resolution": "revised current operational text; original dated prose retained or explicitly scoped"
+    },
+    {
+      "id": "S12",
+      "documents": [
+        "docs/saved-project-source.md",
+        "docs/native-execution-capture.md",
+        "docs/execution-snapshot-verification.md"
+      ],
+      "resolution": "revised current operational text; original dated prose retained or explicitly scoped"
+    },
+    {
+      "id": "S13",
+      "documents": [
+        "docs/log-message-conventions.md",
+        "docs/gui-structured-log.md"
+      ],
+      "resolution": "revised current operational text; original dated prose retained or explicitly scoped"
+    },
+    {
+      "id": "S14",
+      "documents": [
+        "docs/winwrap-w0-contract.md",
+        "docs/winwrap-codegen-safety-plan.md",
+        "docs/typed-definition-service.md"
+      ],
+      "resolution": "revised current operational text; original dated prose retained or explicitly scoped"
+    },
+    {
+      "id": "S15",
+      "resolution": "all registered Markdown classified by applicability; no historical measurements or third-party contents re-certified"
+    },
+    {
+      "id": "S16",
+      "documents": [
+        "docs/a1-history-command-profile.md",
+        "docs/native-execution-capture.md",
+        "docs/winwrap-codegen-safety-plan.md",
+        "docs/winwrap-w0-contract.md",
+        "docs/cst-settings-verifier-design.md"
+      ],
+      "resolution": "Removed remaining contradictory public integration and W0 pending claims; W1-W3 and cross-entry unification remain design."
+    },
+    {
+      "id": "S17",
+      "documents": [
+        "docs/failure-diagnostic-export.md"
+      ],
+      "resolution": "Documented cancellation/progress signature and separated discovery reservation from ZIP byte priority."
+    },
+    {
+      "id": "S18",
+      "documents": [
+        "docs/project-recovery-state-reconciliation.md",
+        "docs/checkpoint-adoption-l5.md"
+      ],
+      "resolution": "Documented checkpoint adoption backfill followed by Runner historic start-intent reconciliation and pause boundaries."
+    },
+    {
+      "id": "S19",
+      "documents": [
+        "docs/gui-hom-workspace.md",
+        "docs/mode-field-selection-implementation-status.md",
+        "docs/log-event-index.md"
+      ],
+      "resolution": "Documented GUI truncation/order, four-reference-mode cap, automatic six-electric domain boundary, and static-only event enumeration."
+    }
+  ],
+  "review_complete": true,
+  "meaning": "现行专题静态语义复审与历史分层已收口；22项余项均有源码/保存证据核对。固定历史/外部来源只核定适用范围，不重新认证原测量、全部第三方规范或真实运行。",
+  "documents": 226,
+  "roles": {
+    "maintenance-contract": 1,
+    "generated-package-guide": 1,
+    "navigation": 2,
+    "current-reference": 51,
+    "dated-implementation-or-acceptance": 45,
+    "historical-or-frozen-evidence": 46,
+    "research-record": 12,
+    "design-reference": 24,
+    "status": 1,
+    "maintenance-review": 1,
+    "generated-navigation": 1,
+    "todo": 1,
+    "implementation-plan": 1,
+    "usage": 1,
+    "dated-knowledge-record": 37,
+    "vendor-reference": 1
+  },
+  "statuses": {
+    "operational-and-applicability-reviewed": 61,
+    "generated-template-reviewed": 1,
+    "historical-scope-reviewed": 128,
+    "design-scope-reviewed": 35,
+    "external-source-scope-reviewed": 1
+  },
+  "documents_with_checked_sources": 74,
+  "unreviewed_roles": [],
+  "cst_started": false,
+  "validation": {
+    "passed": 65,
+    "seconds": 198.89,
+    "kind": "offline documentation and tooling; includes source-package boundary checks",
+    "xml": "artifacts/semantic-review-final-tests.xml",
+    "raw_report_migration_guaranteed": false,
+    "cst_started": false,
+    "initial_attempt": "2 failed, 61 passed; new assertion and archive newline conversion corrected before final rerun"
+  },
+  "followup": {
+    "documents": [
+      "docs/a1-history-command-profile.md",
+      "docs/checkpoint-adoption-l5.md",
+      "docs/cst-settings-verifier-design.md",
+      "docs/execution-snapshot-verification.md",
+      "docs/failure-diagnostic-export.md",
+      "docs/feature-index.md",
+      "docs/g01-g08-progress.md",
+      "docs/gui-hom-workspace.md",
+      "docs/gui-log-performance.md",
+      "docs/gui-refactor-todo.md",
+      "docs/gui-structured-log.md",
+      "docs/local-generated-files.md",
+      "docs/log-event-index.md",
+      "docs/mode-field-selection-implementation-status.md",
+      "docs/native-execution-capture.md",
+      "docs/project-recovery-state-reconciliation.md",
+      "docs/readable-log-directories.md",
+      "docs/recovery-exit-audit-implementation.md",
+      "docs/saved-project-source.md",
+      "docs/settings-history-projection.md",
+      "docs/winwrap-codegen-safety-plan.md",
+      "docs/winwrap-w0-contract.md"
+    ],
+    "scope": "remaining current-reference/navigation/design pages checked against listed implementation and frozen evidence; no new CST",
+    "current_applicability_only_remaining": 0,
+    "gui_validation": [
+      {
+        "passed": 12,
+        "seconds": 1.11,
+        "xml": "artifacts/semantic-followup-log-gui.xml"
+      },
+      {
+        "passed": 11,
+        "seconds": 1.04,
+        "xml": "artifacts/semantic-followup-dashboard.xml"
+      }
+    ],
+    "core_validation": {
+      "passed": 379,
+      "seconds": 52.31,
+      "xml": "artifacts/semantic-followup-core.xml"
+    },
+    "package_validation": {
+      "passed": 8,
+      "seconds": 75.66,
+      "xml": "artifacts/semantic-followup-package.xml"
+    },
+    "complete": true,
+    "raw_reports_migration_guaranteed": false,
+    "closeout_validation": {
+      "passed": 11,
+      "seconds": 7.68,
+      "xml": "artifacts/semantic-followup-closeout.xml"
+    }
+  }
+}

@@ -168,12 +168,16 @@ def verify_new_com_identity(pid,executable,started,baseline_ids):
     return modeler,de
 
 
-def run_new_definition(executable,model,directory,macro,*,isolate_desktop=True):
+def run_new_definition(executable,model,directory,macro,*,isolate_desktop=True,generated_a1=False):
     from .cst_installations import infer_cst_version
     executable=Path(executable).resolve(strict=True)
     if os.name!='nt' or infer_cst_version(executable)!=2022:
         raise ValueError('UNSUPPORTED_CAPABILITY: A1 COM construction requires CST2022/Windows')
     directory=Path(directory).resolve();model=Path(model).resolve()
+    if generated_a1:
+        from .winwrap_checks import check_module
+        check_module(macro)
+    original_macro=macro
     nonce=uuid4().hex
     wrapper=directory/'build.ps1';wrapper.write_text(WRAPPER,encoding='utf-8')
     identity=render_identity_probe(directory,nonce)
@@ -184,6 +188,20 @@ def run_new_definition(executable,model,directory,macro,*,isolate_desktop=True):
     # One RunScript, with a read-only identity gate before any generated modelling.
     macro=macro.replace('    On Error GoTo Failed\n','    On Error GoTo Failed\n    CSTToolsBindNewProject\n',1)
     macro+='\nPrivate Sub'+body
+    if generated_a1:
+        from .winwrap_emitter import check_lines
+        import hashlib
+        check_lines(macro.splitlines())  # Includes fixed ownership injection.
+        mapping_path=directory/'source-map.json'
+        if mapping_path.exists():
+            mapping=read_json(mapping_path)
+            if mapping['hashes']['outer']!=hashlib.sha256(original_macro.encode('ascii')).hexdigest():
+                raise ValueError('source map does not bind the generated module')
+            mapping['final_outer']=[{**row,'line_start':row['line_start']+3,'line_end':row['line_end']+3}
+                                    for row in mapping['outer']]
+            mapping['hashes']['final_outer']=hashlib.sha256(macro.encode('ascii')).hexdigest()
+            mapping['ownership_injection']={'declaration_lines':2,'binding_lines':1}
+            write_json_atomic(mapping_path,mapping)
     macro_path=directory/'probe.bas';macro_path.write_text(macro,encoding='ascii')
     baseline=cst_processes();baseline_ids={(p['pid'],p['create_time']) for p in baseline}
     bound=[]

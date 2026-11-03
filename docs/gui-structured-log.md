@@ -26,16 +26,8 @@ QTableView+QAbstractTableModel按需绘制，固定行高、不自动按全部�
 
 主窗口兼容保留logTextBox.widget原始控件供既有测试/调用使用，布局改用logTextBox.panel；文件日志配置不变。关闭后忽略排队回调并停止GUI定时器，避免Qt父控件销毁后的回调访问；不影响CST安全停止。
 
-## 验收与TODO
+## 证据与待验
 
-2026-10-15新增默认开启的自动滚动开关；测试覆盖事件表/原始日志共同开关、关闭后继续接收且位置不变、重新开启返回底部、空格键切换、一次性“回到最新”及程序设置与按钮状态同步。5000条有界缓存、拖动暂停及文件输出均不改变；重开窗口恢复默认开启，不持久化偏好。实际桌面/DPI体验仍待人工验收；本轮结果见current-status，不沿用下方历史数字。
+实现为GUI/event_log_view.py及GUI/log_view.py；test/gui_event_log_view_test.py、test/gui_log_view_test.py覆盖筛选、详情、合并身份、有界队列、自动滚动及关闭。[原批次完整记录](archive/20261103-semantic-review/gui-structured-log.md)保留10月14–25日524/604等原数字、失败批次与预览证据；当时的清空测试不代表现行支持清空。
 
-本轮完整离线604 passed、21 integration deselected，核心20 passed；轻量报告artifacts/gui-auto-scroll-all-20261015.xml和gui-auto-scroll-core-20261015.xml。包含主窗口的子集三次提前退出而没有正常pytest结论，不计为通过；随后完整套件通过只证明该次测试组合，不宣称Qt原生退出根因已消除。测试临时数据清理后需重生成，artifacts不保证随Git迁移。
-
-本批全套离线524 passed、19 integration deselected。新增筛选组合、详情/异常/源码、原始入口、真实FileHandler路径、清空、进度合并/任务隔离/错误不合并、洪峰上限与淘汰、拖动/选中暂停及回到最新测试。2万条结构化事件本机offscreen排队与处理约0.409秒，不等于生产桌面滚动帧率。
-
-轻量证据：artifacts/gui-structured-log-20261014.xml与PNG预览（不保证随Git迁移）；临时测试目录清理后需重新生成。Qt offscreen字体列表初始为空，显式为预览脚本加载本机微软雅黑后已检查1050×680排版；这是离屏视觉检查，不是实际鼠标/系统缩放验收，也未修改生产字体配置或启动CST。
-
-TODO：真实Windows桌面连续日志/筛选/滚动体验，多DPI与小窗口适配；若需历史检索，另做按页读取JSONL，不能直接加载全文件。文件入口已提供，不新增日志服务。进度身份不齐全时不合并，后续可在具体输出点补字段而非猜消息语义。
-
-2026-10-25显示分层更新：[默认HOM工作台](gui-hom-workspace.md)展示确认覆盖/模式及指标；完整日志和后台管理收纳到详细页，日志保留与重连回放逻辑不变，本地检查点只读观察不提交任务。
+主界面日志位于[详细运行信息](gui-hom-workspace.md)。真实长时筛选/滚动、多DPI/小窗口和文件系统响应仍需专项验收；不因offscreen耗时推导实际帧率。历史检索若扩展必须有界，不整文件加载。

@@ -38,8 +38,8 @@ SHA-256; legacy MD5 values remain readable with their inferred algorithm.
 
 `read_ini`, `write_ini_atomic`, `read_json`, and `write_json_atomic` form the
 serialization boundary. Writes are made to a temporary file in the destination
-directory and published with `os.replace`, so a crash cannot expose a partially
-written configuration.
+directory and published with `os.replace`, so readers do not observe a partially published configuration.
+This is not a guarantee against all power loss or multi-host consistency failures.
 
 INI is retained for small human-edited scalar configuration. JSON is retained
 for structured parameter lists, post-processing definitions, manifests and
@@ -56,9 +56,10 @@ fall back to legacy dictionaries. Injected managers and test doubles must provid
 the same typed interface. Session recovery loads project settings through the
 shared migration reader, including custom relative or absolute runtime paths.
 
-Historical names `GlobalConfmanager` and `ProjectConfmanager` remain aliases so
-existing integrations can migrate without a flag day. New code must use the
-PEP 8 names and typed `settings` properties.
+The exported manager classes are `GlobalConfigManager` and `ProjectConfigManager`.
+The old class-name aliases `GlobalConfmanager`/`ProjectConfmanager` are absent;
+new code consumes typed `settings`. The `conf` persistence view still exists,
+but does not restore those removed class names.
 
 Field-by-field purpose, units, mutability and lifecycle notes are documented in
 `configuration-reference.md`; annotated templates live under `config/`.

@@ -1,5 +1,7 @@
 # CST后台调用改造及无求解验收
 
+> 适用性复审（2026-11-03）：原批次实施/故障/验收记录；旧当前、未提交、待做及现场进程状态不代表本次实时事实。现行实现见[当前状态](current-status.md)、[功能索引](feature-index.md)及对应API；不重算或追认旧证据。
+
 2026-11-03，本机Windows/CST2022.5。**新建/类型化定义构造的后台链已通过正常及可捕获语法错误验收：quiet在归属核验后调用，用户前台事件0，无人工交互，标准退出。** 使用临时非活动桌面内的真实CST GUI，不是真正headless或独立WinWrap编译器。
 
 轻量证据：[JSON](../knowledge-base/cst-background-acceptance-20261103.json)。最终14项批次artifacts/cst-macrocheck-ce858a55；另有公共空工程批次artifacts/project-create-baaa340e。原始事件/宏/日志在artifacts，不保证随Git迁移。

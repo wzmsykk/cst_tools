@@ -1,0 +1,1265 @@
+{
+  "date": "2026-11-03T13:01:05.526786+08:00",
+  "native_acceptance": {
+    "accepted": true,
+    "profile": "cst-2022-a1-sub-w23-v1",
+    "sources": {
+      "csttool/definition_editing.py": "a233de7cd98e5740f92e489282d51beae49452c5eb09d7fedd09b20a2020c08b",
+      "csttool/winwrap_emitter.py": "1fa6396327f909c5aa40dca5c53415fd2138aaf325003d2950d9c736d4cdd3a7",
+      "csttool/winwrap_checks.py": "3500f9153bc0c883f9b16ff36a4e3bc481015fcd96edfb5e1c6878aae8a86360",
+      "csttool/settings_projection.py": "9d8d381be9ced2bba93f5d466445909280ab5313ff21e142fe18ef944fcae521",
+      "csttool/vb_codec.py": "5f824f464cb93927434005b5868b8dc960c284fcd155d06fad163ee393bd5407",
+      "csttool/native_definition_builder.py": "ba4e3a6ee2e8c2a824b97b35abd9ed309a1ab6d21151cb06139676ab6489be48",
+      "data/first_stage_contract.schema.json": "f18e3cf36d6ea23e017e13be10c0189d716deaae962591e03dfebde9c305a843"
+    },
+    "axes": [
+      "x",
+      "y",
+      "z"
+    ],
+    "solver_start_calls": 0,
+    "standard_closed": true,
+    "compilation": {
+      "acceptance_passed": true,
+      "closure": {
+        "exit_code": 0,
+        "exit_confirmed": true,
+        "quiet": {
+          "nonce": "336ccd4e49c94bcba18216ad4e390bd4",
+          "readback": "not-exposed-by-COM",
+          "setter_returned": true,
+          "requested": true
+        },
+        "window_observation": {
+          "baseline_foreground": {
+            "hwnd": 2695562,
+            "pid": 32176,
+            "visible": true,
+            "minimized": false,
+            "owner": 0,
+            "window_class": "Chrome_WidgetWin_1"
+          },
+          "observation": "WinEvent foreground/show hooks plus 50ms window polling",
+          "owned_foreground_events": 0,
+          "errors": [],
+          "dropped_events": 0,
+          "window_enumeration_gaps": 0,
+          "private_desktop": "CstTools_1acce196b95841daa392e82b20686e37",
+          "desktop_handle_closed": true,
+          "owned_window_events": 168,
+          "minimize_actions": 0
+        },
+        "window_observation_path": "D:\\work\\cst_tools\\artifacts\\winwrap-w23-c121c36e\\compile\\window-observation.json"
+      },
+      "marker_absent": true,
+      "parameter_expression_after": "2 * W0Base",
+      "cases": [
+        {
+          "name": "body-marker",
+          "expected": true,
+          "statuses": [
+            "accepted"
+          ],
+          "error": null,
+          "diagnostic": null,
+          "source_sha256": "5950fe8d8e6330e1a596737354178c81c8356c65eb34823789c4c01a6e6fa318"
+        },
+        {
+          "name": "parameter-write",
+          "expected": true,
+          "statuses": [
+            "accepted"
+          ],
+          "error": null,
+          "diagnostic": null,
+          "source_sha256": "700f4dd02d327cee8e2eb75e552cf7b6d0137add7185f100d3daaf90ce83bfec"
+        },
+        {
+          "name": "obvious-syntax-error",
+          "expected": false,
+          "statuses": [
+            "rejected"
+          ],
+          "error": "10586\nExpecting ')'\n[*xMacroRunThis3*#5] w0x = (\n\n",
+          "diagnostic": {
+            "number": 10586,
+            "description": "Expecting ')'",
+            "source": "[*xMacroRunThis3*#5] w0x = (",
+            "module": "*xMacroRunThis3*",
+            "wrapped_line_1based": 5,
+            "original_statement": "w0x = (",
+            "column": null
+          },
+          "source_sha256": "f4ab050ae3d736374daf9d70567d8432a2d5ab5f7a2f23f9acff468e2f245ebf"
+        },
+        {
+          "name": "zrange-original",
+          "expected": false,
+          "statuses": [
+            "rejected"
+          ],
+          "error": "10576\nUnexpected text.\n[*xMacroRunThis4*#5]  .Zrange ((-RestoreDoubleParameter(\"L\"))/2), (RestoreDoubleParameter(\"L\")/2)\n\n",
+          "diagnostic": {
+            "number": 10576,
+            "description": "Unexpected text.",
+            "source": "[*xMacroRunThis4*#5]  .Zrange ((-RestoreDoubleParameter(\"L\"))/2), (RestoreDoubleParameter(\"L\")/2)",
+            "module": "*xMacroRunThis4*",
+            "wrapped_line_1based": 5,
+            "original_statement": " .Zrange ((-RestoreDoubleParameter(\"L\"))/2), (RestoreDoubleParameter(\"L\")/2)",
+            "column": null
+          },
+          "source_sha256": "976327ec066b3db825736bdd2f893ffe5afc018d21a110fe20941c947182078e"
+        },
+        {
+          "name": "zrange-fixed",
+          "expected": true,
+          "statuses": [
+            "accepted"
+          ],
+          "error": null,
+          "diagnostic": null,
+          "source_sha256": "c103f099b9b4ab1335b5a98b0fb9ad89654f82b7c7e9a1ca3dce17eed91d839a"
+        },
+        {
+          "name": "zrange-call",
+          "expected": null,
+          "statuses": [
+            "accepted"
+          ],
+          "error": null,
+          "diagnostic": null,
+          "source_sha256": "cebbab94b7a928187f1e3c25d8fa6084b0b50166f97879011b6b1316494cbdd4"
+        },
+        {
+          "name": "duplicate-declaration",
+          "expected": false,
+          "statuses": [
+            "rejected"
+          ],
+          "error": "10519\nIdentifier is already in use.\n[*xMacroRunThis7*#5] Dim w0x As Integer\n\n",
+          "diagnostic": {
+            "number": 10519,
+            "description": "Identifier is already in use.",
+            "source": "[*xMacroRunThis7*#5] Dim w0x As Integer",
+            "module": "*xMacroRunThis7*",
+            "wrapped_line_1based": 5,
+            "original_statement": "Dim w0x As Integer",
+            "column": null
+          },
+          "source_sha256": "0ce3f69c7de40c0d77a6f584381d87c3bc8b6043ec52ffa4a636e1e6b9f0b143"
+        },
+        {
+          "name": "missing-end-with",
+          "expected": false,
+          "statuses": [
+            "rejected"
+          ],
+          "error": "10587\nUnterminated block statement. 'With'\n[*xMacroRunThis8*#6] End Sub\n\n",
+          "diagnostic": {
+            "number": 10587,
+            "description": "Unterminated block statement. 'With'",
+            "source": "[*xMacroRunThis8*#6] End Sub",
+            "module": "*xMacroRunThis8*",
+            "wrapped_line_1based": 6,
+            "original_statement": "End Sub",
+            "column": null
+          },
+          "source_sha256": "f5399c5c622a7819dfe55fecba5900e69582e889f1df9bb1ee90141b85485699"
+        },
+        {
+          "name": "unicode",
+          "expected": true,
+          "statuses": [
+            "accepted"
+          ],
+          "error": null,
+          "diagnostic": null,
+          "source_sha256": "25dcadfda08e6eca11de7ca8abe206b12a70d87ca0b83b918637246d7c81e4b0"
+        },
+        {
+          "name": "parameter-read",
+          "expected": true,
+          "statuses": [
+            "accepted"
+          ],
+          "error": null,
+          "diagnostic": null,
+          "source_sha256": "427bc721a2594ce3a2c43a0ce58255530d6f1e96032971316e1ab0f480a747c8"
+        },
+        {
+          "name": "inner-history-text",
+          "expected": true,
+          "statuses": [
+            "accepted"
+          ],
+          "error": null,
+          "diagnostic": null,
+          "source_sha256": "75e052d139cae38e133ea6cb2a935b178dc59bd1b4cd200cd49eaf162f46bcfd"
+        },
+        {
+          "name": "xrange-fixed",
+          "expected": true,
+          "statuses": [
+            "accepted"
+          ],
+          "error": null,
+          "diagnostic": null,
+          "source_sha256": "cf151713a25a4240573317dfe0277a54ee015b83ca83b39193d264222c18140f"
+        },
+        {
+          "name": "yrange-fixed",
+          "expected": true,
+          "statuses": [
+            "accepted"
+          ],
+          "error": null,
+          "diagnostic": null,
+          "source_sha256": "5fea9b87df6576294012f0f6a0a70f009fc539fc0ee538e146de73f39c617de5"
+        },
+        {
+          "name": "retained-history-wrapped",
+          "expected": true,
+          "statuses": [
+            "accepted"
+          ],
+          "error": null,
+          "diagnostic": null,
+          "source_sha256": "1a7b436333dce94e309aaaed5c0c1943f36b21089609485f8b3189927c2ef218"
+        },
+        {
+          "name": "outer-x",
+          "expected": true,
+          "statuses": [
+            "accepted"
+          ],
+          "error": null,
+          "diagnostic": null,
+          "source_sha256": "9dff1b67c515217d1f0a4b8750085746ae37341c51318c968a68d1ceb58f9190"
+        },
+        {
+          "name": "history-x",
+          "expected": true,
+          "statuses": [
+            "accepted"
+          ],
+          "error": null,
+          "diagnostic": null,
+          "source_sha256": "8f5a1e4223390b1305e41d7592803f22697a60dd1bb304467a8352e55ef72622"
+        },
+        {
+          "name": "outer-y",
+          "expected": true,
+          "statuses": [
+            "accepted"
+          ],
+          "error": null,
+          "diagnostic": null,
+          "source_sha256": "0251f761fb11f35e14500c31249d79dcb8563008307e3c078c4f3110f009bf1d"
+        },
+        {
+          "name": "history-y",
+          "expected": true,
+          "statuses": [
+            "accepted"
+          ],
+          "error": null,
+          "diagnostic": null,
+          "source_sha256": "bb08c873a596adc5b9de6662ae9fcf5dff3fc8b978813603d0ea9b467eea73d0"
+        },
+        {
+          "name": "outer-z",
+          "expected": true,
+          "statuses": [
+            "accepted"
+          ],
+          "error": null,
+          "diagnostic": null,
+          "source_sha256": "1d5de3fd8572fe3388da5757f287f3b36c950c85724f3f82d3318ae023b7d49c"
+        },
+        {
+          "name": "history-z",
+          "expected": true,
+          "statuses": [
+            "accepted"
+          ],
+          "error": null,
+          "diagnostic": null,
+          "source_sha256": "25c2cb9c876724630722cf1aa2f491c8ae11061591e5fdfa33b5c583a0ba5d9b"
+        },
+        {
+          "name": "outer-unclosed-quote-observed",
+          "expected": null,
+          "statuses": [
+            "accepted"
+          ],
+          "error": null,
+          "diagnostic": null,
+          "source_sha256": "c6d82dce386ba0e0844c981b1a21fdb265c0d7974076af359b66b78c8f9fdd14"
+        },
+        {
+          "name": "outer-unbalanced-expression",
+          "expected": false,
+          "statuses": [
+            "rejected"
+          ],
+          "error": "10586\nExpecting ')'\n[*xMacroRunThis22*#171]         f = (\n\n",
+          "diagnostic": {
+            "number": 10586,
+            "description": "Expecting ')'",
+            "source": "[*xMacroRunThis22*#171]         f = (",
+            "module": "*xMacroRunThis22*",
+            "wrapped_line_1based": 171,
+            "original_statement": "        f = (",
+            "column": null
+          },
+          "source_sha256": "39b101525298dc64a6411bdc5e27587e4be7a6cebf1598e1092ac43697e9cfe2"
+        },
+        {
+          "name": "outer-duplicate-procedure",
+          "expected": false,
+          "statuses": [
+            "rejected"
+          ],
+          "error": "10519\nIdentifier is already in use.\n[*xMacroRunThis23*#207] Private Sub ReportStage\n\n",
+          "diagnostic": {
+            "number": 10519,
+            "description": "Identifier is already in use.",
+            "source": "[*xMacroRunThis23*#207] Private Sub ReportStage",
+            "module": "*xMacroRunThis23*",
+            "wrapped_line_1based": 207,
+            "original_statement": "Private Sub ReportStage",
+            "column": null
+          },
+          "source_sha256": "9953ce9288318eefc6d868da7402bbab787316a1f602ec881462a49ff2f353dc"
+        }
+      ],
+      "checks": 23,
+      "solver_start_calls": 0,
+      "background_verified": true,
+      "failure": null
+    },
+    "failures": [
+      {
+        "kind": "syntax",
+        "expected_failure": true,
+        "error": "GENERATED_CODE_INVALID: history syntax rejected; diagnostics=D:\\work\\cst_tools\\artifacts\\winwrap-w23-c121c36e\\project\\control\\definitions\\fault-syntax\\attempt\\verification-edit\\saved",
+        "old_state_unchanged": true,
+        "closures": [
+          {
+            "exit_code": 0,
+            "exit_confirmed": true,
+            "quiet": {
+              "nonce": "28397ac138cb4331892b453e69d6c864",
+              "readback": "not-exposed-by-COM",
+              "setter_returned": true,
+              "requested": true
+            },
+            "window_observation": {
+              "baseline_foreground": {
+                "hwnd": 2695562,
+                "pid": 32176,
+                "visible": true,
+                "minimized": false,
+                "owner": 0,
+                "window_class": "Chrome_WidgetWin_1"
+              },
+              "observation": "WinEvent foreground/show hooks plus 50ms window polling",
+              "owned_foreground_events": 0,
+              "errors": [],
+              "dropped_events": 0,
+              "window_enumeration_gaps": 0,
+              "private_desktop": "CstTools_a6706489752b479ba0fbb4d4adba81e8",
+              "desktop_handle_closed": true,
+              "owned_window_events": 160,
+              "minimize_actions": 0
+            },
+            "window_observation_path": "D:\\work\\cst_tools\\artifacts\\winwrap-w23-c121c36e\\project\\control\\definitions\\fault-syntax\\attempt\\verification-edit\\saved\\window-observation.json"
+          }
+        ],
+        "diagnostic": {
+          "layer": "history",
+          "raw": "10576\nUnexpected text.\n[*xMacroRunThis1*#42]  .Zrange ((-RestoreDoubleParameter(\"L\"))/2), (RestoreDoubleParameter(\"L\")/2)\n\n",
+          "source": "[*xMacroRunThis1*#42]  .Zrange ((-RestoreDoubleParameter(\"L\"))/2), (RestoreDoubleParameter(\"L\")/2)",
+          "wrapped_line_1based": 42,
+          "history_line_1based": 39,
+          "origin": {
+            "line": 39,
+            "object": "Cylinder",
+            "method": "Zrange",
+            "statement": " .Zrange 0+((-(RestoreDoubleParameter(\"L\")+RestoreDoubleParameter(\"R\")))/2), 0+((RestoreDoubleParameter(\"L\")+RestoreDoubleParameter(\"R\"))/2)",
+            "input_field": "cylinder.axial_range",
+            "implementation": "csttool.definition_editing.render_history"
+          },
+          "column": null
+        },
+        "workspace": "D:\\work\\cst_tools\\artifacts\\winwrap-w23-c121c36e\\project\\control\\definitions\\fault-syntax\\attempt\\verification-edit\\saved"
+      },
+      {
+        "kind": "partial",
+        "expected_failure": true,
+        "error": "SETTING_UNVERIFIED: definition edit not confirmed; exit_confirmed=True, exit_code=0, completion=False, native=-2147218544 controlled failure after partial history source=W3 injected required step\n; diagnostics=D:\\work\\cst_tools\\artifacts\\winwrap-w23-c121c36e\\project\\control\\definitions\\fault-partial\\attempt\\verification-edit\\saved",
+        "old_state_unchanged": true,
+        "closures": [
+          {
+            "exit_code": 0,
+            "exit_confirmed": true,
+            "quiet": {
+              "nonce": "8d600a8165164e168f3543cfec54292f",
+              "readback": "not-exposed-by-COM",
+              "setter_returned": true,
+              "requested": true
+            },
+            "window_observation": {
+              "baseline_foreground": {
+                "hwnd": 97913902,
+                "pid": 32892,
+                "visible": true,
+                "minimized": false,
+                "owner": 0,
+                "window_class": "UnityWndClass"
+              },
+              "observation": "WinEvent foreground/show hooks plus 50ms window polling",
+              "owned_foreground_events": 0,
+              "errors": [],
+              "dropped_events": 0,
+              "window_enumeration_gaps": 0,
+              "private_desktop": "CstTools_eddbb9a7c0a24f26be699321710b70bf",
+              "desktop_handle_closed": true,
+              "owned_window_events": 172,
+              "minimize_actions": 0
+            },
+            "window_observation_path": "D:\\work\\cst_tools\\artifacts\\winwrap-w23-c121c36e\\project\\control\\definitions\\fault-partial\\attempt\\verification-edit\\saved\\window-observation.json"
+          }
+        ],
+        "diagnostic": null,
+        "workspace": "D:\\work\\cst_tools\\artifacts\\winwrap-w23-c121c36e\\project\\control\\definitions\\fault-partial\\attempt\\verification-edit\\saved"
+      }
+    ],
+    "positive": [
+      {
+        "axis": "x",
+        "closure": {
+          "exit_code": 0,
+          "exit_confirmed": true,
+          "quiet": {
+            "nonce": "ee56a377eac244e99194916e21db2e9c",
+            "readback": "not-exposed-by-COM",
+            "setter_returned": true,
+            "requested": true
+          },
+          "window_observation": {
+            "baseline_foreground": {
+              "hwnd": 97913902,
+              "pid": 32892,
+              "visible": true,
+              "minimized": false,
+              "owner": 0,
+              "window_class": "UnityWndClass"
+            },
+            "observation": "WinEvent foreground/show hooks plus 50ms window polling",
+            "owned_foreground_events": 0,
+            "errors": [],
+            "dropped_events": 0,
+            "window_enumeration_gaps": 2,
+            "private_desktop": "CstTools_3746bde4dc55438d9844a978686621db",
+            "desktop_handle_closed": true,
+            "owned_window_events": 168,
+            "minimize_actions": 0
+          },
+          "window_observation_path": "D:\\work\\cst_tools\\artifacts\\winwrap-w23-c121c36e\\project\\x\\candidate\\window-observation.json"
+        },
+        "proof": {
+          "schema_version": 1,
+          "status": "verified",
+          "scope": "root",
+          "source_sha256": "80e8824d4774d3bd4412001189bd29d58a6009b374bdba17c9142f548c37fcf4",
+          "gates": [
+            "saved-reopened",
+            "identity",
+            "settings",
+            "standard-close"
+          ],
+          "diagnostics": "D:\\work\\cst_tools\\artifacts\\winwrap-w23-c121c36e\\project\\x\\candidate\\verification-c37097d7a49f496c8dd00e2b441a73de",
+          "installation": {
+            "executable": "D:\\Program Files (x86)\\CST Studio Suite 2022\\CST DESIGN ENVIRONMENT.exe",
+            "launcher_sha256": "bde34d5ad5b7ec46500ab8d0a1da2eb04b198e27ed06d1d7de3ffe8ec55c397e",
+            "modeler_sha256": "a1cb2ec6316592020e81129fa0687343db2c650d82286c79a22ef4e08310db98",
+            "profile_major": "2022"
+          },
+          "sessions": [
+            {
+              "phase": "saved",
+              "exit_code": 0,
+              "exit_confirmed": true
+            },
+            {
+              "phase": "reopened",
+              "exit_code": 0,
+              "exit_confirmed": true
+            }
+          ],
+          "observations": [
+            {
+              "phase": "saved",
+              "sha256": "d2fbfa5d33a027eb9384de3f302dd79733f977a35ae96364fc0af20ea80a82fd",
+              "native": {
+                "nonce": "75445a853d1f4c1185a5ce3c845f399a",
+                "project": "D:\\work\\cst_tools\\artifacts\\winwrap-w23-c121c36e\\project\\x\\candidate\\verification-c37097d7a49f496c8dd00e2b441a73de\\saved\\definition",
+                "build": "Version 2022.5 - Jun 03 2022",
+                "solver": "HF Eigenmode",
+                "length": "mm",
+                "frequency": "MHz",
+                "mesh": "Tetrahedral",
+                "fmin": "500",
+                "fmax": "2000",
+                "end": "G03V1"
+              },
+              "geometry": {
+                "status": "verified",
+                "source": "native-query",
+                "solid": "cavity:pillbox",
+                "material": "Vacuum",
+                "volume_mm3": 75.3982510265863,
+                "bounds_mm": {
+                  "xmin": -3.0,
+                  "xmax": 3.0,
+                  "ymin": -2.0,
+                  "ymax": 2.0,
+                  "zmin": -2.0,
+                  "zmax": 2.0
+                },
+                "boundaries": {
+                  "xmin": "electric",
+                  "xmax": "electric",
+                  "ymin": "electric",
+                  "ymax": "electric",
+                  "zmin": "electric",
+                  "zmax": "electric"
+                },
+                "background_evidence": "persisted-and-replayed-history-only",
+                "raw": {
+                  "nonce": "75445a853d1f4c1185a5ce3c845f399a",
+                  "project": "D:\\work\\cst_tools\\artifacts\\winwrap-w23-c121c36e\\project\\x\\candidate\\verification-c37097d7a49f496c8dd00e2b441a73de\\saved\\definition",
+                  "solid": "cavity:pillbox",
+                  "exists": "-1",
+                  "material": "Vacuum",
+                  "volume_mm3": "75.3982510265863",
+                  "xmin_mm": "-3",
+                  "xmax_mm": "3",
+                  "ymin_mm": "-2",
+                  "ymax_mm": "2",
+                  "zmin_mm": "-2",
+                  "zmax_mm": "2",
+                  "calculation_xmin_mm": "-3",
+                  "calculation_xmax_mm": "3",
+                  "calculation_ymin_mm": "-2",
+                  "calculation_ymax_mm": "2",
+                  "calculation_zmin_mm": "-2",
+                  "calculation_zmax_mm": "2",
+                  "boundary.xmin": "electric",
+                  "boundary.xmax": "electric",
+                  "boundary.ymin": "electric",
+                  "boundary.ymax": "electric",
+                  "boundary.zmin": "electric",
+                  "boundary.zmax": "electric"
+                }
+              }
+            },
+            {
+              "phase": "reopened",
+              "sha256": "6982dfed3782790c066471ea9730d0d44528879b0850d236179e2c269d1a4667",
+              "native": {
+                "nonce": "01386b554050448e92edf0223a1c0a51",
+                "project": "D:\\work\\cst_tools\\artifacts\\winwrap-w23-c121c36e\\project\\x\\candidate\\verification-c37097d7a49f496c8dd00e2b441a73de\\reopened\\definition",
+                "build": "Version 2022.5 - Jun 03 2022",
+                "solver": "HF Eigenmode",
+                "length": "mm",
+                "frequency": "MHz",
+                "mesh": "Tetrahedral",
+                "fmin": "500",
+                "fmax": "2000",
+                "end": "G03V1"
+              },
+              "geometry": {
+                "status": "verified",
+                "source": "native-query",
+                "solid": "cavity:pillbox",
+                "material": "Vacuum",
+                "volume_mm3": 75.3982510265863,
+                "bounds_mm": {
+                  "xmin": -3.0,
+                  "xmax": 3.0,
+                  "ymin": -2.0,
+                  "ymax": 2.0,
+                  "zmin": -2.0,
+                  "zmax": 2.0
+                },
+                "boundaries": {
+                  "xmin": "electric",
+                  "xmax": "electric",
+                  "ymin": "electric",
+                  "ymax": "electric",
+                  "zmin": "electric",
+                  "zmax": "electric"
+                },
+                "background_evidence": "persisted-and-replayed-history-only",
+                "raw": {
+                  "nonce": "01386b554050448e92edf0223a1c0a51",
+                  "project": "D:\\work\\cst_tools\\artifacts\\winwrap-w23-c121c36e\\project\\x\\candidate\\verification-c37097d7a49f496c8dd00e2b441a73de\\reopened\\definition",
+                  "solid": "cavity:pillbox",
+                  "exists": "-1",
+                  "material": "Vacuum",
+                  "volume_mm3": "75.3982510265863",
+                  "xmin_mm": "-3",
+                  "xmax_mm": "3",
+                  "ymin_mm": "-2",
+                  "ymax_mm": "2",
+                  "zmin_mm": "-2",
+                  "zmax_mm": "2",
+                  "calculation_xmin_mm": "-3",
+                  "calculation_xmax_mm": "3",
+                  "calculation_ymin_mm": "-2",
+                  "calculation_ymax_mm": "2",
+                  "calculation_zmin_mm": "-2",
+                  "calculation_zmax_mm": "2",
+                  "boundary.xmin": "electric",
+                  "boundary.xmax": "electric",
+                  "boundary.ymin": "electric",
+                  "boundary.ymax": "electric",
+                  "boundary.zmin": "electric",
+                  "boundary.zmax": "electric"
+                }
+              }
+            }
+          ]
+        },
+        "source_sha256": "80e8824d4774d3bd4412001189bd29d58a6009b374bdba17c9142f548c37fcf4"
+      },
+      {
+        "axis": "y",
+        "closure": {
+          "exit_code": 0,
+          "exit_confirmed": true,
+          "quiet": {
+            "nonce": "802c5cd0582f41dcbcff78bb657932b0",
+            "readback": "not-exposed-by-COM",
+            "setter_returned": true,
+            "requested": true
+          },
+          "window_observation": {
+            "baseline_foreground": {
+              "hwnd": 97913902,
+              "pid": 32892,
+              "visible": true,
+              "minimized": false,
+              "owner": 0,
+              "window_class": "UnityWndClass"
+            },
+            "observation": "WinEvent foreground/show hooks plus 50ms window polling",
+            "owned_foreground_events": 0,
+            "errors": [],
+            "dropped_events": 0,
+            "window_enumeration_gaps": 0,
+            "private_desktop": "CstTools_eb5308f2eb21422eacbca841282b3d40",
+            "desktop_handle_closed": true,
+            "owned_window_events": 171,
+            "minimize_actions": 0
+          },
+          "window_observation_path": "D:\\work\\cst_tools\\artifacts\\winwrap-w23-c121c36e\\project\\y\\candidate\\window-observation.json"
+        },
+        "proof": {
+          "schema_version": 1,
+          "status": "verified",
+          "scope": "root",
+          "source_sha256": "aff6fc527b3b8e88367f0784fff41693b334b3158a5760f1f43646f3898e968a",
+          "gates": [
+            "saved-reopened",
+            "identity",
+            "settings",
+            "standard-close"
+          ],
+          "diagnostics": "D:\\work\\cst_tools\\artifacts\\winwrap-w23-c121c36e\\project\\y\\candidate\\verification-3ab4b3269290486685e14c82221b85ab",
+          "installation": {
+            "executable": "D:\\Program Files (x86)\\CST Studio Suite 2022\\CST DESIGN ENVIRONMENT.exe",
+            "launcher_sha256": "bde34d5ad5b7ec46500ab8d0a1da2eb04b198e27ed06d1d7de3ffe8ec55c397e",
+            "modeler_sha256": "a1cb2ec6316592020e81129fa0687343db2c650d82286c79a22ef4e08310db98",
+            "profile_major": "2022"
+          },
+          "sessions": [
+            {
+              "phase": "saved",
+              "exit_code": 0,
+              "exit_confirmed": true
+            },
+            {
+              "phase": "reopened",
+              "exit_code": 0,
+              "exit_confirmed": true
+            }
+          ],
+          "observations": [
+            {
+              "phase": "saved",
+              "sha256": "fb10a365cbff41e2a3734a802dcda1210c802b2e4bad823140dc6183198b11bd",
+              "native": {
+                "nonce": "b42a5d9a98414b6483452ba39ff473dc",
+                "project": "D:\\work\\cst_tools\\artifacts\\winwrap-w23-c121c36e\\project\\y\\candidate\\verification-3ab4b3269290486685e14c82221b85ab\\saved\\definition",
+                "build": "Version 2022.5 - Jun 03 2022",
+                "solver": "HF Eigenmode",
+                "length": "mm",
+                "frequency": "MHz",
+                "mesh": "Tetrahedral",
+                "fmin": "500",
+                "fmax": "2000",
+                "end": "G03V1"
+              },
+              "geometry": {
+                "status": "verified",
+                "source": "native-query",
+                "solid": "cavity:pillbox",
+                "material": "Vacuum",
+                "volume_mm3": 75.3982236861551,
+                "bounds_mm": {
+                  "xmin": -2.0,
+                  "xmax": 2.0,
+                  "ymin": -3.0,
+                  "ymax": 3.0,
+                  "zmin": -2.0,
+                  "zmax": 2.0
+                },
+                "boundaries": {
+                  "xmin": "electric",
+                  "xmax": "electric",
+                  "ymin": "electric",
+                  "ymax": "electric",
+                  "zmin": "electric",
+                  "zmax": "electric"
+                },
+                "background_evidence": "persisted-and-replayed-history-only",
+                "raw": {
+                  "nonce": "b42a5d9a98414b6483452ba39ff473dc",
+                  "project": "D:\\work\\cst_tools\\artifacts\\winwrap-w23-c121c36e\\project\\y\\candidate\\verification-3ab4b3269290486685e14c82221b85ab\\saved\\definition",
+                  "solid": "cavity:pillbox",
+                  "exists": "-1",
+                  "material": "Vacuum",
+                  "volume_mm3": "75.3982236861551",
+                  "xmin_mm": "-2",
+                  "xmax_mm": "2",
+                  "ymin_mm": "-3",
+                  "ymax_mm": "3",
+                  "zmin_mm": "-2",
+                  "zmax_mm": "2",
+                  "calculation_xmin_mm": "-2",
+                  "calculation_xmax_mm": "2",
+                  "calculation_ymin_mm": "-3",
+                  "calculation_ymax_mm": "3",
+                  "calculation_zmin_mm": "-2",
+                  "calculation_zmax_mm": "2",
+                  "boundary.xmin": "electric",
+                  "boundary.xmax": "electric",
+                  "boundary.ymin": "electric",
+                  "boundary.ymax": "electric",
+                  "boundary.zmin": "electric",
+                  "boundary.zmax": "electric"
+                }
+              }
+            },
+            {
+              "phase": "reopened",
+              "sha256": "ce886ecaf11dac44ebc402d174ba65b628481e26c02d1d075dd8bfaed54357ef",
+              "native": {
+                "nonce": "6d5eacf1b73e46c8a5fd40278fa2ba7d",
+                "project": "D:\\work\\cst_tools\\artifacts\\winwrap-w23-c121c36e\\project\\y\\candidate\\verification-3ab4b3269290486685e14c82221b85ab\\reopened\\definition",
+                "build": "Version 2022.5 - Jun 03 2022",
+                "solver": "HF Eigenmode",
+                "length": "mm",
+                "frequency": "MHz",
+                "mesh": "Tetrahedral",
+                "fmin": "500",
+                "fmax": "2000",
+                "end": "G03V1"
+              },
+              "geometry": {
+                "status": "verified",
+                "source": "native-query",
+                "solid": "cavity:pillbox",
+                "material": "Vacuum",
+                "volume_mm3": 75.3982236861551,
+                "bounds_mm": {
+                  "xmin": -2.0,
+                  "xmax": 2.0,
+                  "ymin": -3.0,
+                  "ymax": 3.0,
+                  "zmin": -2.0,
+                  "zmax": 2.0
+                },
+                "boundaries": {
+                  "xmin": "electric",
+                  "xmax": "electric",
+                  "ymin": "electric",
+                  "ymax": "electric",
+                  "zmin": "electric",
+                  "zmax": "electric"
+                },
+                "background_evidence": "persisted-and-replayed-history-only",
+                "raw": {
+                  "nonce": "6d5eacf1b73e46c8a5fd40278fa2ba7d",
+                  "project": "D:\\work\\cst_tools\\artifacts\\winwrap-w23-c121c36e\\project\\y\\candidate\\verification-3ab4b3269290486685e14c82221b85ab\\reopened\\definition",
+                  "solid": "cavity:pillbox",
+                  "exists": "-1",
+                  "material": "Vacuum",
+                  "volume_mm3": "75.3982236861551",
+                  "xmin_mm": "-2",
+                  "xmax_mm": "2",
+                  "ymin_mm": "-3",
+                  "ymax_mm": "3",
+                  "zmin_mm": "-2",
+                  "zmax_mm": "2",
+                  "calculation_xmin_mm": "-2",
+                  "calculation_xmax_mm": "2",
+                  "calculation_ymin_mm": "-3",
+                  "calculation_ymax_mm": "3",
+                  "calculation_zmin_mm": "-2",
+                  "calculation_zmax_mm": "2",
+                  "boundary.xmin": "electric",
+                  "boundary.xmax": "electric",
+                  "boundary.ymin": "electric",
+                  "boundary.ymax": "electric",
+                  "boundary.zmin": "electric",
+                  "boundary.zmax": "electric"
+                }
+              }
+            }
+          ]
+        },
+        "source_sha256": "aff6fc527b3b8e88367f0784fff41693b334b3158a5760f1f43646f3898e968a"
+      },
+      {
+        "axis": "z",
+        "closure": {
+          "exit_code": 0,
+          "exit_confirmed": true,
+          "quiet": {
+            "nonce": "a7d8c656becf490eacfe3ed2d5da9479",
+            "readback": "not-exposed-by-COM",
+            "setter_returned": true,
+            "requested": true
+          },
+          "window_observation": {
+            "baseline_foreground": {
+              "hwnd": 2695562,
+              "pid": 32176,
+              "visible": true,
+              "minimized": false,
+              "owner": 0,
+              "window_class": "Chrome_WidgetWin_1"
+            },
+            "observation": "WinEvent foreground/show hooks plus 50ms window polling",
+            "owned_foreground_events": 0,
+            "errors": [],
+            "dropped_events": 0,
+            "window_enumeration_gaps": 0,
+            "private_desktop": "CstTools_aec26cdc614045a4a4528640785ed079",
+            "desktop_handle_closed": true,
+            "owned_window_events": 166,
+            "minimize_actions": 0
+          },
+          "window_observation_path": "D:\\work\\cst_tools\\artifacts\\winwrap-w23-c121c36e\\project\\z\\candidate\\window-observation.json"
+        },
+        "proof": {
+          "schema_version": 1,
+          "status": "verified",
+          "scope": "root",
+          "source_sha256": "7407e58d284aef9bd4c1fbd376fdfe19083520673e0892ca69457b853aaf287b",
+          "gates": [
+            "saved-reopened",
+            "identity",
+            "settings",
+            "standard-close"
+          ],
+          "diagnostics": "D:\\work\\cst_tools\\artifacts\\winwrap-w23-c121c36e\\project\\z\\candidate\\verification-d3fc369651304b43ab59a8c1fdd9ed8f",
+          "installation": {
+            "executable": "D:\\Program Files (x86)\\CST Studio Suite 2022\\CST DESIGN ENVIRONMENT.exe",
+            "launcher_sha256": "bde34d5ad5b7ec46500ab8d0a1da2eb04b198e27ed06d1d7de3ffe8ec55c397e",
+            "modeler_sha256": "a1cb2ec6316592020e81129fa0687343db2c650d82286c79a22ef4e08310db98",
+            "profile_major": "2022"
+          },
+          "sessions": [
+            {
+              "phase": "saved",
+              "exit_code": 0,
+              "exit_confirmed": true
+            },
+            {
+              "phase": "reopened",
+              "exit_code": 0,
+              "exit_confirmed": true
+            }
+          ],
+          "observations": [
+            {
+              "phase": "saved",
+              "sha256": "270749d0d1ec6b474f561251e22a15da88a0e2ed271718ae60defb700797288b",
+              "native": {
+                "nonce": "13459c9ab03443b6a22f0c66775397f1",
+                "project": "D:\\work\\cst_tools\\artifacts\\winwrap-w23-c121c36e\\project\\z\\candidate\\verification-d3fc369651304b43ab59a8c1fdd9ed8f\\saved\\definition",
+                "build": "Version 2022.5 - Jun 03 2022",
+                "solver": "HF Eigenmode",
+                "length": "mm",
+                "frequency": "MHz",
+                "mesh": "Tetrahedral",
+                "fmin": "500",
+                "fmax": "2000",
+                "end": "G03V1"
+              },
+              "geometry": {
+                "status": "verified",
+                "source": "native-query",
+                "solid": "cavity:pillbox",
+                "material": "Vacuum",
+                "volume_mm3": 75.3982510265863,
+                "bounds_mm": {
+                  "xmin": -2.0,
+                  "xmax": 2.0,
+                  "ymin": -2.0,
+                  "ymax": 2.0,
+                  "zmin": -3.0,
+                  "zmax": 3.0
+                },
+                "boundaries": {
+                  "xmin": "electric",
+                  "xmax": "electric",
+                  "ymin": "electric",
+                  "ymax": "electric",
+                  "zmin": "electric",
+                  "zmax": "electric"
+                },
+                "background_evidence": "persisted-and-replayed-history-only",
+                "raw": {
+                  "nonce": "13459c9ab03443b6a22f0c66775397f1",
+                  "project": "D:\\work\\cst_tools\\artifacts\\winwrap-w23-c121c36e\\project\\z\\candidate\\verification-d3fc369651304b43ab59a8c1fdd9ed8f\\saved\\definition",
+                  "solid": "cavity:pillbox",
+                  "exists": "-1",
+                  "material": "Vacuum",
+                  "volume_mm3": "75.3982510265863",
+                  "xmin_mm": "-2",
+                  "xmax_mm": "2",
+                  "ymin_mm": "-2",
+                  "ymax_mm": "2",
+                  "zmin_mm": "-3",
+                  "zmax_mm": "3",
+                  "calculation_xmin_mm": "-2",
+                  "calculation_xmax_mm": "2",
+                  "calculation_ymin_mm": "-2",
+                  "calculation_ymax_mm": "2",
+                  "calculation_zmin_mm": "-3",
+                  "calculation_zmax_mm": "3",
+                  "boundary.xmin": "electric",
+                  "boundary.xmax": "electric",
+                  "boundary.ymin": "electric",
+                  "boundary.ymax": "electric",
+                  "boundary.zmin": "electric",
+                  "boundary.zmax": "electric"
+                }
+              }
+            },
+            {
+              "phase": "reopened",
+              "sha256": "acfc281d6a9cc39d0daaf6e3bf463129fe8a536d811aeda363a5e314449560cd",
+              "native": {
+                "nonce": "abff50cff78a499b9bcf69a5b1023d3a",
+                "project": "D:\\work\\cst_tools\\artifacts\\winwrap-w23-c121c36e\\project\\z\\candidate\\verification-d3fc369651304b43ab59a8c1fdd9ed8f\\reopened\\definition",
+                "build": "Version 2022.5 - Jun 03 2022",
+                "solver": "HF Eigenmode",
+                "length": "mm",
+                "frequency": "MHz",
+                "mesh": "Tetrahedral",
+                "fmin": "500",
+                "fmax": "2000",
+                "end": "G03V1"
+              },
+              "geometry": {
+                "status": "verified",
+                "source": "native-query",
+                "solid": "cavity:pillbox",
+                "material": "Vacuum",
+                "volume_mm3": 75.3982510265863,
+                "bounds_mm": {
+                  "xmin": -2.0,
+                  "xmax": 2.0,
+                  "ymin": -2.0,
+                  "ymax": 2.0,
+                  "zmin": -3.0,
+                  "zmax": 3.0
+                },
+                "boundaries": {
+                  "xmin": "electric",
+                  "xmax": "electric",
+                  "ymin": "electric",
+                  "ymax": "electric",
+                  "zmin": "electric",
+                  "zmax": "electric"
+                },
+                "background_evidence": "persisted-and-replayed-history-only",
+                "raw": {
+                  "nonce": "abff50cff78a499b9bcf69a5b1023d3a",
+                  "project": "D:\\work\\cst_tools\\artifacts\\winwrap-w23-c121c36e\\project\\z\\candidate\\verification-d3fc369651304b43ab59a8c1fdd9ed8f\\reopened\\definition",
+                  "solid": "cavity:pillbox",
+                  "exists": "-1",
+                  "material": "Vacuum",
+                  "volume_mm3": "75.3982510265863",
+                  "xmin_mm": "-2",
+                  "xmax_mm": "2",
+                  "ymin_mm": "-2",
+                  "ymax_mm": "2",
+                  "zmin_mm": "-3",
+                  "zmax_mm": "3",
+                  "calculation_xmin_mm": "-2",
+                  "calculation_xmax_mm": "2",
+                  "calculation_ymin_mm": "-2",
+                  "calculation_ymax_mm": "2",
+                  "calculation_zmin_mm": "-3",
+                  "calculation_zmax_mm": "3",
+                  "boundary.xmin": "electric",
+                  "boundary.xmax": "electric",
+                  "boundary.ymin": "electric",
+                  "boundary.ymax": "electric",
+                  "boundary.zmin": "electric",
+                  "boundary.zmax": "electric"
+                }
+              }
+            }
+          ]
+        },
+        "source_sha256": "7407e58d284aef9bd4c1fbd376fdfe19083520673e0892ca69457b853aaf287b"
+      }
+    ],
+    "after_cst": []
+  },
+  "raw_root": "D:\\work\\cst_tools\\artifacts\\winwrap-w23-c121c36e",
+  "raw_artifacts_migration_guaranteed": false,
+  "limits": "Sub-only sampled A1/CST2022.5. Partial failure is deliberate Err.Raise injection, not a naturally failing CST setter.",
+  "cleanup": {
+    "task_finished": true,
+    "regeneration_required": true,
+    "roots": [
+      {
+        "root": "D:\\work\\cst_tools\\artifacts\\winwrap-w23-34feed88",
+        "confirmed_sessions": 1,
+        "models": [
+          {
+            "path": "compile\\definition.cst",
+            "sha256": "1be3d41435807a384cbedb2d4790149daf880a2f91331d8b093b916ad430bc3c",
+            "bytes": 33028,
+            "retained": {
+              "Model/Parameters.json": "compile\\retained-Parameters.json",
+              "Model/3D/Model.mod": "compile\\retained-Model.mod",
+              "Model/simulationproperties.json": "compile\\retained-simulationproperties.json"
+            }
+          }
+        ]
+      },
+      {
+        "root": "D:\\work\\cst_tools\\artifacts\\winwrap-w23-bbef090c",
+        "confirmed_sessions": 4,
+        "models": [
+          {
+            "path": "compile\\definition.cst",
+            "sha256": "d62617923a3837b477b9c8febfe6ffdc5e85a7bae1f173041dddb1224e91fbcc",
+            "bytes": 33023,
+            "retained": {
+              "Model/Parameters.json": "compile\\retained-Parameters.json",
+              "Model/3D/Model.mod": "compile\\retained-Model.mod",
+              "Model/simulationproperties.json": "compile\\retained-simulationproperties.json"
+            }
+          },
+          {
+            "path": "project\\control\\definitions\\fault-partial\\attempt\\verification-edit\\saved\\definition.cst",
+            "sha256": "784cfd3e416c6f6a1639718fe80a2928fac033c7c603c740cac6abb670bd95e3",
+            "bytes": 33247,
+            "retained": {
+              "Model/Parameters.json": "project\\control\\definitions\\fault-partial\\attempt\\verification-edit\\saved\\retained-Parameters.json",
+              "Model/3D/Model.mod": "project\\control\\definitions\\fault-partial\\attempt\\verification-edit\\saved\\retained-Model.mod",
+              "Model/simulationproperties.json": "project\\control\\definitions\\fault-partial\\attempt\\verification-edit\\saved\\retained-simulationproperties.json"
+            }
+          },
+          {
+            "path": "project\\control\\definitions\\fault-syntax\\attempt\\verification-edit\\saved\\definition.cst",
+            "sha256": "077215106d50cbaf27cd835af344b499f99aa1987acddc95c092464d23262b07",
+            "bytes": 33040,
+            "retained": {
+              "Model/Parameters.json": "project\\control\\definitions\\fault-syntax\\attempt\\verification-edit\\saved\\retained-Parameters.json",
+              "Model/3D/Model.mod": "project\\control\\definitions\\fault-syntax\\attempt\\verification-edit\\saved\\retained-Model.mod",
+              "Model/simulationproperties.json": "project\\control\\definitions\\fault-syntax\\attempt\\verification-edit\\saved\\retained-simulationproperties.json"
+            }
+          },
+          {
+            "path": "project\\x\\candidate\\definition.cst",
+            "sha256": "73ac734cf69ea5f7d2b7c62fdab82d7a2bbba32c3ff8adaca645a4662f52260a",
+            "bytes": 34364,
+            "retained": {
+              "Model/Parameters.json": "project\\x\\candidate\\retained-Parameters.json",
+              "Model/3D/Model.mod": "project\\x\\candidate\\retained-Model.mod",
+              "Model/simulationproperties.json": "project\\x\\candidate\\retained-simulationproperties.json"
+            }
+          }
+        ]
+      },
+      {
+        "root": "D:\\work\\cst_tools\\artifacts\\winwrap-w23-c121c36e",
+        "confirmed_sessions": 12,
+        "models": [
+          {
+            "path": "compile\\definition.cst",
+            "sha256": "780cba6d442c3cc97ab093f69e054d97b20df064aacf4126e5bf2e540f70cc32",
+            "bytes": 33025,
+            "retained": {
+              "Model/Parameters.json": "compile\\retained-Parameters.json",
+              "Model/3D/Model.mod": "compile\\retained-Model.mod",
+              "Model/simulationproperties.json": "compile\\retained-simulationproperties.json"
+            }
+          },
+          {
+            "path": "project\\control\\definitions\\fault-partial\\attempt\\verification-edit\\saved\\definition.cst",
+            "sha256": "af9c46998495258c9f798e3969448e87861312a671daf8c2e42c1afc6d8ea7f5",
+            "bytes": 33239,
+            "retained": {
+              "Model/Parameters.json": "project\\control\\definitions\\fault-partial\\attempt\\verification-edit\\saved\\retained-Parameters.json",
+              "Model/3D/Model.mod": "project\\control\\definitions\\fault-partial\\attempt\\verification-edit\\saved\\retained-Model.mod",
+              "Model/simulationproperties.json": "project\\control\\definitions\\fault-partial\\attempt\\verification-edit\\saved\\retained-simulationproperties.json"
+            }
+          },
+          {
+            "path": "project\\control\\definitions\\fault-syntax\\attempt\\verification-edit\\saved\\definition.cst",
+            "sha256": "15864dd8af848900031d21fbebcfea3cd1408629ed0a686c0f6317e26cc03025",
+            "bytes": 33031,
+            "retained": {
+              "Model/Parameters.json": "project\\control\\definitions\\fault-syntax\\attempt\\verification-edit\\saved\\retained-Parameters.json",
+              "Model/3D/Model.mod": "project\\control\\definitions\\fault-syntax\\attempt\\verification-edit\\saved\\retained-Model.mod",
+              "Model/simulationproperties.json": "project\\control\\definitions\\fault-syntax\\attempt\\verification-edit\\saved\\retained-simulationproperties.json"
+            }
+          },
+          {
+            "path": "project\\x\\candidate\\definition.cst",
+            "sha256": "80e8824d4774d3bd4412001189bd29d58a6009b374bdba17c9142f548c37fcf4",
+            "bytes": 34363,
+            "retained": {
+              "Model/Parameters.json": "project\\x\\candidate\\retained-Parameters.json",
+              "Model/3D/Model.mod": "project\\x\\candidate\\retained-Model.mod",
+              "Model/simulationproperties.json": "project\\x\\candidate\\retained-simulationproperties.json"
+            }
+          },
+          {
+            "path": "project\\x\\candidate\\verification-c37097d7a49f496c8dd00e2b441a73de\\reopened\\definition.cst",
+            "sha256": "6982dfed3782790c066471ea9730d0d44528879b0850d236179e2c269d1a4667",
+            "bytes": 36213,
+            "retained": {
+              "Model/Parameters.json": "project\\x\\candidate\\verification-c37097d7a49f496c8dd00e2b441a73de\\reopened\\retained-Parameters.json",
+              "Model/3D/Model.mod": "project\\x\\candidate\\verification-c37097d7a49f496c8dd00e2b441a73de\\reopened\\retained-Model.mod",
+              "Model/simulationproperties.json": "project\\x\\candidate\\verification-c37097d7a49f496c8dd00e2b441a73de\\reopened\\retained-simulationproperties.json"
+            }
+          },
+          {
+            "path": "project\\x\\candidate\\verification-c37097d7a49f496c8dd00e2b441a73de\\saved\\definition.cst",
+            "sha256": "d2fbfa5d33a027eb9384de3f302dd79733f977a35ae96364fc0af20ea80a82fd",
+            "bytes": 36202,
+            "retained": {
+              "Model/Parameters.json": "project\\x\\candidate\\verification-c37097d7a49f496c8dd00e2b441a73de\\saved\\retained-Parameters.json",
+              "Model/3D/Model.mod": "project\\x\\candidate\\verification-c37097d7a49f496c8dd00e2b441a73de\\saved\\retained-Model.mod",
+              "Model/simulationproperties.json": "project\\x\\candidate\\verification-c37097d7a49f496c8dd00e2b441a73de\\saved\\retained-simulationproperties.json"
+            }
+          },
+          {
+            "path": "project\\y\\candidate\\definition.cst",
+            "sha256": "aff6fc527b3b8e88367f0784fff41693b334b3158a5760f1f43646f3898e968a",
+            "bytes": 34353,
+            "retained": {
+              "Model/Parameters.json": "project\\y\\candidate\\retained-Parameters.json",
+              "Model/3D/Model.mod": "project\\y\\candidate\\retained-Model.mod",
+              "Model/simulationproperties.json": "project\\y\\candidate\\retained-simulationproperties.json"
+            }
+          },
+          {
+            "path": "project\\y\\candidate\\verification-3ab4b3269290486685e14c82221b85ab\\reopened\\definition.cst",
+            "sha256": "ce886ecaf11dac44ebc402d174ba65b628481e26c02d1d075dd8bfaed54357ef",
+            "bytes": 36201,
+            "retained": {
+              "Model/Parameters.json": "project\\y\\candidate\\verification-3ab4b3269290486685e14c82221b85ab\\reopened\\retained-Parameters.json",
+              "Model/3D/Model.mod": "project\\y\\candidate\\verification-3ab4b3269290486685e14c82221b85ab\\reopened\\retained-Model.mod",
+              "Model/simulationproperties.json": "project\\y\\candidate\\verification-3ab4b3269290486685e14c82221b85ab\\reopened\\retained-simulationproperties.json"
+            }
+          },
+          {
+            "path": "project\\y\\candidate\\verification-3ab4b3269290486685e14c82221b85ab\\saved\\definition.cst",
+            "sha256": "fb10a365cbff41e2a3734a802dcda1210c802b2e4bad823140dc6183198b11bd",
+            "bytes": 36187,
+            "retained": {
+              "Model/Parameters.json": "project\\y\\candidate\\verification-3ab4b3269290486685e14c82221b85ab\\saved\\retained-Parameters.json",
+              "Model/3D/Model.mod": "project\\y\\candidate\\verification-3ab4b3269290486685e14c82221b85ab\\saved\\retained-Model.mod",
+              "Model/simulationproperties.json": "project\\y\\candidate\\verification-3ab4b3269290486685e14c82221b85ab\\saved\\retained-simulationproperties.json"
+            }
+          },
+          {
+            "path": "project\\z\\candidate\\definition.cst",
+            "sha256": "7407e58d284aef9bd4c1fbd376fdfe19083520673e0892ca69457b853aaf287b",
+            "bytes": 34354,
+            "retained": {
+              "Model/Parameters.json": "project\\z\\candidate\\retained-Parameters.json",
+              "Model/3D/Model.mod": "project\\z\\candidate\\retained-Model.mod",
+              "Model/simulationproperties.json": "project\\z\\candidate\\retained-simulationproperties.json"
+            }
+          },
+          {
+            "path": "project\\z\\candidate\\verification-d3fc369651304b43ab59a8c1fdd9ed8f\\reopened\\definition.cst",
+            "sha256": "acfc281d6a9cc39d0daaf6e3bf463129fe8a536d811aeda363a5e314449560cd",
+            "bytes": 36202,
+            "retained": {
+              "Model/Parameters.json": "project\\z\\candidate\\verification-d3fc369651304b43ab59a8c1fdd9ed8f\\reopened\\retained-Parameters.json",
+              "Model/3D/Model.mod": "project\\z\\candidate\\verification-d3fc369651304b43ab59a8c1fdd9ed8f\\reopened\\retained-Model.mod",
+              "Model/simulationproperties.json": "project\\z\\candidate\\verification-d3fc369651304b43ab59a8c1fdd9ed8f\\reopened\\retained-simulationproperties.json"
+            }
+          },
+          {
+            "path": "project\\z\\candidate\\verification-d3fc369651304b43ab59a8c1fdd9ed8f\\saved\\definition.cst",
+            "sha256": "270749d0d1ec6b474f561251e22a15da88a0e2ed271718ae60defb700797288b",
+            "bytes": 36198,
+            "retained": {
+              "Model/Parameters.json": "project\\z\\candidate\\verification-d3fc369651304b43ab59a8c1fdd9ed8f\\saved\\retained-Parameters.json",
+              "Model/3D/Model.mod": "project\\z\\candidate\\verification-d3fc369651304b43ab59a8c1fdd9ed8f\\saved\\retained-Model.mod",
+              "Model/simulationproperties.json": "project\\z\\candidate\\verification-d3fc369651304b43ab59a8c1fdd9ed8f\\saved\\retained-simulationproperties.json"
+            }
+          }
+        ]
+      }
+    ],
+    "raw_models_removed": true,
+    "companion_directories_removed": true,
+    "pytest_temporary_directories_removed": true
+  },
+  "offline_validation": {
+    "passed": 271,
+    "skipped": 1,
+    "seconds": 148.79,
+    "xml": "artifacts/w23-final.xml",
+    "skip_reason": "optional mcp dependency absent; SDK module collection skipped",
+    "sets_overlap": true
+  },
+  "post_acceptance_mapping_check": {
+    "axes": [
+      "x",
+      "y",
+      "z"
+    ],
+    "outer_fragments_match_final_after_owned_injection": true
+  },
+  "closeout_validation": {
+    "tests": 11,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 11.402,
+    "repository_registry_valid": true,
+    "calibration_gate_valid": true,
+    "diff_check_passed": true
+  }
+}

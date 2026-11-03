@@ -1,5 +1,7 @@
 # V06新增来源边界（2026-10-28，只读）
 
+> 适用性复审（2026-11-03）：按本条原日期、来源/样本范围引用；原当前/未实现/进程或artifact存在性不作实时保证。本次不复验原数据或外部结论，现行执行见[当前状态](../docs/current-status.md)。
+
 本轮只读固定cst_version源码和仓库Pillbox/Enlarged，原文件hash前后未变；没有启动CST、求解、保存工程或修改共享读取器。设计和用例入口：[V06合同](../docs/cst-settings-v06-acceptance-plan.md)。
 
 ## 源码定义

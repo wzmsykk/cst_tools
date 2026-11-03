@@ -1,6 +1,8 @@
 # Worker协作停止与HOM计算覆盖续跑
 
-2026-10-14。恢复依据为已确认计算覆盖，不是找到的最高模式频率；确认无模式的窗口也推进覆盖。
+现行收尾以[收尾v2](close-receipt-v2.md)、[任务局部恢复](parameter-restore-close-budget.md)和[停止意图对账](recovery-exit-audit-implementation.md)为准：只撤销本任务修改并删除新增参数；求解失败Worker退役，后续从processed.cst新建。下文“最后良好参数”不是每轮全量参数恢复的要求。
+
+2026-10-14原始实现记录。恢复依据为已确认计算覆盖，不是找到的最高模式频率；确认无模式的窗口也推进覆盖。
 
 ## 停止路径
 
@@ -29,11 +31,11 @@ AdaptiveHomScanner在每个区间进入求解前原子保存检查点，将当�
 
 已有checkpoint或scan_manifest而未选择继续时，应用准备阶段（创建Manager之前）及算法入口均拒绝从头运行；即使检查点丢失也不根据已有manifest静默重算覆盖。检查点丢失应恢复账本或新建目录，不凭结果频率猜空区间。需要重算请用新项目目录。继续加载原策略、工程身份/快照哈希、已有结果和待处理区间；失败缺口仍补算，不因后面有较远结果跳过。尚未完成的当前求解区间可能需重新求解，但绝不从扫描起点重放已确认区间；CST求解器内部进度续算未实现。
 
-## 验收与TODO
+## 2026-10-14验收与当时TODO
 
 离线验证启动/步骤钩子、后处理生成开关、停止发布不取任务锁、空窗口推进、求解中停止保留pending、缺口限制frontier、拒绝从头覆盖及既有恢复测试。宏字符串检查不是真实CST退出证明。
 
-本批最终离线537 passed、19 integration deselected，包含文档与事件索引门禁。轻量报告artifacts/cooperative-stop-resume-20261014.xml不保证随Git迁移；本轮模型/pytest临时目录已清理，真实CST中断/保留/正常退出未执行。
+本批最终离线537 passed、19 integration deselected，包含文档与事件索引门禁。轻量报告artifacts/cooperative-stop-resume-20261014.xml不保证随Git迁移；本轮模型/pytest临时目录已清理，该批真实CST中断/保留/正常退出未执行；后续串行实测见[HOM中断L5](hom-interruption-l5-acceptance.md)，不再把原批次待验状态视为全项目未验。
 
 TODO：串行副本实测启动、参数、重建后、Solver返回后、后处理条目、Backup/Ack停止；核对interrupted-project.cst及同名结果目录、StopAck、正常进程退出；GUI加载期间即时取消、保留求解后的仅后处理恢复自动化仍待做。不得删除活跃工作副本或原工程，不把离线测试宣称真实中断验收。
 

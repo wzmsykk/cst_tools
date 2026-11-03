@@ -1,5 +1,7 @@
 # 首阶段统一接口契约：参数化建模到单次仿真结果
 
+> 适用性复审（2026-11-03）：冻结设计/验收目标，非生产API清单；原候选名称、旧尚未实现及待办只在设计时点成立。现行实现见[当前状态](current-status.md)、[功能索引](feature-index.md)及对应API；不重算或追认旧证据。
+
 ## 阅读范围（2026-11-02）
 
 以下编号章节为冻结的设计契约，保留其字段、作用域与迁移细节；其中“本轮/尚未实现/下一步”描述设计时点，不作为现代码状态。已实现并真实验收的是[公共单次/G03及G04子链](single-simulation-service.md)，未完成的是公开建模/发布、MCP宿主与完整迁移。实施进度统一查[当前状态](current-status.md)和[TODO](minimal-python-vba-todo.md)。不把设计接口当已上线API。
@@ -144,7 +146,7 @@ bootstrap路线是本轮设计选择，未运行/未宣称已通过；不满足�
 
 ## 空工程首实现的异步返回边界（2026-11-02）
 
-create_project当前首子集固定mws/mm/MHz，经原Runner start(kind=definition)返回受理run_id；新get_operation_result(run_id)读取最终document_id/document_revision/源hash/关闭证据。inspect_model仅空文档身份与hash，不宣称已实现完整实体/材料回读。其余typed变更/configure/save/close仍按上文目标待实现。新建使用已核查安装自带Python/官方DE.pid，详情见[实际入口](project-creation-service.md)。
+create_project当前首子集固定mws/mm/MHz，经原Runner start(kind=definition)返回受理run_id；新get_operation_result(run_id)读取最终document_id/document_revision/源hash/关闭证据。inspect_model仅空文档身份与hash，不宣称已实现完整实体/材料回读。typed变更/configure/save/close已由当前类型化服务实现；本页原字段草案不替代生产Schema。新建使用已核查安装自带Python/官方DE.pid，详情见[实际入口](project-creation-service.md)。
 
 ## 2026-11-03 实施边界修订
 

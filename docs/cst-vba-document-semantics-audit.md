@@ -1,5 +1,7 @@
 # CST2022 VBA调用语义审计
 
+> 适用性复审（2026-11-03）：原批次实施/故障/验收记录；旧当前、未提交、待做及现场进程状态不代表本次实时事实。现行实现见[当前状态](current-status.md)、[功能索引](feature-index.md)及对应API；不重算或追认旧证据。
+
 最新[历史持久性及真实失败对照](cst-history-persistence-and-solver-failure.md)发现Start返回1但求解器拒绝且无结果的CST2022反例；Managed新增solver-result门禁已真实通过。文档返回值契约不能单独作为成功证明。
 
 日期：2026-10-13。基于安装版Online Help与仓库vendor帮助，不以函数名推断语义。本次覆盖三个Worker模板、HOM预处理、正式场导出、Simple/Complex核心入口及独立效率探针；并非全部ModeRec算法或每个积分公式的完整物理验证。

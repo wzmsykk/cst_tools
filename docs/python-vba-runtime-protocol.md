@@ -1,5 +1,7 @@
 # CST Python / VBA Runtime Protocol
 
+> 适用性复审（2026-11-03）：冻结设计/验收目标，非生产API清单；原候选名称、旧尚未实现及待办只在设计时点成立。现行实现见[当前状态](current-status.md)、[功能索引](feature-index.md)及对应API；不重算或追认旧证据。
+
 L5[采用标记对账](checkpoint-adoption-l5.md)补齐检查点确认后的receipt/RunStore状态，复用TaskID，Python/VBA wire格式不变；对账不触发Solver或重复导入。
 
 L5停止/ACK补验：成功received/acknowledged未被算法采用且Completion已清理时仍须恢复；恢复决定绑定received_task_id，不改变Task/ACK/close.receipt格式。十二个真实时点与已修缺口见[验收记录](stop-ack-l5-acceptance.md)。

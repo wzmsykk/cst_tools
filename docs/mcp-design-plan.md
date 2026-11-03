@@ -1,5 +1,7 @@
 # CST Tools MCP 接入设计与分阶段计划
 
+> 适用性复审（2026-11-03）：冻结设计/验收目标，非生产API清单；原候选名称、旧尚未实现及待办只在设计时点成立。现行实现见[当前状态](current-status.md)、[功能索引](feature-index.md)及对应API；不重算或追认旧证据。
+
 
 架构决策更新：以[MCP优先、CST Tools共用底层](mcp-framework-static-design.md)为最新约束。此前mcp_service专属业务层及“仅允许Runner小幅增量”的限制已被替代：按统一契约迁移旧底层，GUI/CLI/MCP共用公共应用服务；旧源码映射仍是现状证据，不是目标接口保证。
 

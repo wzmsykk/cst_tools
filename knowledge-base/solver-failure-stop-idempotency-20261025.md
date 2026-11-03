@@ -1,5 +1,7 @@
 # 现场失败与重复停止发布
 
+> 适用性复审（2026-11-03）：按本条原日期、来源/样本范围引用；原当前/未实现/进程或artifact存在性不作实时保证。本次不复验原数据或外部结论，现行执行见[当前状态](../docs/current-status.md)。
+
 2026-10-25，[完整证据及修正](../docs/solver-failure-stop-idempotency-20261025.md)。来源59条用户JSONL，原始文本只留artifacts/solver-failure-stop-20261025，不保证随Git迁移。
 
 日志中188个已确认采用TaskID续跑通过；新任务约3313.6秒后SOLVER_FAILED，ACK完成并retiring。随后两次120秒关闭均缺StopAck/close.receipt/退出观测，第二层Manager停止发布再次写已有stop.request，抛FileExistsError。

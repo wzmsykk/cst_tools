@@ -1,5 +1,7 @@
 # CST设置受控副本校准（2026-10-28）
 
+> 适用性复审（2026-11-03）：按本条原日期、来源/样本范围引用；原当前/未实现/进程或artifact存在性不作实时保证。本次不复验原数据或外部结论，现行执行见[当前状态](../docs/current-status.md)。
+
 ## 范围和证据身份
 
 本轮获得V01–V06受控副本授权；只在Pillbox副本进行设置、保存、Backup、重开查询及指定的表达式Rebuild，不调用Solver.Start。原工程不写入，不连接全局Active3D，不强杀进程。运行工具：[calibrate_cst_settings.py](../test/support/calibrate_cst_settings.py)，入口`main`、宏生成`render`、归属/退出核对`run`；安全测试：[cst_settings_calibration_test.py](../test/cst_settings_calibration_test.py)。工具是验收探针，尚未接入公共设置验证器。

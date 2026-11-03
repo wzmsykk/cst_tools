@@ -1,5 +1,7 @@
 # L1：统一会话关闭证据核验
 
+> 适用性复审（2026-11-03）：原批次实施/故障/验收记录；旧当前、未提交、待做及现场进程状态不代表本次实时事实。现行实现见[当前状态](current-status.md)、[功能索引](feature-index.md)及对应API；不重算或追认旧证据。
+
 日期：2026-10-24。对应[生命周期协议L1–L5](python-vba-lifecycle-protocol-v2-plan.md)。本轮实现L1，Task/Completion/Ack/Stop v1与VBA宏不变；L2–L5仍待做，不接受退出1、不启用close.receipt v2。
 
 后续同日L2增补：[v2 codec/静态门禁](close-receipt-v2.md)已实施并接入声明v2目录的附加阻断；上段是L1完成时范围。生产宏仍v1，L3–L5继续pending，不把v2回执代替退出4旧凭据。

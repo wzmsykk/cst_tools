@@ -1,5 +1,7 @@
 # 本地修正迁移核对（2026-10-28）
 
+> 适用性复审（2026-11-03）：原批次实施/故障/验收记录；旧当前、未提交、待做及现场进程状态不代表本次实时事实。现行实现见[当前状态](current-status.md)、[功能索引](feature-index.md)及对应API；不重算或追认旧证据。
+
 对照远程 `17a4cc0`、本地 `b764ab0` / `8288a77` / `7586263` 和拉取前 stash。采用当前 Typed Worker、HomScanAlgorithm、Runner 与 HOM 工作台接口，不整体覆盖远程文件。旧分支与 stash 保留；用户本机 config/current.ini 不在迁移范围。
 
 ## 对照结果

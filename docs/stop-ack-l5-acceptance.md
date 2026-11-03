@@ -1,5 +1,7 @@
 # L5 停止与任务 ACK 时序验收
 
+> 适用性复审（2026-11-03）：原批次实施/故障/验收记录；旧当前、未提交、待做及现场进程状态不代表本次实时事实。现行实现见[当前状态](current-status.md)、[功能索引](feature-index.md)及对应API；不重算或追认旧证据。
+
 后续[六类GUI/Runner实际进程退出](controller-exit-l5-acceptance.md)补验已完成；下文OS级Controller退出pending为本章当时边界，整机掉电、任意指令级窗口等仍pending。
 
 日期2026-10-24，CST2022.5；延续[首轮真实验收](close-v2-l5-acceptance.md)。

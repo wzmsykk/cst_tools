@@ -143,6 +143,9 @@
               "repository-and-package",
               "package-only"
             ]
+          },
+          "review": {
+            "$ref": "#/$defs/document_review"
           }
         }
       }
@@ -368,6 +371,61 @@
         },
         "symbol": {
           "type": "string"
+        }
+      }
+    },
+    "document_review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "date",
+        "baseline",
+        "status",
+        "scope",
+        "checked_sources",
+        "finding_ids",
+        "limitations"
+      ],
+      "properties": {
+        "date": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        },
+        "baseline": {
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "operational-and-applicability-reviewed",
+            "historical-scope-reviewed",
+            "design-scope-reviewed",
+            "external-source-scope-reviewed",
+            "generated-template-reviewed",
+            "applicability-only-reviewed"
+          ]
+        },
+        "scope": {
+          "type": "string"
+        },
+        "checked_sources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/locator"
+          }
+        },
+        "finding_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^S[0-9]+$"
+          }
+        },
+        "limitations": {
+          "type": "string"
+        },
+        "content_sha256_at_review": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
         }
       }
     }

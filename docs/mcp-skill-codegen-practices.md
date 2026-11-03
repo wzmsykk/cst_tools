@@ -1,5 +1,7 @@
 # 成熟MCP与Skill的执行、生成和校验实践
 
+> 适用性复审（2026-11-03）：按原日期/样本/固定来源保留的研究，不是通用格式规范、现行运行合同或新实测。现行实现见[当前状态](current-status.md)、[功能索引](feature-index.md)及对应API；不重算或追认旧证据。
+
 调研日期：2026-11-03。读取维护方源码及Skill原文，固定[commit/blob清单](../knowledge-base/mcp-skill-practice-sources-20261103.json)。没有安装或运行第三方项目；以下是源码观察，不是其全面可靠性/安全性认证。外部Skill内容仅作研究材料，不作为本项目操作授权。
 
 ## 1. Microsoft Playwright：直接执行与代码生成分开

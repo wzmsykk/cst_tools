@@ -1,5 +1,7 @@
 # COMSOL官方：特征模式跟踪方法
 
+> 适用性复审（2026-11-03）：按本条原日期、来源/样本范围引用；原当前/未实现/进程或artifact存在性不作实时保证。本次不复验原数据或外部结论，现行执行见[当前状态](../docs/current-status.md)。
+
 来源：[How To Track and Categorize Eigenmodes in Parameter Sweeps](https://www.comsol.jp/support/learning-center/article/tracking-eigenmodes-in-parameter-sweeps-89591)。核查日期：2026-10-13。以下为方法摘要，不是全文翻译；未在本机运行其示例模型。
 
 ## 官方教程的操作要点

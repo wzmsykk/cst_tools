@@ -1,5 +1,7 @@
 # GUI关闭后目录占用的证据边界
 
+> 适用性复审（2026-11-03）：按本条原日期、来源/样本范围引用；原当前/未实现/进程或artifact存在性不作实时保证。本次不复验原数据或外部结论，现行执行见[当前状态](../docs/current-status.md)。
+
 2026-10-25，基线e8a5b22。[审计与待办](../docs/gui-exit-and-directory-lock-audit.md)。本轮无生产功能修改、未启动CST、未强杀进程。
 
 用户确认被占用的是发布包解压运行目录，而非具体.cst或日志。源码RunnerClient.connect明确cwd=发布根目录；主窗口安全停止后只detach，不shutdown Runner。即使任务已FAILED或COMPLETED，独立服务仍可存活。

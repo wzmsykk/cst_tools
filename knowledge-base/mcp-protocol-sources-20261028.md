@@ -1,5 +1,7 @@
 # MCP官方规范固定来源与SHA256
 
+> 适用性复审（2026-11-03）：按本条原日期、来源/样本范围引用；原当前/未实现/进程或artifact存在性不作实时保证。本次不复验原数据或外部结论，现行执行见[当前状态](../docs/current-status.md)。
+
 日期：2026-10-28；规范基线：2026-07-28。官方Schema提交：`ccaf9102ec5eb656eab50ca8333ef49dcd259c26`。
 
 完整阅读范围与解释见[mcp-protocol-reading-20261028.md](mcp-protocol-reading-20261028.md)。原文快照位于artifacts/mcp-authoritative-reading-20261028，不保证随Git迁移；此表为轻量来源记录。

@@ -25,15 +25,15 @@ Loopback Runner继续使用Bearer认证、client_id控制租约、request_id幂�
 {"operation":"start","payload":{"kind":"simulation","document_id":"document-a","definition_revision":"<server revision>"}}
 ```
 
-示例省略schema_version/request_id/client_id等既有命令信封字段。simulation payload**恰含这三项**；source_project、installation路径、参数覆盖、algorithm、postprocess、resume、worker_count、ready等都拒绝。模式是明确新执行，重连不得隐式重算。公共D14 submit_run将来映射到此内部传输，不宣称完整九操作或现代MCP信封已经实现。
+示例省略schema_version/request_id/client_id等既有命令信封字段。simulation payload**恰含这三项**；source_project、installation路径、参数覆盖、algorithm、postprocess、resume、worker_count、ready等都拒绝。模式是明确新执行，重连不得隐式重算。现有MCP submit_run已映射到此内部传输；该内部HTTP信封仍不等于MCP wire format。
 
-GET `/simulation-results?run_id=...&result_revision=...`以及`RunnerClient.simulation_results`查询同一服务。业务错误仍通过明确HTTP响应返回，新增code字段；不把DEFINITION_NOT_READY/RESULT_CHANGED当作丢失连接。现代MCP适配器九工具已在当前桌面调用通过；新增五个typed/导出工具的SDK真实链已验，桌面完整调用和GUI/CLI完整迁移尚未完成。
+GET `/simulation-results?run_id=...&result_revision=...`以及`RunnerClient.simulation_results`查询同一服务。业务错误仍通过明确HTTP响应返回，新增code字段；不把DEFINITION_NOT_READY/RESULT_CHANGED当作丢失连接。2026-11-02记录了九工具桌面子集通过，本次未重新盘点宿主；新增五个typed/导出工具的SDK真实链已验，桌面完整调用和GUI/CLI完整迁移尚未完成。
 
 ## 定义、验证与身份
 
 定义在control/definitions/<document>/<revision>/保存definition.cst与definition.json。revision覆盖document、源hash、配置、安装引用及积分轴；元数据被改、文件变化、跨project或目录逃逸均拒绝。验证端口的proof须绑定同一source_sha256、root和verified状态，具备saved-reopened/identity/settings/standard-close四组门禁。此端口负责真实证据，不能通过客户端JSON注册回调或注入字段。默认提供NativeDefinitionVerifier；可信假端口仅用于测试，不构成真实验收。
 
-stage_definition不是完整create_project/apply_model_changes/configure_simulation实现；document_revision编辑与候选发布事务仍待后续。冻结候选只复制.cst，不继承外部同名结果；执行时保存的结构/设置由原有历史重建。参数表达式保留，不传运行中参数覆盖或HOM窗口。
+stage_definition不是完整create_project/apply_model_changes/configure_simulation实现；document_revision编辑与候选发布事务已在definition_editing和公共typed工具接入，见typed-definition-service.md。冻结候选只复制.cst，不继承外部同名结果；执行时保存的结构/设置由原有历史重建。参数表达式保留，不传运行中参数覆盖或HOM窗口。
 
 公共definition_revision现在贯穿提交、Managed配置、RunStore采集binding及结果。Native prepare接受所有者的明确revision，另外保存configuration_digest核对源hash/config/批准历史；独立B4没有公共定义时继续以配置摘要建立身份，不能混淆两种摘要。task/session/nonce仍由服务端创建，客户端不能指定。
 

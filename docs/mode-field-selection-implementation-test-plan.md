@@ -1,5 +1,7 @@
 # COMSOL式场匹配：实现与验收计划
 
+> 适用性复审（2026-11-03）：冻结设计/验收目标，非生产API清单；原候选名称、旧尚未实现及待办只在设计时点成立。现行实现见[当前状态](current-status.md)、[功能索引](feature-index.md)及对应API；不重算或追认旧证据。
+
 日期：2026-10-13。依据：[算子流程选择](postprocess-operator-execution-plan.md)、[效率验收](cst-field-efficiency-acceptance-20261013.md)、[COMSOL方法摘要](../knowledge-base/comsol-eigenmode-tracking.md)。范围是参考场匹配及极化模族诊断；本文描述计划，实际交付与未通过门禁见[六阶段实施记录](mode-field-selection-implementation-status.md)。
 
 ## 1. 目标与不变边界

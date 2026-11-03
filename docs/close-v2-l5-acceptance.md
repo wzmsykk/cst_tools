@@ -1,5 +1,7 @@
 # L5 WinWrap / CST 串行副本验收
 
+> 适用性复审（2026-11-03）：原批次实施/故障/验收记录；旧当前、未提交、待做及现场进程状态不代表本次实时事实。现行实现见[当前状态](current-status.md)、[功能索引](feature-index.md)及对应API；不重算或追认旧证据。
+
 后续[十二个停止/ACK时点](stop-ack-l5-acceptance.md)已真实补验，并修复Completion清理后待采用received记录的发现缺口。下文“完整停止时序pending”保留首轮范围，OS级Controller崩溃/任意指令级停止仍未覆盖。
 
 日期2026-10-24，CST2022.5（2022-06-03，change981760）。本轮原工程为test/data/Pillbox/Pillbox.cst，SHA256 `7b63939b2dbed3de567aa55a5ff19cb69e7447245882a691be15d28580f1ddfa`。

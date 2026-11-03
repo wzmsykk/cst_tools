@@ -1,5 +1,7 @@
 # 恢复标志与会话安全不是同一状态
 
+> 适用性复审（2026-11-03）：按本条原日期、来源/样本范围引用；原当前/未实现/进程或artifact存在性不作实时保证。本次不复验原数据或外部结论，现行执行见[当前状态](../docs/current-status.md)。
+
 2026-10-20现场输入：application.jsonl仅12条初始化/拒绝续跑事件；project.ini为RECOVERY_REQUIRED，Runner status为FAILED、initializing、confirmed-closed。没有本轮求解开始的证据，不能将其解释为CST计算失败。
 
 源码核查确认：普通续跑只重置FAILED；后端异常分支和Runner仅会话检测遗漏持久恢复标志。新恢复后端未加载配置，旧顺序还可能在释放锁、打印完成后才写状态失败。这是Python控制层缺陷，不是新发现的CST API语义。

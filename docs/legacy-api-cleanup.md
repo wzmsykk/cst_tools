@@ -1,5 +1,7 @@
 # Python API 清理记录
 
+> 适用性复审（2026-11-03）：原批次实施/故障/验收记录；旧当前、未提交、待做及现场进程状态不代表本次实时事实。现行实现见[当前状态](current-status.md)、[功能索引](feature-index.md)及对应API；不重算或追认旧证据。
+
 生产 Backend、Manager、Worker、算法与后处理接口已迁移到 snake_case。
 
 | 原调用 | 当前调用 |

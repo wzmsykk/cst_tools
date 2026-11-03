@@ -1,5 +1,7 @@
 # 缺失模式后处理与同Worker恢复验收
 
+> 适用性复审（2026-11-03）：原批次实施/故障/验收记录；旧当前、未提交、待做及现场进程状态不代表本次实时事实。现行实现见[当前状态](current-status.md)、[功能索引](feature-index.md)及对应API；不重算或追认旧证据。
+
 日期：2026-10-13，CST2022.5。入口：`test/support/validate_missing_mode_recovery.py`。
 
 ## 设计

@@ -1,6 +1,6 @@
 # W0：WinWrap 调用、CST 持久化与诊断核查
 
-日期：2026-11-03。**静态核查完成，原生能力校准未完成**；本轮没有启动CST、求解或修改原工程。依据是随本机CST 2022保留的WinWrap v9三份CHM、CST宏概述和3D Application Object帮助，以及现行生成器源码。来源和topic hash见[来源清单](../knowledge-base/winwrap-w0-sources-20261103.json)。后续实施遵循[W0–W3方案](winwrap-codegen-safety-plan.md)。
+日期：2026-11-03。**静态契约及后续核心宿主校准已有记录；W0–W3已接受限A1保存链；更广语言/宏仍未完成**。静态来源与本次无求解副本证据分层，当前实现和实测见[W01记录](winwrap-w01-implementation.md)。依据是随本机CST 2022保留的WinWrap v9三份CHM、CST宏概述和3D Application Object帮助，以及现行生成器源码。来源和topic hash见[来源清单](../knowledge-base/winwrap-w0-sources-20261103.json)。后续实施遵循[W0–W3方案](winwrap-codegen-safety-plan.md)。
 
 ## 1. 语言与调用规范
 
@@ -10,7 +10,7 @@
 
 |构造|文档约束|本项目生成规范|
 |---|---|---|
-|Sub/丢弃返回值的调用|`Call name[(arglist)]`或`name [arglist]`；省略Call的Sub实参表不能整体括号包围；doc_call_instr.htm|区分语句调用与返回值表达式。当前裸调用保持既有已验形态；`Call obj.Method(...)`作为待宿主校准候选，不能立即全量替换|
+|Sub/丢弃返回值的调用|`Call name[(arglist)]`或`name [arglist]`；省略Call的Sub实参表不能整体括号包围；doc_call_instr.htm|区分语句调用与返回值表达式。当前裸调用保持既有已验形态；`Call .Zrange(...)`已通过核心语法检查，实际执行/重放在W01小圆柱样本通过，不能立即全量替换|
 |函数返回值|需要返回值时用于表达式；Call形式会丢弃返回值|`If Not AddToHistory(caption, history) Then ...`与无返回值setter分开建模|
 |With|`With objexpr … End With`内`.method/.property`属于该对象；doc_with_stmt.htm|对象身份在进入块前确定；不把文档Project Object分类当作可用的全局Project变量|
 |参数/数组|非ByVal且实参仅为变量时按引用；表达式不是同一引用语义；数组必须引用，不能按值；pop_paramz_popup.htm|字符串、数值表达式、数组变量分别发射；不能为统一格式给所有实参加括号，防止影响ByRef/输出参数|
@@ -24,7 +24,7 @@ CST[宏概述](../knowledge-base/vendor/cst-2022-vba-help/vba/vba_macro_language
 
 现行`definition_editing.render_history`把受限Python AST转换为WinWrap算术，并加`0+`避免裸多参调用首实参以左括号起始。已保留的真实记录说明原`.Zrange ((-RestoreDoubleParameter("L"))/2), ...`失败、加前缀版本成功，见[原验收](typed-public-acceptance-20261103.md)。Call文档支持其调用形态解释，但没有证明所有以括号开头的表达式都非法，也没有证明所有COM方法支持同一种替代形式。W1不得把局部观察提升成通用语法定理。
 
-本轮未找到并核实统一的物理行/续行硬上限；当前24字符分段是实现的保守策略，不是WinWrap文档规定的长度。继续保留，W2用边界样本校准。自动引入临时变量也需先验证历史顶层声明作用域、重名和重放行为，不能直接作为已可靠修复。
+本轮未找到并核实统一的物理行/续行硬上限；W01已观测若干长行/续行样本，详见[实施记录](winwrap-w01-implementation.md)，未求出全局硬边界。当前24字符分段是实现的保守策略，不是WinWrap文档规定的长度。继续保留，W2用边界样本校准。自动引入临时变量也需先验证历史顶层声明作用域、重名和重放行为，不能直接作为已可靠修复。
 
 ## 2. CST 接口与持久化边界
 
@@ -48,14 +48,14 @@ CST[宏概述](../knowledge-base/vendor/cst-2022-vba-help/vba/vba_macro_language
 
 ## 3. 原生检查与诊断：区分脚本作者和宿主开发者
 
-### 优先校准：脚本级 MacroCheckThis
+### 核心已校准：脚本级 MacroCheckThis
 
 WinWrap v9 WWB-COM语言帮助明确列出：
 
 - `MacroCheckThis(MacroCode$)`检查代码、不执行该宏/模块；语法错误返回Err对象，无错返回Nothing。示例声明`Dim E As ErrObject`并读取`E.Description`。
 - `MacroCheck(MacroName$)`检查指定名称的宏/模块，同样返回错误对象或Nothing；它不是任意路径解析的保证。
 
-来源topic：`doc_macrocheckthis_func.htm`、`doc_macrocheck_func.htm`。这是**文档化的原生检查候选**，无需自行开发完整WinWrap编译器；但本轮未证明CST2022实际允许调用、是否继承CST全局方法/参数上下文、是否有弹窗，也未证明返回对象具有行列字段。`E.Description`有示例依据；不能把控件ErrorLine移接到这个对象上。
+来源topic：`doc_macrocheckthis_func.htm`、`doc_macrocheck_func.htm`。这是文档化原生入口；本机2022.5的14样本已证明可调用、限定CST上下文和Sub正文不执行，见[实测](cst-macrocheck-w0-20261103.md)。诊断读取Description/Source，Source观察到行/语句；没有Line/Column成员或通用列号保证，不能从核心样本推出所有上下文/初始化无副作用。`E.Description`有示例依据；不能把控件ErrorLine移接到这个对象上。
 
 外层完整模块与内层历史须分别检查。内层不是完整Main模块时，候选检查器需要固定包装；包装插入行数应进入source map。包装通过不证明AddToHistory顶层语义相同，更不证明建模执行成功；W3仍保留实际历史执行/保存重开。原生检查需要一个已启动的宿主，因此不能叫作“启动CST前离线编译”。离线受限检查与宿主内、模型修改前的检查是两道门禁。
 
@@ -71,38 +71,16 @@ CST Application Object另有ReportError：显示消息框、停止当前VBA求�
 
 原生Python的`cst.interface.studio.py`只是对二进制`_cst_interface`的薄包装，静态阅读没有证明存在纯编译接口；同样不能因Python文件没有方法定义而声称二进制API绝无此能力。本轮没有导入运行或调用这些二进制对象。
 
-## 4. W0收口与下一步校准
+## 4. 当前收口
 
-|项|状态|下一步|
+|项|已核证据|未完成|
 |---|---|---|
-|语言profile、调用/With/ByRef/参数重名规则|本地文档已核实|W1按小范围规则实现，裸调用与Call候选分别留样|
-|首阶段持久化、参数、结果和会话边界|文档与现行profile已对照|保留G03；未知命令仍拒绝，不扩大支持范围|
-|原生检查候选|MacroCheckThis已找到；SyntaxCheck控件权限边界已明确|进行独立串行无求解副本校准后才能接入生产|
-|CST环境下可用性/行列/无弹框/初始化副作用|未实测|不能勾选原生语法门禁通过|
-|统一Call形式、物理行/续行限制|未完成宿主校准|不替换0+或现有分段策略|
+|MacroCheckThis|核心14及扩展23样本；Call实际执行/重放另经W01核验|不是任意宏编译通过或所有COM调用已验|
+|诊断|ErrObject.Description、Source的原始值；Source观察到行/语句|不猜列号或宿主所有错误回调|
+|独立NoUI|激活与清理成功；初始化失败、用户观察eval expired，检查0次|不代表独立编译器可用，不绕过初始化|
+|ANTLR离线PoC|已执行，但接受原始故障反例|不能授予WinWrap通过|
+|W0扩展/W1|Call执行/重放、String数组/Double标量ByRef、长行/续行样本及共享发射器无求解G03通过|受限Sub-only不包含Class/Object初始化钩子；A1门禁见[W23](winwrap-w23-implementation.md)，更广签名/生成器仍待做|
 
-下一轮最小校准只创建本轮空3D副本，0次Solver.Start：固定已验外层驱动分别调用MacroCheckThis检查正常完整模块、明显语法错误、原始Zrange反例、0+版本、Call候选、CST方法/参数引用、中文/多行以及数组/ByRef样本；被检查代码包含写标记的正文以核实检查本身未执行。记录错误对象实际可读字段、是否弹框和source-map包装偏移；不调用错误字段的猜测属性来掩盖原始错误。
+校准工具test/support/calibrate_cst_macrocheck.py及固定样例只在明确授权时运行真实宿主；文档复审不重新运行它。原14项离线静态检查、13项探针回归与14个真实样本是不同集合，不能相加或互相替代。
 
-检查失败或能力不可用时停止该路径并保留诊断，不把未知降级为通过，不以真正运行错误代码替代语法检查。若MacroCheckThis缺失或不能解析同宿主上下文，W0能力结论更新为unsupported，再采用W3隔离的实际构造/重放门禁；不新增控件依赖。若出现模态框，记录无交互能力尚未满足，不继续叠加启动。
-
-只有正常/反例区分、无正文执行、CST上下文适用性、诊断范围和正常关闭均有证据，才允许将该候选标为可用；当前只是设计与文档核实完成。校准程序/夹具与W1发射器需后续实施，用户原工程不参与。
-
-## 本轮验证与产物
-
-文档索引与既有定义事务回归共14 passed（8.91秒），报告artifacts/w0-static-review-20261103.xml；只证明链接/符号及既有离线契约未回归，不证明WinWrap已编译或CST已执行。git diff --check通过。本轮CHM解包树及pytest临时副本在解析后清理；原始CHM保留，可按来源清单重建topic，不依赖artifacts随Git迁移。
-
-## 轻量检查器后续方向
-
-[开源选型](winwrap-open-source-checker-options.md)已核查ANTLR VB6/VBA、Rubberduck和ViperMonkey。当前优先考虑ANTLR VB6离线PoC，保持MacroCheckThis真实宿主校准待验；通用语法通过不能改变此处原生证据状态。
-
-## 已安装v9入口补充
-
-[静态类型库核查](winwrap-v9-installed-entry.md)进一步确认BasicNoUIObj.SyntaxCheck与独立诊断成员，以及ErrObject无Line/Column成员。原生轻量对象创建/初始化尚未验证；这比“完全没有已核实接口”的旧边界前进，但不改变真实检查待验状态。[ANTLR实际PoC](antlr-vb6-poc-20261103.md)已接受原始Zrange故障形态，不可充当原生通过证明。
-
-## NoUI原生尝试结果
-
-[本轮NoUI实测](winwrap-noui-acceptance-20261103.md)在不启动CST情况下完成对象激活与正常清理，但初始化未通过（用户看到评估到期），语法检查0次。IgnoreDialogs=True没有阻止该初始化提示。W0调用规范仍以文档和既有CST证据为准，本轮没有新增原生语法通过结论。
-
-## 2026-11-03核心宿主校准结果
-
-[验收](cst-macrocheck-w0-20261103.md)现已证明本机2022.5的MacroCheckThis正反例、CST调用上下文子集、诊断Source行/语句、正文不执行与标准关闭。独立NoUI状态未改变；行列中的列号仍未知，Source格式仅按观察解码。原先“本轮未实测”保留为静态核查时点，当前结果以此验收为准。
+[原批次完整记录](archive/20261103-semantic-review/winwrap-w0-contract.md)保留静态核查、原计划、开源/NoUI路线与完整原数字。外部规范原来源/样本范围保持不变，本次不重新认证WinWrap完整语言。

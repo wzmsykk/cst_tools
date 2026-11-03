@@ -1,6 +1,6 @@
 # 首阶段类型化定义事务
 
-更新：2026-11-03。实现位于同一个 ApplicationService、Runner start 槽和 MCP 适配器；没有第二个模型后端或求解队列。输入权威来源为[生产 Schema](../data/first_stage_contract.schema.json)，交叉规则在[定义服务](../csttool/definition_editing.py)。当前已完成Z模型的公开SDK/真实CST与几何/G03核验；指定桌面整链由用户选择稍后验收。
+更新：2026-11-03。实现位于同一个 ApplicationService、Runner start 槽和 MCP 适配器；没有第二个模型后端或求解队列。输入权威来源为[生产 Schema](../data/first_stage_contract.schema.json)，交叉规则在[定义服务](../csttool/definition_editing.py)。当前已完成Z模型的公开SDK/真实CST与几何/G03核验；指定桌面正常链同日已通过，见[桌面记录](codex-desktop-acceptance-20261103.md)。
 
 ## 调用顺序
 
@@ -18,7 +18,7 @@ MCP五个新增工具及参数：
 |close_project|document_id、expected_document_revision、disposition=save/discard_candidate|closed 文档；不会新建或强关原生实例|
 |export_simulation_results|run_id、result_revision、formats=[json,csv]|同步的轻量导出结果及相对项目路径/hash/大小|
 
-加上已有九工具，源码目录现为14工具。当前 Codex 连接实际加载的仍是九工具；新增五工具尚未在当前桌面对话调用，不能把 SDK 测试当成桌面热加载。
+加上已有九工具，源码目录现为14工具。2026-11-02指定桌面九工具属于历史记录；2026-11-03当前对话实际发现14工具，正常链通过，不等同全部故障门禁。
 
 ## 草稿与持久化边界
 
@@ -30,9 +30,15 @@ apply/configure 保存**声明式草稿**，不打开 CST，不声称 live gette
 
 关闭后用共用只读来源核对实际保存的表达式和完整 B2 投影，再交给已有 stage_definition/verify_definition 的两会话 G03。只有该证明 ready 后才发布 saved 文档；草稿和 empty 均不可求解。close(save) 要求已验证保存，不能悄悄丢弃草稿；discard_candidate 关闭逻辑文档但保留历史和诊断。原生对象本来按操作保存关闭，逻辑 close 不等于正在运行时调用 Project.Quit。已发布的不可变定义/结果不因文档关闭撤销。
 
+## 共享WinWrap生成与门禁（W1–W3）
+
+历史、算术/参数引用、字符串赋值及声明已迁入winwrap_emitter，复用同一A1允许表。固定控制模板不变，保留0+和24字符分段；GENERATED_CODE_INVALID在参数与辅助名称冲突、未知节点或800字符保守物理行预算超限时返回。保存预检在写原生执行意图前完成发射，长输入拒绝而不截断；冲突旧草稿须新建文档并显式重命名参数及引用，不原地迁移或提供旧发射器兼容开关。当前A1保存还需独立检查、data版本门禁及会话内MacroCheckThis；源图/实际XYZ/G03与故障拒绝见[W23实施](winwrap-w23-implementation.md)。其它宏不由此授予通过。
+
 ## 支持范围和错误
 
 只支持 root MWS、mm/MHz、零中心单个 Vacuum 圆柱、XYZ轴、PEC背景、电边界、无对称、Default/Tet、固定现代 near/far 密度、nmodes=1、关闭自适应、后处理损耗设置。频率下限必须等于频段 min。Frequency 与 R_over_Q 各一个，后者中心线、轴与圆柱一致、beta=1、full。XYZ这里只是受限投影/渲染能力，真实Z模型已构造并求解通过；不扩大为三轴真实验收。
+
+说明当前只接受非代理字符的BMP文本及无首尾空白形式，保存后仍逐项核对；emoji样本失真/末尾空白消失已留证，拒绝而非自动替换或strip。
 
 最多128个大小写不重名参数，表达式4096字符/既有算术 AST 预算；不支持任意函数、VBA、路径或脚本。quantity 是工程单位语义声明和几何参数引用的检查依据；不是完整符号量纲代数。新几何对象只允许一次，后续改 R/L 参数，不追加第二个圆柱。频段、求解模式和 PPS 严格按 Schema，未知字段和非有限值拒绝。
 
@@ -57,7 +63,7 @@ apply/configure 保存**声明式草稿**，不打开 CST，不声称 live gette
 
 [定义事务测试](../test/definition_editing_test.py)、[来源测试](../test/result_provenance_test.py)、[官方 SDK 测试](../test/mcp_sdk_test.py)、[公开串行工具](../test/support/validate_typed_definition.py)。52项服务/草稿/来源测试、79项生命周期/Runner等回归和6项 SDK/适配测试分批通过，集合重叠，不能相加为全仓回归；最后渲染细化另复验。
 
-Codex 当前对话的九工具空工程创建/检查/同ID重发和正常退出通过，见[轻量证据](../knowledge-base/mcp-codex-g02-public-20261102.json)。后续已排除该失败实例并完成14工具 SDK公开链的真实构造/求解/采用恢复/导出/退出，详见[最新验收](typed-public-acceptance-20261103.md)。指定桌面完整 G01–G08 仍待验。
+2026-11-02指定Codex对话的九工具空工程创建/检查/同ID重发和正常退出有历史通过记录（不是本次实时工具盘点），见[轻量证据](../knowledge-base/mcp-codex-g02-public-20261102.json)。后续已排除该失败实例并完成14工具 SDK公开链的真实构造/求解/采用恢复/导出/退出，详见[最新验收](typed-public-acceptance-20261103.md)。指定桌面正常链已通过[同日验收](codex-desktop-acceptance-20261103.md)，完整故障矩阵仍待验。
 
 最新生产G03增加实体存在/材质/体积、结构盒/计算盒和六边界原生观察；只用官方允许的查询，没有调用受限的GetLooseBoundingBoxOfShape。布尔CStr严格接受True/-1，false/未知拒绝；体积以mm³和解析圆柱容差1e-6核对。保存构造还核对参数expr与descr；原生参数说明不只停留在框架spec。
 
@@ -65,7 +71,7 @@ Codex 当前对话的九工具空工程创建/检查/同ID重发和正常退出�
 
 ## W0调用与持久化边界补充
 
-[W0核查](winwrap-w0-contract.md)明确参数表表达式与历史重放分别验证，AddToHistory立即执行且相同标题可能合并，不是原子事务；失败候选不得发布。MacroCheckThis仅为待CST宿主校准的语法检查候选，当前生产API和ready条件不变；未知诊断能力不会降级成通过。
+[W0核查](winwrap-w0-contract.md)明确参数表表达式与历史重放分别验证，AddToHistory立即执行且相同标题可能合并，不是原子事务；失败候选不得发布。MacroCheckThis核心宿主校准已通过14个无求解样本；W2/W3已在受限A1保存链接入独立检查、版本门禁和会话内历史检查，详见W23实施记录；未知诊断能力不会降级成通过。
 
 ## Windows后台创建/构造
 

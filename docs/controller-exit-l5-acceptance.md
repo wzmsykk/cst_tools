@@ -1,5 +1,7 @@
 # L5 Controller / GUI 意外退出验收
 
+> 适用性复审（2026-11-03）：原批次实施/故障/验收记录；旧当前、未提交、待做及现场进程状态不代表本次实时事实。现行实现见[当前状态](current-status.md)、[功能索引](feature-index.md)及对应API；不重算或追认旧证据。
+
 后续[检查点采用标记补写](checkpoint-adoption-l5.md)已实现，并新增三个真实退出窗口验证；下文首轮receipt仍acknowledged及“补写TODO”保留当时证据，不是现行限制。
 
 2026-10-24，CST2022.5。测试仅结束本轮Popen创建的GUI或Runner Python进程；不结束CST及其进程树，不更改原工程，副本串行。

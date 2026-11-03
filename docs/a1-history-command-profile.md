@@ -48,12 +48,8 @@ B编号沿用[官方语义核查](../knowledge-base/cst-first-stage-api-semantic
 
 Cylinder必须显式Reset及必需属性后Create；不采用文档默认补齐缺失值。不做实际实体布尔/体积验证，不证明内建Vacuum真实存在；这些仍由后续原生副本验收取得。`missing_fields`增加身份、全局频段、mesh生成类型、损耗、背景、边界、WCS和圆柱声明；即使缺失为空，publish_ready仍false。
 
-## 离线验收与剩余范围
+## 测试、接入与限制
 
-[完整样例](../test/fixtures/a1-pillbox-history.vb)为人工规范性历史，不是CST导出或运行产物。配合参数表合成只读容器，实际验证完整XYZ投影、参数变化保留表达式、精确scope/hash、单位/类别缺失或伪造、顺序副作用、禁用命令、错误参数及Reset边界。测试入口[a1_history_profile_test.py](../test/a1_history_profile_test.py)。
+固定人工历史为test/fixtures/a1-pillbox-history.vb，离线测试为test/a1_history_profile_test.py及test/settings_projection_test.py；它们不是CST导出的原始历史。生产公共服务已接入B1/B2、G03与原生采集，公开类型化链已有2026-11-03记录；不能继续把B3/公共链记为尚未实现。完整旧模板、未知编码及允许表外命令仍拒绝。
 
-本轮语义/来源回归138 passed（2.99s），报告`artifacts/b2-a1-semantics-20261102.xml`；包含35项旧H/S/M语义和新增完整A1/故障测试，不是138项CST运行验收。初次旧测试5项失败来自已删除参数与Reset契约的预期变化，已同步迁移后重跑。文档同步后的最终合并结果另记当前状态。
-
-最终143 passed（4.01s），报告`artifacts/b2-a1-complete-20261102.xml`，包含新增编码来源诊断/Python专属数值语法拒绝、54项既有投影测试、66项A1测试、17项B1、4项B0及2项文档索引检查。各轮重叠，不累加。原始源/摘录未改，本轮合成容器及pytest临时目录已清理，保留XML与固定人工历史；artifacts不保证随Git迁移。
-
-完整旧Pillbox包含模板附带其他模块命令，仍unsupported；Enlarged未知编码仍unsupported。没有为了让旧工程“通过”广泛放行对象。下一阶段B3是attempt/revision/执行数据库hash绑定、陈旧性与数值精度判定；B2的任意历史解释、其他单位和旧编码仍不在本首阶段profile支持范围。G03、MCP服务器/宿主握手、实际建模→求解→结果全过程尚未通过。无真实CST启动、用户原工程修改或GUI/Runner执行链迁移。
+[原批次完整记录](archive/20261103-semantic-review/a1-history-command-profile.md)保留2026-11-02的138/143项与当时后续计划；当前门禁见[当前状态](current-status.md)，本次只核对源码，不追认旧数字为新验收。

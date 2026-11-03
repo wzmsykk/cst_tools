@@ -1,5 +1,7 @@
 # G04公共单次服务串行副本验收（2026-11-02）
 
+> 适用性复审（2026-11-03）：原批次实施/故障/验收记录；旧当前、未提交、待做及现场进程状态不代表本次实时事实。现行实现见[当前状态](current-status.md)、[功能索引](feature-index.md)及对应API；不重算或追认旧证据。
+
 目的：通过生产G03后运行公共single-simulation服务一次，核对本次definition/run/task/session、原生执行采集、completion/ACK、结果快照、RunStore采用与正常关闭。使用开发者验收工具创建工程不等于G01真实MCP宿主/G02公开建模接口已通过，不能宣称首阶段完整闭环通过。
 
 工具：`python test/support/validate_single_simulation.py --cst-exe <授权安装> --run-cst`。真实调用串行，先检查空闲及磁盘；R=100mm、L=100mm，500–2000MHz、Tet cell=4、nmodes=1，背景PEC内部真空。参数保留表达式，持久设置进历史，G03验证在求解前完成；无求解总超时。

@@ -45,14 +45,6 @@ already_offline只表示已核验Runner所有权释放及允许本次退出的�
 
 ## 测试与证据边界
 
-- 核心147 passed（55.25s）：Runner、恢复、Worker、Backend、采用、导出、生命周期等；artifacts/audit-core-final-20261102.xml。
-- 恢复/项目状态/故障阶段30 passed（5.12s，重叠），以及故障/协议/CLI及索引最终21 passed（5.44s，重叠）；audit-stage-final与audit-final-small报告。
-- GUI Runner/导出27 passed（101.26s）；随后新增/修改分支专项5 passed（7.93s，重叠），导出最后4 passed（0.46s，重叠）。audit-gui-final、audit-gui-new及audit-export-final报告。
-- 主窗口恢复/暂停按钮/布局7 passed（0.73s，33 deselected），audit-display报告；未声称完整主窗口套件通过或字体/DPI现场视觉通过。
-- 独立GUI/Runner进程与Windows目录释放7 passed（41.65s），audit-process-final报告；执行器为fake，没有CST启动。仍覆盖运行、失败、待恢复、仅关界面、HTTP响应丢失及console。
+实现对照Runner.command/_execute、RunnerClient.shutdown_and_wait、Backend.recover_project_sessions及GUI退出编排；回归见test/recovery_exit_audit_test.py、test/runner_recovery_test.py、test/project_recovery_state_test.py、test/checkpoint_adoption_test.py。CLI shutdown复用同一核验；后台已离线不为退出而重启。
 
-以上数字重叠，不相加。早期会话读取重构遗漏局部变量导致失败，已修正；旧GUI测试预期“未知不能请求退出/导出按钮禁用/恢复数恒1”已更新为新契约，没有放宽实际进程安全门禁。此前进程组合29 passed/1 failed是object.__new__测试夹具缺update，补齐夹具后阶段套件30 passed；失败批次不计通过。
-
-轻量XML、故障复现与必要进程日志保留于artifacts，不保证随Git迁移。测试前磁盘约11.16GiB，本轮没有模型/3D场，结束后清理本轮pytest目录；清理后临时工程路径不再可直接恢复。剩余：真实CST串行故障验收、远端慢盘/权限/孤儿进程及现场字体DPI，均未在本批运行。没有自动提交、推送或打包。
-
-CLI shutdown现与GUI复用shutdown_and_wait，既有后台请求需确认所有权释放；后台已离线时走物理核验，不为了退出而启动服务。新增离线CLI子进程测试通过，原参数和HTTP操作保持不变。最终文档/日志索引含在21项中，证明入口/符号有效，不替代真实CST或完整GUI视觉验收。
+[原批次完整记录](archive/20261103-semantic-review/recovery-exit-audit-implementation.md)保留11月2日全部分组数字、失败修正、目录释放和清理记录。它们有重叠且使用fake执行器，不是本次真实CST或现场DPI验收；远端慢盘、孤儿归属及真实故障矩阵仍独立待验。

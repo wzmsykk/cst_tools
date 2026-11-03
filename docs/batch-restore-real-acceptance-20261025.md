@@ -1,5 +1,7 @@
 # 批量表达式恢复与预处理基准重试：真实副本验收
 
+> 适用性复审（2026-11-03）：原批次实施/故障/验收记录；旧当前、未提交、待做及现场进程状态不代表本次实时事实。现行实现见[当前状态](current-status.md)、[功能索引](feature-index.md)及对应API；不重算或追认旧证据。
+
 2026-10-25。工具为test/support/validate_batch_restore_close.py，串行、独占探针锁、小网格cell=8、nmodes=1、480–530MHz。原始夹具test/data/Pillbox/Pillbox.cst只读，输出进入artifacts/batch-restore-real-*；artifacts不保证随Git迁移。生产行为见[实现](parameter-restore-close-budget.md)。
 
 初次受限环境启动在许可证检查退出3（FlexNet -63,403），未执行宏，不计功能通过。正常用户权限重试进入预处理/WinWrap并捕获208个参数。200个probe参数通过预处理副本模板中的测试Sub加入，probe001等保留对probe000的表达式依赖；不更改用户工程或生产预处理模板。

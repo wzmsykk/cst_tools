@@ -1,5 +1,7 @@
 # Python/VBA生命周期协议：故障范围与修订计划
 
+> 适用性复审（2026-11-03）：冻结设计/验收目标，非生产API清单；原候选名称、旧尚未实现及待办只在设计时点成立。现行实现见[当前状态](current-status.md)、[功能索引](feature-index.md)及对应API；不重算或追认旧证据。
+
 设计日期：2026-10-20；进度更新：2026-10-24。状态：**L1–L4源码已接入，L5部分真实验收**。Task/Completion/Ack/Stop仍v1，新Managed会话收尾为v2、旧会话不变；真实WinWrap四组及生产/七阶段故障范围见[L5记录](close-v2-l5-acceptance.md)，完整矩阵仍pending。正常saved改用固定.closed.cst Backup token，两端同步。退出0/有条件退出4规则不放宽，不接受退出1，不追认旧Gate。L4当前API见[事实与诊断](runner-lifecycle-l4.md)，以下旧阶段描述保留其历史边界。
 
 2026-10-24进度：L1见[实施边界](session-closure-l1.md)，L2见[v2说明](close-receipt-v2.md)，L3新生产宏接入见[状态与退役](production-close-v2-l3.md)。第4节格式已冻结，第5–6节已部分落地，完整传播/真实故障矩阵仍待L4–L5。

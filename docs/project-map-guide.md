@@ -1,6 +1,6 @@
 # 项目定位与变更工具
 
-D1已迁入全部136项旧功能，并新增F138登记定位工具及迁移门禁，共137项。权威功能映射为[project-map.json](project-map.json)，结构由[Schema](project-map.schema.json)约束；[feature-index.md](feature-index.md)为生成视图。D2查询、全量文件清单、静态图、变更影响、删除预检和显式生成已补齐离线验收。D3已按明确范围登记66个工具入口/支持模块、18条人工动态关系、14个目录责任类别和全部194篇Markdown；未复审的副作用/文档角色保留未知，登记不代表自动执行权限或完整调用图。架构和全量迁移规则见[实施计划](project-documentation-tooling-plan.md)。工具不替代API正文、动态运行或CST验收。
+权威登记为[project-map.json](project-map.json)，结构由[Schema](project-map.schema.json)约束；[feature-index.md](feature-index.md)只生成。功能、工具、人工动态关系和文档角色分开，登记不授予执行权限、语义正确或实际调用证明。稳定设计见[实施体系](project-documentation-tooling-plan.md)，逐批过程见[复审前快照](archive/20261103-semantic-review/project-map-guide.md)。
 
 ## 日常入口
 
@@ -48,16 +48,16 @@ changes对指定Git提交比较当前已暂存/未暂存/删除文件，并纳�
 
 没有当前根目录Git时，inventory/query等使用源码包release-manifest.json的files范围，不借用父目录Git；changes拒绝这种环境。源码包缺少全仓测试或文档时，validate诚实报告缺失，不把局部包冒充全仓通过。render不带--write只输出预览，带--write才改派生索引。
 
-测试入口：test/project_inspect_test.py（离线合成工作区/临时Git），及原迁移、索引门禁；测试不启动CST、不联网。当时完整登记与D3整合仍待办；当前进展见下方D3记录，D4扩展验收未完成。
 
-静态模块解析复用本轮文件清单，避免对每个import反复解析磁盘路径；不建立持久缓存，不自动刷新人工关系。最终组合31项通过；仓库文件清单/未映射数量是当时范围证据，不代表语义覆盖率。
 
 
 ## D3工具清单与人工动态关系
 
+以下实现/验收叙述属于2026-11-03 D3批次；本页保留现行工具合同，不将原批次结果冒充后续变更验收。
+
 唯一登记仍在project-map.json。`python scripts/project_inspect.py tools` 返回工具条目及范围覆盖；`query --path pack.bat`等路径查询同时返回registered_tools。路径没有F功能映射时仍返回2，不把工具条目冒充功能覆盖。query/graph同时检索人工关系source、targets及consumers；工具只返回登记，不导入或调用它们。
 
-工具范围：scripts/和test/support/下全部Python模块（含无main guard却有顶层副作用的模块）、第一方Python显式main入口、第一方shell脚本。vendor、历史artifacts、知识库和按约定保持不变的utils明确排除；它们仍在文件inventory中，排除不证明无外部调用。公共MCP工具由mcp_server的装饰器注册，本清单登记服务进程入口，不复制一套MCP工具定义。当前66条是本次文件范围，不是允许执行列表。
+工具范围：scripts/和test/support/下全部Python模块（含无main guard却有顶层副作用的模块）、第一方Python显式main入口、第一方shell脚本。vendor、历史artifacts、知识库和按约定保持不变的utils明确排除；它们仍在文件inventory中，排除不证明无外部调用。公共MCP工具由mcp_server的装饰器注册，本清单登记服务进程入口，不复制一套MCP工具定义。数量从tools命令取得；完整范围登记也不是允许执行列表。
 
 每条工具提供用途、入口类型、字面参数、已知副作用、授权边界、未知及证据。AST只能观察字面add_argument，委托base、Qt或动态参数可能遗漏；observed_arguments和人工补充的arguments区分。工具本身也不是一律只读：打包会写ZIP并启动烟雾子进程，ANTLR --prepare下载/构建，NoUI会激活COM且可能弹窗，故障探针可kill本轮GUI/Runner，preview模块顶层即创建Qt/写图。未审查的传递副作用明确标注，不能由文件名推断安全。
 
@@ -69,12 +69,11 @@ changes对指定Git提交比较当前已暂存/未暂存/删除文件，并纳�
 
 源码包保留原仓库登记，省略夹具或历史文档时validate仍会诚实报缺失；工具范围差异不自动删除原登记，不把局部包误判为全仓一致。运行来源可从input中的Git/manifest身份区分。
 
-D3验收：组合离线37项通过（65.72秒）；tools/query/graph/validate仓库检查通过。[轻量证据](../knowledge-base/project-registry-d3-20261103.json)记录分母、未知及范围；没有真实CST启动，数字不可作为运行调用图覆盖率。
 
 
 ## D4故障矩阵与源码包边界
 
-D4修复以下问题：源码包漏带离线文本夹具及base系列CLI；生成的根README未登记；Git重命名可能漏掉旧路径；fenced code中的标题误计章节；包清单缺少严格路径/形状和字节完整性核验；render写入未使用统一解析后路径保护。既有D1–D3数字保留其原批次，不升级为本批代码验收。
+D4修复以下问题：源码包漏带离线文本夹具及base系列CLI；生成的根README未登记；Git重命名可能漏掉旧路径；fenced code中的标题误计章节；包清单缺少严格路径/形状和字节完整性核验；render写入未使用统一解析后路径保护。既有D1–D4数字保留其原批次，不升级为后续语义复审代码验收。
 
 |故障或边界|检查与预期|
 |---|---|
@@ -90,6 +89,11 @@ D4修复以下问题：源码包漏带离线文本夹具及base系列CLI；生�
 
 `python scripts/project_inspect.py validate`继续检查完整仓库契约；源码包因有意省略的vendor/开发脚本会失败。新增`validate --scope package`只适用于无根Git且有合法manifest的解压包：核对已列全部字节、整体内容ID和包内映射/符号/角色/登记，将原契约中未随包提供的引用放入omitted_references，明确repository_complete=False。清单hash证明字节一致，不认证作者或运行结果；查询的input身份也不暗示完整性已验。只读查询仍不修改manifest。若包内源码被合法修改，应视作新的待审查快照，而不是自动“修复”原清单。
 
-当前选择保留离线文本夹具、协议样本、test/support PowerShell入口、3个base CLI和根知识库JSON；继续省略真实CST模型、原始场、厂商帮助、旧pack.bat及GUI UI再生成脚本。已生成源码包的缺省引用预期为这两个开发脚本与vendor README。随包测试不代表全部集成测试均可直接运行；本轮只执行指定离线工具/迁移/登记测试、ZIP/编译/无CST GUI烟雾及包命令验收，不求解、不部署、不推送。
+当前选择保留离线文本夹具、协议样本、test/support PowerShell入口、3个base CLI和根知识库JSON；继续省略真实CST模型、原始场、厂商帮助、旧pack.bat及GUI UI再生成脚本。已生成源码包的缺省引用预期为这两个开发脚本与vendor README。随包测试不代表全部集成测试均可直接运行；D4原批次只执行指定离线工具/迁移/登记测试、ZIP/编译/无CST GUI烟雾及包命令验收，不求解、不部署、不推送。
 
-D4组合60项通过（86.17秒）。[轻量记录](../knowledge-base/project-tooling-d4-20261103.json)保留测试分层与源码包身份；完整包/解压副本在测试结束后清理，仅保留轻量receipt/manifest/JUnit，检查原始包需重新生成。未启动CST，未发布、提交或推送。
+
+## 文档语义复审入口
+
+每个document条目的review记录本次适用性/当前合同核对范围、来源与剩余限制；源码/离线对照不验证旧实测真实性或外部研究。查[复审报告](documentation-semantic-review.md)，不能只因role已分类就推断每条技术陈述已对现实现验证。后续功能变更复审相关条目，不自动将旧日期替换为今天。
+
+文档的content_sha256_at_review用于检查正文是否在复审后变动；变更后人工重核scope/checked_sources/limitations再登记新指纹，不自动续期。test/documentation_semantics_test.py校验指纹及归档正文，不能据hash相等判定语义正确。

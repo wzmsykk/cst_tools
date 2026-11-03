@@ -1,5 +1,7 @@
 # Python恢复与Windows PID复用边界
 
+> 适用性复审（2026-11-03）：按本条原日期、来源/样本范围引用；原当前/未实现/进程或artifact存在性不作实时保证。本次不复验原数据或外部结论，现行执行见[当前状态](../docs/current-status.md)。
+
 2026-11-02。本轮是源码与离线模拟证据，不是CST官方语义或远端实测。旧恢复只用worker.pid和当前进程树存活判断，历史退出会被同号新进程覆盖；按会话1200秒串行等待会掩盖归属错误。离线假身份复现当前实现拒绝reused/unknown且不发送stop.request。新身份和旧记录分流见[实现合同](../docs/recovery-process-identity.md)，关联[现场证据](../docs/recovery-bundle-261020-20261102.md)。没有操纵真实Windows PID复用，不能将现场RECOVERING唯一归因为此。
 
 历史worker.state不是退出证明。已有close-verification的PID/session及协议、模型固定路径哈希全部核验有效时，可证明旧进程已退出，不应等待同号新进程；缺失身份又有活进程时需明确人工核验。丢失父进程且有未知子进程不自动接管。不能用强杀、缩短等待或删检查点替代进程归属。

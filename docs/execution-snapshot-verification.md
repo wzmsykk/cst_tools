@@ -1,6 +1,6 @@
 # B3 执行配置快照验证内核
 
-2026-11-02。公共实现`csttool/execution_snapshot.py`，GUI/CLI/MCP将共用本模块，不新增CST调度、数据库私有格式解析器或协议服务。[原生采集与RunStore/B4子集](native-execution-capture.md)已接入；公共single-simulation与生产G03已接入，真实正常链见[G04](single-simulation-g04-acceptance.md)。HOM默认不启用此选项。低层报告publish_ready始终false，不承担公共定义授权职责。
+2026-11-02。公共实现`csttool/execution_snapshot.py`，公共single-simulation已复用本模块，其他GUI/CLI调用按接入范围分别判断，不新增CST调度、数据库私有格式解析器或协议服务。[原生采集与RunStore/B4子集](native-execution-capture.md)已接入；公共single-simulation与生产G03已接入，真实正常链见[G04](single-simulation-g04-acceptance.md)。HOM默认不启用此选项。低层报告publish_ready始终false，不承担公共定义授权职责。
 
 ## 来源与信任边界
 

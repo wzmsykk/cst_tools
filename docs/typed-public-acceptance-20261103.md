@@ -1,5 +1,7 @@
 # 类型化公开链与真实 CST 验收
 
+> 适用性复审（2026-11-03）：原批次实施/故障/验收记录；旧当前、未提交、待做及现场进程状态不代表本次实时事实。现行实现见[当前状态](current-status.md)、[功能索引](feature-index.md)及对应API；不重算或追认旧证据。
+
 日期：2026-11-03。目标宿主为用户指定的 Codex 桌面；本轮完成的是**现代官方 SDK/stdio 的公开工具链与真实 CST**，新增五工具的桌面整链验收由用户选择稍后进行。不能据此称指定宿主 G01–G08 全部完成。
 
 轻量证据：[JSON](../knowledge-base/mcp-typed-public-acceptance-20261103.json)。原始工作目录 `artifacts/typed-public-676d2b63`；日志、宏、来源、各次失败与恢复证据保留。artifacts不保证随Git迁移。

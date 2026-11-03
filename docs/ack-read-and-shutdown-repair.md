@@ -1,5 +1,7 @@
 # Ack 读取和退出收尾修正
 
+> 适用性复审（2026-11-03）：原批次实施/故障/验收记录；旧当前、未提交、待做及现场进程状态不代表本次实时事实。现行实现见[当前状态](current-status.md)、[功能索引](feature-index.md)及对应API；不重算或追认旧证据。
+
 本页记录第一阶段修补。当前状态协议以 [managed-ack-state-contract.md](managed-ack-state-contract.md) 为准：Ack失败进入阻塞待确认，不再采用等待1秒后主动退出；接收记录和接受回执先于清理，Manager暂停而不自动重算。
 
 ## 现场证据

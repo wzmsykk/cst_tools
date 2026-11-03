@@ -1,5 +1,7 @@
 # 原生采集B4新观察
 
+> 适用性复审（2026-11-03）：按本条原日期、来源/样本范围引用；原当前/未实现/进程或artifact存在性不作实时保证。本次不复验原数据或外部结论，现行执行见[当前状态](../docs/current-status.md)。
+
 2026-11-02，仅对本机CST2022.5受控副本有效。详见[流程、根目录及证据](../docs/native-execution-capture.md)。
 
 **文档定义**：官方Project Object的GetProjectPath("Project")返回无.cst后缀的计算目录；GetApplicationVersion返回版本字符串，文档没有保证其格式与二进制中完整release/change标签相同。GetOwnProject代表当前工程，不意味着应在空工程编译后OpenFile切换scope。

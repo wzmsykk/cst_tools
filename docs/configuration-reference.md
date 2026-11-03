@@ -53,12 +53,12 @@
 
 ### `execution`
 
-- `use_mpi`：是否启用 MPI。
+- `use_mpi`：保留的MPI开关字段；Managed尚未据此启用MPI。
 - `mpi_node_list`：MPI 节点定义，仅在启用 MPI 时生效。
-- `use_remote`：是否使用 CST 远程计算服务。
+- `use_remote`：保留的远程计算开关字段；不是已接入的远程执行能力。
 - `controller_address`：远程控制器地址，仅在启用远程计算时生效。
 
-这些字段属于工程级执行策略，不应作为单个 HOM 扫频任务参数反复提交。
+这些字段目前由配置模型保留/迁移，ProjectConfigManager读取并记录，但Managed启动链没有据此实现MPI或远程分发。不能通过设为True就宣称启用远程计算；不作为单个HOM参数反复提交。
 
 ### `artifacts`
 
@@ -67,7 +67,7 @@
 
 ### `mesh`
 
-- `fixed`：为 `True` 时关闭四面体自适应网格。
+- `fixed`：预处理修改mesh策略；True时按固定Tet设置关闭自适应，False表示保留原设置，不是读取到的原生自适应状态。
 - `cells_per_wavelength`：固定网格密度，单位为 cells/λ，必须为正整数。
 
 Mesh 在项目初始化前确定。恢复已有项目时若请求值与记录不一致，程序拒绝继续；修改 Mesh 应创建新项目。启用收敛分析时，分析得到的推荐值会写入正式项目。
@@ -76,7 +76,7 @@ Mesh 在项目初始化前确定。恢复已有项目时若请求值与记录不
 
 - `status`：项目生命周期状态。允许值为 `READY`、`RUNNING`、`DONE`、`STOP_REQUESTED`、`INTERRUPTED`、`FAILED`、`RECOVERY_REQUIRED`。
 
-该字段由 Manager 更新，用于恢复和重复提交保护。运行期间不得手工编辑。
+该字段由应用/项目配置生命周期更新，用于恢复和重复提交保护。运行期间不得手工编辑。
 
 ## GUI 算法设置
 

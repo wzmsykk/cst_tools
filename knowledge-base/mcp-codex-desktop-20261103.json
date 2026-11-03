@@ -1,0 +1,786 @@
+{
+  "document": {
+    "schema_version": 2,
+    "document_id": "0553f1417f09453f8595d8f9e169221c",
+    "project_id": "dbc1abb0dea0487497a5e37bb40c2195",
+    "name": "desktop-pillbox-20261103",
+    "installation_ref": "cst-2022-c25466fe473c",
+    "units": {
+      "length": "mm",
+      "frequency": "MHz"
+    },
+    "parent_revision": "a85a18c6eaf0cf63fbfe8306fc5b7bf14b17f89a9780c287acca5b76416e308a",
+    "state": "saved",
+    "ready": true,
+    "spec": {
+      "parameters": {
+        "R": {
+          "expression": "100",
+          "quantity": "length",
+          "description": "腔体半径"
+        },
+        "L": {
+          "expression": "R",
+          "quantity": "length",
+          "description": "腔体长度，保留参数表达式"
+        }
+      },
+      "components": [
+        "cavity"
+      ],
+      "cylinder": {
+        "op": "create_cylinder",
+        "component_id": "cavity",
+        "object_id": "pillbox",
+        "material": "Vacuum",
+        "axis": "z",
+        "center": [
+          "0",
+          "0",
+          "0"
+        ],
+        "axial_range": [
+          "-L/2",
+          "L/2"
+        ],
+        "outer_radius": "R",
+        "inner_radius": "0",
+        "segments": 0
+      },
+      "background": {
+        "op": "set_background",
+        "material": "PEC",
+        "padding_mm": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "boundaries": {
+        "op": "set_boundaries",
+        "faces": [
+          "electric",
+          "electric",
+          "electric",
+          "electric",
+          "electric",
+          "electric"
+        ],
+        "symmetry": [
+          "none",
+          "none",
+          "none"
+        ]
+      },
+      "simulation": {
+        "solver": "eigenmode",
+        "method": "default",
+        "frequency_lower_target_mhz": 500,
+        "frequency_range_mhz": {
+          "min": 500,
+          "max": 2000
+        },
+        "losses": "postprocess_only",
+        "mesh": {
+          "adaptive": false,
+          "cells_per_wavelength": 4,
+          "type": "tet"
+        },
+        "requested_modes": 1
+      },
+      "postprocess": [
+        {
+          "method_id": "Frequency",
+          "metric_id": "frequency",
+          "settings": {
+            "mode": {
+              "index": 1,
+              "selection": "one"
+            }
+          }
+        },
+        {
+          "method_id": "R_over_Q",
+          "metric_id": "rq",
+          "settings": {
+            "mode": {
+              "index": 1,
+              "selection": "one"
+            },
+            "integration_line": {
+              "axis": "z",
+              "beta": 1,
+              "offset_mm": [
+                0,
+                0,
+                0
+              ],
+              "range": "full"
+            }
+          }
+        }
+      ]
+    },
+    "empty_model_path": "D:\\work\\cst_tools\\artifacts\\mcp-host-acceptance\\control\\definitions\\0553f1417f09453f8595d8f9e169221c\\09cbc3b635ee49f6b5dc8b22713fb6ab\\verification-bootstrap\\created\\definition.cst",
+    "empty_sha256": "f35b8a8d94e2258287825d0df366b19c413260e8145193e9a829faf6cd14f0ad",
+    "model_path": "D:\\work\\cst_tools\\artifacts\\mcp-host-acceptance\\control\\definitions\\0553f1417f09453f8595d8f9e169221c\\f44940db452b96a51eeab51e4023fbf57cd7a8ca0062e55342297ee6939301bb\\definition.cst",
+    "source_sha256": "27059515da0934239cffe488990d293c1d06f5e61814df08fd38a14617685df1",
+    "definition_revision": "f44940db452b96a51eeab51e4023fbf57cd7a8ca0062e55342297ee6939301bb",
+    "operation_id": "19cfced84cb045efa6c06ecaf4192a18",
+    "document_revision": "3ac70b9fcad1aa33b24a0c31e24ea6a79a751e350e5a61fa3746dca608362f0d"
+  },
+  "create": {
+    "request_id": "desktop-20261103-create-3",
+    "accepted": true,
+    "run_id": "09cbc3b635ee49f6b5dc8b22713fb6ab",
+    "instance_id": "1dbdf591c7cc43dfbfa47774c9d7b8b1"
+  },
+  "save": {
+    "request_id": "desktop-save",
+    "accepted": true,
+    "run_id": "19cfced84cb045efa6c06ecaf4192a18",
+    "instance_id": "1dbdf591c7cc43dfbfa47774c9d7b8b1"
+  },
+  "solve": {
+    "request_id": "desktop-solve",
+    "accepted": true,
+    "run_id": "9e7c8823c38f42c89013752c2c6d4e65",
+    "instance_id": "1dbdf591c7cc43dfbfa47774c9d7b8b1"
+  },
+  "host": "Codex desktop current conversation",
+  "tools": 14,
+  "result": {
+    "schema_version": 2,
+    "run_id": "9e7c8823c38f42c89013752c2c6d4e65",
+    "definition_revision": "f44940db452b96a51eeab51e4023fbf57cd7a8ca0062e55342297ee6939301bb",
+    "task_id": "57a8079a-475b-4b85-a6fa-f11058123bcc",
+    "status": "success",
+    "frequency_mhz": 1147.42692991921,
+    "rq_ohm": 223.541439593232,
+    "snapshot": "D:\\work\\cst_tools\\artifacts\\mcp-host-acceptance\\result\\simulation\\9e7c8823c38f42c89013752c2c6d4e65\\worker_single\\single-simulation__f_1147.426930MHz__57a8079a-475b-4b85-a6fa-f11058123bcc\\single-simulation__f_1147.426930MHz.cst",
+    "snapshot_sha256": "f51c862b394645c3547e298d5c95142309c101b16bdde59cdded92ffeba04ac3",
+    "capture": {
+      "schema_version": 1,
+      "task_id": "57a8079a-475b-4b85-a6fa-f11058123bcc",
+      "nonce": "e15dfc51b8bc4f709deb76b00a82a409",
+      "binding": {
+        "project_id": "dbc1abb0dea0487497a5e37bb40c2195",
+        "attempt_id": "57a8079a-475b-4b85-a6fa-f11058123bcc",
+        "definition_revision": "f44940db452b96a51eeab51e4023fbf57cd7a8ca0062e55342297ee6939301bb",
+        "database_sha256": "38506b2f207e26f0e835ce08301ce706b5d3ec92846c68e560b4bd6c3c019f9a",
+        "cst_build": "2022.5 Release from 2022-06-03 (change 981760)",
+        "scope": "root"
+      },
+      "frame_hashes": {
+        "pre": "a398566043948d54173ed6dcb4bf45ea6b54f7abce0286587b174adc0bb4441c",
+        "started": "f356fa3055982bbd6205135cc9ec8bf4f961dd794088422e82a49b5c41b13400",
+        "post": "a4b975f3e1ec6cbb477f0e756567ac67f95f2b00f47203a2861cb6d3229b2a9a"
+      },
+      "status": "execution-snapshot-match",
+      "reasons": [],
+      "result_success": true,
+      "database_verified": true,
+      "exit_confirmed": true,
+      "solver_return": 1,
+      "calculated_modes": 1,
+      "process_exit_code": 0,
+      "batch_exit_zero": true,
+      "snapshot_sha256": "66391c24252da0ddfad8c11fcc5c96a3f3b0e7972158834e2a686a97595c44ad",
+      "publish_ready": false
+    },
+    "received_sha256": "a5264822208e2cac076dcc9be1d5aa9cfb37b93dc1d864445063ba0ffd476445",
+    "mode_index": 1,
+    "session_id": "c7e6fa55-a723-42d1-ae35-6135fd304e7d",
+    "postprocess_definition": {
+      "schema_version": 1,
+      "mode_index": 1,
+      "source_sha256": "27059515da0934239cffe488990d293c1d06f5e61814df08fd38a14617685df1",
+      "requested_postprocess": [
+        {
+          "method_id": "Frequency",
+          "metric_id": "frequency",
+          "settings": {
+            "mode": {
+              "index": 1,
+              "selection": "one"
+            }
+          }
+        },
+        {
+          "method_id": "R_over_Q",
+          "metric_id": "rq",
+          "settings": {
+            "mode": {
+              "index": 1,
+              "selection": "one"
+            },
+            "integration_line": {
+              "axis": "z",
+              "beta": 1,
+              "offset_mm": [
+                0,
+                0,
+                0
+              ],
+              "range": "full"
+            }
+          }
+        }
+      ],
+      "frequency": {
+        "method": "Frequency",
+        "native_call": "GetModeFrequencyInHz",
+        "unit": "MHz",
+        "scale_from_hz": 1e-06
+      },
+      "r_over_q": {
+        "method": "R_over_Q",
+        "implementation": "EigenResult_Complex",
+        "unit": "ohm",
+        "integration_line": {
+          "axis": "z",
+          "offset_mm": [
+            0,
+            0,
+            0
+          ],
+          "endpoints_mm": [
+            [
+              0,
+              0,
+              -50
+            ],
+            [
+              0,
+              0,
+              50
+            ]
+          ],
+          "beta": 1,
+          "range": "full"
+        },
+        "voltage": "complex line integral with transit phase",
+        "energy": "QFactor.GetTotalEnergy",
+        "formula": "abs(V)^2/(omega*W)",
+        "algorithm": {
+          "path": "rq-algorithm.vb",
+          "sha256": "3c9fdf812a7b53f550bf9c2077b4af858db13048a92d19b3e58941fef40cd71d"
+        }
+      },
+      "generated_macro": {
+        "path": "execution-worker.bas",
+        "sha256": "91807c964f79ea77f62dd30b2238f0490571c89c297d9472ae30307d751bc5c3"
+      },
+      "generated_macro_evidence": "archived"
+    },
+    "postprocess_provenance_sha256": "7e963daf42baf5deafe7c25106b7c72fd871ba2fa5c18f5205789ac6e62ef925",
+    "execution_active": false,
+    "session_safety": "confirmed-closed",
+    "metrics": [
+      {
+        "metric_id": "frequency",
+        "method_id": "Frequency",
+        "value": 1147.42692991921,
+        "unit": "MHz",
+        "status": "success"
+      },
+      {
+        "metric_id": "rq",
+        "method_id": "R_over_Q",
+        "value": 223.541439593232,
+        "unit": "ohm",
+        "status": "success"
+      }
+    ],
+    "result_revision": "e7a7298646948a594078c8408a33e265a3e7c3e00b1c287fb6db7a0ae1691edc"
+  },
+  "exports": {
+    "request_id": "desktop-export",
+    "accepted": true,
+    "instance_id": "1dbdf591c7cc43dfbfa47774c9d7b8b1",
+    "run_id": "9e7c8823c38f42c89013752c2c6d4e65",
+    "result_revision": "e7a7298646948a594078c8408a33e265a3e7c3e00b1c287fb6db7a0ae1691edc",
+    "artifacts": [
+      {
+        "path": "result\\exports\\9e7c8823c38f42c89013752c2c6d4e65\\e7a7298646948a594078c8408a33e265a3e7c3e00b1c287fb6db7a0ae1691edc\\results.csv",
+        "relative_to": "project",
+        "sha256": "4c172891e525b683ce34eb03433062ddabfb498172b41a1a6ae3e314ea308bda",
+        "size_bytes": 565,
+        "format": "csv"
+      },
+      {
+        "path": "result\\exports\\9e7c8823c38f42c89013752c2c6d4e65\\e7a7298646948a594078c8408a33e265a3e7c3e00b1c287fb6db7a0ae1691edc\\results.json",
+        "relative_to": "project",
+        "sha256": "bf6a3309341b1247455f2c29b6ef43876fb0d04c8dea0b7e85cdaaafa745493f",
+        "size_bytes": 4571,
+        "format": "json"
+      }
+    ]
+  },
+  "export_retry_equal": true,
+  "closed_document": {
+    "schema_version": 2,
+    "document_id": "0553f1417f09453f8595d8f9e169221c",
+    "project_id": "dbc1abb0dea0487497a5e37bb40c2195",
+    "name": "desktop-pillbox-20261103",
+    "installation_ref": "cst-2022-c25466fe473c",
+    "units": {
+      "length": "mm",
+      "frequency": "MHz"
+    },
+    "parent_revision": "3ac70b9fcad1aa33b24a0c31e24ea6a79a751e350e5a61fa3746dca608362f0d",
+    "state": "closed",
+    "ready": false,
+    "spec": {
+      "parameters": {
+        "R": {
+          "expression": "100",
+          "quantity": "length",
+          "description": "腔体半径"
+        },
+        "L": {
+          "expression": "R",
+          "quantity": "length",
+          "description": "腔体长度，保留参数表达式"
+        }
+      },
+      "components": [
+        "cavity"
+      ],
+      "cylinder": {
+        "op": "create_cylinder",
+        "component_id": "cavity",
+        "object_id": "pillbox",
+        "material": "Vacuum",
+        "axis": "z",
+        "center": [
+          "0",
+          "0",
+          "0"
+        ],
+        "axial_range": [
+          "-L/2",
+          "L/2"
+        ],
+        "outer_radius": "R",
+        "inner_radius": "0",
+        "segments": 0
+      },
+      "background": {
+        "op": "set_background",
+        "material": "PEC",
+        "padding_mm": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "boundaries": {
+        "op": "set_boundaries",
+        "faces": [
+          "electric",
+          "electric",
+          "electric",
+          "electric",
+          "electric",
+          "electric"
+        ],
+        "symmetry": [
+          "none",
+          "none",
+          "none"
+        ]
+      },
+      "simulation": {
+        "solver": "eigenmode",
+        "method": "default",
+        "frequency_lower_target_mhz": 500,
+        "frequency_range_mhz": {
+          "min": 500,
+          "max": 2000
+        },
+        "losses": "postprocess_only",
+        "mesh": {
+          "adaptive": false,
+          "cells_per_wavelength": 4,
+          "type": "tet"
+        },
+        "requested_modes": 1
+      },
+      "postprocess": [
+        {
+          "method_id": "Frequency",
+          "metric_id": "frequency",
+          "settings": {
+            "mode": {
+              "index": 1,
+              "selection": "one"
+            }
+          }
+        },
+        {
+          "method_id": "R_over_Q",
+          "metric_id": "rq",
+          "settings": {
+            "mode": {
+              "index": 1,
+              "selection": "one"
+            },
+            "integration_line": {
+              "axis": "z",
+              "beta": 1,
+              "offset_mm": [
+                0,
+                0,
+                0
+              ],
+              "range": "full"
+            }
+          }
+        }
+      ]
+    },
+    "empty_model_path": "D:\\work\\cst_tools\\artifacts\\mcp-host-acceptance\\control\\definitions\\0553f1417f09453f8595d8f9e169221c\\09cbc3b635ee49f6b5dc8b22713fb6ab\\verification-bootstrap\\created\\definition.cst",
+    "empty_sha256": "f35b8a8d94e2258287825d0df366b19c413260e8145193e9a829faf6cd14f0ad",
+    "model_path": "D:\\work\\cst_tools\\artifacts\\mcp-host-acceptance\\control\\definitions\\0553f1417f09453f8595d8f9e169221c\\f44940db452b96a51eeab51e4023fbf57cd7a8ca0062e55342297ee6939301bb\\definition.cst",
+    "source_sha256": "27059515da0934239cffe488990d293c1d06f5e61814df08fd38a14617685df1",
+    "definition_revision": null,
+    "operation_id": "7c80af578bd24ec6a7b4175a6d3d54fc",
+    "document_revision": "54329c6afdcc50c04e4f8d8ad61b3885034db54cc92591d5014f9ecb78ab88b0"
+  },
+  "final_status": {
+    "schema_version": 1,
+    "instance_id": "1dbdf591c7cc43dfbfa47774c9d7b8b1",
+    "project_id": "dbc1abb0dea0487497a5e37bb40c2195",
+    "project": "D:\\work\\cst_tools\\artifacts\\mcp-host-acceptance",
+    "run_id": "7c80af578bd24ec6a7b4175a6d3d54fc",
+    "version": 41,
+    "state": "COMPLETED",
+    "phase": "completed",
+    "error": null,
+    "session_safety": "confirmed-closed",
+    "last_progress": null,
+    "log_directory": null,
+    "coverage": null,
+    "mode_count": 0,
+    "completed_tasks": 1,
+    "total_tasks": 1,
+    "artifacts": [
+      {
+        "path": "D:\\work\\cst_tools\\artifacts\\mcp-host-acceptance\\control\\definitions\\0553f1417f09453f8595d8f9e169221c\\f44940db452b96a51eeab51e4023fbf57cd7a8ca0062e55342297ee6939301bb\\definition.cst",
+        "sha256": "27059515da0934239cffe488990d293c1d06f5e61814df08fd38a14617685df1"
+      }
+    ],
+    "lifecycle": {
+      "schema_version": 1,
+      "observed_at": "2026-11-03T13:42:15.471334+00:00",
+      "session_safety": "confirmed-closed",
+      "session_count": 6,
+      "physical_pending_count": 0,
+      "recovery_required": false,
+      "omitted_sessions": 0,
+      "sessions": [
+        {
+          "session_id": "c7e6fa55-a723-42d1-ae35-6135fd304e7d",
+          "process_state": "exited",
+          "exit_code": 0,
+          "exit_classification": "zero",
+          "model_state": "committed",
+          "task_outcome": "success",
+          "result_state": "unknown",
+          "disposition": "standard-stop",
+          "standard_closed": true,
+          "needs_recovery": false,
+          "missing_evidence": [],
+          "worker_id": "single_9e7c8823c38f42c89013752c2c6d4e65",
+          "process_identity_reason": "已核验历史退出及保存证据",
+          "workspace": "D:\\work\\cst_tools\\artifacts\\mcp-host-acceptance\\temp\\worker_single_9e7c8823c38f42c89013752c2c6d4e65\\c7e6fa55-a723-42d1-ae35-6135fd304e7d",
+          "evidence_path": "D:\\work\\cst_tools\\artifacts\\mcp-host-acceptance\\temp\\worker_single_9e7c8823c38f42c89013752c2c6d4e65\\c7e6fa55-a723-42d1-ae35-6135fd304e7d\\close-verification.json",
+          "receipt_path": "D:\\work\\cst_tools\\artifacts\\mcp-host-acceptance\\temp\\worker_single_9e7c8823c38f42c89013752c2c6d4e65\\c7e6fa55-a723-42d1-ae35-6135fd304e7d\\protocol\\close.receipt",
+          "result_observation": {
+            "state": "algorithm_adopted",
+            "status": "Success",
+            "task_id": "57a8079a-475b-4b85-a6fa-f11058123bcc",
+            "receipt_path": "D:\\work\\cst_tools\\artifacts\\mcp-host-acceptance\\control\\runs\\9e7c8823c38f42c89013752c2c6d4e65\\workers\\single\\c7e6fa55-a723-42d1-ae35-6135fd304e7d\\received\\57a8079a-475b-4b85-a6fa-f11058123bcc.json",
+            "optional_analysis_pending": false,
+            "validation": "receipt-observation-only"
+          }
+        },
+        {
+          "kind": "project-bootstrap",
+          "worker_id": "G02",
+          "session_id": "verification-bootstrap/created",
+          "workspace": "D:\\work\\cst_tools\\artifacts\\mcp-host-acceptance\\control\\definitions\\0553f1417f09453f8595d8f9e169221c\\09cbc3b635ee49f6b5dc8b22713fb6ab\\verification-bootstrap\\created",
+          "evidence_path": "D:\\work\\cst_tools\\artifacts\\mcp-host-acceptance\\control\\definitions\\0553f1417f09453f8595d8f9e169221c\\09cbc3b635ee49f6b5dc8b22713fb6ab\\verification-bootstrap\\created\\session-status.json",
+          "receipt_path": "D:\\work\\cst_tools\\artifacts\\mcp-host-acceptance\\control\\definitions\\0553f1417f09453f8595d8f9e169221c\\09cbc3b635ee49f6b5dc8b22713fb6ab\\verification-bootstrap\\created\\completed.txt",
+          "process_state": "exited",
+          "process_identity_reason": "已记录归属进程退出",
+          "exit_code": 0,
+          "exit_classification": "zero",
+          "standard_closed": true,
+          "task_outcome": "definition-observation",
+          "model_state": "saved-empty-project",
+          "disposition": "standard-stop",
+          "needs_recovery": false,
+          "missing_evidence": [],
+          "result_observation": {
+            "state": "not-applicable"
+          }
+        },
+        {
+          "kind": "definition-verification",
+          "worker_id": "G03",
+          "session_id": "verification-edit/saved",
+          "workspace": "D:\\work\\cst_tools\\artifacts\\mcp-host-acceptance\\control\\definitions\\0553f1417f09453f8595d8f9e169221c\\19cfced84cb045efa6c06ecaf4192a18\\verification-edit\\saved",
+          "evidence_path": "D:\\work\\cst_tools\\artifacts\\mcp-host-acceptance\\control\\definitions\\0553f1417f09453f8595d8f9e169221c\\19cfced84cb045efa6c06ecaf4192a18\\verification-edit\\saved\\session-status.json",
+          "receipt_path": "D:\\work\\cst_tools\\artifacts\\mcp-host-acceptance\\control\\definitions\\0553f1417f09453f8595d8f9e169221c\\19cfced84cb045efa6c06ecaf4192a18\\verification-edit\\saved\\completed.txt",
+          "process_state": "exited",
+          "process_identity_reason": "已记录归属进程退出",
+          "exit_code": 0,
+          "exit_classification": "zero",
+          "standard_closed": true,
+          "task_outcome": "definition-observation",
+          "model_state": "frozen-definition-unchanged",
+          "disposition": "standard-stop",
+          "needs_recovery": false,
+          "missing_evidence": [],
+          "result_observation": {
+            "state": "not-applicable"
+          }
+        },
+        {
+          "kind": "definition-verification",
+          "worker_id": "G03",
+          "session_id": "verification-7d7f3e864d7b4b45a5b2e0e52ff15257/reopened",
+          "workspace": "D:\\work\\cst_tools\\artifacts\\mcp-host-acceptance\\control\\definitions\\0553f1417f09453f8595d8f9e169221c\\f44940db452b96a51eeab51e4023fbf57cd7a8ca0062e55342297ee6939301bb\\verification-7d7f3e864d7b4b45a5b2e0e52ff15257\\reopened",
+          "evidence_path": "D:\\work\\cst_tools\\artifacts\\mcp-host-acceptance\\control\\definitions\\0553f1417f09453f8595d8f9e169221c\\f44940db452b96a51eeab51e4023fbf57cd7a8ca0062e55342297ee6939301bb\\verification-7d7f3e864d7b4b45a5b2e0e52ff15257\\reopened\\session-status.json",
+          "receipt_path": "D:\\work\\cst_tools\\artifacts\\mcp-host-acceptance\\control\\definitions\\0553f1417f09453f8595d8f9e169221c\\f44940db452b96a51eeab51e4023fbf57cd7a8ca0062e55342297ee6939301bb\\verification-7d7f3e864d7b4b45a5b2e0e52ff15257\\reopened\\completed.txt",
+          "process_state": "exited",
+          "process_identity_reason": "已记录归属进程退出",
+          "exit_code": 0,
+          "exit_classification": "zero",
+          "standard_closed": true,
+          "task_outcome": "definition-observation",
+          "model_state": "frozen-definition-unchanged",
+          "disposition": "standard-stop",
+          "needs_recovery": false,
+          "missing_evidence": [],
+          "result_observation": {
+            "state": "not-applicable"
+          }
+        },
+        {
+          "kind": "definition-verification",
+          "worker_id": "G03",
+          "session_id": "verification-7d7f3e864d7b4b45a5b2e0e52ff15257/saved",
+          "workspace": "D:\\work\\cst_tools\\artifacts\\mcp-host-acceptance\\control\\definitions\\0553f1417f09453f8595d8f9e169221c\\f44940db452b96a51eeab51e4023fbf57cd7a8ca0062e55342297ee6939301bb\\verification-7d7f3e864d7b4b45a5b2e0e52ff15257\\saved",
+          "evidence_path": "D:\\work\\cst_tools\\artifacts\\mcp-host-acceptance\\control\\definitions\\0553f1417f09453f8595d8f9e169221c\\f44940db452b96a51eeab51e4023fbf57cd7a8ca0062e55342297ee6939301bb\\verification-7d7f3e864d7b4b45a5b2e0e52ff15257\\saved\\session-status.json",
+          "receipt_path": "D:\\work\\cst_tools\\artifacts\\mcp-host-acceptance\\control\\definitions\\0553f1417f09453f8595d8f9e169221c\\f44940db452b96a51eeab51e4023fbf57cd7a8ca0062e55342297ee6939301bb\\verification-7d7f3e864d7b4b45a5b2e0e52ff15257\\saved\\completed.txt",
+          "process_state": "exited",
+          "process_identity_reason": "已记录归属进程退出",
+          "exit_code": 0,
+          "exit_classification": "zero",
+          "standard_closed": true,
+          "task_outcome": "definition-observation",
+          "model_state": "frozen-definition-unchanged",
+          "disposition": "standard-stop",
+          "needs_recovery": false,
+          "missing_evidence": [],
+          "result_observation": {
+            "state": "not-applicable"
+          }
+        },
+        {
+          "kind": "project-bootstrap",
+          "worker_id": "G02",
+          "session_id": "verification-bootstrap/created",
+          "workspace": "D:\\work\\cst_tools\\artifacts\\mcp-host-acceptance\\control\\definitions\\1d3af22e36ed4c11b70a13842b76647a\\389bd860a83645f796717f1c7327b971\\verification-bootstrap\\created",
+          "evidence_path": "D:\\work\\cst_tools\\artifacts\\mcp-host-acceptance\\control\\definitions\\1d3af22e36ed4c11b70a13842b76647a\\389bd860a83645f796717f1c7327b971\\verification-bootstrap\\created\\session-status.json",
+          "receipt_path": "D:\\work\\cst_tools\\artifacts\\mcp-host-acceptance\\control\\definitions\\1d3af22e36ed4c11b70a13842b76647a\\389bd860a83645f796717f1c7327b971\\verification-bootstrap\\created\\completed.txt",
+          "process_state": "exited",
+          "process_identity_reason": "已记录归属进程退出",
+          "exit_code": 0,
+          "exit_classification": "zero",
+          "standard_closed": true,
+          "task_outcome": "definition-observation",
+          "model_state": "saved-empty-project",
+          "disposition": "standard-stop",
+          "needs_recovery": false,
+          "missing_evidence": [],
+          "result_observation": {
+            "state": "not-applicable"
+          }
+        }
+      ],
+      "source": "csttool.session_closure.evaluate_closure"
+    },
+    "error_diagnostic": null,
+    "cleanup_diagnostic": null,
+    "run_kind": "definition",
+    "project_task_status": null,
+    "recovery_reason": null,
+    "recovery_progress": null,
+    "log_history": [
+      {
+        "run_id": "9e7c8823c38f42c89013752c2c6d4e65",
+        "directory": "D:\\work\\cst_tools\\artifacts\\mcp-host-acceptance\\logs\\20261103-214038_单次仿真_新运行_9e7c8823"
+      }
+    ],
+    "owner_client": "codex-desktop-g01-20261103",
+    "execution_active": false,
+    "runtime": {
+      "pid": 76268,
+      "python": "D:\\work\\cst_tools\\artifacts\\mcp-runtime\\Scripts\\python.exe",
+      "cwd": "D:\\work\\cst_tools",
+      "source_root": "D:\\work\\cst_tools"
+    },
+    "control_lease_valid": false,
+    "control_lease_remaining": 0,
+    "control_revision": 8
+  },
+  "shutdown": {
+    "request_id": "desktop-shutdown",
+    "accepted": true,
+    "run_id": "7c80af578bd24ec6a7b4175a6d3d54fc",
+    "instance_id": "1dbdf591c7cc43dfbfa47774c9d7b8b1"
+  },
+  "date": "2026-11-03",
+  "scope": "Codex desktop current conversation public MCP happy-path; not complete N01-N25",
+  "tool_discovery": [
+    "mcp__cst_tools_acceptance__apply_model_changes",
+    "mcp__cst_tools_acceptance__close_project",
+    "mcp__cst_tools_acceptance__configure_simulation",
+    "mcp__cst_tools_acceptance__connect_project",
+    "mcp__cst_tools_acceptance__control_project",
+    "mcp__cst_tools_acceptance__create_project",
+    "mcp__cst_tools_acceptance__export_simulation_results",
+    "mcp__cst_tools_acceptance__get_operation_result",
+    "mcp__cst_tools_acceptance__get_project_status",
+    "mcp__cst_tools_acceptance__get_simulation_results",
+    "mcp__cst_tools_acceptance__inspect_model",
+    "mcp__cst_tools_acceptance__list_installations",
+    "mcp__cst_tools_acceptance__save_project",
+    "mcp__cst_tools_acceptance__submit_run"
+  ],
+  "input_rejections": [
+    {
+      "name": "spaces in project name",
+      "outcome": "INVALID_ARGUMENT invalid identity; no native dispatch"
+    },
+    {
+      "name": "cylinder center with 2 items",
+      "outcome": "INVALID_ARGUMENT schema rejection; corrected to 3"
+    },
+    {
+      "name": "expired control lease",
+      "outcome": "claim required; explicit re-claim succeeded"
+    }
+  ],
+  "export_files_verified": [
+    {
+      "path": "result\\exports\\9e7c8823c38f42c89013752c2c6d4e65\\e7a7298646948a594078c8408a33e265a3e7c3e00b1c287fb6db7a0ae1691edc\\results.csv",
+      "relative_to": "project",
+      "sha256": "4c172891e525b683ce34eb03433062ddabfb498172b41a1a6ae3e314ea308bda",
+      "size_bytes": 565,
+      "format": "csv"
+    },
+    {
+      "path": "result\\exports\\9e7c8823c38f42c89013752c2c6d4e65\\e7a7298646948a594078c8408a33e265a3e7c3e00b1c287fb6db7a0ae1691edc\\results.json",
+      "relative_to": "project",
+      "sha256": "bf6a3309341b1247455f2c29b6ef43876fb0d04c8dea0b7e85cdaaafa745493f",
+      "size_bytes": 4571,
+      "format": "json"
+    }
+  ],
+  "solver_start_calls": 1,
+  "received_receipt": {
+    "schema_version": 1,
+    "phase": "algorithm_adopted",
+    "task_id": "57a8079a-475b-4b85-a6fa-f11058123bcc",
+    "session_id": "c7e6fa55-a723-42d1-ae35-6135fd304e7d",
+    "job": "single-simulation",
+    "parameters": {},
+    "status": "Success",
+    "failure": null,
+    "postprocess": [
+      {
+        "id": 0,
+        "resultName": "frequency",
+        "value": 1147.42692991921,
+        "params": {
+          "iModeNumber": 1
+        }
+      },
+      {
+        "id": 1,
+        "resultName": "rq",
+        "value": 223.541439593232,
+        "params": {
+          "iModeNumber": 1,
+          "axis": "z",
+          "xoffset": 0.0,
+          "yoffset": 0.0,
+          "zoffset": 0.0
+        }
+      }
+    ],
+    "field_artifacts": [],
+    "snapshot": "D:\\work\\cst_tools\\artifacts\\mcp-host-acceptance\\result\\simulation\\9e7c8823c38f42c89013752c2c6d4e65\\worker_single\\single-simulation__f_1147.426930MHz__57a8079a-475b-4b85-a6fa-f11058123bcc\\single-simulation__f_1147.426930MHz.cst",
+    "snapshot_sha256": "f51c862b394645c3547e298d5c95142309c101b16bdde59cdded92ffeba04ac3",
+    "workspace": "D:\\work\\cst_tools\\artifacts\\mcp-host-acceptance\\temp\\worker_single_9e7c8823c38f42c89013752c2c6d4e65\\c7e6fa55-a723-42d1-ae35-6135fd304e7d",
+    "execution_fingerprint": null,
+    "optional_analysis_pending": false
+  },
+  "runner_exit_observation": {
+    "pid": 76268,
+    "pid_exists": false,
+    "public_status_after_shutdown": "RUNNER_UNAVAILABLE"
+  },
+  "this_batch_session_count": 5,
+  "historical_session_count_in_status": 1,
+  "analytic_frequency_mhz": 1147.4252783521006,
+  "relative_frequency_error": 1.4393678965240973e-06,
+  "cleanup": {
+    "models_retained": [
+      "D:\\work\\cst_tools\\artifacts\\mcp-host-acceptance\\control\\definitions\\0553f1417f09453f8595d8f9e169221c\\f44940db452b96a51eeab51e4023fbf57cd7a8ca0062e55342297ee6939301bb\\definition.cst",
+      "D:\\work\\cst_tools\\artifacts\\mcp-host-acceptance\\control\\definitions\\0553f1417f09453f8595d8f9e169221c\\09cbc3b635ee49f6b5dc8b22713fb6ab\\verification-bootstrap\\created\\definition.cst",
+      "D:\\work\\cst_tools\\artifacts\\mcp-host-acceptance\\control\\definitions\\0553f1417f09453f8595d8f9e169221c\\19cfced84cb045efa6c06ecaf4192a18\\verification-edit\\saved\\definition.cst",
+      "D:\\work\\cst_tools\\artifacts\\mcp-host-acceptance\\control\\definitions\\0553f1417f09453f8595d8f9e169221c\\f44940db452b96a51eeab51e4023fbf57cd7a8ca0062e55342297ee6939301bb\\verification-7d7f3e864d7b4b45a5b2e0e52ff15257\\reopened\\definition.cst",
+      "D:\\work\\cst_tools\\artifacts\\mcp-host-acceptance\\control\\definitions\\0553f1417f09453f8595d8f9e169221c\\f44940db452b96a51eeab51e4023fbf57cd7a8ca0062e55342297ee6939301bb\\verification-7d7f3e864d7b4b45a5b2e0e52ff15257\\saved\\definition.cst",
+      "D:\\work\\cst_tools\\artifacts\\mcp-host-acceptance\\temp\\worker_single_9e7c8823c38f42c89013752c2c6d4e65\\c7e6fa55-a723-42d1-ae35-6135fd304e7d\\worker-input.cst",
+      "D:\\work\\cst_tools\\artifacts\\mcp-host-acceptance\\temp\\worker_single_9e7c8823c38f42c89013752c2c6d4e65\\c7e6fa55-a723-42d1-ae35-6135fd304e7d\\worker-input.cst.closed.cst",
+      "D:\\work\\cst_tools\\artifacts\\mcp-host-acceptance\\result\\simulation\\9e7c8823c38f42c89013752c2c6d4e65\\worker_single\\single-simulation__f_1147.426930MHz__57a8079a-475b-4b85-a6fa-f11058123bcc\\single-simulation__f_1147.426930MHz.cst"
+    ],
+    "companion_targets": [
+      "D:\\work\\cst_tools\\artifacts\\mcp-host-acceptance\\control\\definitions\\0553f1417f09453f8595d8f9e169221c\\09cbc3b635ee49f6b5dc8b22713fb6ab\\verification-bootstrap\\created\\definition",
+      "D:\\work\\cst_tools\\artifacts\\mcp-host-acceptance\\control\\definitions\\0553f1417f09453f8595d8f9e169221c\\19cfced84cb045efa6c06ecaf4192a18\\verification-edit\\saved\\definition",
+      "D:\\work\\cst_tools\\artifacts\\mcp-host-acceptance\\control\\definitions\\0553f1417f09453f8595d8f9e169221c\\f44940db452b96a51eeab51e4023fbf57cd7a8ca0062e55342297ee6939301bb\\verification-7d7f3e864d7b4b45a5b2e0e52ff15257\\reopened\\definition",
+      "D:\\work\\cst_tools\\artifacts\\mcp-host-acceptance\\control\\definitions\\0553f1417f09453f8595d8f9e169221c\\f44940db452b96a51eeab51e4023fbf57cd7a8ca0062e55342297ee6939301bb\\verification-7d7f3e864d7b4b45a5b2e0e52ff15257\\saved\\definition",
+      "D:\\work\\cst_tools\\artifacts\\mcp-host-acceptance\\temp\\worker_single_9e7c8823c38f42c89013752c2c6d4e65\\c7e6fa55-a723-42d1-ae35-6135fd304e7d\\worker-input",
+      "D:\\work\\cst_tools\\artifacts\\mcp-host-acceptance\\temp\\worker_single_9e7c8823c38f42c89013752c2c6d4e65\\c7e6fa55-a723-42d1-ae35-6135fd304e7d\\worker-input.cst.closed",
+      "D:\\work\\cst_tools\\artifacts\\mcp-host-acceptance\\result\\simulation\\9e7c8823c38f42c89013752c2c6d4e65\\worker_single\\single-simulation__f_1147.426930MHz__57a8079a-475b-4b85-a6fa-f11058123bcc\\single-simulation__f_1147.426930MHz"
+    ],
+    "removed": true,
+    "regeneration_required_for_fields_and_mesh": true,
+    "pytest_temporary_directories_removed": true
+  },
+  "offline_validation": {
+    "passed": 53,
+    "failed": 0,
+    "seconds": 31.79,
+    "report": "artifacts/desktop-acceptance-tests.xml",
+    "registry_valid": true,
+    "scope": "documentation index/semantics, MCP adapter, definition editing and single simulation service; not all fault gates"
+  },
+  "closeout_validation": {
+    "passed": 11,
+    "seconds": 13.56,
+    "diff_check_passed": true
+  }
+}

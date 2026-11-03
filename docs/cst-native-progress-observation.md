@@ -1,6 +1,6 @@
 # CST 原生阶段记录
 
-阶段4后，生产留档目录集中到 `logs/<run_id>/workers/<worker_id>/<session_id>/native_progress/<task_id>/`；原生源文件仍在temp工作副本的Result内，不改变CST工程文件布局。
+现行留档以Worker.observation_root为根，下面为native_progress/<task_id>/；生产运行目录由可读日志映射分配，不能手拼logs/<run_id>定位。原生源文件仍在temp工作副本的Result内，不改变CST工程文件布局。参见[可读日志目录](readable-log-directories.md)。
 
 Managed Worker 在提交任务前建立观察基线，求解等待期间每 0.2 秒检查 `<会话>/worker-input/Result/progress.log`。它是可覆盖的状态文件，不按 stdout 日志的追加文件方式读取。
 
@@ -47,7 +47,7 @@ Managed Worker 在提交任务前建立观察基线，求解等待期间每 0.2 
 
 100%仅表示CST提供了该数值，不驱动Manager完成、GUI READY、Completion/Ack或HOM区间确认；阶段/文本变化可使局部进度回到0。既不把100%抹掉，也不凭单条样例宣称整个后处理结束。无原生百分比继续显示不确定进度。
 
-测试覆盖本样例、原始证据不变、未知阶段保留、旧事件回放、局部100%不改变RUNNING状态、来源优先级、终态忽略及显示列宽。未启动真实CST；本轮测试数字以current-status为准，真实桌面视觉/未知版本标题仍需现场验收。
+测试覆盖本样例、原始证据不变、未知阶段保留、旧事件回放、局部100%不改变RUNNING状态、来源优先级、终态忽略及显示列宽。未启动真实CST；该批测试数字见下方原日期记录，不由当前状态重新认证，真实桌面视觉/未知版本标题仍需现场验收。
 
 本轮分组验收：主窗口30 passed（1.29s），其余离线578 passed、21 integration deselected（51.25s），合计608项在两个进程中通过；样例/解析/文档索引专项15 passed，与前两组有重叠，不能重复相加。轻量证据artifacts/native-progress-display-gui-20261015.xml、native-progress-display-rest-20261015.xml、native-progress-display-core-20261015.xml，不保证随Git迁移。
 

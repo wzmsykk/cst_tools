@@ -19,7 +19,8 @@ def test_actual_tool_and_markdown_registry_covers_declared_scope():
     documents = {d['path']: d for d in catalog['documents']}
     assert {p for p in paths if p.endswith('.md')} <= documents.keys()
     assert documents['test/fixtures/feature-index-before-d1.md']['authority'] == 'not-current-contract'
-    assert any(d['role']=='unreviewed' for d in documents.values())
+    assert any(d['authority']!='current-defined-scope-only' for d in documents.values())
+    # Unknown roles are allowed, not mandatory after a bounded applicability review.
     for tool in catalog['tools']:
         assert tool['effect'] and tool['authorization'] and tool['unknown'] and tool['evidence']
     assert 'kill' in next(t for t in catalog['tools'] if t['path'].endswith('validate_controller_exit_l5.py'))['effect']

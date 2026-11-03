@@ -1,5 +1,7 @@
 # CST 真实验收：2026-10-13
 
+> 适用性复审（2026-11-03）：原批次实施/故障/验收记录；旧当前、未提交、待做及现场进程状态不代表本次实时事实。现行实现见[当前状态](current-status.md)、[功能索引](feature-index.md)及对应API；不重算或追认旧证据。
+
 源码：32c2bd3fad7334b45e49a58dfdfd3e13ee0f433f。环境：Windows，CST Studio Suite 2022，Python 3.12.7。
 
 执行19项集成测试，采用首个失败即停止。报告 `integration-cst-acceptance-20261013.xml`；现场保存在 `.pytest_cache/cst-acceptance-20261013-01/`。

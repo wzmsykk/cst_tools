@@ -1,5 +1,7 @@
 # Controller / GUI退出与CST真实行为
 
+> 适用性复审（2026-11-03）：按本条原日期、来源/样本范围引用；原当前/未实现/进程或artifact存在性不作实时保证。本次不复验原数据或外部结论，现行执行见[当前状态](../docs/current-status.md)。
+
 后续采用标记补写已完成，见[采用对账](../docs/checkpoint-adoption-l5.md)；本条保留首次发现及其当时边界。
 
 2026-10-24，CST2022.5，Pillbox cell=8两任务副本串行。

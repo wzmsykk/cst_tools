@@ -16,7 +16,11 @@ from .configuration import read_json, write_json_atomic
 from .project_run_lock import ProjectRunLock
 from .saved_project_source import read_saved_source
 from .settings_projection import _Arithmetic, project_history, project_saved_settings
-from .vb_codec import quote_vb_string
+from .winwrap_emitter import (String, Number, Boolean, HistoryCall, With, Symbols,
+    Variable, Element, SubCall, resize_arrays, GeneratedCodeError, validate_parameter_names, assign_string,
+    arithmetic as emit_arithmetic, render_history as emit_history, check_lines)
+from .winwrap_checks import (check_history, check_module, definition_map, map_native_error,
+                             require_calibration)
 
 
 SCHEMA = json.loads((Path(__file__).resolve().parents[1]/'data/first_stage_contract.schema.json').read_text(encoding='utf-8'))
@@ -53,12 +57,19 @@ def arithmetic(spec):
 def check_spec(spec, *, complete=False):
     """Cross-field checks use the existing bounded expression evaluator."""
     params = spec['parameters']
+    try:
+        validate_parameter_names(params)
+    except GeneratedCodeError as error:
+        fail(error.code, error.reason)
     if len(params) > 128 or len({k.lower() for k in params}) != len(params):
         fail('INVALID_ARGUMENT', 'A1 supports at most 128 case-insensitively unique parameters')
     for name, row in params.items():
         if (len(row['expression']) > 4096 or any(c in row['expression'] for c in '\r\n\x00"')
                 or any(ord(c)<32 for c in row['description'])):
             fail('UNSUPPORTED_CAPABILITY', 'bounded single-line arithmetic expressions are required')
+        if (any(ord(c)>0xFFFF or 0xD800<=ord(c)<=0xDFFF for c in row['description'])
+                or row['description']!=row['description'].strip()):
+            fail('UNSUPPORTED_CAPABILITY', 'CST2022 description requires BMP text without edge whitespace; no silent replacement or trimming')
         if name.lower() in ('pi', 'true', 'false', 'e'):
             fail('INVALID_ARGUMENT', 'reserved parameter name')
     numbers = arithmetic(spec)
@@ -130,48 +141,39 @@ def render_history(spec):
     """Only generated allowlisted commands; parameter table is deliberately separate."""
     check_spec(spec, complete=True)
     c = spec['cylinder']; sim = spec['simulation']
-    q = lambda value: '"'+quote_vb_string(value)+'"'
-    def numeric(expression):
-        # Compile bounded arithmetic into numeric VBA in loaded 3D scope.
-        # Parameter references remain in history; never substitute cached values.
-        text=expression.replace('^','**').strip()
-        names={key.lower():key for key in spec['parameters']}
-        def compile_node(node):
-            if isinstance(node,ast.Constant) and type(node.value) in (int,float):
-                return ast.get_source_segment(text,node)
-            if isinstance(node,ast.Name):return 'RestoreDoubleParameter('+q(names[node.id.lower()])+')'
-            if isinstance(node,ast.UnaryOp) and isinstance(node.op,(ast.UAdd,ast.USub)):
-                return '('+('+' if isinstance(node.op,ast.UAdd) else '-')+compile_node(node.operand)+')'
-            if isinstance(node,ast.BinOp):
-                operators={ast.Add:'+',ast.Sub:'-',ast.Mult:'*',ast.Div:'/',ast.Pow:'^'}
-                if type(node.op) in operators:return '('+compile_node(node.left)+operators[type(node.op)]+compile_node(node.right)+')'
-            fail('UNSUPPORTED_CAPABILITY','arithmetic expression cannot compile to A1 history')
-        # A bare multi-argument VBA method cannot start its first argument with
-        # '('; WinWrap treats it as the method's argument-list opener. A zero
-        # additive prefix keeps the exact expression and unambiguous Sub syntax.
-        return '0+'+compile_node(ast.parse(text,mode='eval').body)
-    lines = ['With Units', ' .Geometry "mm"', ' .Frequency "MHz"', 'End With',
-             'ChangeSolverType "HF Eigenmode"', 'With Background', ' .Type "pec"']
-    lines += [' .'+face+'Space 0' for face in ('Xmin','Xmax','Ymin','Ymax','Zmin','Zmax')]
-    lines += ['End With', 'With Boundary']
-    lines += [' .'+face+' "electric"' for face in ('Xmin','Xmax','Ymin','Ymax','Zmin','Zmax')]
-    lines += [' .'+a+'symmetry "none"' for a in 'XYZ']
-    lines += ['End With', 'WCS.ActivateWCS "global"']
-    lines += ['Component.New '+q(name) for name in spec['components']]
-    lines += ['With Cylinder', ' .Reset', ' .Name '+q(c['object_id']), ' .Component '+q(c['component_id']),
-              ' .Material "Vacuum"', ' .Axis '+q(c['axis']), ' .OuterRadius '+numeric(c['outer_radius']),
-              ' .InnerRadius 0', ' .Xcenter 0', ' .Ycenter 0', ' .Zcenter 0',
-              ' .'+c['axis'].upper()+'range '+', '.join(numeric(e) for e in c['axial_range']),
-              ' .Segments 0', ' .Create', 'End With', 'EigenmodeSolver.Reset',
-              'Solver.FrequencyRange '+q(sim['frequency_range_mhz']['min'])+', '+q(sim['frequency_range_mhz']['max']),
-              'Mesh.MeshType "Tetrahedral"', 'With MeshSettings', ' .SetMeshType "Tet"', ' .Set "Version", 1',
-              ' .Set "StepsPerWaveNear", '+q(sim['mesh']['cells_per_wavelength']),
-              ' .Set "StepsPerWaveFar", '+q(sim['mesh']['cells_per_wavelength']),
-              ' .Set "CellsPerWavelengthPolicy", "cellsperwavelength"', 'End With', 'With EigenmodeSolver',
-              ' .SetMethodType "Default", "Tet"', ' .SetMeshType "Tetrahedral Mesh"',
-              ' .SetFrequencyTarget True, '+q(sim['frequency_lower_target_mhz']), ' .SetNumberOfModes 1',
-              ' .SetMeshAdaptationTet False', ' .SetConsiderLossesInPostprocessingOnly True', 'End With']
-    history = '\n'.join(lines)
+    def call(obj, method, *args): return HistoryCall(obj, method, args)
+    def block(obj, rows): return With(obj, tuple(call(obj, method, *args) for method, args in rows))
+    def numeric(value): return emit_arithmetic(value, spec['parameters'])
+    zero = Number('0')
+    nodes = [block('Units', [('Geometry', (String('mm'),)), ('Frequency', (String('MHz'),))]),
+             call('project', 'ChangeSolverType', String('HF Eigenmode')),
+             block('Background', [('Type', (String('pec'),))] +
+                   [(face+'Space', (zero,)) for face in ('Xmin','Xmax','Ymin','Ymax','Zmin','Zmax')]),
+             block('Boundary', [(face, (String('electric'),)) for face in ('Xmin','Xmax','Ymin','Ymax','Zmin','Zmax')] +
+                   [(a+'symmetry', (String('none'),)) for a in 'XYZ']),
+             call('WCS', 'ActivateWCS', String('global'))]
+    nodes += [call('Component', 'New', String(name)) for name in spec['components']]
+    nodes += [block('Cylinder', [
+        ('Reset', ()), ('Name', (String(c['object_id']),)), ('Component', (String(c['component_id']),)),
+        ('Material', (String('Vacuum'),)), ('Axis', (String(c['axis']),)),
+        ('OuterRadius', (numeric(c['outer_radius']),)), ('InnerRadius', (zero,)),
+        ('Xcenter', (zero,)), ('Ycenter', (zero,)), ('Zcenter', (zero,)),
+        (c['axis'].upper()+'range', tuple(numeric(e) for e in c['axial_range'])),
+        ('Segments', (zero,)), ('Create', ())]),
+        call('EigenmodeSolver', 'Reset'),
+        call('Solver', 'FrequencyRange', String(str(sim['frequency_range_mhz']['min'])), String(str(sim['frequency_range_mhz']['max']))),
+        call('Mesh', 'MeshType', String('Tetrahedral')),
+        block('MeshSettings', [('SetMeshType', (String('Tet'),)), ('Set', (String('Version'), Number('1'))),
+            ('Set', (String('StepsPerWaveNear'), String(str(sim['mesh']['cells_per_wavelength'])))),
+            ('Set', (String('StepsPerWaveFar'), String(str(sim['mesh']['cells_per_wavelength'])))),
+            ('Set', (String('CellsPerWavelengthPolicy'), String('cellsperwavelength')))]),
+        block('EigenmodeSolver', [('SetMethodType', (String('Default'), String('Tet'))),
+            ('SetMeshType', (String('Tetrahedral Mesh'),)),
+            ('SetFrequencyTarget', (Boolean(True), String(str(sim['frequency_lower_target_mhz'])))),
+            ('SetNumberOfModes', (Number('1'),)), ('SetMeshAdaptationTet', (Boolean(False),)),
+            ('SetConsiderLossesInPostprocessingOnly', (Boolean(True),))])]
+    history = emit_history(nodes)
+    check_history(history)
     projection = project_history(history, [dict(name=k, expr=v['expression']) for k,v in spec['parameters'].items()], scope='root', available_scopes=('root',))
     if projection.status != 'resolved' or projection.missing_fields:
         fail('SETTING_UNVERIFIED', 'generated history failed A1 projection: '+str(projection.reasons))
@@ -180,31 +182,43 @@ def render_history(spec):
 
 def render_edit_macro(directory, spec, nonce):
     history, _ = render_history(spec)
-    q = lambda value: '"'+quote_vb_string(value)+'"'
+    q = lambda value: String(str(value)).render()
     params = spec['parameters']
-    def assign(name,value):
-        lines=['    '+name+' = ""']
-        # Bound physical WinWrap lines even for non-ASCII descriptions/large expressions.
-        for row,line in enumerate(value.split('\n')):
-            if row:lines.append('    '+name+' = '+name+' & vbCrLf')
-            lines += ['    '+name+' = '+name+' & '+q(line[i:i+24]) for i in range(0,len(line),24)]
-        return lines
-    setup = ['    ReportStage "parameters"']
+    symbols = Symbols(params)
+    for name in ('Main', 'ReportStage', 'CSTToolsBindNewProject', 'CSTToolsProcessId', 'CSTToolsBindingSleep'):
+        symbols.reserve(name)
+    declarations = ', '.join(symbols.declare(name, kind, array=array) for name, kind, array in (
+        ('names', 'String', True), ('expressions', 'String', True), ('history', 'String', False),
+        ('f', 'Integer', False), ('message', 'String', False),
+        ('CSTToolsCheckCode', 'String', False), ('CSTToolsCheckError', 'ErrObject', False)))
+    def assign(target, value): return assign_string(target, value)
+    setup = ['    ' + SubCall('ReportStage', (String('parameters'),)).render()]
     if params:
-        setup += ['    ReDim names(0 To '+str(len(params)-1)+'), expressions(0 To '+str(len(params)-1)+')']
+        setup += ['    ' + resize_arrays((Variable('names'), Variable('expressions')), len(params))]
         for index,(name,row) in enumerate(params.items()):
-            setup += assign('names('+str(index)+')',name)+assign('expressions('+str(index)+')',row['expression'])
+            setup += assign(Element('names', index),name)+assign(Element('expressions', index),row['expression'])
         setup += ['    StoreParameters(names, expressions)']
     for name,row in params.items():
-        setup += assign('message',row['description'])+['    SetParameterDescription '+q(name)+', message']
-    setup += assign('history',history)
-    return ''''#Language "WWB-COM"
+        setup += assign(Variable('message'),row['description'])+['    ' + SubCall('SetParameterDescription', (String(name), Variable('message'))).render()]
+    setup += assign(Variable('history'),history)
+    macro = f''''#Language "WWB-COM"
 Option Explicit
 Sub Main
-    Dim names() As String, expressions() As String, history As String, f As Integer, message As String
+    Dim {declarations}
     On Error GoTo Failed
 '''+ '\n'.join(setup)+f'''
     ReportStage "history"
+    CSTToolsCheckCode = "'#Language ""WWB-COM""" & vbCrLf & "Option Explicit" & vbCrLf & "Sub Main" & vbCrLf & history & vbCrLf & "End Sub"
+    Set CSTToolsCheckError = MacroCheckThis(CSTToolsCheckCode)
+    If Not CSTToolsCheckError Is Nothing Then
+        f = FreeFile
+        Open {q(directory/'history-syntax-error.txt')} For Output As #f
+        Print #f, CStr(CSTToolsCheckError.Number)
+        Print #f, CSTToolsCheckError.Description
+        Print #f, CSTToolsCheckError.Source
+        Close #f
+        Err.Raise vbObjectError + 2995, "A1", "GENERATED_CODE_INVALID: history syntax rejected"
+    End If
     If Not AddToHistory("CST Tools A1 typed definition", history) Then Err.Raise vbObjectError + 2992, "A1", "history rejected"
     ReportStage "rebuild"
     If Not Rebuild Then Err.Raise vbObjectError + 2993, "A1", "rebuild failed"
@@ -217,7 +231,7 @@ Sub Main
     ReportStage "batch-return"
     Exit Sub
 Failed:
-    message = CStr(Err.Number) & " " & Err.Description
+    message = CStr(Err.Number) & " " & Err.Description & " source=" & Err.Source
     On Error Resume Next
     Close
     f = FreeFile
@@ -233,6 +247,9 @@ Private Sub ReportStage(ByVal value As String)
     Close #f
 End Sub
 '''
+    check_lines(macro.splitlines())
+    check_module(macro, params)
+    return macro
 
 
 def build_candidate(service, parent, spec, operation_id, cancel_check, progress):
@@ -243,13 +260,23 @@ def build_candidate(service, parent, spec, operation_id, cancel_check, progress)
     model = directory/'definition.cst'
     nonce = uuid4().hex
     history=render_history(spec)[0]
+    macro=render_edit_macro(directory,spec,nonce)
+    mapping=definition_map(spec,history,macro)
     (directory/'history.vb').write_text(history,encoding='ascii')
+    (directory/'edit.bas').write_text(macro,encoding='ascii',newline='\n')
+    write_json_atomic(directory/'source-map.json',mapping)
     write_json_atomic(directory/'build-intent.json',dict(backend='owned-new-mws-single-runscript',
         parent_revision=parent['document_revision'],spec_sha256=fingerprint(spec),
         history_sha256=hashlib.sha256(history.encode('ascii')).hexdigest()))
     if progress: progress(dict(stage='definition-edit', reason='参数、历史、重建及保存副本', workspace=str(directory)))
     if cancel_check: cancel_check()
-    result = (service.definition_editor or run_new_definition)(service.installations[parent['installation_ref']], model, directory, render_edit_macro(directory,spec,nonce))
+    result = (service.definition_editor or run_new_definition)(service.installations[parent['installation_ref']], model, directory, macro,
+        **({'generated_a1':True} if service.definition_editor is None else {}))
+    syntax = directory/'history-syntax-error.txt'
+    if syntax.exists():
+        raw=syntax.read_text(errors='replace')
+        write_json_atomic(directory/'native-diagnostic.json',map_native_error(raw,mapping))
+        fail('GENERATED_CODE_INVALID','history syntax rejected; diagnostics='+str(directory))
     if (result.get('exit_confirmed') is not True or result.get('exit_code') != 0 or (directory/'failed.txt').exists()
             or not (directory/'completed.txt').exists() or (directory/'completed.txt').read_text().strip() != nonce):
         failure=(directory/'failed.txt').read_text(errors='replace')[:4096] if (directory/'failed.txt').exists() else 'no failure receipt'
@@ -296,7 +323,10 @@ def preflight_edit(service, payload):
     if current.get('document_revision') != payload['expected_document_revision']:
         fail('STALE_DOCUMENT', 'expected revision is not current')
     if parent.get('state') == 'closed': fail('DOCUMENT_CLOSED', 'closed documents cannot be modified')
-    changed_spec(parent, payload)
+    spec = changed_spec(parent, payload)
+    if payload['operation'] == 'save_project':
+        render_history(spec)  # Reject unsupported generated shape before durable intent.
+        require_calibration()
     if payload['operation']=='close_project' and payload['disposition']=='save' and not parent.get('ready'):
         fail('SETTING_UNVERIFIED','save_project must publish a verified definition before close(save)')
     return parent
@@ -317,6 +347,8 @@ def edit_document(service, payload, *, operation_id, cancel_check=None, progress
         assert_definition_sessions_closed(service.catalog)
         parent = preflight_edit(service,payload)
         spec = changed_spec(parent,payload)
+        if payload['operation'] == 'save_project':
+            render_edit_macro(service.catalog/parent['document_id']/operation_id/'verification-edit'/'saved', spec, '0'*32)
         if cancel_check: cancel_check()
         write_json_atomic(intent, dict(payload=payload,document_id=parent['document_id']))
         model = None

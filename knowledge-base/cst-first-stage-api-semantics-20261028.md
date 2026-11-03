@@ -1,5 +1,7 @@
 # CST首阶段接口语义与持久化核查
 
+> 适用性复审（2026-11-03）：按本条原日期、来源/样本范围引用；原当前/未实现/进程或artifact存在性不作实时保证。本次不复验原数据或外部结论，现行执行见[当前状态](../docs/current-status.md)。
+
 日期：2026-10-28，CST2022本机安装版帮助；静态只读，不新增真实CST证据。目标是支撑[首阶段统一契约](../docs/mcp-first-stage-interface-contract.md)，不是完整CST API审计。固定来源和原文件SHA256在`artifacts/first-stage-cst-contract-20261028/sources.json`，提取文本同目录；不保证随Git迁移。
 
 ## 官方文档来源

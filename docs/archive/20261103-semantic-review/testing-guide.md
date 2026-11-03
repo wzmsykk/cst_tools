@@ -1,0 +1,471 @@
+> 历史快照：2026-11-03语义复审前原文，基线2705935。仅重定位相对链接，旧“当前/下一步/测试通过”不代表现行状态。原始字节SHA256：`9639f88f5cad7cd1daf35bb4e77c9be3360f2c23d24b4a19c5ebfb629f521338`。现行入口：[testing-guide.md](../../testing-guide.md)。
+
+# CST Tools 测试基础
+
+GUI退出/资源补偿门禁见[退出契约](../../gui-exit-resource-cleanup.md)：test/exit_resources_test.py为真实文件句柄；test/exit_process_test.py使用真实Qt GUI/Runner Python进程但明确fake执行器，无CST。运行/失败/仅断开/HTTP响应丢失/cmd启动链的正常退出和Windows目录释放独立断言，不用进程强杀制造成功。
+
+当前阶段和已通过 Gate 汇总见[当前状态与实施路线](../../current-status.md)。
+
+## 测试层级
+
+### 1. 默认测试
+
+不启动 CST，适合每次修改后运行：
+
+```powershell
+python -m pytest -q
+```
+
+覆盖 Python 单元测试、Manager 并发、最小文件协议、fake Worker、golden vectors、VBA 静态契约和 Contract Macro 构建。
+
+默认测试也以 `QT_QPA_PLATFORM=offscreen` 覆盖 GUI P0，不显示窗口、不读取真实 CST 配置，也不启动 CST。定向运行命令：
+
+```powershell
+python -m pytest -q test/gui_main_window_test.py
+```
+
+该 Gate 验证完整输入才进入 `READY`、准备和运行期间按钮持续锁定、初始化失败进入 `FAILED`、取消文件选择保持未就绪、后台日志经 Qt signal 更新、失败后可重试、重复启动被拒绝，以及非法状态转换明确失败。P2 进一步验证运行中关闭进入 `STOPPING`、标准停止请求幂等、等待运行/停止线程结束后自动关闭，以及真实四阶段进度更新。P2.6 验证 Worker 数量可配置，并在一次运行期间锁定。
+
+GUI P2.5 使用真实 `CSTManager` 和注入的 Fake Worker 运行完整界面流程：
+
+```powershell
+python -m pytest -q test/gui_fake_worker_flow_test.py
+```
+
+该 Gate 通过界面按钮启动两个 Manager 任务，验证默认 1 个 Worker 时的顺序处理、结果顺序、Worker Failure 到 GUI FAILED 的传播，以及运行中关闭通过 `CSTManager.stop()` 停止 Fake Worker。另一个用例显式选择 Worker 数，验证配置能够传入 Manager；多 Worker 并发由独立 Manager 测试覆盖。它不启动 CST。
+
+GUI P3 的类型配置、Qt 模型通知及新旧 JSON 兼容测试：
+
+```powershell
+python -m pytest -q test/gui_config_models_test.py
+```
+
+该 Gate 验证算法频率范围校验、数字 Validator、稳定后处理 method key、显示名分离、插入/删除行通知、重复结果名拒绝、版本化 JSON 往返，以及 legacy 顶层列表兼容。
+
+GUI P4 的共享主题与语义视觉状态测试：
+
+```powershell
+python -m pytest -q test/gui_theme_test.py
+```
+
+该 Gate 验证共享主题覆盖输入、日志、运行/失败状态，按钮使用 primary、quiet、danger 语义角色，并检查设置窗口的本地化操作文字。主题还通过 Qt offscreen 实际渲染检查。
+
+GUI P5 在同一主题 Gate 中验证主窗口使用真实 Qt Layout，而不是固定坐标；测试分别调整到默认尺寸和最小尺寸，确认日志面板随可用空间伸缩。Qt Designer 源文件可单独校验：
+
+```powershell
+python -m PyQt5.uic.pyuic GUI/ui_main.ui | Out-Null
+```
+
+GUI P6 在配置与主窗口 Gate 中进一步验证：
+
+- 无效算法设置不会关闭窗口，取消恢复已提交值；
+- 后处理保存提交、取消回滚及双击编辑；
+- 重复结果名无法通过新增、整体替换或 JSON 解码进入模型；
+- 设置窗口具有主窗口父子生命周期，并在运行期间冻结；
+- 继续运行和安全模式的选择真实传递到后端。
+
+GUI 唯一启动入口：
+
+```powershell
+python gui_app.py
+```
+
+GUI P6.5 源码启动与打包 Gate：
+
+```powershell
+python gui_app.py --smoke-test
+python -m PyInstaller --clean --noconfirm gui_app.spec
+dist\gui_app.exe --smoke-test
+```
+
+`--smoke-test` 使用真实 GUI 后端创建主窗口、处理 Qt 事件并标准关闭，但不会选择工程或启动 CST。最终打包 Gate 应从仓库外目录启动 `gui_app.exe`，并要求退出码为 0。入口、spec 和启动脚本的默认自动化检查为：
+
+```powershell
+python -m pytest -q test/gui_entrypoint_test.py
+```
+
+当前 Anaconda 构建会报告部分 MKL MPI/PGI/SYCL 可选 DLL 缺失；独立目录 smoke 已以退出码 0 通过，因此这些警告不属于 GUI 启动所需依赖。单文件包仍约 331.8 MB，后续可通过拆分 legacy 数值分析依赖进一步缩减。
+
+GUI P7 Application Service 边界测试：
+
+```powershell
+python -m pytest -q test/gui_application_service_test.py
+```
+
+该 Gate 验证 GUI Service 直接转发现代后端协议、不可变运行请求、Worker 数量边界和标准停止转发。可用以下命令确认旧 Engine API 没有重新泄漏：
+
+```powershell
+rg -n "cst_tools_main|setProjectDir|setRunInfos|starttask|_LegacyBackendAdapter" GUI -g "*.py"
+```
+
+匹配结果应为空。
+
+### 2. 定向协议测试
+
+```powershell
+python -m pytest -q `
+  test/runtime_protocol_test.py `
+  test/runtime_protocol_vba_test.py `
+  test/protocol_contract_test.py
+```
+
+这组测试无需安装 CST，应作为修改 Python/VBA 协议时的最低检查。
+
+### 3. 真实 CST/WWB Contract Test
+
+该测试会启动本机 CST，默认永不运行。必须同时覆盖 pytest marker、显式授权开关和可执行文件路径：
+
+```powershell
+python -m pytest -q -m integration --run-cst `
+  --cst-exe "D:\Program Files (x86)\CST Studio Suite 2022\CST DESIGN ENVIRONMENT.exe" `
+  test/protocol_contract_integration_test.py
+```
+
+也可以设置 `CST_TEST_EXE`，但仍必须传 `--run-cst`。
+
+该历史 Contract Gate 只验证 WWB 协议 Codec：读取 Task、写 Completion、等待 Ack。
+它不打开工程、不运行 Solver；当前生产 Worker 已完成迁移，此测试仅用于防止协议方言回归。
+
+测试通过版本化 OLE ProgID（例如 `CSTStudio.Application.2022`）创建 CST，并持有 `studio.NewMWS` 返回的项目对象。Contract Macro 写出 `contract.result` 并返回后，外部控制器依次调用文档规定的 `Project.Quit` 和 `Application.Quit`，分别关闭项目和退出应用。只有控制器正常返回且本次测试新增的 CST 进程全部退出，测试才会通过。
+
+Contract Macro 由外部 OLE 控制器持有项目对象，因此宏内不得调用 `Quit`；宏返回后由控制器调用 `Project.Quit` / `Application.Quit`。应用级 `-m` Worker 则在 Ack 或明确的 fail-fast 终止路径中请求 `Save/Quit`，并由测试继续验证批处理进程最终正常退出。CST 可能在 batch 尚未返回时记录“Unable to close sheet”诊断，但只要批处理随后以退出码 0 结束且无新增进程/UI 残留，生命周期 Gate 仍成立。任何超时、保存对话框或残留进程都会使 Gate 失败；强制清理只用于恢复环境，不算标准退出。
+
+因此真实 Gate 除协议兼容性外，还证明：测试打开或新建的项目得到妥善处理，结束后不留下必须由用户通过 UI 保存或关闭的问题；在标准退出被实际证明失败之前，不以结束进程代替正常生命周期。
+
+## Golden vectors
+
+冻结文件位于 `test/data/runtime_protocol_v1/`。Python 编码器必须逐字节匹配：
+
+- `task.txt`；
+- `completion-success.txt`；
+- `completion-failure.txt`；
+- `ack.txt`。
+
+修改这些文件等同修改协议。必须说明兼容性影响；不兼容变化应创建 v2，禁止静默更新 v1 fixture 使测试重新通过。
+
+## Contract Macro
+
+`csttool.protocol_contract.prepare_contract_workspace()` 为每次测试建立隔离目录：
+
+```text
+workspace/
+  runtime_protocol_contract.bas
+  contract.result
+  protocol/
+    inbox/
+    completed/
+    ack/
+```
+
+生成的 BAS 由以下模块组成：
+
+- `data/runtime_protocol_v1.vb`：无入口的 Codec；
+- `data/runtime_protocol_contract_main.vb`：唯一测试入口。
+
+## Worker 协议回归 Gate
+
+必须全部满足：
+
+- 默认测试通过；
+- Python 与 golden vectors 逐字节一致；
+- 生成宏只有一个 `Sub Main`；
+- 真实 CST/WWB Contract Test 通过；
+- `.tmp` 不会被读取；
+- 错误 session 被拒绝；
+- Ack 前 Worker 不推进。
+
+该 Gate 已通过，且相同 Codec 已接入独立的一次性 Worker v1。P3 使用 Pillbox 临时副本验证 literal/expression 参数、Rebuild、Eigenmode Solve、Backup Flush、Python 读取 `Result/Frequency (Multiple Modes)/Mode 1.rd0`、Ack 和官方 Save/Quit：
+
+```powershell
+python -m pytest -q -m integration --run-cst `
+  --cst-exe "D:\Program Files (x86)\CST Studio Suite 2022\CST DESIGN ENVIRONMENT.exe" `
+  test/protocol_worker_integration_test.py
+```
+
+联合回归可同时运行 `test/protocol_contract_integration_test.py` 和 `test/protocol_worker_integration_test.py`。
+这里记录的一次性 Worker 是历史迁移 Gate；当前生产路径使用 `ManagedCSTWorker`，旧 `data/worker.vb` 已删除。
+
+P4 双任务 Warm Gate：
+
+```powershell
+python -m pytest -q -m integration --run-cst `
+  --cst-exe "D:\Program Files (x86)\CST Studio Suite 2022\CST DESIGN ENVIRONMENT.exe" `
+  test/protocol_warm_worker_integration_test.py
+```
+
+该 Gate 验证 task 级独立结果目录、Completion/Ack 串行栅栏、两次不同 `.rd0` 以及 Stop Request/Ack 后的标准退出。它记录时间，但单次双点测试不用于宣称 Warm 性能收益。
+
+P4.5/P6.5 I 固定 HOM 结构 Cold/Warm 扫频基准：
+
+```powershell
+python -m pytest -q -m integration --run-cst `
+  --cst-exe "D:\Program Files (x86)\CST Studio Suite 2022\CST DESIGN ENVIRONMENT.exe" `
+  test/protocol_hom_scan_benchmark_integration_test.py
+```
+
+该 Gate 运行两个独立 Cold 频段，再在一个 Warm 进程中运行相同两个频段；逐频段比较 Frequency、Q-Factor、轴上 R/Q、5 mm 偏轴 R/Q、10 mm 偏轴 R/Q 共 5 个原生 `.rd0`，并在 `.pytest_cache/cst-p4-5/<run>/benchmark.json` 保存计时报告。P6.5 I 起，HOM Warm Worker 显式使用 `HOM_PROFILE_V1`：打开工程后、任务循环前只验证一次五个必需模板，报告同时记录 `profile_id`、`profile_preflight_count` 和模板数。本次实测 Cold `328.828s`、Warm `238.484s`，整体墙钟加速约 `1.379x`；双点结果不替代多频段重复统计。
+
+缺模板的 P6.5 I fail-fast Gate 可单独运行：
+
+```powershell
+python -m pytest -q -m integration --run-cst `
+  --cst-exe "D:\Program Files (x86)\CST Studio Suite 2022\CST DESIGN ENVIRONMENT.exe" `
+  test/protocol_hom_scan_benchmark_integration_test.py::test_missing_hom_profile_template_stops_warm_session_before_first_solver
+```
+
+该 Gate 必须在第一个 Solver 前返回 `PROFILE_CAPABILITY_MISSING`，不产生 timing/result，不发布第二任务 Completion，并通过标准 CST 生命周期退出。
+
+P5.5 固定模板/动态运行时后处理边界 Gate：
+
+```powershell
+python -m pytest -q -m integration --run-cst `
+  --cst-exe "D:\Program Files (x86)\CST Studio Suite 2022\CST DESIGN ENVIRONMENT.exe" `
+  test/protocol_hom_runtime_postprocess_integration_test.py
+```
+
+该 Gate 只运行一次 Solver，随后以当前场结果调用 `EigenResult_Complex` 分别计算 x、y、z 积分轴；覆盖 x 轴 y=5 mm、y 轴 x=5 mm、z 轴 y=5 mm 和 z 轴 y=7.5 mm。z 轴 5 mm 与预安装原生 Result Template 对照；后处理阶段不得调用 `StoreParameter`、`Update Params`、Rebuild 或第二次 Solver。结果报告写入 `.pytest_cache/cst-p5-5/<run>/report.json`。
+
+P5.6 已注册 Result Template 当前运行评估 Gate：
+
+```powershell
+python -m pytest -q -m integration --run-cst `
+  --cst-exe "D:\Program Files (x86)\CST Studio Suite 2022\CST DESIGN ENVIRONMENT.exe" `
+  test/protocol_hom_template_evaluation_integration_test.py
+```
+
+该 Gate 通过 CST 官方模板迭代器记录求解前和显式评估后的注册 inventory，并在唯一一次 Solver 完成后调用 `EvaluateResultTemplates`。显式评估前后的 Frequency `.rd0` 必须一致，期间不得修改工程参数、Rebuild 或再次启动 Solver。报告写入 `.pytest_cache/cst-p5-6/<run>/report.json`。CST 2022 没有公开模板注册/删除 VBA API，因此模板安装保留为 Project Profile 的一次性制备步骤，不进入运行期 Python/VBA 协议。
+
+P6 复用同一集成测试文件，并增加一次性 Worker 的缺失能力 fail-fast Gate。正向 Gate 验证 `hom-2022-v1` 的五个模板；负向 Gate 临时要求一个不存在的模板，必须返回 `PROFILE_CAPABILITY_MISSING`，且不产生 timing/result 文件、不启动 Solver、不留下 CST/UI 进程。P6.5 I 则在上述 Cold/Warm 基准文件中验证相同契约已进入有界 Warm Worker。
+
+P6.5 II 不增加新的 CST 工作流，而是收紧能力来源：Cold/Warm 基准显式将同一个 `HOM_PROFILE_V1` 传给 Workspace 和原生结果读取器；P5.5 多轴 Gate 同时用它校验任务、动态 R/Q 能力和原生对照结果。默认测试还使用变体 Profile 验证自定义 `.rd0` 路径、单位、结果分类和积分线路由，防止代码退回模块级 HOM 硬编码。真实回归继续使用前述 P5.5 命令。
+
+P7 将通用核心拆为 `project_profile.py`、`native_results.py` 和 `result_provider.py`。默认测试直接用基础 `ProjectProfile` 构建 Warm Worker，并验证通用严格标量读取和与物理类型无关的 Provider 选择。HOM 模块继续提供兼容入口和 R/Q 领域适配。P7 真实回归使用 P6.5 I 的缺模板定向命令与 P5.5 多轴命令；不需要新增 CST 工作流。
+
+## GUI 新后端迁移 Gate
+
+```powershell
+python -m pytest -q `
+  test/gui_application_service_test.py `
+  test/gui_fake_worker_flow_test.py `
+  test/gui_main_window_test.py
+```
+
+该 Gate 验证 GUI 默认装配新的 `CstApplicationBackend`、旧式注入 Engine 的兼容转换、Fake Worker 成功/失败/停止流程以及窗口状态语义。它不启动 CST。
+
+P9 后端生命周期 Gate：
+
+```powershell
+python -m pytest -q `
+  test/application_backend_test.py `
+  test/gui_application_service_test.py `
+  test/gui_fake_worker_flow_test.py `
+  test/gui_main_window_test.py
+```
+
+该 Gate 进一步验证显式生命周期、非法调用拒绝、初始化失败后重试、算法异常清理、停止幂等性和旧 API 兼容壳。P9 定向结果为 `29 passed`；完整默认测试为 `137 passed, 12 deselected`。
+
+## P10 Manager API 替换 Gate
+
+```powershell
+python -m pytest -q `
+  test/algorithm_manager_contract_test.py `
+  test/cstmanager_test.py `
+  test/application_backend_test.py
+```
+
+该 Gate 使用只实现 `execute/run_batch` 的 Manager 替身验证默认算法已经脱离旧队列接口，同时覆盖并发顺序、失败重试、Worker 回收和应用后端清理。当前定向结果为 `14 passed`，完整默认测试为 `139 passed, 12 deselected`。真实 CST 的默认、TM020 和 WTC 路径仍需分别执行生产验收；默认测试不宣称底层 Worker 已切换到 P7 Warm 文件协议。
+
+## P11 HOM 扫描算法 Gate
+
+```powershell
+python -m pytest -q test/hom_scan_test.py
+```
+
+该 Gate 验证每次只请求一个模式、命中后从该频率右侧微小容差继续、空窗口按窄窗口宽度前移、多模返回拒绝、有限重试、失败原因、原子 checkpoint、策略变更拒绝、Mode 1 后处理协议以及生产算法输出。
+
+该 Gate 不启动 CST。真实验收应使用 `hom-2022-v1` prepared 工程，覆盖普通相邻模式、间隔小于 0.1 MHz 的近邻模式和空窗口，并与人工窄区间 Cold 结果逐模比较。严格同频简并模式需要单独的局部多模探测；通过前不得宣称 P11 已证明真实扫描无漏模。
+
+## P12 GUI Managed Worker Gate
+
+```powershell
+python -m pytest -q test/managed_cstworker_test.py test/gui_fake_worker_flow_test.py
+```
+
+GUI 默认后端使用 `ManagedCSTWorker`，不再创建旧 `local_cstworker + worker.vb`。新 Worker 在一个 CST 会话中循环接收版本化 Task，逐任务执行参数更新、Rebuild、Solver、声明式运行时 VBA 后处理、Backup Flush、Completion/Ack；停止时使用 Stop Request/Ack 后 Save/Quit。单元 Gate 验证动态任务槽、复杂后处理编译、表达式参数和关闭失败传播。
+
+真实 CST Gate 必须另外验证多个连续任务、运行中关闭 GUI、正常完成和故意制造关闭超时。只有 Stop Ack、批处理退出码正常且无新增 CST/UI 进程残留时才算标准退出；强制清场必须使 Gate 失败。
+
+双任务真实 Gate：
+
+```powershell
+python -m pytest -q -m integration --run-cst `
+  --cst-exe "D:\Program Files (x86)\CST Studio Suite 2022\CST DESIGN ENVIRONMENT.exe" `
+  test/managed_cstworker_integration_test.py
+```
+
+当前实测为 `1 passed in 293.37s`。两个参数任务在同一 CST 会话内依次完成，运行时 Frequency 结果成功读取且不同；随后收到 Stop Ack，CST 以退出码 0 自然结束，没有使用强制清场。GUI 运行中关闭的真实端到端 Gate 和故意关闭超时 Gate 仍待补充。
+
+## CST 工程参数预处理 Gate
+
+```powershell
+python -m pytest -q -m integration --run-cst `
+  --cst-exe "D:\Program Files (x86)\CST Studio Suite 2022\CST DESIGN ENVIRONMENT.exe" `
+  test/cst_preprocessor_integration_test.py
+```
+
+该 Gate 使用 CST 2022 打开临时工作副本，通过官方参数 API 添加 `fmin`、`fmax`、`nmodes`、`cell`，并以一个原子 `AddToHistory` 步骤绑定 Frequency Range、Frequency Target、Number of Modes 和四面体网格 `StepsPerWaveNear`，同时关闭四面体自适应网格。宏随后立即执行一次 Rebuild，实际重放包含该步骤的完整 History List；只有 Rebuild、Save 和参数导出全部成功才返回 `SUCCESS`。Gate 要求 prepared 工程和参数清单存在，并验证源 `.cst` 的 SHA-256 不变。预处理器拒绝源/输出为同一路径或覆盖已有输出；Python 不直接修改 `.cst` 容器成员。
+
+Mesh 收敛分析的快速测试使用纯 Python 假评估器验证相对变化、连续稳定判据、提前停止、未收敛和 CSV/JSON 输出。真实 CST 验证应选择“运行前执行 Mesh 收敛分析”，使用较短 Mesh 序列，确认每一级 CST 均最小化运行、Worker 标准退出，且正式工程采用报告中的推荐值。
+
+HOM 扫描另有可复现的概率化假 Worker：
+
+```powershell
+python -m pytest -q test/hom_probabilistic_fake_worker_test.py
+```
+
+它基于固定物理频谱和随机 seed，以可配置概率产生正常单模、空窗口、任务失败、重复边界频率、区间外结果、NaN/Inf 和错误的多模返回。定向场景使用预设事件序列，混合场景使用固定 seed，因此测试覆盖概率事件但不会产生随机失败。
+
+物理频谱可通过 `ProbabilisticHomWorker.from_csv(...)` 从 CST 派生 CSV 载入。默认测试样本取自 `D:\work\HOM_THRESHOLD\all_value_2996-2_ABSORB.csv` 和 `classified_hom.csv` 的真实近邻模式，测试本身使用仓库内最小样本，避免依赖开发机绝对路径。频率基准表 `classified_hom.csv` 的 SHA-256 为 `784274F7E61D8FAE172BF50B61AF685F32B67360F3FC1B6273B1BBFC01D8528F`；141 个模式覆盖 579.328346594951–3002.84867649957 MHz，平均相邻间距 17.3108594993187 MHz，平均密度 0.0577672067663282 模/MHz。间距分布高度不均匀：中位数 1.41670150278321 MHz，最小值 0.0120950619800624 MHz，不能用均匀随机频谱替代。
+
+CSV 假 Worker 保存每个模式的完整数值记录，并按声明式 PPS 的 `resultName`、`method` 和积分偏移返回结果。默认 HOM Gate 覆盖 Frequency、中心/5 mm/10 mm R/Q、Q-factor、Shunt Impedance 和 Total Loss；自定义结果名按 method 映射。CSV 无法提供的后处理项在 Worker 创建阶段明确失败，不使用固定值或零值代替。该模型只覆盖 CSV 已记录的物理量；任意轴、任意积分位置等动态后处理仍需真实 CST Gate 或包含相应字段的数据源。
+
+`ProbabilisticHomWorker.from_csv_randomized(..., model_seed=...)` 提供相似分布随机模型。它从真实相邻模式间距中有放回抽样，再缩放到原始频率范围，因此保持模式总数、频率上下界和平均密度；每个随机模式的后处理值按完整源数据行抽样，保留 Q、R/Q、Shunt Impedance、Total Loss 之间的联合关系。`model_seed` 只控制物理模型，普通 `seed` 仍独立控制协议/求解异常注入。
+
+随机模型 Gate 使用多个固定 `model_seed` 完整扫描各自生成的频谱，要求所有模式逐个找全，并要求每个模式恰好包含默认七项有限后处理值。外部完整表可用于扩大 seed 数量的压力验证，但不作为默认测试路径依赖。
+
+## P14 HOM 安全停止与恢复 Gate
+
+默认测试：
+
+```powershell
+python -m pytest -q `
+  test/hom_run_manifest_test.py `
+  test/hom_scan_test.py `
+  test/cstmanager_test.py `
+  test/managed_cstworker_test.py `
+  test/managed_session_recovery_test.py `
+  test/project_session_recovery_test.py
+```
+
+该 Gate 验证扫描工程、SHA-256、频段和 Worker 数进入不可变
+`scan_manifest.json`；停止后不再派发新区间或轮换 Worker；当前区间完成后原子保存
+checkpoint；VBA 在 `WaitForAck` 阶段也响应 Stop Request，并保留未消费的
+Completion；控制器可在重启后补 ACK。Windows 下 CST 使用独立进程组，普通
+`Ctrl+C` 不再直接传播给 CST。
+
+准备运行时会自动扫描项目 `temp/worker_*/<session>/protocol`。发现未闭合会话时
+进入 `RECOVERY_REQUIRED` 并阻止启动；GUI“恢复会话”在后台补 ACK、发送 Stop
+Request并等待 Stop Ack。标准停止超时测试要求 CST 进程未被 kill；只有显式调用
+`emergency_terminate()` 才允许结束进程，并且不得把项目标记为正常完成。
+每个新 Worker 同时保存 `worker.pid`；恢复器在 Windows 上通过只读进程句柄检查
+PID 是否仍存活。进程已死亡且没有 Stop Ack 时不会伪造 Stop Ack，而是为隔离的
+Worker 副本写入 `abandoned-dead` 恢复凭据，并从最后一个原子 checkpoint 重算。
+仍存活但无响应的进程继续保持 `RECOVERY_REQUIRED`，恢复流程不会自动 kill。
+进程判断覆盖启动器和 Windows 后代进程；显式紧急终止必须结束已记录 PID 的
+整棵进程树，不能只结束启动器并遗留 AMD64 求解进程。
+
+GUI 使用独立的 `RECOVERY_REQUIRED` 状态：选择项目时自动检查残留会话，显示待恢复
+数量，冻结工程、版本与运行配置并禁止启动。运行或标准停止异常后再次查询后端；恢复
+失败仍保留恢复按钮，全部会话收口并写回 `INTERRUPTED` 后才重新允许运行。
+
+真实故障注入 Gate：
+
+```powershell
+python -m pytest -q -s `
+  test/managed_pillbox_fault_recovery_integration_test.py `
+  -m integration --run-cst --cst-exe "<CST DESIGN ENVIRONMENT.exe>"
+```
+
+第一项在 Solver 阶段模拟 Python 控制器丢失，要求新恢复器补 Completion ACK、收到
+StopAck、等待整棵 CST 进程树退出并写入 `standard-stop`。第二项显式终止 CST 进程树，
+要求不伪造 StopAck、写入 `abandoned-dead`，且系统中无 CST 子进程残留。2026-09-20
+CST 2022 实测：`2 passed in 83.54s`。
+
+真实 HOM 十模式分阶段恢复 Gate：
+
+```powershell
+python -m pytest -q -s `
+  test/managed_hom_ten_modes_fault_resume_integration_test.py `
+  -m integration --run-cst --cst-exe "<CST DESIGN ENVIRONMENT.exe>"
+```
+
+Gate 每次只请求 Mode 1，并从已接受频率右侧继续：Mode 3 后执行用户安全暂停；
+Mode 7 在新 Solver 已产生日志后模拟控制器丢失并由协议恢复；Mode 8 后在 Mode 9
+Solver 中终止 CST 进程树，确认该次结果不进入 checkpoint，再从 Mode 8 的安全工程
+快照重算 Mode 9，最后完成 Mode 10。空窗口写入事件并按 50 MHz 推进。
+
+生产接力的快速 Gate 位于 `test/cstmanager_test.py` 与 `test/hom_scan_test.py`：成功任务
+的 `ProjectSnapshot` 必须成为同一 Worker 槽轮换时的输入；显式续跑必须先从 checkpoint
+中的确认快照重建 Worker 池；快照缺失或大小变化必须拒绝续跑。schema 2 checkpoint 保持
+可读并回退原始工程，schema 3 才携带确认快照。
+
+标准批处理 Pillbox 解析 Gate：
+
+```powershell
+python -m pytest -q test/pillbox_standard_batch_test.py
+```
+
+该 Gate 使用四个假 Worker 和真实 `CSTManager.run_batch`，批量改变半径 `R`。假 Worker
+按理想真空圆柱腔 TM010 解析式计算频率，优化器在 180–280 mm 内逐轮缩小搜索区间，
+目标为 500 MHz。参考解析半径为 229.48505567 mm；当前搜索在 54 次独立任务、6 轮后
+得到 229.48730469 mm 和 499.99509991 MHz。Gate 同时要求发生真实并发、Manager 保持
+提交顺序、Worker 轮换仍从基础 Pillbox 工程启动，并且标准任务不产生确认快照接力状态。
+
+同一测试文件还对标准模式执行确定性故障注入：一个半径任务首次直接抛出 Worker
+异常，另一个首次返回结构化 Solver Failure；两者都必须更换对应 Worker、从基础
+Pillbox 工程重启并在原任务上成功重试。永久 Solver Failure 在两次尝试后必须明确
+终止本轮优化，不能返回伪造最优值；解除故障后复用同一 Manager 再次运行必须恢复并
+收敛。所有重建 Worker 的 `cstPath` 都必须是基础工程，且全程不得产生 HOM 确认快照。
+
+真实 CST 标准批处理 Gate：
+
+```powershell
+python -m pytest -q -s test/pillbox_standard_batch_integration_test.py `
+  -m integration --run-cst `
+  --cst-exe "<CST DESIGN ENVIRONMENT.exe>"
+```
+
+该 Gate 使用单个真实 Managed CST Worker，批量 API 仍按提交顺序处理 `R`，只从 CST
+Frequency 后处理选择最优点。此前双 Worker 基线在 15 次求解、3 轮后得到
+`R=230.8125 mm`、`f=499.792534459 MHz`；默认 Worker 数调整为 1 后，Gate 使用该基线附近的
+230.5–231.125 mm 窄区间和 3 点批次重新验证。源工程 SHA-256 必须保持不变，Manager
+不得记录 HOM 确认快照，唯一 Worker 必须通过 Save/Quit 标准退出且不遗留 CST 进程。
+
+2026-09-20 CST 2022 单 Worker 实测：3 次顺序求解、1 轮得到
+`R=230.8125 mm`、`f=499.792534459 MHz`，距目标 `0.207465541 MHz`，耗时
+`431.66 s`；源工程未改变，标准退出且无 CST 残留进程。
+
+2026-09-20 CST 2022 实测频率为：502.882119、504.406888、513.492631、
+687.005013、711.590797、765.999982、771.852902、785.110237、785.686107、
+785.763052 MHz。10 个模式严格递增且各有 Frequency、Q、三条 R/Q、Shunt
+Impedance 和 Total Loss；恢复凭据分别为 `standard-stop/success` 与
+`abandoned-dead`，最终无交互式 CST 进程残留。
+
+## P14.5 CST 输出进度 Gate
+
+```powershell
+python -m pytest -q test/cst_progress_test.py
+```
+
+Managed Worker继续把 stdout/stderr 直接写入无缓冲 `cst.log`，不使用可能阻塞 CST
+的 `PIPE`。独立监控线程只增量读取新增字节，并识别 Mesh、Refinement、
+`Eigenmodes, Pass N` 和 `[... ] N %`。重复百分比会去重，解码或回调异常不得影响
+求解。事件携带 Worker、Task 和 `fmin/fmax` 身份，经 Manager、Backend 和 Qt
+signal 更新 GUI。
+
+GUI 进度条固定标注“当前 CST 阶段”，因为 CST 在不同 Mesh/Solver Pass 中会重新
+从 0% 开始；它不是 HOM 全频段完成率。真实验证复用
+`managed_pillbox_stop_resume_integration_test.py`，并额外要求至少收到一个带
+500–550 MHz 身份的局部百分比事件。2026-09-20 实测：`1 passed in 56.95s`。
+
+真实 Pillbox 生命周期 Gate：
+
+```powershell
+python -m pytest -q -m integration --run-cst `
+  --cst-exe "D:\Program Files (x86)\CST Studio Suite 2022\CST DESIGN ENVIRONMENT.exe" `
+  test/managed_pillbox_stop_resume_integration_test.py
+```
+
+Gate 在第一会话任务运行期间发出安全停止，要求任务完成、结果 ACK、Stop Ack、
+Save/Quit 和退出码 0；随后创建新会话完成下一频段并再次标准退出。任何强制清场
+都会使 Gate 失败。2026-09-20 实测：`1 passed in 84.90s`。

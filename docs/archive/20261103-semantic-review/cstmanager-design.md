@@ -1,0 +1,242 @@
+> 历史快照：2026-11-03语义复审前原文，基线2705935。仅重定位相对链接，旧“当前/下一步/测试通过”不代表现行状态。原始字节SHA256：`9e984d9e523ed1f6e648257190e232b6645e1312fe683e3686c639b67ba1ee72`。现行入口：[cstmanager-design.md](../../cstmanager-design.md)。
+
+# CSTManager 设计文档
+
+状态：当前生产调度层设计。维护中的默认、TM020 和 WTC 算法已经使用 `SimulationTask`；最小 Worker/Profile 实现仍作为独立 Gate 演进，尚未替换底层 Worker。
+
+## 1. 目的
+
+`CSTManager` 为需要反复调用 CST 的优化算法提供一个有边界、可恢复、可测试的本地并发执行层。
+
+它解决的主要问题是：
+
+- 一代优化种群包含多个可并行仿真的个体；
+- 单个 CST 进程可能失败、退出或长期运行后占用过多资源；
+- 每个 CST 实例必须使用隔离的工作目录；
+- 算法需要稳定关联任务名称、参数和结果；
+- 调度逻辑必须在没有 CST 的开发环境中接受单元测试。
+
+## 2. 设计范围
+
+Manager 负责：
+
+- 固定大小 Worker 池；
+- 内存任务队列；
+- 批量并发执行；
+- 失败重试与 Worker 重建；
+- 结果排序和汇总；
+- 生命周期与资源关闭。
+
+Manager 不负责：
+
+- 生成优化参数；
+- 计算目标函数或选择下一代种群；
+- 解析具体后处理物理量；
+- 跨进程或跨主机调度；
+- 持久化任务队列；
+- 判断失败结果能否被业务接受。
+
+这些职责分别属于优化算法、显式注入的 Worker、后处理模块或未来的分布式执行层。
+
+## 3. 组件
+
+### 3.1 `SimulationTask`
+
+不可变任务描述，包含参数、任务名称和重试次数。任务与执行线程、Worker 编号无关，因此可以安全放入共享队列。
+
+### 3.2 `_QueuedTask`
+
+为任务附加全局递增序号。该序号只用于恢复提交顺序，不暴露给 CST Worker。
+
+### 3.3 `_WorkerSlot`
+
+Worker 池中的固定槽位，保存：
+
+- 稳定的 Worker ID；
+- 当前 Worker 实例；
+- 已成功完成的任务数；
+- `ALIVE`、`RESTARTING` 或 `DEAD` 状态。
+
+Worker 失败时替换槽位中的实例，而不是向列表不断追加新 Worker。这保证池容量始终有界。
+
+### 3.4 `CSTManager`
+
+持有配置、队列、槽位和线程池，并提供结构化批量 API。
+
+### 3.5 `WorkerProtocol` 与 Worker 工厂
+
+调度器只依赖两个 Worker 操作：
+
+```python
+runWithParam(resultname, params=...)
+stop()
+```
+
+Worker 工厂必须显式提供。生产后端注入 `ManagedCSTWorker.create`；测试注入假 Worker，从而验证调度、重试和关闭行为而不启动外部程序。
+
+## 4. 数据流
+
+```text
+优化算法
+   │  SimulationTask
+   ▼
+任务队列 Queue[_QueuedTask]
+   │
+   ├──────────────┐
+   ▼              ▼
+Worker Slot 0   Worker Slot 1      固定大小
+   │              │
+   ▼              ▼
+CST Process 0   CST Process 1
+   │              │
+   └──────┬───────┘
+          ▼
+结果队列 Queue[(sequence, result)]
+          │ 按 sequence 排序
+          ▼
+优化算法
+```
+
+## 5. 并发模型
+
+Manager 使用一个最大线程数等于 Worker 数量的 `ThreadPoolExecutor`。
+
+每次 `run_batch()`：
+
+1. 在状态锁内从 `IDLE` 转为 `RUNNING`；
+2. 为每个存活槽位提交一个队列消费循环；
+3. 每个循环通过 `get_nowait()` 原子领取任务；
+4. 每个槽位同一时间最多执行一个任务；
+5. 主调线程等待所有消费循环结束；
+6. Manager 恢复为 `IDLE`。
+
+不使用 `qsize()` 判断后再读取，因为二者之间存在竞争窗口。队列自身提供任务领取的同步保证。
+
+`run_batch()` 有意保持阻塞，与现有优化算法“提交一代、等待一代、处理结果”的流程一致。
+
+## 6. 顺序保证
+
+并发任务的实际完成顺序不确定。Manager 在任务入队时分配序号，并将 `(sequence, result)` 放入结果队列。
+
+`run_batch()` 在返回前按序号排序，因此：
+
+- 任务可以并发执行；
+- 调用方得到的结果仍与提交顺序一致；
+- 算法也可以继续使用 `RunName` 做显式关联。
+
+## 7. 生命周期
+
+Manager 状态机：
+
+```text
+                run_batch
+       ┌────────────────────────┐
+       │                        ▼
+     IDLE ◄────────────────── RUNNING
+       │       batch done
+       │
+       │ stop / context exit
+       ▼
+   STOPPING ─────────────────► CLOSED
+```
+
+规则：
+
+- `IDLE` 可以提交和执行任务；
+- `RUNNING` 不允许再次启动批次；
+- `STOPPING` 和 `CLOSED` 拒绝新任务；
+- `stop()` 幂等；
+- 关闭后的 Manager 不可重新启动，应创建新实例。
+
+Worker 槽位状态机：
+
+```text
+ALIVE ── failure/job limit ──► RESTARTING ── success ──► ALIVE
+                                  │
+                                  └── create failure ──► DEAD
+```
+
+## 8. 失败和重试
+
+一次任务尝试可能：
+
+- 返回 `TaskStatus == "Success"`；
+- 返回 `TaskStatus == "Failure"`；
+- 抛出 Python 异常。
+
+Python 异常会被记录并转换成失败结果，使批量执行不会因为一个 Worker 异常而丢失任务结果。
+
+失败后的处理顺序：
+
+1. 记录失败和当前尝试次数；
+2. 关闭当前 Worker；
+3. 使用相同 Worker ID 和目录配置重新创建 Worker；
+4. 如果还有重试次数，在新 Worker 上重新运行任务；
+5. 重试耗尽则返回最终失败结果。
+
+这里选择“失败后重建”而不是复用进程，因为 CST 失败可能意味着进程或内部工程状态已经不可相信。
+
+## 9. 周期性 Worker 回收
+
+每个槽位记录成功完成的任务数。达到 `max_jobs_per_worker` 后，在执行下一项任务之前重建 Worker。
+
+这是一种针对外部 CST 进程长期运行内存增长的防御措施。计数只统计成功任务；失败会立即触发重建并重置计数。
+
+## 10. 关闭策略
+
+`stop()`：
+
+1. 将 Manager 状态设为 `STOPPING`；
+2. 使用独立的临时线程池并行调用所有 Worker 的 `stop()`；
+3. 单个 Worker 停止失败只记录异常，不阻止其他 Worker 清理；
+4. 关闭主线程池；
+5. 清空任务队列和结果队列；
+6. 清除槽位并转为 `CLOSED`。
+
+上下文管理器把异常路径也纳入关闭流程：
+
+```python
+with CSTManager(...) as manager:
+    manager.run_batch(tasks)
+```
+
+## 11. API 策略
+
+Manager 只公开 `SimulationTask`、`submit()`、`run_batch()` 和 `execute()`。
+Worker 工厂是必需依赖，不允许隐式回退到旧 `local_cstworker`。
+旧队列式 API、旧 Worker 和仓内历史样例已经删除。
+
+## 12. 可测试性
+
+Worker 工厂是显式依赖注入点。并发单元测试使用假 Worker 验证：
+
+- 最大并行度；
+- 提交顺序；
+- 失败后重建和重试；
+- 周期性回收；
+- 结果读取；
+- 关闭和非法状态。
+
+真实 CST 测试使用 `integration` 标记，不进入默认测试套件。
+
+## 13. 当前限制与后续方向
+
+当前限制：
+
+- 仅支持单 Python 进程内的本地线程调度；
+- 任务和结果只保存在内存；
+- 没有公开的单任务取消或 Future API；
+- 没有 Manager 级任务超时，依赖 Worker 自身超时；
+- 批次执行是阻塞式；
+- 真实 CST 关闭速度受外部进程响应时间影响；
+- 默认测试不能代替真实 CST 集成验收。
+
+建议的后续演进顺序：
+
+1. 通过真实 CST Gate 验证默认、TM020 和 WTC 的现代任务调用；
+2. 为成功和失败结果建立正式数据类，逐步替代字典；
+3. 为 Worker 增加明确的启动、健康检查、超时和强制终止协议；
+4. 增加任务取消与进度事件；
+5. 如确有跨机器需求，再引入持久化队列或分布式执行后端。
+
+2026-10-25后续实现：[Mesh/扩窗/窄窗恢复](../../hom-solver-failure-recovery.md)。HOM默认恢复、正常任务不重复写cell，checkpoint v4读取旧v3；退出1仅可在严格已结束/恢复保存及协议证据齐全时按非标准失败退役，不改为标准成功，旧现场分析“仅拒绝/待实现”为历史状态。实际真实CST门禁仍以新文pending为准。

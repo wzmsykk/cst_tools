@@ -1,5 +1,7 @@
 # CST 已安装 WinWrap v9 的检查入口
 
+> 适用性复审（2026-11-03）：按原日期/样本/固定来源保留的研究，不是通用格式规范、现行运行合同或新实测。现行实现见[当前状态](current-status.md)、[功能索引](feature-index.md)及对应API；不重算或追认旧证据。
+
 2026-11-03。**静态类型库核查找到了入口，尚未创建对象或执行SyntaxCheck。** 没有启动CST、注册OCX、读取许可密钥或修改系统组件。读取方式为Windows `LoadTypeLibEx(..., REGKIND_NONE)`，只读取类型库资源，工具见[inspect_winwrap_typelib.py](../test/support/inspect_winwrap_typelib.py)。
 
 ## 找到的接口
