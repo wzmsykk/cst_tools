@@ -55,7 +55,7 @@ def checked_process(identity):
 
 
 def abort_when_running(project, root, identity, *, verify=checked_process, clock=time.monotonic,
-                       pause=time.sleep, timeout=90):
+                       pause=time.sleep, timeout=90, lifecycle_path=None):
     """One attempt only. A lost response stays unknown, never retried."""
     if (root / 'abort-intent.json').exists():
         raise RuntimeError('abort already reserved; reconcile evidence, never replay')
@@ -63,7 +63,7 @@ def abort_when_running(project, root, identity, *, verify=checked_process, clock
     while clock() - started < timeout:
         if (root / 'cancel-bridge').exists():
             raise RuntimeError('bridge cancelled before abort')
-        lifecycle = root / 'lifecycle.log'
+        lifecycle = Path(lifecycle_path) if lifecycle_path is not None else root / 'lifecycle.log'
         text = lifecycle.read_text(encoding='utf-8', errors='replace') if lifecycle.exists() else ''
         if 'calling EigenmodeSolver.Start' in text and project.modeler.is_solver_running():
             kernel, handle = verify(identity)
@@ -98,6 +98,10 @@ def bridge(intent_path):
     identity = intent['identity']
     if Path(identity['project']).resolve() != root / 'worker-input.cst':
         raise ValueError('bridge project/session mismatch')
+    lifecycle = Path(intent.get('lifecycle_path', root / 'lifecycle.log')).resolve()
+    if (ROOT / 'artifacts' not in lifecycle.parents or lifecycle.name != 'lifecycle.log'
+            or lifecycle.parent.name != root.name):
+        raise ValueError('bridge lifecycle/session mismatch')
     kernel, handle = checked_process(identity)
     try:
         sys.path.insert(0, intent['python_libraries'])
@@ -107,7 +111,7 @@ def bridge(intent_path):
         if Path(project.filename()).resolve() != Path(identity['project']).resolve():
             raise ValueError('connected project mismatch')
         write(root / 'bridge-ready.json', dict(identity=identity, project=project.filename()))
-        abort_when_running(project, root, identity)
+        abort_when_running(project, root, identity, lifecycle_path=lifecycle)
     finally:
         kernel.CloseHandle(handle)
 

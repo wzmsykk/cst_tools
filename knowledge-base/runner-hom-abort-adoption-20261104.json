@@ -1,0 +1,883 @@
+{
+  "date": "2026-11-04",
+  "baseline": "b580fd5",
+  "native_root": "artifacts\\runner-hom-abort-74a731d9",
+  "passed": true,
+  "cases": [
+    {
+      "case": "baseline",
+      "passed": true,
+      "driver_sha256": "380968299535428d84586a0bedd4d8332ee39a8a19cd39ad8e7b28999609dc73",
+      "production_hashes": {
+        "csttool/checkpoint_adoption.py": "9074c90cb9977563e6f5a218b493d6fa16467317f161ea65af3e9f160dcee141",
+        "csttool/hom_scan_algorithm.py": "59ccbd539041bf918c1b468dbf9fcb3d79c38d85dfa91b1fb969eb7fc8ac0d99",
+        "csttool/cstmanager.py": "2843ef515cbff19eac23fd814eb233d18a1eaaba059e914ecba40437d337b176",
+        "test/support/validate_solver_abort.py": "69a3775b1c7ca5417148f1b8dba46e461701deeb3786ee3495e707245f1ea7b7"
+      },
+      "solver_calls": 2,
+      "result_hashes_final": {
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\baseline\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__94faaffa-688c-4634-ad97-311634c9038d\\hom_480_530_mesh__f_503.577353MHz\\Result\\h1.m3t": "75e169ab44d0f6b1a7951c31cdd21158cbb1f2641def09dece6ce132fd9a2753",
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\baseline\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__94faaffa-688c-4634-ad97-311634c9038d\\hom_480_530_mesh__f_503.577353MHz\\Result\\e1.m3t": "9e298e8de490345fbe7694052386f6d79d5dc2e14c53df97440aada5f1b85c31",
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\baseline\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__94faaffa-688c-4634-ad97-311634c9038d\\hom_480_530_mesh__f_503.577353MHz.cst": "f3274acba81b143453905c9094b1d817954bfbf82208991fd6a13784be9aecc2",
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\baseline\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__94faaffa-688c-4634-ad97-311634c9038d\\hom_480_530_mesh__f_503.577353MHz\\Result\\henergy1.m3t": "629a431d454b3e9e8c0646c4b0bea953a8e39568f256a77af32f5755c687f481",
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\baseline\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__94faaffa-688c-4634-ad97-311634c9038d\\hom_480_530_mesh__f_503.577353MHz\\Result\\eenergy1.m3t": "2842c8ed5c2987c9b8c6359abb6fe4fbd840a4caf028ad8a29e6726b1c6161a3"
+      },
+      "source_sha256": "7b63939b2dbed3de567aa55a5ff19cb69e7447245882a691be15d28580f1ddfa",
+      "source_unchanged": true,
+      "replacement_from_processed": true,
+      "paused_resume_no_solver_replay": true,
+      "adoption": {
+        "94faaffa-688c-4634-ad97-311634c9038d": [
+          1
+        ]
+      },
+      "closures": [
+        {
+          "session_id": "b10796ed-d066-4619-897e-37c2237dd3fd",
+          "process_state": "exited",
+          "exit_code": 0,
+          "exit_classification": "zero",
+          "model_state": "committed",
+          "task_outcome": "failure",
+          "result_state": "unknown",
+          "disposition": "standard-stop",
+          "standard_closed": true,
+          "needs_recovery": false,
+          "missing_evidence": []
+        },
+        {
+          "session_id": "ebb6d0c2-883c-4693-a401-3ae3f94dfdbf",
+          "process_state": "exited",
+          "exit_code": 0,
+          "exit_classification": "zero",
+          "model_state": "committed",
+          "task_outcome": "success",
+          "result_state": "unknown",
+          "disposition": "standard-stop",
+          "standard_closed": true,
+          "needs_recovery": false,
+          "missing_evidence": []
+        },
+        {
+          "session_id": "15e938f6-f8a2-4528-9a8c-a230a75e1cfa",
+          "process_state": "exited",
+          "exit_code": 0,
+          "exit_classification": "zero",
+          "model_state": "prepared",
+          "task_outcome": "not-started",
+          "result_state": "unknown",
+          "disposition": "standard-stop",
+          "standard_closed": true,
+          "needs_recovery": false,
+          "missing_evidence": []
+        },
+        {
+          "session_id": "88753467-cdf4-4d46-b25b-50a77e73fc9b",
+          "process_state": "exited",
+          "exit_code": 0,
+          "exit_classification": "zero",
+          "model_state": "prepared",
+          "task_outcome": "not-started",
+          "result_state": "unknown",
+          "disposition": "standard-stop",
+          "standard_closed": true,
+          "needs_recovery": false,
+          "missing_evidence": []
+        }
+      ],
+      "remaining_cst": [],
+      "cleaned_companions": 10,
+      "coverage": {
+        "confirmed_frontier": 503.577353822458,
+        "calculated_upper": 530.0
+      },
+      "modes": [
+        {
+          "mode_index": 1,
+          "frequency": 503.577352822458,
+          "values": {
+            "frequency": 503.577352822458,
+            "rq": 183.164985646998
+          },
+          "project_snapshot": "result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__94faaffa-688c-4634-ad97-311634c9038d\\hom_480_530_mesh__f_503.577353MHz.cst",
+          "task_name": "hom_480_530_mesh",
+          "task_id": "94faaffa-688c-4634-ad97-311634c9038d",
+          "mesh_cells_per_wavelength": 12
+        }
+      ],
+      "pending": [
+        {
+          "lo": 503.577353822458,
+          "hi": 530.0
+        }
+      ],
+      "failed": [],
+      "adopted_task_ids": [
+        "94faaffa-688c-4634-ad97-311634c9038d"
+      ],
+      "failed_task_id": "ff7901a8-c3c7-4a0d-9210-0cb076dfd0d2",
+      "abort_response": {
+        "returned": true,
+        "attempt": 1
+      },
+      "actual_abort_failure": "SOLVER_FAILED: solver-result failed: number=-2147418113; description=No Eigenmode results that can be read by methods of the \"EigenmodeSolver\" object have been written to the database so far. This is the case for old projects created earlier than 2013.",
+      "processed_sha256": "22def07075c16c423375fe2e6931563bd47dc559930765de3199b3c374826d33",
+      "processed_unchanged_from_first_task": true,
+      "run_terminal_state": "INTERRUPTED",
+      "scan_complete": false
+    },
+    {
+      "case": "received",
+      "passed": true,
+      "driver_sha256": "380968299535428d84586a0bedd4d8332ee39a8a19cd39ad8e7b28999609dc73",
+      "production_hashes": {
+        "csttool/checkpoint_adoption.py": "9074c90cb9977563e6f5a218b493d6fa16467317f161ea65af3e9f160dcee141",
+        "csttool/hom_scan_algorithm.py": "59ccbd539041bf918c1b468dbf9fcb3d79c38d85dfa91b1fb969eb7fc8ac0d99",
+        "csttool/cstmanager.py": "2843ef515cbff19eac23fd814eb233d18a1eaaba059e914ecba40437d337b176",
+        "test/support/validate_solver_abort.py": "69a3775b1c7ca5417148f1b8dba46e461701deeb3786ee3495e707245f1ea7b7"
+      },
+      "solver_calls": 2,
+      "marker_before": {
+        "receipt": "acknowledged",
+        "indexes": [
+          "acknowledged"
+        ],
+        "events": [
+          0
+        ]
+      },
+      "target_task": "0d52a87c-9c8c-492f-89bd-ef4d00474737",
+      "result_hashes": {},
+      "target_hashes": {
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\received\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__0d52a87c-9c8c-492f-89bd-ef4d00474737\\hom_480_530_mesh__f_503.577353MHz.cst": "346b7adea938095dd8a8db22ab94299ffee5aa44b6f370a89273f3f47c9adf56",
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\received\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__0d52a87c-9c8c-492f-89bd-ef4d00474737\\hom_480_530_mesh__f_503.577353MHz\\Result\\e1.m3t": "1eb9c591f837cc9f6dca54300b5ed16cade920e324d1c7a058b212ee1dd6077b",
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\received\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__0d52a87c-9c8c-492f-89bd-ef4d00474737\\hom_480_530_mesh__f_503.577353MHz\\Result\\eenergy1.m3t": "be6bac483a9ade25e43acdcae1e9e35bb4f2c03c11a8025ea22d1ebdc6b831f4",
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\received\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__0d52a87c-9c8c-492f-89bd-ef4d00474737\\hom_480_530_mesh__f_503.577353MHz\\Result\\h1.m3t": "523f6fdd7571e5995182389d6a51a15489abaf2cb7a93dfccd02906c871dae48",
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\received\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__0d52a87c-9c8c-492f-89bd-ef4d00474737\\hom_480_530_mesh__f_503.577353MHz\\Result\\henergy1.m3t": "da4171ca0497f61d4772721391fb9190174372b28bb3dd6269059c1b32592f29"
+      },
+      "result_hashes_final": {
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\received\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__0d52a87c-9c8c-492f-89bd-ef4d00474737\\hom_480_530_mesh__f_503.577353MHz.cst": "346b7adea938095dd8a8db22ab94299ffee5aa44b6f370a89273f3f47c9adf56",
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\received\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__0d52a87c-9c8c-492f-89bd-ef4d00474737\\hom_480_530_mesh__f_503.577353MHz\\Result\\e1.m3t": "1eb9c591f837cc9f6dca54300b5ed16cade920e324d1c7a058b212ee1dd6077b",
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\received\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__0d52a87c-9c8c-492f-89bd-ef4d00474737\\hom_480_530_mesh__f_503.577353MHz\\Result\\h1.m3t": "523f6fdd7571e5995182389d6a51a15489abaf2cb7a93dfccd02906c871dae48",
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\received\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__0d52a87c-9c8c-492f-89bd-ef4d00474737\\hom_480_530_mesh__f_503.577353MHz\\Result\\henergy1.m3t": "da4171ca0497f61d4772721391fb9190174372b28bb3dd6269059c1b32592f29",
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\received\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__0d52a87c-9c8c-492f-89bd-ef4d00474737\\hom_480_530_mesh__f_503.577353MHz\\Result\\eenergy1.m3t": "be6bac483a9ade25e43acdcae1e9e35bb4f2c03c11a8025ea22d1ebdc6b831f4"
+      },
+      "source_sha256": "7b63939b2dbed3de567aa55a5ff19cb69e7447245882a691be15d28580f1ddfa",
+      "source_unchanged": true,
+      "replacement_from_processed": true,
+      "paused_resume_no_solver_replay": true,
+      "adoption": {
+        "0d52a87c-9c8c-492f-89bd-ef4d00474737": [
+          1,
+          1
+        ]
+      },
+      "closures": [
+        {
+          "session_id": "bcca062d-8b7a-4bd1-afae-d51c840889f9",
+          "process_state": "exited",
+          "exit_code": 0,
+          "exit_classification": "zero",
+          "model_state": "committed",
+          "task_outcome": "failure",
+          "result_state": "unknown",
+          "disposition": "standard-stop",
+          "standard_closed": true,
+          "needs_recovery": false,
+          "missing_evidence": []
+        },
+        {
+          "session_id": "421f1ca9-7dd2-4ac9-aefe-daf56251cd93",
+          "process_state": "exited",
+          "exit_code": null,
+          "exit_classification": "not-observed",
+          "model_state": "committed",
+          "task_outcome": "success",
+          "result_state": "unknown",
+          "disposition": "abandoned-dead",
+          "standard_closed": false,
+          "needs_recovery": false,
+          "missing_evidence": [
+            "exit-code-unobserved"
+          ]
+        },
+        {
+          "session_id": "58e3bf41-5dac-499c-9d10-9aee9291a270",
+          "process_state": "exited",
+          "exit_code": 0,
+          "exit_classification": "zero",
+          "model_state": "prepared",
+          "task_outcome": "not-started",
+          "result_state": "unknown",
+          "disposition": "standard-stop",
+          "standard_closed": true,
+          "needs_recovery": false,
+          "missing_evidence": []
+        },
+        {
+          "session_id": "d1e905bb-e69c-46b9-8e20-bfd1b98bd143",
+          "process_state": "exited",
+          "exit_code": 0,
+          "exit_classification": "zero",
+          "model_state": "prepared",
+          "task_outcome": "not-started",
+          "result_state": "unknown",
+          "disposition": "standard-stop",
+          "standard_closed": true,
+          "needs_recovery": false,
+          "missing_evidence": []
+        },
+        {
+          "session_id": "29e8d7ec-7f20-4e9e-b2b3-fd6e4cbded25",
+          "process_state": "exited",
+          "exit_code": 0,
+          "exit_classification": "zero",
+          "model_state": "prepared",
+          "task_outcome": "not-started",
+          "result_state": "unknown",
+          "disposition": "standard-stop",
+          "standard_closed": true,
+          "needs_recovery": false,
+          "missing_evidence": []
+        },
+        {
+          "session_id": "e88db0f7-6ba2-434e-b04f-6e040be45b55",
+          "process_state": "exited",
+          "exit_code": 0,
+          "exit_classification": "zero",
+          "model_state": "prepared",
+          "task_outcome": "not-started",
+          "result_state": "unknown",
+          "disposition": "standard-stop",
+          "standard_closed": true,
+          "needs_recovery": false,
+          "missing_evidence": []
+        }
+      ],
+      "remaining_cst": [],
+      "cleaned_companions": 14,
+      "coverage": {
+        "confirmed_frontier": 503.577353822458,
+        "calculated_upper": 530.0
+      },
+      "modes": [
+        {
+          "mode_index": 1,
+          "frequency": 503.577352822458,
+          "values": {
+            "frequency": 503.577352822458,
+            "rq": 183.164985646998
+          },
+          "project_snapshot": "result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__0d52a87c-9c8c-492f-89bd-ef4d00474737\\hom_480_530_mesh__f_503.577353MHz.cst",
+          "task_name": "hom_480_530_mesh",
+          "task_id": "0d52a87c-9c8c-492f-89bd-ef4d00474737",
+          "mesh_cells_per_wavelength": 12
+        }
+      ],
+      "pending": [
+        {
+          "lo": 503.577353822458,
+          "hi": 530.0
+        }
+      ],
+      "failed": [],
+      "adopted_task_ids": [
+        "0d52a87c-9c8c-492f-89bd-ef4d00474737"
+      ],
+      "failed_task_id": "d53d6001-6422-450f-b512-ea54757f8816",
+      "abort_response": {
+        "returned": true,
+        "attempt": 1
+      },
+      "actual_abort_failure": "SOLVER_FAILED: solver-result failed: number=-2147418113; description=No Eigenmode results that can be read by methods of the \"EigenmodeSolver\" object have been written to the database so far. This is the case for old projects created earlier than 2013.",
+      "coverage_before": {
+        "confirmed_frontier": 480.0,
+        "calculated_upper": 480.0
+      },
+      "processed_sha256": "2e4ecb85e45b66d696037d8c1425830ad7fbd0e5d07565158bedc24e98738cf0",
+      "processed_unchanged_from_first_task": true,
+      "run_terminal_state": "INTERRUPTED",
+      "scan_complete": false
+    },
+    {
+      "case": "checkpoint",
+      "passed": true,
+      "driver_sha256": "380968299535428d84586a0bedd4d8332ee39a8a19cd39ad8e7b28999609dc73",
+      "production_hashes": {
+        "csttool/checkpoint_adoption.py": "9074c90cb9977563e6f5a218b493d6fa16467317f161ea65af3e9f160dcee141",
+        "csttool/hom_scan_algorithm.py": "59ccbd539041bf918c1b468dbf9fcb3d79c38d85dfa91b1fb969eb7fc8ac0d99",
+        "csttool/cstmanager.py": "2843ef515cbff19eac23fd814eb233d18a1eaaba059e914ecba40437d337b176",
+        "test/support/validate_solver_abort.py": "69a3775b1c7ca5417148f1b8dba46e461701deeb3786ee3495e707245f1ea7b7"
+      },
+      "solver_calls": 2,
+      "marker_before": {
+        "receipt": "acknowledged",
+        "indexes": [
+          "acknowledged"
+        ],
+        "events": [
+          0
+        ]
+      },
+      "target_task": "bb998ecc-1422-4811-8f21-57b15b07fef9",
+      "result_hashes": {
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\checkpoint\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__bb998ecc-1422-4811-8f21-57b15b07fef9\\hom_480_530_mesh__f_503.577353MHz\\Result\\eenergy1.m3t": "4e2f548560d5d91602dd5ac4e9ec2e7186786e0ef72bb6b688c502b344314e61",
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\checkpoint\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__bb998ecc-1422-4811-8f21-57b15b07fef9\\hom_480_530_mesh__f_503.577353MHz.cst": "be307f3da0c554aabda140d88a2aaff5065dbb638a4edf625031e00d262a0431",
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\checkpoint\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__bb998ecc-1422-4811-8f21-57b15b07fef9\\hom_480_530_mesh__f_503.577353MHz\\Result\\henergy1.m3t": "e62ffad68206725a09148a2f020d70b1d6fb3ce03df35136815c6e77db69e9c4",
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\checkpoint\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__bb998ecc-1422-4811-8f21-57b15b07fef9\\hom_480_530_mesh__f_503.577353MHz\\Result\\h1.m3t": "c0831816eec6fb2e7ca020d4d6fc6dc4e6f6395522f34cb3b283924c6ca50162",
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\checkpoint\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__bb998ecc-1422-4811-8f21-57b15b07fef9\\hom_480_530_mesh__f_503.577353MHz\\Result\\e1.m3t": "3c247de2923b0f2f3ff7018f5a1babe468e977d635ce4fe7d67c2db121920347"
+      },
+      "target_hashes": {
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\checkpoint\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__bb998ecc-1422-4811-8f21-57b15b07fef9\\hom_480_530_mesh__f_503.577353MHz.cst": "be307f3da0c554aabda140d88a2aaff5065dbb638a4edf625031e00d262a0431",
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\checkpoint\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__bb998ecc-1422-4811-8f21-57b15b07fef9\\hom_480_530_mesh__f_503.577353MHz\\Result\\e1.m3t": "3c247de2923b0f2f3ff7018f5a1babe468e977d635ce4fe7d67c2db121920347",
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\checkpoint\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__bb998ecc-1422-4811-8f21-57b15b07fef9\\hom_480_530_mesh__f_503.577353MHz\\Result\\eenergy1.m3t": "4e2f548560d5d91602dd5ac4e9ec2e7186786e0ef72bb6b688c502b344314e61",
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\checkpoint\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__bb998ecc-1422-4811-8f21-57b15b07fef9\\hom_480_530_mesh__f_503.577353MHz\\Result\\h1.m3t": "c0831816eec6fb2e7ca020d4d6fc6dc4e6f6395522f34cb3b283924c6ca50162",
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\checkpoint\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__bb998ecc-1422-4811-8f21-57b15b07fef9\\hom_480_530_mesh__f_503.577353MHz\\Result\\henergy1.m3t": "e62ffad68206725a09148a2f020d70b1d6fb3ce03df35136815c6e77db69e9c4"
+      },
+      "result_hashes_final": {
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\checkpoint\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__bb998ecc-1422-4811-8f21-57b15b07fef9\\hom_480_530_mesh__f_503.577353MHz\\Result\\eenergy1.m3t": "4e2f548560d5d91602dd5ac4e9ec2e7186786e0ef72bb6b688c502b344314e61",
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\checkpoint\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__bb998ecc-1422-4811-8f21-57b15b07fef9\\hom_480_530_mesh__f_503.577353MHz.cst": "be307f3da0c554aabda140d88a2aaff5065dbb638a4edf625031e00d262a0431",
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\checkpoint\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__bb998ecc-1422-4811-8f21-57b15b07fef9\\hom_480_530_mesh__f_503.577353MHz\\Result\\henergy1.m3t": "e62ffad68206725a09148a2f020d70b1d6fb3ce03df35136815c6e77db69e9c4",
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\checkpoint\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__bb998ecc-1422-4811-8f21-57b15b07fef9\\hom_480_530_mesh__f_503.577353MHz\\Result\\h1.m3t": "c0831816eec6fb2e7ca020d4d6fc6dc4e6f6395522f34cb3b283924c6ca50162",
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\checkpoint\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__bb998ecc-1422-4811-8f21-57b15b07fef9\\hom_480_530_mesh__f_503.577353MHz\\Result\\e1.m3t": "3c247de2923b0f2f3ff7018f5a1babe468e977d635ce4fe7d67c2db121920347"
+      },
+      "source_sha256": "7b63939b2dbed3de567aa55a5ff19cb69e7447245882a691be15d28580f1ddfa",
+      "source_unchanged": true,
+      "replacement_from_processed": true,
+      "paused_resume_no_solver_replay": true,
+      "adoption": {
+        "bb998ecc-1422-4811-8f21-57b15b07fef9": [
+          1
+        ]
+      },
+      "closures": [
+        {
+          "session_id": "0bae83d8-9737-45d8-95eb-3d38f8602fdb",
+          "process_state": "exited",
+          "exit_code": 0,
+          "exit_classification": "zero",
+          "model_state": "committed",
+          "task_outcome": "failure",
+          "result_state": "unknown",
+          "disposition": "standard-stop",
+          "standard_closed": true,
+          "needs_recovery": false,
+          "missing_evidence": []
+        },
+        {
+          "session_id": "46d2dd67-ea02-46de-bb6e-95c08ec457e4",
+          "process_state": "exited",
+          "exit_code": null,
+          "exit_classification": "not-observed",
+          "model_state": "committed",
+          "task_outcome": "success",
+          "result_state": "unknown",
+          "disposition": "abandoned-dead",
+          "standard_closed": false,
+          "needs_recovery": false,
+          "missing_evidence": [
+            "exit-code-unobserved"
+          ]
+        },
+        {
+          "session_id": "80906d4b-fe6a-4e69-88a9-dd9458288b2f",
+          "process_state": "exited",
+          "exit_code": 0,
+          "exit_classification": "zero",
+          "model_state": "prepared",
+          "task_outcome": "not-started",
+          "result_state": "unknown",
+          "disposition": "standard-stop",
+          "standard_closed": true,
+          "needs_recovery": false,
+          "missing_evidence": []
+        },
+        {
+          "session_id": "cc8c6b74-f378-41db-92da-b9b4d65d189b",
+          "process_state": "exited",
+          "exit_code": 0,
+          "exit_classification": "zero",
+          "model_state": "prepared",
+          "task_outcome": "not-started",
+          "result_state": "unknown",
+          "disposition": "standard-stop",
+          "standard_closed": true,
+          "needs_recovery": false,
+          "missing_evidence": []
+        },
+        {
+          "session_id": "b2bcf284-ca74-4f4c-a919-97b8310ecce7",
+          "process_state": "exited",
+          "exit_code": 0,
+          "exit_classification": "zero",
+          "model_state": "prepared",
+          "task_outcome": "not-started",
+          "result_state": "unknown",
+          "disposition": "standard-stop",
+          "standard_closed": true,
+          "needs_recovery": false,
+          "missing_evidence": []
+        },
+        {
+          "session_id": "a499ef33-2171-4155-882f-1c4f9e875691",
+          "process_state": "exited",
+          "exit_code": 0,
+          "exit_classification": "zero",
+          "model_state": "prepared",
+          "task_outcome": "not-started",
+          "result_state": "unknown",
+          "disposition": "standard-stop",
+          "standard_closed": true,
+          "needs_recovery": false,
+          "missing_evidence": []
+        }
+      ],
+      "remaining_cst": [],
+      "cleaned_companions": 14,
+      "coverage": {
+        "confirmed_frontier": 503.577353822458,
+        "calculated_upper": 530.0
+      },
+      "modes": [
+        {
+          "mode_index": 1,
+          "frequency": 503.577352822458,
+          "values": {
+            "frequency": 503.577352822458,
+            "rq": 183.164985646998
+          },
+          "project_snapshot": "result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__bb998ecc-1422-4811-8f21-57b15b07fef9\\hom_480_530_mesh__f_503.577353MHz.cst",
+          "task_name": "hom_480_530_mesh",
+          "task_id": "bb998ecc-1422-4811-8f21-57b15b07fef9",
+          "mesh_cells_per_wavelength": 12
+        }
+      ],
+      "pending": [
+        {
+          "lo": 503.577353822458,
+          "hi": 530.0
+        }
+      ],
+      "failed": [],
+      "adopted_task_ids": [
+        "bb998ecc-1422-4811-8f21-57b15b07fef9"
+      ],
+      "failed_task_id": "6be3575b-31a3-4ef3-b18b-fbfc97f530c1",
+      "abort_response": {
+        "returned": true,
+        "attempt": 1
+      },
+      "actual_abort_failure": "SOLVER_FAILED: solver-result failed: number=-2147418113; description=No Eigenmode results that can be read by methods of the \"EigenmodeSolver\" object have been written to the database so far. This is the case for old projects created earlier than 2013.",
+      "coverage_before": {
+        "confirmed_frontier": 503.577353822458,
+        "calculated_upper": 530.0
+      },
+      "processed_sha256": "80c6cc916dd44e16a7c64dfb40e30b68ae37746b6cc6cc9d67c57682b8138911",
+      "processed_unchanged_from_first_task": true,
+      "run_terminal_state": "INTERRUPTED",
+      "scan_complete": false
+    },
+    {
+      "case": "journal",
+      "passed": true,
+      "driver_sha256": "380968299535428d84586a0bedd4d8332ee39a8a19cd39ad8e7b28999609dc73",
+      "production_hashes": {
+        "csttool/checkpoint_adoption.py": "9074c90cb9977563e6f5a218b493d6fa16467317f161ea65af3e9f160dcee141",
+        "csttool/hom_scan_algorithm.py": "59ccbd539041bf918c1b468dbf9fcb3d79c38d85dfa91b1fb969eb7fc8ac0d99",
+        "csttool/cstmanager.py": "2843ef515cbff19eac23fd814eb233d18a1eaaba059e914ecba40437d337b176",
+        "test/support/validate_solver_abort.py": "69a3775b1c7ca5417148f1b8dba46e461701deeb3786ee3495e707245f1ea7b7"
+      },
+      "solver_calls": 2,
+      "marker_before": {
+        "receipt": "acknowledged",
+        "indexes": [
+          "acknowledged"
+        ],
+        "events": [
+          1
+        ]
+      },
+      "target_task": "8d5c80af-bf42-4502-84dc-bcdf742036b4",
+      "result_hashes": {
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\journal\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__8d5c80af-bf42-4502-84dc-bcdf742036b4\\hom_480_530_mesh__f_503.577353MHz\\Result\\henergy1.m3t": "6f386a73046ffedbc28c9ca97b96f8385cf645d24ff74d915e37defad5c80cec",
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\journal\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__8d5c80af-bf42-4502-84dc-bcdf742036b4\\hom_480_530_mesh__f_503.577353MHz.cst": "03e777ac29478d840052b88a3e4ea2617755f9d7c7956a4aedf81bf0dda12ee2",
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\journal\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__8d5c80af-bf42-4502-84dc-bcdf742036b4\\hom_480_530_mesh__f_503.577353MHz\\Result\\h1.m3t": "01302a63fd4be4c606a24475a58bf954760222b0946c8fdfd51cf0f0012deda5",
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\journal\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__8d5c80af-bf42-4502-84dc-bcdf742036b4\\hom_480_530_mesh__f_503.577353MHz\\Result\\e1.m3t": "125bc0855a2a37b4e1efef03a57a88bf368c100b30d35b30b29fae399ae67501",
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\journal\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__8d5c80af-bf42-4502-84dc-bcdf742036b4\\hom_480_530_mesh__f_503.577353MHz\\Result\\eenergy1.m3t": "e7ef2b51fef673cadcc2cfc1aa998e5b35aea6c8fc9c3ab0306ec1b030e4115d"
+      },
+      "target_hashes": {
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\journal\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__8d5c80af-bf42-4502-84dc-bcdf742036b4\\hom_480_530_mesh__f_503.577353MHz.cst": "03e777ac29478d840052b88a3e4ea2617755f9d7c7956a4aedf81bf0dda12ee2",
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\journal\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__8d5c80af-bf42-4502-84dc-bcdf742036b4\\hom_480_530_mesh__f_503.577353MHz\\Result\\e1.m3t": "125bc0855a2a37b4e1efef03a57a88bf368c100b30d35b30b29fae399ae67501",
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\journal\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__8d5c80af-bf42-4502-84dc-bcdf742036b4\\hom_480_530_mesh__f_503.577353MHz\\Result\\eenergy1.m3t": "e7ef2b51fef673cadcc2cfc1aa998e5b35aea6c8fc9c3ab0306ec1b030e4115d",
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\journal\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__8d5c80af-bf42-4502-84dc-bcdf742036b4\\hom_480_530_mesh__f_503.577353MHz\\Result\\h1.m3t": "01302a63fd4be4c606a24475a58bf954760222b0946c8fdfd51cf0f0012deda5",
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\journal\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__8d5c80af-bf42-4502-84dc-bcdf742036b4\\hom_480_530_mesh__f_503.577353MHz\\Result\\henergy1.m3t": "6f386a73046ffedbc28c9ca97b96f8385cf645d24ff74d915e37defad5c80cec"
+      },
+      "result_hashes_final": {
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\journal\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__8d5c80af-bf42-4502-84dc-bcdf742036b4\\hom_480_530_mesh__f_503.577353MHz\\Result\\henergy1.m3t": "6f386a73046ffedbc28c9ca97b96f8385cf645d24ff74d915e37defad5c80cec",
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\journal\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__8d5c80af-bf42-4502-84dc-bcdf742036b4\\hom_480_530_mesh__f_503.577353MHz.cst": "03e777ac29478d840052b88a3e4ea2617755f9d7c7956a4aedf81bf0dda12ee2",
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\journal\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__8d5c80af-bf42-4502-84dc-bcdf742036b4\\hom_480_530_mesh__f_503.577353MHz\\Result\\h1.m3t": "01302a63fd4be4c606a24475a58bf954760222b0946c8fdfd51cf0f0012deda5",
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\journal\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__8d5c80af-bf42-4502-84dc-bcdf742036b4\\hom_480_530_mesh__f_503.577353MHz\\Result\\e1.m3t": "125bc0855a2a37b4e1efef03a57a88bf368c100b30d35b30b29fae399ae67501",
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\journal\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__8d5c80af-bf42-4502-84dc-bcdf742036b4\\hom_480_530_mesh__f_503.577353MHz\\Result\\eenergy1.m3t": "e7ef2b51fef673cadcc2cfc1aa998e5b35aea6c8fc9c3ab0306ec1b030e4115d"
+      },
+      "source_sha256": "7b63939b2dbed3de567aa55a5ff19cb69e7447245882a691be15d28580f1ddfa",
+      "source_unchanged": true,
+      "replacement_from_processed": true,
+      "paused_resume_no_solver_replay": true,
+      "adoption": {
+        "8d5c80af-bf42-4502-84dc-bcdf742036b4": [
+          1
+        ]
+      },
+      "closures": [
+        {
+          "session_id": "1a030e4c-abbf-4e4f-92a6-3932ed8d007f",
+          "process_state": "exited",
+          "exit_code": 0,
+          "exit_classification": "zero",
+          "model_state": "committed",
+          "task_outcome": "failure",
+          "result_state": "unknown",
+          "disposition": "standard-stop",
+          "standard_closed": true,
+          "needs_recovery": false,
+          "missing_evidence": []
+        },
+        {
+          "session_id": "54d64cff-9a24-4be1-b82d-7b7299ac1866",
+          "process_state": "exited",
+          "exit_code": null,
+          "exit_classification": "not-observed",
+          "model_state": "committed",
+          "task_outcome": "success",
+          "result_state": "unknown",
+          "disposition": "abandoned-dead",
+          "standard_closed": false,
+          "needs_recovery": false,
+          "missing_evidence": [
+            "exit-code-unobserved"
+          ]
+        },
+        {
+          "session_id": "4878bb08-706b-4541-96e3-100815f4eb61",
+          "process_state": "exited",
+          "exit_code": 0,
+          "exit_classification": "zero",
+          "model_state": "prepared",
+          "task_outcome": "not-started",
+          "result_state": "unknown",
+          "disposition": "standard-stop",
+          "standard_closed": true,
+          "needs_recovery": false,
+          "missing_evidence": []
+        },
+        {
+          "session_id": "2cdce8d5-e9d1-4244-9cf9-a33417343ee5",
+          "process_state": "exited",
+          "exit_code": 0,
+          "exit_classification": "zero",
+          "model_state": "prepared",
+          "task_outcome": "not-started",
+          "result_state": "unknown",
+          "disposition": "standard-stop",
+          "standard_closed": true,
+          "needs_recovery": false,
+          "missing_evidence": []
+        },
+        {
+          "session_id": "46c16842-a65c-4ee2-842d-1b7044de5703",
+          "process_state": "exited",
+          "exit_code": 0,
+          "exit_classification": "zero",
+          "model_state": "prepared",
+          "task_outcome": "not-started",
+          "result_state": "unknown",
+          "disposition": "standard-stop",
+          "standard_closed": true,
+          "needs_recovery": false,
+          "missing_evidence": []
+        },
+        {
+          "session_id": "937a7720-5014-4556-b07a-e509a996f03c",
+          "process_state": "exited",
+          "exit_code": 0,
+          "exit_classification": "zero",
+          "model_state": "prepared",
+          "task_outcome": "not-started",
+          "result_state": "unknown",
+          "disposition": "standard-stop",
+          "standard_closed": true,
+          "needs_recovery": false,
+          "missing_evidence": []
+        }
+      ],
+      "remaining_cst": [],
+      "cleaned_companions": 14,
+      "coverage": {
+        "confirmed_frontier": 503.577353822458,
+        "calculated_upper": 530.0
+      },
+      "modes": [
+        {
+          "mode_index": 1,
+          "frequency": 503.577352822458,
+          "values": {
+            "frequency": 503.577352822458,
+            "rq": 183.164985646998
+          },
+          "project_snapshot": "result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__8d5c80af-bf42-4502-84dc-bcdf742036b4\\hom_480_530_mesh__f_503.577353MHz.cst",
+          "task_name": "hom_480_530_mesh",
+          "task_id": "8d5c80af-bf42-4502-84dc-bcdf742036b4",
+          "mesh_cells_per_wavelength": 12
+        }
+      ],
+      "pending": [
+        {
+          "lo": 503.577353822458,
+          "hi": 530.0
+        }
+      ],
+      "failed": [],
+      "adopted_task_ids": [
+        "8d5c80af-bf42-4502-84dc-bcdf742036b4"
+      ],
+      "failed_task_id": "39431074-77f8-4f7a-a2e7-ce3f92cba2c9",
+      "abort_response": {
+        "returned": true,
+        "attempt": 1
+      },
+      "actual_abort_failure": "SOLVER_FAILED: solver-result failed: number=-2147418113; description=No Eigenmode results that can be read by methods of the \"EigenmodeSolver\" object have been written to the database so far. This is the case for old projects created earlier than 2013.",
+      "coverage_before": {
+        "confirmed_frontier": 503.577353822458,
+        "calculated_upper": 530.0
+      },
+      "processed_sha256": "38f7775fbff2b233e681334de39ad4f21061f793f91867e377f27764b1bb3d4e",
+      "processed_unchanged_from_first_task": true,
+      "run_terminal_state": "INTERRUPTED",
+      "scan_complete": false
+    },
+    {
+      "case": "receipt",
+      "passed": true,
+      "driver_sha256": "380968299535428d84586a0bedd4d8332ee39a8a19cd39ad8e7b28999609dc73",
+      "production_hashes": {
+        "csttool/checkpoint_adoption.py": "9074c90cb9977563e6f5a218b493d6fa16467317f161ea65af3e9f160dcee141",
+        "csttool/hom_scan_algorithm.py": "59ccbd539041bf918c1b468dbf9fcb3d79c38d85dfa91b1fb969eb7fc8ac0d99",
+        "csttool/cstmanager.py": "2843ef515cbff19eac23fd814eb233d18a1eaaba059e914ecba40437d337b176",
+        "test/support/validate_solver_abort.py": "69a3775b1c7ca5417148f1b8dba46e461701deeb3786ee3495e707245f1ea7b7"
+      },
+      "solver_calls": 2,
+      "marker_before": {
+        "receipt": "acknowledged",
+        "indexes": [
+          "algorithm_adopted"
+        ],
+        "events": [
+          1
+        ]
+      },
+      "target_task": "3727dd00-344b-4758-b44f-13e82b4759ea",
+      "result_hashes": {
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\receipt\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__3727dd00-344b-4758-b44f-13e82b4759ea\\hom_480_530_mesh__f_503.577353MHz\\Result\\eenergy1.m3t": "96b3f69e2d88a00f80cebc61d989b0e5b4cd33e24a46ccb54d142052505296dd",
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\receipt\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__3727dd00-344b-4758-b44f-13e82b4759ea\\hom_480_530_mesh__f_503.577353MHz.cst": "0e6c760da4972da28b864a3877832d0314eaa982dc7c00ec78b6e02a47644d3e",
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\receipt\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__3727dd00-344b-4758-b44f-13e82b4759ea\\hom_480_530_mesh__f_503.577353MHz\\Result\\henergy1.m3t": "58e175bad3a718396a5aeed4f78997a5b81d729500349b825abefc0b06e3acf6",
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\receipt\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__3727dd00-344b-4758-b44f-13e82b4759ea\\hom_480_530_mesh__f_503.577353MHz\\Result\\e1.m3t": "69487d098e2e770cc5c750479069dbcb7c58f53c280238b70e7d97b49520fc16",
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\receipt\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__3727dd00-344b-4758-b44f-13e82b4759ea\\hom_480_530_mesh__f_503.577353MHz\\Result\\h1.m3t": "94951ba5aba55e7dca069f78b03c751cf6126f91b2e0b02a4f8298fad5fc660f"
+      },
+      "target_hashes": {
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\receipt\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__3727dd00-344b-4758-b44f-13e82b4759ea\\hom_480_530_mesh__f_503.577353MHz.cst": "0e6c760da4972da28b864a3877832d0314eaa982dc7c00ec78b6e02a47644d3e",
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\receipt\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__3727dd00-344b-4758-b44f-13e82b4759ea\\hom_480_530_mesh__f_503.577353MHz\\Result\\e1.m3t": "69487d098e2e770cc5c750479069dbcb7c58f53c280238b70e7d97b49520fc16",
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\receipt\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__3727dd00-344b-4758-b44f-13e82b4759ea\\hom_480_530_mesh__f_503.577353MHz\\Result\\eenergy1.m3t": "96b3f69e2d88a00f80cebc61d989b0e5b4cd33e24a46ccb54d142052505296dd",
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\receipt\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__3727dd00-344b-4758-b44f-13e82b4759ea\\hom_480_530_mesh__f_503.577353MHz\\Result\\h1.m3t": "94951ba5aba55e7dca069f78b03c751cf6126f91b2e0b02a4f8298fad5fc660f",
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\receipt\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__3727dd00-344b-4758-b44f-13e82b4759ea\\hom_480_530_mesh__f_503.577353MHz\\Result\\henergy1.m3t": "58e175bad3a718396a5aeed4f78997a5b81d729500349b825abefc0b06e3acf6"
+      },
+      "result_hashes_final": {
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\receipt\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__3727dd00-344b-4758-b44f-13e82b4759ea\\hom_480_530_mesh__f_503.577353MHz\\Result\\eenergy1.m3t": "96b3f69e2d88a00f80cebc61d989b0e5b4cd33e24a46ccb54d142052505296dd",
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\receipt\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__3727dd00-344b-4758-b44f-13e82b4759ea\\hom_480_530_mesh__f_503.577353MHz.cst": "0e6c760da4972da28b864a3877832d0314eaa982dc7c00ec78b6e02a47644d3e",
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\receipt\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__3727dd00-344b-4758-b44f-13e82b4759ea\\hom_480_530_mesh__f_503.577353MHz\\Result\\henergy1.m3t": "58e175bad3a718396a5aeed4f78997a5b81d729500349b825abefc0b06e3acf6",
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\receipt\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__3727dd00-344b-4758-b44f-13e82b4759ea\\hom_480_530_mesh__f_503.577353MHz\\Result\\e1.m3t": "69487d098e2e770cc5c750479069dbcb7c58f53c280238b70e7d97b49520fc16",
+        "D:\\work\\cst_tools\\artifacts\\runner-hom-abort-74a731d9\\receipt\\result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__3727dd00-344b-4758-b44f-13e82b4759ea\\hom_480_530_mesh__f_503.577353MHz\\Result\\h1.m3t": "94951ba5aba55e7dca069f78b03c751cf6126f91b2e0b02a4f8298fad5fc660f"
+      },
+      "source_sha256": "7b63939b2dbed3de567aa55a5ff19cb69e7447245882a691be15d28580f1ddfa",
+      "source_unchanged": true,
+      "replacement_from_processed": true,
+      "paused_resume_no_solver_replay": true,
+      "adoption": {
+        "3727dd00-344b-4758-b44f-13e82b4759ea": [
+          1
+        ]
+      },
+      "closures": [
+        {
+          "session_id": "e3cf8ef1-cfcf-49ac-adb5-e0e60edb4599",
+          "process_state": "exited",
+          "exit_code": 0,
+          "exit_classification": "zero",
+          "model_state": "committed",
+          "task_outcome": "failure",
+          "result_state": "unknown",
+          "disposition": "standard-stop",
+          "standard_closed": true,
+          "needs_recovery": false,
+          "missing_evidence": []
+        },
+        {
+          "session_id": "c1198f5c-ffbd-4748-9bff-fcbb85887371",
+          "process_state": "exited",
+          "exit_code": null,
+          "exit_classification": "not-observed",
+          "model_state": "committed",
+          "task_outcome": "success",
+          "result_state": "unknown",
+          "disposition": "abandoned-dead",
+          "standard_closed": false,
+          "needs_recovery": false,
+          "missing_evidence": [
+            "exit-code-unobserved"
+          ]
+        },
+        {
+          "session_id": "2bc728db-6646-4b04-adfd-f417eba587db",
+          "process_state": "exited",
+          "exit_code": 0,
+          "exit_classification": "zero",
+          "model_state": "prepared",
+          "task_outcome": "not-started",
+          "result_state": "unknown",
+          "disposition": "standard-stop",
+          "standard_closed": true,
+          "needs_recovery": false,
+          "missing_evidence": []
+        },
+        {
+          "session_id": "b7d757d9-15ad-4d53-a201-f632f487e944",
+          "process_state": "exited",
+          "exit_code": 0,
+          "exit_classification": "zero",
+          "model_state": "prepared",
+          "task_outcome": "not-started",
+          "result_state": "unknown",
+          "disposition": "standard-stop",
+          "standard_closed": true,
+          "needs_recovery": false,
+          "missing_evidence": []
+        },
+        {
+          "session_id": "bb27bfb2-e869-48fd-9199-6d7a866fb232",
+          "process_state": "exited",
+          "exit_code": 0,
+          "exit_classification": "zero",
+          "model_state": "prepared",
+          "task_outcome": "not-started",
+          "result_state": "unknown",
+          "disposition": "standard-stop",
+          "standard_closed": true,
+          "needs_recovery": false,
+          "missing_evidence": []
+        },
+        {
+          "session_id": "1b2875a2-d45e-40a0-879f-a54e6d9ee492",
+          "process_state": "exited",
+          "exit_code": 0,
+          "exit_classification": "zero",
+          "model_state": "prepared",
+          "task_outcome": "not-started",
+          "result_state": "unknown",
+          "disposition": "standard-stop",
+          "standard_closed": true,
+          "needs_recovery": false,
+          "missing_evidence": []
+        }
+      ],
+      "remaining_cst": [],
+      "cleaned_companions": 14,
+      "coverage": {
+        "confirmed_frontier": 503.577353822458,
+        "calculated_upper": 530.0
+      },
+      "modes": [
+        {
+          "mode_index": 1,
+          "frequency": 503.577352822458,
+          "values": {
+            "frequency": 503.577352822458,
+            "rq": 183.164985646998
+          },
+          "project_snapshot": "result\\worker_1\\hom_480_530_mesh__f_503.577353MHz__3727dd00-344b-4758-b44f-13e82b4759ea\\hom_480_530_mesh__f_503.577353MHz.cst",
+          "task_name": "hom_480_530_mesh",
+          "task_id": "3727dd00-344b-4758-b44f-13e82b4759ea",
+          "mesh_cells_per_wavelength": 12
+        }
+      ],
+      "pending": [
+        {
+          "lo": 503.577353822458,
+          "hi": 530.0
+        }
+      ],
+      "failed": [],
+      "adopted_task_ids": [
+        "3727dd00-344b-4758-b44f-13e82b4759ea"
+      ],
+      "failed_task_id": "0e70d9f0-fa5f-4ccf-a574-4ab2753ae26b",
+      "abort_response": {
+        "returned": true,
+        "attempt": 1
+      },
+      "actual_abort_failure": "SOLVER_FAILED: solver-result failed: number=-2147418113; description=No Eigenmode results that can be read by methods of the \"EigenmodeSolver\" object have been written to the database so far. This is the case for old projects created earlier than 2013.",
+      "coverage_before": {
+        "confirmed_frontier": 503.577353822458,
+        "calculated_upper": 530.0
+      },
+      "processed_sha256": "4db73f4d937d4535df47c62903ad275af7a67a723d2496483115d5108155a8ce",
+      "processed_unchanged_from_first_task": true,
+      "run_terminal_state": "INTERRUPTED",
+      "scan_complete": false
+    }
+  ],
+  "total_actual_solver_starts": 10,
+  "native_driver_hashes": [
+    "380968299535428d84586a0bedd4d8332ee39a8a19cd39ad8e7b28999609dc73"
+  ],
+  "final_driver_sha256": "b3d382591952dfe2ad961be3dc752a1821b12afd8fd6dd6511409e166abd8008",
+  "post_native_change": "Only suite progress/error aggregation changed: partial passing cases cannot set whole matrix passed; native calls/fault hooks/adoption unchanged; offline negative test passes. Keep native driver hash as observed.",
+  "limits": [
+    "Intentional normal pause after first adopted mode; not complete 480--530MHz spectral enumeration",
+    "Failure recovery mesh retry exercised; further real production probe/confirm adoption timing is separate",
+    "Actual Start=1 without readable modes; Start=0/throw remains unverified",
+    "No automatic physical mode identity or frequency drift merging",
+    "Original parent death can leave native exit code unobserved; actual closure evidence retained",
+    "Fields/mesh companions cleaned; regenerate to repeat physical inspection; artifacts not guaranteed in Git"
+  ],
+  "regressions": [
+    {
+      "report": "artifacts/runner-hom-final-regression.xml",
+      "passed": 99
+    },
+    {
+      "report": "artifacts/runner-hom-production-regression.xml",
+      "passed": 98
+    },
+    {
+      "report": "artifacts/runner-hom-final-package.xml",
+      "passed": 47
+    }
+  ],
+  "previous_failures": [
+    {
+      "root": "artifacts/runner-hom-abort-bef22423",
+      "cause": "Bridge watched temporary workspace rather than production observation log; abort not sent; test stopped normally and recovered/shutdown without a solver replay claim"
+    },
+    {
+      "root": "artifacts/runner-hom-abort-5f09512f",
+      "cause": "Real received-boundary recovery reused original successful task but old RunStore index remained acknowledged; fixed cross-run adoption. Earlier suite aggregate partial true was not a complete matrix pass."
+    }
+  ],
+  "failed_probe_cleanup": {
+    "runner-hom-abort-bef22423/baseline": 10,
+    "runner-hom-abort-5f09512f/received": 10
+  },
+  "final_process_check": {
+    "remaining_cst_families": [],
+    "remaining_runner_or_bridge": []
+  }
+}

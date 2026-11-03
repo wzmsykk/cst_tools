@@ -1,8 +1,37 @@
 """Backfill adoption metadata from durable checkpoints; never import or solve."""
 from pathlib import Path
+import math
 from .configuration import read_json, write_json_atomic
 from .result_reconciliation import file_hash
 from .run_store import RunStore
+
+
+def validate_hom_mode_receipt(record, receipt):
+    """Prove persisted mode values against the already received scalar results."""
+    try:
+        mode = record['mode_index']
+        if type(mode) is not int or mode < 1 or not record['values']:
+            raise ValueError('invalid mode or missing values')
+        values = {}
+        for item in receipt['postprocess']:
+            if int((item.get('params') or {}).get('iModeNumber', 1)) != mode:
+                continue
+            name, value = item['resultName'], item['value']
+            if isinstance(value, dict):
+                if len(value) != 1:raise ValueError('ambiguous scalar result')
+                value = next(iter(value.values()))
+            if not isinstance(name, str) or not name or name in values or isinstance(value, bool):
+                raise ValueError('invalid or duplicate metric')
+            values[name] = float(value)
+        expected = {name:float(value) for name,value in record['values'].items()}
+        frequency = [value for name,value in values.items() if name.casefold() == 'frequency']
+        if (len(frequency) != 1 or any(isinstance(v, bool) for v in record['values'].values())
+                or isinstance(record['frequency'], bool)
+                or not all(math.isfinite(v) for v in [*values.values(), *expected.values(), float(record['frequency'])])
+                or expected != values or float(record['frequency']) != frequency[0]):
+            raise ValueError('persisted frequency/metrics differ')
+    except (KeyError, TypeError, ValueError, OverflowError) as error:
+        raise ValueError('HOM checkpoint result differs from receipt') from error
 
 
 def mark_adopted(receipt_path, store, task_id, *, checkpoint=None):
@@ -11,7 +40,27 @@ def mark_adopted(receipt_path, store, task_id, *, checkpoint=None):
         raise ValueError('adoption receipt identity/status mismatch')
     if receipt.get('phase') not in {'received', 'acknowledged', 'algorithm_adopted'}:
         raise ValueError('invalid adoption receipt phase')
-    store.ensure_adopted(task_id, checkpoint=checkpoint)
+    project = store.project.resolve()
+    receipt_path = Path(receipt_path).resolve()
+    if not receipt_path.is_relative_to(project):
+        raise ValueError('adoption receipt outside project')
+    directories = {store.directory.resolve()}
+    directories.update(path.parents[2].resolve() for path in
+                       (project / 'logs').glob('*/tasks/' + task_id + '/attempt.json'))
+    for parent in receipt_path.parents:
+        if parent == project:break
+        if (parent / 'run.json').exists():
+            directories.add(parent.resolve());break
+    # A resumed result may be indexed by both the original and current run.
+    # Validate every related manifest before any adoption mutation.
+    for directory in directories:
+        manifest = read_json(directory / 'run.json')
+        if (not directory.is_relative_to(project) or manifest.get('schema_version') != 1
+                or Path(manifest['project']).resolve() != project):
+            raise ValueError('adoption RunStore project identity mismatch')
+    for directory in sorted(directories):
+        target = store if directory == store.directory.resolve() else RunStore(project, directory)
+        target.ensure_adopted(task_id, checkpoint=checkpoint)
     if receipt['phase'] != 'algorithm_adopted':
         write_json_atomic(receipt_path, {**receipt, 'phase': 'algorithm_adopted'})
 
@@ -86,6 +135,8 @@ def reconcile_checkpoint_adoptions(project, *, progress=None, pause_check=None):
             elif ((record.get('project_snapshot') and (project / record['project_snapshot']).resolve() != snapshot.resolve())
                   or (record.get('task_name') and record['task_name'] != receipt.get('job'))):
                 raise ValueError('HOM checkpoint result differs from receipt')
+            if kind == 'hom':
+                validate_hom_mode_receipt(record, receipt)
         directories = {p.parents[2].resolve() for p in (project / 'logs').glob('*/tasks/' + task + '/attempt.json')}
         for ancestor in path.parents:
             if (ancestor / 'run.json').is_file():

@@ -1999,6 +1999,17 @@
             "run",
             "main"
           ]
+        },
+        {
+          "path": "test/support/validate_runner_hom_abort.py",
+          "label": "生产Runner/HOM中止与采用故障验收",
+          "symbols": [
+            "runner_child",
+            "run_case",
+            "validate_boundary",
+            "received_evidence",
+            "main"
+          ]
         }
       ],
       "tests": [
@@ -2017,6 +2028,10 @@
         {
           "path": "test/solver_abort_probe_test.py",
           "label": "归属拒绝/单次中止/未知响应边界"
+        },
+        {
+          "path": "test/runner_hom_abort_test.py",
+          "label": "生产扫描器/检查点/采用四时点离线故障"
         }
       ],
       "docs": [
@@ -2031,6 +2046,10 @@
         {
           "path": "docs/execution-hardening-five-steps.md",
           "label": "后续五项与隔离/协议边界"
+        },
+        {
+          "path": "docs/runner-hom-abort-adoption.md",
+          "label": "生产中止与结果采用闭环"
         }
       ],
       "provenance": "Migrated from maintained feature-index at c083c58; no new semantic or runtime acceptance."
@@ -2132,7 +2151,8 @@
           "symbols": [
             "confirmed_tasks",
             "reconcile_checkpoint_adoptions",
-            "mark_adopted"
+            "mark_adopted",
+            "validate_hom_mode_receipt"
           ]
         }
       ],
@@ -2146,6 +2166,10 @@
         {
           "path": "docs/checkpoint-adoption-l5.md",
           "label": "采用对账"
+        },
+        {
+          "path": "docs/runner-hom-abort-adoption.md",
+          "label": "HOM采用值核验与四时点恢复"
         }
       ],
       "provenance": "Migrated from maintained feature-index at c083c58; no new semantic or runtime acceptance."
@@ -5230,10 +5254,10 @@
       "authority": "current-defined-scope-only",
       "provenance": "2026-11-03人工适用性/历史堆叠复审；具体检查层级见review，不将分类当逐条事实证明。",
       "review": {
-        "date": "2026-11-03",
-        "baseline": "2705935",
+        "date": "2026-11-04",
+        "baseline": "b580fd5",
         "status": "operational-and-applicability-reviewed",
-        "scope": "核对标准/HOM确认来源、回执/快照绑定、整批验证与逐步补写、截尾修复和幂等边界。",
+        "scope": "五例真实生产Runner/HOM首模采用闭环、四故障边界、源/结果/hash及跨运行/数值核验；首模后暂停，不推定完整频段、物理身份或Start=0/异常。",
         "checked_sources": [
           {
             "path": "csttool/checkpoint_adoption.py"
@@ -5243,13 +5267,22 @@
           },
           {
             "path": "csttool/project_recovery_state.py"
+          },
+          {
+            "path": "test/support/validate_runner_hom_abort.py"
+          },
+          {
+            "path": "test/runner_hom_abort_test.py"
+          },
+          {
+            "path": "knowledge-base/runner-hom-abort-adoption-20261104.json"
           }
         ],
         "finding_ids": [
           "S18"
         ],
         "limitations": "本批逐条静态核对所列源码/保存证据；历史实测及原厂/第三方规范不重新运行或外部认证，不等于完整CST/桌面/物理验收。",
-        "content_sha256_at_review": "7aae2a029e99f8159286fa1e3690d2aaf3c471adc8d51fdeab7bcd18f2bb9567"
+        "content_sha256_at_review": "d19210bf245722e8cef36704d434809271e32183862035ad7c3d0c525c38cc0e"
       }
     },
     {
@@ -5934,9 +5967,9 @@
       "provenance": "D3人工确认维护职责；不授予运行验收。",
       "review": {
         "date": "2026-11-04",
-        "baseline": "24d384a",
+        "baseline": "b580fd5",
         "status": "operational-and-applicability-reviewed",
-        "scope": "官方单次中止/ACK/关闭和processed新Worker恢复已实测；未证明Start=0/自身异常、上层采用或所有阶段；后补CLI错误路径仅离线。",
+        "scope": "五例真实生产Runner/HOM首模采用闭环、四故障边界、源/结果/hash及跨运行/数值核验；首模后暂停，不推定完整频段、物理身份或Start=0/异常。",
         "checked_sources": [
           {
             "path": "csttool/runner.py"
@@ -5979,6 +6012,18 @@
           },
           {
             "path": "knowledge-base/solver-abort-20261104.json"
+          },
+          {
+            "path": "csttool/checkpoint_adoption.py"
+          },
+          {
+            "path": "test/support/validate_runner_hom_abort.py"
+          },
+          {
+            "path": "test/runner_hom_abort_test.py"
+          },
+          {
+            "path": "knowledge-base/runner-hom-abort-adoption-20261104.json"
           }
         ],
         "finding_ids": [
@@ -5986,7 +6031,7 @@
           "S10"
         ],
         "limitations": "重点核对历史堆叠/旧操作语义与责任边界；checked_sources仅列本批主要对照源，不表示每行技术陈述或所有物理/异常分支已验证。",
-        "content_sha256_at_review": "fa97740286e7bc471b151388875a6a29a63e422cf316cb72c48ba89799f170ab"
+        "content_sha256_at_review": "50439a1a1cce31b9fada3c3ec275176227fa90fd270c3fd7ca59fce3a78dd1b5"
       }
     },
     {
@@ -6118,9 +6163,9 @@
       "provenance": "D3人工确认维护职责；不授予运行验收。",
       "review": {
         "date": "2026-11-04",
-        "baseline": "2705935",
+        "baseline": "b580fd5",
         "status": "operational-and-applicability-reviewed",
-        "scope": "2026-11-04对照BatchDesktopLease/stdio及真实恢复报告：区分完成驱动、Start=0/异常未验和小网格模式身份未知；旧批次数字保留日期。",
+        "scope": "五例真实生产Runner/HOM首模采用闭环、四故障边界、源/结果/hash及跨运行/数值核验；首模后暂停，不推定完整频段、物理身份或Start=0/异常。",
         "checked_sources": [
           {
             "path": "scripts/project_inspect.py"
@@ -6145,11 +6190,23 @@
           },
           {
             "path": "knowledge-base/execution-hardening-five-steps-20261104.json"
+          },
+          {
+            "path": "csttool/checkpoint_adoption.py"
+          },
+          {
+            "path": "test/support/validate_runner_hom_abort.py"
+          },
+          {
+            "path": "test/runner_hom_abort_test.py"
+          },
+          {
+            "path": "knowledge-base/runner-hom-abort-adoption-20261104.json"
           }
         ],
         "finding_ids": [],
         "limitations": "本批逐条静态核对所列源码/保存证据；历史实测及原厂/第三方规范不重新运行或外部认证，不等于完整CST/桌面/物理验收。",
-        "content_sha256_at_review": "9cbfcbae9f40c6a607219c25e95ebe46c6b8a421231c4f9638d334808f0c1695"
+        "content_sha256_at_review": "faa84254b8d3a44eac103f40dff4e273a83c62a15e3bf45c4b3351adf822950e"
       }
     },
     {
@@ -7021,9 +7078,9 @@
       "provenance": "D3人工确认维护职责；不授予运行验收。",
       "review": {
         "date": "2026-11-04",
-        "baseline": "24d384a",
+        "baseline": "b580fd5",
         "status": "operational-and-applicability-reviewed",
-        "scope": "官方单次中止/ACK/关闭和processed新Worker恢复已实测；未证明Start=0/自身异常、上层采用或所有阶段；后补CLI错误路径仅离线。",
+        "scope": "五例真实生产Runner/HOM首模采用闭环、四故障边界、源/结果/hash及跨运行/数值核验；首模后暂停，不推定完整频段、物理身份或Start=0/异常。",
         "checked_sources": [
           {
             "path": "csttool/mcp_server.py"
@@ -7060,13 +7117,25 @@
           },
           {
             "path": "knowledge-base/solver-abort-20261104.json"
+          },
+          {
+            "path": "csttool/checkpoint_adoption.py"
+          },
+          {
+            "path": "test/support/validate_runner_hom_abort.py"
+          },
+          {
+            "path": "test/runner_hom_abort_test.py"
+          },
+          {
+            "path": "knowledge-base/runner-hom-abort-adoption-20261104.json"
           }
         ],
         "finding_ids": [
           "S01"
         ],
         "limitations": "重点核对历史堆叠/旧操作语义与责任边界；checked_sources仅列本批主要对照源，不表示每行技术陈述或所有物理/异常分支已验证。",
-        "content_sha256_at_review": "6d12dce8099f7c822b699bd2a4c101e3da0055bc2b7f8debad3e86d78eb42931"
+        "content_sha256_at_review": "fce72db734ae5197e35139ae268a89275a833f39b8040ca664911f1575cf2a7f"
       }
     },
     {
@@ -9078,9 +9147,9 @@
       "provenance": "串行监督工具、原生时序与公共单次服务实现逐项核对",
       "review": {
         "date": "2026-11-04",
-        "baseline": "24d384a",
+        "baseline": "b580fd5",
         "status": "operational-and-applicability-reviewed",
-        "scope": "官方单次中止/ACK/关闭和processed新Worker恢复已实测；未证明Start=0/自身异常、上层采用或所有阶段；后补CLI错误路径仅离线。",
+        "scope": "五例真实生产Runner/HOM首模采用闭环、四故障边界、源/结果/hash及跨运行/数值核验；首模后暂停，不推定完整频段、物理身份或Start=0/异常。",
         "checked_sources": [
           {
             "path": "test/support/validate_public_faults.py"
@@ -9105,11 +9174,23 @@
           },
           {
             "path": "knowledge-base/solver-abort-20261104.json"
+          },
+          {
+            "path": "csttool/checkpoint_adoption.py"
+          },
+          {
+            "path": "test/support/validate_runner_hom_abort.py"
+          },
+          {
+            "path": "test/runner_hom_abort_test.py"
+          },
+          {
+            "path": "knowledge-base/runner-hom-abort-adoption-20261104.json"
           }
         ],
         "finding_ids": [],
         "limitations": "真实结果在同日轻量证据中分批记录；不把旧结果或Fake当新原生验收",
-        "content_sha256_at_review": "1885470a3cebd4928ac74ccda87b1144058695d965e259c0ee6758a7e174da10"
+        "content_sha256_at_review": "b677d63d7b9ceb499bb5435cfb573389b3bb4c4997b88438b830f2ef77370b72"
       }
     },
     {
@@ -9163,6 +9244,41 @@
         "finding_ids": [],
         "limitations": "真实批次仍按独立报告升级；旧原生/离线证据不能相加或推广",
         "content_sha256_at_review": "79768903dbe7fe62b673a55e4875d319ab8556beeaff5e4683fd82105127dc19"
+      }
+    },
+    {
+      "path": "docs/runner-hom-abort-adoption.md",
+      "role": "implementation-and-acceptance",
+      "authority": "current-defined-scope-only",
+      "provenance": "b580fd5后的生产闭环及数值一致性边界",
+      "review": {
+        "date": "2026-11-04",
+        "baseline": "b580fd5",
+        "status": "operational-and-applicability-reviewed",
+        "scope": "五例真实生产Runner/HOM首模采用闭环、四故障边界、源/结果/hash及跨运行/数值核验；首模后暂停，不推定完整频段、物理身份或Start=0/异常。",
+        "checked_sources": [
+          {
+            "path": "test/support/validate_runner_hom_abort.py"
+          },
+          {
+            "path": "csttool/hom_scan_algorithm.py"
+          },
+          {
+            "path": "csttool/checkpoint_adoption.py"
+          },
+          {
+            "path": "csttool/cstmanager.py"
+          },
+          {
+            "path": "test/runner_hom_abort_test.py"
+          },
+          {
+            "path": "knowledge-base/runner-hom-abort-adoption-20261104.json"
+          }
+        ],
+        "finding_ids": [],
+        "limitations": "离线/真实分开；原父死亡退出码未知，真实矩阵状态逐项列出；旧Worker层证据不追认上层。",
+        "content_sha256_at_review": "a64757b72727a174f5c1b2512817d306c08e2584acb0ac765411115dca13e1de"
       }
     }
   ],
@@ -10597,6 +10713,32 @@
       "review_status": "entry-and-controlled-transitive-effects-reviewed",
       "unknown": "正常中止不保证Start=0/Start异常；连接/响应未知不重试，默认无完整求解总超时；不证明任意版本。",
       "evidence": "2026-11-04人工核对run/bridge/abort_when_running调用、命令参数、WinAPI身份句柄、finally及子进程停止目标；真实验收单列。"
+    },
+    {
+      "path": "test/support/validate_runner_hom_abort.py",
+      "entry_kind": "python-main",
+      "main_guard": true,
+      "observed_arguments": [
+        "--case",
+        "--child",
+        "--cst-exe",
+        "--project",
+        "--run-cst"
+      ],
+      "arguments": [
+        "--case",
+        "--child",
+        "--cst-exe",
+        "--project",
+        "--run-cst"
+      ],
+      "argument_discovery": "AST literals and manual parent/child subprocess review",
+      "purpose": "生产Runner/HOM真实中止、processed替代、结果采用及四边界控制器退出的串行副本验收。",
+      "effect": "显式门禁启动Runner及CST副本；官方abort一次，仅kill本轮Python Runner。首个模式采用后Manager正常暂停，重启recover/resume、核验CSV/标记/hash并清理已退出伴随目录。",
+      "authorization": "--run-cst需用户授权；--child/--project/restart仅本轮父进程内部使用，child路径限artifacts，不授权结束CST/树或修改原工程。",
+      "review_status": "entry-and-controlled-transitive-effects-reviewed",
+      "unknown": "首模采用后暂停，不证明整个目标区间；父进程死后原CST退出码可能未知；Start=0/异常及物理模式身份未由本探针证明。",
+      "evidence": "2026-11-04人工核对RunnerClient命令、run_task/归档/adopt/RunStore写入钩子、bridge单次意图、显式集中日志路径、收尾和清理；真实矩阵另列。"
     }
   ],
   "relations": [
@@ -11023,7 +11165,7 @@
       "trigger": "按_received_paths找回执后mark_adopted；恢复入口从已确认检查点补写。",
       "lifecycle": "算法确认/RunStore采用，独立于求解与ACK。",
       "cleanup": "ensure_adopted幂等写入；补写不重复求解或导入。",
-      "evidence": "2026-11-03人工静态核对source/targets；对应文件hash见source_fingerprints。登记、默认分支或注册不证明实际运行/清理成功。",
+      "evidence": "2026-11-03人工静态核对source/targets；对应文件hash见source_fingerprints。登记、默认分支或注册不证明实际运行/清理成功。 2026-11-04复审：恢复采用现逐模式核对接收频率/标量集合，所有任务先校验再写采用；mark_adopted正常调用顺序未变。 同批真实received边界及离线复现旧RunStore索引停留acknowledged；mark_adopted先验证所有相关运行再同步日志/索引、最后receipt，写入缺口与外项目拒绝回归通过。 最终74a731d9五个真实场景通过，旧/新RunStore各一次；严格模式值门禁及相关运行写入缺口离线通过。",
       "unknown": "检查点、回执及hash真实一致性仍需数据证据，不能把收到Completion当采用。",
       "consumers": []
     },
@@ -11365,7 +11507,7 @@
       "trigger": "明确--run-cst及独占验收锁；测试回调实际求解，检查点写后中断再从磁盘重载。",
       "lifecycle": "每个请求自身Managed副本串行；roundtrip复用一Worker；失败只允许标准关闭或严格退役后另建。",
       "cleanup": "不强杀CST，失败保留诊断；成功/核对后清理本例可再生伴随目录；源hash不变。",
-      "evidence": "2026-11-04复审生成模板、真实拒绝、checkpoint-save/adopt顺序和暂停标签；hom_native_probe_test不启动CST。 2026-11-04真实da01c6ed驱动通过，四阶段重载、实际密度读回、ACK/收尾，非模式互异认证。",
+      "evidence": "2026-11-04复审生成模板、真实拒绝、checkpoint-save/adopt顺序和暂停标签；hom_native_probe_test不启动CST。 2026-11-04真实da01c6ed驱动通过，四阶段重载、实际密度读回、ACK/收尾，非模式互异认证。 2026-11-04复审：本探针直接mark_adopted不经新reconcile数值核验，不提升旧验收范围。 mark_adopted跨运行收口仅同步同Task已有元数据，不导入结果/调用Solver；旧探针直接调用范围不扩大。",
       "unknown": "测试几何去混杂和扫描器回调不代表任意生产模型、迭代失败或完整GUI生命周期通过。"
     },
     {
@@ -11409,8 +11551,56 @@
       "trigger": "--run-cst持独占锁；先创建Worker，子Python按身份精确连接并ready后才派任务；日志Start且is_solver_running为真才发一次abort。",
       "lifecycle": "Managed同步run_task；桥接独立bundled Python、持原生只读身份句柄，核项目路径；原生方法不猜timeout单位，桥接连接/退出有界。",
       "cleanup": "只允许结束本轮Python桥接，不终止CST/进程树；失败Worker正常stop或严格退役，确认无CST才新Worker；成功结束后清理伴随目录。",
-      "evidence": "2026-11-04人工复审子进程命令/内部--bridge父身份、WinAPI创建时间/程序核验、abort意图先行和响应缺失不重试；22项离线含既有阶段分类。 独占意图写入及fsync先于abort；已有意图/并发预约拒绝，两个子项目分别汇总会话。 原生b632e158两任务两次Start、标准退出；CLI外部路径拒绝后补离线反例，native源码hash独立保留。",
+      "evidence": "2026-11-04人工复审子进程命令/内部--bridge父身份、WinAPI创建时间/程序核验、abort意图先行和响应缺失不重试；22项离线含既有阶段分类。 独占意图写入及fsync先于abort；已有意图/并发预约拒绝，两个子项目分别汇总会话。 原生b632e158两任务两次Start、标准退出；CLI外部路径拒绝后补离线反例，native源码hash独立保留。 2026-11-04复审：bridge可显式读集中lifecycle_path，限artifacts及同会话；路径错误拒绝，不改变精确工程/原生身份核验或单次abort。 显式lifecycle_path对应集中observation_root，新增离线测试证明无需临时根的同名日志。",
       "unknown": "不是生产即时停止服务；Start=0/Start自身异常由实际结果决定；正常中止后可能仍Start=1无结果；不是模式身份认证。"
+    },
+    {
+      "id": "R027",
+      "source": {
+        "path": "test/support/validate_runner_hom_abort.py",
+        "symbol": "run_case"
+      },
+      "targets": [
+        {
+          "path": "test/support/validate_runner_hom_abort.py",
+          "symbol": "spawn"
+        },
+        {
+          "path": "test/support/validate_runner_hom_abort.py",
+          "symbol": "runner_child"
+        },
+        {
+          "path": "test/support/validate_runner_hom_abort.py",
+          "symbol": "validate_boundary"
+        },
+        {
+          "path": "test/support/validate_runner_hom_abort.py",
+          "symbol": "received_evidence"
+        },
+        {
+          "path": "csttool/runner_client.py",
+          "symbol": "RunnerClient.command"
+        },
+        {
+          "path": "csttool/hom_scan_algorithm.py",
+          "symbol": "HomScanAlgorithm.start"
+        },
+        {
+          "path": "csttool/checkpoint_adoption.py",
+          "symbol": "reconcile_checkpoint_adoptions"
+        },
+        {
+          "path": "test/support/validate_solver_abort.py",
+          "symbol": "bridge"
+        }
+      ],
+      "consumers": [],
+      "type": "runner-hom-native-adoption-fault-driver",
+      "trigger": "显式--run-cst持独占门禁，父RunnerClient命令；子进程钩子中止首任务、首模式采用后正常暂停，按case在接收/检查点/日志/回执时点门控。",
+      "lifecycle": "子Runner后台线程经生产Manager/Managed；bridge先ready后求解，以集中lifecycle_path观察本会话；故障只结束精确Popen Runner，不结束原生子树。",
+      "cleanup": "恢复先物理收尾/对账再续跑；源及结果hash不变；正常暂停后所有原生关闭并正式shutdown Runner。失败保留报告；注入失败父控制器正式stop，已结束伴随目录才清理。",
+      "evidence": "2026-11-04核对五场景、边界标记三元组、快照重命名索引、回执/日志幂等、processed来源及故障回调；离线真实生产scanner/RunStore不等于OS崩溃实测。 五场景固定首模后暂停，正常基线/received索引缺口分别留原报告；只保证实际Solver两次，逻辑请求预算单列。 最终五例真实每例两次Start，原生期间driver hash一致；后补main汇总状态失败保护仅离线验，不改写实测源码版本。",
+      "unknown": "只在首模式采用后暂停；不证明全目标数值完备、模式互异或原父死亡后的退出码。"
     }
   ],
   "source_fingerprints": {
@@ -11430,7 +11620,7 @@
     "csttool/acceptance_session.py": "7a08444bdc9917cde0f20e60a92694cace80088025066a29abebf63d892ab74c",
     "csttool/application_backend.py": "b8c68227c0a7b682b5455ad0aecd059d12f6fc92d5a545c0d95a2ef6beae556c",
     "csttool/application_service.py": "e11dee6406dc8ca58279336b9113f2e148a1b080b369ecf7068c3c7bc43bb875",
-    "csttool/checkpoint_adoption.py": "e0c9479b6efc982074f3b760a053ce8274b0c707f3c525e919aabd96200f54ce",
+    "csttool/checkpoint_adoption.py": "9074c90cb9977563e6f5a218b493d6fa16467317f161ea65af3e9f160dcee141",
     "csttool/close_receipt.py": "12de980b1687fc0c68a5aab73853ce9739777339a0f3c59f6aaa5638db62a1ef",
     "csttool/close_receipt_contract.py": "6be66ba28ec6f9e78a63283c4b64717c01382f4e60495d8cae3e66cbf1528709",
     "csttool/cst_background.py": "868759ac579630be33d5885f76ec2840f9b5bc0164ee8978a1cd52844bda7e2c",
@@ -11558,7 +11748,8 @@
     "csttool/batch_desktop.py": "90976bb2b871a014e3c509343ab551dc5f6bb60b339c7f5e98ca818d310a6d91",
     "test/support/validate_hom_recovery_native.py": "c7f981034cb6453209e580bdc1cb96ded4914140a1fdf0c90ff8283d489adb1d",
     "csttool/mcp_stdio.py": "be3698d63ffb87c0211d83c45f78d118b6652b9fd2b6c170f6561a0618014698",
-    "test/support/validate_solver_abort.py": "2bf5fec88aec3dc4db250cb1d910c323e6971c52c6f8832b57257f59cde8028a"
+    "test/support/validate_solver_abort.py": "69a3775b1c7ca5417148f1b8dba46e461701deeb3786ee3495e707245f1ea7b7",
+    "test/support/validate_runner_hom_abort.py": "b3d382591952dfe2ad961be3dc752a1821b12afd8fd6dd6511409e166abd8008"
   },
   "registry_policy": {
     "enforce_tool_scope": true,

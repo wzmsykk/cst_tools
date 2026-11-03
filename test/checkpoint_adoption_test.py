@@ -126,6 +126,53 @@ def test_shared_runstore_instances_serialize_adoption(tmp_path):
     assert len(adoptions(store, task)) == 1
 
 
+def test_reused_received_task_adoption_updates_original_and_resuming_runstores(tmp_path):
+    task, original, receipt, snapshot, checkpoint = fixture(tmp_path)
+    resumed = RunStore(tmp_path, tmp_path / 'logs/resumed')
+    resumed.event(task, 'reconciled')
+    from csttool.checkpoint_adoption import mark_adopted
+    mark_adopted(receipt, resumed, task, checkpoint=str(checkpoint))
+    assert read_json(original.directory/'tasks'/task/'attempt.json')['event'] == 'algorithm_adopted'
+    assert read_json(resumed.directory/'tasks'/task/'attempt.json')['event'] == 'algorithm_adopted'
+    assert len(adoptions(original, task)) == len(adoptions(resumed, task)) == 1
+
+
+def test_related_foreign_runstore_blocks_live_adoption_before_any_write(tmp_path):
+    task, original, receipt, snapshot, checkpoint = fixture(tmp_path)
+    related = RunStore(tmp_path, tmp_path/'logs/foreign')
+    related.event(task, 'reconciled')
+    write_json_atomic(related.directory/'run.json', dict(schema_version=1,project=str(tmp_path/'other')))
+    before = receipt.read_bytes(), (original.directory/'events.jsonl').read_bytes()
+    from csttool.checkpoint_adoption import mark_adopted
+    with pytest.raises(ValueError,match='project identity mismatch'):
+        mark_adopted(receipt, original, task)
+    assert before == (receipt.read_bytes(), (original.directory/'events.jsonl').read_bytes())
+
+
+@pytest.mark.parametrize('point', ['index','receipt'])
+def test_related_stores_live_adoption_gap_is_repairable_once(tmp_path, monkeypatch, point):
+    task, original, receipt, snapshot, checkpoint = fixture(tmp_path)
+    resumed = RunStore(tmp_path, tmp_path/'logs/resumed');resumed.event(task,'reconciled')
+    import csttool.checkpoint_adoption as adopter
+    import csttool.run_store as store_module
+    module = store_module if point=='index' else adopter
+    writer = module.write_json_atomic
+    def interrupted(path,value):
+        if ((point=='index' and Path(path)==resumed.directory/'tasks'/task/'attempt.json'
+             and value.get('event')=='algorithm_adopted')
+                or (point=='receipt' and Path(path)==receipt and value.get('phase')=='algorithm_adopted')):
+            raise OSError('injected related adoption write gap')
+        return writer(path,value)
+    monkeypatch.setattr(module,'write_json_atomic',interrupted)
+    with pytest.raises(OSError):adopter.mark_adopted(receipt,resumed,task)
+    monkeypatch.setattr(module,'write_json_atomic',writer)
+    adopter.mark_adopted(receipt,resumed,task)
+    before=receipt.read_bytes(),(original.directory/'events.jsonl').read_bytes(),(resumed.directory/'events.jsonl').read_bytes()
+    adopter.mark_adopted(receipt,resumed,task)
+    assert before==(receipt.read_bytes(),(original.directory/'events.jsonl').read_bytes(),(resumed.directory/'events.jsonl').read_bytes())
+    assert len(adoptions(original,task))==len(adoptions(resumed,task))==1
+
+
 @pytest.mark.parametrize('empty', [False, True])
 @pytest.mark.parametrize('relative', [False, True])
 def test_hom_checkpoint_including_empty_completed_task_is_authority(tmp_path, empty, relative):
@@ -135,8 +182,10 @@ def test_hom_checkpoint_including_empty_completed_task_is_authority(tmp_path, em
     report = ScanReport(completed=[ScanInterval(400, 800)], adopted_task_ids=[task])
     if not empty:
         path = str(snapshot.relative_to(tmp_path)) if relative else str(snapshot)
-        report.modes = [ModeResult(i, frequency, {}, path, 'job', task)
+        report.modes = [ModeResult(i, frequency, {'frequency':frequency}, path, 'job', task)
                         for i, frequency in ((1, 500), (2, 600))]
+        write_json_atomic(receipt_path, {**read_json(receipt_path), 'postprocess':[
+            dict(resultName='frequency', value=f, params=dict(iModeNumber=i)) for i,f in ((1,500),(2,600))]})
     hom = tmp_path / 'save/csv/hom_scan_checkpoint.json'
     ScanCheckpointStore(hom).save(ScanPolicy(400, 800, 800), {}, report, [], snapshot_path=snapshot)
     before = hom.read_bytes()
@@ -165,6 +214,32 @@ def test_hom_relative_snapshot_mismatch_still_blocks_before_markers(tmp_path):
     with pytest.raises(ValueError, match='HOM checkpoint result differs'):
         reconcile_checkpoint_adoptions(tmp_path)
     assert before == (receipt.read_bytes(), (store.directory / 'events.jsonl').read_bytes(), hom.read_bytes())
+
+
+@pytest.mark.parametrize('fault', ['frequency','rq','missing','mode','duplicate','nonfinite','boolean'])
+def test_hom_adoption_refuses_changed_metrics_before_any_marker_write(tmp_path, fault):
+    task, store, receipt, snapshot, checkpoint = fixture(tmp_path)
+    checkpoint.unlink()
+    from csttool.hom_scan import ScanCheckpointStore, ScanPolicy, ScanReport, ModeResult
+    values = [dict(resultName=k, value=v, params=dict(iModeNumber=1)) for k,v in [('frequency',500.),('rq',4.)]]
+    write_json_atomic(receipt, {**read_json(receipt), 'postprocess':values})
+    mode = ModeResult(1, 500., {'frequency':500.,'rq':4.}, str(snapshot), 'job', task)
+    hom = tmp_path/'save/csv/hom_scan_checkpoint.json'
+    ScanCheckpointStore(hom).save(ScanPolicy(400,800,800), {}, ScanReport(modes=[mode], adopted_task_ids=[task]), [])
+    document = read_json(hom);record = document['report']['modes'][0]
+    if fault == 'frequency':record['frequency'] = 501.
+    elif fault == 'rq':record['values']['rq'] = 5.
+    elif fault == 'missing':record['values'].pop('rq')
+    elif fault == 'mode':record['mode_index'] = 2
+    elif fault == 'boolean':record['values']['rq'] = True
+    elif fault == 'nonfinite':record['values']['rq'] = float('nan')
+    elif fault == 'duplicate':
+        write_json_atomic(receipt, {**read_json(receipt), 'postprocess':values + [values[0]]})
+    # Permit malformed input bytes to reach the recovery validator.
+    hom.write_text(json.dumps(document), encoding='utf-8')
+    before = receipt.read_bytes(), (store.directory/'events.jsonl').read_bytes(), hom.read_bytes()
+    with pytest.raises(ValueError):reconcile_checkpoint_adoptions(tmp_path)
+    assert before == (receipt.read_bytes(), (store.directory/'events.jsonl').read_bytes(), hom.read_bytes())
 
 
 @pytest.mark.parametrize('kind', ['complete-tail', 'corrupt-middle', 'duplicate-event'])

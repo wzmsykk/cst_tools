@@ -54,3 +54,5 @@ python test/support/validate_solver_abort.py --run-cst --cst-exe "D:/Program Fil
 首轮`solver-abort-805b67b3`中止和新Worker求解成功，但驱动总目录会话查询漏掉两个子项目，整轮报告保持失败；已修正并增加离线回归，不改写首轮为通过。复验`solver-abort-b632e158`通过：单次abort返回True，实际Start=1无结果，随后新Worker恢复Frequency=1147.45580535672MHz、Z轴R/Q=224.694610020595Ω；两次Start、两会话标准关闭、源/processed hash不变。轻量事实见[中止记录](../knowledge-base/solver-abort-20261104.json)。
 
 替代任务保留received-unadopted，不将Worker层成功当上层算法已采用。只覆盖solver-running触发，不代表所有内部阶段。真实运行后仅补了CLI外部路径失败处理的写入边界，离线反例已验；native报告保留当时driver hash，不改写成最新字节实测。正常副本5个伴随目录已清理，首轮失败证据也保留。
+
+生产Runner/HOM上层采用闭环与四个崩溃边界见[当前专项](runner-hom-abort-adoption.md)；本页的此前Worker验收保留原范围，不追认为已采用。

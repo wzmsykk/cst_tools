@@ -95,6 +95,15 @@ def test_no_trigger_expires_without_native_abort(tmp_path):
     assert not calls and not (tmp_path / 'abort-intent.json').exists()
 
 
+def test_production_run_uses_explicit_central_lifecycle_path(tmp_path):
+    identity, closed, verify = make_session(tmp_path)
+    observed = tmp_path / 'central' / 'lifecycle.log';observed.parent.mkdir()
+    (tmp_path / 'lifecycle.log').replace(observed)
+    value, calls = project(identity['project'])
+    probe.abort_when_running(value, tmp_path, identity, verify=verify, lifecycle_path=observed)
+    assert calls == ['abort'] and closed == ['owned-handle']
+
+
 def test_cancel_before_trigger_does_not_abort(tmp_path):
     identity, _, verify = make_session(tmp_path)
     value, calls = project(identity['project'])
