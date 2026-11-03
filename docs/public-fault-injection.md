@@ -36,3 +36,21 @@ python test/support/validate_public_faults.py --run-cst --source <已验证Pillb
 [轻量JSON](../knowledge-base/public-native-faults-20261103.json)保留最终报告、哈希、关闭事实及先导试验暴露的诊断遮蔽。原始驱动hash与验收批次绑定；错误分类的后续扩展另由离线用例验证，不将所有错误类别都算作实测。全部N01–N25、生产Runner在求解中退出和复杂几何仍未完成，不因这15例通过整体勾选。
 
 最终服务/Worker/驱动/文档/登记组合118项通过（103.18s），官方SDK与原始stdio组合13项通过（12.90s）；映射validate和A1校准门禁有效。测试集合不相加作全仓结论。
+
+## 官方中止自动时序探针（2026-11-04）
+
+`test/support/validate_solver_abort.py`只用于受控验收，不增加生产MCP/GUI停止接口。显式运行：
+
+```powershell
+python test/support/validate_solver_abort.py --run-cst --cst-exe "D:/Program Files (x86)/CST Studio Suite 2022/CST DESIGN ENVIRONMENT.exe" --source "已验证的Pillbox源副本.cst"
+```
+
+先使用测试专用几何约束生成小网格processed副本，再建立Managed Worker。桥接使用该安装的bundled Python及python_cst_libraries；按启动器持久身份找到唯一子DE，核实PID、创建时间、程序路径并保留WinAPI进程句柄，再通过`connect(pid)`和`get_open_project(path)`检查精确工程。禁止connect_to_any/active_project或新建额外CST。`--bridge`是内部子进程参数，校验父PID、artifacts位置及会话工程，不是任意工程控制入口。
+
+在桥接ready后才提交任务；观察本会话生命周期的Start调用并通过官方`is_solver_running`确认运行后，独占创建并fsync中止意图，再只调用一次`Modeler.abort_solver`。已有意图（含截断/未知回执）或并发预约均不重发；响应缺失保留unknown。连接及触发等待分别60/90秒，桥接退出10秒有界；这些不是正常求解总时限。桥接通信卡住时只可结束本轮Python桥接，不结束CST或其进程树；原生仍经标准stop/严格失败退役核验。
+
+要求被中止任务无成功指标/快照，实际分类限Start返回0、Start自身异常或Start返回1但无可读结果；三者分别留档。正常关闭后才能从未改动的processed新建Worker，要求Frequency/RQ及成功快照、两任务总计两次Start、两个子项目会话均标准关闭、源及processed hash不变。最终报告保留驱动hash；原始场/网格在任务结束并核实路径后清理。正常中止不能保证自然触发Start=0或Start抛异常。
+
+首轮`solver-abort-805b67b3`中止和新Worker求解成功，但驱动总目录会话查询漏掉两个子项目，整轮报告保持失败；已修正并增加离线回归，不改写首轮为通过。复验`solver-abort-b632e158`通过：单次abort返回True，实际Start=1无结果，随后新Worker恢复Frequency=1147.45580535672MHz、Z轴R/Q=224.694610020595Ω；两次Start、两会话标准关闭、源/processed hash不变。轻量事实见[中止记录](../knowledge-base/solver-abort-20261104.json)。
+
+替代任务保留received-unadopted，不将Worker层成功当上层算法已采用。只覆盖solver-running触发，不代表所有内部阶段。真实运行后仅补了CLI外部路径失败处理的写入边界，离线反例已验；native报告保留当时driver hash，不改写成最新字节实测。正常副本5个伴随目录已清理，首轮失败证据也保留。

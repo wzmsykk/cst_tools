@@ -1,0 +1,209 @@
+{
+  "date": "2026-11-04",
+  "baseline": "24d384a",
+  "scope": "test-only official solver-running abort and fresh Managed Worker recovery",
+  "native": {
+    "passed": true,
+    "source_sha256": "27059515da0934239cffe488990d293c1d06f5e61814df08fd38a14617685df1",
+    "trigger": "solver-running",
+    "driver_sha256": "8841c611e85cbfc7be0a65174904f30c1c39fcca5419ef84e1cf508f63cc1a39",
+    "abort_session": "D:\\work\\cst_tools\\artifacts\\solver-abort-b632e158\\aborted\\temp\\worker_0\\9971c3d7-43ba-40dd-b246-3b96d892807b",
+    "abort_result": {
+      "returned": true,
+      "attempt": 1
+    },
+    "classification": "start-return-1-without-results",
+    "result": {
+      "WorkerID": "0",
+      "TaskStatus": "Failure",
+      "RunName": "official-abort",
+      "RunParameters": {
+        "nmodes": 1,
+        "fmin": 500,
+        "fmax": 2000,
+        "cell": 4
+      },
+      "PostProcessResult": null,
+      "FailureReport": "SOLVER_FAILED: solver-result failed: number=-2147418113; description=No Eigenmode results that can be read by methods of the \"EigenmodeSolver\" object have been written to the database so far. This is the case for old projects created earlier than 2013.",
+      "ProjectSnapshot": null,
+      "TaskID": "a79d5166-f46e-4673-a2f9-a3629bef5206",
+      "ResultDirectory": "D:\\work\\cst_tools\\artifacts\\solver-abort-b632e158\\aborted\\result\\worker_0\\worker_0\\a79d5166-f46e-4673-a2f9-a3629bef5206",
+      "ReceiptPath": "D:\\work\\cst_tools\\artifacts\\solver-abort-b632e158\\aborted\\temp\\worker_0\\9971c3d7-43ba-40dd-b246-3b96d892807b\\received\\a79d5166-f46e-4673-a2f9-a3629bef5206.json"
+    },
+    "recovered": {
+      "WorkerID": "1",
+      "TaskStatus": "Success",
+      "RunName": "fresh-recovery",
+      "RunParameters": {
+        "nmodes": 1,
+        "fmin": 500,
+        "fmax": 2000,
+        "cell": 4
+      },
+      "PostProcessResult": [
+        {
+          "id": 0,
+          "resultName": "frequency",
+          "value": 1147.45580535672,
+          "params": {
+            "iModeNumber": 1
+          }
+        },
+        {
+          "id": 1,
+          "resultName": "rq",
+          "value": 224.694610020595,
+          "params": {
+            "iModeNumber": 1,
+            "axis": "z",
+            "xoffset": 0.0,
+            "yoffset": 0.0,
+            "zoffset": 0.0
+          }
+        }
+      ],
+      "FailureReport": null,
+      "ProjectSnapshot": "D:\\work\\cst_tools\\artifacts\\solver-abort-b632e158\\replacement\\result\\worker_0\\worker_1\\fresh-recovery__f_1147.455805MHz__8b2f6afc-41d1-4b76-8c33-a8c6789db3ae\\fresh-recovery__f_1147.455805MHz.cst",
+      "TaskID": "8b2f6afc-41d1-4b76-8c33-a8c6789db3ae",
+      "ResultDirectory": "D:\\work\\cst_tools\\artifacts\\solver-abort-b632e158\\replacement\\result\\worker_0\\worker_1\\fresh-recovery__f_1147.455805MHz__8b2f6afc-41d1-4b76-8c33-a8c6789db3ae",
+      "ReceiptPath": "D:\\work\\cst_tools\\artifacts\\solver-abort-b632e158\\replacement\\temp\\worker_0\\a406457a-4925-44aa-b5bd-d5c337cce1c9\\received\\8b2f6afc-41d1-4b76-8c33-a8c6789db3ae.json"
+    },
+    "closures": [
+      {
+        "session_id": "9971c3d7-43ba-40dd-b246-3b96d892807b",
+        "process_state": "exited",
+        "exit_code": 0,
+        "exit_classification": "zero",
+        "model_state": "committed",
+        "task_outcome": "failure",
+        "result_state": "unknown",
+        "disposition": "standard-stop",
+        "standard_closed": true,
+        "needs_recovery": false,
+        "missing_evidence": []
+      },
+      {
+        "session_id": "a406457a-4925-44aa-b5bd-d5c337cce1c9",
+        "process_state": "exited",
+        "exit_code": 0,
+        "exit_classification": "zero",
+        "model_state": "committed",
+        "task_outcome": "success",
+        "result_state": "received-unadopted",
+        "disposition": "standard-stop",
+        "standard_closed": true,
+        "needs_recovery": true,
+        "missing_evidence": [
+          "received-result-not-reconciled"
+        ]
+      }
+    ],
+    "solver_calls": 2,
+    "source_unchanged": true,
+    "prepared_unchanged": true,
+    "remaining_cst": [],
+    "cleaned_companions": 5
+  },
+  "intent": {
+    "identity": {
+      "pid": 52468,
+      "create_time": 1793724986.4514613,
+      "executable": "D:\\Program Files (x86)\\CST Studio Suite 2022\\AMD64\\CST DESIGN ENVIRONMENT_AMD64.exe",
+      "project": "D:\\work\\cst_tools\\artifacts\\solver-abort-b632e158\\aborted\\temp\\worker_0\\9971c3d7-43ba-40dd-b246-3b96d892807b\\worker-input.cst"
+    },
+    "trigger": "solver-running",
+    "lifecycle": [
+      "2026/11/4 0:56:55 | stage=parameter-checkpoint; path=D:\\work\\cst_tools\\artifacts\\solver-abort-b632e158\\aborted\\temp\\worker_0\\9971c3d7-43ba-40dd-b246-3b96d892807b\\worker-input.cst.last-good-parameters.tsv; task undo ready; requested=4; changed=0",
+      "2026/11/4 0:56:55 | stage=solver-start; path=D:\\work\\cst_tools\\artifacts\\solver-abort-b632e158\\aborted\\temp\\worker_0\\9971c3d7-43ba-40dd-b246-3b96d892807b\\worker-input.cst; calling EigenmodeSolver.Start"
+    ],
+    "attempt": 1
+  },
+  "abort_response": {
+    "returned": true,
+    "attempt": 1
+  },
+  "ready": {
+    "identity": {
+      "pid": 52468,
+      "create_time": 1793724986.4514613,
+      "executable": "D:\\Program Files (x86)\\CST Studio Suite 2022\\AMD64\\CST DESIGN ENVIRONMENT_AMD64.exe",
+      "project": "D:\\work\\cst_tools\\artifacts\\solver-abort-b632e158\\aborted\\temp\\worker_0\\9971c3d7-43ba-40dd-b246-3b96d892807b\\worker-input.cst"
+    },
+    "project": "D:\\work\\cst_tools\\artifacts\\solver-abort-b632e158\\aborted\\temp\\worker_0\\9971c3d7-43ba-40dd-b246-3b96d892807b\\worker-input.cst"
+  },
+  "lifecycle": [
+    {
+      "path": "artifacts\\solver-abort-b632e158\\aborted\\temp\\worker_0\\9971c3d7-43ba-40dd-b246-3b96d892807b\\lifecycle.log",
+      "lines": [
+        "2026/11/4 0:56:55 | stage=parameter-checkpoint; path=D:\\work\\cst_tools\\artifacts\\solver-abort-b632e158\\aborted\\temp\\worker_0\\9971c3d7-43ba-40dd-b246-3b96d892807b\\worker-input.cst.last-good-parameters.tsv; task undo ready; requested=4; changed=0",
+        "2026/11/4 0:56:55 | stage=solver-start; path=D:\\work\\cst_tools\\artifacts\\solver-abort-b632e158\\aborted\\temp\\worker_0\\9971c3d7-43ba-40dd-b246-3b96d892807b\\worker-input.cst; calling EigenmodeSolver.Start",
+        "2026/11/4 0:56:58 | stage=solver-start; path=D:\\work\\cst_tools\\artifacts\\solver-abort-b632e158\\aborted\\temp\\worker_0\\9971c3d7-43ba-40dd-b246-3b96d892807b\\worker-input.cst; returned=1",
+        "2026/11/4 0:56:58 | stage=solver-result; path=D:\\work\\cst_tools\\artifacts\\solver-abort-b632e158\\aborted\\temp\\worker_0\\9971c3d7-43ba-40dd-b246-3b96d892807b\\worker-input.cst; solver-result failed: number=-2147418113; description=No Eigenmode results that can be read by methods of the \"EigenmodeSolver\" object have been written to the database so far. This is the case for old projects created earlier than 2013.",
+        "2026/11/4 0:56:58 | stage=ack-read; path=D:\\work\\cst_tools\\artifacts\\solver-abort-b632e158\\aborted\\temp\\worker_0\\9971c3d7-43ba-40dd-b246-3b96d892807b\\protocol\\current.ack; waiting",
+        "2026/11/4 0:57:01 | stage=ack-cleanup; path=D:\\work\\cst_tools\\artifacts\\solver-abort-b632e158\\aborted\\temp\\worker_0\\9971c3d7-43ba-40dd-b246-3b96d892807b\\protocol\\current.task; delete-task",
+        "2026/11/4 0:57:01 | stage=ack-cleanup; path=D:\\work\\cst_tools\\artifacts\\solver-abort-b632e158\\aborted\\temp\\worker_0\\9971c3d7-43ba-40dd-b246-3b96d892807b\\protocol\\current.completion; delete-completion",
+        "2026/11/4 0:57:01 | stage=ack-cleanup; path=D:\\work\\cst_tools\\artifacts\\solver-abort-b632e158\\aborted\\temp\\worker_0\\9971c3d7-43ba-40dd-b246-3b96d892807b\\protocol\\current.ack; delete-ack",
+        "2026/11/4 0:57:01 | stage=save; path=D:\\work\\cst_tools\\artifacts\\solver-abort-b632e158\\aborted\\temp\\worker_0\\9971c3d7-43ba-40dd-b246-3b96d892807b\\worker-input.cst; begin",
+        "2026/11/4 0:57:02 | stage=save; path=D:\\work\\cst_tools\\artifacts\\solver-abort-b632e158\\aborted\\temp\\worker_0\\9971c3d7-43ba-40dd-b246-3b96d892807b\\worker-input.cst; returned",
+        "2026/11/4 0:57:02 | stage=close-snapshot; path=D:\\work\\cst_tools\\artifacts\\solver-abort-b632e158\\aborted\\temp\\worker_0\\9971c3d7-43ba-40dd-b246-3b96d892807b\\worker-input.cst.closed.cst; begin; immutable close evidence",
+        "2026/11/4 0:57:04 | stage=close-snapshot; path=D:\\work\\cst_tools\\artifacts\\solver-abort-b632e158\\aborted\\temp\\worker_0\\9971c3d7-43ba-40dd-b246-3b96d892807b\\worker-input.cst.closed.cst; returned; bytes=53663",
+        "2026/11/4 0:57:04 | stage=close-receipt; path=D:\\work\\cst_tools\\artifacts\\solver-abort-b632e158\\aborted\\temp\\worker_0\\9971c3d7-43ba-40dd-b246-3b96d892807b\\protocol\\close.receipt; begin",
+        "2026/11/4 0:57:04 | stage=close-receipt; path=D:\\work\\cst_tools\\artifacts\\solver-abort-b632e158\\aborted\\temp\\worker_0\\9971c3d7-43ba-40dd-b246-3b96d892807b\\protocol\\close.receipt; returned",
+        "2026/11/4 0:57:04 | stage=stop-ack; path=D:\\work\\cst_tools\\artifacts\\solver-abort-b632e158\\aborted\\temp\\worker_0\\9971c3d7-43ba-40dd-b246-3b96d892807b\\protocol\\stop.ack; begin",
+        "2026/11/4 0:57:04 | stage=stop-ack; path=D:\\work\\cst_tools\\artifacts\\solver-abort-b632e158\\aborted\\temp\\worker_0\\9971c3d7-43ba-40dd-b246-3b96d892807b\\protocol\\stop.ack; returned",
+        "2026/11/4 0:57:04 | stage=batch-return; path=D:\\work\\cst_tools\\artifacts\\solver-abort-b632e158\\aborted\\temp\\worker_0\\9971c3d7-43ba-40dd-b246-3b96d892807b\\worker-input.cst; saved; returning to batch runner; Python must verify StopAck and process exit"
+      ]
+    },
+    {
+      "path": "artifacts\\solver-abort-b632e158\\replacement\\temp\\worker_0\\a406457a-4925-44aa-b5bd-d5c337cce1c9\\lifecycle.log",
+      "lines": [
+        "2026/11/4 0:57:33 | stage=parameter-checkpoint; path=D:\\work\\cst_tools\\artifacts\\solver-abort-b632e158\\replacement\\temp\\worker_0\\a406457a-4925-44aa-b5bd-d5c337cce1c9\\worker-input.cst.last-good-parameters.tsv; task undo ready; requested=4; changed=0",
+        "2026/11/4 0:57:33 | stage=solver-start; path=D:\\work\\cst_tools\\artifacts\\solver-abort-b632e158\\replacement\\temp\\worker_0\\a406457a-4925-44aa-b5bd-d5c337cce1c9\\worker-input.cst; calling EigenmodeSolver.Start",
+        "2026/11/4 0:57:38 | stage=solver-start; path=D:\\work\\cst_tools\\artifacts\\solver-abort-b632e158\\replacement\\temp\\worker_0\\a406457a-4925-44aa-b5bd-d5c337cce1c9\\worker-input.cst; returned=1",
+        "2026/11/4 0:57:40 | stage=ack-read; path=D:\\work\\cst_tools\\artifacts\\solver-abort-b632e158\\replacement\\temp\\worker_0\\a406457a-4925-44aa-b5bd-d5c337cce1c9\\protocol\\current.ack; waiting",
+        "2026/11/4 0:57:45 | stage=ack-cleanup; path=D:\\work\\cst_tools\\artifacts\\solver-abort-b632e158\\replacement\\temp\\worker_0\\a406457a-4925-44aa-b5bd-d5c337cce1c9\\protocol\\current.task; delete-task",
+        "2026/11/4 0:57:45 | stage=ack-cleanup; path=D:\\work\\cst_tools\\artifacts\\solver-abort-b632e158\\replacement\\temp\\worker_0\\a406457a-4925-44aa-b5bd-d5c337cce1c9\\protocol\\current.completion; delete-completion",
+        "2026/11/4 0:57:45 | stage=ack-cleanup; path=D:\\work\\cst_tools\\artifacts\\solver-abort-b632e158\\replacement\\temp\\worker_0\\a406457a-4925-44aa-b5bd-d5c337cce1c9\\protocol\\current.ack; delete-ack",
+        "2026/11/4 0:57:45 | stage=save; path=D:\\work\\cst_tools\\artifacts\\solver-abort-b632e158\\replacement\\temp\\worker_0\\a406457a-4925-44aa-b5bd-d5c337cce1c9\\worker-input.cst; begin",
+        "2026/11/4 0:57:47 | stage=save; path=D:\\work\\cst_tools\\artifacts\\solver-abort-b632e158\\replacement\\temp\\worker_0\\a406457a-4925-44aa-b5bd-d5c337cce1c9\\worker-input.cst; returned",
+        "2026/11/4 0:57:47 | stage=close-snapshot; path=D:\\work\\cst_tools\\artifacts\\solver-abort-b632e158\\replacement\\temp\\worker_0\\a406457a-4925-44aa-b5bd-d5c337cce1c9\\worker-input.cst.closed.cst; begin; immutable close evidence",
+        "2026/11/4 0:57:48 | stage=close-snapshot; path=D:\\work\\cst_tools\\artifacts\\solver-abort-b632e158\\replacement\\temp\\worker_0\\a406457a-4925-44aa-b5bd-d5c337cce1c9\\worker-input.cst.closed.cst; returned; bytes=53971",
+        "2026/11/4 0:57:48 | stage=close-receipt; path=D:\\work\\cst_tools\\artifacts\\solver-abort-b632e158\\replacement\\temp\\worker_0\\a406457a-4925-44aa-b5bd-d5c337cce1c9\\protocol\\close.receipt; begin",
+        "2026/11/4 0:57:48 | stage=close-receipt; path=D:\\work\\cst_tools\\artifacts\\solver-abort-b632e158\\replacement\\temp\\worker_0\\a406457a-4925-44aa-b5bd-d5c337cce1c9\\protocol\\close.receipt; returned",
+        "2026/11/4 0:57:48 | stage=stop-ack; path=D:\\work\\cst_tools\\artifacts\\solver-abort-b632e158\\replacement\\temp\\worker_0\\a406457a-4925-44aa-b5bd-d5c337cce1c9\\protocol\\stop.ack; begin",
+        "2026/11/4 0:57:48 | stage=stop-ack; path=D:\\work\\cst_tools\\artifacts\\solver-abort-b632e158\\replacement\\temp\\worker_0\\a406457a-4925-44aa-b5bd-d5c337cce1c9\\protocol\\stop.ack; returned",
+        "2026/11/4 0:57:48 | stage=batch-return; path=D:\\work\\cst_tools\\artifacts\\solver-abort-b632e158\\replacement\\temp\\worker_0\\a406457a-4925-44aa-b5bd-d5c337cce1c9\\worker-input.cst; saved; returning to batch runner; Python must verify StopAck and process exit"
+      ]
+    }
+  ],
+  "final_driver_sha256": "2bf5fec88aec3dc4db250cb1d910c323e6971c52c6f8832b57257f59cde8028a",
+  "post_native_change": "CLI rejects outside-artifacts bridge paths before its failure handler; no native API/valid invocation change; covered by offline test, not a third real run",
+  "offline": {
+    "report": "artifacts/solver-abort-offline.xml",
+    "passed": 22
+  },
+  "limits": [
+    "Start=0 and Start throwing unverified; actual Start=1 without readable results",
+    "successful replacement received-unadopted is intentionally retained; no upper algorithm adoption or public service result publication exercised",
+    "solver-running trigger only; not all solver internal stages",
+    "CST2022 one installation and controlled Pillbox copy only",
+    "native helper timeout does not bound solver total runtime; uncertain native action is never replayed",
+    "artifacts raw field/mesh companions removed; regeneration required; artifact paths not guaranteed to migrate with Git"
+  ],
+  "first_round": {
+    "path": "artifacts/solver-abort-805b67b3/report.json",
+    "passed": false,
+    "finding": "abort/fresh recovery and two standard closures observed, driver queried enclosing root instead of two child projects; kept original failure",
+    "evidence_sha256": "d9470b25bd3f8e9a49f16b47807a0d55564cd723a251d1cbc72933395d8d6246"
+  },
+  "final_regression": {
+    "report": "artifacts/solver-abort-final.xml",
+    "passed": 49,
+    "scope": "offline abort/classification, documentation semantics/index, registry/migration, source-release boundary; overlaps 22 offline tests"
+  },
+  "cleanup": {
+    "first_round_companions": 5,
+    "final_round_companions": 5,
+    "raw_fields_require_regeneration": true
+  }
+}

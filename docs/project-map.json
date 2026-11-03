@@ -1987,6 +1987,18 @@
             "stop",
             "main"
           ]
+        },
+        {
+          "path": "test/support/validate_solver_abort.py",
+          "label": "官方中止与新Worker恢复探针",
+          "symbols": [
+            "owned_environment",
+            "checked_process",
+            "abort_when_running",
+            "bridge",
+            "run",
+            "main"
+          ]
         }
       ],
       "tests": [
@@ -2001,6 +2013,10 @@
         {
           "path": "test/hom_native_probe_test.py",
           "label": "原生探针声明/调用与分阶段检查点接线"
+        },
+        {
+          "path": "test/solver_abort_probe_test.py",
+          "label": "归属拒绝/单次中止/未知响应边界"
         }
       ],
       "docs": [
@@ -5918,9 +5934,9 @@
       "provenance": "D3人工确认维护职责；不授予运行验收。",
       "review": {
         "date": "2026-11-04",
-        "baseline": "2705935",
+        "baseline": "24d384a",
         "status": "operational-and-applicability-reviewed",
-        "scope": "2026-11-04对照BatchDesktopLease/stdio及真实恢复报告：区分完成驱动、Start=0/异常未验和小网格模式身份未知；旧批次数字保留日期。",
+        "scope": "官方单次中止/ACK/关闭和processed新Worker恢复已实测；未证明Start=0/自身异常、上层采用或所有阶段；后补CLI错误路径仅离线。",
         "checked_sources": [
           {
             "path": "csttool/runner.py"
@@ -5957,6 +5973,12 @@
           },
           {
             "path": "knowledge-base/execution-hardening-five-steps-20261104.json"
+          },
+          {
+            "path": "test/support/validate_solver_abort.py"
+          },
+          {
+            "path": "knowledge-base/solver-abort-20261104.json"
           }
         ],
         "finding_ids": [
@@ -5964,7 +5986,7 @@
           "S10"
         ],
         "limitations": "重点核对历史堆叠/旧操作语义与责任边界；checked_sources仅列本批主要对照源，不表示每行技术陈述或所有物理/异常分支已验证。",
-        "content_sha256_at_review": "5d611fdc62a0ed6ed54b2b5bd73998be82695792bcef8e33c2242aafab94e103"
+        "content_sha256_at_review": "fa97740286e7bc471b151388875a6a29a63e422cf316cb72c48ba89799f170ab"
       }
     },
     {
@@ -6127,7 +6149,7 @@
         ],
         "finding_ids": [],
         "limitations": "本批逐条静态核对所列源码/保存证据；历史实测及原厂/第三方规范不重新运行或外部认证，不等于完整CST/桌面/物理验收。",
-        "content_sha256_at_review": "05b14ab6979d81de17c0568d568a2b50628cfbf3672ca928fe799ebb930d90df"
+        "content_sha256_at_review": "9cbfcbae9f40c6a607219c25e95ebe46c6b8a421231c4f9638d334808f0c1695"
       }
     },
     {
@@ -6999,9 +7021,9 @@
       "provenance": "D3人工确认维护职责；不授予运行验收。",
       "review": {
         "date": "2026-11-04",
-        "baseline": "2705935",
+        "baseline": "24d384a",
         "status": "operational-and-applicability-reviewed",
-        "scope": "2026-11-04对照BatchDesktopLease/stdio及真实恢复报告：区分完成驱动、Start=0/异常未验和小网格模式身份未知；旧批次数字保留日期。",
+        "scope": "官方单次中止/ACK/关闭和processed新Worker恢复已实测；未证明Start=0/自身异常、上层采用或所有阶段；后补CLI错误路径仅离线。",
         "checked_sources": [
           {
             "path": "csttool/mcp_server.py"
@@ -7032,13 +7054,19 @@
           },
           {
             "path": "knowledge-base/execution-hardening-five-steps-20261104.json"
+          },
+          {
+            "path": "test/support/validate_solver_abort.py"
+          },
+          {
+            "path": "knowledge-base/solver-abort-20261104.json"
           }
         ],
         "finding_ids": [
           "S01"
         ],
         "limitations": "重点核对历史堆叠/旧操作语义与责任边界；checked_sources仅列本批主要对照源，不表示每行技术陈述或所有物理/异常分支已验证。",
-        "content_sha256_at_review": "d0a63c2745233386030516bf9e9e46128f77833c485b97e414ff9c4f22285799"
+        "content_sha256_at_review": "6d12dce8099f7c822b699bd2a4c101e3da0055bc2b7f8debad3e86d78eb42931"
       }
     },
     {
@@ -9049,10 +9077,10 @@
       "authority": "current-defined-scope-only",
       "provenance": "串行监督工具、原生时序与公共单次服务实现逐项核对",
       "review": {
-        "date": "2026-11-03",
-        "baseline": "57ccb32",
+        "date": "2026-11-04",
+        "baseline": "24d384a",
         "status": "operational-and-applicability-reviewed",
-        "scope": "15场景驱动/默认只读/子进程归属/退出及清理边界；不声明全部实际通过；同日15个真实受支持场景及剩余Start/Runner边界已核对",
+        "scope": "官方单次中止/ACK/关闭和processed新Worker恢复已实测；未证明Start=0/自身异常、上层采用或所有阶段；后补CLI错误路径仅离线。",
         "checked_sources": [
           {
             "path": "test/support/validate_public_faults.py"
@@ -9071,11 +9099,17 @@
           },
           {
             "path": "knowledge-base/public-native-faults-20261103.json"
+          },
+          {
+            "path": "test/support/validate_solver_abort.py"
+          },
+          {
+            "path": "knowledge-base/solver-abort-20261104.json"
           }
         ],
         "finding_ids": [],
         "limitations": "真实结果在同日轻量证据中分批记录；不把旧结果或Fake当新原生验收",
-        "content_sha256_at_review": "e11f7b85614396714312b44669b6c0142b2e3c49673cb29b1b89552d07df5fc6"
+        "content_sha256_at_review": "1885470a3cebd4928ac74ccda87b1144058695d965e259c0ee6758a7e174da10"
       }
     },
     {
@@ -9085,9 +9119,9 @@
       "provenance": "e94d5b7之后的五项实施与逐层验收边界",
       "review": {
         "date": "2026-11-04",
-        "baseline": "e94d5b7",
+        "baseline": "24d384a",
         "status": "operational-and-applicability-reviewed",
-        "scope": "2026-11-04对照BatchDesktopLease/stdio及真实恢复报告：区分完成驱动、Start=0/异常未验和小网格模式身份未知；旧批次数字保留日期。",
+        "scope": "官方单次中止/ACK/关闭和processed新Worker恢复已实测；未证明Start=0/自身异常、上层采用或所有阶段；后补CLI错误路径仅离线。",
         "checked_sources": [
           {
             "path": "csttool/batch_desktop.py"
@@ -9118,11 +9152,17 @@
           },
           {
             "path": "knowledge-base/execution-hardening-five-steps-20261104.json"
+          },
+          {
+            "path": "test/support/validate_solver_abort.py"
+          },
+          {
+            "path": "knowledge-base/solver-abort-20261104.json"
           }
         ],
         "finding_ids": [],
         "limitations": "真实批次仍按独立报告升级；旧原生/离线证据不能相加或推广",
-        "content_sha256_at_review": "e4b8ed63e32ac05648d613afd140082ee7b2cdcc8b811c0c3a5d209b2fbe1a81"
+        "content_sha256_at_review": "79768903dbe7fe62b673a55e4875d319ab8556beeaff5e4683fd82105127dc19"
       }
     }
   ],
@@ -10533,6 +10573,30 @@
       "review_status": "entry-and-direct-delegates-reviewed",
       "unknown": "不证明迭代耗尽或Start=0/Start自身异常，不等同完整生产HOM/GUI崩溃与物理模式身份认证。",
       "evidence": "2026-11-04静态复审入口、FixturePreprocessor、MeshWorker、run回调/检查点、stop/退役及cleanup_case；具体真实结果按批次报告。"
+    },
+    {
+      "path": "test/support/validate_solver_abort.py",
+      "entry_kind": "python-main",
+      "main_guard": true,
+      "observed_arguments": [
+        "--bridge",
+        "--cst-exe",
+        "--run-cst",
+        "--source"
+      ],
+      "arguments": [
+        "--cst-exe",
+        "--source",
+        "--run-cst",
+        "--bridge"
+      ],
+      "argument_discovery": "AST literals and manual subprocess bridge review",
+      "purpose": "串行副本通过官方Modeler.abort_solver单次中止，再从processed新建Worker恢复；不是生产停止接口。",
+      "effect": "显式门禁启动预处理/Managed及bundled Python桥接，正常中止仅精确归属副本；写报告、身份/意图/回执并清理已结束的大伴随目录。",
+      "authorization": "--run-cst需任务授权；--bridge为父进程内部调用，校验父PID/会话工程/原生PID+创建时间+程序；无权操作任意活动工程。",
+      "review_status": "entry-and-controlled-transitive-effects-reviewed",
+      "unknown": "正常中止不保证Start=0/Start异常；连接/响应未知不重试，默认无完整求解总超时；不证明任意版本。",
+      "evidence": "2026-11-04人工核对run/bridge/abort_when_running调用、命令参数、WinAPI身份句柄、finally及子进程停止目标；真实验收单列。"
     }
   ],
   "relations": [
@@ -11303,6 +11367,50 @@
       "cleanup": "不强杀CST，失败保留诊断；成功/核对后清理本例可再生伴随目录；源hash不变。",
       "evidence": "2026-11-04复审生成模板、真实拒绝、checkpoint-save/adopt顺序和暂停标签；hom_native_probe_test不启动CST。 2026-11-04真实da01c6ed驱动通过，四阶段重载、实际密度读回、ACK/收尾，非模式互异认证。",
       "unknown": "测试几何去混杂和扫描器回调不代表任意生产模型、迭代失败或完整GUI生命周期通过。"
+    },
+    {
+      "id": "R026",
+      "source": {
+        "path": "test/support/validate_solver_abort.py",
+        "symbol": "run"
+      },
+      "targets": [
+        {
+          "path": "test/support/validate_solver_abort.py",
+          "symbol": "owned_environment"
+        },
+        {
+          "path": "test/support/validate_solver_abort.py",
+          "symbol": "checked_process"
+        },
+        {
+          "path": "test/support/validate_solver_abort.py",
+          "symbol": "bridge"
+        },
+        {
+          "path": "test/support/validate_solver_abort.py",
+          "symbol": "abort_when_running"
+        },
+        {
+          "path": "test/support/validate_solver_abort.py",
+          "symbol": "finish_bridge"
+        },
+        {
+          "path": "csttool/managed_cstworker.py",
+          "symbol": "ManagedCSTWorker.run_task"
+        },
+        {
+          "path": "test/support/validate_hom_recovery_native.py",
+          "symbol": "stop"
+        }
+      ],
+      "consumers": [],
+      "type": "official-abort-acceptance-bridge",
+      "trigger": "--run-cst持独占锁；先创建Worker，子Python按身份精确连接并ready后才派任务；日志Start且is_solver_running为真才发一次abort。",
+      "lifecycle": "Managed同步run_task；桥接独立bundled Python、持原生只读身份句柄，核项目路径；原生方法不猜timeout单位，桥接连接/退出有界。",
+      "cleanup": "只允许结束本轮Python桥接，不终止CST/进程树；失败Worker正常stop或严格退役，确认无CST才新Worker；成功结束后清理伴随目录。",
+      "evidence": "2026-11-04人工复审子进程命令/内部--bridge父身份、WinAPI创建时间/程序核验、abort意图先行和响应缺失不重试；22项离线含既有阶段分类。 独占意图写入及fsync先于abort；已有意图/并发预约拒绝，两个子项目分别汇总会话。 原生b632e158两任务两次Start、标准退出；CLI外部路径拒绝后补离线反例，native源码hash独立保留。",
+      "unknown": "不是生产即时停止服务；Start=0/Start自身异常由实际结果决定；正常中止后可能仍Start=1无结果；不是模式身份认证。"
     }
   ],
   "source_fingerprints": {
@@ -11449,7 +11557,8 @@
     "test/support/validate_public_faults.py": "e41535452da7e5e6049d0311ccba5fcbd87841945d18798a25361e4b4c2d8fce",
     "csttool/batch_desktop.py": "90976bb2b871a014e3c509343ab551dc5f6bb60b339c7f5e98ca818d310a6d91",
     "test/support/validate_hom_recovery_native.py": "c7f981034cb6453209e580bdc1cb96ded4914140a1fdf0c90ff8283d489adb1d",
-    "csttool/mcp_stdio.py": "be3698d63ffb87c0211d83c45f78d118b6652b9fd2b6c170f6561a0618014698"
+    "csttool/mcp_stdio.py": "be3698d63ffb87c0211d83c45f78d118b6652b9fd2b6c170f6561a0618014698",
+    "test/support/validate_solver_abort.py": "2bf5fec88aec3dc4db250cb1d910c323e6971c52c6f8832b57257f59cde8028a"
   },
   "registry_policy": {
     "enforce_tool_scope": true,

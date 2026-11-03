@@ -55,3 +55,7 @@ HOM预处理历史不自动属于公共A1允许集合：保持SETTING_UNVERIFIED
 轻量原始报告、检查点、正常中止事实和生产Runner新链复验已归入[知识记录](../knowledge-base/execution-hardening-five-steps-20261104.json)。
 
 最终登记/源码包边界63项通过；G03/启动/窗口/文档语义26项通过、1项可选跳过。修正中间发现的派生索引陈旧、未限定类方法符号及迁移测试禁止新增信息的问题后重跑通过；早期失败XML保留，不混作最终结果。大副本除本轮HOM已清理40个外，额外清理29个伴随目录；原始场/网格需重生成。
+
+## 后续：可重复官方中止驱动
+
+2026-11-04以24d384a为基线，将前批手工abort校准做成独立验收工具：预连接、官方running确认、独占持久意图、单次abort、阶段分类、关闭后从processed新建Worker，详见[使用和范围](public-fault-injection.md#官方中止自动时序探针2026-11-04)。新增离线归属/响应丢失/并发预约/两个子项目汇总测试；不增加生产自动超时或停止接口。真实b632e158复验通过：官方单次abort、实际Start=1无结果、ACK/标准收尾、processed新Worker恢复，两任务两次Start，源及processed hash不变。替代结果仍received-unadopted，不证明上层采用；Start=0/自身异常仍未验。真实后补的CLI外部路径拒绝仅离线验，保留原生时点driver hash。22项阶段分类/离线驱动测试通过；轻量证据见[中止记录](../knowledge-base/solver-abort-20261104.json)。
