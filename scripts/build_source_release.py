@@ -17,15 +17,17 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def included(name):
     path = Path(name)
-    if path.parts[0] in {'csttool', 'GUI', 'algs', 'utils', 'test', 'scripts'}:
+    if path.parts[0] == 'test':
+        return path.suffix in {'.py', '.ui', '.csv', '.md', '.json', '.vb', '.bas', '.txt', '.ini', '.ps1'} and '__pycache__' not in path.parts
+    if path.parts[0] in {'csttool', 'GUI', 'algs', 'utils', 'scripts'}:
         return (name == 'csttool/_vendor/provenance.json' or path.suffix in {'.py', '.ui', '.csv'}) and '__pycache__' not in path.parts
     if path.parts[0] in {'data', 'template'}:
         return path.suffix in {'.py', '.vb', '.bas', '.json', '.def', '.txt', '.ini'}
     if path.parts[0] == 'docs':
         return path.suffix == '.md' or name in {'docs/project-map.json','docs/project-map.schema.json'}
     if path.parts[0] == 'knowledge-base':
-        return len(path.parts) == 2 and path.suffix == '.md'
-    return name in {'gui_app.py', 'install_compat.py', 'pyproject.toml', 'AGENTS.md',
+        return len(path.parts) == 2 and path.suffix in {'.md', '.json'}
+    return name in {'gui_app.py', 'base.py', 'base_WTC.py', 'base_tm020.py', 'install_compat.py', 'pyproject.toml', 'AGENTS.md',
                     'win.bat', 'config/default.ini', 'config/project.example.ini'}
 
 
@@ -55,6 +57,9 @@ python -m venv .venv
 
 不启动CST的检查：python gui_app.py --smoke-test；python -m csttool.runner --help。
 测试源码随包提供，但不包含CST夹具，不能声称解压包全部集成测试可直接运行。
+开发定位：python scripts/project_inspect.py query --feature F138。
+包边界校验：python scripts/project_inspect.py validate --scope package；它核对manifest和包内契约，显式列出省略项，不代表完整仓库或运行验收。
+默认validate仍核对完整仓库契约，源码包省略的vendor/开发脚本会导致失败；不要为通过而删掉原登记。
 发布烟雾检查不代表目标机器真实CST、桌面交互或远程/分布式验收。
 完整身份和文件校验见 release-manifest.json；working标记表示包含尚未提交源码快照。
 '''.encode('utf-8')

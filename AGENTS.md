@@ -8,10 +8,18 @@
 
 1. 更新对应API/设计/使用文档及TODO；说明兼容性、错误与恢复行为。
 2. 修改当前阶段、门禁或执行链时更新 `docs/current-status.md`；保留旧验收的日期与证据，不能把旧测试数字当新代码验收。
-3. 更新 `docs/feature-index.md` 的功能ID、源码/函数、测试/工具、说明入口。重命名或删除实现必须同步映射。
+3. 更新 `docs/project-map.json` 的功能ID、源码/函数、测试/工具、说明入口；执行 `python scripts/project_inspect.py render --write` 生成 `docs/feature-index.md`，不直接修改派生表格。重命名或删除实现必须同步映射。
 4. 实测新现象同步知识库，分开文档定义、实测、推测与未完成项；原始数据在artifacts时注明其不保证随Git迁移。
 5. 运行 `test/documentation_index_test.py` 及相应功能测试。索引检查仅证明链接/符号有效，不证明文档语义或真实CST行为。
 6. 最终交付说明文档同步范围、实际验收与剩余边界。此约定不授权额外提交、推送、启动真实求解或修改用户原工程。
+
+## 功能映射与开发工具维护
+
+- `docs/project-map.json` 是功能/工具/人工关系/文档角色的唯一登记来源；`docs/feature-index.md` 只生成，不直接维护。完整Markdown角色登记允许 `unreviewed`，不能凭名称升级权威。
+- 新增、删除或修改命令入口/字面参数，同批更新 tools 的入口类型、观测参数、副作用、授权边界、未知及静态证据；查询工具不执行登记对象。`utils/` 和vendor按工具范围说明排除，不能借登记改动它们。
+- 修改信号/回调、字符串分发、依赖注入、协议或清理链，同批复审 relations 的source/targets/consumers、触发条件、线程/阶段、退出责任及未知；源码hash变化只提示复审，禁止自动刷新hash来掩盖未审查关系。
+- 维护顺序：读当前状态/索引 → query/changes/delete只读预检 → 修改实现及契约/文档 → 人工复审受影响关系并记录证据/hash → 显式render → validate及相应测试。删除预检不授权删除，静态注册不证明实际投递或正常退出。
+- 工具范围/角色门禁在 `test/project_registry_test.py`；定位、迁移、文档索引测试分别见 `test/project_inspect_test.py`、`test/project_map_migration_test.py`、`test/documentation_index_test.py`。扩展矩阵及源码包边界见 `test/project_inspect_fault_test.py`、`test/source_release_boundary_test.py`；包模式 `validate --scope package` 不代表全仓通过。运行这些离线测试不授权真实CST、发布或提交。
 
 这是代理实施过程中的同步要求，不是运行时自动生成文档系统；无须引入新的文档服务或ABI。
 

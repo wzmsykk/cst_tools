@@ -1,12 +1,13 @@
 # 文档导航
 
-更新：2026-11-02。先读[当前状态](current-status.md)与[功能索引](feature-index.md)，再定位专题实现、测试和证据。
+更新：2026-11-03。先读[当前状态](current-status.md)与[功能索引](feature-index.md)，再定位专题实现、测试和证据。
 
 |用途|入口|
 |---|---|
 |当前能力、实际验收和限制|[当前状态](current-status.md)|
 |下一步与保留的长期待办|[现行TODO](minimal-python-vba-todo.md)|
-|功能→源码/函数/工具/说明|[功能索引](feature-index.md)|
+|功能→源码/函数/工具/说明|[生成索引](feature-index.md)、[机器映射及维护指南](project-map-guide.md)|
+|开发工具、副作用、动态关系与维护步骤|[定位指南](project-map-guide.md#d3工具清单与人工动态关系)、[实施与验收计划](project-documentation-tooling-plan.md)、[源码包故障与校验边界](project-map-guide.md#d4故障矩阵与源码包边界)|
 |公共单次API/G03、恢复/错误行为|[公共服务](single-simulation-service.md)|
 |最新真实CST组合验收|[G03/G04记录](single-simulation-g04-acceptance.md)|
 |设置定义/执行事实分层|[验证器](cst-settings-verifier-design.md)、[B2投影](settings-history-projection.md)、[B3快照](execution-snapshot-verification.md)、[原生采集](native-execution-capture.md)|

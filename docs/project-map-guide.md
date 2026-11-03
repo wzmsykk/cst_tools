@@ -1,6 +1,6 @@
 # 项目定位与变更工具
 
-状态：实施草案，尚不可作为已验收工具使用。计划中的权威映射为 `docs/project-map.json`（尚未建立），结构由[Schema](project-map.schema.json)约束；当前[feature-index.md](feature-index.md)仍为现行手工索引，尚未迁为派生视图。下列命令是目标用法；契约文件缺失时不能完成查询。架构和全量迁移规则见[实施计划](project-documentation-tooling-plan.md)。工具不替代API正文、动态运行或CST验收。
+D1已迁入全部136项旧功能，并新增F138登记定位工具及迁移门禁，共137项。权威功能映射为[project-map.json](project-map.json)，结构由[Schema](project-map.schema.json)约束；[feature-index.md](feature-index.md)为生成视图。D2查询、全量文件清单、静态图、变更影响、删除预检和显式生成已补齐离线验收。D3已按明确范围登记66个工具入口/支持模块、18条人工动态关系、14个目录责任类别和全部194篇Markdown；未复审的副作用/文档角色保留未知，登记不代表自动执行权限或完整调用图。架构和全量迁移规则见[实施计划](project-documentation-tooling-plan.md)。工具不替代API正文、动态运行或CST验收。
 
 ## 日常入口
 
@@ -38,3 +38,58 @@ graph输出AST候选和显式登记关系，提供总数/截断标记；import�
 路径/符号/章节有效、派生索引一致，只是结构事实。工具的动态目标列表可以是候选或未知；没有运行记录就不标记runtime_proven。人工登记关系有适用基线，内容hash变化只提示复审。旧记录属于原日期/版本，不因本次生成工具而成为新代码验收。
 
 文档清单保留已核角色与未核角色，不把自动分类当完成人工整理。工具清单中未审查的外部副作用入口明确禁止自动调用；参数提取只是AST事实，不证明参数组合安全。范围外、缺失或历史文件仍显示原因，不静默按测试选择器忽略。
+
+
+## D2实现与验收边界（2026-11-03）
+
+CLI固定UTF-8输出，便于Windows重定向/机器读取。query报告匹配理由、声明位置/歧义、正向与反向候选、必读文档和非执行的验证计划；未登记的Python/VBA声明也可定位，但仍返回未映射。AST绑定始终是候选，不能证明对象身份、回调实际投递或清理已执行。解析失败单独报告。
+
+changes对指定Git提交比较当前已暂存/未暂存/删除文件，并纳入未忽略的新文件；一次解析共享给各文件影响结果。它只报告当前工作树的候选，不重建旧版本调用图。graph支持路径筛选与非负输出上限；空范围返回2，截断提供总数。delete永远不批准删除，其已知引用仅来自静态候选和人工登记；字符串、嵌入宏、文档和外部消费者须另查。
+
+没有当前根目录Git时，inventory/query等使用源码包release-manifest.json的files范围，不借用父目录Git；changes拒绝这种环境。源码包缺少全仓测试或文档时，validate诚实报告缺失，不把局部包冒充全仓通过。render不带--write只输出预览，带--write才改派生索引。
+
+测试入口：test/project_inspect_test.py（离线合成工作区/临时Git），及原迁移、索引门禁；测试不启动CST、不联网。当时完整登记与D3整合仍待办；当前进展见下方D3记录，D4扩展验收未完成。
+
+静态模块解析复用本轮文件清单，避免对每个import反复解析磁盘路径；不建立持久缓存，不自动刷新人工关系。最终组合31项通过；仓库文件清单/未映射数量是当时范围证据，不代表语义覆盖率。
+
+
+## D3工具清单与人工动态关系
+
+唯一登记仍在project-map.json。`python scripts/project_inspect.py tools` 返回工具条目及范围覆盖；`query --path pack.bat`等路径查询同时返回registered_tools。路径没有F功能映射时仍返回2，不把工具条目冒充功能覆盖。query/graph同时检索人工关系source、targets及consumers；工具只返回登记，不导入或调用它们。
+
+工具范围：scripts/和test/support/下全部Python模块（含无main guard却有顶层副作用的模块）、第一方Python显式main入口、第一方shell脚本。vendor、历史artifacts、知识库和按约定保持不变的utils明确排除；它们仍在文件inventory中，排除不证明无外部调用。公共MCP工具由mcp_server的装饰器注册，本清单登记服务进程入口，不复制一套MCP工具定义。当前66条是本次文件范围，不是允许执行列表。
+
+每条工具提供用途、入口类型、字面参数、已知副作用、授权边界、未知及证据。AST只能观察字面add_argument，委托base、Qt或动态参数可能遗漏；observed_arguments和人工补充的arguments区分。工具本身也不是一律只读：打包会写ZIP并启动烟雾子进程，ANTLR --prepare下载/构建，NoUI会激活COM且可能弹窗，故障探针可kill本轮GUI/Runner，preview模块顶层即创建Qt/写图。未审查的传递副作用明确标注，不能由文件名推断安全。
+
+人工关系逐项登记：入口、已知/默认目标、消费者、触发、线程/阶段、清理责任、证据和未知。R001–R004为GUI控制器选择/生产计时器与线程池/退出/注入Qt控制器；R005–R008为MCP注册/client_factory/HTTP分发/执行器选择；R009–R011为editor、worker工厂和Manager线程池；R012–R014为ACK/原生收尾/检查点采用；R015–R018为跨语言COM包装、WinEvent回调、logging handler及发布链。GUI生产使用RunnerController，与注入的GuiRunController分开。嵌入的PowerShell/C#/VBA及CST内部不由Python AST解释，未知始终保留。
+
+全部Markdown有角色条目；仅已人工确认的导航/状态/维护文档标为现行职责，历史/冻结快照按来源目录标记，其他条目允许unreviewed。该清单不是文档正文审计；HTML/CHM等厂商资源不在Markdown角色分母内。
+
+维护步骤：修改入口、参数、回调、注入或清理时，先查相关F和relations/tools，再修改对应登记及说明；人工核对后更新受影响源码hash（仅采集身份），显式render，再validate和相应测试。validate会拒绝工具入口漏登/移除未清、字面参数过期、重复工具/关系ID、关系消费者失效、Markdown缺项和派生索引过期。它不会自动补关系、改hash、运行测试或启动CST。
+
+源码包保留原仓库登记，省略夹具或历史文档时validate仍会诚实报缺失；工具范围差异不自动删除原登记，不把局部包误判为全仓一致。运行来源可从input中的Git/manifest身份区分。
+
+D3验收：组合离线37项通过（65.72秒）；tools/query/graph/validate仓库检查通过。[轻量证据](../knowledge-base/project-registry-d3-20261103.json)记录分母、未知及范围；没有真实CST启动，数字不可作为运行调用图覆盖率。
+
+
+## D4故障矩阵与源码包边界
+
+D4修复以下问题：源码包漏带离线文本夹具及base系列CLI；生成的根README未登记；Git重命名可能漏掉旧路径；fenced code中的标题误计章节；包清单缺少严格路径/形状和字节完整性核验；render写入未使用统一解析后路径保护。既有D1–D3数字保留其原批次，不升级为本批代码验收。
+
+|故障或边界|检查与预期|
+|---|---|
+|目录重命名/删除|changes关闭Git重命名折叠，分别返回旧/新路径；不虚构旧版本调用图|
+|过期/伪章节|ATX章节解析忽略backtick/tilde fenced块，重复slug带序号；过期锚点失败；不是完整Markdown渲染器|
+|图截断/空范围|limit=0仍报告总数/截断；未知范围返回2，负数拒绝|
+|过期源码hash|只提示复审，不自动改契约或hash|
+|损坏JSON/manifest形状或路径|退出1并给结构化错误；拒绝越界、ADS、非规范路径及清单自引用|
+|清单内容ID/文件hash不符、已列文件丢失|包校验失败；不把意图省略项与实际丢失混同|
+|解析后路径逃逸|统一safe_path用于契约/manifest读取和索引写入；无需真正创建OS链接即可离线注入验证拒绝路径|
+|生成README|availability=package-only，在仓库无物理文件；在源码包必须列入manifest并存在|
+|本机Git与无Git源码包|只认当前根Git；包不能借父Git身份，changes拒绝无Git环境；包模式不能用于Git工作树豁免|
+
+`python scripts/project_inspect.py validate`继续检查完整仓库契约；源码包因有意省略的vendor/开发脚本会失败。新增`validate --scope package`只适用于无根Git且有合法manifest的解压包：核对已列全部字节、整体内容ID和包内映射/符号/角色/登记，将原契约中未随包提供的引用放入omitted_references，明确repository_complete=False。清单hash证明字节一致，不认证作者或运行结果；查询的input身份也不暗示完整性已验。只读查询仍不修改manifest。若包内源码被合法修改，应视作新的待审查快照，而不是自动“修复”原清单。
+
+当前选择保留离线文本夹具、协议样本、test/support PowerShell入口、3个base CLI和根知识库JSON；继续省略真实CST模型、原始场、厂商帮助、旧pack.bat及GUI UI再生成脚本。已生成源码包的缺省引用预期为这两个开发脚本与vendor README。随包测试不代表全部集成测试均可直接运行；本轮只执行指定离线工具/迁移/登记测试、ZIP/编译/无CST GUI烟雾及包命令验收，不求解、不部署、不推送。
+
+D4组合60项通过（86.17秒）。[轻量记录](../knowledge-base/project-tooling-d4-20261103.json)保留测试分层与源码包身份；完整包/解压副本在测试结束后清理，仅保留轻量receipt/manifest/JUnit，检查原始包需重新生成。未启动CST，未发布、提交或推送。

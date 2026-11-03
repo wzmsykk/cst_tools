@@ -1,0 +1,45 @@
+{
+  "date": "2026-11-03",
+  "phase": "D3",
+  "evidence_layer": "static-source-review-and-offline-tests-only",
+  "tool_scope": "scripts/test-support Python, first-party Python main guards and shell scripts; excludes vendor, history and unchanged utils; no execution permission; public MCP tools are registered in mcp_server, not separate executable files.",
+  "tools": 66,
+  "relations": 18,
+  "domains": 14,
+  "markdown_documents": 194,
+  "unknowns": [
+    "Transitive tool effects and delegated arguments are not fully audited.",
+    "Dynamic registration is not runtime delivery or successful cleanup proof.",
+    "Many document roles remain unreviewed; inventory is not semantic authority.",
+    "Vendor/unchanged utils are out of executable tool registry scope, not automatically safe."
+  ],
+  "cst_started": false,
+  "production_behavior_changed": false,
+  "tests": {
+    "command": "python -m pytest -q test/project_registry_test.py test/project_inspect_test.py test/project_map_migration_test.py test/documentation_index_test.py",
+    "passed": 37,
+    "seconds": 65.72
+  },
+  "checkout_checks": {
+    "commands": [
+      "tools",
+      "query --path GUI/runner_controller.py",
+      "graph --path GUI/runner_controller.py --limit 3",
+      "validate"
+    ],
+    "tool_candidates": 66,
+    "missing_tools": [],
+    "stale_tool_observations": [],
+    "tool_parse_problems": [],
+    "validation_errors": [],
+    "validation_warnings": [],
+    "gui_relationship_ids": [
+      "R001",
+      "R002",
+      "R003"
+    ]
+  },
+  "catalog_sha256": "26990fbd86c933d92c801fe1c8b8696f15d5de587841bd483f555163bc301e11",
+  "baseline_commit": "c083c5820380e15eef0e4e1f4e1790ee2b86f958",
+  "worktree": "uncommitted D1-D3 changes; not a release/runtime acceptance"
+}

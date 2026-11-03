@@ -1,0 +1,60 @@
+{
+  "date": "2026-11-03",
+  "phase": "D4",
+  "baseline_commit": "c083c5820380e15eef0e4e1f4e1790ee2b86f958",
+  "worktree": "uncommitted D1-D4 implementation; final report text generated after tested source snapshot",
+  "evidence_layer": "offline fault matrix and real source packaging/compile/offscreen GUI only",
+  "tests": {
+    "passed": 60,
+    "seconds": 86.17,
+    "junit": "artifacts/d4-tooling-evidence/tests.xml"
+  },
+  "package": {
+    "archive_sha256": "5120caa54e21959ad46bbb4c78caf95b1db03e692ecf8cedb442ae7ce2c61155",
+    "content_sha256": "58835e42675a1d1bf9ce6ba3834311109936735348f6bd523b7f1eebeab37477",
+    "bytes": 2708600,
+    "files": 638,
+    "checks": [
+      "ZIP CRC and all file hashes",
+      "Python compile and Runner import without Qt",
+      "offscreen GUI smoke without restoring user project",
+      "package validation and explicit omissions",
+      "repository validation rejects partial release",
+      "query/inventory/graph/read-only snapshot and no-Git changes rejection"
+    ],
+    "omitted_references": [
+      "GUI/createpyfromui.bat",
+      "knowledge-base/vendor/cst-2022-vba-help/README.md",
+      "pack.bat"
+    ],
+    "archive_retained": false,
+    "raw_location": "Removed completed artifacts/d4-final-test and initial package test tree; receipt/manifest/JUnit retained in artifacts/d4-tooling-evidence."
+  },
+  "first_failure": {
+    "kind": "document-registry-incomplete",
+    "path": "README.md",
+    "fix": "Explicit package-only document role, required in release manifest"
+  },
+  "repairs": [
+    "Retain offline text/protocol fixtures, base CLI and root knowledge JSON in source releases",
+    "Strict manifest paths/shape/content hash and file byte checks",
+    "Explicit package scope versus repository scope",
+    "Report both rename sides with --no-renames",
+    "Ignore fenced headings and preserve duplicate anchors",
+    "Guard resolved read/render-write paths"
+  ],
+  "cst_started": false,
+  "production_algorithms_or_utils_modified": false,
+  "boundaries": [
+    "No real CST or desktop MCP acceptance",
+    "Registry completeness does not prove semantic or transitive tool safety",
+    "Resolved-path escape tested by injected resolution, not OS junction creation",
+    "Package hashes establish consistency, not author authenticity",
+    "Raw test package removed; regenerate before inspecting its contents"
+  ],
+  "final_repository_validation": {
+    "valid": true,
+    "errors": [],
+    "warnings": []
+  }
+}
