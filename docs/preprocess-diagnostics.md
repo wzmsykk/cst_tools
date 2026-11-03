@@ -6,6 +6,8 @@
 
 旧实现使用TemporaryDirectory，异常时自动删除副本和宏；subprocess.run的180秒总超时还会终止直接启动的进程。因此空temp不是“未启动CST”的证据，也无法从该堆栈判断加载、历史执行或重建具体卡在哪里。
 
+2026-11-04后台启动共用BatchDesktopLease独立桌面和正向归属观察；隔离失败拒绝启动，释放本地句柄不代表CST已退出。模板增加共享字符串/物理行检查及generation-manifest，范围见[五项实施](execution-hardening-five-steps.md)。
+
 现实现仍使用`-m -b 副本.cst`，不更改原工程，不强杀，不自动重试：
 
 - 每次创建`temp/cst-preprocess-<随机ID>`，日志与异常打印该绝对路径。

@@ -19,6 +19,7 @@ from csttool import projectutil
 from .acceptance_session import cst_processes, wait_probe
 from .configuration import write_json_atomic
 from .logging_config import log_failure
+from .batch_desktop import BatchDesktopLease, macro_manifest, literal_content
 
 
 REQUIRED_HOM_PARAMETERS = frozenset({"fmin", "fmax", "nmodes", "cell"})
@@ -109,9 +110,8 @@ class CstProjectPreprocessor:
         self.logger.debug("已记录其他CST实例，不参与本任务退出检查",
                           extra={'phase':'preprocess','preexisting_processes':preexisting,'diagnostics':str(working)})
         with (working / "cst.log").open("wb") as stream:
-            process = subprocess.Popen(command, env=cst_process_environment(),
-                                       stdout=stream, stderr=subprocess.STDOUT,
-                                       **self._startup_options())
+            lease=BatchDesktopLease(self.executable,command[3],working,isolate=self.run_in_background)
+            process = lease.start(command,stream,**self._startup_options())
             try:
                 identity = {"pid": process.pid,
                             "create_time": psutil.Process(process.pid).create_time()}
@@ -121,14 +121,19 @@ class CstProjectPreprocessor:
                                    "exit_confirmed": False})
             except psutil.NoSuchProcess:
                 pass
-            diagnostic = wait_probe(
+            detail_observer=self._observer(working, self._detail_cursor)
+            def observe(report):
+                lease.observe(report['owned']);detail_observer(report)
+            try:
+                diagnostic = wait_probe(
                 process, working, stage_timeout=self.timeout, exit_timeout=60,
                 completion_names=("completion.txt",),
                 unbounded_stages=("bind-history", "rebuild", "save"),
-                on_observation=self._observer(working, self._detail_cursor),
+                on_observation=observe,
                 preexisting_processes=preexisting,
                 task_project=command[3],
-            )
+                )
+            finally:lease.finish()
         if diagnostic['foreign_processes']:
             self.logger.debug("独立/未关联CST仅记录，不阻塞本任务 | processes=%s diagnostics=%s",
                               diagnostic['foreign_processes'], working)
@@ -150,7 +155,7 @@ class CstProjectPreprocessor:
 
     @staticmethod
     def _vb_path(path: Path) -> str:
-        return str(path.resolve()).replace("\\", "\\\\")
+        return literal_content(str(path.resolve()).replace("\\", "\\\\"))
 
     def render_macro(
         self,
@@ -174,6 +179,8 @@ class CstProjectPreprocessor:
             if marker not in source:
                 raise CstPreprocessError(f"preprocess template is missing {marker}")
             source = source.replace(marker, value)
+        from .winwrap_emitter import check_lines
+        check_lines(source.splitlines())
         return source
 
     def preprocess(
@@ -243,6 +250,8 @@ class CstProjectPreprocessor:
                 encoding="utf-8",
             )
             command = [str(self.executable), "-m", "-b", str(working_project)]
+            macro_manifest(working,macro_path.read_text(encoding='utf-8'),purpose='HOM preprocessing',
+                sources=[self.macro_template,Path(__file__)])
             self.logger.info("开始预处理工程副本，原工程保持不变",
                              extra={'phase':'preprocess','source_project':str(source_project_path),
                                     'diagnostics':str(working),'modify_mesh':modify_mesh})

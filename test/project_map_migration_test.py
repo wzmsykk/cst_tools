@@ -2,6 +2,7 @@
 import copy
 from pathlib import Path
 import re
+import pytest
 
 from scripts.project_inspect import load, render, validate
 
@@ -19,6 +20,19 @@ def normalized_links(cell, parent):
             for label, target in re.findall(r'\[([^]]+)\]\(([^)]+)\)', cell)]
 
 
+def assert_preserved(before, after):
+    """The frozen migration content remains ordered; later additions are allowed."""
+    remaining = iter(after)
+    for item in before:
+        assert any(candidate == item for candidate in remaining), item
+
+
+@pytest.mark.parametrize('changed', [['a'], ['b', 'a'], ['a', 'c']])
+def test_preservation_still_rejects_loss_and_reordering(changed):
+    with pytest.raises(AssertionError):
+        assert_preserved(['a', 'b'], changed)
+
+
 def test_all_136_features_preserved_in_order_and_content():
     old = rows(BASELINE.read_text(encoding='utf-8'))
     catalog = load(ROOT)
@@ -30,9 +44,9 @@ def test_all_136_features_preserved_in_order_and_content():
     assert len({f['id'] for f in catalog['features']}) == 137
     for before, after in zip(old, new):
         assert before[:2] == after[:2]
-        assert re.findall(r'`([^`]+)`', before[3]) == re.findall(r'`([^`]+)`', after[3])
+        assert_preserved(re.findall(r'`([^`]+)`', before[3]), re.findall(r'`([^`]+)`', after[3]))
         for column in (2, 4, 5):
-            assert normalized_links(before[column], ROOT / 'docs') == normalized_links(after[column], ROOT / 'docs')
+            assert_preserved(normalized_links(before[column], ROOT / 'docs'), normalized_links(after[column], ROOT / 'docs'))
             # Also preserve non-link information, including F133's manual verification note.
             plain = lambda value: re.sub(r'\[[^]]+\]\([^)]+\)', '', value).strip(' 、,;')
             assert plain(before[column]) == plain(after[column])

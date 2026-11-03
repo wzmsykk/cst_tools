@@ -79,3 +79,5 @@ G02新建/检查空文档子集参见[创建服务](project-creation-service.md)
 ## 结果/定义v2与公开导出
 
 新定义schema_version=2将postprocess列表与metric_id纳入definition_revision；旧v1不自动提升/兼容为ready，须从源重新登记并显式G03，旧验收按原日期保留。新结果schema_version=2在派发前冻结参数模型hash、中心积分线端点/轴/beta、能量/公式、算法和实际宏证据，metrics保留请求的metric_id，供JSON/CSV一致输出。查询验证冻结文件，篡改返回RESULT_INVALID。Runner命令export_simulation_results及MCP同名工具已接线，写请求需claim/request_id；不启动CST，不宣称远程工件下载。详见[类型化服务](typed-definition-service.md)。
+
+2026-11-04：G03批调用与预处理、Managed共用BatchDesktopLease；后台默认独立桌面，归属观察与原验证结果/退出核验分开。仅增加固定模板字符串/行预算与来源清单，不将非A1宏视为已完整编译。见[五项实施及验收边界](execution-hardening-five-steps.md)。

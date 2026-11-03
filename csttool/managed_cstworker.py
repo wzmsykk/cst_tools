@@ -19,7 +19,7 @@ from install_compat import resource_path
 from .postprocess_cst import CstPostProcessor
 from .configuration import write_json_atomic, read_json
 from .cst_progress import CstLogProgressMonitor, CstLogProgressParser
-from .vb_codec import quote_vb_string
+from .batch_desktop import literal_content
 from .logging_config import ContextLogger, log_failure
 from .worker_models import WorkerConfig, SimulationResult
 from .cst_process_env import cst_process_environment
@@ -251,17 +251,17 @@ class ManagedCSTWorker:
                 '            stage = "native-capture-post"\n            CaptureAfterSolver solverReturn\n'
                 '            stage = "solver-result"')
         replacements = {
-            "%PROJECT_PATH%": quote_vb_string(self.project_path),
+            "%PROJECT_PATH%": literal_content(self.project_path),
             "%SESSION_ID%": self.session_id,
-            "%TASK_PATH%": quote_vb_string(self.task_path),
-            "%COMPLETION_PATH%": quote_vb_string(self.completion_path),
-            "%ACK_PATH%": quote_vb_string(self.ack_path),
-            "%MARKER_PATH%": quote_vb_string(self.marker_path),
-            "%LIFECYCLE_PATH%": quote_vb_string(getattr(self, 'observation_root', self.root) / 'lifecycle.log'),
-            "%STOP_REQUEST_PATH%": quote_vb_string(self.stop_request_path),
-            "%STOP_ACK_PATH%": quote_vb_string(self.stop_ack_path),
-            "%CLOSE_RECEIPT_PATH%": quote_vb_string(self.task_path.parent / 'close.receipt'),
-            "%RESULT_ROOT%": quote_vb_string(str(self.result_root) + "\\"),
+            "%TASK_PATH%": literal_content(self.task_path),
+            "%COMPLETION_PATH%": literal_content(self.completion_path),
+            "%ACK_PATH%": literal_content(self.ack_path),
+            "%MARKER_PATH%": literal_content(self.marker_path),
+            "%LIFECYCLE_PATH%": literal_content(getattr(self, 'observation_root', self.root) / 'lifecycle.log'),
+            "%STOP_REQUEST_PATH%": literal_content(self.stop_request_path),
+            "%STOP_ACK_PATH%": literal_content(self.stop_ack_path),
+            "%CLOSE_RECEIPT_PATH%": literal_content(self.task_path.parent / 'close.receipt'),
+            "%RESULT_ROOT%": literal_content(str(self.result_root) + "\\"),
         }
         for placeholder, value in replacements.items():
             main = main.replace(placeholder, value)
@@ -290,14 +290,12 @@ class ManagedCSTWorker:
         return [str(self.executable), '-m', '-b', str(self.project_path)]
 
     def _start(self) -> None:
+        from .batch_desktop import BatchDesktopLease, macro_manifest
+        macro_manifest(self.root,self.macro_path.read_text(encoding='ascii'),purpose='Managed loaded-project worker',
+            sources=[Path(__file__),Path(__file__).parents[1]/'data/runtime_managed_worker_v1_main.vb'])
         self._log_stream = self.log_path.open("wb", buffering=0)
-        self._process = subprocess.Popen(
-            self._launch_command(),
-            env=cst_process_environment(),
-            stdout=self._log_stream,
-            stderr=subprocess.STDOUT,
-            **self._background_startup_options(),
-        )
+        self._desktop_lease=BatchDesktopLease(self.executable,self.project_path,self.root,isolate=self._run_in_background)
+        self._process = self._desktop_lease.start(self._launch_command(),self._log_stream,**self._background_startup_options())
         self.pid_path.write_text(str(self._process.pid), encoding="ascii")
         from .process_identity import capture_process_identity
         capture_process_identity(self.root, self._process.pid, self.executable, self.project_path)
@@ -334,53 +332,17 @@ class ManagedCSTWorker:
         options["startupinfo"] = startupinfo
         return options
 
-    def _keep_window_minimized(self) -> None:
-        """Re-minimize visible CST windows that appear while a task is running."""
-        if (
-            not self._run_in_background
-            or os.name != "nt"
-            or self._process is None
-            or self._process.poll() is not None
-        ):
-            return
-        now = time.monotonic()
-        if now - self._last_window_check < 0.5:
-            return
-        self._last_window_check = now
-
-        try:
-            import ctypes
-
-            user32 = ctypes.windll.user32
-            target_pid = self._process.pid
-            callback_type = ctypes.WINFUNCTYPE(
-                ctypes.c_bool, ctypes.c_void_p, ctypes.c_void_p
-            )
-
-            def minimize(hwnd, _lparam):
-                process_id = ctypes.c_ulong()
-                user32.GetWindowThreadProcessId(hwnd, ctypes.byref(process_id))
-                if (
-                    process_id.value == target_pid
-                    and user32.IsWindowVisible(hwnd)
-                    and not user32.IsIconic(hwnd)
-                ):
-                    user32.ShowWindow(hwnd, 6)  # SW_MINIMIZE
-                return True
-
-            user32.EnumWindows(callback_type(minimize), 0)
-        except Exception:
-            self.logger.debug(
-                "Unable to enforce minimized CST window for worker %s",
-                self.ID,
-                exc_info=True,
-            )
+    def _observe_background_windows(self) -> None:
+        """Observe only positively bound instances on the owned desktop."""
+        lease=getattr(self,'_desktop_lease',None)
+        if lease is not None:
+            lease.observe()
 
     def _wait_for_marker(self, expected: str, timeout: float) -> None:
         deadline = time.monotonic() + timeout
         while time.monotonic() < deadline:
             self._ensure_running()
-            self._keep_window_minimized()
+            self._observe_background_windows()
             if self.marker_path.exists():
                 marker = self.marker_path.read_text(encoding="ascii").strip()
                 if marker == expected or (expected == 'ready' and marker.startswith('ready:')):
@@ -770,7 +732,7 @@ class ManagedCSTWorker:
         next_heartbeat = started + 600.0
         while deadline is None or time.monotonic() < deadline:
             self._ensure_running()
-            self._keep_window_minimized()
+            self._observe_background_windows()
             if getattr(self, '_native_progress', None) is not None:
                 self._native_progress.poll()
             if getattr(self, '_solver_output', None) is not None:
@@ -1129,6 +1091,10 @@ class ManagedCSTWorker:
             self._close_log()
 
     def _close_log(self) -> None:
+        lease=getattr(self,'_desktop_lease',None)
+        if lease is not None:
+            lease.finish()
+            self._desktop_lease=None
         progress_monitor = getattr(self, "_progress_monitor", None)
         if progress_monitor is not None:
             progress_monitor.stop()

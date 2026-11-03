@@ -1,0 +1,1090 @@
+{
+  "date": "2026-11-04",
+  "baseline": "e94d5b7",
+  "scope": "five-step execution hardening; native evidence separated from offline and numerical mode identity",
+  "hom": {
+    "passed": true,
+    "source_sha256": "27059515da0934239cffe488990d293c1d06f5e61814df08fd38a14617685df1",
+    "attempts": [
+      {
+        "phase": "normal",
+        "lo": 1000,
+        "hi": 1050,
+        "cell": 4,
+        "result": {
+          "WorkerID": "0",
+          "TaskStatus": "Failure",
+          "RunName": "recovery-normal",
+          "RunParameters": {
+            "nmodes": 1,
+            "fmin": 1000,
+            "fmax": 1050,
+            "cell": 4
+          },
+          "PostProcessResult": null,
+          "FailureReport": "SOLVER_FAILED: solver-result failed: number=-2147418113; description=No Eigenmode results that can be read by methods of the \"EigenmodeSolver\" object have been written to the database so far. This is the case for old projects created earlier than 2013.",
+          "ProjectSnapshot": null,
+          "TaskID": "e37cea59-06a3-4921-ab24-cc5feb2d0eff",
+          "ResultDirectory": "D:\\work\\cst_tools\\artifacts\\hom-recovery-native-da01c6ed\\attempt-0\\result\\worker_0\\worker_0\\e37cea59-06a3-4921-ab24-cc5feb2d0eff",
+          "ReceiptPath": "D:\\work\\cst_tools\\artifacts\\hom-recovery-native-da01c6ed\\attempt-0\\temp\\worker_0\\94a248c4-a5bf-406d-8869-3bce55ddbd4b\\received\\e37cea59-06a3-4921-ab24-cc5feb2d0eff.json"
+        }
+      },
+      {
+        "phase": "mesh",
+        "lo": 1000,
+        "hi": 1050,
+        "cell": 6,
+        "result": {
+          "WorkerID": "0",
+          "TaskStatus": "Failure",
+          "RunName": "recovery-mesh",
+          "RunParameters": {
+            "nmodes": 1,
+            "fmin": 1000,
+            "fmax": 1050,
+            "cell": 6
+          },
+          "PostProcessResult": null,
+          "FailureReport": "SOLVER_FAILED: solver-result failed: number=-2147418113; description=No Eigenmode results that can be read by methods of the \"EigenmodeSolver\" object have been written to the database so far. This is the case for old projects created earlier than 2013.",
+          "ProjectSnapshot": null,
+          "TaskID": "4978fd44-6780-44d3-afe9-5191fdcd3a04",
+          "ResultDirectory": "D:\\work\\cst_tools\\artifacts\\hom-recovery-native-da01c6ed\\attempt-1\\result\\worker_0\\worker_0\\4978fd44-6780-44d3-afe9-5191fdcd3a04",
+          "ReceiptPath": "D:\\work\\cst_tools\\artifacts\\hom-recovery-native-da01c6ed\\attempt-1\\temp\\worker_0\\dfbd01a4-644e-46b2-97bd-8804d480000d\\received\\4978fd44-6780-44d3-afe9-5191fdcd3a04.json"
+        }
+      },
+      {
+        "phase": "probe",
+        "lo": 1000,
+        "hi": 1100,
+        "cell": 4,
+        "result": {
+          "WorkerID": "0",
+          "TaskStatus": "Success",
+          "RunName": "recovery-probe",
+          "RunParameters": {
+            "nmodes": 1,
+            "fmin": 1000,
+            "fmax": 1100,
+            "cell": 4
+          },
+          "PostProcessResult": [
+            {
+              "id": 0,
+              "resultName": "frequency",
+              "value": 1148.50586256623,
+              "params": {
+                "iModeNumber": 1
+              }
+            },
+            {
+              "id": 1,
+              "resultName": "rq",
+              "value": 228.591576299729,
+              "params": {
+                "iModeNumber": 1,
+                "axis": "z",
+                "xoffset": 0.0,
+                "yoffset": 0.0,
+                "zoffset": 0.0
+              }
+            }
+          ],
+          "FailureReport": null,
+          "ProjectSnapshot": "D:\\work\\cst_tools\\artifacts\\hom-recovery-native-da01c6ed\\attempt-2\\result\\worker_0\\worker_0\\recovery-probe__f_1148.505863MHz__ac573cd7-e445-4407-9cd1-262a3fd7d85f\\recovery-probe__f_1148.505863MHz.cst",
+          "TaskID": "ac573cd7-e445-4407-9cd1-262a3fd7d85f",
+          "ResultDirectory": "D:\\work\\cst_tools\\artifacts\\hom-recovery-native-da01c6ed\\attempt-2\\result\\worker_0\\worker_0\\recovery-probe__f_1148.505863MHz__ac573cd7-e445-4407-9cd1-262a3fd7d85f",
+          "ReceiptPath": "D:\\work\\cst_tools\\artifacts\\hom-recovery-native-da01c6ed\\attempt-2\\temp\\worker_0\\55a818ff-2587-42a7-b06c-cba465ba0c67\\received\\ac573cd7-e445-4407-9cd1-262a3fd7d85f.json"
+        }
+      },
+      {
+        "phase": "probe",
+        "lo": 1000,
+        "hi": 1200,
+        "cell": 4,
+        "result": {
+          "WorkerID": "0",
+          "TaskStatus": "Success",
+          "RunName": "recovery-probe",
+          "RunParameters": {
+            "nmodes": 1,
+            "fmin": 1000,
+            "fmax": 1200,
+            "cell": 4
+          },
+          "PostProcessResult": [
+            {
+              "id": 0,
+              "resultName": "frequency",
+              "value": 1147.70915239034,
+              "params": {
+                "iModeNumber": 1
+              }
+            },
+            {
+              "id": 1,
+              "resultName": "rq",
+              "value": 223.510580561709,
+              "params": {
+                "iModeNumber": 1,
+                "axis": "z",
+                "xoffset": 0.0,
+                "yoffset": 0.0,
+                "zoffset": 0.0
+              }
+            }
+          ],
+          "FailureReport": null,
+          "ProjectSnapshot": "D:\\work\\cst_tools\\artifacts\\hom-recovery-native-da01c6ed\\attempt-3\\result\\worker_0\\worker_0\\recovery-probe__f_1147.709152MHz__ae1c719e-84b6-48d0-99ff-da7fc8f7b7f1\\recovery-probe__f_1147.709152MHz.cst",
+          "TaskID": "ae1c719e-84b6-48d0-99ff-da7fc8f7b7f1",
+          "ResultDirectory": "D:\\work\\cst_tools\\artifacts\\hom-recovery-native-da01c6ed\\attempt-3\\result\\worker_0\\worker_0\\recovery-probe__f_1147.709152MHz__ae1c719e-84b6-48d0-99ff-da7fc8f7b7f1",
+          "ReceiptPath": "D:\\work\\cst_tools\\artifacts\\hom-recovery-native-da01c6ed\\attempt-3\\temp\\worker_0\\fd22e927-542d-43ff-a22a-5305a746dace\\received\\ae1c719e-84b6-48d0-99ff-da7fc8f7b7f1.json"
+        }
+      },
+      {
+        "phase": "confirm",
+        "lo": 1122.70915239034,
+        "hi": 1172.70915239034,
+        "cell": 4,
+        "result": {
+          "WorkerID": "0",
+          "TaskStatus": "Success",
+          "RunName": "recovery-confirm",
+          "RunParameters": {
+            "nmodes": 1,
+            "fmin": 1122.70915239034,
+            "fmax": 1172.70915239034,
+            "cell": 4
+          },
+          "PostProcessResult": [
+            {
+              "id": 0,
+              "resultName": "frequency",
+              "value": 1147.56121679991,
+              "params": {
+                "iModeNumber": 1
+              }
+            },
+            {
+              "id": 1,
+              "resultName": "rq",
+              "value": 229.081341837638,
+              "params": {
+                "iModeNumber": 1,
+                "axis": "z",
+                "xoffset": 0.0,
+                "yoffset": 0.0,
+                "zoffset": 0.0
+              }
+            }
+          ],
+          "FailureReport": null,
+          "ProjectSnapshot": "D:\\work\\cst_tools\\artifacts\\hom-recovery-native-da01c6ed\\attempt-4\\result\\worker_0\\worker_0\\recovery-confirm__f_1147.561217MHz__01778c40-aaed-499d-86da-0111121707c0\\recovery-confirm__f_1147.561217MHz.cst",
+          "TaskID": "01778c40-aaed-499d-86da-0111121707c0",
+          "ResultDirectory": "D:\\work\\cst_tools\\artifacts\\hom-recovery-native-da01c6ed\\attempt-4\\result\\worker_0\\worker_0\\recovery-confirm__f_1147.561217MHz__01778c40-aaed-499d-86da-0111121707c0",
+          "ReceiptPath": "D:\\work\\cst_tools\\artifacts\\hom-recovery-native-da01c6ed\\attempt-4\\temp\\worker_0\\a9dee4a9-04aa-4eb0-8ee2-bf274af9c74f\\received\\01778c40-aaed-499d-86da-0111121707c0.json"
+        }
+      },
+      {
+        "phase": "normal",
+        "lo": 1147.56121779991,
+        "hi": 1150,
+        "cell": 4,
+        "result": {
+          "WorkerID": "0",
+          "TaskStatus": "Failure",
+          "RunName": "recovery-normal",
+          "RunParameters": {
+            "nmodes": 1,
+            "fmin": 1147.56121779991,
+            "fmax": 1150,
+            "cell": 4
+          },
+          "PostProcessResult": null,
+          "FailureReport": "SOLVER_FAILED: solver-result failed: number=-2147418113; description=No Eigenmode results that can be read by methods of the \"EigenmodeSolver\" object have been written to the database so far. This is the case for old projects created earlier than 2013.",
+          "ProjectSnapshot": null,
+          "TaskID": "2b4e0045-13d3-4086-9d54-b3b87514f600",
+          "ResultDirectory": "D:\\work\\cst_tools\\artifacts\\hom-recovery-native-da01c6ed\\attempt-5\\result\\worker_0\\worker_0\\2b4e0045-13d3-4086-9d54-b3b87514f600",
+          "ReceiptPath": "D:\\work\\cst_tools\\artifacts\\hom-recovery-native-da01c6ed\\attempt-5\\temp\\worker_0\\2dfdab6b-6f9e-4be4-bdb5-22e79b344f35\\received\\2b4e0045-13d3-4086-9d54-b3b87514f600.json"
+        }
+      },
+      {
+        "phase": "mesh",
+        "lo": 1147.56121779991,
+        "hi": 1150,
+        "cell": 6,
+        "result": {
+          "WorkerID": "0",
+          "TaskStatus": "Success",
+          "RunName": "recovery-mesh",
+          "RunParameters": {
+            "nmodes": 1,
+            "fmin": 1147.56121779991,
+            "fmax": 1150,
+            "cell": 6
+          },
+          "PostProcessResult": [
+            {
+              "id": 0,
+              "resultName": "frequency",
+              "value": 1737.80652701286,
+              "params": {
+                "iModeNumber": 1
+              }
+            },
+            {
+              "id": 1,
+              "resultName": "rq",
+              "value": 0.00476000013866615,
+              "params": {
+                "iModeNumber": 1,
+                "axis": "z",
+                "xoffset": 0.0,
+                "yoffset": 0.0,
+                "zoffset": 0.0
+              }
+            }
+          ],
+          "FailureReport": null,
+          "ProjectSnapshot": "D:\\work\\cst_tools\\artifacts\\hom-recovery-native-da01c6ed\\attempt-6\\result\\worker_0\\worker_0\\recovery-mesh__f_1737.806527MHz__3d7dde49-8ffb-4576-aea5-e980abba5f01\\recovery-mesh__f_1737.806527MHz.cst",
+          "TaskID": "3d7dde49-8ffb-4576-aea5-e980abba5f01",
+          "ResultDirectory": "D:\\work\\cst_tools\\artifacts\\hom-recovery-native-da01c6ed\\attempt-6\\result\\worker_0\\worker_0\\recovery-mesh__f_1737.806527MHz__3d7dde49-8ffb-4576-aea5-e980abba5f01",
+          "ReceiptPath": "D:\\work\\cst_tools\\artifacts\\hom-recovery-native-da01c6ed\\attempt-6\\temp\\worker_0\\75c66a9d-b438-44e9-b999-f509de95b07c\\received\\3d7dde49-8ffb-4576-aea5-e980abba5f01.json"
+        }
+      },
+      {
+        "phase": "probe",
+        "lo": 1147.56121779991,
+        "hi": 1152.43878220009,
+        "cell": 4,
+        "result": {
+          "WorkerID": "0",
+          "TaskStatus": "Success",
+          "RunName": "recovery-probe",
+          "RunParameters": {
+            "nmodes": 1,
+            "fmin": 1147.56121779991,
+            "fmax": 1152.43878220009,
+            "cell": 4
+          },
+          "PostProcessResult": [
+            {
+              "id": 0,
+              "resultName": "frequency",
+              "value": 1148.05026248049,
+              "params": {
+                "iModeNumber": 1
+              }
+            },
+            {
+              "id": 1,
+              "resultName": "rq",
+              "value": 229.512766432722,
+              "params": {
+                "iModeNumber": 1,
+                "axis": "z",
+                "xoffset": 0.0,
+                "yoffset": 0.0,
+                "zoffset": 0.0
+              }
+            }
+          ],
+          "FailureReport": null,
+          "ProjectSnapshot": "D:\\work\\cst_tools\\artifacts\\hom-recovery-native-da01c6ed\\attempt-7\\result\\worker_0\\worker_0\\recovery-probe__f_1148.050262MHz__7ab99aee-fd5d-4dcd-88c8-edd9d8a17119\\recovery-probe__f_1148.050262MHz.cst",
+          "TaskID": "7ab99aee-fd5d-4dcd-88c8-edd9d8a17119",
+          "ResultDirectory": "D:\\work\\cst_tools\\artifacts\\hom-recovery-native-da01c6ed\\attempt-7\\result\\worker_0\\worker_0\\recovery-probe__f_1148.050262MHz__7ab99aee-fd5d-4dcd-88c8-edd9d8a17119",
+          "ReceiptPath": "D:\\work\\cst_tools\\artifacts\\hom-recovery-native-da01c6ed\\attempt-7\\temp\\worker_0\\18d4faae-1dcb-4ea5-894f-681225f76e24\\received\\7ab99aee-fd5d-4dcd-88c8-edd9d8a17119.json"
+        }
+      },
+      {
+        "phase": "confirm",
+        "lo": 1147.56121779991,
+        "hi": 1197.56121779991,
+        "cell": 4,
+        "result": {
+          "WorkerID": "0",
+          "TaskStatus": "Success",
+          "RunName": "recovery-confirm",
+          "RunParameters": {
+            "nmodes": 1,
+            "fmin": 1147.56121779991,
+            "fmax": 1197.56121779991,
+            "cell": 4
+          },
+          "PostProcessResult": [
+            {
+              "id": 0,
+              "resultName": "frequency",
+              "value": 1147.70169077069,
+              "params": {
+                "iModeNumber": 1
+              }
+            },
+            {
+              "id": 1,
+              "resultName": "rq",
+              "value": 226.424321386391,
+              "params": {
+                "iModeNumber": 1,
+                "axis": "z",
+                "xoffset": 0.0,
+                "yoffset": 0.0,
+                "zoffset": 0.0
+              }
+            }
+          ],
+          "FailureReport": null,
+          "ProjectSnapshot": "D:\\work\\cst_tools\\artifacts\\hom-recovery-native-da01c6ed\\attempt-8\\result\\worker_0\\worker_0\\recovery-confirm__f_1147.701691MHz__e650571c-c80a-4dbd-85c0-37940f1c5c8b\\recovery-confirm__f_1147.701691MHz.cst",
+          "TaskID": "e650571c-c80a-4dbd-85c0-37940f1c5c8b",
+          "ResultDirectory": "D:\\work\\cst_tools\\artifacts\\hom-recovery-native-da01c6ed\\attempt-8\\result\\worker_0\\worker_0\\recovery-confirm__f_1147.701691MHz__e650571c-c80a-4dbd-85c0-37940f1c5c8b",
+          "ReceiptPath": "D:\\work\\cst_tools\\artifacts\\hom-recovery-native-da01c6ed\\attempt-8\\temp\\worker_0\\2e26ce91-94c8-4967-813f-5bf9d9f7881b\\received\\e650571c-c80a-4dbd-85c0-37940f1c5c8b.json"
+        }
+      },
+      {
+        "phase": "normal",
+        "lo": 1147.70169177069,
+        "hi": 1150,
+        "cell": 4,
+        "result": {
+          "WorkerID": "0",
+          "TaskStatus": "Success",
+          "RunName": "recovery-normal",
+          "RunParameters": {
+            "nmodes": 1,
+            "fmin": 1147.70169177069,
+            "fmax": 1150,
+            "cell": 4
+          },
+          "PostProcessResult": [
+            {
+              "id": 0,
+              "resultName": "frequency",
+              "value": 1147.75899647644,
+              "params": {
+                "iModeNumber": 1
+              }
+            },
+            {
+              "id": 1,
+              "resultName": "rq",
+              "value": 228.991915448072,
+              "params": {
+                "iModeNumber": 1,
+                "axis": "z",
+                "xoffset": 0.0,
+                "yoffset": 0.0,
+                "zoffset": 0.0
+              }
+            }
+          ],
+          "FailureReport": null,
+          "ProjectSnapshot": "D:\\work\\cst_tools\\artifacts\\hom-recovery-native-da01c6ed\\attempt-9\\result\\worker_0\\worker_0\\recovery-normal__f_1147.758996MHz__619ba6a1-ac9b-4ec0-a5fc-f0e23c31ddcb\\recovery-normal__f_1147.758996MHz.cst",
+          "TaskID": "619ba6a1-ac9b-4ec0-a5fc-f0e23c31ddcb",
+          "ResultDirectory": "D:\\work\\cst_tools\\artifacts\\hom-recovery-native-da01c6ed\\attempt-9\\result\\worker_0\\worker_0\\recovery-normal__f_1147.758996MHz__619ba6a1-ac9b-4ec0-a5fc-f0e23c31ddcb",
+          "ReceiptPath": "D:\\work\\cst_tools\\artifacts\\hom-recovery-native-da01c6ed\\attempt-9\\temp\\worker_0\\b77fe7fe-fbd0-45da-ae87-ddc552b3304d\\received\\619ba6a1-ac9b-4ec0-a5fc-f0e23c31ddcb.json"
+        }
+      },
+      {
+        "phase": "normal",
+        "lo": 1147.75899747644,
+        "hi": 1150,
+        "cell": 4,
+        "result": {
+          "WorkerID": "0",
+          "TaskStatus": "Success",
+          "RunName": "recovery-normal",
+          "RunParameters": {
+            "nmodes": 1,
+            "fmin": 1147.75899747644,
+            "fmax": 1150,
+            "cell": 4
+          },
+          "PostProcessResult": [
+            {
+              "id": 0,
+              "resultName": "frequency",
+              "value": 1736.43526518917,
+              "params": {
+                "iModeNumber": 1
+              }
+            },
+            {
+              "id": 1,
+              "resultName": "rq",
+              "value": 0.00500677522393693,
+              "params": {
+                "iModeNumber": 1,
+                "axis": "z",
+                "xoffset": 0.0,
+                "yoffset": 0.0,
+                "zoffset": 0.0
+              }
+            }
+          ],
+          "FailureReport": null,
+          "ProjectSnapshot": "D:\\work\\cst_tools\\artifacts\\hom-recovery-native-da01c6ed\\attempt-10\\result\\worker_0\\worker_0\\recovery-normal__f_1736.435265MHz__90ef66e1-6f47-4aa3-b5c7-ae4aefbafa9f\\recovery-normal__f_1736.435265MHz.cst",
+          "TaskID": "90ef66e1-6f47-4aa3-b5c7-ae4aefbafa9f",
+          "ResultDirectory": "D:\\work\\cst_tools\\artifacts\\hom-recovery-native-da01c6ed\\attempt-10\\result\\worker_0\\worker_0\\recovery-normal__f_1736.435265MHz__90ef66e1-6f47-4aa3-b5c7-ae4aefbafa9f",
+          "ReceiptPath": "D:\\work\\cst_tools\\artifacts\\hom-recovery-native-da01c6ed\\attempt-10\\temp\\worker_0\\aac33b1a-d3e5-4e3d-b5e5-b147c352c7f4\\received\\90ef66e1-6f47-4aa3-b5c7-ae4aefbafa9f.json"
+        }
+      },
+      {
+        "phase": "normal",
+        "lo": 1147.75899747644,
+        "hi": 1786.43526518917,
+        "cell": 4,
+        "result": {
+          "WorkerID": "0",
+          "TaskStatus": "Success",
+          "RunName": "recovery-normal",
+          "RunParameters": {
+            "nmodes": 1,
+            "fmin": 1147.75899747644,
+            "fmax": 1786.43526518917,
+            "cell": 4
+          },
+          "PostProcessResult": [
+            {
+              "id": 0,
+              "resultName": "frequency",
+              "value": 1737.49323863764,
+              "params": {
+                "iModeNumber": 1
+              }
+            },
+            {
+              "id": 1,
+              "resultName": "rq",
+              "value": 0.00108425531263255,
+              "params": {
+                "iModeNumber": 1,
+                "axis": "z",
+                "xoffset": 0.0,
+                "yoffset": 0.0,
+                "zoffset": 0.0
+              }
+            }
+          ],
+          "FailureReport": null,
+          "ProjectSnapshot": "D:\\work\\cst_tools\\artifacts\\hom-recovery-native-da01c6ed\\attempt-11\\result\\worker_0\\worker_0\\recovery-normal__f_1737.493239MHz__d94b3b3a-1d71-4bda-a17f-8c57952bc18d\\recovery-normal__f_1737.493239MHz.cst",
+          "TaskID": "d94b3b3a-1d71-4bda-a17f-8c57952bc18d",
+          "ResultDirectory": "D:\\work\\cst_tools\\artifacts\\hom-recovery-native-da01c6ed\\attempt-11\\result\\worker_0\\worker_0\\recovery-normal__f_1737.493239MHz__d94b3b3a-1d71-4bda-a17f-8c57952bc18d",
+          "ReceiptPath": "D:\\work\\cst_tools\\artifacts\\hom-recovery-native-da01c6ed\\attempt-11\\temp\\worker_0\\87a550b9-c9b9-41ab-92ef-5766fe5de5f3\\received\\d94b3b3a-1d71-4bda-a17f-8c57952bc18d.json"
+        }
+      }
+    ],
+    "mesh_roundtrip": [
+      {
+        "cell": 4,
+        "cell_expression": "4",
+        "actual_cells": 634,
+        "task_id": "dd653d07-cb1a-4a2d-a917-f8d02e10f7be"
+      },
+      {
+        "cell": 6,
+        "cell_expression": "6",
+        "actual_cells": 2140,
+        "task_id": "b903998e-21b1-4cf5-b39c-0c3ee1836bd3"
+      },
+      {
+        "cell": 4,
+        "cell_expression": "4",
+        "actual_cells": 634,
+        "task_id": "1dba5a56-34b4-4ba1-801e-5c5828921d1b"
+      }
+    ],
+    "pauses": [
+      "before-mesh",
+      "before-probe",
+      "before-confirm",
+      "after-confirm"
+    ],
+    "resumes": [
+      {
+        "pause": "before-mesh",
+        "first_phase": "mesh"
+      },
+      {
+        "pause": "before-probe",
+        "first_phase": "probe"
+      },
+      {
+        "pause": "before-confirm",
+        "first_phase": "confirm"
+      },
+      {
+        "pause": "after-confirm",
+        "first_phase": "normal"
+      }
+    ],
+    "resume_first_phase": "confirm",
+    "modes": [
+      {
+        "frequency": 1147.56121679991,
+        "values": {
+          "frequency": 1147.56121679991,
+          "rq": 229.081341837638
+        }
+      },
+      {
+        "frequency": 1147.70169077069,
+        "values": {
+          "frequency": 1147.70169077069,
+          "rq": 226.424321386391
+        }
+      },
+      {
+        "frequency": 1147.75899647644,
+        "values": {
+          "frequency": 1147.75899647644,
+          "rq": 228.991915448072
+        }
+      }
+    ],
+    "remaining_cst": [],
+    "cleaned_companions": 40
+  },
+  "hom_checkpoint": {
+    "coverage": {
+      "confirmed_frontier": 1150,
+      "calculated_upper": 1786.43526518917
+    },
+    "schemaVersion": 4,
+    "policy": {
+      "start": 1000,
+      "initial_stop": 1050,
+      "stop": 1150,
+      "window_width": 50,
+      "requested_modes": 1,
+      "frequency_abs_tol": 1e-06,
+      "frequency_rel_tol": 1e-09,
+      "max_interval_attempts": 2,
+      "max_solver_calls": 20,
+      "failure_recovery": true,
+      "base_mesh_cells": 4,
+      "mesh_retry_factor": 1.5,
+      "max_probe_expansions": 3
+    },
+    "projectFingerprint": {
+      "source_sha256": "047bf83fd6b98da31354dbf128bda63f4db10cae820079fd397136de5efa7991"
+    },
+    "pending": [],
+    "pendingBounded": false,
+    "confirmedSnapshot": null,
+    "report": {
+      "modes": [
+        {
+          "mode_index": 1,
+          "frequency": 1147.56121679991,
+          "values": {
+            "frequency": 1147.56121679991,
+            "rq": 229.081341837638
+          },
+          "project_snapshot": null,
+          "task_name": "",
+          "task_id": "01778c40-aaed-499d-86da-0111121707c0",
+          "mesh_cells_per_wavelength": null
+        },
+        {
+          "mode_index": 1,
+          "frequency": 1147.70169077069,
+          "values": {
+            "frequency": 1147.70169077069,
+            "rq": 226.424321386391
+          },
+          "project_snapshot": null,
+          "task_name": "",
+          "task_id": "e650571c-c80a-4dbd-85c0-37940f1c5c8b",
+          "mesh_cells_per_wavelength": null
+        },
+        {
+          "mode_index": 1,
+          "frequency": 1147.75899647644,
+          "values": {
+            "frequency": 1147.75899647644,
+            "rq": 228.991915448072
+          },
+          "project_snapshot": null,
+          "task_name": "",
+          "task_id": "619ba6a1-ac9b-4ec0-a5fc-f0e23c31ddcb",
+          "mesh_cells_per_wavelength": null
+        }
+      ],
+      "completed": [
+        {
+          "lo": 1000,
+          "hi": 1200
+        },
+        {
+          "lo": 1147.56121779991,
+          "hi": 1152.43878220009
+        },
+        {
+          "lo": 1147.70169177069,
+          "hi": 1150
+        },
+        {
+          "lo": 1147.75899747644,
+          "hi": 1786.43526518917
+        }
+      ],
+      "empty": [
+        {
+          "lo": 1000,
+          "hi": 1050
+        }
+      ],
+      "probed": [
+        {
+          "lo": 1000,
+          "hi": 1200
+        },
+        {
+          "lo": 1147.56121779991,
+          "hi": 1152.43878220009
+        }
+      ],
+      "failed": [],
+      "failure_reasons": {},
+      "solver_calls": 13,
+      "adopted_task_ids": [
+        "ae1c719e-84b6-48d0-99ff-da7fc8f7b7f1",
+        "01778c40-aaed-499d-86da-0111121707c0",
+        "7ab99aee-fd5d-4dcd-88c8-edd9d8a17119",
+        "e650571c-c80a-4dbd-85c0-37940f1c5c8b",
+        "619ba6a1-ac9b-4ec0-a5fc-f0e23c31ddcb",
+        "d94b3b3a-1d71-4bda-a17f-8c57952bc18d"
+      ],
+      "active_mesh_cells": 4,
+      "recovery_states": {},
+      "recovery_events": [
+        {
+          "interval": {
+            "lo": 1000,
+            "hi": 1050
+          },
+          "phase": "mesh",
+          "lo": 1000,
+          "hi": 1050,
+          "mesh_cells": 6,
+          "outcome": "failed",
+          "reason": "RecoverableSolveError: SOLVER_FAILED: solver-result failed: number=-2147418113; description=No Eigenmode results that can be read by methods of the \"EigenmodeSolver\" object have been written to the database so far. This is the case for old projects created earlier than 2013."
+        },
+        {
+          "interval": {
+            "lo": 1000,
+            "hi": 1050
+          },
+          "phase": "probe",
+          "lo": 1000,
+          "hi": 1100,
+          "mesh_cells": 4,
+          "outcome": "failed",
+          "reason": "RecoverableSolveError: next mode lies above recovery probe upper bound"
+        },
+        {
+          "interval": {
+            "lo": 1000,
+            "hi": 1050
+          },
+          "phase": "probe",
+          "lo": 1000,
+          "hi": 1200,
+          "mesh_cells": 4,
+          "outcome": "success",
+          "task_id": "ae1c719e-84b6-48d0-99ff-da7fc8f7b7f1",
+          "frequencies": [
+            1147.70915239034
+          ]
+        },
+        {
+          "interval": {
+            "lo": 1000,
+            "hi": 1050
+          },
+          "phase": "confirm",
+          "lo": 1122.70915239034,
+          "hi": 1172.70915239034,
+          "mesh_cells": 4,
+          "outcome": "success",
+          "task_id": "01778c40-aaed-499d-86da-0111121707c0",
+          "frequencies": [
+            1147.56121679991
+          ]
+        },
+        {
+          "interval": {
+            "lo": 1000,
+            "hi": 1050
+          },
+          "phase": "empty-inferred",
+          "outcome": "confirmed",
+          "evidence": "successful-lowest-mode-probe-and-narrow-confirmation",
+          "probe_frequency": 1147.70915239034,
+          "frequency": 1147.56121679991
+        },
+        {
+          "interval": {
+            "lo": 1147.56121779991,
+            "hi": 1150
+          },
+          "phase": "mesh",
+          "lo": 1147.56121779991,
+          "hi": 1150,
+          "mesh_cells": 6,
+          "outcome": "failed",
+          "reason": "RecoverableSolveError: next mode lies above recovery probe upper bound"
+        },
+        {
+          "interval": {
+            "lo": 1147.56121779991,
+            "hi": 1150
+          },
+          "phase": "probe",
+          "lo": 1147.56121779991,
+          "hi": 1152.43878220009,
+          "mesh_cells": 4,
+          "outcome": "success",
+          "task_id": "7ab99aee-fd5d-4dcd-88c8-edd9d8a17119",
+          "frequencies": [
+            1148.05026248049
+          ]
+        },
+        {
+          "interval": {
+            "lo": 1147.56121779991,
+            "hi": 1150
+          },
+          "phase": "confirm",
+          "lo": 1147.56121779991,
+          "hi": 1197.56121779991,
+          "mesh_cells": 4,
+          "outcome": "success",
+          "task_id": "e650571c-c80a-4dbd-85c0-37940f1c5c8b",
+          "frequencies": [
+            1147.70169077069
+          ]
+        }
+      ]
+    }
+  },
+  "abort": {
+    "intent": {
+      "pid": 27852,
+      "create_time": 1793722262.3198497,
+      "executable": "D:\\Program Files (x86)\\CST Studio Suite 2022\\AMD64\\CST DESIGN ENVIRONMENT_AMD64.exe",
+      "project": "D:\\work\\cst_tools\\artifacts\\hom-recovery-native-da01c6ed\\attempt-5\\temp\\worker_0\\2dfdab6b-6f9e-4be4-bdb5-22e79b344f35\\worker-input.cst"
+    },
+    "result": {
+      "returncode": 0,
+      "stdout": "verified-project D:\\work\\cst_tools\\artifacts\\hom-recovery-native-da01c6ed\\attempt-5\\temp\\worker_0\\2dfdab6b-6f9e-4be4-bdb5-22e79b344f35\\worker-input.cst\nabort-result True\n",
+      "stderr": ""
+    },
+    "actual_vba": "Start returned=1, no result; close receipt and StopAck written"
+  },
+  "limits": [
+    "Start=0 and Start throwing not established",
+    "small-grid frequency drift may count repeated physical modes; no field-identity claim",
+    "checkpoint interruption is test callback, not full GUI crash proof",
+    "artifacts not guaranteed to migrate with Git; cleaned raw companions need regeneration"
+  ],
+  "offline": [
+    {
+      "report": "artifacts/p1-5-final-core.xml",
+      "passed": 48,
+      "skipped_modules": 2
+    },
+    {
+      "report": "artifacts/p1-5-final-wire.xml",
+      "passed": 22
+    },
+    {
+      "report": "artifacts/p1-5-registry-final.xml",
+      "passed": 63
+    },
+    {
+      "report": "artifacts/p1-5-launch-final.xml",
+      "passed": 26,
+      "skipped": 1
+    }
+  ],
+  "runner_private_desktop": {
+    "point": "runner-solver",
+    "original_sha256": "7b63939b2dbed3de567aa55a5ff19cb69e7447245882a691be15d28580f1ddfa",
+    "passed": true,
+    "initial_instance": "c9bee43b8f0d455aa411d5a1b0d8bb71",
+    "first_task_id": "5db57c27-0e1e-4ca3-a8e9-c1e7fae3db29",
+    "first_snapshot_sha256": "58fe94f2c9d27d15270e327dc599c694a15e2c998e9c5e8154f14372d09f6603",
+    "first_fields_sha256": {
+      "D:\\work\\cst_tools\\artifacts\\controller-exit-l5-e8e89f33\\runner-solver\\result\\worker_0\\first__f_503.605585MHz__5db57c27-0e1e-4ca3-a8e9-c1e7fae3db29\\first__f_503.605585MHz\\Result\\e1.m3t": "e8087d1025ec31b30c2a63685df5a6cd054b7cd6357bac8a560741ce6fb6c169",
+      "D:\\work\\cst_tools\\artifacts\\controller-exit-l5-e8e89f33\\runner-solver\\result\\worker_0\\first__f_503.605585MHz__5db57c27-0e1e-4ca3-a8e9-c1e7fae3db29\\first__f_503.605585MHz\\Result\\eenergy1.m3t": "2e87076076e9289f27ddbcc84c4f46535bad6f2ec40165fa767303a2d5539164",
+      "D:\\work\\cst_tools\\artifacts\\controller-exit-l5-e8e89f33\\runner-solver\\result\\worker_0\\first__f_503.605585MHz__5db57c27-0e1e-4ca3-a8e9-c1e7fae3db29\\first__f_503.605585MHz\\Result\\h1.m3t": "5579f507f7c6c8f6fd77d2b907ea025f57a46bf22a39aa05c48ac6644b8ef124",
+      "D:\\work\\cst_tools\\artifacts\\controller-exit-l5-e8e89f33\\runner-solver\\result\\worker_0\\first__f_503.605585MHz__5db57c27-0e1e-4ca3-a8e9-c1e7fae3db29\\first__f_503.605585MHz\\Result\\henergy1.m3t": "9458f59965590ce147bd56e8593f13f612c5a8c32c0b6a1e9e8a988c2076037c"
+    },
+    "killed_runner_pid": 71356,
+    "recovered": {
+      "schema_version": 1,
+      "instance_id": "2172c0c4685e485aa7f91d68242bff59",
+      "project_id": "1e5f70df498c4b68b6a3aee6b6e985f0",
+      "project": "D:\\work\\cst_tools\\artifacts\\controller-exit-l5-e8e89f33\\runner-solver",
+      "run_id": "595c31092fe74d078665510e3d098555",
+      "version": 20,
+      "state": "IDLE",
+      "phase": "idle",
+      "error": null,
+      "session_safety": "exited-unverified",
+      "last_progress": null,
+      "log_directory": "D:\\work\\cst_tools\\artifacts\\controller-exit-l5-e8e89f33\\runner-solver\\logs\\20261104-003647_会话恢复_新运行_595c3109",
+      "completed_tasks": 0,
+      "total_tasks": 0,
+      "lifecycle": {
+        "schema_version": 1,
+        "observed_at": "2026-11-03T16:36:55.860341+00:00",
+        "session_safety": "exited-unverified",
+        "session_count": 1,
+        "physical_pending_count": 0,
+        "recovery_required": false,
+        "omitted_sessions": 0,
+        "sessions": [
+          {
+            "session_id": "4e0bbd82-77bd-4245-8c1b-4a92c2124993",
+            "process_state": "exited",
+            "exit_code": null,
+            "exit_classification": "not-observed",
+            "model_state": "committed",
+            "task_outcome": "success",
+            "result_state": "received-unadopted",
+            "disposition": "abandoned-dead",
+            "standard_closed": false,
+            "needs_recovery": false,
+            "missing_evidence": [
+              "exit-code-unobserved"
+            ],
+            "worker_id": "0",
+            "process_identity_reason": "原启动进程已退出；仍须核实子进程和收尾证据",
+            "workspace": "D:\\work\\cst_tools\\artifacts\\controller-exit-l5-e8e89f33\\runner-solver\\temp\\worker_0\\4e0bbd82-77bd-4245-8c1b-4a92c2124993",
+            "evidence_path": "D:\\work\\cst_tools\\artifacts\\controller-exit-l5-e8e89f33\\runner-solver\\temp\\worker_0\\4e0bbd82-77bd-4245-8c1b-4a92c2124993\\close-verification.json",
+            "receipt_path": "D:\\work\\cst_tools\\artifacts\\controller-exit-l5-e8e89f33\\runner-solver\\temp\\worker_0\\4e0bbd82-77bd-4245-8c1b-4a92c2124993\\protocol\\close.receipt",
+            "result_observation": {
+              "state": "received",
+              "status": "Success",
+              "task_id": "46551da6-4289-4ed9-9989-804fbafc5953",
+              "receipt_path": "D:\\work\\cst_tools\\artifacts\\controller-exit-l5-e8e89f33\\runner-solver\\logs\\20261104-003510_标准批次_新运行_a2300820\\workers\\0\\4e0bbd82-77bd-4245-8c1b-4a92c2124993\\received\\46551da6-4289-4ed9-9989-804fbafc5953.json",
+              "optional_analysis_pending": false,
+              "validation": "receipt-observation-only"
+            }
+          }
+        ],
+        "source": "csttool.session_closure.evaluate_closure",
+        "preprocessor_recovery_required": false
+      },
+      "error_diagnostic": null,
+      "cleanup_diagnostic": null,
+      "run_kind": "standard",
+      "unfinished_intents": [],
+      "intent_diagnostics": [],
+      "project_task_status": "INTERRUPTED",
+      "log_history": [
+        {
+          "run_id": "a2300820210d4568afd44779db36ef25",
+          "directory": "D:\\work\\cst_tools\\artifacts\\controller-exit-l5-e8e89f33\\runner-solver\\logs\\20261104-003510_标准批次_新运行_a2300820"
+        }
+      ],
+      "recovery_reason": null,
+      "recovery_progress": {
+        "stage": "complete",
+        "reason": "恢复完成，可继续未完成计算"
+      },
+      "owner_client": "15248f3a3e9149b0974532826f2970bd",
+      "execution_active": false,
+      "runtime": {
+        "pid": 60732,
+        "python": "d:\\Users\\ykk48\\anaconda3\\python.exe",
+        "cwd": "D:\\work\\cst_tools",
+        "source_root": "D:\\work\\cst_tools"
+      },
+      "control_lease_valid": true,
+      "control_lease_remaining": 10.0,
+      "control_revision": 1
+    },
+    "final": {
+      "schema_version": 1,
+      "instance_id": "2172c0c4685e485aa7f91d68242bff59",
+      "project_id": "1e5f70df498c4b68b6a3aee6b6e985f0",
+      "project": "D:\\work\\cst_tools\\artifacts\\controller-exit-l5-e8e89f33\\runner-solver",
+      "run_id": "2f9f18eec8314f4fbaf4450d74525012",
+      "version": 30,
+      "state": "COMPLETED",
+      "phase": "completed",
+      "error": null,
+      "session_safety": "exited-unverified",
+      "last_progress": null,
+      "log_directory": "D:\\work\\cst_tools\\artifacts\\controller-exit-l5-e8e89f33\\runner-solver\\logs\\20261104-003655_标准批次_续跑_2f9f18ee",
+      "completed_tasks": 2,
+      "total_tasks": 2,
+      "lifecycle": {
+        "schema_version": 1,
+        "observed_at": "2026-11-03T16:37:55.573621+00:00",
+        "session_safety": "exited-unverified",
+        "session_count": 4,
+        "physical_pending_count": 0,
+        "recovery_required": false,
+        "omitted_sessions": 0,
+        "sessions": [
+          {
+            "session_id": "4e0bbd82-77bd-4245-8c1b-4a92c2124993",
+            "process_state": "exited",
+            "exit_code": null,
+            "exit_classification": "not-observed",
+            "model_state": "committed",
+            "task_outcome": "success",
+            "result_state": "unknown",
+            "disposition": "abandoned-dead",
+            "standard_closed": false,
+            "needs_recovery": false,
+            "missing_evidence": [
+              "exit-code-unobserved"
+            ],
+            "worker_id": "0",
+            "process_identity_reason": "原启动进程已退出；仍须核实子进程和收尾证据",
+            "workspace": "D:\\work\\cst_tools\\artifacts\\controller-exit-l5-e8e89f33\\runner-solver\\temp\\worker_0\\4e0bbd82-77bd-4245-8c1b-4a92c2124993",
+            "evidence_path": "D:\\work\\cst_tools\\artifacts\\controller-exit-l5-e8e89f33\\runner-solver\\temp\\worker_0\\4e0bbd82-77bd-4245-8c1b-4a92c2124993\\close-verification.json",
+            "receipt_path": "D:\\work\\cst_tools\\artifacts\\controller-exit-l5-e8e89f33\\runner-solver\\temp\\worker_0\\4e0bbd82-77bd-4245-8c1b-4a92c2124993\\protocol\\close.receipt",
+            "result_observation": {
+              "state": "algorithm_adopted",
+              "status": "Success",
+              "task_id": "46551da6-4289-4ed9-9989-804fbafc5953",
+              "receipt_path": "D:\\work\\cst_tools\\artifacts\\controller-exit-l5-e8e89f33\\runner-solver\\logs\\20261104-003510_标准批次_新运行_a2300820\\workers\\0\\4e0bbd82-77bd-4245-8c1b-4a92c2124993\\received\\46551da6-4289-4ed9-9989-804fbafc5953.json",
+              "optional_analysis_pending": false,
+              "validation": "receipt-observation-only"
+            }
+          },
+          {
+            "session_id": "882c60b7-3324-47c0-8e9f-375154d5c49b",
+            "process_state": "exited",
+            "exit_code": 0,
+            "exit_classification": "zero",
+            "model_state": "prepared",
+            "task_outcome": "not-started",
+            "result_state": "unknown",
+            "disposition": "standard-stop",
+            "standard_closed": true,
+            "needs_recovery": false,
+            "missing_evidence": [],
+            "worker_id": "1",
+            "process_identity_reason": "已核验历史退出及保存证据",
+            "workspace": "D:\\work\\cst_tools\\artifacts\\controller-exit-l5-e8e89f33\\runner-solver\\temp\\worker_1\\882c60b7-3324-47c0-8e9f-375154d5c49b",
+            "evidence_path": "D:\\work\\cst_tools\\artifacts\\controller-exit-l5-e8e89f33\\runner-solver\\temp\\worker_1\\882c60b7-3324-47c0-8e9f-375154d5c49b\\close-verification.json",
+            "receipt_path": "D:\\work\\cst_tools\\artifacts\\controller-exit-l5-e8e89f33\\runner-solver\\temp\\worker_1\\882c60b7-3324-47c0-8e9f-375154d5c49b\\protocol\\close.receipt",
+            "result_observation": {
+              "state": "unknown"
+            }
+          },
+          {
+            "session_id": "5a490be9-a22a-4cd6-be1f-99a82f49ae8f",
+            "process_state": "exited",
+            "exit_code": 0,
+            "exit_classification": "zero",
+            "model_state": "prepared",
+            "task_outcome": "not-started",
+            "result_state": "unknown",
+            "disposition": "standard-stop",
+            "standard_closed": true,
+            "needs_recovery": false,
+            "missing_evidence": [],
+            "worker_id": "2",
+            "process_identity_reason": "已核验历史退出及保存证据",
+            "workspace": "D:\\work\\cst_tools\\artifacts\\controller-exit-l5-e8e89f33\\runner-solver\\temp\\worker_2\\5a490be9-a22a-4cd6-be1f-99a82f49ae8f",
+            "evidence_path": "D:\\work\\cst_tools\\artifacts\\controller-exit-l5-e8e89f33\\runner-solver\\temp\\worker_2\\5a490be9-a22a-4cd6-be1f-99a82f49ae8f\\close-verification.json",
+            "receipt_path": "D:\\work\\cst_tools\\artifacts\\controller-exit-l5-e8e89f33\\runner-solver\\temp\\worker_2\\5a490be9-a22a-4cd6-be1f-99a82f49ae8f\\protocol\\close.receipt",
+            "result_observation": {
+              "state": "unknown"
+            }
+          },
+          {
+            "session_id": "8ddf28b7-2ad4-474a-8ac5-0a102e14149d",
+            "process_state": "exited",
+            "exit_code": 0,
+            "exit_classification": "zero",
+            "model_state": "prepared",
+            "task_outcome": "not-started",
+            "result_state": "unknown",
+            "disposition": "standard-stop",
+            "standard_closed": true,
+            "needs_recovery": false,
+            "missing_evidence": [],
+            "worker_id": "3",
+            "process_identity_reason": "已核验历史退出及保存证据",
+            "workspace": "D:\\work\\cst_tools\\artifacts\\controller-exit-l5-e8e89f33\\runner-solver\\temp\\worker_3\\8ddf28b7-2ad4-474a-8ac5-0a102e14149d",
+            "evidence_path": "D:\\work\\cst_tools\\artifacts\\controller-exit-l5-e8e89f33\\runner-solver\\temp\\worker_3\\8ddf28b7-2ad4-474a-8ac5-0a102e14149d\\close-verification.json",
+            "receipt_path": "D:\\work\\cst_tools\\artifacts\\controller-exit-l5-e8e89f33\\runner-solver\\temp\\worker_3\\8ddf28b7-2ad4-474a-8ac5-0a102e14149d\\protocol\\close.receipt",
+            "result_observation": {
+              "state": "unknown"
+            }
+          }
+        ],
+        "source": "csttool.session_closure.evaluate_closure",
+        "preprocessor_recovery_required": false
+      },
+      "error_diagnostic": null,
+      "cleanup_diagnostic": null,
+      "run_kind": "standard",
+      "unfinished_intents": [],
+      "intent_diagnostics": [],
+      "project_task_status": "DONE",
+      "log_history": [
+        {
+          "run_id": "a2300820210d4568afd44779db36ef25",
+          "directory": "D:\\work\\cst_tools\\artifacts\\controller-exit-l5-e8e89f33\\runner-solver\\logs\\20261104-003510_标准批次_新运行_a2300820"
+        },
+        {
+          "run_id": "595c31092fe74d078665510e3d098555",
+          "directory": "D:\\work\\cst_tools\\artifacts\\controller-exit-l5-e8e89f33\\runner-solver\\logs\\20261104-003647_会话恢复_新运行_595c3109"
+        }
+      ],
+      "recovery_reason": null,
+      "recovery_progress": {
+        "stage": "adoption-apply",
+        "task_id": "5db57c27-0e1e-4ca3-a8e9-c1e7fae3db29",
+        "current": 1,
+        "total": 1,
+        "reason": "补齐采用索引与回执，不重复导入结果"
+      },
+      "artifacts": [
+        {
+          "artifact_id": "2f9f18eec8314f4fbaf4450d74525012:checkpoint",
+          "node_id": "LAPTOP-JMVDV92E",
+          "path": "D:\\work\\cst_tools\\artifacts\\controller-exit-l5-e8e89f33\\runner-solver\\save\\standard_batch_checkpoint.json",
+          "sha256": "418f06b8b17a57f79d7e2c414b970e57bb53c3aa4c0446535b2af30ad18913ae"
+        }
+      ],
+      "owner_client": "15248f3a3e9149b0974532826f2970bd",
+      "execution_active": false,
+      "runtime": {
+        "pid": 60732,
+        "python": "d:\\Users\\ykk48\\anaconda3\\python.exe",
+        "cwd": "D:\\work\\cst_tools",
+        "source_root": "D:\\work\\cst_tools"
+      },
+      "control_lease_valid": true,
+      "control_lease_remaining": 10.0,
+      "control_revision": 2
+    },
+    "final_task_ids": [
+      "5db57c27-0e1e-4ca3-a8e9-c1e7fae3db29",
+      "46551da6-4289-4ed9-9989-804fbafc5953"
+    ],
+    "solver_calls": 2,
+    "original_unchanged": true,
+    "cst_processes_after": []
+  },
+  "cleanup_extra": {
+    "hom-recovery-native-ea6b1866": 0,
+    "hom-recovery-native-bfd9f127": 3,
+    "hom-recovery-native-fd11096e": 3,
+    "hom-recovery-native-1e20fcb5": 7,
+    "managed-isolation-smoke-8a57756b": 3,
+    "managed-compiler-compare-66bf227b": 1,
+    "managed-compiler-fixed-51b7fba7": 1,
+    "controller-exit-l5-e8e89f33/runner-solver": 11
+  }
+}

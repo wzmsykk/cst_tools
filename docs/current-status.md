@@ -1,6 +1,6 @@
 # CST Tools 当前状态
 
-更新：2026-11-03；本页只保留现行结论。源码基线为57ccb32；W0–W3受限A1链和桌面正常闭环已验，本批已补充串行真实故障驱动、原始stdio测试及失败诊断修正，完成15个受支持真实场景；完整协议/进程矩阵仍逐项验收。逐批原文及旧待办见[复审前快照](archive/20261103-semantic-review/current-status.md)和[更早归档](archive/20261102-progress-consolidation/README.md)。
+更新：2026-11-04；本页只保留现行结论。本轮代码基于e94d5b7；受限A1与桌面正常闭环、串行故障驱动、生产Runner崩溃恢复及HOM恢复驱动已有各自证据；完整协议/数值模式身份和Start=0/自身异常矩阵仍逐项验收。逐批原文及旧待办见[复审前快照](archive/20261103-semantic-review/current-status.md)和[更早归档](archive/20261102-progress-consolidation/README.md)。
 
 ## 已实现与实际证据
 
@@ -8,16 +8,18 @@
 |---|---|---|
 |生产GUI/批量/HOM|GUI的RunnerController经Runner分发，后端使用CSTManager及ManagedCSTWorker；根base系列CLI仍直接调用应用后端|GUI关闭、Runner退出、原生会话关闭与任务采用分别核验；不可把所有CLI说成走MCP|
 |保存来源与验证|共享cst_version只读来源；B2受限A1历史投影；G03保存重开、表达式/设置和可读回原生值核验|不解释任意VBA；未知编码、复杂历史、多材料/CAD及跨版本矩阵未全覆盖|
-|公共类型化单次服务|同一ApplicationService/Runner槽支持create/apply/configure/save/close及单次计算；原生采集和RunStore绑定，采用缺口幂等补写|2026-11-03官方SDK/stdio真实Pillbox纵向链通过，2026-11-03指定Codex桌面Z向Pillbox正常闭环通过；首次恢复DTO已统一；15个真实故障场景通过、22个原生会话标准关闭；Start返回0/Start异常与求解中生产Runner退出仍未验|
+|公共类型化单次服务|同一ApplicationService/Runner槽支持create/apply/configure/save/close及单次计算；原生采集和RunStore绑定，采用缺口幂等补写|2026-11-03官方SDK/stdio真实Pillbox纵向链通过，2026-11-03指定Codex桌面Z向Pillbox正常闭环通过；首次恢复DTO已统一；15个真实故障场景通过、22个原生会话标准关闭；Start返回0/Start自身异常未验；生产Runner求解中退出已有独立副本证据，新增隔离链复验通过，两任务两次Start|
 |MCP|源码注册14工具，tools-only，严格Schema、控制句柄/租约及请求幂等|桌面9工具的发现/空工程调用是2026-11-02记录；本轮当前桌面对话发现14工具并完成正常纵向链；不替代N01–N25|
-|HOM失败恢复|生产启用加密一次→原密度扩窗→窄窗确认；覆盖和结果采用独立；失败新Worker从processed基准启动|新恢复策略的真实网格生效、原密度恢复及故障矩阵仍待串行副本验收；不以迭代耗尽判空|
+|HOM失败恢复|生产启用加密一次→原密度扩窗→窄窗确认；覆盖和结果采用独立；失败新Worker从processed基准启动|2026-11-04测试副本实际网格634→2140→634，扩窗/确认及四个检查点中断重载通过；小网格频率漂移会被现有频率判重计为多个结果，不证明模式完备或互异|
 |W0–W3语法防线|A1保存已接共享发射、独立检查、源映射、源码版本门禁和会话内历史MacroCheckThis；W23最终23个编译样本及12个无求解会话通过，XYZ/G03/故障拒绝均验|仅Sub-only/首阶段定义构造；不是完整语言、全部宏/初始化/真实求解故障证明；NoUI仍未初始化，ANTLR不替代原生|
-|后台窗口策略|公共空工程/类型化构造默认非活动桌面、归属后quiet与窗口观察；无求解正常/语法错误副本通过|G03独立CLI、预处理、Managed/HOM尚未迁为同一隔离策略；不能承诺全链headless或全部异常无弹窗|
-|D1–D4开发工具|功能机器映射、生成索引、69项工具范围、22条人工动态关系、文档角色与包边界检查已实现|60项离线/源码包检查属于2026-11-03批次；机械覆盖不等于逐篇语义或真实调用图已证|
+|后台窗口策略|公共空工程/类型化构造默认非活动桌面、归属后quiet与窗口观察；无求解正常/语法错误副本通过|G03、预处理、Managed/HOM已共用BatchDesktopLease隔离，真实副本串行链已运行；不能承诺全链headless或全部异常无弹窗|
+|D1–D4开发工具|功能机器映射、生成索引、70项工具范围、25条人工动态关系、文档角色与包边界检查已实现|60项离线/源码包检查属于2026-11-03批次；机械覆盖不等于逐篇语义或真实调用图已证|
 
 现行生成检查与发布门禁见[W23实施](winwrap-w23-implementation.md)；[W01记录](winwrap-w01-implementation.md)保留前阶段证据。新批次没有重算旧求解结果。W23组合271项通过、1项可选SDK跳过，源码包门禁可独立核验；实际XYZ/故障样本和边界见实施页。
 
 ## 已有验收入口
+
+- [五项实施](execution-hardening-five-steps.md)：原始stdio/SDK22项通过，核心48项通过（当前普通环境缺SDK的两模块跳过，另以固定SDK环境完成22项）。真实HOM恢复驱动已完成且本轮CST退出、清理40个伴随目录；一次网格初始化等待经精确身份/路径连接后的官方abort_solver正常中止，Start仍返回1无结果，不能勾选Start=0/自身异常。生产Runner新隔离链复验通过，两任务两次Start；登记最终检查结果以实施页为准。
 
 - [公开类型化真实链](typed-public-acceptance-20261103.md)：一次Solver.Start、1147.42692991921MHz、中心Z轴R/Q223.541439593232Ω；采用恢复不重复求解。不是XYZ、场型/收敛或指定桌面全门禁证明。
 - [Codex桌面完整链](codex-desktop-acceptance-20261103.md)：本轮新建至结果导出和正常退出；一次Start，5个原生会话标准关闭。

@@ -1,6 +1,6 @@
 # 现行计划与TODO
 
-更新：2026-11-03。以[当前状态](current-status.md)确认实现和证据；本页只列当前工作。所有旧未决条目保存在[复审前完整快照](archive/20261103-semantic-review/minimal-python-vba-todo.md)及[较早归档](archive/20261102-progress-consolidation/minimal-python-vba-todo.md)，不因归档标为完成。
+更新：2026-11-04。以[当前状态](current-status.md)确认实现和证据；本页只列当前工作。所有旧未决条目保存在[复审前完整快照](archive/20261103-semantic-review/minimal-python-vba-todo.md)及[较早归档](archive/20261102-progress-consolidation/minimal-python-vba-todo.md)，不因归档标为完成。
 
 ## 已完成的基础
 
@@ -21,12 +21,14 @@
 4. [x] 2026-11-03指定Codex桌面当前对话发现14工具，完成新建→建模→设置→保存重开→一次求解→后处理→JSON/CSV导出→文档关闭→Runner退出，见[桌面验收](codex-desktop-acceptance-20261103.md)；全故障矩阵仍见第5项。
 5. [x] 建立[公共故障覆盖矩阵](public-fault-matrix.md)：新增19项服务故障，覆盖未确认ACK、接收/收尾/发布写入缺口、重建服务、采集缺失/损坏/身份串用、失败及缺指标；组合123项及SDK8项通过。修复首次发布恢复遗漏result_revision。
    - [x] [串行真实驱动](public-fault-injection.md)：12个停止/ACK时点、发布前/采用回执前控制器突然退出、Start返回1无结果拒绝及从冻结定义新Worker成功；15例通过、22个原生会话标准关闭。
-   - [ ] Start返回0/Start自身异常、生产Runner在求解中崩溃及其完整状态收口另验；N01–N25仍按覆盖表保持部分通过。
+   - [ ] Start返回0/Start自身异常仍待真实触发；生产Runner求解中崩溃基线已验，新增隔离链复验通过，两任务两次Start；N01–N25仍按覆盖表保持部分通过。
+
+- [ ] 小网格重算频率漂移的模式身份判定：本轮1147.56/1147.70/1147.76MHz会作为不同频率接收；未以场重叠判定其物理互异，不能用增大容差掩盖。
 
 ## 保留的长期与独立验收
 
-- [ ] HOM临时加密真实生效→恢复原密度→扩窗首模→窄窗确认及各阶段中断，见[恢复策略](hom-solver-failure-recovery.md)；数值失败不能独立判空。
-- [ ] G03独立CLI、预处理、Managed/HOM后续迁移隔离桌面时，连同桌面租约、诊断/恢复/退出门禁验收；更广许可/保存/编译弹窗不承诺全部静默。
+- [x] 测试副本HOM密度实际634→2140→634、扩窗首模→窄窗确认及四个检查点中断重载；不等于生产GUI全部故障矩阵，见[恢复策略](hom-solver-failure-recovery.md)；数值失败不能独立判空。
+- [x] G03独立CLI、预处理、Managed/HOM已共用隔离桌面并完成串行副本链；新增Runner崩溃复验通过，两任务两次Start；更广许可/保存/编译弹窗不承诺全部静默。
 - [ ] 更广Save/Rebuild陈旧性、未知编码/复杂历史、版本、XYZ/积分位置与后处理算子等价性；更长Warm性能/内存/失败率统计。
 - [ ] 多材料/复杂CAD共同域及完整模式追踪、COMSOL能力对齐；现有PEC背景/内部真空第一版不扩大适用范围。
 - [ ] 远程/分布式E6–E9、跨入口迁移与宿主兼容矩阵；现有本机HTTP和ArtifactRef不是远程执行已实现。

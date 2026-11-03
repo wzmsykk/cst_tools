@@ -91,6 +91,9 @@ def create_server(project,*,adapter=None):
     from mcp_types import ToolAnnotations
     from typing import Literal
     class StrictServer(MCPServer):
+        async def run_stdio_async(self):
+            from .mcp_stdio import run_stdio
+            await run_stdio(self)
         async def list_tools(self):
             tools=await super().list_tools()
             from copy import deepcopy
@@ -120,6 +123,10 @@ def create_server(project,*,adapter=None):
 
     async def modern_only(context,call_next):
         from mcp.shared.exceptions import MCPError
+        if context.method not in ('server/discover','initialize'):
+            meta=(context.params or {}).get('_meta',{})
+            if not isinstance(meta,dict) or 'io.modelcontextprotocol/protocolVersion' not in meta:
+                raise MCPError(-32602,'Per-request protocolVersion is required')
         if context.method!='server/discover' and context.protocol_version!='2026-07-28':
             raise MCPError(-32022,'Unsupported protocol version; requires 2026-07-28')
         if context.method not in ('server/discover','tools/list','tools/call'):

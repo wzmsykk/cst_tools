@@ -1,0 +1,32 @@
+{
+  "batch_date": "2026-11-03",
+  "scope": "read-only audit of installed CST2022 EigenmodeSolver VBA help and Python interface sources",
+  "help": {
+    "path": "knowledge-base\\vendor\\cst-2022-vba-help\\VBA_3D\\special_vbasolver\\special_vbasolver_eigenmodesolver_object.htm",
+    "sha256": "333341a259c3f5c73cf08acef922f8e6ec7e9c1fe11f0e128d23f9b023650328"
+  },
+  "documented": {
+    "Start": "returns 1 on success and 0 on failure",
+    "SetAccuracy": "relative residual tolerance; not a documented maximum-iteration injection",
+    "result_count": "query actual modes before mode results; fewer than requested need not mean failure"
+  },
+  "real_evidence": "knowledge-base/public-native-faults-20261103.json",
+  "observed": "Default/Tet open-boundary test returns 1 but result count query fails; not Start=0 or Start throwing",
+  "status": "Start=0 and Start throwing remain unverified",
+  "excluded_substitutes": [
+    "manually returning 0 or Err.Raise is a synthetic branch test",
+    "configuration or Rebuild exception before Start is a different phase",
+    "license changes, intentional OOM and corrupting original projects are outside the controlled test scope"
+  ],
+  "checked_python_sources": [
+    "D:/Program Files (x86)/CST Studio Suite 2022/AMD64/python_cst_libraries/cst/interface/studio.py"
+  ],
+  "limits": "Initial wrapper-only audit was incomplete: full Python help documents abort_solver. Actual normal abort still did not trigger Start=0 or Start throwing.",
+  "followup_20261104": {
+    "help": "Online Help/Python/source/cst.interface.html",
+    "documented": "DesignEnvironment.connect(pid), get_open_project(path), Modeler.abort_solver",
+    "observed": "exact PID/create_time/path connected; abort_solver=True; VBA Start=1, no readable mode results; ACK and close receipts written",
+    "evidence": "artifacts/hom-recovery-native-da01c6ed/attempt-5",
+    "limits": "does not establish Start=0 or Start throwing; helper communication timeout is not a solver total timeout"
+  }
+}

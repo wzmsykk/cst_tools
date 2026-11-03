@@ -25,7 +25,7 @@ def test_default_solver_wait_accepts_completion_after_forty_minutes(tmp_path, mo
     checks = []
     monkeypatch.setattr("csttool.managed_cstworker.time.monotonic", lambda: clock[0])
     monkeypatch.setattr(worker, "_ensure_running", lambda: checks.append(clock[0]))
-    monkeypatch.setattr(worker, "_keep_window_minimized", lambda: None)
+    monkeypatch.setattr(worker, "_observe_background_windows", lambda: None)
 
     def advance(_):
         clock[0] = 2401.0
@@ -62,7 +62,7 @@ def test_wait_logs_debug_samples_but_only_ten_minute_info_heartbeats(tmp_path, m
     ticks = iter([30, 60, 599, 600, 630, 1200, 1230])
     monkeypatch.setattr('csttool.managed_cstworker.time.monotonic', lambda: clock[0])
     monkeypatch.setattr(worker, '_ensure_running', lambda: None)
-    monkeypatch.setattr(worker, '_keep_window_minimized', lambda: None)
+    monkeypatch.setattr(worker, '_observe_background_windows', lambda: None)
     def advance(_):
         clock[0] = next(ticks)
         if clock[0] == 1230:
@@ -86,7 +86,7 @@ def test_explicit_solver_timeout_remains_available_for_test_harness(tmp_path, mo
     monkeypatch.setattr("csttool.managed_cstworker.time.monotonic", lambda: clock[0])
     monkeypatch.setattr("csttool.managed_cstworker.time.sleep", lambda _: clock.__setitem__(0, 2.0))
     monkeypatch.setattr(worker, "_ensure_running", lambda: None)
-    monkeypatch.setattr(worker, "_keep_window_minimized", lambda: None)
+    monkeypatch.setattr(worker, "_observe_background_windows", lambda: None)
     with pytest.raises(TimeoutError):
         worker._wait_completion(task)
 

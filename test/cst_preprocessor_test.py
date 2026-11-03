@@ -235,7 +235,12 @@ def test_native_runner_uses_stage_monitor_without_communicate_timeout(tmp_path, 
     def launch(*args, **kwargs):
         assert observed == ['baseline']
         return Process()
-    monkeypatch.setattr(module.subprocess, 'Popen', launch)
+    class Lease:
+        def __init__(self,*args,**kwargs):pass
+        def start(self,*args,**kwargs):return launch(*args,**kwargs)
+        def observe(self,*args):pass
+        def finish(self):pass
+    monkeypatch.setattr(module, 'BatchDesktopLease', Lease)
     from types import SimpleNamespace
     monkeypatch.setattr(module.psutil, 'Process', lambda pid:SimpleNamespace(create_time=lambda:1.))
     def monitor(process, directory, **kwargs):

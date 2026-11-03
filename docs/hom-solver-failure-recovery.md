@@ -52,3 +52,7 @@ GUI主工作台显示临时加密/原密度扩窗/原密度窄窗确认阶段；
 正常用户权限的无CST协议/Runner回归92 passed（12.49s），扫描与恢复检查点73 passed（6.44s），GUI及假Worker流程15 passed（1.62s），诊断导出与索引27 passed（3.19s）；各组重叠，不相加。报告分别为artifacts/hom-recovery-native-final-20261025.xml、hom-recovery-closeout-20261025.xml、hom-recovery-gui-final-20261025.xml、hom-recovery-bundle-20261025.xml。此前受限环境协议夹具读文件出现PermissionError，88 passed/4 failed/4 errors；保留失败记录，不用重试掩盖原因，正常权限通过也不证明现场不存在瞬时文件访问异常。
 
 最终审计将生产接口的空后处理列表视为输出缺失，禁止据此确认空区间；通用扫描器的明确空结果契约保留。相关测试首次52 passed/2 failed：密度测试夹具以空后处理结束尾窗，更新为含终点模式的夹具后54 passed（3.10s），报告artifacts/hom-recovery-final-audit2-20261025.xml。未启动真实CST，临时加密是否实际生效及现场扩窗恢复仍待串行副本验收。轻量报告保留，临时测试副本清理；artifacts不保证随Git迁移。
+
+## 2026-11-04测试副本补充
+
+真实小网格恢复驱动完成4→6→4实际634→2140→634单元，四个检查点暂停/磁盘重载、实际求解拒绝后扩窗/窄窗确认通过。使用测试专用几何约束，非生产默认改动；尾窗一次官方中止后继续恢复。小网格重算出现频率漂移并被当前频率判重接收为多项，不证明互异模式，完整数值验收仍需模式身份/收敛判据。见[五项实施](execution-hardening-five-steps.md)。

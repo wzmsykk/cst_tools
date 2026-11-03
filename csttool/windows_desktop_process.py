@@ -64,7 +64,7 @@ class DesktopProcess:
             info=PROCESS_INFORMATION()
             environment=ctypes.create_unicode_buffer('\0'.join(k+'='+v for k,v in sorted(env.items(),key=lambda pair:pair[0].upper()))+'\0\0')
             line=ctypes.create_unicode_buffer(subprocess.list2cmdline([str(x) for x in command]))
-            if not kernel.CreateProcessW(None,line,None,None,True,0x08000000|0x400,
+            if not kernel.CreateProcessW(None,line,None,None,True,0x08000000|0x400|0x200,
                                           environment,str(cwd),ctypes.byref(startup),ctypes.byref(info)):
                 raise ctypes.WinError(ctypes.get_last_error())
             self.pid=info.dwProcessId
@@ -93,6 +93,15 @@ class DesktopProcess:
         if getattr(self,'handle',None):
             self.kernel.CloseHandle(self.handle)
             self.handle=None
+
+    def wait(self, timeout=None):
+        import time
+        deadline=None if timeout is None else time.monotonic()+timeout
+        while self.poll() is None:
+            if deadline is not None and time.monotonic() >= deadline:
+                raise subprocess.TimeoutExpired('owned desktop process',timeout)
+            time.sleep(.05)
+        return self.returncode
 
     def __del__(self):
         self.close()

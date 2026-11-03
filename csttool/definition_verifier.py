@@ -14,7 +14,7 @@ from .execution_snapshot import is_cst_2022
 from .native_execution_capture import verify_capture_installation
 from .saved_project_source import read_saved_source
 from .settings_projection import project_saved_settings, PARAMETERS
-from .vb_codec import quote_vb_string
+from .batch_desktop import BatchDesktopLease, macro_manifest, literal_content
 
 
 def digest(path):
@@ -23,7 +23,7 @@ def digest(path):
 
 def render_definition_probe(model, directory, nonce, projection=None):
     """Loaded 3D Model.run scope, using documented/calibrated read calls only."""
-    def q(path): return quote_vb_string(path)
+    def q(path): return literal_content(path)
     macro=f''''#Language "WWB-COM"
 Option Explicit
 Sub Main
@@ -70,6 +70,7 @@ End Sub
 
 
 def run_definition_probe(executable, model, directory, macro):
+    macro_manifest(directory,macro,purpose='G03 loaded-project readback',sources=[Path(__file__)])
     script = model.with_suffix('') / 'Model/3D/Model.run'
     script.parent.mkdir(parents=True, exist_ok=True)
     script.write_text(macro, encoding='ascii')
@@ -82,16 +83,18 @@ def run_definition_probe(executable, model, directory, macro):
         startup.wShowWindow = 7
         options['startupinfo'] = startup
     with (directory / 'cst.log').open('wb') as stream:
-        process = subprocess.Popen([str(executable), '-m', '-b', str(model)],
-            stdout=stream, stderr=subprocess.STDOUT, cwd=directory,
-            env=cst_process_environment(), **options)
+        lease=BatchDesktopLease(executable,model,directory)
+        process = lease.start([str(executable), '-m', '-b', str(model)],stream,**options)
         identity=psutil.Process(process.pid)
         write_json_atomic(directory/'session-status.json',dict(exit_confirmed=False,
             launcher_pid=process.pid,owned=[dict(pid=process.pid,create_time=identity.create_time())],
             model_path=str(model),phase='launch'))
-        session = wait_probe(process, directory, task_project=model,
-                             preexisting_processes=baseline, stage_timeout=180, exit_timeout=60,
-                             expected_launcher_identity=(process.pid,identity.create_time()))
+        try:
+            session = wait_probe(process, directory, task_project=model,
+                                 preexisting_processes=baseline, stage_timeout=180, exit_timeout=60,
+                                 on_observation=lambda report:lease.observe(report['owned']),
+                                 expected_launcher_identity=(process.pid,identity.create_time()))
+        finally:lease.finish()
     session.update(exit_code=process.returncode)
     write_json_atomic(directory/'session-status.json',session)
     return dict(exit_code=process.returncode, exit_confirmed=session['exit_confirmed'])
