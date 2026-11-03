@@ -202,6 +202,8 @@ def test_managed_single_macro_hooks_reuse_existing_protocol(tmp_path,monkeypatch
     assert text.index('            CaptureAfterSolver solverReturn')>text.index('solverReturn = EigenmodeSolver.Start')
     assert 'modelNeedsRecovery = False\n            CaptureBeforeSolver' in text
     assert 'CSTP_WriteCompletion' in text and 'CSTC2_WriteCloseReceipt' in text
+    assert text.index('"returned=" & CStr(solverReturn)') < text.index('CaptureAfterSolver solverReturn')
+    assert text.index('If EigenmodeSolver.GetNumberOfModesCalculated < 1 Then') < text.index('CaptureAfterSolver solverReturn')
     with pytest.raises(ValueError,match='forbids overrides'):
         worker.run_task('bad',params={'fmin':900})
 

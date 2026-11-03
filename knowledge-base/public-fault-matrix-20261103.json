@@ -1,0 +1,50 @@
+{
+  "date": "2026-11-03",
+  "baseline": "57ccb32",
+  "scope": "offline fake-peer and official SDK faults; no CST launch",
+  "new_cases": 19,
+  "initial_failure": {
+    "test": "controller publication gap repeated recovery",
+    "observation": "first repair omitted result_revision while subsequent query returned it",
+    "fix": "publish then return get_simulation_results(run_id)"
+  },
+  "evidence": [
+    {
+      "path": "artifacts/public-fault-final.xml",
+      "tests": "123",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "82.850"
+    },
+    {
+      "path": "artifacts/public-sdk.xml",
+      "tests": "8",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "3.329"
+    }
+  ],
+  "remaining": [
+    "real CST solver failure",
+    "native ACK timing with controller OS process exit",
+    "full N01-N25 wire/cancellation/auth/transport matrix"
+  ],
+  "documentation_validation": {
+    "passed": 17,
+    "seconds": 43.73,
+    "registry_valid": true,
+    "calibration_still_valid": true
+  },
+  "cleanup": {
+    "pytest_directories_removed": true,
+    "xml_and_lightweight_reports_retained": true,
+    "native_models_generated": false
+  },
+  "closeout": {
+    "documentation_index_passed": 2,
+    "seconds": 8.65,
+    "diff_check_passed": true
+  }
+}

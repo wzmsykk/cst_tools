@@ -242,11 +242,14 @@ class ManagedCSTWorker:
             main = main.replace(calling,
                 '            stage = "native-capture-pre"\n            modelNeedsRecovery = False\n'
                 '            CaptureBeforeSolver\n            stage = "solver-start"\n'+calling)
-            main = main.replace('            solverReturn = EigenmodeSolver.Start',
-                '            solverReturn = EigenmodeSolver.Start\n'
-                '            If solverReturn = 1 Then solverReturnedSuccess = True\n'
+            # Keep Start's return trace and result availability checks ahead of
+            # successful-result capture: absent DB must remain SOLVER_FAILED.
+            ready = '            activeTaskSolveReady = True'
+            if main.count(ready) != 1:
+                raise ValueError('single-simulation result gate does not match managed template')
+            main = main.replace(ready, ready + '\n'
                 '            stage = "native-capture-post"\n            CaptureAfterSolver solverReturn\n'
-                '            stage = "solver-start"')
+                '            stage = "solver-result"')
         replacements = {
             "%PROJECT_PATH%": quote_vb_string(self.project_path),
             "%SESSION_ID%": self.session_id,

@@ -1,0 +1,1203 @@
+{
+  "date": "2026-11-03",
+  "baseline": "57ccb32",
+  "scope": "15 serial real CST cases, not complete N01-N25; public controller tests use shared ApplicationService rather than production Runner crash",
+  "native_report": {
+    "passed": true,
+    "source_sha256": "27059515da0934239cffe488990d293c1d06f5e61814df08fd38a14617685df1",
+    "cases": [
+      {
+        "case": "before-parameters",
+        "report": {
+          "point": "before-parameters",
+          "source_sha256": "27059515da0934239cffe488990d293c1d06f5e61814df08fd38a14617685df1",
+          "passed": true,
+          "scheduling": "test-only gate",
+          "close": {
+            "session_id": "3e8c448b-c945-4e4b-947b-a49cc785bb47",
+            "process_state": "exited",
+            "exit_code": 0,
+            "exit_classification": "zero",
+            "model_state": "prepared",
+            "task_outcome": "cancelled",
+            "result_state": "unknown",
+            "disposition": "standard-stop",
+            "standard_closed": true,
+            "needs_recovery": false,
+            "missing_evidence": []
+          },
+          "before_recovery": [
+            {
+              "session_id": "3e8c448b-c945-4e4b-947b-a49cc785bb47",
+              "process_state": "exited",
+              "exit_code": 0,
+              "exit_classification": "zero",
+              "model_state": "prepared",
+              "task_outcome": "cancelled",
+              "result_state": "unknown",
+              "disposition": "standard-stop",
+              "standard_closed": true,
+              "needs_recovery": true,
+              "missing_evidence": [
+                "completion-not-reconciled"
+              ]
+            }
+          ],
+          "after_recovery": [
+            {
+              "session_id": "3e8c448b-c945-4e4b-947b-a49cc785bb47",
+              "process_state": "exited",
+              "exit_code": 0,
+              "exit_classification": "zero",
+              "model_state": "prepared",
+              "task_outcome": "cancelled",
+              "result_state": "unknown",
+              "disposition": "standard-stop",
+              "standard_closed": true,
+              "needs_recovery": false,
+              "missing_evidence": []
+            }
+          ],
+          "cancelled_not_adopted": true,
+          "solver_calls": 0,
+          "source_unchanged": true,
+          "cst_processes_after": []
+        },
+        "cleaned_companions": 2
+      },
+      {
+        "case": "after-rebuild",
+        "report": {
+          "point": "after-rebuild",
+          "source_sha256": "27059515da0934239cffe488990d293c1d06f5e61814df08fd38a14617685df1",
+          "passed": true,
+          "scheduling": "test-only gate",
+          "close": {
+            "session_id": "55878ac9-d29e-45a7-af5d-075104dc998c",
+            "process_state": "exited",
+            "exit_code": 0,
+            "exit_classification": "zero",
+            "model_state": "restored-saved",
+            "task_outcome": "cancelled",
+            "result_state": "unknown",
+            "disposition": "standard-stop",
+            "standard_closed": true,
+            "needs_recovery": false,
+            "missing_evidence": []
+          },
+          "before_recovery": [
+            {
+              "session_id": "55878ac9-d29e-45a7-af5d-075104dc998c",
+              "process_state": "exited",
+              "exit_code": 0,
+              "exit_classification": "zero",
+              "model_state": "restored-saved",
+              "task_outcome": "cancelled",
+              "result_state": "unknown",
+              "disposition": "standard-stop",
+              "standard_closed": true,
+              "needs_recovery": true,
+              "missing_evidence": [
+                "completion-not-reconciled"
+              ]
+            }
+          ],
+          "after_recovery": [
+            {
+              "session_id": "55878ac9-d29e-45a7-af5d-075104dc998c",
+              "process_state": "exited",
+              "exit_code": 0,
+              "exit_classification": "zero",
+              "model_state": "restored-saved",
+              "task_outcome": "cancelled",
+              "result_state": "unknown",
+              "disposition": "standard-stop",
+              "standard_closed": true,
+              "needs_recovery": false,
+              "missing_evidence": []
+            }
+          ],
+          "cancelled_not_adopted": true,
+          "solver_calls": 0,
+          "source_unchanged": true,
+          "cst_processes_after": []
+        },
+        "cleaned_companions": 2
+      },
+      {
+        "case": "during-solver",
+        "report": {
+          "point": "during-solver",
+          "source_sha256": "27059515da0934239cffe488990d293c1d06f5e61814df08fd38a14617685df1",
+          "passed": true,
+          "scheduling": "native observation",
+          "stop_during_native_start": true,
+          "close": {
+            "session_id": "cbee822b-3656-4a4f-a9f6-42b68466b041",
+            "process_state": "exited",
+            "exit_code": 0,
+            "exit_classification": "zero",
+            "model_state": "committed",
+            "task_outcome": "cancelled",
+            "result_state": "unknown",
+            "disposition": "standard-stop",
+            "standard_closed": true,
+            "needs_recovery": false,
+            "missing_evidence": []
+          },
+          "before_recovery": [
+            {
+              "session_id": "cbee822b-3656-4a4f-a9f6-42b68466b041",
+              "process_state": "exited",
+              "exit_code": 0,
+              "exit_classification": "zero",
+              "model_state": "committed",
+              "task_outcome": "cancelled",
+              "result_state": "unknown",
+              "disposition": "standard-stop",
+              "standard_closed": true,
+              "needs_recovery": true,
+              "missing_evidence": [
+                "completion-not-reconciled"
+              ]
+            }
+          ],
+          "after_recovery": [
+            {
+              "session_id": "cbee822b-3656-4a4f-a9f6-42b68466b041",
+              "process_state": "exited",
+              "exit_code": 0,
+              "exit_classification": "zero",
+              "model_state": "committed",
+              "task_outcome": "cancelled",
+              "result_state": "unknown",
+              "disposition": "standard-stop",
+              "standard_closed": true,
+              "needs_recovery": false,
+              "missing_evidence": []
+            }
+          ],
+          "cancelled_not_adopted": true,
+          "solver_calls": 1,
+          "source_unchanged": true,
+          "cst_processes_after": []
+        },
+        "cleaned_companions": 3
+      },
+      {
+        "case": "after-solver",
+        "report": {
+          "point": "after-solver",
+          "source_sha256": "27059515da0934239cffe488990d293c1d06f5e61814df08fd38a14617685df1",
+          "passed": true,
+          "scheduling": "test-only gate",
+          "close": {
+            "session_id": "6a22e03e-99ef-4a7f-ba6a-5095aef19ede",
+            "process_state": "exited",
+            "exit_code": 0,
+            "exit_classification": "zero",
+            "model_state": "committed",
+            "task_outcome": "cancelled",
+            "result_state": "unknown",
+            "disposition": "standard-stop",
+            "standard_closed": true,
+            "needs_recovery": false,
+            "missing_evidence": []
+          },
+          "before_recovery": [
+            {
+              "session_id": "6a22e03e-99ef-4a7f-ba6a-5095aef19ede",
+              "process_state": "exited",
+              "exit_code": 0,
+              "exit_classification": "zero",
+              "model_state": "committed",
+              "task_outcome": "cancelled",
+              "result_state": "unknown",
+              "disposition": "standard-stop",
+              "standard_closed": true,
+              "needs_recovery": true,
+              "missing_evidence": [
+                "completion-not-reconciled"
+              ]
+            }
+          ],
+          "after_recovery": [
+            {
+              "session_id": "6a22e03e-99ef-4a7f-ba6a-5095aef19ede",
+              "process_state": "exited",
+              "exit_code": 0,
+              "exit_classification": "zero",
+              "model_state": "committed",
+              "task_outcome": "cancelled",
+              "result_state": "unknown",
+              "disposition": "standard-stop",
+              "standard_closed": true,
+              "needs_recovery": false,
+              "missing_evidence": []
+            }
+          ],
+          "cancelled_not_adopted": true,
+          "solver_calls": 1,
+          "source_unchanged": true,
+          "cst_processes_after": []
+        },
+        "cleaned_companions": 3
+      },
+      {
+        "case": "completion-before-receive",
+        "report": {
+          "point": "completion-before-receive",
+          "source_sha256": "27059515da0934239cffe488990d293c1d06f5e61814df08fd38a14617685df1",
+          "passed": true,
+          "scheduling": "test-only gate",
+          "close": {
+            "session_id": "6acbafbf-9f43-4cf3-abbf-3aed1bccb3c0",
+            "process_state": "exited",
+            "exit_code": 0,
+            "exit_classification": "zero",
+            "model_state": "committed",
+            "task_outcome": "success",
+            "result_state": "unknown",
+            "disposition": "standard-stop",
+            "standard_closed": true,
+            "needs_recovery": false,
+            "missing_evidence": []
+          },
+          "before_recovery": [
+            {
+              "session_id": "6acbafbf-9f43-4cf3-abbf-3aed1bccb3c0",
+              "process_state": "exited",
+              "exit_code": 0,
+              "exit_classification": "zero",
+              "model_state": "committed",
+              "task_outcome": "success",
+              "result_state": "unknown",
+              "disposition": "standard-stop",
+              "standard_closed": true,
+              "needs_recovery": true,
+              "missing_evidence": [
+                "completion-not-reconciled"
+              ]
+            }
+          ],
+          "after_recovery": [
+            {
+              "session_id": "6acbafbf-9f43-4cf3-abbf-3aed1bccb3c0",
+              "process_state": "exited",
+              "exit_code": 0,
+              "exit_classification": "zero",
+              "model_state": "committed",
+              "task_outcome": "success",
+              "result_state": "received-unadopted",
+              "disposition": "standard-stop",
+              "standard_closed": true,
+              "needs_recovery": false,
+              "missing_evidence": []
+            }
+          ],
+          "frequency": 1147.42692991921,
+          "adopted_once": true,
+          "solver_calls": 1,
+          "source_unchanged": true,
+          "cst_processes_after": []
+        },
+        "cleaned_companions": 3
+      },
+      {
+        "case": "received-before-ack",
+        "report": {
+          "point": "received-before-ack",
+          "source_sha256": "27059515da0934239cffe488990d293c1d06f5e61814df08fd38a14617685df1",
+          "passed": true,
+          "scheduling": "native observation",
+          "close": {
+            "session_id": "957a1da5-e08f-4e85-b6ab-ff58a24995a6",
+            "process_state": "exited",
+            "exit_code": 0,
+            "exit_classification": "zero",
+            "model_state": "committed",
+            "task_outcome": "success",
+            "result_state": "unknown",
+            "disposition": "standard-stop",
+            "standard_closed": true,
+            "needs_recovery": false,
+            "missing_evidence": []
+          },
+          "before_recovery": [
+            {
+              "session_id": "957a1da5-e08f-4e85-b6ab-ff58a24995a6",
+              "process_state": "exited",
+              "exit_code": 0,
+              "exit_classification": "zero",
+              "model_state": "committed",
+              "task_outcome": "success",
+              "result_state": "received-unadopted",
+              "disposition": "standard-stop",
+              "standard_closed": true,
+              "needs_recovery": true,
+              "missing_evidence": [
+                "completion-not-reconciled",
+                "received-result-not-reconciled"
+              ]
+            }
+          ],
+          "after_recovery": [
+            {
+              "session_id": "957a1da5-e08f-4e85-b6ab-ff58a24995a6",
+              "process_state": "exited",
+              "exit_code": 0,
+              "exit_classification": "zero",
+              "model_state": "committed",
+              "task_outcome": "success",
+              "result_state": "received-unadopted",
+              "disposition": "standard-stop",
+              "standard_closed": true,
+              "needs_recovery": false,
+              "missing_evidence": []
+            }
+          ],
+          "frequency": 1147.42692991921,
+          "adopted_once": true,
+          "solver_calls": 1,
+          "source_unchanged": true,
+          "cst_processes_after": []
+        },
+        "cleaned_companions": 3
+      },
+      {
+        "case": "ack-accepted",
+        "report": {
+          "point": "ack-accepted",
+          "source_sha256": "27059515da0934239cffe488990d293c1d06f5e61814df08fd38a14617685df1",
+          "passed": true,
+          "scheduling": "test-only gate",
+          "close": {
+            "session_id": "fd02a354-9341-4880-9f1e-8a3dda797de5",
+            "process_state": "exited",
+            "exit_code": 0,
+            "exit_classification": "zero",
+            "model_state": "committed",
+            "task_outcome": "success",
+            "result_state": "unknown",
+            "disposition": "standard-stop",
+            "standard_closed": true,
+            "needs_recovery": false,
+            "missing_evidence": []
+          },
+          "before_recovery": [
+            {
+              "session_id": "fd02a354-9341-4880-9f1e-8a3dda797de5",
+              "process_state": "exited",
+              "exit_code": 0,
+              "exit_classification": "zero",
+              "model_state": "committed",
+              "task_outcome": "success",
+              "result_state": "received-unadopted",
+              "disposition": "standard-stop",
+              "standard_closed": true,
+              "needs_recovery": true,
+              "missing_evidence": [
+                "received-result-not-reconciled"
+              ]
+            }
+          ],
+          "after_recovery": [
+            {
+              "session_id": "fd02a354-9341-4880-9f1e-8a3dda797de5",
+              "process_state": "exited",
+              "exit_code": 0,
+              "exit_classification": "zero",
+              "model_state": "committed",
+              "task_outcome": "success",
+              "result_state": "received-unadopted",
+              "disposition": "standard-stop",
+              "standard_closed": true,
+              "needs_recovery": false,
+              "missing_evidence": []
+            }
+          ],
+          "frequency": 1147.42692991921,
+          "adopted_once": true,
+          "solver_calls": 1,
+          "source_unchanged": true,
+          "cst_processes_after": []
+        },
+        "cleaned_companions": 3
+      },
+      {
+        "case": "task-deleted",
+        "report": {
+          "point": "task-deleted",
+          "source_sha256": "27059515da0934239cffe488990d293c1d06f5e61814df08fd38a14617685df1",
+          "passed": true,
+          "scheduling": "test-only gate",
+          "close": {
+            "session_id": "045df811-d04b-4317-92af-1e9bd60dae4e",
+            "process_state": "exited",
+            "exit_code": 0,
+            "exit_classification": "zero",
+            "model_state": "committed",
+            "task_outcome": "success",
+            "result_state": "unknown",
+            "disposition": "standard-stop",
+            "standard_closed": true,
+            "needs_recovery": false,
+            "missing_evidence": []
+          },
+          "before_recovery": [
+            {
+              "session_id": "045df811-d04b-4317-92af-1e9bd60dae4e",
+              "process_state": "exited",
+              "exit_code": 0,
+              "exit_classification": "zero",
+              "model_state": "committed",
+              "task_outcome": "success",
+              "result_state": "received-unadopted",
+              "disposition": "standard-stop",
+              "standard_closed": true,
+              "needs_recovery": true,
+              "missing_evidence": [
+                "received-result-not-reconciled"
+              ]
+            }
+          ],
+          "after_recovery": [
+            {
+              "session_id": "045df811-d04b-4317-92af-1e9bd60dae4e",
+              "process_state": "exited",
+              "exit_code": 0,
+              "exit_classification": "zero",
+              "model_state": "committed",
+              "task_outcome": "success",
+              "result_state": "received-unadopted",
+              "disposition": "standard-stop",
+              "standard_closed": true,
+              "needs_recovery": false,
+              "missing_evidence": []
+            }
+          ],
+          "frequency": 1147.42692991921,
+          "adopted_once": true,
+          "solver_calls": 1,
+          "source_unchanged": true,
+          "cst_processes_after": []
+        },
+        "cleaned_companions": 3
+      },
+      {
+        "case": "completion-deleted",
+        "report": {
+          "point": "completion-deleted",
+          "source_sha256": "27059515da0934239cffe488990d293c1d06f5e61814df08fd38a14617685df1",
+          "passed": true,
+          "scheduling": "test-only gate",
+          "close": {
+            "session_id": "26708adc-c32a-4221-9052-c45c4a21fedf",
+            "process_state": "exited",
+            "exit_code": 0,
+            "exit_classification": "zero",
+            "model_state": "committed",
+            "task_outcome": "success",
+            "result_state": "unknown",
+            "disposition": "standard-stop",
+            "standard_closed": true,
+            "needs_recovery": false,
+            "missing_evidence": []
+          },
+          "before_recovery": [
+            {
+              "session_id": "26708adc-c32a-4221-9052-c45c4a21fedf",
+              "process_state": "exited",
+              "exit_code": 0,
+              "exit_classification": "zero",
+              "model_state": "committed",
+              "task_outcome": "success",
+              "result_state": "received-unadopted",
+              "disposition": "standard-stop",
+              "standard_closed": true,
+              "needs_recovery": true,
+              "missing_evidence": [
+                "received-result-not-reconciled"
+              ]
+            }
+          ],
+          "after_recovery": [
+            {
+              "session_id": "26708adc-c32a-4221-9052-c45c4a21fedf",
+              "process_state": "exited",
+              "exit_code": 0,
+              "exit_classification": "zero",
+              "model_state": "committed",
+              "task_outcome": "success",
+              "result_state": "received-unadopted",
+              "disposition": "standard-stop",
+              "standard_closed": true,
+              "needs_recovery": false,
+              "missing_evidence": []
+            }
+          ],
+          "frequency": 1147.42692991921,
+          "adopted_once": true,
+          "solver_calls": 1,
+          "source_unchanged": true,
+          "cst_processes_after": []
+        },
+        "cleaned_companions": 3
+      },
+      {
+        "case": "ready-before-adopt",
+        "report": {
+          "point": "ready-before-adopt",
+          "source_sha256": "27059515da0934239cffe488990d293c1d06f5e61814df08fd38a14617685df1",
+          "passed": true,
+          "scheduling": "native observation",
+          "close": {
+            "session_id": "955f14d3-3d3a-47b0-b1ab-e99504bffec9",
+            "process_state": "exited",
+            "exit_code": 0,
+            "exit_classification": "zero",
+            "model_state": "committed",
+            "task_outcome": "success",
+            "result_state": "unknown",
+            "disposition": "standard-stop",
+            "standard_closed": true,
+            "needs_recovery": false,
+            "missing_evidence": []
+          },
+          "before_recovery": [
+            {
+              "session_id": "955f14d3-3d3a-47b0-b1ab-e99504bffec9",
+              "process_state": "exited",
+              "exit_code": 0,
+              "exit_classification": "zero",
+              "model_state": "committed",
+              "task_outcome": "success",
+              "result_state": "received-unadopted",
+              "disposition": "standard-stop",
+              "standard_closed": true,
+              "needs_recovery": true,
+              "missing_evidence": [
+                "received-result-not-reconciled"
+              ]
+            }
+          ],
+          "after_recovery": [
+            {
+              "session_id": "955f14d3-3d3a-47b0-b1ab-e99504bffec9",
+              "process_state": "exited",
+              "exit_code": 0,
+              "exit_classification": "zero",
+              "model_state": "committed",
+              "task_outcome": "success",
+              "result_state": "received-unadopted",
+              "disposition": "standard-stop",
+              "standard_closed": true,
+              "needs_recovery": false,
+              "missing_evidence": []
+            }
+          ],
+          "frequency": 1147.42692991921,
+          "adopted_once": true,
+          "solver_calls": 1,
+          "source_unchanged": true,
+          "cst_processes_after": []
+        },
+        "cleaned_companions": 3
+      },
+      {
+        "case": "wrong-ack",
+        "report": {
+          "point": "wrong-ack",
+          "source_sha256": "27059515da0934239cffe488990d293c1d06f5e61814df08fd38a14617685df1",
+          "passed": true,
+          "scheduling": "test-only gate",
+          "invalid_ack_sha256": "a2869b8d0b739338c053662c38fa9a19c4961e646890e06c81a104349ca07144",
+          "close": {
+            "session_id": "af8a3e61-ffa6-4926-a923-ed6e4ec936ef",
+            "process_state": "exited",
+            "exit_code": 0,
+            "exit_classification": "zero",
+            "model_state": "committed",
+            "task_outcome": "success",
+            "result_state": "unknown",
+            "disposition": "standard-stop",
+            "standard_closed": true,
+            "needs_recovery": false,
+            "missing_evidence": []
+          },
+          "before_recovery": [
+            {
+              "session_id": "af8a3e61-ffa6-4926-a923-ed6e4ec936ef",
+              "process_state": "exited",
+              "exit_code": 0,
+              "exit_classification": "zero",
+              "model_state": "committed",
+              "task_outcome": "success",
+              "result_state": "received-unadopted",
+              "disposition": "standard-stop",
+              "standard_closed": true,
+              "needs_recovery": true,
+              "missing_evidence": [
+                "completion-not-reconciled",
+                "received-result-not-reconciled"
+              ]
+            }
+          ],
+          "after_recovery": [
+            {
+              "session_id": "af8a3e61-ffa6-4926-a923-ed6e4ec936ef",
+              "process_state": "exited",
+              "exit_code": 0,
+              "exit_classification": "zero",
+              "model_state": "committed",
+              "task_outcome": "success",
+              "result_state": "received-unadopted",
+              "disposition": "standard-stop",
+              "standard_closed": true,
+              "needs_recovery": false,
+              "missing_evidence": []
+            }
+          ],
+          "frequency": 1147.42692991921,
+          "adopted_once": true,
+          "invalid_ack_preserved": true,
+          "solver_calls": 1,
+          "source_unchanged": true,
+          "cst_processes_after": []
+        },
+        "cleaned_companions": 3
+      },
+      {
+        "case": "truncated-ack",
+        "report": {
+          "point": "truncated-ack",
+          "source_sha256": "27059515da0934239cffe488990d293c1d06f5e61814df08fd38a14617685df1",
+          "passed": true,
+          "scheduling": "test-only gate",
+          "invalid_ack_sha256": "d0960a65de998c3d9ce34107fc4f6f2ceb5ed93a34568de6f47b41c87232f9f9",
+          "close": {
+            "session_id": "bd46803c-a866-4764-aecd-be4715dbf9c7",
+            "process_state": "exited",
+            "exit_code": 0,
+            "exit_classification": "zero",
+            "model_state": "committed",
+            "task_outcome": "success",
+            "result_state": "unknown",
+            "disposition": "standard-stop",
+            "standard_closed": true,
+            "needs_recovery": false,
+            "missing_evidence": []
+          },
+          "before_recovery": [
+            {
+              "session_id": "bd46803c-a866-4764-aecd-be4715dbf9c7",
+              "process_state": "exited",
+              "exit_code": 0,
+              "exit_classification": "zero",
+              "model_state": "committed",
+              "task_outcome": "success",
+              "result_state": "received-unadopted",
+              "disposition": "standard-stop",
+              "standard_closed": true,
+              "needs_recovery": true,
+              "missing_evidence": [
+                "completion-not-reconciled",
+                "received-result-not-reconciled"
+              ]
+            }
+          ],
+          "after_recovery": [
+            {
+              "session_id": "bd46803c-a866-4764-aecd-be4715dbf9c7",
+              "process_state": "exited",
+              "exit_code": 0,
+              "exit_classification": "zero",
+              "model_state": "committed",
+              "task_outcome": "success",
+              "result_state": "received-unadopted",
+              "disposition": "standard-stop",
+              "standard_closed": true,
+              "needs_recovery": false,
+              "missing_evidence": []
+            }
+          ],
+          "frequency": 1147.42692991921,
+          "adopted_once": true,
+          "invalid_ack_preserved": true,
+          "solver_calls": 1,
+          "source_unchanged": true,
+          "cst_processes_after": []
+        },
+        "cleaned_companions": 3
+      },
+      {
+        "case": "controller-before-publication",
+        "report": {
+          "passed": true,
+          "case": "controller-before-publication",
+          "solver_calls": 1,
+          "controller_exit": 91,
+          "solver_returns": [
+            "2026/11/3 22:31:21 | stage=solver-start; path=D:\\work\\cst_tools\\artifacts\\public-native-faults-4b92d5c9\\controller-before-publication\\temp\\worker_single_fault\\9dfeba47-c05f-4f8f-a976-4e7ada9cb5a4\\worker-input.cst; returned=1"
+          ],
+          "injected": {
+            "case": "controller-before-publication",
+            "pid": 63592,
+            "boundary": "before-result-write"
+          },
+          "closures": [
+            {
+              "session_id": "9dfeba47-c05f-4f8f-a976-4e7ada9cb5a4",
+              "process_state": "exited",
+              "exit_code": 0,
+              "exit_classification": "zero",
+              "model_state": "committed",
+              "task_outcome": "success",
+              "result_state": "unknown",
+              "disposition": "standard-stop",
+              "standard_closed": true,
+              "needs_recovery": false,
+              "missing_evidence": []
+            }
+          ]
+        },
+        "cleaned_companions": 5
+      },
+      {
+        "case": "controller-before-adoption-receipt",
+        "report": {
+          "passed": true,
+          "case": "controller-before-adoption-receipt",
+          "solver_calls": 1,
+          "controller_exit": 91,
+          "solver_returns": [
+            "2026/11/3 22:33:45 | stage=solver-start; path=D:\\work\\cst_tools\\artifacts\\public-native-faults-4b92d5c9\\controller-before-adoption-receipt\\temp\\worker_single_fault\\851667c3-c36f-4f2d-bb88-8c551de79ad5\\worker-input.cst; returned=1"
+          ],
+          "injected": {
+            "case": "controller-before-adoption-receipt",
+            "pid": 36204,
+            "boundary": "before-adoption-receipt"
+          },
+          "closures": [
+            {
+              "session_id": "851667c3-c36f-4f2d-bb88-8c551de79ad5",
+              "process_state": "exited",
+              "exit_code": 0,
+              "exit_classification": "zero",
+              "model_state": "committed",
+              "task_outcome": "success",
+              "result_state": "unknown",
+              "disposition": "standard-stop",
+              "standard_closed": true,
+              "needs_recovery": false,
+              "missing_evidence": []
+            }
+          ]
+        },
+        "cleaned_companions": 5
+      },
+      {
+        "case": "solver-rejection",
+        "report": {
+          "passed": true,
+          "case": "solver-rejection",
+          "solver_calls": 2,
+          "controller_exit": 0,
+          "solver_returns": [
+            "2026/11/3 22:36:00 | stage=solver-start; path=D:\\work\\cst_tools\\artifacts\\public-native-faults-4b92d5c9\\solver-rejection\\temp\\worker_single_fault\\7afd9ec8-e1db-4311-8d70-3a024f700ee8\\worker-input.cst; returned=1",
+            "2026/11/3 22:36:28 | stage=solver-start; path=D:\\work\\cst_tools\\artifacts\\public-native-faults-4b92d5c9\\solver-rejection\\temp\\worker_single_recovered\\c0a24dbd-1f37-4a3f-bff1-bb23a33c648c\\worker-input.cst; returned=1"
+          ],
+          "injected": {
+            "case": "solver-rejection",
+            "recovery": "new-worker-from-definition"
+          },
+          "closures": [
+            {
+              "session_id": "7afd9ec8-e1db-4311-8d70-3a024f700ee8",
+              "process_state": "exited",
+              "exit_code": 0,
+              "exit_classification": "zero",
+              "model_state": "committed",
+              "task_outcome": "failure",
+              "result_state": "unknown",
+              "disposition": "standard-stop",
+              "standard_closed": true,
+              "needs_recovery": false,
+              "missing_evidence": []
+            },
+            {
+              "session_id": "c0a24dbd-1f37-4a3f-bff1-bb23a33c648c",
+              "process_state": "exited",
+              "exit_code": 0,
+              "exit_classification": "zero",
+              "model_state": "committed",
+              "task_outcome": "success",
+              "result_state": "unknown",
+              "disposition": "standard-stop",
+              "standard_closed": true,
+              "needs_recovery": false,
+              "missing_evidence": []
+            }
+          ]
+        },
+        "cleaned_companions": 7
+      }
+    ],
+    "real_cst": true,
+    "driver_sha256": "e41535452da7e5e6049d0311ccba5fcbd87841945d18798a25361e4b4c2d8fce",
+    "remaining_cst": []
+  },
+  "native_report_path": "artifacts\\public-native-faults-4b92d5c9\\report.json",
+  "standard_closed_sessions": 22,
+  "managed_closures": [
+    {
+      "session_id": "3e8c448b-c945-4e4b-947b-a49cc785bb47",
+      "process_state": "exited",
+      "exit_code": 0,
+      "exit_classification": "zero",
+      "model_state": "prepared",
+      "task_outcome": "cancelled",
+      "result_state": "unknown",
+      "disposition": "standard-stop",
+      "standard_closed": true,
+      "needs_recovery": false,
+      "missing_evidence": []
+    },
+    {
+      "session_id": "55878ac9-d29e-45a7-af5d-075104dc998c",
+      "process_state": "exited",
+      "exit_code": 0,
+      "exit_classification": "zero",
+      "model_state": "restored-saved",
+      "task_outcome": "cancelled",
+      "result_state": "unknown",
+      "disposition": "standard-stop",
+      "standard_closed": true,
+      "needs_recovery": false,
+      "missing_evidence": []
+    },
+    {
+      "session_id": "cbee822b-3656-4a4f-a9f6-42b68466b041",
+      "process_state": "exited",
+      "exit_code": 0,
+      "exit_classification": "zero",
+      "model_state": "committed",
+      "task_outcome": "cancelled",
+      "result_state": "unknown",
+      "disposition": "standard-stop",
+      "standard_closed": true,
+      "needs_recovery": false,
+      "missing_evidence": []
+    },
+    {
+      "session_id": "6a22e03e-99ef-4a7f-ba6a-5095aef19ede",
+      "process_state": "exited",
+      "exit_code": 0,
+      "exit_classification": "zero",
+      "model_state": "committed",
+      "task_outcome": "cancelled",
+      "result_state": "unknown",
+      "disposition": "standard-stop",
+      "standard_closed": true,
+      "needs_recovery": false,
+      "missing_evidence": []
+    },
+    {
+      "session_id": "6acbafbf-9f43-4cf3-abbf-3aed1bccb3c0",
+      "process_state": "exited",
+      "exit_code": 0,
+      "exit_classification": "zero",
+      "model_state": "committed",
+      "task_outcome": "success",
+      "result_state": "unknown",
+      "disposition": "standard-stop",
+      "standard_closed": true,
+      "needs_recovery": false,
+      "missing_evidence": []
+    },
+    {
+      "session_id": "957a1da5-e08f-4e85-b6ab-ff58a24995a6",
+      "process_state": "exited",
+      "exit_code": 0,
+      "exit_classification": "zero",
+      "model_state": "committed",
+      "task_outcome": "success",
+      "result_state": "unknown",
+      "disposition": "standard-stop",
+      "standard_closed": true,
+      "needs_recovery": false,
+      "missing_evidence": []
+    },
+    {
+      "session_id": "fd02a354-9341-4880-9f1e-8a3dda797de5",
+      "process_state": "exited",
+      "exit_code": 0,
+      "exit_classification": "zero",
+      "model_state": "committed",
+      "task_outcome": "success",
+      "result_state": "unknown",
+      "disposition": "standard-stop",
+      "standard_closed": true,
+      "needs_recovery": false,
+      "missing_evidence": []
+    },
+    {
+      "session_id": "045df811-d04b-4317-92af-1e9bd60dae4e",
+      "process_state": "exited",
+      "exit_code": 0,
+      "exit_classification": "zero",
+      "model_state": "committed",
+      "task_outcome": "success",
+      "result_state": "unknown",
+      "disposition": "standard-stop",
+      "standard_closed": true,
+      "needs_recovery": false,
+      "missing_evidence": []
+    },
+    {
+      "session_id": "26708adc-c32a-4221-9052-c45c4a21fedf",
+      "process_state": "exited",
+      "exit_code": 0,
+      "exit_classification": "zero",
+      "model_state": "committed",
+      "task_outcome": "success",
+      "result_state": "unknown",
+      "disposition": "standard-stop",
+      "standard_closed": true,
+      "needs_recovery": false,
+      "missing_evidence": []
+    },
+    {
+      "session_id": "955f14d3-3d3a-47b0-b1ab-e99504bffec9",
+      "process_state": "exited",
+      "exit_code": 0,
+      "exit_classification": "zero",
+      "model_state": "committed",
+      "task_outcome": "success",
+      "result_state": "unknown",
+      "disposition": "standard-stop",
+      "standard_closed": true,
+      "needs_recovery": false,
+      "missing_evidence": []
+    },
+    {
+      "session_id": "af8a3e61-ffa6-4926-a923-ed6e4ec936ef",
+      "process_state": "exited",
+      "exit_code": 0,
+      "exit_classification": "zero",
+      "model_state": "committed",
+      "task_outcome": "success",
+      "result_state": "unknown",
+      "disposition": "standard-stop",
+      "standard_closed": true,
+      "needs_recovery": false,
+      "missing_evidence": []
+    },
+    {
+      "session_id": "bd46803c-a866-4764-aecd-be4715dbf9c7",
+      "process_state": "exited",
+      "exit_code": 0,
+      "exit_classification": "zero",
+      "model_state": "committed",
+      "task_outcome": "success",
+      "result_state": "unknown",
+      "disposition": "standard-stop",
+      "standard_closed": true,
+      "needs_recovery": false,
+      "missing_evidence": []
+    },
+    {
+      "session_id": "9dfeba47-c05f-4f8f-a976-4e7ada9cb5a4",
+      "process_state": "exited",
+      "exit_code": 0,
+      "exit_classification": "zero",
+      "model_state": "committed",
+      "task_outcome": "success",
+      "result_state": "unknown",
+      "disposition": "standard-stop",
+      "standard_closed": true,
+      "needs_recovery": false,
+      "missing_evidence": []
+    },
+    {
+      "session_id": "851667c3-c36f-4f2d-bb88-8c551de79ad5",
+      "process_state": "exited",
+      "exit_code": 0,
+      "exit_classification": "zero",
+      "model_state": "committed",
+      "task_outcome": "success",
+      "result_state": "unknown",
+      "disposition": "standard-stop",
+      "standard_closed": true,
+      "needs_recovery": false,
+      "missing_evidence": []
+    },
+    {
+      "session_id": "7afd9ec8-e1db-4311-8d70-3a024f700ee8",
+      "process_state": "exited",
+      "exit_code": 0,
+      "exit_classification": "zero",
+      "model_state": "committed",
+      "task_outcome": "failure",
+      "result_state": "unknown",
+      "disposition": "standard-stop",
+      "standard_closed": true,
+      "needs_recovery": false,
+      "missing_evidence": []
+    },
+    {
+      "session_id": "c0a24dbd-1f37-4a3f-bff1-bb23a33c648c",
+      "process_state": "exited",
+      "exit_code": 0,
+      "exit_classification": "zero",
+      "model_state": "committed",
+      "task_outcome": "success",
+      "result_state": "unknown",
+      "disposition": "standard-stop",
+      "standard_closed": true,
+      "needs_recovery": false,
+      "missing_evidence": []
+    }
+  ],
+  "g03_sessions": [
+    {
+      "path": "artifacts\\public-native-faults-4b92d5c9\\controller-before-publication\\control\\definitions\\pillbox\\9714b17d747c5d038963c42c4a6e020149c4194ad0329c8c313d931e6e505154\\verification-bdb14cefcc0d4f51ad2901600d7850f3\\reopened\\session-status.json",
+      "exit_confirmed": true,
+      "exit_code": 0
+    },
+    {
+      "path": "artifacts\\public-native-faults-4b92d5c9\\controller-before-publication\\control\\definitions\\pillbox\\9714b17d747c5d038963c42c4a6e020149c4194ad0329c8c313d931e6e505154\\verification-bdb14cefcc0d4f51ad2901600d7850f3\\saved\\session-status.json",
+      "exit_confirmed": true,
+      "exit_code": 0
+    },
+    {
+      "path": "artifacts\\public-native-faults-4b92d5c9\\controller-before-adoption-receipt\\control\\definitions\\pillbox\\9714b17d747c5d038963c42c4a6e020149c4194ad0329c8c313d931e6e505154\\verification-99861119f0c24f379bbb83fc2dc98230\\reopened\\session-status.json",
+      "exit_confirmed": true,
+      "exit_code": 0
+    },
+    {
+      "path": "artifacts\\public-native-faults-4b92d5c9\\controller-before-adoption-receipt\\control\\definitions\\pillbox\\9714b17d747c5d038963c42c4a6e020149c4194ad0329c8c313d931e6e505154\\verification-99861119f0c24f379bbb83fc2dc98230\\saved\\session-status.json",
+      "exit_confirmed": true,
+      "exit_code": 0
+    },
+    {
+      "path": "artifacts\\public-native-faults-4b92d5c9\\solver-rejection\\control\\definitions\\pillbox\\9714b17d747c5d038963c42c4a6e020149c4194ad0329c8c313d931e6e505154\\verification-b9f5559952f24248b8174a499e4d7c94\\reopened\\session-status.json",
+      "exit_confirmed": true,
+      "exit_code": 0
+    },
+    {
+      "path": "artifacts\\public-native-faults-4b92d5c9\\solver-rejection\\control\\definitions\\pillbox\\9714b17d747c5d038963c42c4a6e020149c4194ad0329c8c313d931e6e505154\\verification-b9f5559952f24248b8174a499e4d7c94\\saved\\session-status.json",
+      "exit_confirmed": true,
+      "exit_code": 0
+    }
+  ],
+  "solver_calls": 14,
+  "preserved_interrupted_field_hashes": {
+    "during-solver": {
+      "e1.m3t": "221858eb7cd8cf5b07640284485fca41f1e7e1677834add65997048a2f261af5",
+      "h1.m3t": "4eb7823f3e0b1d93dd467761cf040356e052e7595e9c404221ce0431082a2be7"
+    },
+    "after-solver": {
+      "e1.m3t": "63d01613be6739a1a72fff144c3880bdb4309eeea84f537defdd55d7e4145461",
+      "h1.m3t": "51f4f18234681c06c147faa405614c2b6699e83ff93f8ebad4034a1e7ffb2b81"
+    }
+  },
+  "cleanup": {
+    "final_companions_removed": 51,
+    "pilot_companions_removed": 17,
+    "raw_fields_require_regeneration": true,
+    "lightweight_models_logs_macros_receipts_retained": true,
+    "artifacts_not_guaranteed_in_git": true,
+    "pytest_temporary_directories_removed": true
+  },
+  "pilot": {
+    "path": "artifacts\\public-native-faults-14041e0c",
+    "cases": 4,
+    "note": "solver rejection initially masked by missing native-post.tsv; not final diagnostic acceptance",
+    "failure": {
+      "type": "FileNotFoundError",
+      "error": "[Errno 2] No such file or directory: 'D:\\\\work\\\\cst_tools\\\\artifacts\\\\public-native-faults-14041e0c\\\\solver-rejection\\\\control\\\\runs\\\\fault\\\\workers\\\\single\\\\f98afb01-3ca4-4c2a-92e7-5647fa14532a\\\\native-execution\\\\native-post.tsv'",
+      "safety": "confirmed-closed",
+      "recovery": true
+    }
+  },
+  "solver_rejection": {
+    "type": "ServiceError",
+    "error": "SOLVER_FAILED: SOLVER_FAILED: solver-result failed: number=-2147418113; description=No Eigenmode results that can be read by methods of the \"EigenmodeSolver\" object have been written to the database so far. This is the case for old projects created earlier than 2013.",
+    "safety": "confirmed-closed",
+    "recovery": true
+  },
+  "new_information": [
+    "Start returned 1 without readable modes; GetNumberOfModesCalculated raised SOLVER_FAILED",
+    "The missing-results message mentions pre-2013 projects even for this new test model; not evidence of an old project",
+    "post capture must follow actual mode availability; missing post is secondary to preserved failed completion"
+  ],
+  "remaining": [
+    "Start return 0 and Start itself throwing require separate real evidence",
+    "production Runner exit while CST is solving",
+    "full N01-N25 malformed messages/cancellation/pagination/HTTP/auth extensions"
+  ],
+  "process_observation_at_closeout": [],
+  "source_fingerprints": {
+    "csttool/application_service.py": "e11dee6406dc8ca58279336b9113f2e148a1b080b369ecf7068c3c7bc43bb875",
+    "csttool/managed_cstworker.py": "276cb9205cb6dea4d3f4d1f43a4dc7b3f0b9c04f0aa2057305569d8531439bf9",
+    "test/support/validate_public_faults.py": "e41535452da7e5e6049d0311ccba5fcbd87841945d18798a25361e4b4c2d8fce"
+  },
+  "validation": [
+    {
+      "path": "artifacts/public-driver-regression.xml",
+      "tests": "91",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "44.464"
+    },
+    {
+      "path": "artifacts/public-wire-final.xml",
+      "tests": "13",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "12.546"
+    },
+    {
+      "path": "artifacts/public-driver-docs.xml",
+      "tests": "17",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "33.806"
+    },
+    {
+      "path": "artifacts/public-driver-guards.xml",
+      "tests": "13",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.770"
+    },
+    {
+      "path": "artifacts/public-error-codes.xml",
+      "tests": "52",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "42.735"
+    }
+  ],
+  "source_fingerprints_scope": "closeout disk snapshot; protocol error-category mapping extended after child startup and verified offline; observed SOLVER_FAILED path unchanged",
+  "final_regression": {
+    "passed": 118,
+    "seconds": 103.18,
+    "report": "artifacts/public-driver-closeout.xml",
+    "sdk_and_raw_stdio_passed": 13,
+    "sdk_report": "artifacts/public-wire-final.xml",
+    "registry_valid": true,
+    "calibration_valid": true,
+    "diff_check_passed": true
+  },
+  "closeout_index": {
+    "passed": 2,
+    "seconds": 9.38
+  }
+}

@@ -60,3 +60,40 @@ def test_legacy_calls_are_not_business_compatibility(tmp_path):
             async with Client(server,mode='legacy') as client:
                 await client.list_tools()
     asyncio.run(run())
+
+
+@pytest.mark.parametrize('name,arguments', [
+    ('get_project_status', {'unexpected': True}),
+    ('connect_project', {'client_id': 'caller', 'launch': 'yes'}),
+    ('create_project', {'control_handle': 'bad', 'name': 'new', 'installation_ref': 'local',
+                        'request_id': 'one', 'executable': 'injected.exe'}),
+    ('submit_run', {'control_handle': 'bad', 'document_id': 'doc',
+                    'definition_revision': 'a'*64, 'request_id': 'one', 'parameters': {}}),
+])
+def test_modern_invalid_inputs_are_errors_without_business_dispatch(tmp_path, name, arguments):
+    async def run():
+        FakeClient.calls = []
+        server = create_server(tmp_path, adapter=MCPApplicationAdapter(tmp_path, client_factory=FakeClient))
+        async with Client(server, mode='2026-07-28') as client:
+            result = await client.call_tool(name, arguments)
+            assert result.is_error and result.result_type == 'complete'
+            assert FakeClient.calls == []
+    asyncio.run(run())
+
+
+def test_modern_unicode_payload_and_error_do_not_poison_next_call(tmp_path):
+    class UnicodePeer(FakeClient):
+        def status(self): return {'state': 'IDLE', 'detail': '中文项目\\路径\n下一行'}
+    async def run():
+        server = create_server(tmp_path, adapter=MCPApplicationAdapter(tmp_path, client_factory=UnicodePeer))
+        async with Client(server, mode='2026-07-28') as client:
+            before = await client.list_tools()
+            error = await client.call_tool('submit_run', dict(control_handle='bad', document_id='doc',
+                definition_revision='a'*64, request_id='one'))
+            assert error.is_error
+            result = await client.call_tool('get_project_status', {})
+            assert result.structured_content == {'state': 'IDLE', 'detail': '中文项目\\路径\n下一行'}
+            after = await client.list_tools()
+            assert [t.name for t in before.tools] == [t.name for t in after.tools]
+            assert after.ttl_ms == 0 and after.cache_scope == 'private'
+    asyncio.run(run())

@@ -1945,7 +1945,7 @@
     },
     {
       "id": "F69",
-      "purpose": "真实停止/ACK时序与产物复核",
+      "purpose": "真实停止/ACK时序、公共控制器退出与求解器拒绝串行副本验收",
       "sources": [
         {
           "path": "test/support/validate_stop_ack_l5.py",
@@ -1955,18 +1955,37 @@
             "read_current_completion",
             "verify_timing_reports"
           ]
+        },
+        {
+          "path": "test/support/validate_public_faults.py",
+          "label": "串行监督与公共故障注入",
+          "symbols": [
+            "supervise",
+            "public_case",
+            "reconcile_public",
+            "cleanup_case",
+            "main"
+          ]
         }
       ],
       "tests": [
         {
           "path": "test/stop_ack_l5_test.py",
           "label": "探针契约"
+        },
+        {
+          "path": "test/public_fault_driver_test.py",
+          "label": "串行阻断/归属前提/清理边界"
         }
       ],
       "docs": [
         {
           "path": "docs/stop-ack-l5-acceptance.md",
           "label": "十二时点验收"
+        },
+        {
+          "path": "docs/public-fault-injection.md",
+          "label": "自动注入使用与证据边界"
         }
       ],
       "provenance": "Migrated from maintained feature-index at c083c58; no new semantic or runtime acceptance."
@@ -3271,12 +3290,20 @@
         {
           "path": "test/single_simulation_service_test.py",
           "label": "服务与HTTP假对端"
+        },
+        {
+          "path": "test/public_failure_matrix_test.py",
+          "label": "ACK/采集/发布持久缺口与重建服务故障"
         }
       ],
       "docs": [
         {
           "path": "docs/single-simulation-service.md",
           "label": "接口与G03边界"
+        },
+        {
+          "path": "docs/public-fault-matrix.md",
+          "label": "公共故障矩阵与N01–N25分项覆盖"
         }
       ],
       "provenance": "Migrated from maintained feature-index at c083c58; no new semantic or runtime acceptance."
@@ -3440,6 +3467,10 @@
         {
           "path": "test/mcp_sdk_test.py",
           "label": "官方SDK/stdio"
+        },
+        {
+          "path": "test/mcp_wire_fault_test.py",
+          "label": "原始stdio版本/发现/错误隔离"
         }
       ],
       "docs": [
@@ -3450,6 +3481,14 @@
         {
           "path": "docs/codex-desktop-acceptance-20261103.md",
           "label": "指定Codex桌面正常链验收"
+        },
+        {
+          "path": "docs/public-fault-matrix.md",
+          "label": "公共故障矩阵与N01–N25分项覆盖"
+        },
+        {
+          "path": "docs/public-fault-injection.md",
+          "label": "协议与真实故障分层"
         }
       ],
       "provenance": "Migrated from maintained feature-index at c083c58; no new semantic or runtime acceptance."
@@ -3832,6 +3871,10 @@
         {
           "path": "docs/typed-definition-service.md",
           "label": "结果与恢复"
+        },
+        {
+          "path": "docs/public-fault-matrix.md",
+          "label": "公共故障矩阵与N01–N25分项覆盖"
         }
       ],
       "provenance": "Migrated from maintained feature-index at c083c58; no new semantic or runtime acceptance."
@@ -4142,7 +4185,7 @@
         "date": "2026-11-03",
         "baseline": "2705935",
         "status": "operational-and-applicability-reviewed",
-        "scope": "2026-11-03 W23实施后人工对照：A1独立检查/源图、版本/会话原生检查、XYZ/G03及字符持久化边界；保留原日期证据。；同日桌面正常链以新增验收记录为证，全故障矩阵未完成",
+        "scope": "2026-11-03 W23实施后人工对照：A1独立检查/源图、版本/会话原生检查、XYZ/G03及字符持久化边界；保留原日期证据。；同日桌面正常链以新增验收记录为证，全故障矩阵未完成；复审本批公共故障矩阵和首次恢复DTO修正；复审原生采集移至模式可用之后及原始求解错误优先保留",
         "checked_sources": [
           {
             "path": "docs/current-status.md"
@@ -4155,11 +4198,14 @@
           },
           {
             "path": "knowledge-base/mcp-codex-desktop-20261103.json"
+          },
+          {
+            "path": "knowledge-base/public-fault-matrix-20261103.json"
           }
         ],
         "finding_ids": [],
         "limitations": "只核对本批明确列出的操作语义及适用范围；不重新认证原测量、全部自然语言、外部资料及真实运行行为。",
-        "content_sha256_at_review": "33e9060065efb7a6d2a497cc9b1265b65e3f286f502d9c1159f17613e6e0e3a3"
+        "content_sha256_at_review": "39a6b6cf88f2d4140c7c234c10b13faf207eed82f7bbe674bd64b263a0cb9e0c"
       }
     },
     {
@@ -5800,7 +5846,7 @@
         "date": "2026-11-03",
         "baseline": "2705935",
         "status": "operational-and-applicability-reviewed",
-        "scope": "2026-11-03 W23实施后人工对照：A1独立检查/源图、版本/会话原生检查、XYZ/G03及字符持久化边界；保留原日期证据。；同日桌面正常链以新增验收记录为证，全故障矩阵未完成",
+        "scope": "2026-11-03 W23实施后人工对照：A1独立检查/源图、版本/会话原生检查、XYZ/G03及字符持久化边界；保留原日期证据。；同日桌面正常链以新增验收记录为证，全故障矩阵未完成；复审本批公共故障矩阵和首次恢复DTO修正；同日15个真实受支持场景及剩余Start/Runner边界已核对",
         "checked_sources": [
           {
             "path": "csttool/runner.py"
@@ -5822,6 +5868,12 @@
           },
           {
             "path": "knowledge-base/mcp-codex-desktop-20261103.json"
+          },
+          {
+            "path": "knowledge-base/public-fault-matrix-20261103.json"
+          },
+          {
+            "path": "knowledge-base/public-native-faults-20261103.json"
           }
         ],
         "finding_ids": [
@@ -5829,7 +5881,7 @@
           "S10"
         ],
         "limitations": "重点核对历史堆叠/旧操作语义与责任边界；checked_sources仅列本批主要对照源，不表示每行技术陈述或所有物理/异常分支已验证。",
-        "content_sha256_at_review": "78deed6b9fe83163cb11f7e4f9cf292131f2d30c1c19b069d239bdf1eb770fcf"
+        "content_sha256_at_review": "c7b3ab40cc7da6abfec54bf15acde96147e737c2a462b758c0c0e64bba957383"
       }
     },
     {
@@ -5983,7 +6035,7 @@
         ],
         "finding_ids": [],
         "limitations": "本批逐条静态核对所列源码/保存证据；历史实测及原厂/第三方规范不重新运行或外部认证，不等于完整CST/桌面/物理验收。",
-        "content_sha256_at_review": "ad9a4f0edb1ae719e5c6a503542c9e21d5acfa99a998a90d13c3a15b234b14d4"
+        "content_sha256_at_review": "81d76561c1326847cef55b29538b4b95db7ca10da3a0a083c4c30865156afda7"
       }
     },
     {
@@ -6031,7 +6083,7 @@
         "date": "2026-11-03",
         "baseline": "2705935",
         "status": "operational-and-applicability-reviewed",
-        "scope": "逐门禁对照源码已接入子集及原日期证据；指定桌面/实时工具发现/故障矩阵不升级为已验。；同日桌面正常链以新增验收记录为证，全故障矩阵未完成",
+        "scope": "逐门禁对照源码已接入子集及原日期证据；指定桌面/实时工具发现/故障矩阵不升级为已验。；同日桌面正常链以新增验收记录为证，全故障矩阵未完成；复审本批公共故障矩阵和首次恢复DTO修正；同日15个真实受支持场景及剩余Start/Runner边界已核对",
         "checked_sources": [
           {
             "path": "csttool/mcp_server.py"
@@ -6047,6 +6099,12 @@
           },
           {
             "path": "knowledge-base/mcp-codex-desktop-20261103.json"
+          },
+          {
+            "path": "knowledge-base/public-fault-matrix-20261103.json"
+          },
+          {
+            "path": "knowledge-base/public-native-faults-20261103.json"
           }
         ],
         "finding_ids": [
@@ -6054,7 +6112,7 @@
           "S10"
         ],
         "limitations": "本批逐条静态核对所列源码/保存证据；历史实测及原厂/第三方规范不重新运行或外部认证，不等于完整CST/桌面/物理验收。",
-        "content_sha256_at_review": "5cd5d8e04b63aadd04968e6ee1ceb9897214e56348b537dde61f40a8f29023cd"
+        "content_sha256_at_review": "df656ed65183b876c8f1b895b1994ee3122073e56c603e23f936afe5f5e9abf9"
       }
     },
     {
@@ -6755,13 +6813,17 @@
         "date": "2026-11-03",
         "baseline": "2705935",
         "status": "design-scope-reviewed",
-        "scope": "旧语义与现行执行的适用性、历史记录堆叠及操作/证据边界",
-        "checked_sources": [],
+        "scope": "旧语义与现行执行的适用性、历史记录堆叠及操作/证据边界；复审本批公共故障矩阵和首次恢复DTO修正",
+        "checked_sources": [
+          {
+            "path": "knowledge-base/public-fault-matrix-20261103.json"
+          }
+        ],
         "finding_ids": [
           "S15"
         ],
         "limitations": "核对作用范围与现行接口分离；原方案、伪代码、外部来源及公式示例不认证为当前生产行为，未重新逐源联网验证。",
-        "content_sha256_at_review": "8f2c8a384c0e0f5a95f998f3e5904a4f952872c06961c257c97af48e5f013ac3"
+        "content_sha256_at_review": "bc283c14c6a06f1fc6c2ee58aae8c87211aa335549f18266e42487ca03312342"
       }
     },
     {
@@ -6838,7 +6900,7 @@
         "date": "2026-11-03",
         "baseline": "2705935",
         "status": "operational-and-applicability-reviewed",
-        "scope": "2026-11-03 W23实施后人工对照：A1独立检查/源图、版本/会话原生检查、XYZ/G03及字符持久化边界；保留原日期证据。；同日桌面正常链以新增验收记录为证，全故障矩阵未完成",
+        "scope": "2026-11-03 W23实施后人工对照：A1独立检查/源图、版本/会话原生检查、XYZ/G03及字符持久化边界；保留原日期证据。；同日桌面正常链以新增验收记录为证，全故障矩阵未完成；复审本批公共故障矩阵和首次恢复DTO修正；同日15个真实受支持场景及剩余Start/Runner边界已核对",
         "checked_sources": [
           {
             "path": "csttool/mcp_server.py"
@@ -6854,13 +6916,19 @@
           },
           {
             "path": "knowledge-base/mcp-codex-desktop-20261103.json"
+          },
+          {
+            "path": "knowledge-base/public-fault-matrix-20261103.json"
+          },
+          {
+            "path": "knowledge-base/public-native-faults-20261103.json"
           }
         ],
         "finding_ids": [
           "S01"
         ],
         "limitations": "重点核对历史堆叠/旧操作语义与责任边界；checked_sources仅列本批主要对照源，不表示每行技术陈述或所有物理/异常分支已验证。",
-        "content_sha256_at_review": "cfaf82eca180b12b2fbdb554a8368d887528c9eadbce5b4e2bd371cf1b019bb1"
+        "content_sha256_at_review": "bb1d8a1b659c090b719951515ca3b159ec9452f7bfa35e37e58e8a8d5a2eee29"
       }
     },
     {
@@ -6976,7 +7044,7 @@
         "date": "2026-11-03",
         "baseline": "2705935",
         "status": "operational-and-applicability-reviewed",
-        "scope": "核对prepare/render/finalize、nonce帧/DB/安装绑定、幂等顺序和公共接线；修正公共接入仍待实施的旧断言。",
+        "scope": "核对prepare/render/finalize、nonce帧/DB/安装绑定、幂等顺序和公共接线；修正公共接入仍待实施的旧断言。；复审原生采集移至模式可用之后及原始求解错误优先保留",
         "checked_sources": [
           {
             "path": "csttool/native_execution_capture.py"
@@ -6996,7 +7064,7 @@
           "S16"
         ],
         "limitations": "本批逐条静态核对所列源码/保存证据；历史实测及原厂/第三方规范不重新运行或外部认证，不等于完整CST/桌面/物理验收。",
-        "content_sha256_at_review": "cb9a0b0c293a1589af9da1b7f9c951ff9a1626b9e4d70370dd9c9deea8036e94"
+        "content_sha256_at_review": "3a16827491f2386947f020ad5c9e08be7d1aede4214637a5f3efb0a83a17e334"
       }
     },
     {
@@ -7556,7 +7624,7 @@
         "date": "2026-11-03",
         "baseline": "2705935",
         "status": "operational-and-applicability-reviewed",
-        "scope": "旧语义与现行执行的适用性、历史记录堆叠及操作/证据边界",
+        "scope": "旧语义与现行执行的适用性、历史记录堆叠及操作/证据边界；复审本批公共故障矩阵和首次恢复DTO修正；复审原生采集移至模式可用之后及原始求解错误优先保留；同日15个真实受支持场景及剩余Start/Runner边界已核对",
         "checked_sources": [
           {
             "path": "csttool/application_service.py"
@@ -7569,13 +7637,19 @@
           },
           {
             "path": "csttool/definition_editing.py"
+          },
+          {
+            "path": "knowledge-base/public-fault-matrix-20261103.json"
+          },
+          {
+            "path": "knowledge-base/public-native-faults-20261103.json"
           }
         ],
         "finding_ids": [
           "S09"
         ],
         "limitations": "重点核对历史堆叠/旧操作语义与责任边界；checked_sources仅列本批主要对照源，不表示每行技术陈述或所有物理/异常分支已验证。",
-        "content_sha256_at_review": "543ae4797079112742a0119997ce4a7523d2e6d1ceb01878fe4886e6b3756650"
+        "content_sha256_at_review": "ca6053711ae59fe1c75ff9599fc81554b8d6f3b1cc15991c7cc096710128f22b"
       }
     },
     {
@@ -8807,6 +8881,73 @@
         "finding_ids": [],
         "limitations": "不覆盖N01–N25、XYZ求解、复杂几何、远程或全COMSOL能力",
         "content_sha256_at_review": "f0599179862dc3da38b47ba82d4e1f6f84e9532a5d8fb669f6906717f0ba4c06"
+      }
+    },
+    {
+      "path": "docs/public-fault-matrix.md",
+      "role": "current-reference",
+      "authority": "current-defined-scope-only",
+      "provenance": "57ccb32后公共故障矩阵与对应测试",
+      "review": {
+        "date": "2026-11-03",
+        "baseline": "57ccb32",
+        "status": "operational-and-applicability-reviewed",
+        "scope": "G03/G04/G08故障测试及N01–N25分项覆盖，不整体认证；复审原生采集移至模式可用之后及原始求解错误优先保留；同日15个真实受支持场景及剩余Start/Runner边界已核对",
+        "checked_sources": [
+          {
+            "path": "csttool/application_service.py"
+          },
+          {
+            "path": "test/public_failure_matrix_test.py"
+          },
+          {
+            "path": "test/mcp_sdk_test.py"
+          },
+          {
+            "path": "knowledge-base/public-fault-matrix-20261103.json"
+          },
+          {
+            "path": "knowledge-base/public-native-faults-20261103.json"
+          }
+        ],
+        "finding_ids": [],
+        "limitations": "离线注入/假任务子进程不等于真实CST失败和所有协议矩阵",
+        "content_sha256_at_review": "e7cf71537ae3ab202f559869659ce84e5e50c63149a4d0bd7d15e1c58d02dc3e"
+      }
+    },
+    {
+      "path": "docs/public-fault-injection.md",
+      "role": "current-reference",
+      "authority": "current-defined-scope-only",
+      "provenance": "串行监督工具、原生时序与公共单次服务实现逐项核对",
+      "review": {
+        "date": "2026-11-03",
+        "baseline": "57ccb32",
+        "status": "operational-and-applicability-reviewed",
+        "scope": "15场景驱动/默认只读/子进程归属/退出及清理边界；不声明全部实际通过；同日15个真实受支持场景及剩余Start/Runner边界已核对",
+        "checked_sources": [
+          {
+            "path": "test/support/validate_public_faults.py"
+          },
+          {
+            "path": "test/support/validate_stop_ack_l5.py"
+          },
+          {
+            "path": "test/mcp_wire_fault_test.py"
+          },
+          {
+            "path": "csttool/managed_cstworker.py"
+          },
+          {
+            "path": "csttool/application_service.py"
+          },
+          {
+            "path": "knowledge-base/public-native-faults-20261103.json"
+          }
+        ],
+        "finding_ids": [],
+        "limitations": "真实结果在同日轻量证据中分批记录；不把旧结果或Fake当新原生验收",
+        "content_sha256_at_review": "e11f7b85614396714312b44669b6c0142b2e3c49673cb29b1b89552d07df5fc6"
       }
     }
   ],
@@ -10165,6 +10306,36 @@
       "review_status": "manually-reviewed-owned-copy-no-solver",
       "unknown": "部分属性故障为明确注入，不冒充自然CST setter失败；不是完整语言/全部弹窗/初始化证明。",
       "evidence": "2026-11-03静态复核main/negative：exclusive_probe→持有对象构造→既有G03；require_closed阻断后续未确认退出，源码前后hash不变才允许写门禁。"
+    },
+    {
+      "path": "test/support/validate_public_faults.py",
+      "entry_kind": "python-main",
+      "main_guard": true,
+      "observed_arguments": [
+        "--case",
+        "--child",
+        "--cst-exe",
+        "--keep-raw",
+        "--root",
+        "--run-cst",
+        "--source"
+      ],
+      "argument_discovery": "AST literals only; internal child flags guarded by parent intent",
+      "purpose": "Serial owned-CST fault supervision, read-only plan by default",
+      "effect": "--run-cst启动串行受控副本及求解，测试子进程在发布/采用边界os._exit；不终止CST。默认标准关闭后删除本例伴随场/网格，保留轻量工程/宏/日志/hash；--keep-raw保留。",
+      "authorization": "只有明确授权真实故障验收时执行--run-cst；默认仅计划；不得更改原工程或用强杀CST代替正常关闭。",
+      "arguments": [
+        "--case",
+        "--child",
+        "--cst-exe",
+        "--keep-raw",
+        "--root",
+        "--run-cst",
+        "--source"
+      ],
+      "review_status": "entry-and-direct-delegates-reviewed",
+      "unknown": "不是全部CST故障/许可弹窗/协议符合性证明，求解中控制器进程死亡仍需独立校准。",
+      "evidence": "2026-11-03人工核对main/父意图/串行监督、run_timing、ApplicationService/G03/Managed、突然退出及副本清理路径；运行证据另记录。"
     }
   ],
   "relations": [
@@ -10435,7 +10606,7 @@
       "trigger": "operation、run_kind及executor_factory is LocalExecution决定单次/定义/恢复/批量分支。",
       "lifecycle": "Runner后台worker线程；共享stop_intent和状态更新。",
       "cleanup": "finally调用executor.close；lifecycle_facts可调用时采集事实；异常保留RECOVERY_REQUIRED。",
-      "evidence": "2026-11-03人工静态核对source/targets；对应文件hash见source_fingerprints。登记、默认分支或注册不证明实际运行/清理成功。",
+      "evidence": "2026-11-03人工静态核对source/targets；对应文件hash见source_fingerprints。登记、默认分支或注册不证明实际运行/清理成功。；2026-11-03复审执行/恢复分支未变，reconcile_simulation首次补写后统一从持久结果读取DTO；public_failure_matrix_test核对重复恢复不派发和采用幂等。；2026-11-03复审：公共失败回执保留SOLVER_FAILED，成功采集移至Start返回/模式可用门禁之后，Worker停止/清理分支及责任未变；原生故障验收单独留证。；失败分类复审：保留已知协议码，未知TASK_FAILED；真实SOLVER_FAILED与其它离线分类证据分开。",
       "unknown": "注入executor_factory及getattr生命周期探针不能静态唯一解析；close返回不等于CST安全。",
       "consumers": []
     },
@@ -10475,7 +10646,7 @@
       "trigger": "_worker_factory(worker_id,config,logger)；应用默认配置传ManagedCSTWorker.create。",
       "lifecycle": "Manager槽位生命周期；worker ID启动失败也保留分配。",
       "cleanup": "CSTManager.stop调用slot.worker.stop并汇总错误；实际实现由工厂决定。",
-      "evidence": "2026-11-03人工静态核对source/targets；对应文件hash见source_fingerprints。登记、默认分支或注册不证明实际运行/清理成功。",
+      "evidence": "2026-11-03人工静态核对source/targets；对应文件hash见source_fingerprints。登记、默认分支或注册不证明实际运行/清理成功。；2026-11-03复审：公共失败回执保留SOLVER_FAILED，成功采集移至Start返回/模式可用门禁之后，Worker停止/清理分支及责任未变；原生故障验收单独留证。",
       "unknown": "测试/用户工厂可能不同；默认目标不是所有注入对象的证明。",
       "consumers": [
         {
@@ -10539,7 +10710,7 @@
       "trigger": "Python先写received/RunStore事件，再ACK；VBA读ACK、写accepted回执后删task/completion/ack。",
       "lifecycle": "文件协议以task/session关联；ACK等待可能遇到停止或阻断。",
       "cleanup": "Python等待ready/retiring；VBA失败或停止保留可恢复证据。",
-      "evidence": "2026-11-03人工静态核对source/targets；对应文件hash见source_fingerprints。登记、默认分支或注册不证明实际运行/清理成功。",
+      "evidence": "2026-11-03人工静态核对source/targets；对应文件hash见source_fingerprints。登记、默认分支或注册不证明实际运行/清理成功。；2026-11-03复审：公共失败回执保留SOLVER_FAILED，成功采集移至Start返回/模式可用门禁之后，Worker停止/清理分支及责任未变；原生故障验收单独留证。；失败分类复审：保留已知协议码，未知TASK_FAILED；真实SOLVER_FAILED与其它离线分类证据分开。",
       "unknown": "跨语言注册只描述源码顺序；原子性、磁盘故障及实际收尾需协议验收。",
       "consumers": []
     },
@@ -10567,7 +10738,7 @@
       "trigger": "request_stop后共享有界收尾期限，核对close回执/StopAck/进程状态。",
       "lifecycle": "本worker已核身份的原生会话；不处理无关实例。",
       "cleanup": "标准收尾确认才报告关闭；失败保留诊断和恢复状态，不自动强杀。",
-      "evidence": "2026-11-03人工静态核对source/targets；对应文件hash见source_fingerprints。登记、默认分支或注册不证明实际运行/清理成功。",
+      "evidence": "2026-11-03人工静态核对source/targets；对应文件hash见source_fingerprints。登记、默认分支或注册不证明实际运行/清理成功。；2026-11-03复审：公共失败回执保留SOLVER_FAILED，成功采集移至Start返回/模式可用门禁之后，Worker停止/清理分支及责任未变；原生故障验收单独留证。",
       "unknown": "模板CloseSession及Python读取之间存在跨进程时序；无回执不能推断未保存。",
       "consumers": []
     },
@@ -10794,6 +10965,42 @@
       "evidence": "2026-11-03 W23人工复审最终源码/调用点：版本门禁、默认generated_a1注入、最终映射hash、持有对象正常退出责任；知识库winwrap-w23-20261103原生12会话及故障样本。R020不是安全签名，R021的部分失败为明确注入。",
       "unknown": "不是自然求解失败、任意CST setter或全部生命周期故障证明。",
       "consumers": []
+    },
+    {
+      "id": "R022",
+      "source": {
+        "path": "test/support/validate_public_faults.py",
+        "symbol": "supervise"
+      },
+      "targets": [
+        {
+          "path": "test/support/validate_public_faults.py",
+          "symbol": "main"
+        },
+        {
+          "path": "test/support/validate_public_faults.py",
+          "symbol": "public_case"
+        },
+        {
+          "path": "test/support/validate_public_faults.py",
+          "symbol": "reconcile_public"
+        },
+        {
+          "path": "test/support/validate_public_faults.py",
+          "symbol": "cleanup_case"
+        },
+        {
+          "path": "test/support/validate_stop_ack_l5.py",
+          "symbol": "run_timing"
+        }
+      ],
+      "type": "owned-fault-supervision",
+      "trigger": "显式--run-cst；父进程持锁逐例派发，子进程父PID/源hash/安装/路径核对。",
+      "lifecycle": "独立父监督与测试子控制器；子控制器可在已关闭CST后的发布边界os._exit(91)，父进程继续对账。",
+      "cleanup": "CST沿正常stop；退出不明/残留即阻断；关闭核验后删除本例未跟踪伴随文件，保留轻量证据。",
+      "evidence": "2026-11-03逐调用静态复审，driver单元测试覆盖串行和阻断；真实报告限定其实际场景。；artifacts/public-native-faults-4b92d5c9最终15例、22标准关闭会话；清理51个伴随目录，见knowledge-base/public-native-faults-20261103.json。",
+      "unknown": "测试业务控制器突然退出不等于生产Runner求解中死亡，也不是全MCP协议矩阵。",
+      "consumers": []
     }
   ],
   "source_fingerprints": {
@@ -10812,7 +11019,7 @@
     "GUI/session_store.py": "bb458322e74866674295934e569085a19b5a084dea2ee0afbcb0cd35e2d63c22",
     "csttool/acceptance_session.py": "7a08444bdc9917cde0f20e60a92694cace80088025066a29abebf63d892ab74c",
     "csttool/application_backend.py": "b8c68227c0a7b682b5455ad0aecd059d12f6fc92d5a545c0d95a2ef6beae556c",
-    "csttool/application_service.py": "a5e5a8f1e2789affad8eea0a63b48a1c84b7155d4b53e4726bce8d24773538e1",
+    "csttool/application_service.py": "e11dee6406dc8ca58279336b9113f2e148a1b080b369ecf7068c3c7bc43bb875",
     "csttool/checkpoint_adoption.py": "e0c9479b6efc982074f3b760a053ce8274b0c707f3c525e919aabd96200f54ce",
     "csttool/close_receipt.py": "12de980b1687fc0c68a5aab73853ce9739777339a0f3c59f6aaa5638db62a1ef",
     "csttool/close_receipt_contract.py": "6be66ba28ec6f9e78a63283c4b64717c01382f4e60495d8cae3e66cbf1528709",
@@ -10837,7 +11044,7 @@
     "csttool/lifecycle_diagnostics.py": "d6590e190a0449759cd919fbcffef6f456be562ca242087c9845845ececd4622",
     "csttool/log_event_index.py": "58ffd1eca39d040200de6549a88ee59de5526d496eeb53e03da7f158091c08bd",
     "csttool/logging_config.py": "b664595865c6530dbb448aded381fe96b436a2138cde424e5648d9e6a416ec37",
-    "csttool/managed_cstworker.py": "c0458011cfdf4445b4d04fff7b44f71b81214301a7eaf284ff1b00bf5079e39c",
+    "csttool/managed_cstworker.py": "276cb9205cb6dea4d3f4d1f43a4dc7b3f0b9c04f0aa2057305569d8531439bf9",
     "csttool/managed_session_recovery.py": "1a84a69e85a43457039af1059a15cb25ac8553849896ae0b787f369fafb3e999",
     "csttool/mcp_server.py": "cc1dc1a73eb34028ab961cd4cde0eca9e7f54bea56cfdcfccaaa4bff701a294a",
     "csttool/native_definition_builder.py": "7128e5bfd84d8bbad401eaf033c77daaa80828385bf331c50aae6e99039bbe27",
@@ -10884,7 +11091,7 @@
     "test/support/validate_pillbox_cross_mesh.py": "5d2782afd26b774cef768215ec43d253acc9863ad2d9b0cf691d4ba2012e4477",
     "test/support/validate_recovery_faults.py": "60c8007d588bb3a77157beba4aff6e4b96c0a36a167037d8fe18d5b6b047a110",
     "test/support/validate_single_simulation.py": "59dea033104f911439c9e72baf976537c1d75b80346fc52a4ec1fac21d81f10f",
-    "test/support/validate_stop_ack_l5.py": "323075132058005dd9817b2187ef1e1d1898572a46a159a25027ea037c205767",
+    "test/support/validate_stop_ack_l5.py": "dcae53197a210d5469fb0eb3322f5cd6e74223b86319bd0f3756218ba9c04c73",
     "test/support/validate_winwrap_noui.py": "ff6eb6f6d2f17ba62296a534db1430db0ea93a1e12db1bb3e50484c2acac1a94",
     "scripts/project_inspect.py": "57658c9fdbd6af0fbebda0b03480003e0460c5a989fef284ee7d3ec8c3b3f6d3",
     "base_WTC.py": "440ac8ac53479a40affcd3f84c46cbbf8ddafd8b7ddc14ac1bad22c8ec616235",
@@ -10936,7 +11143,8 @@
     "csttool/winwrap_emitter.py": "1fa6396327f909c5aa40dca5c53415fd2138aaf325003d2950d9c736d4cdd3a7",
     "test/support/calibrate_winwrap_calls.py": "8ca3d86870b070d8e9f1c47213d372aba2e74fff49fbc918bd101e213901614d",
     "csttool/winwrap_checks.py": "260549d041ce4cfcbe6221c81cc56917fffc123f07bc6d8da04036dba914a117",
-    "test/support/calibrate_winwrap_gate.py": "4a474da4e534443129f6b4e769a32fea3003e2a8e7f5b74925af9995385fa458"
+    "test/support/calibrate_winwrap_gate.py": "4a474da4e534443129f6b4e769a32fea3003e2a8e7f5b74925af9995385fa458",
+    "test/support/validate_public_faults.py": "e41535452da7e5e6049d0311ccba5fcbd87841945d18798a25361e4b4c2d8fce"
   },
   "registry_policy": {
     "enforce_tool_scope": true,

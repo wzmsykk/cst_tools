@@ -18,6 +18,10 @@
 
 当前状态是进度入口，API文档描述已实现接口，设计契约描述目标；历史验收只证明其记录的版本/场景。旧文档不以删除来消除矛盾，而是归档并保留来源链接。artifacts原始数据不保证随Git迁移；知识库区分文档定义、实测、推测和未完成项。
 
+真实副本自动时序/控制器故障注入：[串行驱动与边界](public-fault-injection.md)。
+
+公共故障与N01–N25覆盖入口：[故障矩阵](public-fault-matrix.md)。
+
 本轮执行入口：[G01–G08逐项推进、SDK接入与恢复验收](g01-g08-progress.md)。
 
 G02首子集：[空工程创建、不可变文档与官方Python ABI](project-creation-service.md)。

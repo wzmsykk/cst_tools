@@ -68,13 +68,13 @@ def read_current_completion(worker, task):
     return value
 
 
-def run_timing(executable, source, root, point):
-    root.mkdir(parents=True)
+def run_timing(executable, source, root, point, *, fmin=500, fmax=800):
+    root.mkdir(parents=True, exist_ok=True)
     config = _config(root, '0', executable, source)
     pps = [dict(resultName='frequency', method='Frequency', params=dict(iModeNumber=1))]
     config['postProcess'] = pps
     fingerprint = file_hash(source) + ':frequency-v1'
-    params = dict(nmodes=1, fmin=500, fmax=800)
+    params = dict(nmodes=1, fmin=fmin, fmax=fmax)
     report = dict(point=point, source_sha256=file_hash(source), passed=False,
                   scheduling='test-only gate' if point not in {'during-solver', 'received-before-ack', 'ready-before-adopt'} else 'native observation')
     worker = None
@@ -129,7 +129,7 @@ def run_timing(executable, source, root, point):
             assert candidate is not None, 'completed solve was not available for reconciliation'
             receipt_path, receipt = candidate
             report['frequency'] = receipt['postprocess'][0]['value']
-            assert 500 <= float(report['frequency']) <= 800
+            assert fmin <= float(report['frequency']) <= fmax
             # Use the real Manager idempotent adoption method without creating a pool.
             from csttool.cstmanager import CSTManager
             manager = CSTManager.__new__(CSTManager)

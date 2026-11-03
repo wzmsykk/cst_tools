@@ -462,7 +462,9 @@ class ApplicationService:
             if published is not None:
                 self._mark_received_adopted(store,received,intent)
                 return published
-            return self._publish_result(store,received,capture)
+            self._publish_result(store,received,capture)
+            # Recovery has the same public DTO on first repair and later reads.
+            return self.get_simulation_results(run_id)
         finally:lock.release()
 
     def _mark_received_adopted(self,store,received,intent):
@@ -607,6 +609,13 @@ class SingleSimulationExecution:
                     or protocol_receipt.get('status')!=result.status or protocol_receipt.get('postprocess')!=result.postprocess
                     or protocol_receipt.get('session_id')!=identity['session_id']):
                 raise ServiceError('RESULT_INVALID','protocol result does not match acknowledged task')
+            if result.status != 'Success':
+                from .runtime_protocol import ErrorCode
+                failure = str(result.failure or protocol_receipt.get('failure') or
+                    'CST task failed; inspect the preserved completion and lifecycle evidence')
+                code = failure.partition(':')[0]
+                if code not in {item.value for item in ErrorCode}: code = 'TASK_FAILED'
+                raise ServiceError(code, failure)
             expected_snapshot=protocol_receipt.get('snapshot_sha256')
             if result.status=='Success' and (not result.snapshot or _sha(Path(result.snapshot))!=expected_snapshot):
                 raise ServiceError('RESULT_INVALID','snapshot differs from the acknowledged receipt')

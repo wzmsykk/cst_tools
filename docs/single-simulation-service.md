@@ -4,6 +4,8 @@
 
 后端从冻结definition.cst复制，不复制同名结果目录；两个串行batch会话分别保存、退出，以及从保存后的.cst重新打开、再保存退出。每阶段在已加载3D Model.run中调用Save、GetOwnProject作用域下已有工程的全局身份/单位/频率读回接口，无OpenFile、参数写入、AddToHistory、Rebuild或Solver.Start。核对CST 2022大版本、精确副本路径、HF Eigenmode、mm/MHz、Tet及频率范围。频率读回按已校准六位有效数字容差；有效历史投影及精确表达式/参数JSON必须与冻结定义一致。方法、模式数、目标开关和自适应等以保存重开后的完整允许表历史为定义证明；不将不存在的live getter或旧执行DB伪装为证明，实际执行配置仍由B3独立核验。
 
+公共失败completion已确认时优先保留原协议错误码和failure，未知错误码使用TASK_FAILED；成功结果采集在Start返回及模式可用门禁之后。没有post帧不会将原始求解失败替换为FileNotFoundError，关闭和恢复事实仍独立判断。自动时序与控制器注入见[驱动说明](public-fault-injection.md)。
+
 只有每次完成nonce、无宏错误、退出码0、归属进程全部退出、保存后设置和表达式未变、安装hash及源hash未变，才生成四组G03门禁。验证记录及宏/日志/状态位于定义目录verification-<id>；文件夹ID由definition.json的verification.diagnostics映射。失败不更新ready，不强杀；前次会话退出未确认则禁止重试，需要核实session-status及现场进程后对账。当前验证会话已纳入项目恢复及退出核验，GUI生命周期文本显示G03；恢复仅等待正常退出或记录已退出但未验证成功，不授予ready。GUI验证按钮、HTTP验证命令和真实中断矩阵仍待完成。
 
 
@@ -17,7 +19,7 @@
 |inspect_definition / preflight|只读校验完整性、元数据摘要、project/document/revision、安装及G03状态，不启动CST|
 |execute_simulation(payload, run_id, stop, update)|仅构造Runner执行适配器；在Runner线程run时获取现有项目锁并启动Managed Worker|
 |get_simulation_results(run_id, result_revision=None)|只读已采用结果及稳定内容revision，核对接收记录与快照hash；缺结果RESULT_NOT_READY，旧revision RESULT_CHANGED|
-|reconcile_simulation(run_id)|所有者仅补写已ACK/标准关闭/原生匹配的已收取结果，不调用Worker或Solver|
+|reconcile_simulation(run_id)|所有者仅补写已ACK/标准关闭/原生匹配的已收取结果，不调用Worker或Solver；首次修复与再次读取均返回含result_revision的公共DTO|
 
 Loopback Runner继续使用Bearer认证、client_id控制租约、request_id幂等和既有命令记录：
 
