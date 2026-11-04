@@ -4532,9 +4532,17 @@
         {
           "path": "knowledge-base/geometry-production-20261104.json",
           "label": "当前原生/SDK/离线轻量证据"
+        },
+        {
+          "path": "docs/codex-desktop-geometry-20261104.md",
+          "label": "指定Codex桌面GEO正常链"
+        },
+        {
+          "path": "knowledge-base/mcp-codex-geometry-20261104.json",
+          "label": "桌面原生及退出轻量证据"
         }
       ],
-      "provenance": "2026-11-04 GEO-1/1.1离线契约及GEO-2–4同一底层实现；当前源版本独立GEO校准及XYZ真实小网格通过，见geometry-calibration-20261104。旧离线阶段和A1记录不自动认证当前代码；A1旧许可未更新；桌面新签名对话验收独立。"
+      "provenance": "2026-11-04 GEO-1/1.1离线契约及GEO-2–4同一底层实现；当前源版本独立GEO校准及XYZ真实小网格通过，见geometry-calibration-20261104。旧离线阶段和A1记录不自动认证当前代码；A1旧许可未更新；桌面新签名对话验收独立。 2026-11-04后续当前Codex桌面14工具实际GEO正常链通过，保存/提交/导出幂等重试与一次Start、正常收尾独立核验；不是SDK替代或完整故障矩阵。"
     }
   ],
   "documents": [
@@ -4587,21 +4595,21 @@
       "provenance": "D3人工确认维护职责；不授予运行验收。",
       "review": {
         "date": "2026-11-04",
-        "baseline": "f755505",
+        "baseline": "b11ecab",
         "status": "operational-and-applicability-reviewed",
-        "scope": "GEO-2–4当前profile、实际保存/原生观察、公开签名、许可分离及失败/取消/恢复；早期离线章节明确为历史快照。",
+        "scope": "桌面实际工具调用与受限GEO保存/求解/幂等/退出证据；现行状态和旧SDK批次分层。",
         "checked_sources": [
           {
-            "path": "csttool/history_program.py"
+            "path": "knowledge-base/mcp-codex-geometry-20261104.json"
           },
           {
-            "path": "csttool/managed_history.py"
+            "path": "csttool/mcp_server.py"
           },
           {
             "path": "csttool/definition_editing.py"
           },
           {
-            "path": "csttool/definition_geometry.py"
+            "path": "csttool/managed_history.py"
           },
           {
             "path": "csttool/definition_verifier.py"
@@ -4610,18 +4618,12 @@
             "path": "csttool/definition_sessions.py"
           },
           {
-            "path": "csttool/application_service.py"
-          },
-          {
-            "path": "test/geometry_publication_test.py"
-          },
-          {
-            "path": "knowledge-base/geometry-calibration-20261104.json"
+            "path": "csttool/runner_client.py"
           }
         ],
         "finding_ids": [],
-        "limitations": "不追认旧测试为当前代码验收；不是任意CAD/多材料/模式身份/网格收敛或桌面新签名对话验收；A1旧许可保留失效。",
-        "content_sha256_at_review": "98aba0ff333cdbb8c6f1a5195260ed55f1aa35ed601afad71d80f7a68ee356a6"
+        "limitations": "初始连接就绪超时根因未定；沙箱进程枚举遗漏不证明不存在；不是全故障/网格收敛/复杂CAD或全部CST服务退出。",
+        "content_sha256_at_review": "9842c75bfee523e99036e0eb53c06eee4f748ed3e1962f7aa20366e3e660fdbc"
       }
     },
     {
@@ -6292,21 +6294,21 @@
       "provenance": "D3人工确认维护职责；不授予运行验收。",
       "review": {
         "date": "2026-11-04",
-        "baseline": "f755505",
+        "baseline": "b11ecab",
         "status": "operational-and-applicability-reviewed",
-        "scope": "GEO-2–4当前profile、实际保存/原生观察、公开签名、许可分离及失败/取消/恢复；早期离线章节明确为历史快照。",
+        "scope": "桌面实际工具调用与受限GEO保存/求解/幂等/退出证据；现行状态和旧SDK批次分层。",
         "checked_sources": [
           {
-            "path": "csttool/history_program.py"
+            "path": "knowledge-base/mcp-codex-geometry-20261104.json"
           },
           {
-            "path": "csttool/managed_history.py"
+            "path": "csttool/mcp_server.py"
           },
           {
             "path": "csttool/definition_editing.py"
           },
           {
-            "path": "csttool/definition_geometry.py"
+            "path": "csttool/managed_history.py"
           },
           {
             "path": "csttool/definition_verifier.py"
@@ -6315,18 +6317,12 @@
             "path": "csttool/definition_sessions.py"
           },
           {
-            "path": "csttool/application_service.py"
-          },
-          {
-            "path": "test/geometry_publication_test.py"
-          },
-          {
-            "path": "knowledge-base/geometry-calibration-20261104.json"
+            "path": "csttool/runner_client.py"
           }
         ],
         "finding_ids": [],
-        "limitations": "不追认旧测试为当前代码验收；不是任意CAD/多材料/模式身份/网格收敛或桌面新签名对话验收；A1旧许可保留失效。",
-        "content_sha256_at_review": "88937765f9c36300904ed8ccb7d4efb6eb07593222d89d163b9ed51a942e53c4"
+        "limitations": "初始连接就绪超时根因未定；沙箱进程枚举遗漏不证明不存在；不是全故障/网格收敛/复杂CAD或全部CST服务退出。",
+        "content_sha256_at_review": "7aaeb07737ab0c3b5da471c57db77729973f6888663b02338a582246f5cf082b"
       }
     },
     {
@@ -7373,21 +7369,21 @@
       "provenance": "D3人工确认维护职责；不授予运行验收。",
       "review": {
         "date": "2026-11-04",
-        "baseline": "f755505",
+        "baseline": "b11ecab",
         "status": "operational-and-applicability-reviewed",
-        "scope": "GEO-2–4当前profile、实际保存/原生观察、公开签名、许可分离及失败/取消/恢复；早期离线章节明确为历史快照。",
+        "scope": "桌面实际工具调用与受限GEO保存/求解/幂等/退出证据；现行状态和旧SDK批次分层。",
         "checked_sources": [
           {
-            "path": "csttool/history_program.py"
+            "path": "knowledge-base/mcp-codex-geometry-20261104.json"
           },
           {
-            "path": "csttool/managed_history.py"
+            "path": "csttool/mcp_server.py"
           },
           {
             "path": "csttool/definition_editing.py"
           },
           {
-            "path": "csttool/definition_geometry.py"
+            "path": "csttool/managed_history.py"
           },
           {
             "path": "csttool/definition_verifier.py"
@@ -7396,18 +7392,12 @@
             "path": "csttool/definition_sessions.py"
           },
           {
-            "path": "csttool/application_service.py"
-          },
-          {
-            "path": "test/geometry_publication_test.py"
-          },
-          {
-            "path": "knowledge-base/geometry-calibration-20261104.json"
+            "path": "csttool/runner_client.py"
           }
         ],
         "finding_ids": [],
-        "limitations": "不追认旧测试为当前代码验收；不是任意CAD/多材料/模式身份/网格收敛或桌面新签名对话验收；A1旧许可保留失效。",
-        "content_sha256_at_review": "1030e6a4ebe4221088e17464b37c2e4fad56898d0dbe8eddfc0e9096075f59b1"
+        "limitations": "初始连接就绪超时根因未定；沙箱进程枚举遗漏不证明不存在；不是全故障/网格收敛/复杂CAD或全部CST服务退出。",
+        "content_sha256_at_review": "99ceef16a4a844fa334ed8d171b8de88c7d26ae1fe228e31d29ff4b440615bf5"
       }
     },
     {
@@ -9643,21 +9633,21 @@
       "provenance": "2026-11-04 GEO-2–4当前实现及独立验收。",
       "review": {
         "date": "2026-11-04",
-        "baseline": "f755505",
+        "baseline": "b11ecab",
         "status": "operational-and-applicability-reviewed",
-        "scope": "GEO-2–4当前profile、实际保存/原生观察、公开签名、许可分离及失败/取消/恢复；早期离线章节明确为历史快照。",
+        "scope": "桌面实际工具调用与受限GEO保存/求解/幂等/退出证据；现行状态和旧SDK批次分层。",
         "checked_sources": [
           {
-            "path": "csttool/history_program.py"
+            "path": "knowledge-base/mcp-codex-geometry-20261104.json"
           },
           {
-            "path": "csttool/managed_history.py"
+            "path": "csttool/mcp_server.py"
           },
           {
             "path": "csttool/definition_editing.py"
           },
           {
-            "path": "csttool/definition_geometry.py"
+            "path": "csttool/managed_history.py"
           },
           {
             "path": "csttool/definition_verifier.py"
@@ -9666,18 +9656,50 @@
             "path": "csttool/definition_sessions.py"
           },
           {
-            "path": "csttool/application_service.py"
-          },
-          {
-            "path": "test/geometry_publication_test.py"
-          },
-          {
-            "path": "knowledge-base/geometry-calibration-20261104.json"
+            "path": "csttool/runner_client.py"
           }
         ],
         "finding_ids": [],
-        "limitations": "不追认旧测试为当前代码验收；不是任意CAD/多材料/模式身份/网格收敛或桌面新签名对话验收；A1旧许可保留失效。",
-        "content_sha256_at_review": "b7e4fa9c547bdbfd6bdd6814b4638ec40c594dfc89b7788b3be680c4c220e678"
+        "limitations": "初始连接就绪超时根因未定；沙箱进程枚举遗漏不证明不存在；不是全故障/网格收敛/复杂CAD或全部CST服务退出。",
+        "content_sha256_at_review": "6dc9b6fe338ff03d9d746d946cd6d8d8f0bc722c30800c978bec33186be6c1c1"
+      }
+    },
+    {
+      "path": "docs/codex-desktop-geometry-20261104.md",
+      "role": "dated-implementation-or-acceptance",
+      "authority": "dated-evidence-only",
+      "provenance": "2026-11-04当前Codex桌面实际GEO公开工具正常链；运行源码未变。",
+      "review": {
+        "date": "2026-11-04",
+        "baseline": "b11ecab",
+        "status": "operational-and-applicability-reviewed",
+        "scope": "桌面实际工具调用与受限GEO保存/求解/幂等/退出证据；现行状态和旧SDK批次分层。",
+        "checked_sources": [
+          {
+            "path": "knowledge-base/mcp-codex-geometry-20261104.json"
+          },
+          {
+            "path": "csttool/mcp_server.py"
+          },
+          {
+            "path": "csttool/definition_editing.py"
+          },
+          {
+            "path": "csttool/managed_history.py"
+          },
+          {
+            "path": "csttool/definition_verifier.py"
+          },
+          {
+            "path": "csttool/definition_sessions.py"
+          },
+          {
+            "path": "csttool/runner_client.py"
+          }
+        ],
+        "finding_ids": [],
+        "limitations": "初始连接就绪超时根因未定；沙箱进程枚举遗漏不证明不存在；不是全故障/网格收敛/复杂CAD或全部CST服务退出。",
+        "content_sha256_at_review": "797bb96c72db1acf9854987780fd203eafdb5d04276fe4b2a91e85980cc5fc37"
       }
     }
   ],

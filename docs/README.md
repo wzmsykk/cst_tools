@@ -36,3 +36,5 @@ G02首子集：[空工程创建、不可变文档与官方Python ABI](project-cr
 WinWrap现行生成检查/源图/校准与发布门禁：[W23受限A1链](winwrap-w23-implementation.md)；[W01](winwrap-w01-implementation.md)保留原批次证据。
 
 - [GEO-2–4生产实现与验收](geometry-production-implementation.md)：当前原子历史、公开几何保存、受限仿真闭环及独立原生证据；设计旧阶段不作为当前API。
+
+- [2026-11-04桌面GEO对话验收](codex-desktop-geometry-20261104.md)：当前14工具正常链、实际保存/表达式、单次求解与标准收尾，不以SDK代替指定宿主。

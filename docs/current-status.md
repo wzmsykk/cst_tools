@@ -1,6 +1,6 @@
 # CST Tools 当前状态
 
-更新：2026-11-04；本页只保留现行结论。当前工作基于f755505；受限A1与桌面正常闭环、串行故障驱动、生产Runner崩溃恢复及HOM恢复驱动已有各自证据；完整协议/数值模式身份和Start=0/自身异常矩阵仍逐项验收。逐批原文及旧待办见[复审前快照](archive/20261103-semantic-review/current-status.md)和[更早归档](archive/20261102-progress-consolidation/README.md)。
+更新：2026-11-04；本页只保留现行结论。当前工作基于b11ecab；受限A1与桌面正常闭环、串行故障驱动、生产Runner崩溃恢复及HOM恢复驱动已有各自证据；完整协议/数值模式身份和Start=0/自身异常矩阵仍逐项验收。逐批原文及旧待办见[复审前快照](archive/20261103-semantic-review/current-status.md)和[更早归档](archive/20261102-progress-consolidation/README.md)。
 
 ## 已实现与实际证据
 
@@ -19,7 +19,7 @@
 
 通用几何/选择集：GEO-1/1.1声明编辑及GEO-2–4已接同一公共底层，详见[GEO-2–4生产实现与验收](geometry-production-implementation.md)。设置唯一归属、原子分块/显式依赖、实际Model.mod提取与参数表达式核对、保存/重开几何观察、独立GEO版本门禁已实现。MCP仍14工具，geometry_profile/validation_target进入实际签名；GUI提供同一Runner适配入口，没有新增CAD画布。geometry_saved只承诺几何目标；完整受限Eigenmode配置和原生证明才可ready。
 
-2026-11-04当前源码C1–C7及GEO-4串行副本矩阵通过，XYZ小网格Pillbox各一次Start且标准关闭；布尔退化拒绝、参数重建、分块故障/停止均有独立证据，见[独立校准](../knowledge-base/geometry-calibration-20261104.json)。公开现代SDK完整链通过；功能/故障/SDK/映射/包514项及独立GUI/Runner89项通过，最终范围见生产实施页；不冒充重新加载后的Codex桌面对话验收。A1仍独立：旧原生stamp因源码变化失效；另行更新A1许可被自动审批拒绝，本批未更新或借GEO放行。历史473项离线数字仅适用旧代码。
+2026-11-04当前源码C1–C7及GEO-4串行副本矩阵通过，XYZ小网格Pillbox各一次Start且标准关闭；布尔退化拒绝、参数重建、分块故障/停止均有独立证据，见[独立校准](../knowledge-base/geometry-calibration-20261104.json)。公开现代SDK完整链通过；功能/故障/SDK/映射/包514项及独立GUI/Runner89项通过，最终范围见生产实施页；现代SDK与桌面验收分开：2026-11-04当前桌面已加载GEO新签名并完成新建/几何保存/配置/仿真保存/一次求解/导出/关闭，实际Start一次、8个本轮原生会话标准收尾及Runner退出，见[桌面GEO](codex-desktop-geometry-20261104.md)。A1仍独立：旧原生stamp因源码变化失效；另行更新A1许可被自动审批拒绝，本批未更新或借GEO放行。历史473项离线数字仅适用旧代码。
 
 
 ## 已有验收入口

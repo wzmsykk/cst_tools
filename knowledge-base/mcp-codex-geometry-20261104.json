@@ -1,0 +1,457 @@
+{
+  "date": "2026-11-04",
+  "baseline": "b11ecab",
+  "status": "accepted",
+  "desktop_host": true,
+  "real_cst": true,
+  "profile": "geometry-v1",
+  "tools": [
+    "mcp__cst_tools_acceptance__apply_model_changes",
+    "mcp__cst_tools_acceptance__close_project",
+    "mcp__cst_tools_acceptance__configure_simulation",
+    "mcp__cst_tools_acceptance__connect_project",
+    "mcp__cst_tools_acceptance__control_project",
+    "mcp__cst_tools_acceptance__create_project",
+    "mcp__cst_tools_acceptance__export_simulation_results",
+    "mcp__cst_tools_acceptance__get_operation_result",
+    "mcp__cst_tools_acceptance__get_project_status",
+    "mcp__cst_tools_acceptance__get_simulation_results",
+    "mcp__cst_tools_acceptance__inspect_model",
+    "mcp__cst_tools_acceptance__list_installations",
+    "mcp__cst_tools_acceptance__save_project",
+    "mcp__cst_tools_acceptance__submit_run"
+  ],
+  "project": "D:\\work\\cst_tools\\artifacts\\mcp-host-acceptance",
+  "document_id": "e1c5b242b8e04bfaa0db2fe061dbfe9a",
+  "definition_revision": "2162e0fabdc11a098b2e15a3ae09f860e871f78d6918084dbc9e809ea55e07a5",
+  "result_revision": "481b778ccfbfb70c033fd659d8423c6e57cb45ebda44273d8a3f82e07c13429a",
+  "simulation_run_id": "f1513431c8dd4c278441bb984b8e4e86",
+  "metrics": [
+    {
+      "metric_id": "frequency",
+      "method_id": "Frequency",
+      "value": 1147.42692991921,
+      "unit": "MHz",
+      "status": "success"
+    },
+    {
+      "metric_id": "rq",
+      "method_id": "R_over_Q",
+      "value": 223.541439593232,
+      "unit": "ohm",
+      "status": "success"
+    }
+  ],
+  "analytic_tm010_mhz": 1147.4252783521006,
+  "frequency_relative_error": 1.4393678964275125e-06,
+  "parameter_expressions": {
+    "R": "100",
+    "L": "R"
+  },
+  "model_shape": "R100 L=R Z vacuum cylinder; auxiliary Brick created/deleted; solid metadata selection",
+  "geometry_only": {
+    "geometry_saved": true,
+    "ready": false,
+    "definition_revision": null
+  },
+  "simulation_ready": true,
+  "saved_history": [
+    {
+      "target": "geometry_only",
+      "source_sha256": "6872f7a72db741943536dfdcfb842832286cdc9b763d72f7af1f5acea2db682f",
+      "parser_profile": "cst-geo-history-v1",
+      "block_count": 6,
+      "captions": [
+        "CST Tools GEO units",
+        "CST Tools GEO wcs",
+        "CST Tools GEO component-c_31eb5cb46700fa44a322",
+        "CST Tools GEO f_02a7a784302936efbe32eeb806182cf4",
+        "CST Tools GEO f_525a044e7aceb6ca2c8b6b2d2270a4a3",
+        "CST Tools GEO f_4b321d38d3e72b290f67817b6dfe1a02"
+      ]
+    },
+    {
+      "target": "saved",
+      "source_sha256": "780cd5ed25d715210a302a707101a7f74c84b2ff48160ac9b98b2e649396331e",
+      "parser_profile": "cst-geo-eigenmode-history-v1",
+      "block_count": 13,
+      "captions": [
+        "CST Tools GEO units",
+        "CST Tools GEO wcs",
+        "CST Tools GEO component-c_31eb5cb46700fa44a322",
+        "CST Tools GEO f_02a7a784302936efbe32eeb806182cf4",
+        "CST Tools GEO f_525a044e7aceb6ca2c8b6b2d2270a4a3",
+        "CST Tools GEO f_4b321d38d3e72b290f67817b6dfe1a02",
+        "CST Tools SIM solver-family",
+        "CST Tools SIM background",
+        "CST Tools SIM boundaries",
+        "CST Tools SIM solver-context",
+        "CST Tools SIM frequency",
+        "CST Tools SIM mesh-density",
+        "CST Tools SIM modes"
+      ]
+    }
+  ],
+  "solver_start_calls": 1,
+  "solver_trace_paths": [
+    "control\\runs\\f1513431c8dd4c278441bb984b8e4e86\\workers\\single\\8cdf5222-97a3-460c-b562-38e3cb0341dc\\lifecycle.log"
+  ],
+  "exports": [
+    {
+      "path": "result\\exports\\f1513431c8dd4c278441bb984b8e4e86\\481b778ccfbfb70c033fd659d8423c6e57cb45ebda44273d8a3f82e07c13429a\\results.csv",
+      "relative_to": "project",
+      "sha256": "f5d0f302686de48ae3b910637f020c2485d441e484a2ea6c262e3cc1ec12872e",
+      "size_bytes": 565,
+      "format": "csv"
+    },
+    {
+      "path": "result\\exports\\f1513431c8dd4c278441bb984b8e4e86\\481b778ccfbfb70c033fd659d8423c6e57cb45ebda44273d8a3f82e07c13429a\\results.json",
+      "relative_to": "project",
+      "sha256": "afbf5f13e70923d14decdc37e0e502016c912b81cdc373aa5e2d1c269c7671d2",
+      "size_bytes": 4571,
+      "format": "json"
+    }
+  ],
+  "retry": "save, submit and export repeated requests returned identical operation/result identities",
+  "native_definition_sessions": [
+    {
+      "path": "control\\definitions\\e1c5b242b8e04bfaa0db2fe061dbfe9a\\2162e0fabdc11a098b2e15a3ae09f860e871f78d6918084dbc9e809ea55e07a5\\verification-managed-a73c15ddaa624750901e6adba18faa81\\reopened\\session-status.json",
+      "owned": [
+        {
+          "pid": 74796,
+          "create_time": 1793798598.2047515
+        },
+        {
+          "pid": 77660,
+          "create_time": 1793798598.2297256
+        },
+        {
+          "pid": 38420,
+          "create_time": 1793798600.0219264
+        },
+        {
+          "pid": 16800,
+          "create_time": 1793798600.745673
+        },
+        {
+          "pid": 63136,
+          "create_time": 1793798601.9965236
+        },
+        {
+          "pid": 61340,
+          "create_time": 1793798602.8544211
+        },
+        {
+          "pid": 51856,
+          "create_time": 1793798602.9295232
+        },
+        {
+          "pid": 60736,
+          "create_time": 1793798603.2725704
+        }
+      ],
+      "exit_code": 0,
+      "exit_confirmed": true
+    },
+    {
+      "path": "control\\definitions\\e1c5b242b8e04bfaa0db2fe061dbfe9a\\2162e0fabdc11a098b2e15a3ae09f860e871f78d6918084dbc9e809ea55e07a5\\verification-managed-a73c15ddaa624750901e6adba18faa81\\saved\\session-status.json",
+      "owned": [
+        {
+          "pid": 55724,
+          "create_time": 1793798583.058339
+        },
+        {
+          "pid": 55248,
+          "create_time": 1793798583.081002
+        },
+        {
+          "pid": 72292,
+          "create_time": 1793798585.1816535
+        },
+        {
+          "pid": 52152,
+          "create_time": 1793798585.9467533
+        },
+        {
+          "pid": 80860,
+          "create_time": 1793798587.3560715
+        },
+        {
+          "pid": 62708,
+          "create_time": 1793798588.5115068
+        },
+        {
+          "pid": 65620,
+          "create_time": 1793798588.6126776
+        },
+        {
+          "pid": 69752,
+          "create_time": 1793798589.0686011
+        }
+      ],
+      "exit_code": 0,
+      "exit_confirmed": true
+    },
+    {
+      "path": "control\\definitions\\e1c5b242b8e04bfaa0db2fe061dbfe9a\\419b80b58a9f44efaaebe04cb091e044\\verification-edit\\saved\\session-status.json",
+      "owned": [
+        {
+          "pid": 74804,
+          "create_time": 1793798449.0940435
+        },
+        {
+          "pid": 28700,
+          "create_time": 1793798449.1215305
+        },
+        {
+          "pid": 72292,
+          "create_time": 1793798449.6332333
+        },
+        {
+          "pid": 63064,
+          "create_time": 1793798449.826278
+        },
+        {
+          "pid": 81208,
+          "create_time": 1793798451.8723269
+        },
+        {
+          "pid": 54916,
+          "create_time": 1793798452.6837337
+        },
+        {
+          "pid": 74172,
+          "create_time": 1793798454.057998
+        },
+        {
+          "pid": 45392,
+          "create_time": 1793798454.9874868
+        },
+        {
+          "pid": 69764,
+          "create_time": 1793798455.2011285
+        },
+        {
+          "pid": 80620,
+          "create_time": 1793798455.5812135
+        }
+      ],
+      "exit_code": 0,
+      "exit_confirmed": true
+    },
+    {
+      "path": "control\\definitions\\e1c5b242b8e04bfaa0db2fe061dbfe9a\\419b80b58a9f44efaaebe04cb091e044\\verification-edit\\saved\\verification-managed-1280248c207c4e6398b959902475ec77\\reopened\\session-status.json",
+      "owned": [
+        {
+          "pid": 51948,
+          "create_time": 1793798482.5979319
+        },
+        {
+          "pid": 57048,
+          "create_time": 1793798482.6252213
+        },
+        {
+          "pid": 18280,
+          "create_time": 1793798484.4291685
+        },
+        {
+          "pid": 69020,
+          "create_time": 1793798485.137041
+        },
+        {
+          "pid": 16400,
+          "create_time": 1793798486.5218503
+        },
+        {
+          "pid": 39812,
+          "create_time": 1793798487.403006
+        },
+        {
+          "pid": 71776,
+          "create_time": 1793798487.4813254
+        },
+        {
+          "pid": 74556,
+          "create_time": 1793798487.874745
+        }
+      ],
+      "exit_code": 0,
+      "exit_confirmed": true
+    },
+    {
+      "path": "control\\definitions\\e1c5b242b8e04bfaa0db2fe061dbfe9a\\419b80b58a9f44efaaebe04cb091e044\\verification-edit\\saved\\verification-managed-1280248c207c4e6398b959902475ec77\\saved\\session-status.json",
+      "owned": [
+        {
+          "pid": 40556,
+          "create_time": 1793798467.9836636
+        },
+        {
+          "pid": 20912,
+          "create_time": 1793798468.142449
+        },
+        {
+          "pid": 74968,
+          "create_time": 1793798469.935411
+        },
+        {
+          "pid": 81104,
+          "create_time": 1793798470.6667876
+        },
+        {
+          "pid": 81644,
+          "create_time": 1793798471.905162
+        },
+        {
+          "pid": 31560,
+          "create_time": 1793798472.7774982
+        },
+        {
+          "pid": 23756,
+          "create_time": 1793798472.8507702
+        },
+        {
+          "pid": 5584,
+          "create_time": 1793798473.2012513
+        }
+      ],
+      "exit_code": 0,
+      "exit_confirmed": true
+    },
+    {
+      "path": "control\\definitions\\e1c5b242b8e04bfaa0db2fe061dbfe9a\\98986c3ea5f44a88a07511c9647e0852\\verification-edit\\saved\\session-status.json",
+      "owned": [
+        {
+          "pid": 27464,
+          "create_time": 1793798563.9947884
+        },
+        {
+          "pid": 53156,
+          "create_time": 1793798564.0105665
+        },
+        {
+          "pid": 77764,
+          "create_time": 1793798564.4841857
+        },
+        {
+          "pid": 70976,
+          "create_time": 1793798564.6453447
+        },
+        {
+          "pid": 68504,
+          "create_time": 1793798566.3068953
+        },
+        {
+          "pid": 55484,
+          "create_time": 1793798567.0573509
+        },
+        {
+          "pid": 68704,
+          "create_time": 1793798568.206393
+        },
+        {
+          "pid": 36472,
+          "create_time": 1793798569.1312296
+        },
+        {
+          "pid": 76280,
+          "create_time": 1793798569.411384
+        },
+        {
+          "pid": 45652,
+          "create_time": 1793798569.7849572
+        }
+      ],
+      "exit_code": 0,
+      "exit_confirmed": true
+    },
+    {
+      "path": "control\\definitions\\e1c5b242b8e04bfaa0db2fe061dbfe9a\\c318fb0c45db47f68484fbcf5e9d03a2\\verification-bootstrap\\created\\session-status.json",
+      "owned": [
+        {
+          "pid": 20860,
+          "create_time": 1793798369.429398
+        },
+        {
+          "pid": 38040,
+          "create_time": 1793798369.707922
+        },
+        {
+          "pid": 32856,
+          "create_time": 1793798370.1565535
+        },
+        {
+          "pid": 37452,
+          "create_time": 1793798373.8940203
+        },
+        {
+          "pid": 45512,
+          "create_time": 1793798374.221327
+        },
+        {
+          "pid": 68468,
+          "create_time": 1793798377.4057045
+        },
+        {
+          "pid": 37564,
+          "create_time": 1793798379.5712843
+        },
+        {
+          "pid": 54416,
+          "create_time": 1793798380.494256
+        },
+        {
+          "pid": 67388,
+          "create_time": 1793798385.8897703
+        }
+      ],
+      "exit_code": 0,
+      "exit_confirmed": true
+    }
+  ],
+  "worker_close": {
+    "session_safety": "confirmed-closed",
+    "session_id": "8cdf5222-97a3-460c-b562-38e3cb0341dc"
+  },
+  "prior_document_hashes_unchanged": {
+    "control\\documents\\0553f1417f09453f8595d8f9e169221c\\3ac70b9fcad1aa33b24a0c31e24ea6a79a751e350e5a61fa3746dca608362f0d.json": "de0c4724042791494db9de4a59c9e859aa3db6c556389920eb14b6a20116bf07",
+    "control\\documents\\0553f1417f09453f8595d8f9e169221c\\54329c6afdcc50c04e4f8d8ad61b3885034db54cc92591d5014f9ecb78ab88b0.json": "cda82bdea66392820da3a9143c44ca450d224a9668d8fca90b0f8cbcabcdda46",
+    "control\\documents\\0553f1417f09453f8595d8f9e169221c\\a85a18c6eaf0cf63fbfe8306fc5b7bf14b17f89a9780c287acca5b76416e308a.json": "5c1c8551e10f792af0618737a20b43bed5b03cac83dcff600a8c54c64ec1098f",
+    "control\\documents\\0553f1417f09453f8595d8f9e169221c\\current.json": "f0d99040c03115164c8f351ded78ba34b0716d982066e2b3a233f5662b2cd851",
+    "control\\documents\\0553f1417f09453f8595d8f9e169221c\\d92bbcdfe813ad643404c928c41e13f897838f4f8d3015afa9a82f8c62ff1bc7.json": "4eeda39a12740c5b0c51034e1ad88f73af60d360c2dd187051bbdece6dabd32d",
+    "control\\documents\\0553f1417f09453f8595d8f9e169221c\\e2b6d228ff480e74fc6a1033f6571a3cbf6e165b23e57b81377fad118a6978dc.json": "edba941f75da908ff49c901c55e15c5cb22048c91e618c3759719601d790f8ee",
+    "control\\documents\\1d3af22e36ed4c11b70a13842b76647a\\bcf97aa28a862328f775b3c73f0323a35e1447c231c40699c3bc6279661bf6fa.json": "bdbb75e454ddf21b509f4592f7a9a91bd64e3922e29183116ebcadbbed20fe7e",
+    "control\\documents\\1d3af22e36ed4c11b70a13842b76647a\\current.json": "2eb943eefbc09d59804cf6ed470e1903ab935027c58976ea37e307a5b4264b1f"
+  },
+  "public_trace_artifact": "artifacts/geo-desktop-20261104-acceptance.json",
+  "public_trace_sha256": "7e3ba6078bd46dc51c781722f37c6514080ecd5d10a7c7b18350b07d653a1981",
+  "connection_observation": "initial status and explicit launch readiness timed out; same owned Runner later reachable; no second launch/task replay; internal cause unverified",
+  "scope": "normal desktop dialogue only, not full fault matrix, convergence, arbitrary topology, multimaterial or remote compute",
+  "cleanup": {
+    "status": "completed",
+    "raw_files_removed": 129,
+    "raw_bytes_removed": 13961577,
+    "retained": "lightweight CST sources, native DB, full control/runs archives, macros/logs/parameters/hash/export and public tool trace",
+    "raw_field_mesh_available": false,
+    "artifacts_guaranteed_in_git": false
+  },
+  "exit_verification": {
+    "runner_pid": 29172,
+    "runner_pid_absent": true,
+    "runner_os_lock_released": true,
+    "owned_native_identities_checked": 61,
+    "owned_native_identities_still_running": [],
+    "other_cst_services": "CSTDCMainController_AMD64.exe, CSTDCSolverServer_AMD64.exe, cstd.exe observed; not terminated or treated as owned model sessions"
+  },
+  "offline_acceptance": {
+    "passed": 32,
+    "scope": [
+      "documentation_index",
+      "project_registry",
+      "project_map_migration",
+      "mcp_application_adapter",
+      "geometry_gate_adapter"
+    ],
+    "junit": "artifacts/geo-desktop-doc-tests.xml",
+    "runtime_source_changed": false
+  }
+}
