@@ -72,11 +72,21 @@ def verify_shutdown_safety(project):
 
 
 class Runner:
-    def __init__(self, project, executor_factory=None):
+    def __init__(self, project, executor_factory=None, *, startup_observer=None):
         self.project = Path(project).resolve()
         self.control = self.project / 'control'
+        phase=startup_observer or (lambda stage:None)
+        phase('protect-directory')
         protect_directory(self.control)
+        phase('runner-ownership')
         self.ownership = RunnerOwnership(self.control / 'runner.lock').acquire()
+        try:self._initialize(executor_factory,phase)
+        except BaseException:
+            self.ownership.close()
+            raise
+
+    def _initialize(self,executor_factory,phase):
+        phase('project-identity')
         project_identity = self.control / 'project.json'
         if not project_identity.exists():
             write_json_atomic(project_identity, {'schema_version': 1, 'project_id': uuid4().hex})
@@ -98,6 +108,7 @@ class Runner:
                        'state': 'IDLE', 'phase': '', 'error': None,
                        'session_safety': 'unknown', 'last_progress': None}
         previous = self.control / 'status.json'
+        phase('restore-status')
         if previous.exists():
             old = read_json(previous)
             for key in ('run_id', 'state', 'phase', 'error', 'session_safety', 'last_progress',
@@ -118,18 +129,23 @@ class Runner:
             if legacy:
                 self.status['log_history'] = [dict(run_id=None, directory=str(path)) for path in legacy[:-1]]
                 self.status['log_directory'] = str(legacy[-1])
+        phase('reconcile-intents')
         unfinished, errors = self._unfinished_start_intents()
         if unfinished or errors:
             self.status.update(state='RECOVERY_REQUIRED', phase='recovery-required',
                 unfinished_intents=unfinished, intent_diagnostics=errors,
                 error='Unfinished durable start intent requires reconciliation')
+        phase('restore-checkpoint')
         checkpoint = self.project / 'save/csv/hom_scan_checkpoint.json'
         if checkpoint.exists():
             document = read_json(checkpoint)
             self.status.update(coverage=document.get('coverage'),
                                mode_count=len(document.get('report', {}).get('modes', [])))
+        phase('reconcile-project')
         self._reconcile_project_state()
+        phase('persist-status')
         self._save_status()
+        phase('state-ready')
 
     def _unfinished_start_intents(self):
         pending, errors = [], []
@@ -732,7 +748,17 @@ class LocalExecution:
 
 
 def serve(project, executor_factory=None):
-    runner = Runner(project, executor_factory)
+    started=time.monotonic()
+    def trace(phase,**fields):
+        print(json.dumps(dict(event='RUNNER_STARTUP',phase=phase,pid=os.getpid(),
+            project=str(Path(project).resolve()),timestamp=time.strftime('%Y-%m-%dT%H:%M:%SZ',time.gmtime()),
+            elapsed_seconds=round(time.monotonic()-started,6),source='csttool.runner.serve',**fields)),
+            file=sys.stderr,flush=True)
+    trace('module-ready')
+    try:runner=Runner(project,executor_factory,startup_observer=trace)
+    except BaseException as error:
+        trace('initialization-failed',error_type=type(error).__name__,reason=str(error)[:500])
+        raise
 
     class Handler(BaseHTTPRequestHandler):
         def setup(self):
@@ -806,17 +832,27 @@ def serve(project, executor_factory=None):
         do_GET = handle_request
         do_POST = handle_request
 
-    server = ThreadingHTTPServer(('127.0.0.1', 0), Handler)
-    server.timeout = .25
-    write_json_atomic(runner.control / 'runner.json', {
-        'schema_version': 1, 'instance_id': runner.instance_id, 'pid': os.getpid(),
-        'port': server.server_port, 'token': runner.token, 'project': str(runner.project)})
+    server=None;published=False
     try:
+        trace('binding-http')
+        server = ThreadingHTTPServer(('127.0.0.1', 0), Handler)
+        server.timeout = .25
+        trace('publishing-endpoint')
+        write_json_atomic(runner.control / 'runner.json', {
+            'schema_version': 1, 'instance_id': runner.instance_id, 'pid': os.getpid(),
+            'port': server.server_port, 'token': runner.token, 'project': str(runner.project)})
+        published=True
+        trace('serving',instance_id=runner.instance_id,port=server.server_port)
         while not runner.shutdown_requested.is_set():
             server.handle_request()
+    except BaseException as error:
+        trace('server-failed' if published else 'startup-failed',error_type=type(error).__name__,reason=str(error)[:500])
+        raise
     finally:
-        server.server_close()
-        runner.close()
+        try:
+            if server is not None:server.server_close()
+        finally:runner.close()
+        trace('ownership-released')
 
 
 def main():

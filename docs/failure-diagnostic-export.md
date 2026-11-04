@@ -29,3 +29,7 @@ manifest.json保存project/run/state/phase/error、run身份来源、源路径�
 发现时优先预留control及当前/最近运行主日志/元数据名额；写ZIP再次按核心→原生→其余/资源优先级处理。先写入候选的检查点不代表其字节一定早于原生日志；额度耗尽可略过，必须看manifest，不能承诺所有文件全包含。
 
 [原批次完整记录](archive/20261103-semantic-review/failure-diagnostic-export.md)保留10月25日实际旧文件导出及11月2日优先级/取消修正过程、原始测试数字。现行测试见test/diagnostic_bundle_test.py和GUI导出/退出用例。没有远端文件下载、通用脱敏或磁盘调用硬超时；部分诊断包不是可恢复工程。
+
+## 启动失败尚未形成任务
+
+诊断包额外包含control/bootstrap.json、bootstrap.log及manifest.startup；即便run_id为空或旧status仍为COMPLETED，启动事实单列，不覆盖原运行身份。损坏bootstrap记录为unreadable，已有任务日志继续导出；runner.json/endpoint.json仍排除。路径/体积/取消及离线边界不变，说明见[冷启动就绪与诊断](runner-startup-readiness.md)。

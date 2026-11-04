@@ -1,0 +1,1240 @@
+{
+  "runtime_base": "cd5a820",
+  "status": "implemented-controlled-processes-verified",
+  "original_desktop_timeout_root_cause": "not uniquely established; normal/history copied trials did not reproduce the 15s failure",
+  "source_sha256": {
+    "csttool/runner.py": "4475e8d201c54e3cfd37072ecf7386a8392616036fb6a88bb28cca47012b1bae",
+    "csttool/runner_client.py": "b0a993daf0aff9f54a4b6c84524659a7fad6488e9aba70c32ab9ecf39783b138",
+    "csttool/runner_ownership.py": "307eb5aade18edef772e1a4092b73fa23d0394e3fc4aa62dab9b48af705d610d",
+    "csttool/diagnostic_bundle.py": "a4eb5e696811b1af4474d2eb811c1183fe843c5ac50743b12658e6f0f380eecf",
+    "test/runner_startup_test.py": "57437c45ccf5e3c48a026f7aa819b985202284b27432a8ad9a4fa9eedc141c88",
+    "test/diagnostic_bundle_test.py": "431a2b8510a9aa6cdfd7d190abcc84e2b7b734feddd3c6671b567c35673f5f82",
+    "test/runner_test.py": "35a3762b7b90c21c98e66ba3a5b4e40df7026cdb1e303fb07383e331faaf5ed8"
+  },
+  "baseline": {
+    "normal_and_profile": [
+      {
+        "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-baseline-20261104\\plain-0",
+        "profile": false,
+        "connect_error": null,
+        "ready_elapsed": 1.0478143999935128,
+        "runtime": {
+          "pid": 73216,
+          "python": "D:\\work\\cst_tools\\artifacts\\mcp-runtime\\Scripts\\python.exe",
+          "cwd": "D:\\work\\cst_tools",
+          "source_root": "D:\\work\\cst_tools"
+        },
+        "shutdown": {
+          "runner_stopped": true
+        },
+        "events": [
+          {
+            "event": "probe",
+            "at": 3.900029696524143e-06,
+            "duration": 0.00016279995907098055,
+            "error": "FileNotFoundError: [Errno 2] No such file or directory: 'D:\\\\work\\\\cst_tools\\\\artifacts\\\\runner-cold-baseline-20261104\\\\plain-0\\\\control\\\\runner.json'"
+          },
+          {
+            "event": "spawn",
+            "at": 0.012378700019326061,
+            "pid": 81208
+          },
+          {
+            "event": "probe",
+            "at": 0.012394400022458285,
+            "duration": 0.00015789997996762395,
+            "error": "FileNotFoundError: [Errno 2] No such file or directory: 'D:\\\\work\\\\cst_tools\\\\artifacts\\\\runner-cold-baseline-20261104\\\\plain-0\\\\control\\\\runner.json'"
+          },
+          {
+            "event": "probe",
+            "at": 0.11329820001265034,
+            "duration": 0.0001889999839477241,
+            "error": "FileNotFoundError: [Errno 2] No such file or directory: 'D:\\\\work\\\\cst_tools\\\\artifacts\\\\runner-cold-baseline-20261104\\\\plain-0\\\\control\\\\runner.json'"
+          },
+          {
+            "event": "probe",
+            "at": 0.21404779999284074,
+            "duration": 0.0001784000196494162,
+            "error": "FileNotFoundError: [Errno 2] No such file or directory: 'D:\\\\work\\\\cst_tools\\\\artifacts\\\\runner-cold-baseline-20261104\\\\plain-0\\\\control\\\\runner.json'"
+          },
+          {
+            "event": "probe",
+            "at": 0.31445950001943856,
+            "duration": 0.0002655999851413071,
+            "error": "FileNotFoundError: [Errno 2] No such file or directory: 'D:\\\\work\\\\cst_tools\\\\artifacts\\\\runner-cold-baseline-20261104\\\\plain-0\\\\control\\\\runner.json'"
+          },
+          {
+            "event": "probe",
+            "at": 0.4149273000075482,
+            "duration": 0.00015979999443516135,
+            "error": "FileNotFoundError: [Errno 2] No such file or directory: 'D:\\\\work\\\\cst_tools\\\\artifacts\\\\runner-cold-baseline-20261104\\\\plain-0\\\\control\\\\runner.json'"
+          },
+          {
+            "event": "probe",
+            "at": 0.515554899990093,
+            "duration": 0.0002080000122077763,
+            "error": "FileNotFoundError: [Errno 2] No such file or directory: 'D:\\\\work\\\\cst_tools\\\\artifacts\\\\runner-cold-baseline-20261104\\\\plain-0\\\\control\\\\runner.json'"
+          },
+          {
+            "event": "probe",
+            "at": 0.6159693999798037,
+            "duration": 0.0002267000381834805,
+            "error": "FileNotFoundError: [Errno 2] No such file or directory: 'D:\\\\work\\\\cst_tools\\\\artifacts\\\\runner-cold-baseline-20261104\\\\plain-0\\\\control\\\\runner.json'"
+          },
+          {
+            "event": "probe",
+            "at": 0.7163274000049569,
+            "duration": 0.00016449997201561928,
+            "error": "FileNotFoundError: [Errno 2] No such file or directory: 'D:\\\\work\\\\cst_tools\\\\artifacts\\\\runner-cold-baseline-20261104\\\\plain-0\\\\control\\\\runner.json'"
+          },
+          {
+            "event": "probe",
+            "at": 0.8166245999746025,
+            "duration": 0.00016160000814124942,
+            "error": "FileNotFoundError: [Errno 2] No such file or directory: 'D:\\\\work\\\\cst_tools\\\\artifacts\\\\runner-cold-baseline-20261104\\\\plain-0\\\\control\\\\runner.json'"
+          },
+          {
+            "event": "probe",
+            "at": 0.917391300026793,
+            "duration": 0.00016850000247359276,
+            "error": "FileNotFoundError: [Errno 2] No such file or directory: 'D:\\\\work\\\\cst_tools\\\\artifacts\\\\runner-cold-baseline-20261104\\\\plain-0\\\\control\\\\runner.json'"
+          },
+          {
+            "event": "probe",
+            "at": 1.0179241999867372,
+            "duration": 0.0298659999971278,
+            "ok": true
+          },
+          {
+            "event": "probe",
+            "at": 1.0478250000160187,
+            "duration": 0.02871350001078099,
+            "ok": true
+          },
+          {
+            "event": "probe",
+            "at": 1.076568100019358,
+            "duration": 0.023760200012475252,
+            "ok": true
+          },
+          {
+            "event": "probe",
+            "at": 1.1003504000254907,
+            "duration": 0.06751729996176437,
+            "ok": true
+          }
+        ],
+        "launcher_exit_codes": [
+          0
+        ]
+      },
+      {
+        "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-baseline-20261104\\plain-1",
+        "profile": false,
+        "connect_error": null,
+        "ready_elapsed": 0.9387776999501511,
+        "runtime": {
+          "pid": 65284,
+          "python": "D:\\work\\cst_tools\\artifacts\\mcp-runtime\\Scripts\\python.exe",
+          "cwd": "D:\\work\\cst_tools",
+          "source_root": "D:\\work\\cst_tools"
+        },
+        "shutdown": {
+          "runner_stopped": true
+        },
+        "events": [
+          {
+            "event": "probe",
+            "at": 5.599984433501959e-06,
+            "duration": 0.00012179999612271786,
+            "error": "FileNotFoundError: [Errno 2] No such file or directory: 'D:\\\\work\\\\cst_tools\\\\artifacts\\\\runner-cold-baseline-20261104\\\\plain-1\\\\control\\\\runner.json'"
+          },
+          {
+            "event": "spawn",
+            "at": 0.011837599973659962,
+            "pid": 67904
+          },
+          {
+            "event": "probe",
+            "at": 0.01185269997222349,
+            "duration": 0.0001708000199869275,
+            "error": "FileNotFoundError: [Errno 2] No such file or directory: 'D:\\\\work\\\\cst_tools\\\\artifacts\\\\runner-cold-baseline-20261104\\\\plain-1\\\\control\\\\runner.json'"
+          },
+          {
+            "event": "probe",
+            "at": 0.11225479998392984,
+            "duration": 0.00017419998766854405,
+            "error": "FileNotFoundError: [Errno 2] No such file or directory: 'D:\\\\work\\\\cst_tools\\\\artifacts\\\\runner-cold-baseline-20261104\\\\plain-1\\\\control\\\\runner.json'"
+          },
+          {
+            "event": "probe",
+            "at": 0.21304109995253384,
+            "duration": 0.00017860002117231488,
+            "error": "FileNotFoundError: [Errno 2] No such file or directory: 'D:\\\\work\\\\cst_tools\\\\artifacts\\\\runner-cold-baseline-20261104\\\\plain-1\\\\control\\\\runner.json'"
+          },
+          {
+            "event": "probe",
+            "at": 0.3136397999478504,
+            "duration": 0.00018250005086883903,
+            "error": "FileNotFoundError: [Errno 2] No such file or directory: 'D:\\\\work\\\\cst_tools\\\\artifacts\\\\runner-cold-baseline-20261104\\\\plain-1\\\\control\\\\runner.json'"
+          },
+          {
+            "event": "probe",
+            "at": 0.414231899951119,
+            "duration": 0.00024070002837106586,
+            "error": "FileNotFoundError: [Errno 2] No such file or directory: 'D:\\\\work\\\\cst_tools\\\\artifacts\\\\runner-cold-baseline-20261104\\\\plain-1\\\\control\\\\runner.json'"
+          },
+          {
+            "event": "probe",
+            "at": 0.5149457999505103,
+            "duration": 0.0001979000517167151,
+            "error": "FileNotFoundError: [Errno 2] No such file or directory: 'D:\\\\work\\\\cst_tools\\\\artifacts\\\\runner-cold-baseline-20261104\\\\plain-1\\\\control\\\\runner.json'"
+          },
+          {
+            "event": "probe",
+            "at": 0.6156936999759637,
+            "duration": 0.00017720001051202416,
+            "error": "FileNotFoundError: [Errno 2] No such file or directory: 'D:\\\\work\\\\cst_tools\\\\artifacts\\\\runner-cold-baseline-20261104\\\\plain-1\\\\control\\\\runner.json'"
+          },
+          {
+            "event": "probe",
+            "at": 0.7159587999922223,
+            "duration": 0.0002231999533250928,
+            "error": "FileNotFoundError: [Errno 2] No such file or directory: 'D:\\\\work\\\\cst_tools\\\\artifacts\\\\runner-cold-baseline-20261104\\\\plain-1\\\\control\\\\runner.json'"
+          },
+          {
+            "event": "probe",
+            "at": 0.8165585999959148,
+            "duration": 0.0002777999616228044,
+            "error": "FileNotFoundError: [Errno 2] No such file or directory: 'D:\\\\work\\\\cst_tools\\\\artifacts\\\\runner-cold-baseline-20261104\\\\plain-1\\\\control\\\\runner.json'"
+          },
+          {
+            "event": "probe",
+            "at": 0.9172702999785542,
+            "duration": 0.02149800001643598,
+            "ok": true
+          },
+          {
+            "event": "probe",
+            "at": 0.9387815999798477,
+            "duration": 0.0034898999729193747,
+            "ok": true
+          },
+          {
+            "event": "probe",
+            "at": 0.9422956999624148,
+            "duration": 0.010838099988177419,
+            "ok": true
+          },
+          {
+            "event": "probe",
+            "at": 0.95315799996024,
+            "duration": 0.051041900005657226,
+            "ok": true
+          }
+        ],
+        "launcher_exit_codes": [
+          0
+        ]
+      },
+      {
+        "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-baseline-20261104\\profile",
+        "profile": true,
+        "connect_error": null,
+        "ready_elapsed": 0.948718200030271,
+        "runtime": {
+          "pid": 72564,
+          "python": "D:\\work\\cst_tools\\artifacts\\mcp-runtime\\Scripts\\python.exe",
+          "cwd": "D:\\work\\cst_tools",
+          "source_root": "D:\\work\\cst_tools"
+        },
+        "shutdown": {
+          "runner_stopped": true
+        },
+        "events": [
+          {
+            "event": "probe",
+            "at": 5.600042641162872e-06,
+            "duration": 0.00026189995696768165,
+            "error": "FileNotFoundError: [Errno 2] No such file or directory: 'D:\\\\work\\\\cst_tools\\\\artifacts\\\\runner-cold-baseline-20261104\\\\profile\\\\control\\\\runner.json'"
+          },
+          {
+            "event": "spawn",
+            "at": 0.01582530001178384,
+            "pid": 37696
+          },
+          {
+            "event": "probe",
+            "at": 0.015842200024053454,
+            "duration": 0.0002762000076472759,
+            "error": "FileNotFoundError: [Errno 2] No such file or directory: 'D:\\\\work\\\\cst_tools\\\\artifacts\\\\runner-cold-baseline-20261104\\\\profile\\\\control\\\\runner.json'"
+          },
+          {
+            "event": "probe",
+            "at": 0.11638960003620014,
+            "duration": 0.00023800000781193376,
+            "error": "FileNotFoundError: [Errno 2] No such file or directory: 'D:\\\\work\\\\cst_tools\\\\artifacts\\\\runner-cold-baseline-20261104\\\\profile\\\\control\\\\runner.json'"
+          },
+          {
+            "event": "probe",
+            "at": 0.21722610003780574,
+            "duration": 0.00019619998056441545,
+            "error": "FileNotFoundError: [Errno 2] No such file or directory: 'D:\\\\work\\\\cst_tools\\\\artifacts\\\\runner-cold-baseline-20261104\\\\profile\\\\control\\\\runner.json'"
+          },
+          {
+            "event": "probe",
+            "at": 0.31755550001980737,
+            "duration": 0.0001742999884299934,
+            "error": "FileNotFoundError: [Errno 2] No such file or directory: 'D:\\\\work\\\\cst_tools\\\\artifacts\\\\runner-cold-baseline-20261104\\\\profile\\\\control\\\\runner.json'"
+          },
+          {
+            "event": "probe",
+            "at": 0.4180064999964088,
+            "duration": 0.0004988000146113336,
+            "error": "FileNotFoundError: [Errno 2] No such file or directory: 'D:\\\\work\\\\cst_tools\\\\artifacts\\\\runner-cold-baseline-20261104\\\\profile\\\\control\\\\runner.json'"
+          },
+          {
+            "event": "probe",
+            "at": 0.5188423999934457,
+            "duration": 0.00024590000975877047,
+            "error": "FileNotFoundError: [Errno 2] No such file or directory: 'D:\\\\work\\\\cst_tools\\\\artifacts\\\\runner-cold-baseline-20261104\\\\profile\\\\control\\\\runner.json'"
+          },
+          {
+            "event": "probe",
+            "at": 0.6194592000101693,
+            "duration": 0.00027110002702102065,
+            "error": "FileNotFoundError: [Errno 2] No such file or directory: 'D:\\\\work\\\\cst_tools\\\\artifacts\\\\runner-cold-baseline-20261104\\\\profile\\\\control\\\\runner.json'"
+          },
+          {
+            "event": "probe",
+            "at": 0.7199511000071652,
+            "duration": 0.00021399999968707561,
+            "error": "FileNotFoundError: [Errno 2] No such file or directory: 'D:\\\\work\\\\cst_tools\\\\artifacts\\\\runner-cold-baseline-20261104\\\\profile\\\\control\\\\runner.json'"
+          },
+          {
+            "event": "probe",
+            "at": 0.8205555999884382,
+            "duration": 0.0003092000260949135,
+            "error": "FileNotFoundError: [Errno 2] No such file or directory: 'D:\\\\work\\\\cst_tools\\\\artifacts\\\\runner-cold-baseline-20261104\\\\profile\\\\control\\\\runner.json'"
+          },
+          {
+            "event": "probe",
+            "at": 0.921524400007911,
+            "duration": 0.027179600030649453,
+            "ok": true
+          },
+          {
+            "event": "probe",
+            "at": 0.9487221000017598,
+            "duration": 0.015513500024098903,
+            "ok": true
+          },
+          {
+            "event": "probe",
+            "at": 0.9642572000157088,
+            "duration": 0.023881100001744926,
+            "ok": true
+          },
+          {
+            "event": "probe",
+            "at": 0.9881596000050195,
+            "duration": 0.07758939999621361,
+            "ok": true
+          }
+        ],
+        "launcher_exit_codes": [
+          0
+        ]
+      }
+    ],
+    "history_metadata_only": {
+      "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-baseline-20261104\\history",
+      "copied_commands": 43,
+      "ready_elapsed": 0.6451904000132345,
+      "state": "COMPLETED",
+      "runtime": {
+        "pid": 74296,
+        "python": "D:\\work\\cst_tools\\artifacts\\mcp-runtime\\Scripts\\python.exe",
+        "cwd": "D:\\work\\cst_tools",
+        "source_root": "D:\\work\\cst_tools"
+      },
+      "shutdown": {
+        "runner_stopped": true
+      },
+      "scope": "read-only copied command/outcome/status metadata, not source project ownership or CST files"
+    },
+    "interpretation": "wall clock samples, not a performance improvement claim"
+  },
+  "controlled": {
+    "real_cst": false,
+    "solver_calls": 0,
+    "results": [
+      {
+        "case": "normal-0",
+        "ready_elapsed": 0.9423171000089496,
+        "startup": {
+          "schema_version": 1,
+          "attempt_id": "12536341aff045939ccb692d3f41831d",
+          "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\normal-0",
+          "started_at": "2026-11-04T16:14:06.831384+00:00",
+          "timeout_seconds": 15,
+          "startup_state": "ready",
+          "source": "csttool.runner_client.RunnerClient.connect",
+          "launcher_pid": 75912,
+          "launcher_exit_code": null,
+          "probe_count": 12,
+          "last_probe_error": {
+            "type": "FileNotFoundError",
+            "message": "[Errno 2] No such file or directory: 'D:\\\\work\\\\cst_tools\\\\artifacts\\\\runner-cold-verified-bf9ddf39\\\\normal-0\\\\control\\\\runner.json'"
+          },
+          "initial_probe_error": {
+            "type": "FileNotFoundError",
+            "message": "[Errno 2] No such file or directory: 'D:\\\\work\\\\cst_tools\\\\artifacts\\\\runner-cold-verified-bf9ddf39\\\\normal-0\\\\control\\\\runner.json'"
+          },
+          "phase": "waiting-http",
+          "ready_instance_id": "c65018ba9010478bbb9c4c214cb826ae",
+          "runtime": {
+            "pid": 64756,
+            "python": "D:\\work\\cst_tools\\artifacts\\mcp-runtime\\Scripts\\python.exe",
+            "cwd": "D:\\work\\cst_tools",
+            "source_root": "D:\\work\\cst_tools"
+          },
+          "elapsed_seconds": 0.937,
+          "last_endpoint": {
+            "pid": 64756,
+            "port": 63294,
+            "instance_id": "c65018ba9010478bbb9c4c214cb826ae"
+          }
+        },
+        "shutdown": {
+          "runner_stopped": true
+        },
+        "launcher_exit_code": 0,
+        "phases": [
+          {
+            "event": "RUNNER_STARTUP_CLIENT",
+            "client_pid": 76872,
+            "schema_version": 1,
+            "attempt_id": "12536341aff045939ccb692d3f41831d",
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\normal-0",
+            "started_at": "2026-11-04T16:14:06.831384+00:00",
+            "timeout_seconds": 15,
+            "startup_state": "waiting",
+            "source": "csttool.runner_client.RunnerClient.connect",
+            "launcher_pid": null,
+            "launcher_exit_code": null,
+            "probe_count": 2,
+            "last_probe_error": {
+              "type": "FileNotFoundError",
+              "message": "[Errno 2] No such file or directory: 'D:\\\\work\\\\cst_tools\\\\artifacts\\\\runner-cold-verified-bf9ddf39\\\\normal-0\\\\control\\\\runner.json'"
+            },
+            "initial_probe_error": {
+              "type": "FileNotFoundError",
+              "message": "[Errno 2] No such file or directory: 'D:\\\\work\\\\cst_tools\\\\artifacts\\\\runner-cold-verified-bf9ddf39\\\\normal-0\\\\control\\\\runner.json'"
+            },
+            "phase": "spawn"
+          },
+          {
+            "event": "RUNNER_STARTUP",
+            "phase": "module-ready",
+            "pid": 64756,
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\normal-0",
+            "timestamp": "2026-11-04T16:14:07Z",
+            "elapsed_seconds": 0.0,
+            "source": "csttool.runner.serve"
+          },
+          {
+            "event": "RUNNER_STARTUP",
+            "phase": "protect-directory",
+            "pid": 64756,
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\normal-0",
+            "timestamp": "2026-11-04T16:14:07Z",
+            "elapsed_seconds": 0.0,
+            "source": "csttool.runner.serve"
+          },
+          {
+            "event": "RUNNER_STARTUP",
+            "phase": "runner-ownership",
+            "pid": 64756,
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\normal-0",
+            "timestamp": "2026-11-04T16:14:07Z",
+            "elapsed_seconds": 0.063,
+            "source": "csttool.runner.serve"
+          },
+          {
+            "event": "RUNNER_STARTUP",
+            "phase": "project-identity",
+            "pid": 64756,
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\normal-0",
+            "timestamp": "2026-11-04T16:14:07Z",
+            "elapsed_seconds": 0.063,
+            "source": "csttool.runner.serve"
+          },
+          {
+            "event": "RUNNER_STARTUP",
+            "phase": "restore-status",
+            "pid": 64756,
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\normal-0",
+            "timestamp": "2026-11-04T16:14:07Z",
+            "elapsed_seconds": 0.078,
+            "source": "csttool.runner.serve"
+          },
+          {
+            "event": "RUNNER_STARTUP",
+            "phase": "reconcile-intents",
+            "pid": 64756,
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\normal-0",
+            "timestamp": "2026-11-04T16:14:07Z",
+            "elapsed_seconds": 0.078,
+            "source": "csttool.runner.serve"
+          },
+          {
+            "event": "RUNNER_STARTUP",
+            "phase": "restore-checkpoint",
+            "pid": 64756,
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\normal-0",
+            "timestamp": "2026-11-04T16:14:07Z",
+            "elapsed_seconds": 0.078,
+            "source": "csttool.runner.serve"
+          },
+          {
+            "event": "RUNNER_STARTUP",
+            "phase": "reconcile-project",
+            "pid": 64756,
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\normal-0",
+            "timestamp": "2026-11-04T16:14:07Z",
+            "elapsed_seconds": 0.078,
+            "source": "csttool.runner.serve"
+          },
+          {
+            "event": "RUNNER_STARTUP",
+            "phase": "persist-status",
+            "pid": 64756,
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\normal-0",
+            "timestamp": "2026-11-04T16:14:07Z",
+            "elapsed_seconds": 0.078,
+            "source": "csttool.runner.serve"
+          },
+          {
+            "event": "RUNNER_STARTUP",
+            "phase": "state-ready",
+            "pid": 64756,
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\normal-0",
+            "timestamp": "2026-11-04T16:14:07Z",
+            "elapsed_seconds": 0.078,
+            "source": "csttool.runner.serve"
+          },
+          {
+            "event": "RUNNER_STARTUP",
+            "phase": "binding-http",
+            "pid": 64756,
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\normal-0",
+            "timestamp": "2026-11-04T16:14:07Z",
+            "elapsed_seconds": 0.078,
+            "source": "csttool.runner.serve"
+          },
+          {
+            "event": "RUNNER_STARTUP",
+            "phase": "publishing-endpoint",
+            "pid": 64756,
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\normal-0",
+            "timestamp": "2026-11-04T16:14:07Z",
+            "elapsed_seconds": 0.094,
+            "source": "csttool.runner.serve"
+          },
+          {
+            "event": "RUNNER_STARTUP",
+            "phase": "serving",
+            "pid": 64756,
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\normal-0",
+            "timestamp": "2026-11-04T16:14:07Z",
+            "elapsed_seconds": 0.094,
+            "source": "csttool.runner.serve",
+            "instance_id": "c65018ba9010478bbb9c4c214cb826ae",
+            "port": 63294
+          },
+          {
+            "event": "RUNNER_STARTUP",
+            "phase": "ownership-released",
+            "pid": 64756,
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\normal-0",
+            "timestamp": "2026-11-04T16:14:08Z",
+            "elapsed_seconds": 0.453,
+            "source": "csttool.runner.serve"
+          }
+        ]
+      },
+      {
+        "case": "normal-1",
+        "ready_elapsed": 0.8570303000160493,
+        "startup": {
+          "schema_version": 1,
+          "attempt_id": "1ba3c2a570ec4243a1ec9bcbcf108b4f",
+          "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\normal-1",
+          "started_at": "2026-11-04T16:14:08.214404+00:00",
+          "timeout_seconds": 15,
+          "startup_state": "ready",
+          "source": "csttool.runner_client.RunnerClient.connect",
+          "launcher_pid": 74368,
+          "launcher_exit_code": null,
+          "probe_count": 11,
+          "last_probe_error": {
+            "type": "FileNotFoundError",
+            "message": "[Errno 2] No such file or directory: 'D:\\\\work\\\\cst_tools\\\\artifacts\\\\runner-cold-verified-bf9ddf39\\\\normal-1\\\\control\\\\runner.json'"
+          },
+          "initial_probe_error": {
+            "type": "FileNotFoundError",
+            "message": "[Errno 2] No such file or directory: 'D:\\\\work\\\\cst_tools\\\\artifacts\\\\runner-cold-verified-bf9ddf39\\\\normal-1\\\\control\\\\runner.json'"
+          },
+          "phase": "waiting-http",
+          "ready_instance_id": "a854b14357014c119b0f560d83aa27bb",
+          "runtime": {
+            "pid": 62064,
+            "python": "D:\\work\\cst_tools\\artifacts\\mcp-runtime\\Scripts\\python.exe",
+            "cwd": "D:\\work\\cst_tools",
+            "source_root": "D:\\work\\cst_tools"
+          },
+          "elapsed_seconds": 0.844,
+          "last_endpoint": {
+            "pid": 62064,
+            "port": 63307,
+            "instance_id": "a854b14357014c119b0f560d83aa27bb"
+          }
+        },
+        "shutdown": {
+          "runner_stopped": true
+        },
+        "launcher_exit_code": 0,
+        "phases": [
+          {
+            "event": "RUNNER_STARTUP_CLIENT",
+            "client_pid": 76872,
+            "schema_version": 1,
+            "attempt_id": "1ba3c2a570ec4243a1ec9bcbcf108b4f",
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\normal-1",
+            "started_at": "2026-11-04T16:14:08.214404+00:00",
+            "timeout_seconds": 15,
+            "startup_state": "waiting",
+            "source": "csttool.runner_client.RunnerClient.connect",
+            "launcher_pid": null,
+            "launcher_exit_code": null,
+            "probe_count": 2,
+            "last_probe_error": {
+              "type": "FileNotFoundError",
+              "message": "[Errno 2] No such file or directory: 'D:\\\\work\\\\cst_tools\\\\artifacts\\\\runner-cold-verified-bf9ddf39\\\\normal-1\\\\control\\\\runner.json'"
+            },
+            "initial_probe_error": {
+              "type": "FileNotFoundError",
+              "message": "[Errno 2] No such file or directory: 'D:\\\\work\\\\cst_tools\\\\artifacts\\\\runner-cold-verified-bf9ddf39\\\\normal-1\\\\control\\\\runner.json'"
+            },
+            "phase": "spawn"
+          },
+          {
+            "event": "RUNNER_STARTUP",
+            "phase": "module-ready",
+            "pid": 62064,
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\normal-1",
+            "timestamp": "2026-11-04T16:14:08Z",
+            "elapsed_seconds": 0.0,
+            "source": "csttool.runner.serve"
+          },
+          {
+            "event": "RUNNER_STARTUP",
+            "phase": "protect-directory",
+            "pid": 62064,
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\normal-1",
+            "timestamp": "2026-11-04T16:14:08Z",
+            "elapsed_seconds": 0.0,
+            "source": "csttool.runner.serve"
+          },
+          {
+            "event": "RUNNER_STARTUP",
+            "phase": "runner-ownership",
+            "pid": 62064,
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\normal-1",
+            "timestamp": "2026-11-04T16:14:08Z",
+            "elapsed_seconds": 0.047,
+            "source": "csttool.runner.serve"
+          },
+          {
+            "event": "RUNNER_STARTUP",
+            "phase": "project-identity",
+            "pid": 62064,
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\normal-1",
+            "timestamp": "2026-11-04T16:14:08Z",
+            "elapsed_seconds": 0.047,
+            "source": "csttool.runner.serve"
+          },
+          {
+            "event": "RUNNER_STARTUP",
+            "phase": "restore-status",
+            "pid": 62064,
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\normal-1",
+            "timestamp": "2026-11-04T16:14:08Z",
+            "elapsed_seconds": 0.047,
+            "source": "csttool.runner.serve"
+          },
+          {
+            "event": "RUNNER_STARTUP",
+            "phase": "reconcile-intents",
+            "pid": 62064,
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\normal-1",
+            "timestamp": "2026-11-04T16:14:08Z",
+            "elapsed_seconds": 0.047,
+            "source": "csttool.runner.serve"
+          },
+          {
+            "event": "RUNNER_STARTUP",
+            "phase": "restore-checkpoint",
+            "pid": 62064,
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\normal-1",
+            "timestamp": "2026-11-04T16:14:08Z",
+            "elapsed_seconds": 0.047,
+            "source": "csttool.runner.serve"
+          },
+          {
+            "event": "RUNNER_STARTUP",
+            "phase": "reconcile-project",
+            "pid": 62064,
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\normal-1",
+            "timestamp": "2026-11-04T16:14:08Z",
+            "elapsed_seconds": 0.047,
+            "source": "csttool.runner.serve"
+          },
+          {
+            "event": "RUNNER_STARTUP",
+            "phase": "persist-status",
+            "pid": 62064,
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\normal-1",
+            "timestamp": "2026-11-04T16:14:08Z",
+            "elapsed_seconds": 0.062,
+            "source": "csttool.runner.serve"
+          },
+          {
+            "event": "RUNNER_STARTUP",
+            "phase": "state-ready",
+            "pid": 62064,
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\normal-1",
+            "timestamp": "2026-11-04T16:14:08Z",
+            "elapsed_seconds": 0.062,
+            "source": "csttool.runner.serve"
+          },
+          {
+            "event": "RUNNER_STARTUP",
+            "phase": "binding-http",
+            "pid": 62064,
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\normal-1",
+            "timestamp": "2026-11-04T16:14:08Z",
+            "elapsed_seconds": 0.062,
+            "source": "csttool.runner.serve"
+          },
+          {
+            "event": "RUNNER_STARTUP",
+            "phase": "publishing-endpoint",
+            "pid": 62064,
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\normal-1",
+            "timestamp": "2026-11-04T16:14:09Z",
+            "elapsed_seconds": 0.078,
+            "source": "csttool.runner.serve"
+          },
+          {
+            "event": "RUNNER_STARTUP",
+            "phase": "serving",
+            "pid": 62064,
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\normal-1",
+            "timestamp": "2026-11-04T16:14:09Z",
+            "elapsed_seconds": 0.094,
+            "source": "csttool.runner.serve",
+            "instance_id": "a854b14357014c119b0f560d83aa27bb",
+            "port": 63307
+          },
+          {
+            "event": "RUNNER_STARTUP",
+            "phase": "ownership-released",
+            "pid": 62064,
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\normal-1",
+            "timestamp": "2026-11-04T16:14:09Z",
+            "elapsed_seconds": 0.437,
+            "source": "csttool.runner.serve"
+          }
+        ]
+      },
+      {
+        "case": "early-exit",
+        "elapsed": 0.8353724999469705,
+        "startup": {
+          "schema_version": 1,
+          "attempt_id": "f8adaa9019da407a90e0669b4e63ac0f",
+          "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\early-exit",
+          "started_at": "2026-11-04T16:14:09.594467+00:00",
+          "timeout_seconds": 15,
+          "startup_state": "launcher-exited",
+          "source": "csttool.runner_client.RunnerClient.connect",
+          "launcher_pid": 15012,
+          "launcher_exit_code": 1,
+          "probe_count": 11,
+          "last_probe_error": {
+            "type": "FileNotFoundError",
+            "message": "[Errno 2] No such file or directory: 'D:\\\\work\\\\cst_tools\\\\artifacts\\\\runner-cold-verified-bf9ddf39\\\\early-exit\\\\control\\\\runner.json'"
+          },
+          "initial_probe_error": {
+            "type": "FileNotFoundError",
+            "message": "[Errno 2] No such file or directory: 'D:\\\\work\\\\cst_tools\\\\artifacts\\\\runner-cold-verified-bf9ddf39\\\\early-exit\\\\control\\\\runner.json'"
+          },
+          "phase": "waiting-http",
+          "elapsed_seconds": 0.828
+        },
+        "ownership_released": true,
+        "launcher_exit_code": 1,
+        "phases": [
+          {
+            "event": "RUNNER_STARTUP_CLIENT",
+            "client_pid": 76872,
+            "schema_version": 1,
+            "attempt_id": "f8adaa9019da407a90e0669b4e63ac0f",
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\early-exit",
+            "started_at": "2026-11-04T16:14:09.594467+00:00",
+            "timeout_seconds": 15,
+            "startup_state": "waiting",
+            "source": "csttool.runner_client.RunnerClient.connect",
+            "launcher_pid": null,
+            "launcher_exit_code": null,
+            "probe_count": 2,
+            "last_probe_error": {
+              "type": "FileNotFoundError",
+              "message": "[Errno 2] No such file or directory: 'D:\\\\work\\\\cst_tools\\\\artifacts\\\\runner-cold-verified-bf9ddf39\\\\early-exit\\\\control\\\\runner.json'"
+            },
+            "initial_probe_error": {
+              "type": "FileNotFoundError",
+              "message": "[Errno 2] No such file or directory: 'D:\\\\work\\\\cst_tools\\\\artifacts\\\\runner-cold-verified-bf9ddf39\\\\early-exit\\\\control\\\\runner.json'"
+            },
+            "phase": "spawn"
+          },
+          {
+            "event": "RUNNER_STARTUP",
+            "phase": "module-ready",
+            "pid": 41620,
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\early-exit",
+            "timestamp": "2026-11-04T16:14:10Z",
+            "elapsed_seconds": 0.0,
+            "source": "csttool.runner.serve"
+          },
+          {
+            "event": "RUNNER_STARTUP",
+            "phase": "protect-directory",
+            "pid": 41620,
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\early-exit",
+            "timestamp": "2026-11-04T16:14:10Z",
+            "elapsed_seconds": 0.0,
+            "source": "csttool.runner.serve"
+          },
+          {
+            "event": "RUNNER_STARTUP",
+            "phase": "runner-ownership",
+            "pid": 41620,
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\early-exit",
+            "timestamp": "2026-11-04T16:14:10Z",
+            "elapsed_seconds": 0.063,
+            "source": "csttool.runner.serve"
+          },
+          {
+            "event": "RUNNER_STARTUP",
+            "phase": "project-identity",
+            "pid": 41620,
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\early-exit",
+            "timestamp": "2026-11-04T16:14:10Z",
+            "elapsed_seconds": 0.063,
+            "source": "csttool.runner.serve"
+          },
+          {
+            "event": "RUNNER_STARTUP",
+            "phase": "restore-status",
+            "pid": 41620,
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\early-exit",
+            "timestamp": "2026-11-04T16:14:10Z",
+            "elapsed_seconds": 0.078,
+            "source": "csttool.runner.serve"
+          },
+          {
+            "event": "RUNNER_STARTUP",
+            "phase": "reconcile-intents",
+            "pid": 41620,
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\early-exit",
+            "timestamp": "2026-11-04T16:14:10Z",
+            "elapsed_seconds": 0.078,
+            "source": "csttool.runner.serve"
+          },
+          {
+            "event": "RUNNER_STARTUP",
+            "phase": "restore-checkpoint",
+            "pid": 41620,
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\early-exit",
+            "timestamp": "2026-11-04T16:14:10Z",
+            "elapsed_seconds": 0.078,
+            "source": "csttool.runner.serve"
+          },
+          {
+            "event": "RUNNER_STARTUP",
+            "phase": "reconcile-project",
+            "pid": 41620,
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\early-exit",
+            "timestamp": "2026-11-04T16:14:10Z",
+            "elapsed_seconds": 0.078,
+            "source": "csttool.runner.serve"
+          },
+          {
+            "event": "RUNNER_STARTUP",
+            "phase": "persist-status",
+            "pid": 41620,
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\early-exit",
+            "timestamp": "2026-11-04T16:14:10Z",
+            "elapsed_seconds": 0.078,
+            "source": "csttool.runner.serve"
+          },
+          {
+            "event": "RUNNER_STARTUP",
+            "phase": "initialization-failed",
+            "pid": 41620,
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\early-exit",
+            "timestamp": "2026-11-04T16:14:10Z",
+            "elapsed_seconds": 0.078,
+            "source": "csttool.runner.serve",
+            "error_type": "RuntimeError",
+            "reason": "controlled init failure"
+          },
+          {
+            "event": "RUNNER_STARTUP_CLIENT",
+            "client_pid": 76872,
+            "schema_version": 1,
+            "attempt_id": "f8adaa9019da407a90e0669b4e63ac0f",
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\early-exit",
+            "started_at": "2026-11-04T16:14:09.594467+00:00",
+            "timeout_seconds": 15,
+            "startup_state": "launcher-exited",
+            "source": "csttool.runner_client.RunnerClient.connect",
+            "launcher_pid": 15012,
+            "launcher_exit_code": 1,
+            "probe_count": 11,
+            "last_probe_error": {
+              "type": "FileNotFoundError",
+              "message": "[Errno 2] No such file or directory: 'D:\\\\work\\\\cst_tools\\\\artifacts\\\\runner-cold-verified-bf9ddf39\\\\early-exit\\\\control\\\\runner.json'"
+            },
+            "initial_probe_error": {
+              "type": "FileNotFoundError",
+              "message": "[Errno 2] No such file or directory: 'D:\\\\work\\\\cst_tools\\\\artifacts\\\\runner-cold-verified-bf9ddf39\\\\early-exit\\\\control\\\\runner.json'"
+            },
+            "phase": "waiting-http",
+            "elapsed_seconds": 0.828
+          }
+        ]
+      },
+      {
+        "case": "late-ready",
+        "launch_count": 1,
+        "timeout_record": {
+          "schema_version": 1,
+          "attempt_id": "b351df9c17724eca8dc4c40e80712d25",
+          "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\late-ready",
+          "started_at": "2026-11-04T16:14:10.560323+00:00",
+          "timeout_seconds": 0.3,
+          "startup_state": "timeout",
+          "source": "csttool.runner_client.RunnerClient.connect",
+          "launcher_pid": 32792,
+          "launcher_exit_code": null,
+          "probe_count": 8,
+          "last_probe_error": {
+            "type": "FileNotFoundError",
+            "message": "[Errno 2] No such file or directory: 'D:\\\\work\\\\cst_tools\\\\artifacts\\\\runner-cold-verified-bf9ddf39\\\\late-ready\\\\control\\\\runner.json'"
+          },
+          "initial_probe_error": {
+            "type": "FileNotFoundError",
+            "message": "[Errno 2] No such file or directory: 'D:\\\\work\\\\cst_tools\\\\artifacts\\\\runner-cold-verified-bf9ddf39\\\\late-ready\\\\control\\\\runner.json'"
+          },
+          "phase": "waiting-http",
+          "elapsed_seconds": 0.312
+        },
+        "reconnected_startup": {
+          "schema_version": 1,
+          "attempt_id": "b351df9c17724eca8dc4c40e80712d25",
+          "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\late-ready",
+          "started_at": "2026-11-04T16:14:10.560323+00:00",
+          "timeout_seconds": 0.3,
+          "startup_state": "ready",
+          "source": "csttool.runner_client.RunnerClient.connect",
+          "launcher_pid": 32792,
+          "launcher_exit_code": null,
+          "probe_count": 8,
+          "last_probe_error": {
+            "type": "FileNotFoundError",
+            "message": "[Errno 2] No such file or directory: 'D:\\\\work\\\\cst_tools\\\\artifacts\\\\runner-cold-verified-bf9ddf39\\\\late-ready\\\\control\\\\runner.json'"
+          },
+          "initial_probe_error": {
+            "type": "FileNotFoundError",
+            "message": "[Errno 2] No such file or directory: 'D:\\\\work\\\\cst_tools\\\\artifacts\\\\runner-cold-verified-bf9ddf39\\\\late-ready\\\\control\\\\runner.json'"
+          },
+          "phase": "connected-existing",
+          "elapsed_seconds": 1.953,
+          "ready_instance_id": "84a27959296247f996466a470bb88396",
+          "runtime": {
+            "pid": 12984,
+            "python": "D:\\work\\cst_tools\\artifacts\\mcp-runtime\\Scripts\\python.exe",
+            "cwd": "D:\\work\\cst_tools",
+            "source_root": "D:\\work\\cst_tools"
+          },
+          "reconnected_at": "2026-11-04T16:14:12.512055+00:00",
+          "previous_startup_state": "timeout"
+        },
+        "shutdown": {
+          "runner_stopped": true
+        },
+        "launcher_exit_code": 0,
+        "phases": [
+          {
+            "event": "RUNNER_STARTUP_CLIENT",
+            "client_pid": 76872,
+            "schema_version": 1,
+            "attempt_id": "b351df9c17724eca8dc4c40e80712d25",
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\late-ready",
+            "started_at": "2026-11-04T16:14:10.560323+00:00",
+            "timeout_seconds": 0.3,
+            "startup_state": "waiting",
+            "source": "csttool.runner_client.RunnerClient.connect",
+            "launcher_pid": null,
+            "launcher_exit_code": null,
+            "probe_count": 2,
+            "last_probe_error": {
+              "type": "FileNotFoundError",
+              "message": "[Errno 2] No such file or directory: 'D:\\\\work\\\\cst_tools\\\\artifacts\\\\runner-cold-verified-bf9ddf39\\\\late-ready\\\\control\\\\runner.json'"
+            },
+            "initial_probe_error": {
+              "type": "FileNotFoundError",
+              "message": "[Errno 2] No such file or directory: 'D:\\\\work\\\\cst_tools\\\\artifacts\\\\runner-cold-verified-bf9ddf39\\\\late-ready\\\\control\\\\runner.json'"
+            },
+            "phase": "spawn"
+          },
+          {
+            "event": "RUNNER_STARTUP",
+            "phase": "module-ready",
+            "pid": 12984,
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\late-ready",
+            "timestamp": "2026-11-04T16:14:11Z",
+            "elapsed_seconds": 0.0,
+            "source": "csttool.runner.serve"
+          },
+          {
+            "event": "RUNNER_STARTUP",
+            "phase": "protect-directory",
+            "pid": 12984,
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\late-ready",
+            "timestamp": "2026-11-04T16:14:11Z",
+            "elapsed_seconds": 0.0,
+            "source": "csttool.runner.serve"
+          },
+          {
+            "event": "RUNNER_STARTUP",
+            "phase": "runner-ownership",
+            "pid": 12984,
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\late-ready",
+            "timestamp": "2026-11-04T16:14:11Z",
+            "elapsed_seconds": 0.062,
+            "source": "csttool.runner.serve"
+          },
+          {
+            "event": "RUNNER_STARTUP",
+            "phase": "project-identity",
+            "pid": 12984,
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\late-ready",
+            "timestamp": "2026-11-04T16:14:11Z",
+            "elapsed_seconds": 0.062,
+            "source": "csttool.runner.serve"
+          },
+          {
+            "event": "RUNNER_STARTUP",
+            "phase": "restore-status",
+            "pid": 12984,
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\late-ready",
+            "timestamp": "2026-11-04T16:14:11Z",
+            "elapsed_seconds": 0.078,
+            "source": "csttool.runner.serve"
+          },
+          {
+            "event": "RUNNER_STARTUP",
+            "phase": "reconcile-intents",
+            "pid": 12984,
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\late-ready",
+            "timestamp": "2026-11-04T16:14:11Z",
+            "elapsed_seconds": 0.078,
+            "source": "csttool.runner.serve"
+          },
+          {
+            "event": "RUNNER_STARTUP",
+            "phase": "restore-checkpoint",
+            "pid": 12984,
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\late-ready",
+            "timestamp": "2026-11-04T16:14:11Z",
+            "elapsed_seconds": 0.078,
+            "source": "csttool.runner.serve"
+          },
+          {
+            "event": "RUNNER_STARTUP",
+            "phase": "reconcile-project",
+            "pid": 12984,
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\late-ready",
+            "timestamp": "2026-11-04T16:14:11Z",
+            "elapsed_seconds": 0.078,
+            "source": "csttool.runner.serve"
+          },
+          {
+            "event": "RUNNER_STARTUP",
+            "phase": "persist-status",
+            "pid": 12984,
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\late-ready",
+            "timestamp": "2026-11-04T16:14:11Z",
+            "elapsed_seconds": 0.078,
+            "source": "csttool.runner.serve"
+          },
+          {
+            "event": "RUNNER_STARTUP",
+            "phase": "state-ready",
+            "pid": 12984,
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\late-ready",
+            "timestamp": "2026-11-04T16:14:12Z",
+            "elapsed_seconds": 1.093,
+            "source": "csttool.runner.serve"
+          },
+          {
+            "event": "RUNNER_STARTUP",
+            "phase": "binding-http",
+            "pid": 12984,
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\late-ready",
+            "timestamp": "2026-11-04T16:14:12Z",
+            "elapsed_seconds": 1.093,
+            "source": "csttool.runner.serve"
+          },
+          {
+            "event": "RUNNER_STARTUP",
+            "phase": "publishing-endpoint",
+            "pid": 12984,
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\late-ready",
+            "timestamp": "2026-11-04T16:14:12Z",
+            "elapsed_seconds": 1.125,
+            "source": "csttool.runner.serve"
+          },
+          {
+            "event": "RUNNER_STARTUP",
+            "phase": "serving",
+            "pid": 12984,
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\late-ready",
+            "timestamp": "2026-11-04T16:14:12Z",
+            "elapsed_seconds": 1.14,
+            "source": "csttool.runner.serve",
+            "instance_id": "84a27959296247f996466a470bb88396",
+            "port": 58632
+          },
+          {
+            "event": "RUNNER_STARTUP",
+            "phase": "ownership-released",
+            "pid": 12984,
+            "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\late-ready",
+            "timestamp": "2026-11-04T16:14:12Z",
+            "elapsed_seconds": 1.484,
+            "source": "csttool.runner.serve"
+          }
+        ]
+      },
+      {
+        "case": "silent-stale-endpoint",
+        "elapsed": 0.37120340002002195,
+        "launch_count": 0,
+        "startup": {
+          "schema_version": 1,
+          "attempt_id": "a8770f0b0df04488b6692550668d2191",
+          "project": "D:\\work\\cst_tools\\artifacts\\runner-cold-verified-bf9ddf39\\silent-stale-endpoint",
+          "started_at": "2026-11-04T16:14:13.362050+00:00",
+          "timeout_seconds": 0.35,
+          "startup_state": "timeout",
+          "source": "csttool.runner_client.RunnerClient.connect",
+          "launcher_pid": null,
+          "launcher_exit_code": null,
+          "probe_count": 1,
+          "last_probe_error": {
+            "type": "TimeoutError",
+            "message": "timed out"
+          },
+          "initial_probe_error": {
+            "type": "TimeoutError",
+            "message": "timed out"
+          },
+          "phase": "before-spawn",
+          "elapsed_seconds": 0.375,
+          "last_endpoint": {
+            "pid": 1,
+            "port": 58637,
+            "instance_id": "stale"
+          }
+        }
+      }
+    ]
+  },
+  "real_cst": false,
+  "solver_start_calls": 0,
+  "a1_geo_gates_current": true,
+  "confirmed_defects": [
+    "no launcher early-exit distinction or startup phase timeline",
+    "initial HTTP probe excluded from readiness budget; final poll could use full 2 seconds",
+    "Windows stat/write-before-lock race reproduced by real parallel startup",
+    "post-lock already-ready observer must not overwrite original starter report",
+    "readiness timeout followed by reachable server needs summary reconciliation",
+    "failure bundle omitted control-plane startup evidence"
+  ],
+  "ownership_lock_definition": {
+    "source": "https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/locking?view=msvc-170",
+    "documented": "byte ranges may extend beyond EOF",
+    "observed": "first empty-file handle acquired; second rejected; release allowed next owner; file size zero"
+  },
+  "safety": {
+    "cooperating_clients_share_startup_lock": true,
+    "actual_runner_ownership_separate": true,
+    "never_replace_owned_process": true,
+    "no_process_kill": true,
+    "no_automatic_task_or_recovery": true,
+    "lock_release_not_cst_closure": true,
+    "all_probe_runner_locks_released": true
+  },
+  "limitations": [
+    "network probe budget is not hard realtime for OS creation or disk operations",
+    "original 15s desktop observation needs instrumented recurrence for unique attribution",
+    "existing loaded GUI/MCP client processes need normal reload for new Python client code; no desktop hot-reload claim",
+    "startup controls do not certify CST solver/session/result readiness"
+  ],
+  "offline_specialist": {
+    "startup_passed": 30,
+    "startup_and_bundle_passed": 47,
+    "overlapping": true
+  },
+  "cleanup": {
+    "status": "complete",
+    "finished_pytest_directories_removed": 14,
+    "retained_test_evidence_archive": "D:\\work\\cst_tools\\artifacts\\runner-startup-retained-tests.zip",
+    "retained_archive_sha256": "534c65b2a3970b949865033452b937f50f21d68dc27be7d9372d68f71842bc44",
+    "retained": "baseline and final controlled-process JSON/logs, JUnit XML, source/ownership receipts and compressed light test evidence; endpoint credential files excluded from retained test ZIP",
+    "raw_artifacts_guaranteed_in_git": false
+  },
+  "offline_final": {
+    "passed": 236,
+    "junit": "artifacts/runner-startup-verified-regression.xml",
+    "elapsed_seconds": 203.34,
+    "scope": "startup/Runner/GUI/recovery/diagnostic export/MCP SDK/registry/docs/source-package",
+    "overlaps_specialist": true
+  },
+  "regression_corrections": [
+    "wrong credential test now asserts HTTPError 403 rather than accepting an incidental JSON decoding error",
+    "F43 original purpose title retained for original 136-feature preservation; new sources/tests/docs added without replacing original meaning"
+  ],
+  "offline_metadata_repeat": {
+    "passed": 16,
+    "junit": "artifacts/runner-startup-final-metadata.xml",
+    "overlaps_final": true
+  },
+  "controlled_probe_source_sha256": "9a70a9aaae994556fcc34a3f8b85b83182f0c119b98285ef806164d6a63db991"
+}

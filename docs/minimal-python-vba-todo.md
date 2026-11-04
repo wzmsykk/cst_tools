@@ -1,6 +1,6 @@
 # 现行计划与TODO
 
-更新：2026-11-04。以[当前状态](current-status.md)确认实现和证据；本页只列当前工作。所有旧未决条目保存在[复审前完整快照](archive/20261103-semantic-review/minimal-python-vba-todo.md)及[较早归档](archive/20261102-progress-consolidation/minimal-python-vba-todo.md)，不因归档标为完成。
+更新：2026-11-05。以[当前状态](current-status.md)确认实现和证据；本页只列当前工作。所有旧未决条目保存在[复审前完整快照](archive/20261103-semantic-review/minimal-python-vba-todo.md)及[较早归档](archive/20261102-progress-consolidation/minimal-python-vba-todo.md)，不因归档标为完成。
 
 ## 已完成的基础
 
@@ -42,7 +42,8 @@
 
 - [ ] 后续独立阶段：面/边命名规则、零/一/多匹配及拓扑失效校准；不以COMSOL选择tag或CST旧编号保证稳定，不阻塞实体集合首版。
 
-- [ ] 桌面冷启动就绪超时的原因及提示：本轮同一Runner后来可达，未重复启动；不能用沙箱进程枚举遗漏推断已退出，也不因一次观察直接调长超时。
+- [x] [冷启动就绪与诊断](runner-startup-readiness.md)：统一预算、阶段/早退诊断、迟就绪重连、合作启动互斥和导出接入；修复已复现Windows锁前写入竞争，不延长默认15秒，不重启/强杀/重算。
+- [ ] 原现场首次15秒就绪超时仍待带新bootstrap证据复现；本轮普通/复制历史启动未复现，不把已证实的并发竞争直接归为该现场根因。当前已加载GUI/MCP需正常重载后才采用新客户端，未宣称桌面热更新验收。
 
 ## 保留的长期与独立验收
 

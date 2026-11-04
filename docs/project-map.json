@@ -1192,7 +1192,8 @@
             "Runner.command",
             "Runner.snapshot",
             "LocalExecution.run",
-            "serve"
+            "serve",
+            "Runner._initialize"
           ]
         }
       ],
@@ -1200,15 +1201,23 @@
         {
           "path": "test/runner_test.py",
           "label": "进程验收"
+        },
+        {
+          "path": "test/runner_startup_test.py",
+          "label": "预算/早退/迟就绪/OS锁及真实双客户端"
         }
       ],
       "docs": [
         {
           "path": "docs/local-runner.md",
           "label": "本机Runner"
+        },
+        {
+          "path": "docs/runner-startup-readiness.md",
+          "label": "当前启动诊断、受控进程与现场边界"
         }
       ],
-      "provenance": "Migrated from maintained feature-index at c083c58; no new semantic or runtime acceptance."
+      "provenance": "cd5a820后本批复审：Runner启动/等待/诊断与实际任务、CST安全和采用边界独立；原现场超时未唯一归因。Windows空锁前写入竞争已实测，直接锁EOF字节并保持原文件；无原生CST启动。"
     },
     {
       "id": "F42",
@@ -1227,15 +1236,23 @@
         {
           "path": "test/runner_test.py",
           "label": "进程验收"
+        },
+        {
+          "path": "test/runner_startup_test.py",
+          "label": "预算/早退/迟就绪/OS锁及真实双客户端"
         }
       ],
       "docs": [
         {
           "path": "docs/execution-platform-implementation-plan.md",
           "label": "统一计划"
+        },
+        {
+          "path": "docs/runner-startup-readiness.md",
+          "label": "当前启动诊断、受控进程与现场边界"
         }
       ],
-      "provenance": "Migrated from maintained feature-index at c083c58; no new semantic or runtime acceptance."
+      "provenance": "cd5a820后本批复审：Runner启动/等待/诊断与实际任务、CST安全和采用边界独立；原现场超时未唯一归因。Windows空锁前写入竞争已实测，直接锁EOF字节并保持原文件；无原生CST启动。"
     },
     {
       "id": "F43",
@@ -1247,7 +1264,10 @@
           "symbols": [
             "RunnerClient.connect",
             "RunnerClient.command",
-            "main"
+            "main",
+            "RunnerClient._startup_record",
+            "RunnerStartupError",
+            "RunnerStartupTimeout"
           ]
         }
       ],
@@ -1255,15 +1275,23 @@
         {
           "path": "test/runner_test.py",
           "label": "进程验收"
+        },
+        {
+          "path": "test/runner_startup_test.py",
+          "label": "预算/早退/迟就绪/OS锁及真实双客户端"
         }
       ],
       "docs": [
         {
           "path": "docs/local-runner.md",
           "label": "本机Runner"
+        },
+        {
+          "path": "docs/runner-startup-readiness.md",
+          "label": "当前启动诊断、受控进程与现场边界"
         }
       ],
-      "provenance": "Migrated from maintained feature-index at c083c58; no new semantic or runtime acceptance."
+      "provenance": "cd5a820后本批复审：Runner启动/等待/诊断与实际任务、CST安全和采用边界独立；原现场超时未唯一归因。Windows空锁前写入竞争已实测，直接锁EOF字节并保持原文件；无原生CST启动。"
     },
     {
       "id": "F44",
@@ -2587,15 +2615,23 @@
         {
           "path": "test/diagnostic_bundle_test.py",
           "label": "边界/大日志测试"
+        },
+        {
+          "path": "test/runner_startup_test.py",
+          "label": "预算/早退/迟就绪/OS锁及真实双客户端"
         }
       ],
       "docs": [
         {
           "path": "docs/failure-diagnostic-export.md",
           "label": "范围及API"
+        },
+        {
+          "path": "docs/runner-startup-readiness.md",
+          "label": "当前启动诊断、受控进程与现场边界"
         }
       ],
-      "provenance": "Migrated from maintained feature-index at c083c58; no new semantic or runtime acceptance."
+      "provenance": "cd5a820后本批复审：Runner启动/等待/诊断与实际任务、CST安全和采用边界独立；原现场超时未唯一归因。Windows空锁前写入竞争已实测，直接锁EOF字节并保持原文件；无原生CST启动。"
     },
     {
       "id": "F89",
@@ -4611,36 +4647,36 @@
       "authority": "current-navigation",
       "provenance": "D3人工确认维护职责；不授予运行验收。",
       "review": {
-        "date": "2026-11-04",
-        "baseline": "54b8715",
+        "date": "2026-11-05",
+        "baseline": "cd5a820",
         "status": "operational-and-applicability-reviewed",
-        "scope": "A1当前独立许可、原子历史/错误前缀、可信测试注入与生产原诊断分离、12最终和2排查会话边界；GEO记录独立。",
+        "scope": "冷启动预算、两类启动异常、里程碑/迟就绪、协作锁及实际所有权；失败包启动证据与运行身份分离。",
         "checked_sources": [
           {
-            "path": "test/support/calibrate_winwrap_gate.py"
+            "path": "csttool/runner_client.py"
           },
           {
-            "path": "test/winwrap_gate_probe_test.py"
+            "path": "csttool/runner.py"
           },
           {
-            "path": "csttool/managed_history.py"
+            "path": "csttool/runner_ownership.py"
           },
           {
-            "path": "csttool/winwrap_checks.py"
+            "path": "csttool/diagnostic_bundle.py"
           },
           {
-            "path": "data/winwrap-a1-calibration.json"
+            "path": "test/runner_startup_test.py"
           },
           {
-            "path": "knowledge-base/winwrap-w23-20261104.json"
+            "path": "test/diagnostic_bundle_test.py"
           },
           {
-            "path": "knowledge-base/a1-recalibration-review-20261104.json"
+            "path": "knowledge-base/runner-startup-readiness-20261105.json"
           }
         ],
         "finding_ids": [],
-        "limitations": "不是完整语言、自然setter/求解异常或任意模型证明；原始artifacts可能清理；旧阶段记录保留当时范围。",
-        "content_sha256_at_review": "5291700fb5a15f34e4e3bbda67860948b4362d705dc5584b67d4b7b6590768bf"
+        "limitations": "原现场首次超时未唯一归因；OS创建/磁盘不硬实时；未启动CST、不宣称已加载GUI/MCP热更新；启动或锁释放不是原生关闭/结果证明。",
+        "content_sha256_at_review": "1edafb7c7b251aa6be0dde3af2f0c4ce66d06429c401c0fb14291a9fa24ca082"
       }
     },
     {
@@ -6310,36 +6346,36 @@
       "authority": "current-progress",
       "provenance": "D3人工确认维护职责；不授予运行验收。",
       "review": {
-        "date": "2026-11-04",
-        "baseline": "54b8715",
+        "date": "2026-11-05",
+        "baseline": "cd5a820",
         "status": "operational-and-applicability-reviewed",
-        "scope": "A1当前独立许可、原子历史/错误前缀、可信测试注入与生产原诊断分离、12最终和2排查会话边界；GEO记录独立。",
+        "scope": "冷启动预算、两类启动异常、里程碑/迟就绪、协作锁及实际所有权；失败包启动证据与运行身份分离。",
         "checked_sources": [
           {
-            "path": "test/support/calibrate_winwrap_gate.py"
+            "path": "csttool/runner_client.py"
           },
           {
-            "path": "test/winwrap_gate_probe_test.py"
+            "path": "csttool/runner.py"
           },
           {
-            "path": "csttool/managed_history.py"
+            "path": "csttool/runner_ownership.py"
           },
           {
-            "path": "csttool/winwrap_checks.py"
+            "path": "csttool/diagnostic_bundle.py"
           },
           {
-            "path": "data/winwrap-a1-calibration.json"
+            "path": "test/runner_startup_test.py"
           },
           {
-            "path": "knowledge-base/winwrap-w23-20261104.json"
+            "path": "test/diagnostic_bundle_test.py"
           },
           {
-            "path": "knowledge-base/a1-recalibration-review-20261104.json"
+            "path": "knowledge-base/runner-startup-readiness-20261105.json"
           }
         ],
         "finding_ids": [],
-        "limitations": "不是完整语言、自然setter/求解异常或任意模型证明；原始artifacts可能清理；旧阶段记录保留当时范围。",
-        "content_sha256_at_review": "f2446e97871def163f95c638efb9f42bf75a4f58d9790d5cf78e0db5e645b5d9"
+        "limitations": "原现场首次超时未唯一归因；OS创建/磁盘不硬实时；未启动CST、不宣称已加载GUI/MCP热更新；启动或锁释放不是原生关闭/结果证明。",
+        "content_sha256_at_review": "6f711f87bf4d8e0144c5de7eeb55450f9dc6fecddaf196fabb84426d5f879d74"
       }
     },
     {
@@ -6426,24 +6462,36 @@
       "authority": "current-defined-scope-only",
       "provenance": "2026-11-03人工适用性/历史堆叠复审；具体检查层级见review，不将分类当逐条事实证明。",
       "review": {
-        "date": "2026-11-03",
-        "baseline": "2705935",
+        "date": "2026-11-05",
+        "baseline": "cd5a820",
         "status": "operational-and-applicability-reviewed",
-        "scope": "核对候选发现和ZIP两层优先级、限额、取消/进度回调、部分捕获与发布清理；补齐API签名。",
+        "scope": "冷启动预算、两类启动异常、里程碑/迟就绪、协作锁及实际所有权；失败包启动证据与运行身份分离。",
         "checked_sources": [
+          {
+            "path": "csttool/runner_client.py"
+          },
+          {
+            "path": "csttool/runner.py"
+          },
+          {
+            "path": "csttool/runner_ownership.py"
+          },
           {
             "path": "csttool/diagnostic_bundle.py"
           },
           {
-            "path": "GUI/main_window.py"
+            "path": "test/runner_startup_test.py"
+          },
+          {
+            "path": "test/diagnostic_bundle_test.py"
+          },
+          {
+            "path": "knowledge-base/runner-startup-readiness-20261105.json"
           }
         ],
-        "finding_ids": [
-          "S11",
-          "S17"
-        ],
-        "limitations": "本批逐条静态核对所列源码/保存证据；历史实测及原厂/第三方规范不重新运行或外部认证，不等于完整CST/桌面/物理验收。",
-        "content_sha256_at_review": "fcec9a096adbbddf25082fb5b08aeaa8a29aaa9247401e1b33f6752bf37c9893"
+        "finding_ids": [],
+        "limitations": "原现场首次超时未唯一归因；OS创建/磁盘不硬实时；未启动CST、不宣称已加载GUI/MCP热更新；启动或锁释放不是原生关闭/结果证明。",
+        "content_sha256_at_review": "4155e25746735a17529dd11a05b110f3ba5679815a00f3ad5496241cdc362184"
       }
     },
     {
@@ -7056,29 +7104,36 @@
       "authority": "current-defined-scope-only",
       "provenance": "2026-11-03人工适用性/历史堆叠复审；具体检查层级见review，不将分类当逐条事实证明。",
       "review": {
-        "date": "2026-11-03",
-        "baseline": "2705935",
+        "date": "2026-11-05",
+        "baseline": "cd5a820",
         "status": "operational-and-applicability-reviewed",
-        "scope": "旧语义与现行执行的适用性、历史记录堆叠及操作/证据边界",
+        "scope": "冷启动预算、两类启动异常、里程碑/迟就绪、协作锁及实际所有权；失败包启动证据与运行身份分离。",
         "checked_sources": [
-          {
-            "path": "csttool/runner.py"
-          },
           {
             "path": "csttool/runner_client.py"
           },
           {
-            "path": "GUI/runner_controller.py"
+            "path": "csttool/runner.py"
           },
           {
-            "path": "csttool/mcp_server.py"
+            "path": "csttool/runner_ownership.py"
+          },
+          {
+            "path": "csttool/diagnostic_bundle.py"
+          },
+          {
+            "path": "test/runner_startup_test.py"
+          },
+          {
+            "path": "test/diagnostic_bundle_test.py"
+          },
+          {
+            "path": "knowledge-base/runner-startup-readiness-20261105.json"
           }
         ],
-        "finding_ids": [
-          "S09"
-        ],
-        "limitations": "重点核对历史堆叠/旧操作语义与责任边界；checked_sources仅列本批主要对照源，不表示每行技术陈述或所有物理/异常分支已验证。",
-        "content_sha256_at_review": "2acda530faf78c7eb05badaa0d8a4846de317b5f3f11ca18b5ffc106383faf7b"
+        "finding_ids": [],
+        "limitations": "原现场首次超时未唯一归因；OS创建/磁盘不硬实时；未启动CST、不宣称已加载GUI/MCP热更新；启动或锁释放不是原生关闭/结果证明。",
+        "content_sha256_at_review": "2f858f6865e08f0f36abfd1bff0d8b8b21c7f27ed1649dd426746049bdeef7de"
       }
     },
     {
@@ -7385,36 +7440,36 @@
       "authority": "current-worklist",
       "provenance": "D3人工确认维护职责；不授予运行验收。",
       "review": {
-        "date": "2026-11-04",
-        "baseline": "54b8715",
+        "date": "2026-11-05",
+        "baseline": "cd5a820",
         "status": "operational-and-applicability-reviewed",
-        "scope": "A1当前独立许可、原子历史/错误前缀、可信测试注入与生产原诊断分离、12最终和2排查会话边界；GEO记录独立。",
+        "scope": "冷启动预算、两类启动异常、里程碑/迟就绪、协作锁及实际所有权；失败包启动证据与运行身份分离。",
         "checked_sources": [
           {
-            "path": "test/support/calibrate_winwrap_gate.py"
+            "path": "csttool/runner_client.py"
           },
           {
-            "path": "test/winwrap_gate_probe_test.py"
+            "path": "csttool/runner.py"
           },
           {
-            "path": "csttool/managed_history.py"
+            "path": "csttool/runner_ownership.py"
           },
           {
-            "path": "csttool/winwrap_checks.py"
+            "path": "csttool/diagnostic_bundle.py"
           },
           {
-            "path": "data/winwrap-a1-calibration.json"
+            "path": "test/runner_startup_test.py"
           },
           {
-            "path": "knowledge-base/winwrap-w23-20261104.json"
+            "path": "test/diagnostic_bundle_test.py"
           },
           {
-            "path": "knowledge-base/a1-recalibration-review-20261104.json"
+            "path": "knowledge-base/runner-startup-readiness-20261105.json"
           }
         ],
         "finding_ids": [],
-        "limitations": "不是完整语言、自然setter/求解异常或任意模型证明；原始artifacts可能清理；旧阶段记录保留当时范围。",
-        "content_sha256_at_review": "61bb5c3f6194fcc227ce9489523c4d9255c626a4a74c1908579eea0613936673"
+        "limitations": "原现场首次超时未唯一归因；OS创建/磁盘不硬实时；未启动CST、不宣称已加载GUI/MCP热更新；启动或锁释放不是原生关闭/结果证明。",
+        "content_sha256_at_review": "fe90fe1754427afc2a43d876021a02f04b5e1ce7b463b62095c51b2df7ca0e8c"
       }
     },
     {
@@ -9738,6 +9793,44 @@
         "limitations": "不是完整语言、自然setter/求解异常或任意模型证明；原始artifacts可能清理；旧阶段记录保留当时范围。",
         "content_sha256_at_review": "1abcdcab69d47c74cceb1b8b90bd22f3db6c39fca227a332ba3c9b277018f72b"
       }
+    },
+    {
+      "path": "docs/runner-startup-readiness.md",
+      "role": "api-contract",
+      "authority": "current-defined-scope-only",
+      "provenance": "本批纯Python Runner控制面排查与实现；不替代CST或指定桌面热重载证明。",
+      "review": {
+        "date": "2026-11-05",
+        "baseline": "cd5a820",
+        "status": "operational-and-applicability-reviewed",
+        "scope": "冷启动预算、两类启动异常、里程碑/迟就绪、协作锁及实际所有权；失败包启动证据与运行身份分离。",
+        "checked_sources": [
+          {
+            "path": "csttool/runner_client.py"
+          },
+          {
+            "path": "csttool/runner.py"
+          },
+          {
+            "path": "csttool/runner_ownership.py"
+          },
+          {
+            "path": "csttool/diagnostic_bundle.py"
+          },
+          {
+            "path": "test/runner_startup_test.py"
+          },
+          {
+            "path": "test/diagnostic_bundle_test.py"
+          },
+          {
+            "path": "knowledge-base/runner-startup-readiness-20261105.json"
+          }
+        ],
+        "finding_ids": [],
+        "limitations": "原现场首次超时未唯一归因；OS创建/磁盘不硬实时；未启动CST、不宣称已加载GUI/MCP热更新；启动或锁释放不是原生关闭/结果证明。",
+        "content_sha256_at_review": "ce8eaa5b22757fd3141bd5a9796b850d6c0b41b82f04a2964d9c3a879dbc7dc6"
+      }
     }
   ],
   "tools": [
@@ -9907,7 +10000,7 @@
       ],
       "review_status": "source-reviewed-specific-boundary",
       "unknown": "动态/委托参数、外部工具及传递副作用不由AST或本条登记证明安全。",
-      "evidence": "2026-11-03静态检查；已读serve/main/_execute；正常关闭与GUI关闭不同。"
+      "evidence": "本批复审main/serve：--project/--fake字面参数未变；启动阶段写bootstrap stderr，初始化/绑定失败释放控制服务资源；不自动提交或恢复任务。"
     },
     {
       "path": "csttool/runner_client.py",
@@ -9931,7 +10024,7 @@
       ],
       "review_status": "source-reviewed-specific-boundary",
       "unknown": "动态/委托参数、外部工具及传递副作用不由AST或本条登记证明安全。",
-      "evidence": "2026-11-03静态检查；已读main/connect/shutdown_and_wait；命令参数并非只读。"
+      "evidence": "本批复审main/connect/status/shutdown_and_wait：CLI仍只连接已有Runner；新启动诊断只在显式允许launch的Python调用；预算/协作锁/早退不新增CLI参数或自动强杀。"
     },
     {
       "path": "csttool/vacuum_mode_tracking.py",
@@ -11322,7 +11415,7 @@
       "trigger": "用户选择仅关闭界面或停止并退出；后者依状态先停后shutdown。",
       "lifecycle": "Qt关闭事件；未知/只读/等待状态会阻止完整退出。",
       "cleanup": "detach释放客户端租约；shutdown_and_wait核验Runner所有权，不强杀。",
-      "evidence": "2026-11-04 GEO-2–4逐调用人工复审：复核同一Runner/adapter或注入边界及未更改的清理责任；GEO新增目标不是另一后端。 代码hash仅作复审定位，原生证据另见独立校准。",
+      "evidence": "本批逐调用复审：RunnerClient的预算/状态探测和异常、实际Runner OS所有权及协作启动锁分离；launch=False不派生，shutdown标准链/活动拒绝保留，HTTP JSON409业务拒绝与HTML403传输未确认分开；原启动器PID不等于venv实际子PID。",
       "unknown": "Runner锁释放与原生会话安全不是一个事实；缺证据仍需恢复。",
       "consumers": []
     },
@@ -11438,8 +11531,8 @@
       "trigger": "client_factory默认RunnerClient，按client_id保存控制句柄。",
       "lifecycle": "适配器锁保护句柄表；连接可显式launch Runner。",
       "cleanup": "具体控制操作按Runner租约处理；句柄不代表原生资源所有权。",
-      "evidence": "2026-11-04 GEO-2–4逐调用人工复审：复核同一Runner/adapter或注入边界及未更改的清理责任；GEO新增目标不是另一后端。 代码hash仅作复审定位，原生证据另见独立校准。",
-      "unknown": "client_factory注入目标未知；connect不是求解成功。",
+      "evidence": "本批逐调用复审：RunnerClient的预算/状态探测和异常、实际Runner OS所有权及协作启动锁分离；launch=False不派生，shutdown标准链/活动拒绝保留，HTTP JSON409业务拒绝与HTML403传输未确认分开；原启动器PID不等于venv实际子PID。",
+      "unknown": "已加载adapter需正常重载Python客户端；控制句柄不授予CST所有权，原现场15秒未唯一归因。",
       "consumers": []
     },
     {
@@ -11456,13 +11549,21 @@
         {
           "path": "csttool/runner.py",
           "symbol": "Runner.close"
+        },
+        {
+          "path": "csttool/runner.py",
+          "symbol": "Runner.__init__"
+        },
+        {
+          "path": "csttool/runner.py",
+          "symbol": "Runner._initialize"
         }
       ],
       "type": "dispatch",
-      "trigger": "嵌套HTTP Handler按路径/命令分发并核验Authorization/client身份。",
+      "trigger": "HTTP Handler路由和鉴权不变；serve注入startup_observer到Runner初始化，子阶段只写stderr bootstrap日志，无任务派发。",
       "lifecycle": "独立Runner服务；请求与后台执行分离。",
-      "cleanup": "服务收尾关闭server并调用Runner.close；活跃执行拒绝关闭。",
-      "evidence": "2026-11-03人工静态核对source/targets；对应文件hash见source_fingerprints。登记、默认分支或注册不证明实际运行/清理成功。",
+      "cleanup": "初始化失败关闭已取得的Runner锁；绑定/端点发布失败及标准退出均关闭server/Runner；活动任务仍拒绝关闭；ownership-released不是CST关闭证明。",
+      "evidence": "本批逐调用复审：RunnerClient的预算/状态探测和异常、实际Runner OS所有权及协作启动锁分离；launch=False不派生，shutdown标准链/活动拒绝保留，HTTP JSON409业务拒绝与HTML403传输未确认分开；原启动器PID不等于venv实际子PID。",
       "unknown": "网络响应丢失、HTTP线程调度或调用方断线需故障验收。",
       "consumers": [
         {
@@ -11499,7 +11600,7 @@
       "trigger": "operation、run_kind及executor_factory is LocalExecution决定单次/定义/恢复/批量分支。",
       "lifecycle": "Runner后台worker线程；共享stop_intent和状态更新。",
       "cleanup": "finally调用executor.close；lifecycle_facts可调用时采集事实；异常保留RECOVERY_REQUIRED。",
-      "evidence": "2026-11-04 GEO-2–4逐调用人工复审：复核同一Runner/adapter或注入边界及未更改的清理责任；GEO新增目标不是另一后端。 代码hash仅作复审定位，原生证据另见独立校准。",
+      "evidence": "本批逐调用复审：Runner._execute的executor_factory/stop/恢复/结果/关闭分发未修改；初始化提取为_initialize及serve启动观测，不向executor注入启动回调，不改变Managed/HOM采用或标准退出责任。",
       "unknown": "注入executor_factory及getattr生命周期探针不能静态唯一解析；close返回不等于CST安全。",
       "consumers": []
     },
@@ -12113,7 +12214,7 @@
       "trigger": "显式--run-cst持独占门禁，父RunnerClient命令；子进程钩子中止首任务、首模式采用后正常暂停，按case在接收/检查点/日志/回执时点门控。",
       "lifecycle": "子Runner后台线程经生产Manager/Managed；bridge先ready后求解，以集中lifecycle_path观察本会话；故障只结束精确Popen Runner，不结束原生子树。",
       "cleanup": "恢复先物理收尾/对账再续跑；源及结果hash不变；正常暂停后所有原生关闭并正式shutdown Runner。失败保留报告；注入失败父控制器正式stop，已结束伴随目录才清理。",
-      "evidence": "2026-11-04核对五场景、边界标记三元组、快照重命名索引、回执/日志幂等、processed来源及故障回调；离线真实生产scanner/RunStore不等于OS崩溃实测。 五场景固定首模后暂停，正常基线/received索引缺口分别留原报告；只保证实际Solver两次，逻辑请求预算单列。 最终五例真实每例两次Start，原生期间driver hash一致；后补main汇总状态失败保护仅离线验，不改写实测源码版本。",
+      "evidence": "本批逐调用复审：RunnerClient的预算/状态探测和异常、实际Runner OS所有权及协作启动锁分离；launch=False不派生，shutdown标准链/活动拒绝保留，HTTP JSON409业务拒绝与HTML403传输未确认分开；原启动器PID不等于venv实际子PID。",
       "unknown": "只在首模式采用后暂停；不证明全目标数值完备、模式互异或原父死亡后的退出码。"
     },
     {
@@ -12349,6 +12450,43 @@
       "cleanup": "沿用detach/lease与Runner退出责任，不因提交返回而证明完成。",
       "evidence": "2026-11-04逐调用人工复审；源码/单元测试与独立GEO原生证据分开；hash登记不替代实际投递/关闭验收。",
       "unknown": "没有新增CAD画布或按钮接线，SDK/CLI与GUI适配测试分别证明。"
+    },
+    {
+      "id": "R035",
+      "source": {
+        "path": "csttool/runner_client.py",
+        "symbol": "RunnerClient.connect"
+      },
+      "targets": [
+        {
+          "path": "csttool/runner_client.py",
+          "symbol": "RunnerClient.status"
+        },
+        {
+          "path": "csttool/runner_client.py",
+          "symbol": "RunnerClient._startup_record"
+        },
+        {
+          "path": "csttool/runner_ownership.py",
+          "symbol": "RunnerOwnership.acquire"
+        }
+      ],
+      "consumers": [
+        {
+          "path": "GUI/runner_controller.py",
+          "symbol": "RunnerController._observe"
+        },
+        {
+          "path": "csttool/mcp_server.py",
+          "symbol": "MCPApplicationAdapter.connect_project"
+        }
+      ],
+      "type": "protocol",
+      "trigger": "显式launch且尚未发起/连接的客户端，初始状态失败后进入有界协作启动；只有实际无Runner所有权且预算未耗尽才Popen。",
+      "lifecycle": "Qt异步传输/stdio工具线程；父启动锁有界，实际后台Runner独立持锁；所有HTTP探测用剩余预算，正常求解不受影响。",
+      "cleanup": "finally释放启动临界区；超时不杀/替换子进程，迟就绪只重连；未持有启动记录写权的观察者不覆盖原始记录。",
+      "evidence": "本批人工复审实际连接/状态/锁/里程碑调用、30项专项、真实Python正常/早退/迟就绪/静默端点，源码哈希仅用于复审定位。",
+      "unknown": "不是硬实时OS调用保证；原现场原因未唯一确认；父进程崩溃窗口仍以Runner OS锁最终仲裁，不证明永无竞争启动器。"
     }
   ],
   "source_fingerprints": {
@@ -12379,7 +12517,7 @@
     "csttool/definition_geometry.py": "0f84c36aeafd53929b9281f5cdef37021f4436d7d68e14911f3f31a2a44ca6ef",
     "csttool/definition_sessions.py": "39ca9cf9c9941abdb4e53b653a75fee01a98eaf02ab1fa2b0c361893b9510081",
     "csttool/definition_verifier.py": "780fa13657540290ba85a2c2b595475f0df8c32998d0ab0b6e73f264f1e5e7be",
-    "csttool/diagnostic_bundle.py": "fc6fab1dcc9d9c21d0bde8a156e8f7357032464e044a166e2741b5b80c6346f4",
+    "csttool/diagnostic_bundle.py": "a4eb5e696811b1af4474d2eb811c1183fe843c5ac50743b12658e6f0f380eecf",
     "csttool/event_replay.py": "aa93c21d998517bb541fd6aa9cd47158c9002892f0f667477c272c0410789806",
     "csttool/execution_contract.py": "e4b7b310382870a6a244e34088e78896d3c4e3d8320abb7fcdb9d67e09bccbde",
     "csttool/execution_snapshot.py": "0b72f6c42bb96ac17a4f53788c7f61e4c3b48237b61306e1b9f0e23337ede780",
@@ -12409,9 +12547,9 @@
     "csttool/result_reconciliation.py": "c3db6853d773b13599a084dc66eba5280cde16b08db65361e32ac65808e9d199",
     "csttool/run_overview.py": "31f2f341d44b9a3568a3d8a2ae617c7bc5338038eb81ce12f48c0b62cf598438",
     "csttool/run_store.py": "2e5fc481564f294467d735506db4152d1228a9717920ba6ba1378fa64d4d4ac9",
-    "csttool/runner.py": "a2e43ac0662da94e2fcc2510be54979298e7657fa9ad955e84e392aa8d74a1e0",
-    "csttool/runner_client.py": "bf124870941530620e4f56c1a7ed9e47e29175ca3eba7790133660e4290d60f7",
-    "csttool/runner_ownership.py": "039e76acbc90bdb52fad029710bd62d6a3a9f2f3744885649cf63fb970f2610c",
+    "csttool/runner.py": "4475e8d201c54e3cfd37072ecf7386a8392616036fb6a88bb28cca47012b1bae",
+    "csttool/runner_client.py": "b0a993daf0aff9f54a4b6c84524659a7fad6488e9aba70c32ab9ecf39783b138",
+    "csttool/runner_ownership.py": "307eb5aade18edef772e1a4092b73fa23d0394e3fc4aa62dab9b48af705d610d",
     "csttool/runtime_protocol.py": "fd944b0eb56634228bc6e8dace424ab19900dffc2c4b73b09607b6bc2df1d147",
     "csttool/saved_field_export.py": "3c759e2fb6ef73cf7b46e50cebddbbe6a2dddaa36cee630fd8c8abd4e8a947f2",
     "csttool/saved_project_source.py": "708aff0da5c4028003d11b0a20bc41ed9bb3ddc4cc88480a511629e73fd5636b",

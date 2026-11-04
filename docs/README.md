@@ -40,3 +40,5 @@ WinWrap现行生成检查/源图/校准与发布门禁：[W23受限A1链](winwra
 - [2026-11-04桌面GEO对话验收](codex-desktop-geometry-20261104.md)：当前14工具正常链、实际保存/表达式、单次求解与标准收尾，不以SDK代替指定宿主。
 
 - [A1重校准](a1-recalibration-20261104.md)：2026-11-04当前原子历史、真实语法拒绝前缀、可信注入诊断及XYZ无求解保存重开；A1/GEO许可独立。
+
+- [冷启动就绪与诊断](runner-startup-readiness.md)：纯Runner启动实测、Windows锁竞争、阶段/早退诊断、迟就绪重连及尚未确认的原现场原因。

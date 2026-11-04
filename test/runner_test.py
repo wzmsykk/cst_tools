@@ -6,6 +6,7 @@ import subprocess
 import sys
 import threading
 import time
+from urllib.error import HTTPError
 from uuid import uuid4
 import pytest
 from csttool.configuration import read_json, write_json_atomic
@@ -259,8 +260,9 @@ def test_process_disconnect_reconnect_stop_resume_and_auth(fake_runner, tmp_path
     assert read_json(checkpoint)['coverage']['confirmed_frontier'] >= before
     wrong = RunnerClient(tmp_path)
     wrong.endpoint = {**fresh.endpoint, 'token': 'invalid'}
-    with pytest.raises((RuntimeError, ValueError)):
+    with pytest.raises(HTTPError) as rejected:
         wrong.status()
+    assert rejected.value.code == 403
 
 
 def test_standard_fake_batch_persists_results_and_refuses_changed_resume(fake_runner, tmp_path):

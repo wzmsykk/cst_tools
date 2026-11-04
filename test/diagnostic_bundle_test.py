@@ -51,6 +51,28 @@ def test_bundle_links_current_run_native_failure_and_protocol_without_tokens_or_
     assert (tmp_path / 'control/endpoint.json').read_text() == 'SECRET_RUNNER_TOKEN'
 
 
+def test_startup_failure_without_run_is_exported_without_endpoint_credentials(tmp_path):
+    control=tmp_path/'control';control.mkdir()
+    (control/'bootstrap.json').write_text(json.dumps(dict(project=str(tmp_path),attempt_id='startup',
+        startup_state='timeout',phase='waiting-http',launcher_pid=123)),encoding='utf-8')
+    (control/'bootstrap.log').write_text('RUNNER_STARTUP persist-status\n',encoding='utf-8')
+    (control/'runner.json').write_text('{"token":"SECRET_ENDPOINT_TOKEN"}',encoding='utf-8')
+    manifest,files=read_bundle(export_failure_bundle(tmp_path))
+    assert manifest['run_id'] is None and manifest['startup']['startup_state']=='timeout'
+    assert manifest['startup']['attempt_id']=='startup'
+    assert 'files/control/bootstrap.json' in files and 'files/control/bootstrap.log' in files
+    assert not any('SECRET_ENDPOINT_TOKEN' in v.decode(errors='replace') for v in files.values())
+
+
+def test_unreadable_startup_evidence_does_not_hide_existing_run_diagnostics(tmp_path):
+    project_files(tmp_path)
+    (tmp_path/'control/bootstrap.json').write_text('not-json',encoding='utf-8')
+    manifest,files=read_bundle(export_failure_bundle(tmp_path))
+    assert manifest['run_id']=='run-a' and manifest['startup']['startup_state']=='unreadable'
+    assert 'files/logs/current/application.jsonl' in files
+    assert any('bootstrap unavailable' in w for w in manifest['warnings'])
+
+
 def test_bounded_tails_and_total_budget_are_explicit(tmp_path):
     run, _ = project_files(tmp_path)
     (run / 'application.log').write_bytes(b'x' * 500 + b'TAIL')

@@ -88,9 +88,30 @@ def export_failure_bundle(project, *, file_limit=4 * 1024**2,
                 status = {}
     except (OSError, ValueError) as error:
         warnings.append('status unavailable: ' + str(error))
-    # Explicit allowlist: endpoint.json may contain the Runner bearer token.
+    # Explicit allowlist: endpoint.json/runner.json contain bearer credentials.
     for name in ('status.json', 'project.json'):
         add(project / 'control' / name)
+    startup = None
+    for name in ('bootstrap.json', 'bootstrap.log'):
+        path = project / 'control' / name
+        if path.is_file():
+            add(path)
+    bootstrap = project / 'control/bootstrap.json'
+    try:
+        if bootstrap.is_file():
+            if not bootstrap.resolve().is_relative_to(project):
+                raise ValueError('bootstrap evidence escapes project')
+            with bootstrap.open('rb') as stream:
+                value = json.loads(stream.read(1024**2))
+            if (not isinstance(value, dict) or not isinstance(value.get('project'), str)
+                    or Path(value['project']).resolve() != project):
+                raise ValueError('invalid bootstrap project identity')
+            startup = dict(source='control/bootstrap.json', **{key:value.get(key) for key in (
+                'attempt_id', 'startup_state', 'phase', 'started_at', 'elapsed_seconds',
+                'launcher_pid', 'launcher_exit_code', 'last_probe_error')})
+    except (OSError, ValueError) as error:
+        startup = dict(source='control/bootstrap.json', startup_state='unreadable')
+        warnings.append('bootstrap unavailable: ' + str(error))
     for name in ('project.ini', 'project.conf', 'params.json', 'pps.json'):
         if (project / name).is_file():
             add(project / name)
@@ -208,6 +229,7 @@ def export_failure_bundle(project, *, file_limit=4 * 1024**2,
                 'run_identity_source': ('control/status.json' if status.get('run_id') else
                                         str(runs[0] / 'run.json') if run_metadata.get('run_id') else None),
                 'state': status.get('state'), 'phase': status.get('phase'),
+                'startup': startup,
                 'error': status.get('error'), 'runs': [str(p) for p in runs],
                 'limits': {'per_file': file_limit, 'total': total_limit, 'files': max_files},
                 'snapshot_consistency': 'best-effort; active files can change',

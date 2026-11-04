@@ -1,6 +1,6 @@
 # 本机Runner接口与使用
 
-2026-11-03按runner.py、runner_client.py和生产GUI核对。当前仅本机执行；[复审前完整原文](archive/20261103-semantic-review/local-runner.md)保留阶段变更/验收。不能把本页HTTP当现代MCP协议，也不能说MCP服务尚不存在。
+2026-11-03基础核对；本批冷启动修正见[冷启动就绪与诊断](runner-startup-readiness.md)。当前仅本机执行；[复审前完整原文](archive/20261103-semantic-review/local-runner.md)保留阶段变更/验收。不能把本页HTTP当现代MCP协议，也不能说MCP服务尚不存在。
 
 ## 执行与控制
 
@@ -9,6 +9,12 @@
 Runner持操作系统项目所有权，客户端控制租约另有期限。GUI失联/仅关界面不停止后台；正常断开尝试release，崩溃后可在10秒租约到期后申请控制。连接状态未知不代表CST已停。
 
 GUI正常重开可找回上次项目并连接/必要时启动状态服务，不自动start/recover。启动意图未确认时停止保存原request_id并发cancel_start，不制造第二次启动；切换项目使用连接代次，未确认停止意图不能被切换丢弃。完整退出编排stop→标准收尾→shutdown/所有权核验→本地资源清理；失败可选择仅断开，不强杀制造成功。
+
+## 冷启动与就绪
+
+默认15秒连接预算未加长，初始HTTP探测和就绪等待共用剩余预算。合作客户端经bootstrap.lock协调启动，实际Runner所有权仍由runner.lock保证；已有后台或启动尚未确认时不重复派生/提交。control/bootstrap.json给出阶段、首末探测错误及启动器退出，bootstrap.log保留客户端/子Runner事件。超时不是进程死亡；仅显式重连，迟就绪成功会更新摘要。phase/state和CST关闭、G03、任务采用分别判断。已有GUI/MCP进程需正常重载新Python客户端代码，非热更新验收。
+
+详见[冷启动就绪与诊断](runner-startup-readiness.md)及失败诊断包；不启动CST的受控进程已验证正常、早退、迟就绪和静默端点，原现场唯一根因仍未确认。
 
 ## CLI
 

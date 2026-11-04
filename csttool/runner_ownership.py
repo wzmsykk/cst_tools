@@ -11,9 +11,9 @@ class RunnerOwnership:
     def acquire(self):
         self.path.parent.mkdir(parents=True, exist_ok=True)
         stream = self.path.open('a+b')
-        if self.path.stat().st_size == 0:
-            stream.write(b'0')
-            stream.flush()
+        # Windows _locking supports a byte beyond EOF. Do not initialize a
+        # byte before locking: another opener can lock it between stat/write,
+        # causing a spurious PermissionError in a competing cold start.
         stream.seek(0)
         try:
             if os.name == 'nt':
