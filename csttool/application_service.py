@@ -42,6 +42,7 @@ def _sha(path):
 
 def _proof_ready(proof,source_hash):
     return (isinstance(proof,dict) and proof.get('source_sha256')==source_hash
+            and proof.get('validation_target','simulation')=='simulation'
             and proof.get('scope')=='root' and proof.get('status')=='verified'
             and isinstance(proof.get('gates'),list) and all(isinstance(item,str) for item in proof['gates'])
             and set(proof['gates'])=={'saved-reopened','identity','settings','standard-close'})
@@ -149,7 +150,9 @@ class ApplicationService:
         directory=(self.project/'control/documents'/document_id).resolve()
         if not directory.is_relative_to(self.project/'control/documents'):
             raise ServiceError('INVALID_ARGUMENT','document escapes catalog')
-        record=read_snapshot_record(directory/(document_revision+'.json'))
+        # Declarative multi-solid documents can exceed the 64 KiB execution
+        # snapshot default; retain the shared strict reader and its 1 MiB cap.
+        record=read_snapshot_record(directory/(document_revision+'.json'),max_bytes=1024*1024)
         if record.get('schema_version')==2:
             from .definition_editing import inspect_typed
             return inspect_typed(self,record,document_id,document_revision)
@@ -216,7 +219,7 @@ class ApplicationService:
             raise ServiceError('INVALID_ARGUMENT','run directory escapes project')
         return directory
 
-    def stage_definition(self,document_id,source_project,installation_ref,*,postprocess=None):
+    def stage_definition(self,document_id,source_project,installation_ref,*,postprocess=None,geometry_spec=None):
         """Owner-side candidate registration, NOT a public arbitrary-path tool.
 
         The trusted definition backend must supply G03 proof. Missing backend leaves
@@ -225,7 +228,12 @@ class ApplicationService:
         if installation_ref not in self.installations:
             raise ServiceError('INSTALLATION_NOT_FOUND','unknown authorized installation')
         source=read_saved_source(source_project,scope='root')
-        projection=project_saved_settings(source)
+        if geometry_spec is not None:
+            from .definition_editing import check_geometry_simulation
+            from .managed_history import verify_saved_program
+            check_geometry_simulation(geometry_spec)
+            projection=verify_saved_program(source,geometry_spec)
+        else:projection=project_saved_settings(source)
         if projection.status!='resolved' or projection.missing_fields:
             raise ServiceError('SETTING_UNVERIFIED','incomplete or unsupported saved definition')
         values=projection.fields
@@ -241,6 +249,8 @@ class ApplicationService:
              values['solver.mesh_adaptation.tet'],values['solver.requested_modes'])
         if config.requested_modes!=1:
             raise ServiceError('UNSUPPORTED_CAPABILITY','A1 capture currently requires one mode')
+        if geometry_spec is not None and postprocess is None:
+            raise ServiceError('INVALID_ARGUMENT','GEO definition requires explicit postprocess')
         if postprocess is None:
             postprocess=[dict(metric_id='frequency',method_id='Frequency',settings=dict(mode=dict(selection='one',index=1))),
                 dict(metric_id='rq',method_id='R_over_Q',settings=dict(mode=dict(selection='one',index=1),
@@ -250,10 +260,12 @@ class ApplicationService:
         validator=Draft202012Validator({'$defs':SCHEMA['$defs'],'$ref':'#/$defs/PPS'})
         if (next(validator.iter_errors(postprocess),None) or len({p['metric_id'] for p in postprocess})!=2
                 or {p['method_id'] for p in postprocess}!={'Frequency','R_over_Q'}
-                or next(p for p in postprocess if p['method_id']=='R_over_Q')['settings']['integration_line']['axis']!=values['geometry.cylinder.axis']):
+                or (geometry_spec is None and next(p for p in postprocess if p['method_id']=='R_over_Q')['settings']['integration_line']['axis']!=values['geometry.cylinder.axis'])):
             raise ServiceError('INVALID_ARGUMENT','unsupported definition postprocess')
+        axis=next(p for p in postprocess if p['method_id']=='R_over_Q')['settings']['integration_line']['axis']
         descriptor=dict(document_id=document_id,source_sha256=source.sha256,installation_ref=installation_ref,
-                        config=asdict(config),axis=values['geometry.cylinder.axis'],postprocess=postprocess)
+                        config=asdict(config),axis=axis,postprocess=postprocess)
+        if geometry_spec is not None:descriptor['geometry_spec']=geometry_spec
         revision=hashlib.sha256(json.dumps(descriptor,sort_keys=True).encode()).hexdigest()
         directory=self._directory(document_id,revision)
         lock=ProjectRunLock(self.project);lock.acquire()
@@ -267,7 +279,8 @@ class ApplicationService:
                 raise ServiceError('STALE_DOCUMENT','source changed while staging')
             proof=None
             if self.definition_verifier is not None and getattr(self.definition_verifier,'verify_on_stage',True):
-                proof=self.definition_verifier(candidate,projection,self.installations[installation_ref])
+                proof=self.definition_verifier(candidate,projection,self.installations[installation_ref],
+                    **({'spec':geometry_spec} if geometry_spec is not None else {}))
             if _sha(candidate)!=source.sha256:
                 raise ServiceError('STALE_DOCUMENT','verifier modified the frozen candidate')
             ready=_proof_ready(proof,source.sha256)
@@ -281,7 +294,7 @@ class ApplicationService:
     def inspect_definition(self,document_id,revision):
         directory=self._directory(document_id,revision)
         try:
-            record=read_snapshot_record(directory/'definition.json')
+            record=read_snapshot_record(directory/'definition.json',max_bytes=1024*1024)
         except FileNotFoundError as exc:
             raise ServiceError('DEFINITION_NOT_FOUND','definition not registered') from exc
         except ValueError as exc:
@@ -295,22 +308,31 @@ class ApplicationService:
                 or record.get('definition_revision')!=revision or _sha(directory/'definition.cst')!=record['source_sha256']):
             raise ServiceError('STALE_DOCUMENT','definition identity/hash changed')
         descriptor={key:record[key] for key in ('document_id','source_sha256','installation_ref','config','axis','postprocess')}
+        if 'geometry_spec' in record:descriptor['geometry_spec']=record['geometry_spec']
         if hashlib.sha256(json.dumps(descriptor,sort_keys=True).encode()).hexdigest()!=revision:
             raise ServiceError('STALE_DOCUMENT','definition metadata changed')
         return record
 
-    def verify_definition(self,document_id,revision):
+    def verify_definition(self,document_id,revision,*,cancel_check=None):
         """Explicit owner operation, not a read query; no default fake G03 proof."""
         if self.definition_verifier is None:
             raise ServiceError('SETTING_UNVERIFIED','native definition verifier not registered')
         lock=ProjectRunLock(self.project);lock.acquire()
         try:
+            from .definition_verifier import assert_definition_sessions_closed
+            assert_definition_sessions_closed(self.catalog)
             record=self.inspect_definition(document_id,revision)
             candidate=self._directory(document_id,revision)/'definition.cst'
-            projection=project_saved_settings(read_saved_source(candidate,scope='root'))
+            source=read_saved_source(candidate,scope='root')
+            if 'geometry_spec' in record:
+                from .managed_history import verify_saved_program
+                projection=verify_saved_program(source,record['geometry_spec'])
+            else:projection=project_saved_settings(source)
             record.update(ready=False,verification=None)
             write_json_atomic(candidate.parent/'definition.json',record)
-            proof=self.definition_verifier(candidate,projection,self.installations[record['installation_ref']])
+            proof=self.definition_verifier(candidate,projection,self.installations[record['installation_ref']],
+                **({'spec':record['geometry_spec']} if 'geometry_spec' in record else {}),
+                **({'cancel_check':cancel_check} if getattr(self.definition_verifier,'supports_cancel',False) else {}))
             if _sha(candidate)!=record['source_sha256']:
                 raise ServiceError('STALE_DOCUMENT','verifier modified the frozen definition')
             record.update(verification=proof,ready=_proof_ready(proof,record['source_sha256']))
@@ -588,7 +610,8 @@ class SingleSimulationExecution:
                 raise ServiceError('STALE_DOCUMENT','worker definition identity mismatch')
             from .result_provenance import freeze_postprocess_provenance
             provenance_hash=freeze_postprocess_provenance(self.directory/'definition.cst',self.definition['axis'],self.worker,store.directory,
-                self.definition['postprocess'])
+                self.definition['postprocess'],**({'geometry_spec':self.definition['geometry_spec'],
+                    'geometry_proof':self.definition['verification']} if 'geometry_spec' in self.definition else {}))
             write_json_atomic(store.directory/'simulation-intent.json',dict(document_id=self.definition['document_id'],
                 definition_revision=self.definition['definition_revision'],run_id=self.run_id,execution_identity=identity,
                 dispatch_intent=False,postprocess_provenance_sha256=provenance_hash))

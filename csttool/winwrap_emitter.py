@@ -1,4 +1,4 @@
-"""Small WWB-COM emitter for owned A1 definitions, not a Basic compiler.
+"""Small WWB-COM emitter for explicitly scoped A1/GEO history, not a compiler.
 
 History commands use settings_projection's sole allowlist. Fixed control-flow
 templates remain fixed; caller-provided Basic source is never an expression.
@@ -7,7 +7,7 @@ import ast
 from dataclasses import dataclass
 import re
 
-from .settings_projection import COMMAND_ARITIES, history_call_contract, _Arithmetic
+from .settings_projection import COMMAND_ARITIES, PROFILE, command_arities, history_call_contract, _Arithmetic
 from .vb_codec import quote_vb_string
 
 
@@ -165,10 +165,10 @@ class HistoryCall:
     method: str
     arguments: tuple = ()
 
-    def render(self, *, within=None):
+    def render(self, *, within=None, profile=PROFILE):
         identifier(self.object); identifier(self.method)
         try:
-            contract = history_call_contract(self.object, self.method)
+            contract = history_call_contract(self.object, self.method, profile=profile)
         except ValueError as error:
             raise GeneratedCodeError('unsupported history command') from error
         if len(self.arguments) != contract['arity']:
@@ -208,18 +208,18 @@ class With:
     object: str
     calls: tuple
 
-    def render(self):
+    def render(self, *, profile=PROFILE):
         identifier(self.object)
         if self.object.lower() == 'project' or not self.calls:
             raise GeneratedCodeError('invalid history With object')
-        return ['With ' + self.object, *[' ' + c.render(within=self.object) for c in self.calls], 'End With']
+        return ['With ' + self.object, *[' ' + c.render(within=self.object,profile=profile) for c in self.calls], 'End With']
 
 
-def render_history(nodes):
+def render_history(nodes, *, profile=PROFILE):
     lines = []
     for node in nodes:
-        if isinstance(node, With): lines.extend(node.render())
-        elif isinstance(node, HistoryCall): lines.append(node.render())
+        if isinstance(node, With): lines.extend(node.render(profile=profile))
+        elif isinstance(node, HistoryCall): lines.append(node.render(profile=profile))
         else: raise GeneratedCodeError('typed history statement required')
     check_lines(lines)
     return '\n'.join(lines)
@@ -235,7 +235,8 @@ def check_lines(lines, limit=800):
 # Not advertised as an exhaustive list of all WinWrap/CST reserved names.
 TEMPLATE_SYMBOLS = ('Main', 'ReportStage', 'names', 'expressions', 'history', 'f', 'message',
                     'value', 'tick', 'CSTToolsCheckCode', 'CSTToolsCheckError',
-                    'CSTToolsBindNewProject', 'CSTToolsProcessId', 'CSTToolsBindingSleep')
+                    'CSTToolsBindNewProject', 'CSTToolsProcessId', 'CSTToolsBindingSleep',
+                    'CSTToolsStage', 'CSTToolsBlockIndex', 'CSTToolsLastApplied', 'CSTToolsCaption')
 EXTERNAL_SYMBOLS = tuple(sorted({obj for obj, _ in COMMAND_ARITIES if obj != 'project'})) + (
     'RestoreDoubleParameter', 'StoreParameters', 'SetParameterDescription', 'AddToHistory',
     'ChangeSolverType', 'MacroCheckThis', 'Rebuild', 'SaveAs', 'FreeFile', 'ChrW', 'Err', 'vbObjectError', 'vbCrLf', 'CStr', 'Dir', 'DoEvents')
@@ -264,8 +265,10 @@ class Symbols:
         return self.reserve(name) + ('()' if array else '') + ' As ' + kind
 
 
-def validate_parameter_names(parameters):
-    symbols = Symbols((*TEMPLATE_SYMBOLS, *EXTERNAL_SYMBOLS))
+def validate_parameter_names(parameters, *, profile=PROFILE):
+    base=(*TEMPLATE_SYMBOLS,*EXTERNAL_SYMBOLS)
+    extra={obj for obj,_ in command_arities(profile)}-{'project'}-{name.lower() for name in base}
+    symbols = Symbols((*base,*sorted(extra)))
     for name in parameters: symbols.reserve(name)
 
 

@@ -97,3 +97,5 @@ D4修复以下问题：源码包漏带离线文本夹具及base系列CLI；生�
 每个document条目的review记录本次适用性/当前合同核对范围、来源与剩余限制；源码/离线对照不验证旧实测真实性或外部研究。查[复审报告](documentation-semantic-review.md)，不能只因role已分类就推断每条技术陈述已对现实现验证。后续功能变更复审相关条目，不自动将旧日期替换为今天。
 
 文档的content_sha256_at_review用于检查正文是否在复审后变动；变更后人工重核scope/checked_sources/limitations再登记新指纹，不自动续期。test/documentation_semantics_test.py校验指纹及归档正文，不能据hash相等判定语义正确。
+
+2026-11-04源码包边界补充：test/source_release_boundary_test.py核对包内外require_calibration判定一致并原样携带stamp；源码变化后的stale拒绝属于门禁事实，打包/编译/GUI烟雾不负责将其升级为原生通过。GEO离线profile与剩余边界见[当前历史设计](geometry-selection-interface-design.md#13-geo-2离线历史发射投影检查与源映射)。

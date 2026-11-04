@@ -189,13 +189,16 @@ def test_gui_claim_reachable_from_readonly(app, fake_runner):
     owner.command('claim')
     other = RunnerClient(owner.project)
     controller = controller_for(other)
+    errors = []
+    controller.error.connect(errors.append)
     try:
         wait(app, lambda: controller.read_only)
         # Valid owner is rejected, then release makes the GUI request succeed.
         assert controller.request_control()
-        wait(app, lambda: controller.unknown)
+        wait(app, lambda: bool(errors) and not controller.pending)
+        assert controller.read_only and not controller.unknown
+        assert other.status()['owner_client'] == owner.client_id
         owner.command('release')
-        wait(app, lambda: not controller.unknown)
         assert controller.request_control()
         wait(app, lambda: other.status()['owner_client'] == other.client_id and not controller.read_only)
     finally:
@@ -411,8 +414,13 @@ def test_pending_stop_allows_required_recovery_before_reconciliation(app, runner
     client.save_stop_request(start['request_id'])
     controller = controller_for(client)
     try:
-        wait(app, lambda: controller.state is RunState.RECOVERY_REQUIRED)
-        assert controller.stop_after_start
+        wait(app, lambda: controller.state is RunState.RECOVERY_REQUIRED and not controller.pending)
+        # cancel_start durably transfers the intent; recovery is still required.
+        assert not controller.stop_after_start
+        tombstone = json.loads((runner.control / 'cancelled-starts' /
+                                (start['request_id'] + '.json')).read_text(encoding='utf-8'))
+        assert tombstone['run_id'] == 'unfinished-run' and tombstone['accepted']
+        assert runner.snapshot()['state'] == 'RECOVERY_REQUIRED'
         assert not controller.pending
         assert controller.request_recovery()
         wait(app, lambda: not controller.has_active_work)

@@ -29,6 +29,19 @@
 
 - [ ] 小网格重算频率漂移的模式身份判定：本轮1147.56/1147.70/1147.76MHz会作为不同频率接收；未以场重叠判定其物理互异，不能用增大容差掩盖。
 
+## 通用几何与选择集推进顺序
+
+- [x] GEO-0：[官方语义、统一契约与历史边界设计](geometry-selection-interface-design.md)，仅静态核对，来源及哈希见[知识记录](../knowledge-base/geometry-selection-api-20261104.json)。
+- [x] GEO-1/1.1：同一公共事务的声明契约、身份保留、步骤更新/移除、实体集合、依赖诊断；旧缺identities的开发草稿明确拒绝，不静默迁移。
+- [x] GEO-2：共用原子历史发射、唯一设置归属/Reset审计、O1–O8故障测试、块感知源图和实际Model.mod/参数表核对；C1–C7受控副本通过，独立GEO门禁绑定当前源版本及原生证据。
+- [x] GEO-3：既有MCP签名/HTTP/公共事务、GUI Runner适配及CLI转发接入，几何目标实际保存重开后才geometry_saved；未提交意图不自动重放。具体范围见[GEO-2–4生产实现与验收](geometry-production-implementation.md)。
+- [x] GEO-4：受限PEC背景/真空、Default/Tet Version1固定密度、nmodes=1、六面electric及Frequency/RQ闭环；XYZ小网格各一次真实求解，沿原Managed/RunStore采用和导出链。不是多材料/其它求解器或完整CAD承诺。
+- [ ] GEO新签名在指定Codex桌面重新加载后的对话验收；本批官方SDK实际调用不替代该宿主验收。
+- [ ] A1独立原生重校准：源码变化使旧许可失效，本次更新许可被自动审批拒绝；未改写A1记录，不影响有独立证据的GEO路径。
+
+
+- [ ] 后续独立阶段：面/边命名规则、零/一/多匹配及拓扑失效校准；不以COMSOL选择tag或CST旧编号保证稳定，不阻塞实体集合首版。
+
 ## 保留的长期与独立验收
 
 - [x] 测试副本HOM密度实际634→2140→634、扩窗首模→窄窗确认及四个检查点中断重载；不等于生产GUI全部故障矩阵，见[恢复策略](hom-solver-failure-recovery.md)；数值失败不能独立判空。

@@ -3204,7 +3204,9 @@
             "project_saved_settings",
             "project_history",
             "Projection",
-            "history_call_contract"
+            "history_call_contract",
+            "project_geometry_history",
+            "geometry_expression_identity"
           ]
         }
       ],
@@ -3212,12 +3214,20 @@
         {
           "path": "test/settings_projection_test.py",
           "label": "语义与故障测试"
+        },
+        {
+          "path": "test/geometry_codegen_test.py",
+          "label": "独立GEO profile不扩A1范围"
         }
       ],
       "docs": [
         {
           "path": "docs/settings-history-projection.md",
           "label": "支持范围与待办"
+        },
+        {
+          "path": "docs/geometry-selection-interface-design.md",
+          "label": "GEO-1声明契约/投影与原生待校准边界"
         }
       ],
       "provenance": "Migrated from maintained feature-index at c083c58; no new semantic or runtime acceptance."
@@ -3232,7 +3242,8 @@
           "symbols": [
             "project_saved_settings",
             "project_history",
-            "history_call_contract"
+            "history_call_contract",
+            "command_arities"
           ]
         }
       ],
@@ -3240,6 +3251,10 @@
         {
           "path": "test/a1_history_profile_test.py",
           "label": "完整A1与故障测试"
+        },
+        {
+          "path": "test/geometry_codegen_test.py",
+          "label": "独立GEO profile不扩A1范围"
         }
       ],
       "docs": [
@@ -3663,6 +3678,10 @@
         {
           "path": "docs/project-creation-service.md",
           "label": "公共创建服务"
+        },
+        {
+          "path": "docs/geometry-selection-interface-design.md",
+          "label": "GEO-1声明契约/投影与原生待校准边界"
         }
       ],
       "provenance": "Migrated from maintained feature-index at c083c58; no new semantic or runtime acceptance."
@@ -3710,7 +3729,11 @@
             "render_history",
             "render_edit_macro",
             "edit_document",
-            "reconcile_edit"
+            "reconcile_edit",
+            "prepare_candidate_artifacts",
+            "read_failure_context",
+            "validate_candidate_completion",
+            "build_candidate"
           ]
         },
         {
@@ -3733,7 +3756,9 @@
             "check_module",
             "definition_map",
             "map_native_error",
-            "require_calibration"
+            "require_calibration",
+            "execution_definition_map",
+            "require_geometry_calibration"
           ]
         },
         {
@@ -3742,6 +3767,29 @@
           "symbols": [
             "macro_manifest",
             "literal_content"
+          ]
+        },
+        {
+          "path": "csttool/native_definition_builder.py",
+          "label": "共用身份注入及持有对象标准收尾",
+          "symbols": [
+            "inject_definition_ownership",
+            "run_new_definition"
+          ]
+        },
+        {
+          "path": "csttool/history_program.py",
+          "label": "原子分块/设置归属",
+          "symbols": [
+            "partition",
+            "validate"
+          ]
+        },
+        {
+          "path": "csttool/managed_history.py",
+          "label": "保存来源核验",
+          "symbols": [
+            "verify_saved_program"
           ]
         }
       ],
@@ -3781,6 +3829,10 @@
         {
           "path": "test/support/calibrate_winwrap_gate.py",
           "label": "W3原生校准及显式门禁写入"
+        },
+        {
+          "path": "test/geometry_execution_macro_test.py",
+          "label": "共用宏payload/逐块故障/保存参数/退出回执/绝对源图"
         }
       ],
       "docs": [
@@ -3819,9 +3871,17 @@
         {
           "path": "docs/execution-hardening-five-steps.md",
           "label": "后续五项与隔离/协议边界"
+        },
+        {
+          "path": "docs/geometry-selection-interface-design.md",
+          "label": "GEO契约/分块归属与依赖设计、声明更新及原生边界"
+        },
+        {
+          "path": "docs/geometry-production-implementation.md",
+          "label": "共用生产实现与GEO独立边界"
         }
       ],
-      "provenance": "2026-11-03 W23受限A1：独立检查/源图、假对端故障与最终12个无求解串行会话；原生样本不扩大为所有生成器/求解失败通过。"
+      "provenance": "2026-11-04现行A1/GEO共用原子历史宏、检查及源图，事务/原生验证/关闭分层；GEO独立原生许可通过，A1旧stamp失效未更新。旧W23 12会话只认证旧批次。"
     },
     {
       "id": "F127",
@@ -3936,6 +3996,10 @@
         {
           "path": "docs/typed-definition-service.md",
           "label": "G02/G03当前契约"
+        },
+        {
+          "path": "docs/geometry-selection-interface-design.md",
+          "label": "GEO-1声明契约/投影与原生待校准边界"
         }
       ],
       "provenance": "Migrated from maintained feature-index at c083c58; no new semantic or runtime acceptance."
@@ -4245,6 +4309,232 @@
         }
       ],
       "provenance": "D1-D3静态契约与离线测试；人工关系有未知，不是运行调用证明。"
+    },
+    {
+      "id": "F139",
+      "purpose": "通用几何声明编辑、原子历史构造、实际保存核验及受限仿真公共闭环（GEO-1–4）",
+      "sources": [
+        {
+          "path": "csttool/geometry_contract.py",
+          "label": "顺序声明、身份保留和依赖诊断",
+          "symbols": [
+            "apply_changes",
+            "project_geometry",
+            "feature_id",
+            "expression",
+            "trace_dependencies",
+            "dependency_report",
+            "resolve_feature_values",
+            "validate_selection_sets",
+            "native_component_name",
+            "native_solid_name",
+            "feature_expressions"
+          ]
+        },
+        {
+          "path": "csttool/definition_editing.py",
+          "label": "同一公共定义事务",
+          "symbols": [
+            "validate_edit",
+            "changed_spec",
+            "inspect_typed",
+            "preflight_edit",
+            "edit_document",
+            "reconcile_edit",
+            "render_edit_macro",
+            "prepare_candidate_artifacts",
+            "read_failure_context",
+            "validate_candidate_completion",
+            "build_candidate"
+          ]
+        },
+        {
+          "path": "data/first_stage_contract.schema.json",
+          "label": "GeometryFeature唯一契约与编辑/身份预算",
+          "symbols": []
+        },
+        {
+          "path": "csttool/geometry_codegen.py",
+          "label": "共享GEO降低与声明/源码核对",
+          "symbols": [
+            "render_geometry_history",
+            "expected_geometry_history",
+            "validate_geometry_history"
+          ]
+        },
+        {
+          "path": "csttool/settings_projection.py",
+          "label": "显式GEO profile及实际body投影（非SavedSource提取）",
+          "symbols": [
+            "command_arities",
+            "history_call_contract",
+            "project_geometry_history",
+            "geometry_expression_identity"
+          ]
+        },
+        {
+          "path": "csttool/winwrap_checks.py",
+          "label": "独立检查与块感知源映射",
+          "symbols": [
+            "check_history",
+            "geometry_definition_map",
+            "map_native_error",
+            "execution_definition_map",
+            "require_geometry_calibration"
+          ]
+        },
+        {
+          "path": "csttool/native_definition_builder.py",
+          "label": "共用身份注入及持有对象标准收尾",
+          "symbols": [
+            "inject_definition_ownership",
+            "run_new_definition"
+          ]
+        },
+        {
+          "path": "csttool/history_program.py",
+          "label": "共用设置归属/完整块及依赖",
+          "symbols": [
+            "partition",
+            "validate",
+            "simulation_blocks",
+            "logical_geometry"
+          ]
+        },
+        {
+          "path": "csttool/managed_history.py",
+          "label": "实际Model.mod及参数核对",
+          "symbols": [
+            "extract_program",
+            "verify_saved_program"
+          ]
+        },
+        {
+          "path": "csttool/definition_geometry.py",
+          "label": "原生几何观察及证明",
+          "symbols": [
+            "geometry_objects",
+            "render_managed_geometry_observer",
+            "verify_managed_geometry_observation",
+            "geometry_proof_ready"
+          ]
+        },
+        {
+          "path": "csttool/definition_verifier.py",
+          "label": "保存/重开共享会话",
+          "symbols": [
+            "NativeDefinitionVerifier._phases",
+            "NativeDefinitionVerifier.verify_geometry",
+            "NativeDefinitionVerifier._verify_managed"
+          ]
+        },
+        {
+          "path": "csttool/application_service.py",
+          "label": "同一仿真定义/验证及采用",
+          "symbols": [
+            "ApplicationService.stage_definition",
+            "ApplicationService.verify_definition",
+            "ApplicationService.inspect_definition"
+          ]
+        },
+        {
+          "path": "csttool/definition_sessions.py",
+          "label": "嵌套定义会话发现及恢复",
+          "symbols": [
+            "definition_status_paths",
+            "definition_session_facts",
+            "recover_definition_sessions"
+          ]
+        },
+        {
+          "path": "csttool/result_provenance.py",
+          "label": "计算域绑定的后处理来源",
+          "symbols": []
+        },
+        {
+          "path": "GUI/runner_controller.py",
+          "label": "同一Runner槽GUI适配",
+          "symbols": [
+            "RunnerController.submit_definition"
+          ]
+        },
+        {
+          "path": "csttool/mcp_server.py",
+          "label": "14工具的实际GEO签名",
+          "symbols": [
+            "create_server"
+          ]
+        }
+      ],
+      "tests": [
+        {
+          "path": "test/geometry_contract_test.py",
+          "label": "声明/生命周期/表达式/CAS/采用/保存拒绝"
+        },
+        {
+          "path": "test/definition_editing_test.py",
+          "label": "A1假原生发布回归"
+        },
+        {
+          "path": "test/geometry_history_edit_test.py",
+          "label": "H1–H7步骤更新/移除、父身份、故障与诊断"
+        },
+        {
+          "path": "test/geometry_codegen_test.py",
+          "label": "GEO-2离线发射/变异/表达式/源图/门禁"
+        },
+        {
+          "path": "test/geometry_execution_macro_test.py",
+          "label": "共用宏payload/逐块故障/保存参数/退出回执/绝对源图"
+        },
+        {
+          "path": "test/history_program_test.py",
+          "label": "O1–O8归属/原子块/实际保存变异"
+        },
+        {
+          "path": "test/geometry_publication_test.py",
+          "label": "发布/对账/锁/取消/SDK分发"
+        },
+        {
+          "path": "test/geometry_gate_adapter_test.py",
+          "label": "独立许可/GUI与CLI适配"
+        },
+        {
+          "path": "test/definition_sessions_test.py",
+          "label": "嵌套会话及畸形证据"
+        },
+        {
+          "path": "test/source_release_boundary_test.py",
+          "label": "源码包许可判定一致"
+        },
+        {
+          "path": "test/support/calibrate_geometry.py",
+          "label": "C1–C7及GEO-4受控原生校准"
+        }
+      ],
+      "docs": [
+        {
+          "path": "docs/geometry-selection-interface-design.md",
+          "label": "GEO契约/分块归属与依赖设计、声明更新及原生边界"
+        },
+        {
+          "path": "docs/typed-definition-service.md",
+          "label": "公共调用范围与错误恢复"
+        },
+        {
+          "path": "docs/minimal-python-vba-todo.md",
+          "label": "GEO分阶段待办"
+        },
+        {
+          "path": "docs/geometry-production-implementation.md",
+          "label": "当前公共接口、实现及验收边界"
+        },
+        {
+          "path": "knowledge-base/geometry-production-20261104.json",
+          "label": "当前原生/SDK/离线轻量证据"
+        }
+      ],
+      "provenance": "2026-11-04 GEO-1/1.1离线契约及GEO-2–4同一底层实现；当前源版本独立GEO校准及XYZ真实小网格通过，见geometry-calibration-20261104。旧离线阶段和A1记录不自动认证当前代码；A1旧许可未更新；桌面新签名对话验收独立。"
     }
   ],
   "documents": [
@@ -4296,30 +4586,42 @@
       "authority": "current-navigation",
       "provenance": "D3人工确认维护职责；不授予运行验收。",
       "review": {
-        "date": "2026-11-03",
-        "baseline": "2705935",
+        "date": "2026-11-04",
+        "baseline": "f755505",
         "status": "operational-and-applicability-reviewed",
-        "scope": "2026-11-03 W23实施后人工对照：A1独立检查/源图、版本/会话原生检查、XYZ/G03及字符持久化边界；保留原日期证据。；同日桌面正常链以新增验收记录为证，全故障矩阵未完成；复审本批公共故障矩阵和首次恢复DTO修正；复审原生采集移至模式可用之后及原始求解错误优先保留",
+        "scope": "GEO-2–4当前profile、实际保存/原生观察、公开签名、许可分离及失败/取消/恢复；早期离线章节明确为历史快照。",
         "checked_sources": [
           {
-            "path": "docs/current-status.md"
+            "path": "csttool/history_program.py"
           },
           {
-            "path": "docs/winwrap-w01-implementation.md"
+            "path": "csttool/managed_history.py"
           },
           {
-            "path": "docs/winwrap-w23-implementation.md"
+            "path": "csttool/definition_editing.py"
           },
           {
-            "path": "knowledge-base/mcp-codex-desktop-20261103.json"
+            "path": "csttool/definition_geometry.py"
           },
           {
-            "path": "knowledge-base/public-fault-matrix-20261103.json"
+            "path": "csttool/definition_verifier.py"
+          },
+          {
+            "path": "csttool/definition_sessions.py"
+          },
+          {
+            "path": "csttool/application_service.py"
+          },
+          {
+            "path": "test/geometry_publication_test.py"
+          },
+          {
+            "path": "knowledge-base/geometry-calibration-20261104.json"
           }
         ],
         "finding_ids": [],
-        "limitations": "只核对本批明确列出的操作语义及适用范围；不重新认证原测量、全部自然语言、外部资料及真实运行行为。",
-        "content_sha256_at_review": "39a6b6cf88f2d4140c7c234c10b13faf207eed82f7bbe674bd64b263a0cb9e0c"
+        "limitations": "不追认旧测试为当前代码验收；不是任意CAD/多材料/模式身份/网格收敛或桌面新签名对话验收；A1旧许可保留失效。",
+        "content_sha256_at_review": "98aba0ff333cdbb8c6f1a5195260ed55f1aa35ed601afad71d80f7a68ee356a6"
       }
     },
     {
@@ -4328,23 +4630,42 @@
       "authority": "current-defined-scope-only",
       "provenance": "2026-11-03人工适用性/历史堆叠复审；具体检查层级见review，不将分类当逐条事实证明。",
       "review": {
-        "date": "2026-11-03",
-        "baseline": "2705935",
+        "date": "2026-11-04",
+        "baseline": "f755505",
         "status": "operational-and-applicability-reviewed",
-        "scope": "逐项允许对象/参数数、身份顺序、Reset及错误清空；旧下游未实现结论已移归档。",
+        "scope": "GEO-2–4当前profile、实际保存/原生观察、公开签名、许可分离及失败/取消/恢复；早期离线章节明确为历史快照。",
         "checked_sources": [
           {
-            "path": "csttool/settings_projection.py"
+            "path": "csttool/history_program.py"
           },
           {
-            "path": "test/a1_history_profile_test.py"
+            "path": "csttool/managed_history.py"
+          },
+          {
+            "path": "csttool/definition_editing.py"
+          },
+          {
+            "path": "csttool/definition_geometry.py"
+          },
+          {
+            "path": "csttool/definition_verifier.py"
+          },
+          {
+            "path": "csttool/definition_sessions.py"
+          },
+          {
+            "path": "csttool/application_service.py"
+          },
+          {
+            "path": "test/geometry_publication_test.py"
+          },
+          {
+            "path": "knowledge-base/geometry-calibration-20261104.json"
           }
         ],
-        "finding_ids": [
-          "S16"
-        ],
-        "limitations": "本批逐条静态核对所列源码/保存证据；历史实测及原厂/第三方规范不重新运行或外部认证，不等于完整CST/桌面/物理验收。",
-        "content_sha256_at_review": "0603abc8b7c9580433ba3865ac1a657e50f14af54d099f814ebf0c61a2eb7402"
+        "finding_ids": [],
+        "limitations": "不追认旧测试为当前代码验收；不是任意CAD/多材料/模式身份/网格收敛或桌面新签名对话验收；A1旧许可保留失效。",
+        "content_sha256_at_review": "31734246b15f68e00c78c252ad455df5c7cfc490f51ed62a708d3d7a1fb14565"
       }
     },
     {
@@ -5334,16 +5655,20 @@
       "authority": "dated-source-context-not-current-API",
       "provenance": "2026-11-03人工适用性/历史堆叠复审；具体检查层级见review，不将分类当逐条事实证明。",
       "review": {
-        "date": "2026-11-03",
+        "date": "2026-11-04",
         "baseline": "2705935",
         "status": "design-scope-reviewed",
-        "scope": "旧语义与现行执行的适用性、历史记录堆叠及操作/证据边界",
-        "checked_sources": [],
+        "scope": "旧语义与现行执行的适用性、历史记录堆叠及操作/证据边界；2026-11-04按固定COMSOL MCP源码及官方6.3文档补充几何序列/输出身份、命名选择与锁/快照边界，不视为运行验收。",
+        "checked_sources": [
+          {
+            "path": "knowledge-base/geometry-selection-api-20261104.json"
+          }
+        ],
         "finding_ids": [
           "S15"
         ],
         "limitations": "核对作用范围与现行接口分离；原方案、伪代码、外部来源及公式示例不认证为当前生产行为，未重新逐源联网验证。",
-        "content_sha256_at_review": "6e55cb07256378221019138cd9968d544f8af81e33401466e16ce7c2226198d1"
+        "content_sha256_at_review": "69e90a0c8c4f1cca496bc3a34cdaaa3755a31b05357dc4929411e45c75c1b283"
       }
     },
     {
@@ -5967,71 +6292,41 @@
       "provenance": "D3人工确认维护职责；不授予运行验收。",
       "review": {
         "date": "2026-11-04",
-        "baseline": "b580fd5",
+        "baseline": "f755505",
         "status": "operational-and-applicability-reviewed",
-        "scope": "五例真实生产Runner/HOM首模采用闭环、四故障边界、源/结果/hash及跨运行/数值核验；首模后暂停，不推定完整频段、物理身份或Start=0/异常。",
+        "scope": "GEO-2–4当前profile、实际保存/原生观察、公开签名、许可分离及失败/取消/恢复；早期离线章节明确为历史快照。",
         "checked_sources": [
           {
-            "path": "csttool/runner.py"
+            "path": "csttool/history_program.py"
           },
           {
-            "path": "csttool/mcp_server.py"
+            "path": "csttool/managed_history.py"
           },
           {
-            "path": "csttool/cstmanager.py"
+            "path": "csttool/definition_editing.py"
           },
           {
-            "path": "csttool/managed_cstworker.py"
+            "path": "csttool/definition_geometry.py"
           },
           {
-            "path": "docs/winwrap-w01-implementation.md"
+            "path": "csttool/definition_verifier.py"
           },
           {
-            "path": "docs/winwrap-w23-implementation.md"
+            "path": "csttool/definition_sessions.py"
           },
           {
-            "path": "knowledge-base/mcp-codex-desktop-20261103.json"
+            "path": "csttool/application_service.py"
           },
           {
-            "path": "knowledge-base/public-fault-matrix-20261103.json"
+            "path": "test/geometry_publication_test.py"
           },
           {
-            "path": "knowledge-base/public-native-faults-20261103.json"
-          },
-          {
-            "path": "csttool/batch_desktop.py"
-          },
-          {
-            "path": "csttool/mcp_stdio.py"
-          },
-          {
-            "path": "knowledge-base/execution-hardening-five-steps-20261104.json"
-          },
-          {
-            "path": "test/support/validate_solver_abort.py"
-          },
-          {
-            "path": "knowledge-base/solver-abort-20261104.json"
-          },
-          {
-            "path": "csttool/checkpoint_adoption.py"
-          },
-          {
-            "path": "test/support/validate_runner_hom_abort.py"
-          },
-          {
-            "path": "test/runner_hom_abort_test.py"
-          },
-          {
-            "path": "knowledge-base/runner-hom-abort-adoption-20261104.json"
+            "path": "knowledge-base/geometry-calibration-20261104.json"
           }
         ],
-        "finding_ids": [
-          "S01",
-          "S10"
-        ],
-        "limitations": "重点核对历史堆叠/旧操作语义与责任边界；checked_sources仅列本批主要对照源，不表示每行技术陈述或所有物理/异常分支已验证。",
-        "content_sha256_at_review": "50439a1a1cce31b9fada3c3ec275176227fa90fd270c3fd7ca59fce3a78dd1b5"
+        "finding_ids": [],
+        "limitations": "不追认旧测试为当前代码验收；不是任意CAD/多材料/模式身份/网格收敛或桌面新签名对话验收；A1旧许可保留失效。",
+        "content_sha256_at_review": "88937765f9c36300904ed8ccb7d4efb6eb07593222d89d163b9ed51a942e53c4"
       }
     },
     {
@@ -6163,9 +6458,9 @@
       "provenance": "D3人工确认维护职责；不授予运行验收。",
       "review": {
         "date": "2026-11-04",
-        "baseline": "b580fd5",
+        "baseline": "f755505",
         "status": "operational-and-applicability-reviewed",
-        "scope": "五例真实生产Runner/HOM首模采用闭环、四故障边界、源/结果/hash及跨运行/数值核验；首模后暂停，不推定完整频段、物理身份或Start=0/异常。",
+        "scope": "五例真实生产Runner/HOM首模采用闭环、四故障边界、源/结果/hash及跨运行/数值核验；首模后暂停，不推定完整频段、物理身份或Start=0/异常。；2026-11-04按GEO设计入口重新生成，功能实现范围不变。；GEO-1新增F139声明契约及投影，未扩大原生门禁。；F139增加顺序历史设计导航，未改源码符号或动态关系。；F139增加GEO-1.1源码/测试与身份诊断入口。；GEO-2共享历史/检查/源图及R029离线关系导航。",
         "checked_sources": [
           {
             "path": "scripts/project_inspect.py"
@@ -6206,7 +6501,7 @@
         ],
         "finding_ids": [],
         "limitations": "本批逐条静态核对所列源码/保存证据；历史实测及原厂/第三方规范不重新运行或外部认证，不等于完整CST/桌面/物理验收。",
-        "content_sha256_at_review": "faa84254b8d3a44eac103f40dff4e273a83c62a15e3bf45c4b3351adf822950e"
+        "content_sha256_at_review": "005cea6b5c3cff0e19ac113b85f2923816ec5850fedc69a3caf59a31d72e73b1"
       }
     },
     {
@@ -7078,64 +7373,41 @@
       "provenance": "D3人工确认维护职责；不授予运行验收。",
       "review": {
         "date": "2026-11-04",
-        "baseline": "b580fd5",
+        "baseline": "f755505",
         "status": "operational-and-applicability-reviewed",
-        "scope": "五例真实生产Runner/HOM首模采用闭环、四故障边界、源/结果/hash及跨运行/数值核验；首模后暂停，不推定完整频段、物理身份或Start=0/异常。",
+        "scope": "GEO-2–4当前profile、实际保存/原生观察、公开签名、许可分离及失败/取消/恢复；早期离线章节明确为历史快照。",
         "checked_sources": [
           {
-            "path": "csttool/mcp_server.py"
+            "path": "csttool/history_program.py"
+          },
+          {
+            "path": "csttool/managed_history.py"
           },
           {
             "path": "csttool/definition_editing.py"
           },
           {
-            "path": "docs/winwrap-w01-implementation.md"
+            "path": "csttool/definition_geometry.py"
           },
           {
-            "path": "docs/winwrap-w23-implementation.md"
+            "path": "csttool/definition_verifier.py"
           },
           {
-            "path": "knowledge-base/mcp-codex-desktop-20261103.json"
+            "path": "csttool/definition_sessions.py"
           },
           {
-            "path": "knowledge-base/public-fault-matrix-20261103.json"
+            "path": "csttool/application_service.py"
           },
           {
-            "path": "knowledge-base/public-native-faults-20261103.json"
+            "path": "test/geometry_publication_test.py"
           },
           {
-            "path": "csttool/batch_desktop.py"
-          },
-          {
-            "path": "csttool/mcp_stdio.py"
-          },
-          {
-            "path": "knowledge-base/execution-hardening-five-steps-20261104.json"
-          },
-          {
-            "path": "test/support/validate_solver_abort.py"
-          },
-          {
-            "path": "knowledge-base/solver-abort-20261104.json"
-          },
-          {
-            "path": "csttool/checkpoint_adoption.py"
-          },
-          {
-            "path": "test/support/validate_runner_hom_abort.py"
-          },
-          {
-            "path": "test/runner_hom_abort_test.py"
-          },
-          {
-            "path": "knowledge-base/runner-hom-abort-adoption-20261104.json"
+            "path": "knowledge-base/geometry-calibration-20261104.json"
           }
         ],
-        "finding_ids": [
-          "S01"
-        ],
-        "limitations": "重点核对历史堆叠/旧操作语义与责任边界；checked_sources仅列本批主要对照源，不表示每行技术陈述或所有物理/异常分支已验证。",
-        "content_sha256_at_review": "fce72db734ae5197e35139ae268a89275a833f39b8040ca664911f1575cf2a7f"
+        "finding_ids": [],
+        "limitations": "不追认旧测试为当前代码验收；不是任意CAD/多材料/模式身份/网格收敛或桌面新签名对话验收；A1旧许可保留失效。",
+        "content_sha256_at_review": "1030e6a4ebe4221088e17464b37c2e4fad56898d0dbe8eddfc0e9096075f59b1"
       }
     },
     {
@@ -7451,10 +7723,10 @@
       "authority": "D1-D3-tooling-scope",
       "provenance": "D3人工确认维护职责；不授予运行验收。",
       "review": {
-        "date": "2026-11-03",
+        "date": "2026-11-04",
         "baseline": "2705935",
         "status": "operational-and-applicability-reviewed",
-        "scope": "旧语义与现行执行的适用性、历史记录堆叠及操作/证据边界",
+        "scope": "旧语义与现行执行的适用性、历史记录堆叠及操作/证据边界；GEO-2离线导航及源码包门禁原样保留/同判定边界复审，不替代Native验收。",
         "checked_sources": [
           {
             "path": "scripts/project_inspect.py"
@@ -7467,7 +7739,7 @@
           "S01"
         ],
         "limitations": "重点核对历史堆叠/旧操作语义与责任边界；checked_sources仅列本批主要对照源，不表示每行技术陈述或所有物理/异常分支已验证。",
-        "content_sha256_at_review": "17e159362ea13c8887da96cd183360205d9451b5a9898144d7522ce34a44b607"
+        "content_sha256_at_review": "acb4cf5069e8321632a872b2997e6bdd06c2dee6ffefb384d4ef8c9a3a515c1a"
       }
     },
     {
@@ -7796,21 +8068,42 @@
       "authority": "current-defined-scope-only",
       "provenance": "2026-11-03人工适用性/历史堆叠复审；具体检查层级见review，不将分类当逐条事实证明。",
       "review": {
-        "date": "2026-11-03",
-        "baseline": "2705935",
+        "date": "2026-11-04",
+        "baseline": "f755505",
         "status": "operational-and-applicability-reviewed",
-        "scope": "逐字段核对身份/表达式与精确值、词法/算术预算、Reset/模糊拒绝和正式文件入口门禁。",
+        "scope": "GEO-2–4当前profile、实际保存/原生观察、公开签名、许可分离及失败/取消/恢复；早期离线章节明确为历史快照。",
         "checked_sources": [
           {
-            "path": "csttool/settings_projection.py"
+            "path": "csttool/history_program.py"
+          },
+          {
+            "path": "csttool/managed_history.py"
+          },
+          {
+            "path": "csttool/definition_editing.py"
+          },
+          {
+            "path": "csttool/definition_geometry.py"
+          },
+          {
+            "path": "csttool/definition_verifier.py"
+          },
+          {
+            "path": "csttool/definition_sessions.py"
           },
           {
             "path": "csttool/application_service.py"
+          },
+          {
+            "path": "test/geometry_publication_test.py"
+          },
+          {
+            "path": "knowledge-base/geometry-calibration-20261104.json"
           }
         ],
         "finding_ids": [],
-        "limitations": "本批逐条静态核对所列源码/保存证据；历史实测及原厂/第三方规范不重新运行或外部认证，不等于完整CST/桌面/物理验收。",
-        "content_sha256_at_review": "0fa80ecc853e7a8dbde6c92d1ddad735dfd2c8df2f7378fa3a9b0e1e9226ed7a"
+        "limitations": "不追认旧测试为当前代码验收；不是任意CAD/多材料/模式身份/网格收敛或桌面新签名对话验收；A1旧许可保留失效。",
+        "content_sha256_at_review": "3459cea14daa64de5d15bdc761e0b3a8cfeeb237c4ae55b68f8aef8c77ba1d76"
       }
     },
     {
@@ -7986,36 +8279,42 @@
       "authority": "current-defined-scope-only",
       "provenance": "2026-11-03人工适用性/历史堆叠复审；具体检查层级见review，不将分类当逐条事实证明。",
       "review": {
-        "date": "2026-11-03",
-        "baseline": "2705935",
+        "date": "2026-11-04",
+        "baseline": "f755505",
         "status": "operational-and-applicability-reviewed",
-        "scope": "2026-11-03 W23实施后人工对照：A1独立检查/源图、版本/会话原生检查、XYZ/G03及字符持久化边界；保留原日期证据。；同日桌面正常链以新增验收记录为证，全故障矩阵未完成",
+        "scope": "GEO-2–4当前profile、实际保存/原生观察、公开签名、许可分离及失败/取消/恢复；早期离线章节明确为历史快照。",
         "checked_sources": [
+          {
+            "path": "csttool/history_program.py"
+          },
+          {
+            "path": "csttool/managed_history.py"
+          },
           {
             "path": "csttool/definition_editing.py"
           },
           {
-            "path": "csttool/mcp_server.py"
+            "path": "csttool/definition_geometry.py"
           },
           {
-            "path": "data/first_stage_contract.schema.json"
+            "path": "csttool/definition_verifier.py"
           },
           {
-            "path": "docs/winwrap-w01-implementation.md"
+            "path": "csttool/definition_sessions.py"
           },
           {
-            "path": "docs/winwrap-w23-implementation.md"
+            "path": "csttool/application_service.py"
           },
           {
-            "path": "knowledge-base/mcp-codex-desktop-20261103.json"
+            "path": "test/geometry_publication_test.py"
+          },
+          {
+            "path": "knowledge-base/geometry-calibration-20261104.json"
           }
         ],
-        "finding_ids": [
-          "S10",
-          "S14"
-        ],
-        "limitations": "重点核对历史堆叠/旧操作语义与责任边界；checked_sources仅列本批主要对照源，不表示每行技术陈述或所有物理/异常分支已验证。",
-        "content_sha256_at_review": "f72552955d9c26e2978aaea4efb166288feddf7206896e90aaf86b73cc2b1c01"
+        "finding_ids": [],
+        "limitations": "不追认旧测试为当前代码验收；不是任意CAD/多材料/模式身份/网格收敛或桌面新签名对话验收；A1旧许可保留失效。",
+        "content_sha256_at_review": "f0eded40bd96248dcbd3aa7192ebda548a6d85c2cea35f9ef421bdd3ff5d823b"
       }
     },
     {
@@ -8317,30 +8616,42 @@
       "authority": "current-defined-scope-only",
       "provenance": "2026-11-03 W23最终受控无求解XYZ/G03与失败拒绝；源码版本及知识库原生摘要绑定。",
       "review": {
-        "date": "2026-11-03",
-        "baseline": "2705935",
+        "date": "2026-11-04",
+        "baseline": "f755505",
         "status": "operational-and-applicability-reviewed",
-        "scope": "受限A1保存检查/源图/版本门禁、当前字符持久化边界与12会话原生结果；不扩充真实求解门禁。",
+        "scope": "GEO-2–4当前profile、实际保存/原生观察、公开签名、许可分离及失败/取消/恢复；早期离线章节明确为历史快照。",
         "checked_sources": [
           {
-            "path": "csttool/winwrap_checks.py"
+            "path": "csttool/history_program.py"
+          },
+          {
+            "path": "csttool/managed_history.py"
           },
           {
             "path": "csttool/definition_editing.py"
           },
           {
-            "path": "csttool/native_definition_builder.py"
+            "path": "csttool/definition_geometry.py"
           },
           {
-            "path": "test/support/calibrate_winwrap_gate.py"
+            "path": "csttool/definition_verifier.py"
           },
           {
-            "path": "knowledge-base/winwrap-w23-20261103.json"
+            "path": "csttool/definition_sessions.py"
+          },
+          {
+            "path": "csttool/application_service.py"
+          },
+          {
+            "path": "test/geometry_publication_test.py"
+          },
+          {
+            "path": "knowledge-base/geometry-calibration-20261104.json"
           }
         ],
         "finding_ids": [],
-        "limitations": "样本/本机2022.5/Sub-only；注入故障不冒充自然setter失败，版本记录不是本地恶意篡改防线。",
-        "content_sha256_at_review": "786d920d0c88dfcfc06b5e159d1e7874f82ec193708fdf1b4842dcdee60db9a4"
+        "limitations": "不追认旧测试为当前代码验收；不是任意CAD/多材料/模式身份/网格收敛或桌面新签名对话验收；A1旧许可保留失效。",
+        "content_sha256_at_review": "d209bdb376f161e8f63623de681c82898a08228af64dd79989166e9dfe98eeae"
       }
     },
     {
@@ -9279,6 +9590,94 @@
         "finding_ids": [],
         "limitations": "离线/真实分开；原父死亡退出码未知，真实矩阵状态逐项列出；旧Worker层证据不追认上层。",
         "content_sha256_at_review": "a64757b72727a174f5c1b2512817d306c08e2584acb0ac765411115dca13e1de"
+      }
+    },
+    {
+      "path": "docs/geometry-selection-interface-design.md",
+      "role": "design-reference",
+      "authority": "dated-source-context-not-current-API",
+      "provenance": "GEO-0官方帮助核对与GEO-1声明契约离线实现；完整原生接口仍为设计目标。",
+      "review": {
+        "date": "2026-11-04",
+        "baseline": "f755505",
+        "status": "operational-and-applicability-reviewed",
+        "scope": "GEO-2–4当前profile、实际保存/原生观察、公开签名、许可分离及失败/取消/恢复；早期离线章节明确为历史快照。",
+        "checked_sources": [
+          {
+            "path": "csttool/history_program.py"
+          },
+          {
+            "path": "csttool/managed_history.py"
+          },
+          {
+            "path": "csttool/definition_editing.py"
+          },
+          {
+            "path": "csttool/definition_geometry.py"
+          },
+          {
+            "path": "csttool/definition_verifier.py"
+          },
+          {
+            "path": "csttool/definition_sessions.py"
+          },
+          {
+            "path": "csttool/application_service.py"
+          },
+          {
+            "path": "test/geometry_publication_test.py"
+          },
+          {
+            "path": "knowledge-base/geometry-calibration-20261104.json"
+          }
+        ],
+        "finding_ids": [],
+        "limitations": "不追认旧测试为当前代码验收；不是任意CAD/多材料/模式身份/网格收敛或桌面新签名对话验收；A1旧许可保留失效。",
+        "content_sha256_at_review": "52ecebe1626542a3cd5da8315fb91c1ba59f87230d2a31aceb54524dfb29ead9"
+      }
+    },
+    {
+      "path": "docs/geometry-production-implementation.md",
+      "role": "api-contract",
+      "authority": "current-defined-scope-only",
+      "provenance": "2026-11-04 GEO-2–4当前实现及独立验收。",
+      "review": {
+        "date": "2026-11-04",
+        "baseline": "f755505",
+        "status": "operational-and-applicability-reviewed",
+        "scope": "GEO-2–4当前profile、实际保存/原生观察、公开签名、许可分离及失败/取消/恢复；早期离线章节明确为历史快照。",
+        "checked_sources": [
+          {
+            "path": "csttool/history_program.py"
+          },
+          {
+            "path": "csttool/managed_history.py"
+          },
+          {
+            "path": "csttool/definition_editing.py"
+          },
+          {
+            "path": "csttool/definition_geometry.py"
+          },
+          {
+            "path": "csttool/definition_verifier.py"
+          },
+          {
+            "path": "csttool/definition_sessions.py"
+          },
+          {
+            "path": "csttool/application_service.py"
+          },
+          {
+            "path": "test/geometry_publication_test.py"
+          },
+          {
+            "path": "knowledge-base/geometry-calibration-20261104.json"
+          }
+        ],
+        "finding_ids": [],
+        "limitations": "不追认旧测试为当前代码验收；不是任意CAD/多材料/模式身份/网格收敛或桌面新签名对话验收；A1旧许可保留失效。",
+        "content_sha256_at_review": "b7e4fa9c547bdbfd6bdd6814b4638ec40c594dfc89b7788b3be680c4c220e678"
       }
     }
   ],
@@ -10543,22 +10942,24 @@
       "entry_kind": "python-main",
       "main_guard": true,
       "observed_arguments": [
+        "--geometry",
         "--resume-project",
         "--run-cst",
         "--solve"
       ],
       "argument_discovery": "AST literals only; delegated, dynamic and Qt arguments may be absent",
       "purpose": "Explicit public modern-stdio A1 acceptance; serial new copies, optional solve.",
-      "effect": "可能启动原生CST/求解、子进程或GUI并读写报告/项目；转调入口的副作用未穷尽。",
+      "effect": "官方SDK公开定义纵向链；--geometry选择同一GEO契约并先几何保存；--solve真实单次计算/采用/JSON CSV导出及重试；逻辑关闭后Runner标准退出，不更新原生许可。",
       "authorization": "仅登记，不授权执行；按当前用户任务另行判断。原生/求解/故障注入需显式范围及归属核验。",
       "arguments": [
+        "--geometry",
         "--resume-project",
         "--run-cst",
         "--solve"
       ],
       "review_status": "entry-observed-transitive-effects-unreviewed",
       "unknown": "动态/委托参数、外部工具及传递副作用不由AST或本条登记证明安全。",
-      "evidence": "2026-11-03静态检查；已核AST入口、字面参数及直接调用；跨模块和参数分支需执行前复审。"
+      "evidence": "2026-11-04人工复审run/main、SDK字段分发/轮询、GEO两目标保存及结果重试；独立GEO门禁不放行A1。"
     },
     {
       "path": "test/support/validate_winwrap_noui.py",
@@ -10636,7 +11037,7 @@
       ],
       "review_status": "manually-reviewed-owned-copy-no-solver",
       "unknown": "部分属性故障为明确注入，不冒充自然CST setter失败；不是完整语言/全部弹窗/初始化证明。",
-      "evidence": "2026-11-03静态复核main/negative：exclusive_probe→持有对象构造→既有G03；require_closed阻断后续未确认退出，源码前后hash不变才允许写门禁。"
+      "evidence": "2026-11-03静态复核main/negative：exclusive_probe→持有对象构造→既有G03；require_closed阻断后续未确认退出，源码前后hash不变才允许写门禁。；GEO-2离线扩展后复审：该工具仍是A1原生校准，SOURCES扩展不证明GEO；本批未调用工具或刷新凭据。；本批静态复审两处generated_profile调用与partial阶段注入新锚点，显式断言唯一；CLI参数/串行关闭/校准权限不变，未运行原生工具。"
     },
     {
       "path": "test/support/validate_public_faults.py",
@@ -10739,6 +11140,36 @@
       "review_status": "entry-and-controlled-transitive-effects-reviewed",
       "unknown": "首模采用后暂停，不证明整个目标区间；父进程死后原CST退出码可能未知；Start=0/异常及物理模式身份未由本探针证明。",
       "evidence": "2026-11-04人工核对RunnerClient命令、run_task/归档/adopt/RunStore写入钩子、bridge单次意图、显式集中日志路径、收尾和清理；真实矩阵另列。"
+    },
+    {
+      "path": "test/support/calibrate_geometry.py",
+      "entry_kind": "python-main",
+      "main_guard": true,
+      "observed_arguments": [
+        "--cst-exe",
+        "--matrix",
+        "--publish-gate",
+        "--resume",
+        "--reuse-simulation",
+        "--run-cst",
+        "--simulate"
+      ],
+      "arguments": [
+        "--cst-exe",
+        "--matrix",
+        "--publish-gate",
+        "--resume",
+        "--reuse-simulation",
+        "--run-cst",
+        "--simulate"
+      ],
+      "argument_discovery": "AST literals and manual orchestration review",
+      "purpose": "独立GEO原生许可的串行受控副本校准",
+      "effect": "--matrix构造/保存/重开、参数重放、显式Err.Raise和边界停止；--simulate执行一次小网格求解；--reuse-simulation重核同源Z回执并求解X/Y；--publish-gate只写GEO许可及固定知识库证据；不写A1许可。",
+      "authorization": "需--run-cst及明确受控副本授权；不修改用户原工程、不强杀；--resume只对账同源已完成回执，不重放部分原生执行。",
+      "review_status": "entry-and-controlled-transitive-effects-reviewed",
+      "unknown": "退化CAD内部失败原因及所有CST版本未证明；几何/仿真许可分开，原始artifacts可能清理。",
+      "evidence": "2026-11-04逐读main/run_matrix/construct/replay_parameters/controlled_failure/simulate及归属关闭/源版本检查；当前矩阵实际通过，见knowledge-base/geometry-calibration-20261104.json。"
     }
   ],
   "relations": [
@@ -10762,7 +11193,7 @@
       "trigger": "uses_runner后端选择RunnerController；否则使用注入controller或GuiRunController。",
       "lifecycle": "GUI窗口构造；生产gui_app传RunnerBackend。",
       "cleanup": "窗口关闭调用各自控制器清理链；不把窗口消失当CST退出。",
-      "evidence": "2026-11-03人工静态核对source/targets；对应文件hash见source_fingerprints。登记、默认分支或注册不证明实际运行/清理成功。",
+      "evidence": "2026-11-04 GEO-2–4逐调用人工复审：复核同一Runner/adapter或注入边界及未更改的清理责任；GEO新增目标不是另一后端。 代码hash仅作复审定位，原生证据另见独立校准。",
       "unknown": "自定义engine/controller可能替换目标；静态记录不证明所选后端。",
       "consumers": [
         {
@@ -10795,7 +11226,7 @@
       "trigger": "QTimer.timeout.connect(self.poll)；ThreadPoolExecutor承载串行传输。",
       "lifecycle": "GUI Qt线程观察future；HTTP读取在线程池。",
       "cleanup": "detach取消排队动作，串行release；pool.shutdown(wait=False)，poll等待通信结束、停止timer。",
-      "evidence": "2026-11-03人工静态核对source/targets；对应文件hash见source_fingerprints。登记、默认分支或注册不证明实际运行/清理成功。",
+      "evidence": "2026-11-04 GEO-2–4逐调用人工复审：新submit_definition复用_command/future，不改变Qt计时/异步读取/退出责任。 代码hash仅作复审定位，原生证据另见独立校准。",
       "unknown": "回调实际投递及外部Runner是否退出需单独证据。",
       "consumers": [
         {
@@ -10832,7 +11263,7 @@
       "trigger": "用户选择仅关闭界面或停止并退出；后者依状态先停后shutdown。",
       "lifecycle": "Qt关闭事件；未知/只读/等待状态会阻止完整退出。",
       "cleanup": "detach释放客户端租约；shutdown_and_wait核验Runner所有权，不强杀。",
-      "evidence": "2026-11-03人工静态核对source/targets；对应文件hash见source_fingerprints。登记、默认分支或注册不证明实际运行/清理成功。",
+      "evidence": "2026-11-04 GEO-2–4逐调用人工复审：复核同一Runner/adapter或注入边界及未更改的清理责任；GEO新增目标不是另一后端。 代码hash仅作复审定位，原生证据另见独立校准。",
       "unknown": "Runner锁释放与原生会话安全不是一个事实；缺证据仍需恢复。",
       "consumers": []
     },
@@ -10924,7 +11355,7 @@
       "trigger": "server.tool装饰器注册公开工具；闭包invoke限流并转换错误。",
       "lifecycle": "MCP stdio进程；SDK在create_server内加载，adapter可注入。",
       "cleanup": "invoke finally释放信号量；EOF关闭适配器不停止独立任务。",
-      "evidence": "2026-11-03人工静态核对source/targets；对应文件hash见source_fingerprints。登记、默认分支或注册不证明实际运行/清理成功。；2026-11-04人工复审受影响生成/发射/清理路径：批后台切换共用独立桌面资源，字符串/行预算不扩大CST语义允许表；stdio仍委托SDK和Runner；退出证明独立。",
+      "evidence": "2026-11-04 GEO-2–4逐调用人工复审：14工具签名新增显式geometry_profile/validation_target并实际转发；SDK分发测试和公开真实链分层。 代码hash仅作复审定位，原生证据另见独立校准。",
       "unknown": "SDK动态调用/宿主发现与版本协商不由本记录证明；注入adapter可替换。",
       "consumers": []
     },
@@ -10948,7 +11379,7 @@
       "trigger": "client_factory默认RunnerClient，按client_id保存控制句柄。",
       "lifecycle": "适配器锁保护句柄表；连接可显式launch Runner。",
       "cleanup": "具体控制操作按Runner租约处理；句柄不代表原生资源所有权。",
-      "evidence": "2026-11-03人工静态核对source/targets；对应文件hash见source_fingerprints。登记、默认分支或注册不证明实际运行/清理成功。；2026-11-04人工复审受影响生成/发射/清理路径：批后台切换共用独立桌面资源，字符串/行预算不扩大CST语义允许表；stdio仍委托SDK和Runner；退出证明独立。",
+      "evidence": "2026-11-04 GEO-2–4逐调用人工复审：复核同一Runner/adapter或注入边界及未更改的清理责任；GEO新增目标不是另一后端。 代码hash仅作复审定位，原生证据另见独立校准。",
       "unknown": "client_factory注入目标未知；connect不是求解成功。",
       "consumers": []
     },
@@ -11009,7 +11440,7 @@
       "trigger": "operation、run_kind及executor_factory is LocalExecution决定单次/定义/恢复/批量分支。",
       "lifecycle": "Runner后台worker线程；共享stop_intent和状态更新。",
       "cleanup": "finally调用executor.close；lifecycle_facts可调用时采集事实；异常保留RECOVERY_REQUIRED。",
-      "evidence": "2026-11-03人工静态核对source/targets；对应文件hash见source_fingerprints。登记、默认分支或注册不证明实际运行/清理成功。；2026-11-03复审执行/恢复分支未变，reconcile_simulation首次补写后统一从持久结果读取DTO；public_failure_matrix_test核对重复恢复不派发和采用幂等。；2026-11-03复审：公共失败回执保留SOLVER_FAILED，成功采集移至Start返回/模式可用门禁之后，Worker停止/清理分支及责任未变；原生故障验收单独留证。；失败分类复审：保留已知协议码，未知TASK_FAILED；真实SOLVER_FAILED与其它离线分类证据分开。",
+      "evidence": "2026-11-04 GEO-2–4逐调用人工复审：复核同一Runner/adapter或注入边界及未更改的清理责任；GEO新增目标不是另一后端。 代码hash仅作复审定位，原生证据另见独立校准。",
       "unknown": "注入executor_factory及getattr生命周期探针不能静态唯一解析；close返回不等于CST安全。",
       "consumers": []
     },
@@ -11023,13 +11454,21 @@
         {
           "path": "csttool/native_definition_builder.py",
           "symbol": "run_new_definition"
+        },
+        {
+          "path": "csttool/definition_editing.py",
+          "symbol": "prepare_candidate_artifacts"
+        },
+        {
+          "path": "csttool/definition_editing.py",
+          "symbol": "validate_candidate_completion"
         }
       ],
       "type": "injection",
-      "trigger": "service.definition_editor or run_new_definition；构造新A1候选并核对nonce/退出/保存定义。",
+      "trigger": "显式A1/GEO目标通过各自许可后，在既有intent/项目锁内准备和构造候选；实际历史/参数/退出核对后执行对应原生验证。",
       "lifecycle": "定义操作目录的副本构造；原生执行由被选editor持有。",
       "cleanup": "默认builder正常Quit/COM释放/ExitStack释放观察与桌面；失败保留诊断。",
-      "evidence": "2026-11-03 W23人工复审最终源码/调用点：版本门禁、默认generated_a1注入、最终映射hash、持有对象正常退出责任；知识库winwrap-w23-20261103原生12会话及故障样本。R020不是安全签名，R021的部分失败为明确注入。",
+      "evidence": "2026-11-04 GEO-2–4逐调用人工复审：按目标选择独立许可，准备分块宏，保持持有对象标准关闭、原始错误/参数/实际保存检查；几何证明全过程在项目锁内。 代码hash仅作复审定位，原生证据另见独立校准。",
       "unknown": "注入editor未知；表达式/历史核验不能由名称或单个退出码替代。",
       "consumers": []
     },
@@ -11191,13 +11630,17 @@
         {
           "path": "csttool/cst_background.py",
           "symbol": "BackgroundWindowObserver"
+        },
+        {
+          "path": "csttool/native_definition_builder.py",
+          "symbol": "inject_definition_ownership"
         }
       ],
       "type": "protocol",
-      "trigger": "Python生成单RunScript包装，PowerShell/C#创建持有COM对象并做nonce/进程身份quiet握手。",
+      "trigger": "run_new_definition先以纯文本helper注入身份并绑定宏hash/source map，再启动既有PowerShell/COM包装器；持有对象及nonce/进程身份握手责任沿用。",
       "lifecycle": "跨Python/PowerShell/C#/WinWrap与COM STA封送；正文是字符串，Python AST不解析。",
       "cleanup": "持有对象正常Quit、释放COM；ExitStack关闭观察线程与私有桌面。",
-      "evidence": "2026-11-03 W23人工复审最终源码/调用点：版本门禁、默认generated_a1注入、最终映射hash、持有对象正常退出责任；知识库winwrap-w23-20261103原生12会话及故障样本。R020不是安全签名，R021的部分失败为明确注入。",
+      "evidence": "2026-11-04 GEO-2–4逐调用人工复审：身份注入仍先握手；停止只写本目录cancel.request，继续等待持有对象正常Quit；不强杀/全局Active3D。 代码hash仅作复审定位，原生证据另见独立校准。",
       "unknown": "COM/WinWrap内部行为及所有异常路径不能由Python符号图解释；quiet无通用headless保证。",
       "consumers": []
     },
@@ -11317,7 +11760,7 @@
       "trigger": "显式--run-cst、独占锁且无现存CST时，W0→W1→G03串行；任一未确认失败阻断后续。",
       "lifecycle": "调用线程创建受控原生进程；父进程归属/quiet握手，串行各会话实际退出后继续。",
       "cleanup": "run_new_definition/既有G03负责正常保存、退出及资源释放；探针不强杀、不自动删除仍活跃副本。",
-      "evidence": "2026-11-03静态复审main/driver及目标；artifacts/winwrap-w01-0627823e/acceptance.json与知识库JSON确认四会话、零求解、退出0。；2026-11-04人工复审受影响生成/发射/清理路径：批后台切换共用独立桌面资源，字符串/行预算不扩大CST语义允许表；stdio仍委托SDK和Runner；退出证明独立。",
+      "evidence": "2026-11-04 GEO-2–4逐调用人工复审：复核同一Runner/adapter或注入边界及未更改的清理责任；GEO新增目标不是另一后端。 代码hash仅作复审定位，原生证据另见独立校准。",
       "unknown": "不是任意WinWrap语法、初始化或所有失败关闭的运行保证。",
       "consumers": []
     },
@@ -11334,11 +11777,11 @@
         }
       ],
       "type": "versioned-artifact-gate",
-      "trigger": "save_project预检：有限读取本地校准记录及固定命名知识库证据，核规范化源码hash和校准摘要，不启动CST。",
+      "trigger": "A1保存预检只读取独立A1许可及固定证据；GEO目标改用require_geometry_calibration，不借A1 stamp。",
       "lifecycle": "保存前控制线程；检查器加载后磁盘变化拒绝，不支持热升级；不是签名/恶意篡改防线。",
       "cleanup": "纯读取，无原生资源；过期/缺失拒绝写原生执行意图，需授权的校准而非求解重试。",
-      "evidence": "2026-11-03 W23人工复审最终源码/调用点：版本门禁、默认generated_a1注入、最终映射hash、持有对象正常退出责任；知识库winwrap-w23-20261103原生12会话及故障样本。R020不是安全签名，R021的部分失败为明确注入。",
-      "unknown": "版本/样本一致不保证任意输入语法或初始化无副作用，仍需独立和会话内检查。",
+      "evidence": "2026-11-04 GEO-2–4逐调用人工复审：仅A1许可；源码变化失效保留，不借GEO证据或更新hash伪造放行。 代码hash仅作复审定位，原生证据另见独立校准。",
+      "unknown": "版本/样本一致不保证任意输入语法或初始化无副作用，仍需独立和会话内检查。；SOURCES含GEO文件但stamp profile仍A1，不能据此授权GEO。",
       "consumers": []
     },
     {
@@ -11365,7 +11808,7 @@
       "trigger": "显式--run-cst；编译样本→语法失败→注入步骤失败→XYZ/G03，全部通过且源码未变才可--publish-gate。",
       "lifecycle": "独占串行副本；无Solver.Start；失败候选不发布，未知退出阻断下一个会话。",
       "cleanup": "既有持有对象及批执行正常退出；不强杀；原始大副本验收完成再清理，保留宏/哈希/证据。",
-      "evidence": "2026-11-03 W23人工复审最终源码/调用点：版本门禁、默认generated_a1注入、最终映射hash、持有对象正常退出责任；知识库winwrap-w23-20261103原生12会话及故障样本。R020不是安全签名，R021的部分失败为明确注入。；2026-11-04人工复审受影响生成/发射/清理路径：批后台切换共用独立桌面资源，字符串/行预算不扩大CST语义允许表；stdio仍委托SDK和Runner；退出证明独立。",
+      "evidence": "2026-11-04 GEO-2–4逐调用人工复审：离线宏/故障注入适配新分块；本批未运行A1许可发布。 代码hash仅作复审定位，原生证据另见独立校准。",
       "unknown": "不是自然求解失败、任意CST setter或全部生命周期故障证明。",
       "consumers": []
     },
@@ -11471,7 +11914,7 @@
       "trigger": "StrictServer.run_stdio_async；仅现代stdio，每个请求校验信封后仍交官方SDK分发。",
       "lifecycle": "单连接异步输入/输出与SDK线程调用；在途ID按响应/取消清理；取消不转换为CST stop。",
       "cleanup": "EOF关闭适配进程资源，不停止独立Runner；不启用HTTP/OAuth/Tasks。",
-      "evidence": "2026-11-04核对SDK2.3.0通知归一化、era选择、重复入站ID源码及本项目原始消息测试。",
+      "evidence": "2026-11-04 GEO-2–4逐调用人工复审：复核同一Runner/adapter或注入边界及未更改的清理责任；GEO新增目标不是另一后端。 代码hash仅作复审定位，原生证据另见独立校准。",
       "unknown": "SDK私有lowlevel入口依赖固定版本；非stdio客户端和未测试扩展不能外推符合。"
     },
     {
@@ -11601,6 +12044,240 @@
       "cleanup": "恢复先物理收尾/对账再续跑；源及结果hash不变；正常暂停后所有原生关闭并正式shutdown Runner。失败保留报告；注入失败父控制器正式stop，已结束伴随目录才清理。",
       "evidence": "2026-11-04核对五场景、边界标记三元组、快照重命名索引、回执/日志幂等、processed来源及故障回调；离线真实生产scanner/RunStore不等于OS崩溃实测。 五场景固定首模后暂停，正常基线/received索引缺口分别留原报告；只保证实际Solver两次，逻辑请求预算单列。 最终五例真实每例两次Start，原生期间driver hash一致；后补main汇总状态失败保护仅离线验，不改写实测源码版本。",
       "unknown": "只在首模式采用后暂停；不证明全目标数值完备、模式互异或原父死亡后的退出码。"
+    },
+    {
+      "id": "R028",
+      "source": {
+        "path": "csttool/definition_editing.py",
+        "symbol": "changed_spec"
+      },
+      "targets": [
+        {
+          "path": "csttool/geometry_contract.py",
+          "symbol": "apply_changes"
+        },
+        {
+          "path": "csttool/geometry_contract.py",
+          "symbol": "project_geometry"
+        }
+      ],
+      "consumers": [
+        {
+          "path": "csttool/definition_editing.py",
+          "symbol": "inspect_typed"
+        },
+        {
+          "path": "csttool/definition_editing.py",
+          "symbol": "preflight_edit"
+        }
+      ],
+      "type": "profile-dispatch",
+      "trigger": "显式geometry-v1在GeometryFeature唯一Schema下执行append/update/remove及集合操作，按最终features投影；inspect复核投影和直接父身份保留。",
+      "lifecycle": "既有Runner definition槽/项目锁/CAS与提交对账；单次顺序扫描派生对象与依赖；父JSON受1MiB边界，不追溯无限祖先，不创建CST/线程/资源。",
+      "cleanup": "复用ProjectRunLock、immutable revision及intent/commit/result恢复；无新增原生资源；拒绝时保留父revision，GEO save在intent前失败。",
+      "evidence": "2026-11-04 GEO-2–4逐调用人工复审：geometry-v1显式分发、身份/选择/参数及背景边界声明，完整配置才生成SIM；inspect核对原生证明及保存程序。 代码hash仅作复审定位，原生证据另见独立校准。",
+      "unknown": "旧缺identities开发草稿明确拒绝；一般CSG与任意拓扑等价、面边选择及多材料仿真未校准。"
+    },
+    {
+      "id": "R029",
+      "source": {
+        "path": "csttool/geometry_codegen.py",
+        "symbol": "validate_geometry_history"
+      },
+      "targets": [
+        {
+          "path": "csttool/winwrap_checks.py",
+          "symbol": "check_history"
+        },
+        {
+          "path": "csttool/settings_projection.py",
+          "symbol": "project_geometry_history"
+        },
+        {
+          "path": "csttool/geometry_codegen.py",
+          "symbol": "expected_geometry_history"
+        }
+      ],
+      "consumers": [
+        {
+          "path": "csttool/geometry_codegen.py",
+          "symbol": "render_geometry_history"
+        },
+        {
+          "path": "csttool/winwrap_checks.py",
+          "symbol": "geometry_definition_map"
+        }
+      ],
+      "type": "profile-validation-chain",
+      "trigger": "生成候选时显式GEO逻辑历史检查及声明核对，交由partition拆物理块；源图绑定完整实际宏。",
+      "lifecycle": "调用线程内纯字符串/有界AST处理；复用HistoryCall/With、共享词法和Projection；不执行代码，不建Native/Worker/控制器。",
+      "cleanup": "纯字符串/投影无原生资源；生成失败在intent前拒绝，原生许可独立。",
+      "evidence": "2026-11-04 GEO-2–4逐调用人工复审：逻辑setup新增MHz，与实际分块分层；允许表/投影核对符号引用，不证明原生事实。 代码hash仅作复审定位，原生证据另见独立校准。",
+      "unknown": "独立静态检查不是完整WinWrap编译器或保存证明；实际保存由managed_history及两会话原生观察核验。"
+    },
+    {
+      "id": "R030",
+      "source": {
+        "path": "csttool/definition_editing.py",
+        "symbol": "prepare_candidate_artifacts"
+      },
+      "targets": [
+        {
+          "path": "csttool/definition_editing.py",
+          "symbol": "render_edit_macro"
+        },
+        {
+          "path": "csttool/history_program.py",
+          "symbol": "partition"
+        },
+        {
+          "path": "csttool/history_program.py",
+          "symbol": "validate"
+        },
+        {
+          "path": "csttool/winwrap_checks.py",
+          "symbol": "execution_definition_map"
+        }
+      ],
+      "consumers": [
+        {
+          "path": "csttool/native_definition_builder.py",
+          "symbol": "inject_definition_ownership"
+        },
+        {
+          "path": "csttool/definition_editing.py",
+          "symbol": "validate_candidate_completion"
+        },
+        {
+          "path": "csttool/definition_editing.py",
+          "symbol": "build_candidate"
+        }
+      ],
+      "type": "generated-artifact-protocol",
+      "trigger": "显式prepare生成A1/GEO物理program/参数/源图；准备不派发，默认native builder只接受通过目标独立门禁的生成profile。",
+      "lifecycle": "单线程文件/字符串准备；无COM、进程、后台任务或执行intent。运行由既有native builder拥有，不新增服务。",
+      "cleanup": "失败候选不发布，保留轻量诊断；真实资源由持有对象包装器及Python退出核验释放，不由prepare或完成读者强杀。",
+      "evidence": "2026-11-04 GEO-2–4逐调用人工复审：准备调用partition/validate、共用render_edit_macro和execution_definition_map；保存实际程序由managed_history核对。 代码hash仅作复审定位，原生证据另见独立校准。",
+      "unknown": "回执不是安全签名；任意导入历史和跨scope编辑不支持，单独退出0不是成功。"
+    },
+    {
+      "id": "R031",
+      "source": {
+        "path": "csttool/winwrap_checks.py",
+        "symbol": "require_geometry_calibration"
+      },
+      "targets": [
+        {
+          "path": "csttool/definition_editing.py",
+          "symbol": "preflight_edit"
+        },
+        {
+          "path": "csttool/definition_editing.py",
+          "symbol": "build_candidate"
+        }
+      ],
+      "consumers": [],
+      "type": "versioned-artifact-gate",
+      "trigger": "GEO目标分别验证源指纹及固定知识库摘要，在写intent前拒绝缺失/过期许可。",
+      "lifecycle": "定义槽控制线程；模块加载后源码变化拒绝。",
+      "cleanup": "只读，无原生资源，不刷新许可。",
+      "evidence": "2026-11-04逐调用人工复审；源码/单元测试与独立GEO原生证据分开；hash登记不替代实际投递/关闭验收。",
+      "unknown": "不是签名或完整语言证明；A1许可独立。"
+    },
+    {
+      "id": "R032",
+      "source": {
+        "path": "csttool/definition_verifier.py",
+        "symbol": "NativeDefinitionVerifier._phases"
+      },
+      "targets": [
+        {
+          "path": "csttool/definition_verifier.py",
+          "symbol": "run_definition_probe"
+        },
+        {
+          "path": "csttool/definition_verifier.py",
+          "symbol": "render_managed_probe"
+        }
+      ],
+      "consumers": [
+        {
+          "path": "csttool/definition_verifier.py",
+          "symbol": "NativeDefinitionVerifier.verify_geometry"
+        },
+        {
+          "path": "csttool/definition_verifier.py",
+          "symbol": "NativeDefinitionVerifier.__call__"
+        },
+        {
+          "path": "csttool/application_service.py",
+          "symbol": "ApplicationService.verify_definition"
+        }
+      ],
+      "type": "protocol",
+      "trigger": "保存与重开两会话串行核验，每次启动前检查取消；原生getter只在匹配目标使用。",
+      "lifecycle": "项目锁内归属副本；验证器只检查candidate.parent，服务检查整个catalog。",
+      "cleanup": "每会话所属batch标准返回及进程关闭，失败留原始诊断，不强杀或重放。",
+      "evidence": "2026-11-04逐调用人工复审；源码/单元测试与独立GEO原生证据分开；hash登记不替代实际投递/关闭验收。",
+      "unknown": "未知退出阻断；一般CAD形状等价及任意getter不可由正体积推出。"
+    },
+    {
+      "id": "R033",
+      "source": {
+        "path": "csttool/definition_sessions.py",
+        "symbol": "definition_status_paths"
+      },
+      "targets": [
+        {
+          "path": "csttool/definition_sessions.py",
+          "symbol": "definition_session_facts"
+        },
+        {
+          "path": "csttool/definition_verifier.py",
+          "symbol": "assert_definition_sessions_closed"
+        }
+      ],
+      "consumers": [
+        {
+          "path": "csttool/definition_sessions.py",
+          "symbol": "recover_definition_sessions"
+        },
+        {
+          "path": "csttool/application_service.py",
+          "symbol": "ApplicationService.verify_definition"
+        }
+      ],
+      "type": "shared-discovery",
+      "trigger": "递归发现catalog内嵌套GEO会话，解析路径越界拒绝；畸形状态/证明保持unknown。",
+      "lifecycle": "恢复/验证/生命周期读取同一发现入口；服务持项目锁。",
+      "cleanup": "只观察或对账已死会话，不重放/杀进程；实际退出码严格整数。",
+      "evidence": "2026-11-04逐调用人工复审；源码/单元测试与独立GEO原生证据分开；hash登记不替代实际投递/关闭验收。",
+      "unknown": "历史日志缺失不能制造成功；局部验证器范围不代表全catalog安全。"
+    },
+    {
+      "id": "R034",
+      "source": {
+        "path": "GUI/runner_controller.py",
+        "symbol": "RunnerController.submit_definition"
+      },
+      "targets": [
+        {
+          "path": "GUI/runner_controller.py",
+          "symbol": "RunnerController._command"
+        }
+      ],
+      "consumers": [
+        {
+          "path": "GUI/runner_controller.py",
+          "symbol": "RunnerController"
+        }
+      ],
+      "type": "adapter",
+      "trigger": "类型化payload验证并深拷贝后提交既有start槽，不创建另一个CAD后端。",
+      "lifecycle": "GUI线程受理；既有future和HTTP控制权处理结果。",
+      "cleanup": "沿用detach/lease与Runner退出责任，不因提交返回而证明完成。",
+      "evidence": "2026-11-04逐调用人工复审；源码/单元测试与独立GEO原生证据分开；hash登记不替代实际投递/关闭验收。",
+      "unknown": "没有新增CAD画布或按钮接线，SDK/CLI与GUI适配测试分别证明。"
     }
   ],
   "source_fingerprints": {
@@ -11614,12 +12291,12 @@
     "GUI/main_window.py": "9b7c952e6eaee84d06635146dad98f7717a75d82c5adc6c0e35205100297b9ab",
     "GUI/run_controller.py": "fc317a74d42248f6cab0fb7cccffb83c1a23cf65097ebb91c666870b0a12e752",
     "GUI/runner_backend.py": "e50a46a40ef852025e1ea475c2430e0d069bc45cd33f0cd7a2b45713f51da900",
-    "GUI/runner_controller.py": "832617e37f9f8eab2ad5380680cab3012145c276f3aabe4dda304f5df2d10507",
+    "GUI/runner_controller.py": "493b6bcef325504504a89294e8f313e82aefc555cb8b7692e6c5933b13673550",
     "GUI/runner_management_dialog.py": "4c6df68f228071c6c177dd08d2f2e47af3b9b41c424cb21677c830bbc1affe8e",
     "GUI/session_store.py": "bb458322e74866674295934e569085a19b5a084dea2ee0afbcb0cd35e2d63c22",
     "csttool/acceptance_session.py": "7a08444bdc9917cde0f20e60a92694cace80088025066a29abebf63d892ab74c",
     "csttool/application_backend.py": "b8c68227c0a7b682b5455ad0aecd059d12f6fc92d5a545c0d95a2ef6beae556c",
-    "csttool/application_service.py": "e11dee6406dc8ca58279336b9113f2e148a1b080b369ecf7068c3c7bc43bb875",
+    "csttool/application_service.py": "71dc0ad3d4c7256ba74e91f0987780b3fd09d4495c3cdfe75cb18ad6c2a1ea82",
     "csttool/checkpoint_adoption.py": "9074c90cb9977563e6f5a218b493d6fa16467317f161ea65af3e9f160dcee141",
     "csttool/close_receipt.py": "12de980b1687fc0c68a5aab73853ce9739777339a0f3c59f6aaa5638db62a1ef",
     "csttool/close_receipt_contract.py": "6be66ba28ec6f9e78a63283c4b64717c01382f4e60495d8cae3e66cbf1528709",
@@ -11627,10 +12304,10 @@
     "csttool/cst_preprocessor.py": "809ffbfb88481fd7c4dd7c8cc47116f0cf9eaa29798256b1211531b45b97788c",
     "csttool/cst_progress.py": "bc56ab72a5d4cf597b4f6eddd5fbe52ff02390bce52318385912609c309cf877",
     "csttool/cstmanager.py": "2843ef515cbff19eac23fd814eb233d18a1eaaba059e914ecba40437d337b176",
-    "csttool/definition_editing.py": "f2b99f3a6bdce2cd57e9986b5e9879594b017cb2cd70eb72674cccaec080d671",
-    "csttool/definition_geometry.py": "f7a8405ae5cd6d2fc60c3fdffa17afcf0ee6000a9bb7cbd8f1ce5c1af00a9d8b",
-    "csttool/definition_sessions.py": "0a00f3af0fffd16be6efaf712f6e22227b3cdf91c4e78e1cc6e156875cbefca5",
-    "csttool/definition_verifier.py": "24033403a6617ec67808af347419bc8093b92baf9af9a93042bfa3f3de02a45b",
+    "csttool/definition_editing.py": "4e168dac1ae0c8604e8536d354b7a7b5a56e6a1339002d120d4531f75afb25c1",
+    "csttool/definition_geometry.py": "0f84c36aeafd53929b9281f5cdef37021f4436d7d68e14911f3f31a2a44ca6ef",
+    "csttool/definition_sessions.py": "39ca9cf9c9941abdb4e53b653a75fee01a98eaf02ab1fa2b0c361893b9510081",
+    "csttool/definition_verifier.py": "780fa13657540290ba85a2c2b595475f0df8c32998d0ab0b6e73f264f1e5e7be",
     "csttool/diagnostic_bundle.py": "fc6fab1dcc9d9c21d0bde8a156e8f7357032464e044a166e2741b5b80c6346f4",
     "csttool/event_replay.py": "aa93c21d998517bb541fd6aa9cd47158c9002892f0f667477c272c0410789806",
     "csttool/execution_contract.py": "e4b7b310382870a6a244e34088e78896d3c4e3d8320abb7fcdb9d67e09bccbde",
@@ -11646,8 +12323,8 @@
     "csttool/logging_config.py": "b664595865c6530dbb448aded381fe96b436a2138cde424e5648d9e6a416ec37",
     "csttool/managed_cstworker.py": "53177e919554544d5a4f157a0a3126ac92b61c1cc3af0cfa24213aa51242fde6",
     "csttool/managed_session_recovery.py": "1a84a69e85a43457039af1059a15cb25ac8553849896ae0b787f369fafb3e999",
-    "csttool/mcp_server.py": "ccdd3bcb1ba04248d18bbb99d2e7a154ff5c5a84580b0712cdb52ac87cd46cb5",
-    "csttool/native_definition_builder.py": "7128e5bfd84d8bbad401eaf033c77daaa80828385bf331c50aae6e99039bbe27",
+    "csttool/mcp_server.py": "86f3eca54884bce79b8ec86f47b106edd820ed07e54dfde76bd553bec7faac60",
+    "csttool/native_definition_builder.py": "7becaf1525d62d9d332ad4b46ec864d925a2db60991131f14f8c38860db4a872",
     "csttool/native_execution_capture.py": "6bcd6e1519cc41794e151e872d2f6077b08d9566f854e63fbe810305ae609a25",
     "csttool/physical_domain.py": "e8fdb99ef1a65a829f9ca525f9c049a73e6b6fc5cb69bb98a552ee6908f2113a",
     "csttool/pillbox_reference.py": "9692c3205a06be998fd581b2df94b12b3ab73a96c69f38beac1a6f0af210b589",
@@ -11657,7 +12334,7 @@
     "csttool/project_session_recovery.py": "f66c8636a1cc6a0ae29e15ef83b6d23295b520d6682279902a5311a1680d7a11",
     "csttool/projectconfmanager.py": "6c51b4a13708a646002929703a3ddd2334f3cd6537e77469cf8b4c19c33ebc3b",
     "csttool/recovery_control.py": "f0c4a3399934d46e1bf737f927eb2904980e8fdab5ecfaca5917245aa0a1f14d",
-    "csttool/result_provenance.py": "eed46241a6be1109340e48d014e80f7f88c4c1f3b0f10983be092695db178622",
+    "csttool/result_provenance.py": "d1ca07a637f049a08b753b024b035eaa09cfd1f64ec79cc4243d2316fa34fa3e",
     "csttool/result_reconciliation.py": "c3db6853d773b13599a084dc66eba5280cde16b08db65361e32ac65808e9d199",
     "csttool/run_overview.py": "31f2f341d44b9a3568a3d8a2ae617c7bc5338038eb81ce12f48c0b62cf598438",
     "csttool/run_store.py": "2e5fc481564f294467d735506db4152d1228a9717920ba6ba1378fa64d4d4ac9",
@@ -11669,7 +12346,7 @@
     "csttool/saved_project_source.py": "708aff0da5c4028003d11b0a20bc41ed9bb3ddc4cc88480a511629e73fd5636b",
     "csttool/scan_settings.py": "0ad99bdd399f9d733b6eed9dffca4e1ed65410636ef9cbbe41627b60c43a2ee4",
     "csttool/session_closure.py": "8f5eaffb0af2195ca62073c934aa563d5c31811626f3a9827ccc285e94dbe6e6",
-    "csttool/settings_projection.py": "9d8d381be9ced2bba93f5d466445909280ab5313ff21e142fe18ef944fcae521",
+    "csttool/settings_projection.py": "f02801de6eb09457c9b319fabab5e87e000ca6393febd4f36b4a94b7c103ea2c",
     "csttool/standard_batch.py": "f2f3f00e8b968a5bc60cbcb77af26aec3ea4af77ef36c625dcdf7c49967f36b0",
     "csttool/vacuum_domain_registry.py": "89b900dbc58d9a9cc4deda021a04153e1ac7f6064f01ce548cdf7091dc3ae61e",
     "csttool/vacuum_mode_tracking.py": "f7697d9ceaf5a594dee52e4b8e689ed65166b799c07c3f2ef7c7fb3a547ae012",
@@ -11736,20 +12413,26 @@
     "gui_app.py": "fdea110958b626e4e1c7ae7e71d5fb4819b3136ff147e33873e528a562315087",
     "test/support/validate_batch_restore_close.py": "d34164e805ad0596045a66c8f236433566f0c4ba1a7abc20af4a3d3a998bcb92",
     "csttool/nsgaii_TM020.py": "b8c815ef219cf751f6c628ebbdedde6330963b7ad0de033c40f2c68810e14a5b",
-    "test/support/validate_typed_definition.py": "3cdea8bb105a0ca4fa4bb9b1d6d81df3bd4ff8e094d97ba1497813f2fd5abfa7",
+    "test/support/validate_typed_definition.py": "ee7a7bb5c7af807100e9b8ff0b592a17418f4e6d537d56ce929888c2783c9120",
     "base.py": "fa7cc824152f577385928b9202166874921fd705546956d33f187bbbd1054eea",
     "test/support/finish_public_simulation.py": "0143eccaab9cd0427c4537dba44dc398b550824e2eb8f502f47aaef233ead082",
     "test/support/benchmark_field_efficiency.py": "935bfe4904fcc1e6f9188440e78aba34c71da046225ba6bb10af173ee7ab55f3",
-    "csttool/winwrap_emitter.py": "1fa6396327f909c5aa40dca5c53415fd2138aaf325003d2950d9c736d4cdd3a7",
+    "csttool/winwrap_emitter.py": "506e8bdeba2edee8a3c97a7d52eeded7c47ef237668b90bb123157f71bf81942",
     "test/support/calibrate_winwrap_calls.py": "8ca3d86870b070d8e9f1c47213d372aba2e74fff49fbc918bd101e213901614d",
-    "csttool/winwrap_checks.py": "260549d041ce4cfcbe6221c81cc56917fffc123f07bc6d8da04036dba914a117",
-    "test/support/calibrate_winwrap_gate.py": "4a474da4e534443129f6b4e769a32fea3003e2a8e7f5b74925af9995385fa458",
+    "csttool/winwrap_checks.py": "bec2a914b930072d574edd5552c44e00910f3abe3e289b4f769e425349f4b40e",
+    "test/support/calibrate_winwrap_gate.py": "32782e665b35a50c3dd7a482462ce63122d7fb4658af90d891c212c78df87987",
     "test/support/validate_public_faults.py": "e41535452da7e5e6049d0311ccba5fcbd87841945d18798a25361e4b4c2d8fce",
     "csttool/batch_desktop.py": "90976bb2b871a014e3c509343ab551dc5f6bb60b339c7f5e98ca818d310a6d91",
     "test/support/validate_hom_recovery_native.py": "c7f981034cb6453209e580bdc1cb96ded4914140a1fdf0c90ff8283d489adb1d",
     "csttool/mcp_stdio.py": "be3698d63ffb87c0211d83c45f78d118b6652b9fd2b6c170f6561a0618014698",
     "test/support/validate_solver_abort.py": "69a3775b1c7ca5417148f1b8dba46e461701deeb3786ee3495e707245f1ea7b7",
-    "test/support/validate_runner_hom_abort.py": "b3d382591952dfe2ad961be3dc752a1821b12afd8fd6dd6511409e166abd8008"
+    "test/support/validate_runner_hom_abort.py": "b3d382591952dfe2ad961be3dc752a1821b12afd8fd6dd6511409e166abd8008",
+    "csttool/geometry_contract.py": "35abf9eb0aceb988b42bec231fd575d53d9a9b3464e0a371835598e81003da30",
+    "csttool/geometry_codegen.py": "433c1dd7786ae79502f159590b19ca86aed8c646f45ce039a1fc3023037a89aa",
+    "csttool/history_program.py": "7338692954aca3c438dfb3952a0cc47ade3e2a83c395d1084bf8903b1c37ec73",
+    "csttool/managed_history.py": "98e6dc0d46d02ff50cb2a86c3a6433e6f9a2ab442a4783d5ae9bf160d22ee5be",
+    "data/first_stage_contract.schema.json": "67a625e76f5a976ca93f88ec8e8c598822f0249c5da96692e8184f6f20e12e85",
+    "test/support/calibrate_geometry.py": "d03d7f7d87049e838b20c4efb0996d0568b7a9cd72a90d82e600bc454b7b0b75"
   },
   "registry_policy": {
     "enforce_tool_scope": true,

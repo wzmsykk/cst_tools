@@ -21,7 +21,8 @@ from csttool.definition_editing import render_history,render_edit_macro,build_ca
 from csttool.definition_verifier import NativeDefinitionVerifier
 from csttool.native_definition_builder import run_new_definition
 from csttool.saved_project_source import read_saved_source
-from csttool.winwrap_checks import (PROFILE,generator_fingerprint,check_module,definition_map)
+from csttool.winwrap_checks import (PROFILE,generator_fingerprint,check_module,execution_definition_map)
+from csttool.history_program import partition
 from csttool.winwrap_emitter import assign_string,Variable,String
 from csttool.application_service import ServiceError
 from test.support.calibrate_cst_macrocheck import cases,render,evaluate
@@ -57,10 +58,10 @@ def require_closed(closure):
         raise RuntimeError('owned standard closure not confirmed; stop this serial probe')
 
 
-def write_bundle(directory,spec,history,macro):
+def write_bundle(directory,spec,history,macro,program=None):
     (directory/'history.vb').write_text(history,encoding='ascii',newline='\n')
     (directory/'edit.bas').write_text(macro,encoding='ascii',newline='\n')
-    write_json_atomic(directory/'source-map.json',definition_map(spec,history,macro))
+    write_json_atomic(directory/'source-map.json',execution_definition_map(spec,partition(spec) if program is None else program,macro))
 
 
 def negative(root,executable,kind):
@@ -68,11 +69,16 @@ def negative(root,executable,kind):
     spec=spec_for('z');history=render_history(spec)[0]
     closures=[]
     def editor(exe,model,directory,macro):
+        program=deepcopy(list(partition(spec)))
+        block=next(b for b in program if b['caption']=='CST Tools A1 geometry-cylinder')
+        original=block['history']
         if kind=='syntax':
-            line=next(s for s in history.splitlines() if s.startswith(' .Zrange '))
-            altered=history.replace(line,' .Zrange ((-RestoreDoubleParameter("L"))/2), (RestoreDoubleParameter("L")/2)')
-        else:altered=history.split('With Cylinder')[0].rstrip()
-        old='\n'.join(assign_string(Variable('history'),history))
+            line=next(s for s in original.splitlines() if s.startswith(' .Zrange '))
+            altered=original.replace(line,' .Zrange ((-RestoreDoubleParameter("L"))/2), (RestoreDoubleParameter("L")/2)')
+        else:altered='WCS.ActivateWCS "global"'
+        block['history']=altered
+        old='\n'.join(assign_string(Variable('history'),original))
+        if old not in macro:raise RuntimeError('fault history assignment anchor missing')
         macro=macro.replace(old,'\n'.join(assign_string(Variable('history'),altered)),1)
         if kind=='partial':
             q=lambda p:String(str(p)).render()
@@ -82,12 +88,14 @@ def negative(root,executable,kind):
     Close #f
     Err.Raise vbObjectError + 2960, "W3 injected required step", "controlled failure after partial history"
 '''
-            macro=macro.replace('    ReportStage "rebuild"\n',injection+'    ReportStage "rebuild"\n',1)
+            anchor='    CSTToolsStage = "rebuild"\n'
+            assert macro.count(anchor)==1
+            macro=macro.replace(anchor,anchor+injection,1)
         # Outer code is valid; intentional invalid inner text must be caught by
         # the in-session MacroCheckThis before AddToHistory, not by executing it.
         check_module(macro,spec['parameters'])
-        write_bundle(directory,spec,altered,macro)
-        closure=run_new_definition(exe,model,directory,macro,generated_a1=True)
+        write_bundle(directory,spec,altered,macro,program)
+        closure=run_new_definition(exe,model,directory,macro,generated_profile='cst-a1-history-v2')
         require_closed(closure);closures.append(closure)
         return closure
     catalog=root/'project'/'control'/'definitions'
@@ -145,7 +153,7 @@ def main():
             spec=spec_for(axis);directory=root/'project'/axis/'candidate';directory.mkdir(parents=True)
             history,projection=render_history(spec);nonce=uuid4().hex;macro=render_edit_macro(directory,spec,nonce)
             write_bundle(directory,spec,history,macro)
-            closure=run_new_definition(args.cst_exe,directory/'definition.cst',directory,macro,generated_a1=True)
+            closure=run_new_definition(args.cst_exe,directory/'definition.cst',directory,macro,generated_profile='cst-a1-history-v2')
             require_closed(closure)
             if (directory/'failed.txt').exists() or (directory/'completed.txt').read_text().strip()!=nonce:
                 raise RuntimeError('positive generated candidate failed')

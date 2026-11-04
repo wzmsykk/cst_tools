@@ -105,7 +105,10 @@ def test_committed_draft_response_gap_repairs_without_reapplying(tmp_path,monkey
     assert edit_document(app,command,operation_id='gap')==recovered
 
 
-def test_uncommitted_edit_never_replays_and_close_requires_explicit_save(tmp_path):
+def test_uncommitted_edit_never_replays_and_close_requires_explicit_save(tmp_path, monkeypatch):
+    # Synthetic native peer only; the repository's real calibration stays stale
+    # after generator changes until a separately authorized native acceptance.
+    monkeypatch.setattr('csttool.definition_editing.require_calibration', lambda: {'fake_only': True})
     app,empty,model,configured,calls=draft(tmp_path)
     with pytest.raises(ServiceError,match='SETTING_UNVERIFIED'):
         preflight_edit(app,request(configured,'close_project',disposition='save'))
@@ -118,7 +121,8 @@ def test_uncommitted_edit_never_replays_and_close_requires_explicit_save(tmp_pat
     assert app.inspect_model(configured['document_id'],configured['document_revision'])==configured
 
 
-def test_save_uses_shared_g03_before_ready_and_preserves_parameters(tmp_path):
+def test_save_uses_shared_g03_before_ready_and_preserves_parameters(tmp_path, monkeypatch):
+    monkeypatch.setattr('csttool.definition_editing.require_calibration', lambda: {'fake_only': True})
     app,empty,model,configured,calls=draft(tmp_path)
     def editor(exe,path,directory,macro):
         spec=configured['spec'];history=render_history(spec)[0]
@@ -138,6 +142,7 @@ def test_save_uses_shared_g03_before_ready_and_preserves_parameters(tmp_path):
     app.definition_verifier=verify
     saved=edit_document(app,request(configured,'save_project'),operation_id='save')
     assert calls==[1,'verify'] and saved['ready'] and saved['state']=='saved'
+    assert saved['geometry_saved'] and saved['validation_target']=='simulation'
     assert app.inspect_model(saved['document_id'],saved['document_revision'])==saved
     assert app.inspect_definition(saved['document_id'],saved['definition_revision'])['ready']
     closed=edit_document(app,request(saved,'close_project',disposition='save'),operation_id='close')

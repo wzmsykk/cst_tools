@@ -1,0 +1,392 @@
+{
+  "date": "2026-11-04",
+  "baseline": "f755505",
+  "status": "current production conclusion is production_implementation; earlier offline sections preserve dated evidence",
+  "design": "docs/geometry-selection-interface-design.md",
+  "sources": [
+    {
+      "object": "Brick",
+      "path": "knowledge-base/vendor/cst-2022-vba-help/VBA_3D/common_vbabasicsolids/common_vbabrick_object.htm",
+      "sha256": "8e6162d6728af9fd99baafede7f2b1ceb1d6465be2bfbebfd138ec2f3dc89fc9",
+      "evidence": "official-documentation-not-runtime-calibration"
+    },
+    {
+      "object": "Cylinder",
+      "path": "knowledge-base/vendor/cst-2022-vba-help/VBA_3D/common_vbabasicsolids/common_vbacylinder_object.htm",
+      "sha256": "0d1d42874cbc9dcb6d896470402160cba2e9ad8085cd7db57183dd6298537849",
+      "evidence": "official-documentation-not-runtime-calibration"
+    },
+    {
+      "object": "Sphere",
+      "path": "knowledge-base/vendor/cst-2022-vba-help/VBA_3D/common_vbabasicsolids/common_vbasphere_object.htm",
+      "sha256": "359dc302ec0ae703d90baf3b2fb8100900e826ddf5feefaf62221d7a0281a37f",
+      "evidence": "official-documentation-not-runtime-calibration"
+    },
+    {
+      "object": "Solid",
+      "path": "knowledge-base/vendor/cst-2022-vba-help/VBA_3D/common_vbasolido/common_vbasolido_solid_object.htm",
+      "sha256": "d3803ff636d80c86d9fb69f8f6c98af7601f85c54e33f84b495734506f3b27b5",
+      "evidence": "official-documentation-not-runtime-calibration"
+    },
+    {
+      "object": "Pick",
+      "path": "knowledge-base/vendor/cst-2022-vba-help/VBA_3D/common_vbapicko/common_vbapicko_pick_object.htm",
+      "sha256": "9f9eda334d9766fefab9bfd5c2c702abfcec03b0356fd30343e78c7e3120189b",
+      "evidence": "official-documentation-not-runtime-calibration"
+    },
+    {
+      "object": "Group",
+      "path": "knowledge-base/vendor/cst-2022-vba-help/VBA_3D/special_vbalayer/spwcial_vbalayerogroup_object.htm",
+      "sha256": "ddc95d1e63acca13229b69e7e25248ce2c0869d8c6e1b4f453a6062f152a8dc3",
+      "evidence": "official-documentation-not-runtime-calibration"
+    },
+    {
+      "object": "Component",
+      "path": "knowledge-base/vendor/cst-2022-vba-help/VBA_3D/special_vbalayer/special_vbalayerocomponent_object.htm",
+      "sha256": "16a24f655c8211111cfaf1dbc73facc34e129cbdbdedb280f8d376614ed2d05b",
+      "evidence": "official-documentation-not-runtime-calibration"
+    },
+    {
+      "object": "Transform",
+      "path": "knowledge-base/vendor/cst-2022-vba-help/VBA_3D/special_vbatransformo/special_vbatransformo_transform_object.htm",
+      "sha256": "65722df4e203c265a98b5702f3ede6817e1349a1a948b99236e6d569667089e6",
+      "evidence": "official-documentation-not-runtime-calibration"
+    },
+    {
+      "object": "WCS",
+      "path": "knowledge-base/vendor/cst-2022-vba-help/VBA_3D/common_vbawcso/common_vbawcso_wcs_object.htm",
+      "sha256": "27219dbdb58459e1c2f7b2ba34ea0ae7657e69dd22a8da39fbc1c3d4fa09ce35",
+      "evidence": "official-documentation-not-runtime-calibration"
+    },
+    {
+      "object": "Solid names",
+      "path": "knowledge-base/vendor/cst-2022-vba-help/VBA_3D/common_vbageneral/common_general_solid_names.htm",
+      "sha256": "df1bf02804333c712cacfeffb0297cef596b68db9f14a25dca63fe38bed5e810",
+      "evidence": "official-documentation-not-runtime-calibration"
+    },
+    {
+      "object": "Global names",
+      "path": "knowledge-base/vendor/cst-2022-vba-help/VBA_3D/common_vbageneral/common_general_global_names.htm",
+      "sha256": "ff3dda711c3209beee49b33c9a1d410137eba2bcea347ea5cfd087f4c78b2ff4",
+      "evidence": "official-documentation-not-runtime-calibration"
+    },
+    {
+      "object": "Application",
+      "path": "knowledge-base/vendor/cst-2022-vba-help/VBA_3D/common_vbaapp/common_vbaappapplication_object.htm",
+      "sha256": "349d17d1d0a058b50642c6b281d4942185b77235bbb44f4bdb2f15c5615226be",
+      "evidence": "official-documentation-not-runtime-calibration"
+    },
+    {
+      "object": "Python interface",
+      "installed_path": "D:\\Program Files (x86)\\CST Studio Suite 2022\\Online Help\\Python\\source\\cst.interface.html",
+      "sha256": "91f0ed305e691e579284fe68182e5cbb34e0018bc2f110b1363c4be7c0d55fa0",
+      "portable": false,
+      "evidence": "official-documentation-not-runtime-calibration"
+    }
+  ],
+  "documented_facts": [
+    "Solid Add/Subtract/Intersect preserve the first name and delete the second; Insert retains the second.",
+    "Group AddItem uses typed global names; no membership enumeration getter is documented in the inspected Group page.",
+    "Pick topology IDs may change with geometry; picked-list indices and topology IDs are distinct.",
+    "PickFaceFromPoint uses global coordinates; PickPointFromCoordinates depends on active WCS.",
+    "GetLooseBoundingBoxOfShape is non-tight and forbidden during history rebuild or structural macro execution.",
+    "AddToHistory executes the body immediately; consecutive equal captions trigger duplicate-block handling.",
+    "Rebuild replays history and deletes results; failed history execution does not prove atomic rollback.",
+    "Transform GroupObjects unites copies with original; it does not define a named selection set.",
+    "Python Modeler.add_to_history still executes VBA; Project.modeler may be None; Project.close does not save."
+  ],
+  "design_policies": [
+    "Root MWS/global WCS/mm and owned declarative geometry only; reuse ApplicationService, Runner, typed emitter, verifier and shared read-only source.",
+    "Initial named solid sets are revisioned document metadata, distinct from native Group and ephemeral Pick state.",
+    "Unique feature captions; expressions retained; candidate-only rebuild and failed candidate retirement.",
+    "Geometry persistence and simulation readiness must be separate; existing A1 readiness remains unchanged."
+  ],
+  "unverified": [
+    "Native Group persistence and stable face/edge selectors",
+    "Exact arbitrary CSG equivalence and per-solid tight bounds",
+    "Multi-material/other solver, adaptive mesh and multimode simulation profiles",
+    "Refreshed Codex desktop dialogue with GEO signatures"
+  ],
+  "existing_evidence_boundary": "Existing A1/Sub-only calibration is not calibration of the proposed geometry profile.",
+  "implementation": {
+    "sources": [
+      "csttool/geometry_contract.py",
+      "csttool/definition_editing.py",
+      "data/first_stage_contract.schema.json"
+    ],
+    "tests": [
+      "test/geometry_contract_test.py"
+    ],
+    "native_sessions_started": 0,
+    "calibration": "Existing A1 stamp is stale after generator/schema changes; stamp and old evidence not rewritten.",
+    "limits": "No GEO native history/save/simulation or MCP signature expansion in GEO-1; declaration projection only.",
+    "offline_acceptance": {
+      "functional_passed": 207,
+      "documentation_registry_passed": 49,
+      "registry_features": 138,
+      "registry_relations": 28,
+      "native_acceptance": false,
+      "raw_models_created": false,
+      "scope": "GEO declaration lifecycle and A1 fake-peer regressions; source-bound native calibration remains stale.",
+      "final_geometry_module_passed": 50,
+      "counts_overlap": true,
+      "temporary_data": "Dedicated geo1-contract-tests directory and generated read-only query/text caches removed after tests ended; no native CST data generated."
+    },
+    "phase": "GEO-1 prior-stage evidence; test counts are not new GEO-1.1 acceptance"
+  },
+  "sequential_history_design": {
+    "date": "2026-11-04",
+    "status": "feature-editing-identity-dependencies-implemented-offline",
+    "document": "docs/geometry-selection-interface-design.md#9-顺序历史中的几何结构维护",
+    "principles": [
+      "Ordered editable features are the sole geometry intent; object states/dependencies are derived.",
+      "Current revision parameter table applies to all features; it is not a sequence of parameter-time snapshots.",
+      "Delete solid and remove/edit feature are distinct operations.",
+      "New candidate construction for geometry definition changes is separate from HOM solver-setting reuse."
+    ],
+    "pending": [
+      "Native history emission/build observation/save/exit calibration",
+      "Face/edge rule selections and topology matching"
+    ]
+  },
+  "comsol_geometry_review": {
+    "date": "2026-11-04",
+    "status": "fixed-source-review-only",
+    "native_sessions_started": 0,
+    "sources": [
+      {
+        "repository": "Ching-Chiang/comsol-mcp",
+        "commit": "ccca65aa8277d1205c5de5fb6221e460aca5997a",
+        "files": [
+          "comsol_mcp/_tools_geometry.py",
+          "comsol_mcp/_model_ops.py",
+          "comsol_mcp/_state.py",
+          "comsol_mcp/_tools_snapshot.py",
+          "comsol_mcp/_tools_physics.py"
+        ]
+      },
+      {
+        "repository": "wjc9011/COMSOL_Multiphysics_MCP",
+        "commit": "53c9ca4cd9f16187b1e5e4fa97cff6dca716ed9d",
+        "files": [
+          "src/tools/geometry.py",
+          "src/tools/physics.py"
+        ]
+      }
+    ],
+    "official_reference": "https://doc.comsol.com/6.3/doc/com.comsol.help.comsol/comsol_api_general.47.35.html",
+    "findings": [
+      "Native feature editing is distinct from output-object identity.",
+      "COMSOL create inserts after current feature; MCP wrapper is not proof of append-only order.",
+      "Native feature move/partial run/status APIs are not all exposed by inspected MCP geometry tools.",
+      "Named Box selection stores a rule; evaluated members are not guaranteed stable identities.",
+      "Tool locks and error envelopes do not roll back partial property updates.",
+      "Snapshots are explicit workflow operations, not automatic revision commits per edit."
+    ],
+    "limitations": "No COMSOL execution; not a latest-HEAD audit; inspected paths only. CST equivalence remains uncalibrated."
+  },
+  "current_plan": {
+    "updated": "2026-11-04",
+    "status": "GEO-1-4 implemented and independently accepted in supported profile",
+    "next": "Optional refreshed Codex desktop GEO signature dialogue acceptance; independent future face/edge and material/solver expansion; A1 recalibration needs separate authorization",
+    "order": [
+      "GEO-1/1.1 declaration and edit",
+      "GEO-2 O1-O8 and managed saved history/C1-C7",
+      "GEO-3 shared adapters/public SDK",
+      "GEO-4 real XYZ/Managed/RunStore result chain"
+    ],
+    "evidence": "knowledge-base/geometry-production-20261104.json"
+  },
+  "history_edit_implementation": {
+    "date": "2026-11-04",
+    "baseline": "f755505",
+    "sources": [
+      "csttool/geometry_contract.py",
+      "csttool/definition_editing.py",
+      "data/first_stage_contract.schema.json"
+    ],
+    "tests": [
+      "test/geometry_history_edit_test.py",
+      "test/geometry_contract_test.py"
+    ],
+    "native_sessions_started": 0,
+    "contract": "update_feature(feature_id, full typed replacement); remove_feature(feature_id); immutable op and created object ID.",
+    "identity": "geometry.identities object_id to original creation feature; maximum 512; monotone immediate-parent comparison; no unbounded ancestor walk.",
+    "diagnostics": "One sequential lifetime/dependency projection; per-step input/output/consumers, transitive parameters, content hash; full internal bounded diagnostics plus compact error string.",
+    "compatibility": "Current development Specs require identities and new projection. Obsolete GEO-1 development records rejected without automatic rewrite or migration.",
+    "native_boundary": "geometry_saved=false, ready=false, native_build_state=unverified; old A1 calibration remains stale; no stamp changes.",
+    "first_regression_observation": "Initial offline combination: 240 passed, 1 existing HTTP bootstrap test timed out waiting for runner.json in 10s. Isolated recheck passed in 0.85s; cause not established, not a CST failure.",
+    "offline_acceptance": {
+      "functional_combination_passed": 242,
+      "new_history_module_passed": 34,
+      "documentation_registry_passed": 49,
+      "module_included_in_combination": true,
+      "registry_features": 138,
+      "registry_tools": 72,
+      "registry_relations": 28,
+      "registry_warnings": [],
+      "native_acceptance": false,
+      "temporary_data": "Task-owned geo11-* fixture directories and query caches removed after tests completed; no real CST/field outputs."
+    },
+    "source_sha256": {
+      "csttool/geometry_contract.py": "f0994084e3697af4390a96477e187363cafef55b9e72bb59582b0ef76a7ba6a8",
+      "csttool/definition_editing.py": "ca3d1998ad1fd142b573c986032951a931fd49ba83d914de3bb1c88c738e451d",
+      "data/first_stage_contract.schema.json": "9c6e7ebc806ce5970de7dfca469fbb4de55329ca0033604a840f4b977145351b"
+    }
+  },
+  "geometry_history_offline": {
+    "date": "2026-11-04",
+    "baseline": "f755505",
+    "sources": [
+      "csttool/geometry_codegen.py",
+      "csttool/geometry_contract.py",
+      "csttool/winwrap_emitter.py",
+      "csttool/winwrap_checks.py",
+      "csttool/settings_projection.py"
+    ],
+    "tests": [
+      "test/geometry_codegen_test.py",
+      "test/source_release_boundary_test.py"
+    ],
+    "history_profile": "cst-geo-history-v1",
+    "native_sessions_started": 0,
+    "implemented": [
+      "Shared typed emission with explicit profile; A1 default allowlist not widened",
+      "Actual block-text semantic projection and symbolic parameter identity comparison",
+      "Independent syntax-shape/arity checking",
+      "Block-aware body and assign_string fragment source maps; explicit block required for native diagnostic correlation"
+    ],
+    "not_implemented": [
+      "Executable GEO outer macro and parameter persistence",
+      "Actual saved Model.mod block extraction",
+      "Native syntax/build/save/exit C1-C7 calibration",
+      "GEO save/ready or MCP signature expansion"
+    ],
+    "native_gate": "Original stamp unchanged/stale. Expanded source fingerprints bind code, not GEO acceptance. Package tests preserve the same source/package gate outcome.",
+    "offline_acceptance": {
+      "combined_passed": 338,
+      "functional_passed": 287,
+      "new_geometry_tests": 39,
+      "documentation_registry_passed": 49,
+      "source_package_boundary_tests": 2,
+      "subset_counts_not_additive": true,
+      "native_sessions_started": 0,
+      "registry_features": 138,
+      "registry_tools": 72,
+      "registry_relations": 29,
+      "warnings": [],
+      "native_gate": {
+        "accepted": false,
+        "code": "GENERATED_CODE_INVALID",
+        "reason": "native calibration missing/stale; run the owned W3 acceptance, do not retry simulation"
+      },
+      "temporary_data": "geo2-* test fixture/query/cache directories and generated source ZIPs removed after checks; rebuild to inspect original temporary archives."
+    },
+    "source_sha256": {
+      "csttool/geometry_codegen.py": "a8432fb56374996ec9a524cd6d45a90b09c0037f6e7d86889a57486fbeb320f3",
+      "csttool/geometry_contract.py": "c0f5d3881175703fb8a022d081276242e92bd736c3c7317a209fc9f5f4247125",
+      "csttool/winwrap_emitter.py": "43f2382449346ec10bc9fb8f6214effb7daf12ab817e39f7c5ad96e3066a76c6",
+      "csttool/winwrap_checks.py": "5b639d94497fc144cbb74e54d4d0e45fa2077ed1898cbb2495fefebcef246468",
+      "csttool/settings_projection.py": "e818b40f9fa793b1b20f36de486d39329fea48e1bd4e016f98230faaa75e410d"
+    },
+    "source_package_receipt": {
+      "sha256": "0a9446c7ba67eef410dcceb279b2d85ff0188767e6d9f6e85395b3fd136e9b70",
+      "bytes": 3095772,
+      "files": 719,
+      "content_sha256": "fe81e750f034205b4157cf2652a85197c1048d08c85a7c56d78e299d5a2fe933",
+      "compile_no_qt_runner": "passed",
+      "gui_smoke": "passed"
+    },
+    "first_package_check": "Before registry review sync, first package check reported four changed-since-capture warnings. Manually reviewed affected functions/relations and synchronized registry; final combination passes with no warnings. Native stamp was never refreshed."
+  },
+  "geometry_execution_macro_offline": {
+    "date": "2026-11-04",
+    "implemented": [
+      "Shared A1/GEO fixed macro; one parameter batch plus original descriptions",
+      "Ordered MacroCheckThis/ErrObject guard/AddToHistory for each setup/feature block",
+      "Rebuild/SaveAs/completion nonce and six-line phase/block failure context",
+      "Pure artifact preparation and owned binding injection with complete source-map relocation",
+      "Shared independent exit/completion/failure/parameter-table adoption checks",
+      "A1 production builder uses shared preparation and completion reader; GEO builder still refuses"
+    ],
+    "native_sessions_started": 0,
+    "native_stamp_modified": false,
+    "documented_vs_observed": "Implementation and offline fixed-template fake-peer evidence only; no new CST API semantics or native close guarantees established.",
+    "offline_acceptance": {
+      "combined_passed": 473,
+      "functional_passed": 410,
+      "new_execution_macro_tests": 46,
+      "documentation_registry_passed": 61,
+      "source_package_boundary_tests": 2,
+      "subset_counts_not_additive": true,
+      "registry_features": 138,
+      "registry_tools": 72,
+      "registry_relations": 30,
+      "warnings": [],
+      "source_package_receipt": {
+        "sha256": "99182037cf1537ba7e0665607d014d8c02fd04db88bbb0cabbf8ecaf443c49e7",
+        "bytes": 3109768,
+        "files": 720,
+        "content_sha256": "b51c57447cd5d6b7da689160c760b9ccd3632773b7f4f2198df6bea22d4a8ce8",
+        "compile_no_qt_runner": "passed",
+        "gui_smoke": "passed"
+      },
+      "package_scope": "Test-only snapshot before final lightweight receipt/document closeout; not a published release.",
+      "initial_package_failure": "calibrate_winwrap_gate.py changed after registry capture; reviewed current stage/injection relation and synchronized its fingerprint; complete final rerun passed.",
+      "temporary_data": "Task-owned geo2-macro-* pytest fake containers, macros, query cache and test ZIPs removed after completion; regenerate to inspect original temporary files."
+    },
+    "remaining": [
+      "Actual saved Model.mod multi-block extraction and matching",
+      "Legal native geometry measurements and persisted expression/rebuild checks",
+      "Independent GEO source/evidence gate and authorized C1-C7 acceptance",
+      "Recalibrate A1 for the changed generator; do not reuse its old stamp",
+      "GEO-3 public adapters and GEO-4 simulation readiness"
+    ],
+    "source_sha256": {
+      "csttool/definition_editing.py": "71696a9bb76a573877758d7020c940fb8f2723ee6b881c59c1524fa3216aa538",
+      "csttool/native_definition_builder.py": "d6b45d387cecb0244371cf4190b1734bcffe4a61b0f293596a544e2361e0f7e2",
+      "csttool/winwrap_checks.py": "5f320108950ef0e3db4def963e1ecbdacea43ab78b76a6e145ae098c55436f7c",
+      "csttool/winwrap_emitter.py": "506e8bdeba2edee8a3c97a7d52eeded7c47ef237668b90bb123157f71bf81942",
+      "test/geometry_execution_macro_test.py": "4f2e5712d730a195bb0c44e5a925009f6142384fa9b18430bd4f9266afaa9945",
+      "test/support/calibrate_winwrap_gate.py": "80c8c38e6583b1c5d4a88e5c058af2621a7e645309935f5646a652a34112d509"
+    }
+  },
+  "history_block_policy_design": {
+    "date": "2026-11-04",
+    "status": "implemented-and-tested-in-managed-profile",
+    "authority": "docs/geometry-selection-interface-design.md section 15",
+    "rules": [
+      "One semantic setting owner per explicit scope/property; no last-writer-wins overlay history",
+      "Smallest complete functional block; keep required initialization/properties/action together",
+      "Explicit ordered dependencies may cross non-adjacent blocks; no automatic semantic reordering",
+      "Necessary shared-state sequences remain within a block or declared contiguous segment",
+      "Update typed declarations with stable identity; generate a complete new candidate from the new revision",
+      "Never append same-caption AddToHistory to pretend to replace a historical block",
+      "Functional atomicity does not guarantee native transactional rollback",
+      "Keep immutable old revisions/results and separate append-only audit",
+      "Do not compact arbitrary imported history or silently migrate the HOM reuse path"
+    ],
+    "current_gap": "No generic cross-block builder segment engine needed by supported profile; retain complete Reset/properties/Create blocks; no imported history compaction/HOM migration.",
+    "native_sessions_started": "see independent geometry-calibration-20261104; original zero below refers design-only batch",
+    "source_changes": true,
+    "schema_changes": false,
+    "native_stamp_modified": "GEO independent gate only; A1 unchanged",
+    "documentation_acceptance": {
+      "passed": 16,
+      "tests": [
+        "test/documentation_index_test.py",
+        "test/project_registry_test.py",
+        "test/project_map_migration_test.py"
+      ],
+      "registry_warnings": [],
+      "native_sessions_started": 0,
+      "meaning": "Original design-only batch link/symbol/registry checks; later O1-O8/current native evidence is in geometry-production-20261104."
+    }
+  },
+  "production_implementation": {
+    "status": "GEO-2-4-supported-profile-accepted",
+    "evidence": "knowledge-base/geometry-production-20261104.json",
+    "native_calibration": "knowledge-base/geometry-calibration-20261104.json"
+  },
+  "native_sessions_started_at_initial_design": 0
+}

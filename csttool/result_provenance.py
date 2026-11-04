@@ -7,11 +7,22 @@ from .saved_project_source import read_saved_source
 from .settings_projection import project_saved_settings
 
 
-def freeze_postprocess_provenance(definition_path, axis, worker, directory, postprocess):
+def freeze_postprocess_provenance(definition_path, axis, worker, directory, postprocess,*,geometry_spec=None,geometry_proof=None):
     directory=Path(directory)
     source=read_saved_source(definition_path,scope='root')
-    projection=project_saved_settings(source)
-    bounds=projection.fields['geometry.cylinder.'+axis+'range']
+    if geometry_spec is not None:
+        from .managed_history import verify_saved_program
+        verify_saved_program(source,geometry_spec)
+        if (not isinstance(geometry_proof,dict) or geometry_proof.get('status')!='verified'
+                or geometry_proof.get('source_sha256')!=source.sha256 or len(geometry_proof.get('observations',[]))!=2):
+            raise ValueError('GEO integration domain requires saved/reopened native proof')
+        box=geometry_proof['observations'][-1]['geometry']['calculation_bounds_mm']
+        bounds=[box[axis+'min'],box[axis+'max']]
+        import math
+        if not all(math.isfinite(v) for v in bounds) or bounds[0]>=bounds[1]:raise ValueError('invalid GEO integration extent')
+    else:
+        projection=project_saved_settings(source)
+        bounds=projection.fields['geometry.cylinder.'+axis+'range']
     endpoints=[]
     for value in bounds:
         point=[0.,0.,0.];point['xyz'.index(axis)]=value;endpoints.append(point)

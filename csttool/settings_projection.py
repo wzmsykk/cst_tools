@@ -1,4 +1,4 @@
-"""Bounded persisted-settings projection. Never executes VBA or proves live state."""
+"""Bounded A1 persisted-settings/GEO program projections; no execution/live proof."""
 import ast
 from dataclasses import dataclass, field, replace
 from decimal import Decimal, DecimalException, localcontext
@@ -11,6 +11,7 @@ from .saved_project_source import SavedSource, SourceError
 HISTORY = 'Model/3D/Model.mod'
 PARAMETERS = 'Model/Parameters.json'
 PROFILE = 'cst-a1-history-v2'
+GEOMETRY_PROFILE = 'cst-geo-history-v1'
 
 # Exact names/arity, not object-wide exemptions. See docs/a1-history-command-profile.md.
 COMMAND_ARITIES = MappingProxyType({
@@ -37,26 +38,48 @@ COMMAND_ARITIES = MappingProxyType({
     ('meshadaption3d', 'settype'): 1, ('meshadaption3d', 'minpasses'): 1,
 })
 
+# Same registry entry point, separate explicit profile. None of these extra
+# commands become valid A1 history or authorize native execution.
+GEOMETRY_COMMAND_ARITIES = MappingProxyType({
+    **{key:value for key,value in COMMAND_ARITIES.items() if key[0] in ('cylinder','wcs','component','units')},
+    **{(obj,method):0 for obj in ('brick','sphere','transform') for method in ('reset',)},
+    ('brick','create'):0, ('sphere','create'):0,
+    **{(obj,method):1 for obj in ('brick','sphere') for method in ('name','component','material')},
+    **{('brick',a+'range'):2 for a in 'xyz'},
+    **{('sphere',method):1 for method in ('axis','centerradius','topradius','bottomradius','segments')},
+    ('sphere','center'):3,
+    **{('solid',method):2 for method in ('add','subtract','intersect')}, ('solid','delete'):1,
+    **{('transform',method):1 for method in ('name','usepickedpoints','multipleobjects','groupobjects','repetitions','touch')},
+    ('transform','vector'):3, ('transform','transform'):2,
+})
 
-def history_call_contract(obj, command):
-    """Calling card derived from the sole A1 command registry.
+
+def command_arities(profile=PROFILE):
+    if profile==PROFILE: return COMMAND_ARITIES
+    if profile==GEOMETRY_PROFILE: return GEOMETRY_COMMAND_ARITIES
+    raise ValueError('unknown history profile')
+
+
+def history_call_contract(obj, command, *, profile=PROFILE):
+    """Calling card derived from the explicitly selected shared command profile.
 
     This is an owned 3D-history statement, not a DE method/live getter. Values,
     enums, units, numeric-string forms and order remain checked by projection.
     """
     obj, command = obj.lower(), command.lower()
-    arity = COMMAND_ARITIES.get((obj, command))
+    arity = command_arities(profile).get((obj, command))
     if arity is None:
         raise ValueError('unknown A1 history command')
-    topic = {'project': 'B03', 'units': 'B09', 'wcs': 'B06', 'component': 'B05',
+    topic = {'brick':'Brick','sphere':'Sphere','solid':'Solid','transform':'Transform',
+             'project': 'B03', 'units': 'B09', 'wcs': 'B06', 'component': 'B05',
              'background': 'B07', 'boundary': 'B08', 'cylinder': 'B04',
              'solver': 'B11', 'mesh': 'B10', 'eigenmodesolver': 'B12',
              'meshsettings': 'V05', 'meshadaption3d': 'MeshAdaption3D'}[obj]
     return MappingProxyType(dict(arity=arity, scope='loaded-3D', call_kind='statement',
-        argument_rule='typed-expression; command-specific values checked by A1 projection',
+        argument_rule='typed-expression; command-specific values checked by '+('A1' if profile==PROFILE else 'GEO')+' projection',
         return_use='discarded', persistence='AddToHistory; immediate execution and later replay',
         side_effect='candidate geometry or settings mutation; not transactional',
-        version='CST2022 A1 profile', documentation=topic))
+        version='CST2022 A1 profile' if profile==PROFILE else 'CST2022 GEO offline; native calibration pending', documentation=topic))
 
 IDENTITY_FIELDS = ('units.length', 'units.frequency', 'solver.family')
 
@@ -84,6 +107,8 @@ class Projection:
     @property
     def missing_fields(self):
         """Missing A1 settings remain explicit even when a partial projection resolves."""
+        if self.parser_profile==GEOMETRY_PROFILE:
+            return tuple(k for k in ('units.length','units.frequency','wcs.mode','components','geometry.features','geometry.objects') if k not in self.fields)
         required = IDENTITY_FIELDS + ('solver.selected_mesh', 'solver.selected_method', 'solver.requested_modes',
                     'solver.frequency_target.enabled', 'solver.frequency_target.value_mhz',
                     'solver.mesh_adaptation.tet', 'mesh.tet.near', 'mesh.tet.far',
@@ -94,6 +119,8 @@ class Projection:
                         'background.'+face+'_mm' for face in ('xmin','xmax','ymin','ymax','zmin','zmax')) + tuple(
                         'boundary.'+face for face in ('xmin','xmax','ymin','ymax','zmin','zmax')) + tuple(
                         'boundary.'+axis+'symmetry' for axis in 'xyz')
+        if self.parser_profile=='cst-geo-eigenmode-history-v1':
+            required=tuple(k for k in required if k!='geometry.cylinder.name')+('geometry.features','geometry.objects')
         return tuple(key for key in required if key not in self.fields)
 
 
@@ -600,3 +627,201 @@ def project_saved_settings(source: SavedSource, *, encoding=None):
                           failure_origin=MappingProxyType(dict(
                               member=exc.member, scope=source.scope, source_hash=source.sha256,
                               member_hash=source.member_hashes.get(exc.member))))
+
+
+def geometry_expression_identity(text, parameters):
+    """Bounded symbolic identity across user arithmetic and its WWB lowering.
+
+    Only the emitter's argument-safe zero-addition is erased. Parameter calls
+    become parameter references; no general algebra or numeric substitution.
+    """
+    _Arithmetic(parameters).expression(text)
+    tree=ast.parse(text.replace('^','**').strip(),mode='eval')
+    def visit(node):
+        if isinstance(node,ast.Constant) and type(node.value) in (int,float):
+            token=ast.get_source_segment(text.replace('^','**').strip(),node)
+            value=format(Decimal(token),'f')
+            return ('number',value.rstrip('0').rstrip('.') if '.' in value else value)
+        if isinstance(node,ast.Name): return ('parameter',node.id.lower())
+        if isinstance(node,ast.Call) and isinstance(node.func,ast.Name) and node.func.id.lower()=='restoredoubleparameter':
+            return ('parameter',node.args[0].value.lower())
+        if isinstance(node,ast.UnaryOp): return (type(node.op).__name__,visit(node.operand))
+        if isinstance(node,ast.BinOp):
+            left,right=visit(node.left),visit(node.right)
+            if isinstance(node.op,ast.Add) and left==('number','0'): return right
+            return (type(node.op).__name__,left,right)
+        _fail('unsupported','unsupported-geometry-expression')
+    return visit(tree.body)
+
+
+def project_geometry_history(blocks, parameters, *, scope, available_scopes, source_hash=''):
+    """Project owned GEO block bodies using shared lexical/arithmetic primitives.
+
+    This is not a saved Model.mod block extractor, BRep observer, compiler or
+    native calibration. Source strings are never executed. A1 stays independent.
+    """
+    fields,origins,exact,objects,features={},{},{},{},[]
+    location={}; components=[]; names=set(); object_origins={}
+    def failure(reason,status='unsupported'): _fail(status,reason)
+    try:
+        if scope!='root' or scope not in available_scopes: failure('geometry-root-scope-required','rejected')
+        if not isinstance(blocks,(list,tuple)) or not 1<=len(blocks)<=513: failure('geometry-block-budget','rejected')
+        if (not isinstance(parameters,list) or len(parameters)>128): failure('geometry-parameter-budget','rejected')
+        arithmetic=_Arithmetic(parameters)
+        for name in arithmetic.rows: arithmetic.parameter(name)
+        budget=0; captions=set(); statement_count=0
+
+        def numeric(entry, position, path):
+            nonlocal location
+            location=entry[2]; text=entry[1][position]
+            if text.startswith('"'): failure('geometry-numeric-string-outside-profile')
+            value=arithmetic.expression(text)
+            exact[path]=geometry_expression_identity(text,parameters)
+            origins[path]=MappingProxyType(dict(location))
+            return value
+
+        def fixed(entry, number):
+            if numeric(entry,0,'fixed')!=number or exact.pop('fixed')!=('number',str(number)):
+                failure('geometry-fixed-setting-required')
+            origins.pop('fixed',None)
+
+        def string(entry, position=0):
+            nonlocal location
+            location=entry[2]
+            return _string(entry[1][position])
+
+        def live(name):
+            if name not in objects or objects[name]['state']!='live': failure('geometry-object-not-live')
+            return objects[name]
+
+        for block_index,block in enumerate(blocks):
+            location=dict(block_index=block_index,scope=scope,source_hash=source_hash)
+            if not isinstance(block,dict) or set(block)!={'caption','history'} or not all(isinstance(v,str) for v in block.values()):
+                failure('malformed-geometry-block','malformed')
+            caption=block['caption'];text=block['history']
+            location['caption']=caption
+            if caption in captions: failure('duplicate-history-caption','ambiguous')
+            if (block_index==0 and caption!='CST Tools GEO setup') or (block_index and not re.fullmatch(r'CST Tools GEO f_[a-f0-9]{32}',caption)):
+                failure('geometry-caption-identity')
+            encoded=text.encode('utf-8');body_hash=hashlib.sha256(encoded).hexdigest()
+            captions.add(caption);budget+=len(encoded)
+            if budget>2*1024*1024: failure('history-budget-exceeded','rejected')
+            stack=[];calls=[]
+            for statement,first,last,start,end,step in _statements(text):
+                statement_count+=1
+                location=dict(block_index=block_index,caption=caption,scope=scope,source_hash=source_hash,
+                    line_start=first,line_end=last,byte_start=start,byte_end=end,statement=statement,
+                    member_hash=body_hash)
+                if statement_count>20000: failure('statement-budget-exceeded','rejected')
+                if statement.lower().startswith('with '):
+                    obj=statement[5:].lower().strip()
+                    if stack or obj not in {key[0] for key in GEOMETRY_COMMAND_ARITIES}: failure('geometry-with-object')
+                    stack.append(obj);continue
+                if statement.lower()=='end with':
+                    if not stack: failure('unbalanced-with','malformed')
+                    stack.pop();continue
+                if statement.startswith('.'):
+                    if not stack: failure('unbound-with-member','malformed')
+                    statement=stack[-1]+statement
+                match=re.fullmatch(r'([A-Za-z][A-Za-z0-9_]*)\.([A-Za-z][A-Za-z0-9_]*)(?:\s+(.*))?',statement)
+                if not match: failure('unknown-geometry-statement')
+                obj,method=match[1].lower(),match[2].lower()
+                args=[s.strip() for s in _split(match[3],',')] if match[3] else []
+                if GEOMETRY_COMMAND_ARITIES.get((obj,method))!=len(args) or any(not a for a in args): failure('unknown-geometry-command-or-arity')
+                calls.append((obj,method,(method,args,dict(location))))
+            if stack or not calls: failure('incomplete-geometry-block','malformed')
+            if block_index==0:
+                if [(o,m) for o,m,_ in calls[:3]]!=[('units','geometry'),('units','frequency'),('wcs','activatewcs')]: failure('geometry-setup-order')
+                if string(calls[0][2])!='mm' or string(calls[1][2])!='MHz' or string(calls[2][2])!='global': failure('geometry-global-mm-required')
+                for obj,method,entry in calls[3:]:
+                    if (obj,method)!=('component','new'): failure('geometry-setup-command')
+                    name=string(entry)
+                    if not re.fullmatch(r'c_[a-f0-9]{20}',name) or name in components: failure('geometry-component-identity')
+                    components.append(name)
+                if len(components)>32: failure('geometry-component-budget','rejected')
+                fields.update({'units.length':'mm','units.frequency':'MHz','wcs.mode':'global','components':tuple(components)})
+                origins['units.length']=MappingProxyType(calls[0][2][2]);origins['units.frequency']=MappingProxyType(calls[1][2][2]);origins['wcs.mode']=MappingProxyType(calls[2][2][2])
+                origins['components']=tuple(MappingProxyType(entry[2]) for _,_,entry in calls[3:])
+                continue
+            index=len(features);prefix='geometry.features['+str(index)+'].'
+            owner=calls[0][0]; props={}
+            if owner in ('brick','cylinder','sphere','transform'):
+                end='transform' if owner=='transform' else 'create'
+                if calls[0][1]!='reset' or calls[-1][1]!=end or any(o!=owner for o,_,_ in calls): failure('geometry-lifecycle-order')
+                for _,method,entry in calls[1:-1]:
+                    if method in props: failure('duplicate-geometry-property','ambiguous')
+                    props[method]=entry
+                def required(keys):
+                    if set(props)!=set(keys): failure('geometry-properties-missing-or-extra')
+                def num(key,path=None,pos=0): return numeric(props[key],pos,prefix+(path or key))
+                def vector(key,path): return [str(num(key,path+'['+str(i)+']',i)) for i in range(len(props[key][1]))]
+                if owner=='transform':
+                    required(('name','vector','usepickedpoints','multipleobjects','groupobjects','repetitions','touch'))
+                    for flag in ('usepickedpoints','multipleobjects','groupobjects','touch'):
+                        location=props[flag][2]
+                        if props[flag][1]!=['False']: failure('geometry-copy-pick-touch-forbidden')
+                    fixed(props['repetitions'],1)
+                    if [string(calls[-1][2],i) for i in range(2)]!=['Shape','Translate']: failure('geometry-translation-only')
+                    target=string(props['name']);live(target)
+                    feature=dict(op='translate_solid',target_name=target,resolved=dict(translation_mm=vector('vector','translation_mm')))
+                    object_origins[target]=MappingProxyType(calls[-1][2][2])
+                else:
+                    common=['name','component','material']
+                    if owner=='brick':
+                        required(common+[a+'range' for a in 'xyz'])
+                        resolved={a:vector(a+'range','bounds_mm.'+a) for a in 'xyz'}
+                        if any(Decimal(bounds[0])>=Decimal(bounds[1]) for bounds in resolved.values()): failure('invalid-brick-dimensions','malformed')
+                    elif owner=='cylinder':
+                        if 'axis' not in props: failure('geometry-axis-missing')
+                        axis=string(props['axis'])
+                        if axis not in 'xyz' or len(axis)!=1: failure('geometry-axis-unsupported')
+                        transverse=[a for a in 'xyz' if a!=axis]
+                        required(common+['axis','outerradius','innerradius','segments',axis+'range']+[a+'center' for a in transverse])
+                        fixed(props['segments'],0)
+                        bounds=vector(axis+'range','axial_range_mm')
+                        outer=num('outerradius','outer_radius_mm');inner=num('innerradius','inner_radius_mm')
+                        if not 0<=inner<outer or Decimal(bounds[0])>=Decimal(bounds[1]): failure('invalid-cylinder-dimensions','malformed')
+                        resolved=dict(axis=axis,axial_range_mm=bounds,outer_radius_mm=str(outer),inner_radius_mm=str(inner),
+                            transverse_center_mm=[str(num(a+'center','transverse_center_mm['+str(i)+']')) for i,a in enumerate(transverse)])
+                    else:
+                        required(common+['axis','centerradius','topradius','bottomradius','center','segments'])
+                        if string(props['axis'])!='z': failure('geometry-full-sphere-axis')
+                        for key in ('topradius','bottomradius','segments'): fixed(props[key],0)
+                        radius=num('centerradius','radius_mm')
+                        if radius<=0: failure('invalid-sphere-radius','malformed')
+                        resolved=dict(radius_mm=str(radius),center_mm=vector('center','center_mm'))
+                    component=string(props['component']);name=string(props['name']);material=string(props['material'])
+                    if component not in components or not re.fullmatch(r's_[a-f0-9]{20}',name): failure('geometry-solid-identity')
+                    if material not in ('Vacuum','PEC'): failure('geometry-material-unsupported')
+                    native=component+':'+name
+                    if native in names: failure('geometry-solid-name-reused','ambiguous')
+                    names.add(native);objects[native]=dict(state='live',material_id=material)
+                    object_origins[native]=MappingProxyType(calls[-1][2][2])
+                    feature=dict(op='create_'+owner,native_name=native,material_id=material,resolved=resolved)
+            elif owner=='solid' and len(calls)==1:
+                _,method,entry=calls[0];location=entry[2]
+                target=string(entry);first=live(target)
+                if method=='delete':
+                    first['state']='deleted';feature=dict(op='delete_object',target_name=target,resolved={})
+                    object_origins[target]=MappingProxyType(entry[2])
+                elif method in ('add','subtract','intersect'):
+                    tool=string(entry,1);second=live(tool)
+                    if target==tool or target.split(':')[0]!=tool.split(':')[0] or first['material_id']!=second['material_id']: failure('geometry-boolean-operands')
+                    second['state']='consumed'
+                    object_origins[target]=MappingProxyType(entry[2]);object_origins[tool]=MappingProxyType(entry[2])
+                    feature=dict(op='boolean_solids',target_name=target,tool_name=tool,
+                        operation={'add':'union','subtract':'difference','intersect':'intersection'}[method],resolved=dict(result_geometry='unverified'))
+                else: failure('geometry-solid-operation')
+            else: failure('geometry-block-operation')
+            if sum(o['state']=='live' for o in objects.values())>128: failure('geometry-live-solid-budget','rejected')
+            features.append(feature);origins[prefix.rstrip('.')]=MappingProxyType(dict(location))
+        fields.update({'geometry.features':tuple(features),'geometry.objects':objects})
+        origins['geometry.features']=tuple(origins['geometry.features['+str(i)+']'] for i in range(len(features)))
+        origins['geometry.objects']=MappingProxyType(object_origins)
+        return Projection('resolved',MappingProxyType(fields),MappingProxyType(origins),(),source_hash,scope,
+            parser_profile=GEOMETRY_PROFILE,exact_values=MappingProxyType(exact))
+    except (ProjectionError,ValueError,TypeError,RecursionError) as error:
+        reason=error.reason if isinstance(error,ProjectionError) else 'malformed-geometry-program'
+        status=error.status if isinstance(error,ProjectionError) else 'malformed'
+        return Projection(status,MappingProxyType({}),MappingProxyType({}),(reason,),source_hash,scope,
+            parser_profile=GEOMETRY_PROFILE,failure_origin=MappingProxyType(dict(location)) if location else None)

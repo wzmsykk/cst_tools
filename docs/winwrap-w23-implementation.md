@@ -1,6 +1,8 @@
 # W2/W3：A1独立检查、源映射与原生发布门禁
 
-2026-11-03。作用域为类型化A1定义的save_project构造链；不迁移其它稳定Worker/预处理宏，不增加MCP工具或编译服务。W0/W1原始证据见[前阶段](winwrap-w01-implementation.md)。本轮受限链已实施并通过串行无求解验收，结果以知识库及下方结论为准，不使用旧数字替代新代码。
+2026-11-03原生记录；2026-11-04更新当前实现边界。作用域为类型化A1定义的save_project构造链；不迁移其它稳定Worker/预处理宏，不增加MCP工具或编译服务。W0/W1原始证据见[前阶段](winwrap-w01-implementation.md)。下方串行无求解验收仅代表原记录版本，当前生成器变化已使旧stamp失效，不能用于放行新代码。
+
+2026-11-04现行扩展：A1/GEO共用history_program原子分块、控制模板与物理块源图。GEO实际保存提取/两会话核验及独立版本门禁已接，见[GEO-2–4生产实现与验收](geometry-production-implementation.md)。A1本页旧23样本/12会话不自动认证变化后的源码，旧A1许可失效；本批独立A1更新被自动审批拒绝，未改写凭据。
 
 ## 生产链
 
@@ -12,7 +14,7 @@ winwrap_checks.check_history和check_module读取已经发射的文本，不复�
 
 ## 版本门禁
 
-require_calibration核对data/winwrap-a1-calibration.json、其中固定命名的知识库原生证据摘要及七个生成相关源码/Schema的规范化换行SHA256。缺失、过期、证据改变、检查器加载后磁盘变化均拒绝保存，不自动刷新hash。应正常退出旧Runner后升级；不支持热更新。
+require_calibration核对data/winwrap-a1-calibration.json、其中固定命名的知识库原生证据摘要及原批次七个生成相关源码/Schema的规范化换行SHA256。缺失、过期、证据改变、检查器加载后磁盘变化均拒绝保存，不自动刷新hash。应正常退出旧Runner后升级；不支持热更新。
 
 数据文件是本地发布/开发门禁，不是数字签名，不能防御可同时篡改代码和证据的本地操作者。它只证明记录版本和样本；运行输入仍检查，构造后仍核对G03。2022大版本规则沿用用户既定假设，真实校准只覆盖本机2022.5。
 
@@ -56,3 +58,5 @@ CST参数说明中的emoji样本保存成两个问号，且观察到末尾空白
 完整组合回归271 passed、1 skipped（148.79秒），包含独立检查/源图、定义事务/故障、原生构造/G03、适配器、文档/登记和源码包；跳过模块为缺少可选mcp依赖的SDK测试。解压源码包直接require_calibration核验通过，不依赖开发目录。原生XYZ的外层映射片段与实际注入后的probe.bas逐段核对一致。
 
 本轮17个会话（最终12、前期5）均结束后，已保留各模型的参数/历史/必要宏/源图/hash并删除17份.cst及同名计算目录，测试临时树已清理；原模型需重生成，不能按旧路径直接重验。未提交、推送或交付新发布包。
+
+2026-11-04边界补充：现行SOURCES已扩展包含geometry_contract/geometry_codegen，旧stamp未刷新且失效。显式GEO离线profile与[源映射产物](geometry-selection-interface-design.md#13-geo-2离线历史发射投影检查与源映射)不由本页A1原生证据校准，GEO已由独立geometry-calibration校准，不借本页旧A1证据放行。

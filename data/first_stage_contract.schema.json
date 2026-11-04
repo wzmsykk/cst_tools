@@ -693,15 +693,16 @@
         },
         "changes": {
           "type": "array",
-          "items": {
-            "$ref": "#/$defs/Change"
-          },
+          "items": {},
           "minItems": 1,
           "maxItems": 64
         },
         "invalidate_results": {
           "type": "boolean",
           "default": false
+        },
+        "geometry_profile": {
+          "const": "geometry-v1"
         }
       },
       "required": [
@@ -709,7 +710,34 @@
         "expected_document_revision",
         "changes"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "geometry_profile"
+            ]
+          },
+          "then": {
+            "properties": {
+              "changes": {
+                "items": {
+                  "$ref": "#/$defs/GeometryChange"
+                }
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "changes": {
+                "items": {
+                  "$ref": "#/$defs/Change"
+                }
+              }
+            }
+          }
+        }
+      ]
     },
     "configure_simulation": {
       "type": "object",
@@ -751,6 +779,12 @@
         "verify_reopen": {
           "const": true,
           "default": true
+        },
+        "validation_target": {
+          "enum": [
+            "geometry",
+            "simulation"
+          ]
         }
       },
       "required": [
@@ -870,6 +904,599 @@
         "formats"
       ],
       "additionalProperties": false
+    },
+    "GeometryChange": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "op": {
+              "const": "set_parameters"
+            },
+            "values": {
+              "type": "object",
+              "minProperties": 1,
+              "maxProperties": 1024,
+              "propertyNames": {
+                "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"
+              },
+              "additionalProperties": {
+                "$ref": "#/$defs/Parameter"
+              }
+            }
+          },
+          "required": [
+            "op",
+            "values"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "op": {
+              "const": "ensure_component"
+            },
+            "component_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,99}$"
+            }
+          },
+          "required": [
+            "op",
+            "component_id"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "$ref": "#/$defs/GeometryFeature"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "op": {
+              "const": "define_selection_set"
+            },
+            "selection_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,99}$"
+            },
+            "entity_kind": {
+              "const": "solid"
+            },
+            "members": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,99}$"
+              },
+              "minItems": 1,
+              "maxItems": 128,
+              "uniqueItems": true
+            }
+          },
+          "required": [
+            "op",
+            "selection_id",
+            "entity_kind",
+            "members"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "op": {
+              "const": "delete_selection_set"
+            },
+            "selection_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,99}$"
+            }
+          },
+          "required": [
+            "op",
+            "selection_id"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "op": {
+              "const": "update_feature"
+            },
+            "feature_id": {
+              "type": "string",
+              "pattern": "^f_[a-f0-9]{32}$"
+            },
+            "replacement": {
+              "$ref": "#/$defs/GeometryFeature"
+            }
+          },
+          "required": [
+            "op",
+            "feature_id",
+            "replacement"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "op": {
+              "const": "remove_feature"
+            },
+            "feature_id": {
+              "type": "string",
+              "pattern": "^f_[a-f0-9]{32}$"
+            }
+          },
+          "required": [
+            "op",
+            "feature_id"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "op": {
+              "const": "set_background"
+            },
+            "material": {
+              "const": "PEC"
+            },
+            "padding_mm": {
+              "type": "array",
+              "items": {
+                "const": 0
+              },
+              "minItems": 6,
+              "maxItems": 6
+            }
+          },
+          "required": [
+            "op",
+            "material",
+            "padding_mm"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "op": {
+              "const": "set_boundaries"
+            },
+            "faces": {
+              "type": "array",
+              "items": {
+                "const": "electric"
+              },
+              "minItems": 6,
+              "maxItems": 6
+            },
+            "symmetry": {
+              "type": "array",
+              "items": {
+                "const": "none"
+              },
+              "minItems": 3,
+              "maxItems": 3
+            }
+          },
+          "required": [
+            "op",
+            "faces",
+            "symmetry"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "GeometrySpec": {
+      "type": "object",
+      "properties": {
+        "parameters": {
+          "type": "object",
+          "maxProperties": 128,
+          "propertyNames": {
+            "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/Parameter"
+          }
+        },
+        "components": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,99}$"
+          },
+          "maxItems": 32,
+          "uniqueItems": true
+        },
+        "geometry": {
+          "type": "object",
+          "properties": {
+            "profile": {
+              "const": "geometry-v1"
+            },
+            "features": {
+              "type": "array",
+              "maxItems": 512,
+              "items": {
+                "type": "object"
+              }
+            },
+            "identities": {
+              "type": "object",
+              "maxProperties": 512,
+              "propertyNames": {
+                "type": "string",
+                "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,99}$"
+              },
+              "additionalProperties": {
+                "type": "string",
+                "pattern": "^f_[a-f0-9]{32}$"
+              }
+            }
+          },
+          "required": [
+            "profile",
+            "features",
+            "identities"
+          ],
+          "additionalProperties": false
+        },
+        "selection_sets": {
+          "type": "object",
+          "maxProperties": 64,
+          "propertyNames": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,99}$"
+          },
+          "additionalProperties": {
+            "type": "object"
+          }
+        },
+        "background": {
+          "type": "object",
+          "properties": {
+            "op": {
+              "const": "set_background"
+            },
+            "material": {
+              "const": "PEC"
+            },
+            "padding_mm": {
+              "type": "array",
+              "items": {
+                "const": 0
+              },
+              "minItems": 6,
+              "maxItems": 6
+            }
+          },
+          "required": [
+            "op",
+            "material",
+            "padding_mm"
+          ],
+          "additionalProperties": false
+        },
+        "boundaries": {
+          "type": "object",
+          "properties": {
+            "op": {
+              "const": "set_boundaries"
+            },
+            "faces": {
+              "type": "array",
+              "items": {
+                "const": "electric"
+              },
+              "minItems": 6,
+              "maxItems": 6
+            },
+            "symmetry": {
+              "type": "array",
+              "items": {
+                "const": "none"
+              },
+              "minItems": 3,
+              "maxItems": 3
+            }
+          },
+          "required": [
+            "op",
+            "faces",
+            "symmetry"
+          ],
+          "additionalProperties": false
+        },
+        "simulation": {
+          "$ref": "#/$defs/Simulation"
+        },
+        "postprocess": {
+          "$ref": "#/$defs/PPS"
+        }
+      },
+      "required": [
+        "parameters",
+        "components",
+        "geometry",
+        "selection_sets"
+      ],
+      "additionalProperties": false
+    },
+    "GeometryFeature": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "op": {
+              "const": "create_brick"
+            },
+            "object_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,99}$"
+            },
+            "component_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,99}$"
+            },
+            "material_id": {
+              "enum": [
+                "Vacuum",
+                "PEC"
+              ]
+            },
+            "bounds_mm": {
+              "type": "object",
+              "properties": {
+                "x": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4096
+                  },
+                  "minItems": 2,
+                  "maxItems": 2
+                },
+                "y": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4096
+                  },
+                  "minItems": 2,
+                  "maxItems": 2
+                },
+                "z": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4096
+                  },
+                  "minItems": 2,
+                  "maxItems": 2
+                }
+              },
+              "required": [
+                "x",
+                "y",
+                "z"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "op",
+            "object_id",
+            "component_id",
+            "material_id",
+            "bounds_mm"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "op": {
+              "const": "create_cylinder"
+            },
+            "object_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,99}$"
+            },
+            "component_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,99}$"
+            },
+            "material_id": {
+              "enum": [
+                "Vacuum",
+                "PEC"
+              ]
+            },
+            "axis": {
+              "enum": [
+                "x",
+                "y",
+                "z"
+              ]
+            },
+            "transverse_center_mm": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4096
+              },
+              "minItems": 2,
+              "maxItems": 2
+            },
+            "axial_range_mm": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4096
+              },
+              "minItems": 2,
+              "maxItems": 2
+            },
+            "outer_radius_mm": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            },
+            "inner_radius_mm": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            }
+          },
+          "required": [
+            "op",
+            "object_id",
+            "component_id",
+            "material_id",
+            "axis",
+            "transverse_center_mm",
+            "axial_range_mm",
+            "outer_radius_mm",
+            "inner_radius_mm"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "op": {
+              "const": "create_sphere"
+            },
+            "object_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,99}$"
+            },
+            "component_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,99}$"
+            },
+            "material_id": {
+              "enum": [
+                "Vacuum",
+                "PEC"
+              ]
+            },
+            "center_mm": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4096
+              },
+              "minItems": 3,
+              "maxItems": 3
+            },
+            "radius_mm": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            }
+          },
+          "required": [
+            "op",
+            "object_id",
+            "component_id",
+            "material_id",
+            "center_mm",
+            "radius_mm"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "op": {
+              "const": "translate_solid"
+            },
+            "target_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,99}$"
+            },
+            "translation_mm": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4096
+              },
+              "minItems": 3,
+              "maxItems": 3
+            }
+          },
+          "required": [
+            "op",
+            "target_id",
+            "translation_mm"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "op": {
+              "const": "boolean_solids"
+            },
+            "operation": {
+              "enum": [
+                "union",
+                "difference",
+                "intersection"
+              ]
+            },
+            "target_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,99}$"
+            },
+            "tool_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,99}$"
+            }
+          },
+          "required": [
+            "op",
+            "operation",
+            "target_id",
+            "tool_id"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "op": {
+              "const": "delete_object"
+            },
+            "object_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,99}$"
+            }
+          },
+          "required": [
+            "op",
+            "object_id"
+          ],
+          "additionalProperties": false
+        }
+      ]
     }
   }
 }

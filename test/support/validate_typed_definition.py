@@ -17,7 +17,7 @@ from csttool.configuration import read_json,write_json_atomic
 from csttool.acceptance_session import exclusive_probe
 
 
-async def run(root,solve,resume=False):
+async def run(root,solve,resume=False,geometry=False):
     from mcp import Client
     from mcp.client.stdio import StdioServerParameters
     trace=[]
@@ -68,6 +68,10 @@ async def run(root,solve,resume=False):
                 axial_range=['-L/2','L/2'],outer_radius='R',inner_radius='0',material='Vacuum',segments=0),
             dict(op='set_background',material='PEC',padding_mm=[0]*6),
             dict(op='set_boundaries',faces=['electric']*6,symmetry=['none']*3)]
+        if geometry:
+            changes[2]=dict(op='create_cylinder',object_id='pillbox',component_id='cavity',axis='z',
+                transverse_center_mm=['0','0'],axial_range_mm=['-L/2','L/2'],outer_radius_mm='R',inner_radius_mm='0',material_id='Vacuum')
+            changes.append(dict(op='define_selection_set',selection_id='volume',entity_kind='solid',members=['pillbox']))
         if resume:
             await control('claim');await control('recover')
             while True:
@@ -77,18 +81,24 @@ async def run(root,solve,resume=False):
             if recovered['state']!='IDLE':raise RuntimeError('previous acceptance recovery is not complete')
             draft=next(row['result'] for row in reversed(previous_trace) if row['tool']=='get_operation_result' and row['result'].get('state')=='draft' and row['result'].get('spec',{}).get('simulation'))
         else:
-            draft=await execute('apply_model_changes',dict(**revision(empty),changes=changes))
+            draft=await execute('apply_model_changes',dict(**revision(empty),changes=changes,**({'geometry_profile':'geometry-v1'} if geometry else {})))
+            if geometry:
+                geometry_saved=await execute('save_project',dict(**revision(draft),validation_target='geometry',verify_reopen=True))
+                if not geometry_saved['geometry_saved'] or geometry_saved['ready'] or geometry_saved['definition_revision'] is not None:
+                    raise AssertionError('geometry-only save granted incorrect readiness')
+                draft=geometry_saved
             draft=await execute('configure_simulation',dict(**revision(draft),simulation=dict(
             solver='eigenmode',method='default',mesh=dict(type='tet',cells_per_wavelength=4,adaptive=False),
             frequency_range_mhz=dict(min=500,max=2000),frequency_lower_target_mhz=500,requested_modes=1,losses='postprocess_only'),
             postprocess=[dict(metric_id='frequency',method_id='Frequency',settings={'mode':dict(selection='one',index=1)}),
                 dict(metric_id='rq',method_id='R_over_Q',settings={'mode':dict(selection='one',index=1),
                     'integration_line':dict(axis='z',offset_mm=[0]*3,beta=1,range='full')})]))
-        saved=await execute('save_project',dict(**revision(draft),verify_reopen=True))
+        saved=await execute('save_project',dict(**revision(draft),verify_reopen=True,**({'validation_target':'simulation'} if geometry else {})))
         observed=await call('inspect_model',dict(document_id=saved['document_id'],document_revision=saved['document_revision']))
         if observed!=saved or not saved['ready']:raise AssertionError('immutable saved definition not ready')
         report=dict(gate='G02/G03-public-sdk',real_cst=True,desktop_host=False,model=saved,solver_start_calls=0,
-            resumed_existing_public_draft=resume,public_trace=str(trace_path))
+            geometry_profile='geometry-v1' if geometry else 'A1',resumed_existing_public_draft=resume,public_trace=str(trace_path))
+        if geometry and not resume:report['geometry_only']=geometry_saved
         if solve:
             result=await execute('submit_run',dict(document_id=saved['document_id'],definition_revision=saved['definition_revision']))
             if result['postprocess_definition']['r_over_q']['integration_line']['axis']!='z':raise AssertionError('RQ context missing')
@@ -129,6 +139,7 @@ async def run(root,solve,resume=False):
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--run-cst',action='store_true');parser.add_argument('--solve',action='store_true')
     parser.add_argument('--resume-project',type=Path)
+    parser.add_argument('--geometry',action='store_true',help='GEO public tools: geometry-only save then simulation save/solve; does not update A1 license')
     args=parser.parse_args()
     if not args.run_cst:parser.error('requires explicit --run-cst')
     with exclusive_probe(ROOT):
@@ -138,7 +149,7 @@ def main():
         else:
             root=ROOT/'artifacts'/('typed-public-'+uuid4().hex[:8]);root.mkdir()
         print('TYPED_ROOT='+str(root),flush=True)
-        asyncio.run(run(root,args.solve,bool(args.resume_project)))
+        asyncio.run(run(root,args.solve,bool(args.resume_project),args.geometry))
 
 
 if __name__=='__main__':main()

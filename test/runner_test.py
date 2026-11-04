@@ -203,7 +203,12 @@ def fake_runner(tmp_path):
 def test_shutdown_wait_confirms_real_runner_release(fake_runner, monkeypatch, lost_response):
     client, process = fake_runner
     runtime = client.status()['runtime']
-    assert runtime['pid'] == process.pid
+    # Windows venv python.exe can be a redirector whose child owns Runner.
+    # Bind to the launched tree rather than accepting any reported PID.
+    import psutil
+    launcher = psutil.Process(process.pid)
+    assert runtime['pid'] in {launcher.pid, *(p.pid for p in launcher.children(recursive=True))}
+    actual = psutil.Process(runtime['pid'])
     assert Path(runtime['source_root']) == Path(__file__).resolve().parents[1]
     assert runtime['python']
     assert Path(runtime['cwd']) == Path(__file__).resolve().parents[1]
@@ -217,6 +222,7 @@ def test_shutdown_wait_confirms_real_runner_release(fake_runner, monkeypatch, lo
     assert client.shutdown_and_wait() == {'runner_stopped': True}
     process.wait(5)
     assert process.returncode == 0
+    assert not actual.is_running()
 
 
 def test_shutdown_timeout_never_kills_or_reports_stopped(tmp_path, monkeypatch):

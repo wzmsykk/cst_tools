@@ -276,6 +276,15 @@ class RunnerController(QObject):
             return False
         return self._command('start', self.backend.run_payload(bool(resume), worker_count))
 
+    def submit_definition(self,payload):
+        """Nonblocking typed definition adapter, sharing the existing Runner slot."""
+        from copy import deepcopy
+        from csttool.definition_editing import validate_edit
+        from csttool.application_service import validate_project_creation
+        if payload.get('operation')=='create_project':validate_project_creation(payload)
+        else:validate_edit(payload)
+        return self._command('start',deepcopy(payload))
+
     def request_stop(self):
         if self.start_request_id and ((self.pending and self.pending_operation == 'start')
                 or self.unknown or self.state is RunState.RUNNING):

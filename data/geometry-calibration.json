@@ -1,0 +1,28 @@
+{
+  "profile": "cst-2022-managed-geometry-v1",
+  "accepted": true,
+  "sources": {
+    "csttool/definition_editing.py": "83586960c9b655a5f1cda78e37dc8987107f014f3d08bdf90083c3ef667b5aaa",
+    "csttool/winwrap_emitter.py": "506e8bdeba2edee8a3c97a7d52eeded7c47ef237668b90bb123157f71bf81942",
+    "csttool/winwrap_checks.py": "1054eecf4dbcdbb041f7426b8512713c11a4c92b46007907a3e8150916cbd570",
+    "csttool/settings_projection.py": "f02801de6eb09457c9b319fabab5e87e000ca6393febd4f36b4a94b7c103ea2c",
+    "csttool/vb_codec.py": "5f824f464cb93927434005b5868b8dc960c284fcd155d06fad163ee393bd5407",
+    "csttool/native_definition_builder.py": "dd9e7fb22fddf50c1111b56b7b147134e68a44234e6092d9eb525d47bfd173d9",
+    "data/first_stage_contract.schema.json": "79eb070c7cac6b073b570465cb860a81894b4512781b6b63cfdf09c44417eca8",
+    "csttool/geometry_contract.py": "9e7b835b4d151ee6e9e4cf903637ed5544a063306dc39c4e7183972ee28ce8a0",
+    "csttool/geometry_codegen.py": "433c1dd7786ae79502f159590b19ca86aed8c646f45ce039a1fc3023037a89aa",
+    "csttool/history_program.py": "7338692954aca3c438dfb3952a0cc47ade3e2a83c395d1084bf8903b1c37ec73",
+    "csttool/managed_history.py": "98e6dc0d46d02ff50cb2a86c3a6433e6f9a2ab442a4783d5ae9bf160d22ee5be",
+    "csttool/definition_geometry.py": "0f84c36aeafd53929b9281f5cdef37021f4436d7d68e14911f3f31a2a44ca6ef",
+    "csttool/definition_verifier.py": "4e14e23a0a29038ab46afc7c97789f5ee4981395dc5eaa0b4910a01363845f46",
+    "csttool/application_service.py": "c104d13fd168baba4850ef4bd7db8221fc55042361a4ca15e015689b023eb02a",
+    "csttool/result_provenance.py": "d1ca07a637f049a08b753b024b035eaa09cfd1f64ec79cc4243d2316fa34fa3e",
+    "csttool/definition_sessions.py": "b166f4ddb778110b8dd5c5b47f9297c0a294fed5b6b9702906a74812d794fa76"
+  },
+  "targets": [
+    "geometry",
+    "simulation"
+  ],
+  "evidence_file": "knowledge-base/geometry-calibration-20261104.json",
+  "evidence_sha256": "854c3e01dd889e6cbcf2e1718856aac11e704535c933b3d6dfd3a66b2904d9ae"
+}

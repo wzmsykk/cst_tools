@@ -1,5 +1,6 @@
 # B2 保存设置的受限历史投影
 
+2026-11-04：受管历史现由history_program原子分块，managed_history核对实际Model.mod；A1允许表范围仍独立，GEO设置组合/观察/许可见[GEO-2–4生产实现与验收](geometry-production-implementation.md)。旧离线GEO阶段文字只作历史记录。
 2026-11-02。MCP共用底层实施批次，接续[B1来源](saved-project-source.md)。首阶段完整历史子集现已补齐，详见[51项命令与身份校验](a1-history-command-profile.md)；不是任意VBA解释器、生产MCP服务器或完整设置验证器。B3原生采集/RunStore、生产G03及G04公共单次子链已接入，见[当前状态](current-status.md)；不代表全部设置或任意工程均通过。
 
 ## 接口与作用域
@@ -28,3 +29,7 @@ B3更新：新增只读exact_values，保留solver.frequency_target.value_mhz及
 该模块已由[公共single-simulation服务](single-simulation-service.md)复用；生产G03及新Managed组合真实子链见[G04记录](single-simulation-g04-acceptance.md)。模块本身的静态/快照报告不单独证明live设置、求解、结果或退出。未知编码/历史及未校准组合继续保守拒绝。
 
 原批次离线数字、故障修正、B4正常/失败/旧库副本及清理记录完整移至[历史验收](archive/20261102-progress-consolidation/settings-history-projection.md)。旧not-run/下一步只在原批次成立；当前未完成项查[TODO](minimal-python-vba-todo.md)。
+
+## GEO离线program投影（2026-11-04）
+
+同一模块新增project_geometry_history(blocks, parameters, scope=..., available_scopes=...)，复用词法/有界算术、Projection和命令profile入口；详见[GEO接口](geometry-selection-interface-design.md#13-geo-2离线历史发射投影检查与源映射)。输入是框架拥有的caption/body块，不是SavedSource或任意Model.mod。默认project_history/project_saved_settings仍只处理A1；没有自动探测/放宽原保存投影。GEO report的missing_fields按几何字段判定，publish_ready始终False；语义、独立文本检查及原生校准各自需要，不能将resolved当成编译/构建/保存证据。

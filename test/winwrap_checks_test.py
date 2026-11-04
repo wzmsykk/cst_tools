@@ -53,12 +53,13 @@ def test_random_bounded_expression_semantics_and_all_axes_are_preserved():
 
 def test_source_map_links_native_history_error_to_input_and_outer_assignment(tmp_path):
     spec=definition();history=render_history(spec)[0];macro=render_edit_macro(tmp_path,spec,'nonce')
-    mapping=checks.definition_map(spec,history,macro)
+    from csttool.history_program import partition
+    mapping=checks.execution_definition_map(spec,partition(spec),macro)
     row=next(r for r in mapping['history'] if r['method']=='Zrange')
     raw='10576\nUnexpected text.\n[*check*#'+str(row['line']+3)+'] '+row['statement']+'\n'
-    diagnostic=checks.map_native_error(raw,mapping)
+    diagnostic=checks.map_native_error(raw,mapping,block_index=row['block_index'])
     assert diagnostic['origin']['input_field']=='cylinder.axial_range' and diagnostic['column'] is None
-    outer=next(r for r in mapping['outer'] if r['history_lines']==[row['line']])
+    outer=next(r for r in mapping['outer'] if r['history_lines']==[row['line']] and r.get('block_index')==row['block_index'])
     assert 'history = history &' in macro.splitlines()[outer['line_start']-1]
     description=next(r for r in mapping['outer'] if r['input_field']=='parameters.R.description')
     assert 'message = ""' in macro.splitlines()[description['line_start']-1]

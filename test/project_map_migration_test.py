@@ -38,10 +38,11 @@ def test_all_136_features_preserved_in_order_and_content():
     catalog = load(ROOT)
     new = rows(render(catalog))[:136]
     assert len(old) == len(new) == 136
-    assert len(catalog['features']) == 137
-    assert catalog['features'][-1]['id'] == 'F138'
+    # Freeze preservation of the original rows, not the number of later features.
+    assert len(catalog['features']) >= 137
+    assert 'F138' in {f['id'] for f in catalog['features'][136:]}
     assert [r[0] for r in old] == [f['id'] for f in catalog['features'][:136]]
-    assert len({f['id'] for f in catalog['features']}) == 137
+    assert len({f['id'] for f in catalog['features']}) == len(catalog['features'])
     for before, after in zip(old, new):
         assert before[:2] == after[:2]
         assert_preserved(re.findall(r'`([^`]+)`', before[3]), re.findall(r'`([^`]+)`', after[3]))

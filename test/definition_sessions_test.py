@@ -105,3 +105,29 @@ def test_bootstrap_is_displayed_as_new_project_not_frozen_g03(tmp_path):
     assert facts['sessions'][0]['model_state']=='saved-empty-project'
     from GUI.lifecycle_display import lifecycle_lines
     assert any('G02工程创建' in line for line in lifecycle_lines(dict(lifecycle=facts)))
+
+
+@pytest.mark.parametrize('level',[0,1,3])
+def test_nested_geometry_verification_is_never_missed_by_any_guard(tmp_path,level):
+    from csttool.definition_verifier import assert_definition_sessions_closed
+    directory=tmp_path/'control/definitions/doc/operation/verification-edit/saved'
+    for i in range(level+1):directory=directory/('verification-managed-'+str(i))/'saved'
+    path=directory/'session-status.json';write_json_atomic(path,dict(exit_confirmed=False))
+    assert len(definition_session_facts(tmp_path))==1
+    assert project_lifecycle(tmp_path)['session_safety']=='unknown'
+    with pytest.raises(ValueError,match='exit unconfirmed'):
+        assert_definition_sessions_closed(tmp_path/'control/definitions')
+    with pytest.raises(RuntimeError,match='ownership unknown'):recover_definition_sessions(tmp_path)
+    write_json_atomic(path,dict(exit_confirmed=True,exit_code=0))
+    assert_definition_sessions_closed(tmp_path/'control/definitions')
+    assert not project_lifecycle(tmp_path)['recovery_required']
+
+
+@pytest.mark.parametrize('report',[[],None,dict(exit_confirmed=True,exit_code=False)])
+def test_malformed_or_boolean_exit_code_is_not_standard_close(tmp_path,report):
+    path=session(tmp_path);write_json_atomic(path,report)
+    facts=definition_session_facts(tmp_path)[0]
+    assert not facts['standard_closed'] and facts['needs_recovery']
+    if not isinstance(report,dict):
+        from csttool.definition_verifier import assert_definition_sessions_closed
+        with pytest.raises(ValueError):assert_definition_sessions_closed(tmp_path/'control/definitions')

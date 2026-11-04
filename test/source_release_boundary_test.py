@@ -18,6 +18,7 @@ def test_release_selection_keeps_offline_contract_inputs_and_excludes_heavy_mode
         assert release.included(name),name
     assert release.included('data/winwrap-a1-calibration.json')
     assert release.included('knowledge-base/winwrap-w23-20261103.json')
+    assert release.included('csttool/geometry_codegen.py')
     for name in ['model/Pillbox.cst','test/data/Pillbox.cst','artifacts/raw.h5',
                  'knowledge-base/vendor/cst-2022-vba-help/README.md','test/__pycache__/cached.pyc']:
         assert not release.included(name),name
@@ -41,10 +42,27 @@ def test_real_source_package_boundary(tmp_path):
         assert hashlib.sha256((folder/name).read_bytes()).hexdigest()==digest
     assert not any(p.suffix.lower() in {'.cst','.h5','.chm'} for p in folder.rglob('*'))
     before={p.relative_to(folder).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in folder.rglob('*') if p.is_file()}
-    gate=subprocess.run([sys.executable,'-B','-c',
-        'from csttool.winwrap_checks import require_calibration; require_calibration(); print("gate-ok")'],
-        cwd=folder,capture_output=True,text=True)
-    assert gate.returncode==0,gate.stdout+gate.stderr
+    # Packaging must preserve the actual source-bound gate, including a stale
+    # refusal. Offline packaging is not permission to manufacture native proof.
+    probe='''import json
+from csttool.winwrap_checks import require_calibration, require_geometry_calibration
+from csttool.winwrap_emitter import GeneratedCodeError
+decisions={}
+for name,check in [('a1',require_calibration),('geometry',lambda:require_geometry_calibration('geometry')),
+                   ('geo-simulation',lambda:require_geometry_calibration('simulation'))]:
+    try:check()
+    except GeneratedCodeError as error:decisions[name]=dict(accepted=False,code=error.code)
+    else:decisions[name]=dict(accepted=True)
+print(json.dumps(decisions))
+'''
+    def calibration(directory):
+        result=subprocess.run([sys.executable,'-B','-c',probe],cwd=directory,capture_output=True,text=True)
+        assert result.returncode==0,result.stdout+result.stderr
+        return json.loads(result.stdout)
+    assert (folder/'data/winwrap-a1-calibration.json').read_bytes()==(ROOT/'data/winwrap-a1-calibration.json').read_bytes()
+    if (ROOT/'data/geometry-calibration.json').exists():
+        assert (folder/'data/geometry-calibration.json').read_bytes()==(ROOT/'data/geometry-calibration.json').read_bytes()
+    assert calibration(folder)==calibration(ROOT)
     def run(*args):
         result=subprocess.run([sys.executable,'-B','scripts/project_inspect.py',*args],cwd=folder,capture_output=True,encoding='utf-8')
         return result,json.loads(result.stdout) if result.stdout.startswith('{') else None

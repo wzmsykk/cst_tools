@@ -1,6 +1,9 @@
 # B2 首阶段完整历史命令与身份校验
 
+2026-11-04：受管历史现由history_program原子分块，managed_history核对实际Model.mod；A1允许表范围仍独立，GEO设置组合/观察/许可见[GEO-2–4生产实现与验收](geometry-production-implementation.md)。旧离线GEO阶段文字只作历史记录。
 2026-11-02，`cst-a1-history-v2`。[投影API](settings-history-projection.md)的本批更新；源码`csttool/settings_projection.py`，固定允许表`COMMAND_ARITIES`共51项。完整指首阶段受控历史子集，不指任意CST模板或现有工程全部历史。
+
+2026-11-04：共享查询入口新增显式cst-geo-history-v1离线profile，详见[GEO历史子阶段](geometry-selection-interface-design.md#13-geo-2离线历史发射投影检查与源映射)；本页A1默认COMMAND_ARITIES及表内范围不变，GEO命令不作为A1豁免。
 
 ## 命令允许表
 

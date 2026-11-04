@@ -1,4 +1,4 @@
-"""Owned COM new-MWS construction for geometry-free A1 definitions.
+"""Owned COM new-MWS construction using the shared definition macro.
 
 Empty saved MWS files cannot currently enter Model.run batch in CST2022. This
 uses a newly created 3D object's RunScript, with no OpenFile/global Active3D.
@@ -168,40 +168,52 @@ def verify_new_com_identity(pid,executable,started,baseline_ids):
     return modeler,de
 
 
-def run_new_definition(executable,model,directory,macro,*,isolate_desktop=True,generated_a1=False):
+def inject_definition_ownership(macro,directory,nonce,*,profile=None,mapping=None):
+    """Pure ownership-code/source-map preparation, with no COM or process calls."""
+    from copy import deepcopy
+    import hashlib
+    from .settings_projection import PROFILE,GEOMETRY_PROFILE
+    if profile not in (None,PROFILE,GEOMETRY_PROFILE):raise ValueError('unknown generated definition profile')
+    if profile is not None:
+        from .winwrap_checks import check_module
+        check_module(macro,profile=profile)
+        if mapping is None or mapping.get('hashes',{}).get('outer')!=hashlib.sha256(macro.encode('ascii')).hexdigest():
+            raise ValueError('source map does not bind the generated module')
+        if (mapping.get('schema_version')==2 and mapping.get('profile')!=profile) or mapping.get('schema_version') not in (1,2):
+            raise ValueError('source map profile differs from the generated module')
+    if (macro.count('Option Explicit\n')!=1 or macro.count('Sub Main\n')!=1
+            or macro.count('    On Error GoTo Failed\n')!=1 or 'Private Sub CSTToolsBindNewProject' in macro):
+        raise ValueError('generated macro entry point is not unique or already bound')
+    anchor='    CSTToolsStage = "parameters"\n' if profile else '    On Error GoTo Failed\n'
+    if macro.count(anchor)!=1:raise ValueError('owned macro binding anchor is not unique')
+    binding_line=macro[:macro.index(anchor)].count('\n')+1+(0 if profile else 1)
+    declarations,body=render_identity_probe(directory,nonce).split('Private Sub',1)
+    macro=macro.replace('Option Explicit\n','Option Explicit\n'+declarations,1)
+    macro=macro.replace(anchor,('    CSTToolsBindNewProject\n'+anchor) if profile else (anchor+'    CSTToolsBindNewProject\n'),1)
+    macro+='\nPrivate Sub'+body
+    from .winwrap_emitter import check_lines
+    if profile is not None:check_lines(macro.splitlines())
+    if mapping is not None:
+        mapping=deepcopy(mapping)
+        def shift(line):return line+2+(1 if line>=binding_line else 0)
+        mapping['final_outer']=[{**row,'line_start':shift(row['line_start']),'line_end':shift(row['line_end'])} for row in mapping['outer']]
+        mapping['hashes']['final_outer']=hashlib.sha256(macro.encode('ascii')).hexdigest()
+        mapping['ownership_injection']=dict(declaration_lines=2,binding_lines=1,binding_before_line=binding_line)
+    return macro,mapping
+
+
+def run_new_definition(executable,model,directory,macro,*,isolate_desktop=True,generated_profile=None,cancel_check=None):
     from .cst_installations import infer_cst_version
     executable=Path(executable).resolve(strict=True)
     if os.name!='nt' or infer_cst_version(executable)!=2022:
-        raise ValueError('UNSUPPORTED_CAPABILITY: A1 COM construction requires CST2022/Windows')
+        raise ValueError('UNSUPPORTED_CAPABILITY: owned definition construction requires CST2022/Windows')
     directory=Path(directory).resolve();model=Path(model).resolve()
-    if generated_a1:
-        from .winwrap_checks import check_module
-        check_module(macro)
-    original_macro=macro
+    mapping_path=directory/'source-map.json'
+    mapping=read_json(mapping_path) if generated_profile and mapping_path.exists() else None
     nonce=uuid4().hex
+    macro,mapping=inject_definition_ownership(macro,directory,nonce,profile=generated_profile,mapping=mapping)
     wrapper=directory/'build.ps1';wrapper.write_text(WRAPPER,encoding='utf-8')
-    identity=render_identity_probe(directory,nonce)
-    declarations,body=identity.split('Private Sub',1)
-    if macro.count('Option Explicit\n')!=1 or macro.count('Sub Main\n')!=1 or macro.count('    On Error GoTo Failed\n')!=1:
-        raise ValueError('generated A1 macro entry point is not unique')
-    macro=macro.replace('Option Explicit\n','Option Explicit\n'+declarations,1)
-    # One RunScript, with a read-only identity gate before any generated modelling.
-    macro=macro.replace('    On Error GoTo Failed\n','    On Error GoTo Failed\n    CSTToolsBindNewProject\n',1)
-    macro+='\nPrivate Sub'+body
-    if generated_a1:
-        from .winwrap_emitter import check_lines
-        import hashlib
-        check_lines(macro.splitlines())  # Includes fixed ownership injection.
-        mapping_path=directory/'source-map.json'
-        if mapping_path.exists():
-            mapping=read_json(mapping_path)
-            if mapping['hashes']['outer']!=hashlib.sha256(original_macro.encode('ascii')).hexdigest():
-                raise ValueError('source map does not bind the generated module')
-            mapping['final_outer']=[{**row,'line_start':row['line_start']+3,'line_end':row['line_end']+3}
-                                    for row in mapping['outer']]
-            mapping['hashes']['final_outer']=hashlib.sha256(macro.encode('ascii')).hexdigest()
-            mapping['ownership_injection']={'declaration_lines':2,'binding_lines':1}
-            write_json_atomic(mapping_path,mapping)
+    if mapping is not None:write_json_atomic(mapping_path,mapping)
     macro_path=directory/'probe.bas';macro_path.write_text(macro,encoding='ascii')
     baseline=cst_processes();baseline_ids={(p['pid'],p['create_time']) for p in baseline}
     bound=[]
@@ -230,6 +242,13 @@ def run_new_definition(executable,model,directory,macro,*,isolate_desktop=True,g
         launcher=psutil.Process(process.pid);expected=(process.pid,launcher.create_time())
         write_json_atomic(directory/'session-status.json',dict(exit_confirmed=False,owned=[dict(pid=expected[0],create_time=expected[1])]))
         def observe(report):
+            if cancel_check is not None:
+                from .hom_scan import ScanInterrupted
+                try:cancel_check()
+                except ScanInterrupted:
+                    # Signal the owned macro and keep observing standard exit;
+                    # abandoning wait_probe here would leave a live COM instance.
+                    (directory/'cancel.request').touch(exist_ok=True)
             server_file=directory/'server-process.json'
             if not announced_server and server_file.exists():
                 server=psutil.Process(read_json(server_file)['pid'])

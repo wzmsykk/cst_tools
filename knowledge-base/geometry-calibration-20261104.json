@@ -1,0 +1,4043 @@
+{
+  "date": "2026-11-04",
+  "sources": {
+    "csttool/definition_editing.py": "83586960c9b655a5f1cda78e37dc8987107f014f3d08bdf90083c3ef667b5aaa",
+    "csttool/winwrap_emitter.py": "506e8bdeba2edee8a3c97a7d52eeded7c47ef237668b90bb123157f71bf81942",
+    "csttool/winwrap_checks.py": "1054eecf4dbcdbb041f7426b8512713c11a4c92b46007907a3e8150916cbd570",
+    "csttool/settings_projection.py": "f02801de6eb09457c9b319fabab5e87e000ca6393febd4f36b4a94b7c103ea2c",
+    "csttool/vb_codec.py": "5f824f464cb93927434005b5868b8dc960c284fcd155d06fad163ee393bd5407",
+    "csttool/native_definition_builder.py": "dd9e7fb22fddf50c1111b56b7b147134e68a44234e6092d9eb525d47bfd173d9",
+    "data/first_stage_contract.schema.json": "79eb070c7cac6b073b570465cb860a81894b4512781b6b63cfdf09c44417eca8",
+    "csttool/geometry_contract.py": "9e7b835b4d151ee6e9e4cf903637ed5544a063306dc39c4e7183972ee28ce8a0",
+    "csttool/geometry_codegen.py": "433c1dd7786ae79502f159590b19ca86aed8c646f45ce039a1fc3023037a89aa",
+    "csttool/history_program.py": "7338692954aca3c438dfb3952a0cc47ade3e2a83c395d1084bf8903b1c37ec73",
+    "csttool/managed_history.py": "98e6dc0d46d02ff50cb2a86c3a6433e6f9a2ab442a4783d5ae9bf160d22ee5be",
+    "csttool/definition_geometry.py": "0f84c36aeafd53929b9281f5cdef37021f4436d7d68e14911f3f31a2a44ca6ef",
+    "csttool/definition_verifier.py": "4e14e23a0a29038ab46afc7c97789f5ee4981395dc5eaa0b4910a01363845f46",
+    "csttool/application_service.py": "c104d13fd168baba4850ef4bd7db8221fc55042361a4ca15e015689b023eb02a",
+    "csttool/result_provenance.py": "d1ca07a637f049a08b753b024b035eaa09cfd1f64ec79cc4243d2316fa34fa3e",
+    "csttool/definition_sessions.py": "b166f4ddb778110b8dd5c5b47f9297c0a294fed5b6b9702906a74812d794fa76"
+  },
+  "cases": {
+    "C1": {
+      "status": "verified",
+      "primitives": {
+        "status": "verified",
+        "source_sha256": "c19c02e66efed5f8281317af4a00e99775b7f2564db1b6a8e3c3e6f4105608ab",
+        "closure": {
+          "exit_code": 0,
+          "exit_confirmed": true,
+          "quiet": {
+            "nonce": "8658435c45674a88822b8283b9958ef1",
+            "readback": "not-exposed-by-COM",
+            "setter_returned": true,
+            "requested": true
+          },
+          "window_observation": {
+            "baseline_foreground": {
+              "hwnd": 19276814,
+              "pid": 71700,
+              "visible": true,
+              "minimized": false,
+              "owner": 0,
+              "window_class": "Windows.UI.Core.CoreWindow"
+            },
+            "observation": "WinEvent foreground/show hooks plus 50ms window polling",
+            "owned_foreground_events": 0,
+            "errors": [],
+            "dropped_events": 0,
+            "window_enumeration_gaps": 17,
+            "private_desktop": "CstTools_023e69c557af4f118679acad809db5d0",
+            "desktop_handle_closed": true,
+            "owned_window_events": 183,
+            "minimize_actions": 0
+          },
+          "window_observation_path": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\primitives\\constructed\\window-observation.json"
+        },
+        "proof": {
+          "schema_version": 1,
+          "status": "verified",
+          "scope": "root",
+          "source_sha256": "c19c02e66efed5f8281317af4a00e99775b7f2564db1b6a8e3c3e6f4105608ab",
+          "validation_target": "geometry",
+          "gates": [
+            "saved-reopened",
+            "identity",
+            "settings",
+            "standard-close"
+          ],
+          "diagnostics": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\primitives\\constructed\\verification-managed-6a3652e49d2a433292105aeee64d59aa",
+          "installation": {
+            "executable": "D:\\Program Files (x86)\\CST Studio Suite 2022\\CST DESIGN ENVIRONMENT.exe",
+            "launcher_sha256": "bde34d5ad5b7ec46500ab8d0a1da2eb04b198e27ed06d1d7de3ffe8ec55c397e",
+            "modeler_sha256": "a1cb2ec6316592020e81129fa0687343db2c650d82286c79a22ef4e08310db98",
+            "profile_major": "2022"
+          },
+          "sessions": [
+            {
+              "phase": "saved",
+              "exit_code": 0,
+              "exit_confirmed": true
+            },
+            {
+              "phase": "reopened",
+              "exit_code": 0,
+              "exit_confirmed": true
+            }
+          ],
+          "observations": [
+            {
+              "phase": "saved",
+              "sha256": "285398b35b96feb45c3f317cdbca3003a0bb01297fd2fb7167688dc5b92d33ae",
+              "native": {
+                "nonce": "bac4c938cabd4753ae69d2561a6dd04c",
+                "project": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\primitives\\constructed\\verification-managed-6a3652e49d2a433292105aeee64d59aa\\saved\\definition",
+                "build": "Version 2022.5 - Jun 03 2022",
+                "length": "mm",
+                "frequency": "MHz",
+                "end": "G03V1"
+              },
+              "geometry": {
+                "status": "verified",
+                "source": "native-query",
+                "objects": [
+                  {
+                    "object_id": "brick",
+                    "native_name": "c_657fdc2b228b14a6aba7:s_c762830741c126f19e44",
+                    "state": "live",
+                    "exists": true,
+                    "material_id": "Vacuum",
+                    "volume_mm3": 8000.0,
+                    "solid": true,
+                    "hybrid": false,
+                    "volume_check": "analytic"
+                  },
+                  {
+                    "object_id": "cyl_x0",
+                    "native_name": "c_657fdc2b228b14a6aba7:s_442316fb7ee8e64850a4",
+                    "state": "live",
+                    "exists": true,
+                    "material_id": "Vacuum",
+                    "volume_mm3": 6283.18530717958,
+                    "solid": true,
+                    "hybrid": false,
+                    "volume_check": "analytic"
+                  },
+                  {
+                    "object_id": "cyl_x1",
+                    "native_name": "c_657fdc2b228b14a6aba7:s_05e3853e5593cbaefd38",
+                    "state": "live",
+                    "exists": true,
+                    "material_id": "Vacuum",
+                    "volume_mm3": 4712.38943201058,
+                    "solid": true,
+                    "hybrid": false,
+                    "volume_check": "analytic"
+                  },
+                  {
+                    "object_id": "cyl_y0",
+                    "native_name": "c_657fdc2b228b14a6aba7:s_b741e6aa7eec319e517f",
+                    "state": "live",
+                    "exists": true,
+                    "material_id": "Vacuum",
+                    "volume_mm3": 6283.18986391813,
+                    "solid": true,
+                    "hybrid": false,
+                    "volume_check": "analytic"
+                  },
+                  {
+                    "object_id": "cyl_y1",
+                    "native_name": "c_657fdc2b228b14a6aba7:s_6416126ddc079f0331d6",
+                    "state": "live",
+                    "exists": true,
+                    "material_id": "Vacuum",
+                    "volume_mm3": 4712.38943201058,
+                    "solid": true,
+                    "hybrid": false,
+                    "volume_check": "analytic"
+                  },
+                  {
+                    "object_id": "cyl_z0",
+                    "native_name": "c_657fdc2b228b14a6aba7:s_96d8b1db900607f722ac",
+                    "state": "live",
+                    "exists": true,
+                    "material_id": "Vacuum",
+                    "volume_mm3": 6283.18075044104,
+                    "solid": true,
+                    "hybrid": false,
+                    "volume_check": "analytic"
+                  },
+                  {
+                    "object_id": "cyl_z1",
+                    "native_name": "c_657fdc2b228b14a6aba7:s_81e246a4bce9676ec302",
+                    "state": "live",
+                    "exists": true,
+                    "material_id": "Vacuum",
+                    "volume_mm3": 4712.39080712808,
+                    "solid": true,
+                    "hybrid": false,
+                    "volume_check": "analytic"
+                  },
+                  {
+                    "object_id": "sphere",
+                    "native_name": "c_657fdc2b228b14a6aba7:s_0f58b78bc54e0c3e5556",
+                    "state": "live",
+                    "exists": true,
+                    "material_id": "Vacuum",
+                    "volume_mm3": 523.598775598299,
+                    "solid": true,
+                    "hybrid": false,
+                    "volume_check": "analytic"
+                  }
+                ],
+                "bounds_mm": {
+                  "xmin": 10.0,
+                  "xmax": 1005.0,
+                  "ymin": -10.0,
+                  "ymax": 15.0,
+                  "zmin": -13.0,
+                  "zmax": 10.0
+                },
+                "calculation_bounds_mm": {
+                  "xmin": 10.0,
+                  "xmax": 1005.0,
+                  "ymin": -10.0,
+                  "ymax": 15.0,
+                  "zmin": -13.0,
+                  "zmax": 10.0
+                },
+                "per_solid_bounds": "not-queried; LooseBoundingBox structural-macro restriction",
+                "raw": {
+                  "nonce": "bac4c938cabd4753ae69d2561a6dd04c",
+                  "project": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\primitives\\constructed\\verification-managed-6a3652e49d2a433292105aeee64d59aa\\saved\\definition",
+                  "count": "8",
+                  "bounds.xmin": "10",
+                  "calculation.xmin": "10",
+                  "bounds.xmax": "1005",
+                  "calculation.xmax": "1005",
+                  "bounds.ymin": "-10",
+                  "calculation.ymin": "-10",
+                  "bounds.ymax": "15",
+                  "calculation.ymax": "15",
+                  "bounds.zmin": "-13",
+                  "calculation.zmin": "-13",
+                  "bounds.zmax": "10",
+                  "calculation.zmax": "10",
+                  "solid.0.name": "c_657fdc2b228b14a6aba7:s_c762830741c126f19e44",
+                  "solid.0.exists": "-1",
+                  "solid.0.material": "Vacuum",
+                  "solid.0.volume_mm3": "8000",
+                  "solid.0.solid": "-1",
+                  "solid.0.hybrid": "0",
+                  "solid.1.name": "c_657fdc2b228b14a6aba7:s_442316fb7ee8e64850a4",
+                  "solid.1.exists": "-1",
+                  "solid.1.material": "Vacuum",
+                  "solid.1.volume_mm3": "6283.18530717958",
+                  "solid.1.solid": "-1",
+                  "solid.1.hybrid": "0",
+                  "solid.2.name": "c_657fdc2b228b14a6aba7:s_05e3853e5593cbaefd38",
+                  "solid.2.exists": "-1",
+                  "solid.2.material": "Vacuum",
+                  "solid.2.volume_mm3": "4712.38943201058",
+                  "solid.2.solid": "-1",
+                  "solid.2.hybrid": "0",
+                  "solid.3.name": "c_657fdc2b228b14a6aba7:s_b741e6aa7eec319e517f",
+                  "solid.3.exists": "-1",
+                  "solid.3.material": "Vacuum",
+                  "solid.3.volume_mm3": "6283.18986391813",
+                  "solid.3.solid": "-1",
+                  "solid.3.hybrid": "0",
+                  "solid.4.name": "c_657fdc2b228b14a6aba7:s_6416126ddc079f0331d6",
+                  "solid.4.exists": "-1",
+                  "solid.4.material": "Vacuum",
+                  "solid.4.volume_mm3": "4712.38943201058",
+                  "solid.4.solid": "-1",
+                  "solid.4.hybrid": "0",
+                  "solid.5.name": "c_657fdc2b228b14a6aba7:s_96d8b1db900607f722ac",
+                  "solid.5.exists": "-1",
+                  "solid.5.material": "Vacuum",
+                  "solid.5.volume_mm3": "6283.18075044104",
+                  "solid.5.solid": "-1",
+                  "solid.5.hybrid": "0",
+                  "solid.6.name": "c_657fdc2b228b14a6aba7:s_81e246a4bce9676ec302",
+                  "solid.6.exists": "-1",
+                  "solid.6.material": "Vacuum",
+                  "solid.6.volume_mm3": "4712.39080712808",
+                  "solid.6.solid": "-1",
+                  "solid.6.hybrid": "0",
+                  "solid.7.name": "c_657fdc2b228b14a6aba7:s_0f58b78bc54e0c3e5556",
+                  "solid.7.exists": "-1",
+                  "solid.7.material": "Vacuum",
+                  "solid.7.volume_mm3": "523.598775598299",
+                  "solid.7.solid": "-1",
+                  "solid.7.hybrid": "0",
+                  "end": "GEO1"
+                }
+              }
+            },
+            {
+              "phase": "reopened",
+              "sha256": "591cc5f2729447f164f43fba86eae981b74f9c1e2ab070ce5052bce7126444bc",
+              "native": {
+                "nonce": "4265992f555d41c0857d6e65f9ff947b",
+                "project": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\primitives\\constructed\\verification-managed-6a3652e49d2a433292105aeee64d59aa\\reopened\\definition",
+                "build": "Version 2022.5 - Jun 03 2022",
+                "length": "mm",
+                "frequency": "MHz",
+                "end": "G03V1"
+              },
+              "geometry": {
+                "status": "verified",
+                "source": "native-query",
+                "objects": [
+                  {
+                    "object_id": "brick",
+                    "native_name": "c_657fdc2b228b14a6aba7:s_c762830741c126f19e44",
+                    "state": "live",
+                    "exists": true,
+                    "material_id": "Vacuum",
+                    "volume_mm3": 8000.0,
+                    "solid": true,
+                    "hybrid": false,
+                    "volume_check": "analytic"
+                  },
+                  {
+                    "object_id": "cyl_x0",
+                    "native_name": "c_657fdc2b228b14a6aba7:s_442316fb7ee8e64850a4",
+                    "state": "live",
+                    "exists": true,
+                    "material_id": "Vacuum",
+                    "volume_mm3": 6283.18530717958,
+                    "solid": true,
+                    "hybrid": false,
+                    "volume_check": "analytic"
+                  },
+                  {
+                    "object_id": "cyl_x1",
+                    "native_name": "c_657fdc2b228b14a6aba7:s_05e3853e5593cbaefd38",
+                    "state": "live",
+                    "exists": true,
+                    "material_id": "Vacuum",
+                    "volume_mm3": 4712.38943201058,
+                    "solid": true,
+                    "hybrid": false,
+                    "volume_check": "analytic"
+                  },
+                  {
+                    "object_id": "cyl_y0",
+                    "native_name": "c_657fdc2b228b14a6aba7:s_b741e6aa7eec319e517f",
+                    "state": "live",
+                    "exists": true,
+                    "material_id": "Vacuum",
+                    "volume_mm3": 6283.18986391813,
+                    "solid": true,
+                    "hybrid": false,
+                    "volume_check": "analytic"
+                  },
+                  {
+                    "object_id": "cyl_y1",
+                    "native_name": "c_657fdc2b228b14a6aba7:s_6416126ddc079f0331d6",
+                    "state": "live",
+                    "exists": true,
+                    "material_id": "Vacuum",
+                    "volume_mm3": 4712.38943201058,
+                    "solid": true,
+                    "hybrid": false,
+                    "volume_check": "analytic"
+                  },
+                  {
+                    "object_id": "cyl_z0",
+                    "native_name": "c_657fdc2b228b14a6aba7:s_96d8b1db900607f722ac",
+                    "state": "live",
+                    "exists": true,
+                    "material_id": "Vacuum",
+                    "volume_mm3": 6283.18075044104,
+                    "solid": true,
+                    "hybrid": false,
+                    "volume_check": "analytic"
+                  },
+                  {
+                    "object_id": "cyl_z1",
+                    "native_name": "c_657fdc2b228b14a6aba7:s_81e246a4bce9676ec302",
+                    "state": "live",
+                    "exists": true,
+                    "material_id": "Vacuum",
+                    "volume_mm3": 4712.39080712808,
+                    "solid": true,
+                    "hybrid": false,
+                    "volume_check": "analytic"
+                  },
+                  {
+                    "object_id": "sphere",
+                    "native_name": "c_657fdc2b228b14a6aba7:s_0f58b78bc54e0c3e5556",
+                    "state": "live",
+                    "exists": true,
+                    "material_id": "Vacuum",
+                    "volume_mm3": 523.598775598299,
+                    "solid": true,
+                    "hybrid": false,
+                    "volume_check": "analytic"
+                  }
+                ],
+                "bounds_mm": {
+                  "xmin": 10.0,
+                  "xmax": 1005.0,
+                  "ymin": -10.0,
+                  "ymax": 15.0,
+                  "zmin": -13.0,
+                  "zmax": 10.0
+                },
+                "calculation_bounds_mm": {
+                  "xmin": 10.0,
+                  "xmax": 1005.0,
+                  "ymin": -10.0,
+                  "ymax": 15.0,
+                  "zmin": -13.0,
+                  "zmax": 10.0
+                },
+                "per_solid_bounds": "not-queried; LooseBoundingBox structural-macro restriction",
+                "raw": {
+                  "nonce": "4265992f555d41c0857d6e65f9ff947b",
+                  "project": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\primitives\\constructed\\verification-managed-6a3652e49d2a433292105aeee64d59aa\\reopened\\definition",
+                  "count": "8",
+                  "bounds.xmin": "10",
+                  "calculation.xmin": "10",
+                  "bounds.xmax": "1005",
+                  "calculation.xmax": "1005",
+                  "bounds.ymin": "-10",
+                  "calculation.ymin": "-10",
+                  "bounds.ymax": "15",
+                  "calculation.ymax": "15",
+                  "bounds.zmin": "-13",
+                  "calculation.zmin": "-13",
+                  "bounds.zmax": "10",
+                  "calculation.zmax": "10",
+                  "solid.0.name": "c_657fdc2b228b14a6aba7:s_c762830741c126f19e44",
+                  "solid.0.exists": "-1",
+                  "solid.0.material": "Vacuum",
+                  "solid.0.volume_mm3": "8000",
+                  "solid.0.solid": "-1",
+                  "solid.0.hybrid": "0",
+                  "solid.1.name": "c_657fdc2b228b14a6aba7:s_442316fb7ee8e64850a4",
+                  "solid.1.exists": "-1",
+                  "solid.1.material": "Vacuum",
+                  "solid.1.volume_mm3": "6283.18530717958",
+                  "solid.1.solid": "-1",
+                  "solid.1.hybrid": "0",
+                  "solid.2.name": "c_657fdc2b228b14a6aba7:s_05e3853e5593cbaefd38",
+                  "solid.2.exists": "-1",
+                  "solid.2.material": "Vacuum",
+                  "solid.2.volume_mm3": "4712.38943201058",
+                  "solid.2.solid": "-1",
+                  "solid.2.hybrid": "0",
+                  "solid.3.name": "c_657fdc2b228b14a6aba7:s_b741e6aa7eec319e517f",
+                  "solid.3.exists": "-1",
+                  "solid.3.material": "Vacuum",
+                  "solid.3.volume_mm3": "6283.18986391813",
+                  "solid.3.solid": "-1",
+                  "solid.3.hybrid": "0",
+                  "solid.4.name": "c_657fdc2b228b14a6aba7:s_6416126ddc079f0331d6",
+                  "solid.4.exists": "-1",
+                  "solid.4.material": "Vacuum",
+                  "solid.4.volume_mm3": "4712.38943201058",
+                  "solid.4.solid": "-1",
+                  "solid.4.hybrid": "0",
+                  "solid.5.name": "c_657fdc2b228b14a6aba7:s_96d8b1db900607f722ac",
+                  "solid.5.exists": "-1",
+                  "solid.5.material": "Vacuum",
+                  "solid.5.volume_mm3": "6283.18075044104",
+                  "solid.5.solid": "-1",
+                  "solid.5.hybrid": "0",
+                  "solid.6.name": "c_657fdc2b228b14a6aba7:s_81e246a4bce9676ec302",
+                  "solid.6.exists": "-1",
+                  "solid.6.material": "Vacuum",
+                  "solid.6.volume_mm3": "4712.39080712808",
+                  "solid.6.solid": "-1",
+                  "solid.6.hybrid": "0",
+                  "solid.7.name": "c_657fdc2b228b14a6aba7:s_0f58b78bc54e0c3e5556",
+                  "solid.7.exists": "-1",
+                  "solid.7.material": "Vacuum",
+                  "solid.7.volume_mm3": "523.598775598299",
+                  "solid.7.solid": "-1",
+                  "solid.7.hybrid": "0",
+                  "end": "GEO1"
+                }
+              }
+            }
+          ]
+        },
+        "workspace": "artifacts\\geo234-native-ebb3e6df\\primitives",
+        "spec_sha256": "c3f6c73f4b4ab6e7059aa3379701f07ffce47584090dccd2e083c9b4f19daf7d"
+      },
+      "parameter_rebuild": {
+        "status": "verified",
+        "closure": {
+          "exit_code": 0,
+          "exit_confirmed": true
+        },
+        "geometry": {
+          "status": "verified",
+          "source": "native-query",
+          "objects": [
+            {
+              "object_id": "brick",
+              "native_name": "c_657fdc2b228b14a6aba7:s_c762830741c126f19e44",
+              "state": "live",
+              "exists": true,
+              "material_id": "Vacuum",
+              "volume_mm3": 13824.0,
+              "solid": true,
+              "hybrid": false,
+              "volume_check": "analytic"
+            },
+            {
+              "object_id": "cyl_x0",
+              "native_name": "c_657fdc2b228b14a6aba7:s_442316fb7ee8e64850a4",
+              "state": "live",
+              "exists": true,
+              "material_id": "Vacuum",
+              "volume_mm3": 10857.3442108063,
+              "solid": true,
+              "hybrid": false,
+              "volume_check": "analytic"
+            },
+            {
+              "object_id": "cyl_x1",
+              "native_name": "c_657fdc2b228b14a6aba7:s_05e3853e5593cbaefd38",
+              "state": "live",
+              "exists": true,
+              "material_id": "Vacuum",
+              "volume_mm3": 8143.00893851427,
+              "solid": true,
+              "hybrid": false,
+              "volume_check": "analytic"
+            },
+            {
+              "object_id": "cyl_y0",
+              "native_name": "c_657fdc2b228b14a6aba7:s_b741e6aa7eec319e517f",
+              "state": "live",
+              "exists": true,
+              "material_id": "Vacuum",
+              "volume_mm3": 10857.3481478284,
+              "solid": true,
+              "hybrid": false,
+              "volume_check": "analytic"
+            },
+            {
+              "object_id": "cyl_y1",
+              "native_name": "c_657fdc2b228b14a6aba7:s_6416126ddc079f0331d6",
+              "state": "live",
+              "exists": true,
+              "material_id": "Vacuum",
+              "volume_mm3": 8143.00893851426,
+              "solid": true,
+              "hybrid": false,
+              "volume_check": "analytic"
+            },
+            {
+              "object_id": "cyl_z0",
+              "native_name": "c_657fdc2b228b14a6aba7:s_96d8b1db900607f722ac",
+              "state": "live",
+              "exists": true,
+              "material_id": "Vacuum",
+              "volume_mm3": 10857.3363367621,
+              "solid": true,
+              "hybrid": false,
+              "volume_check": "analytic"
+            },
+            {
+              "object_id": "cyl_z1",
+              "native_name": "c_657fdc2b228b14a6aba7:s_81e246a4bce9676ec302",
+              "state": "live",
+              "exists": true,
+              "material_id": "Vacuum",
+              "volume_mm3": 8143.00500149216,
+              "solid": true,
+              "hybrid": false,
+              "volume_check": "analytic"
+            },
+            {
+              "object_id": "sphere",
+              "native_name": "c_657fdc2b228b14a6aba7:s_0f58b78bc54e0c3e5556",
+              "state": "live",
+              "exists": true,
+              "material_id": "Vacuum",
+              "volume_mm3": 904.77868423386,
+              "solid": true,
+              "hybrid": false,
+              "volume_check": "analytic"
+            }
+          ],
+          "bounds_mm": {
+            "xmin": 8.0,
+            "xmax": 1006.0,
+            "ymin": -12.0,
+            "ymax": 17.0,
+            "zmin": -15.0,
+            "zmax": 12.0
+          },
+          "calculation_bounds_mm": {
+            "xmin": 8.0,
+            "xmax": 1006.0,
+            "ymin": -12.0,
+            "ymax": 17.0,
+            "zmin": -15.0,
+            "zmax": 12.0
+          },
+          "per_solid_bounds": "not-queried; LooseBoundingBox structural-macro restriction",
+          "raw": {
+            "nonce": "6a61d3ff3de44f158c89c7b70f3c4e10",
+            "project": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\primitives-replay\\parameter-rebuild\\definition",
+            "count": "8",
+            "bounds.xmin": "8",
+            "calculation.xmin": "8",
+            "bounds.xmax": "1006",
+            "calculation.xmax": "1006",
+            "bounds.ymin": "-12",
+            "calculation.ymin": "-12",
+            "bounds.ymax": "17",
+            "calculation.ymax": "17",
+            "bounds.zmin": "-15",
+            "calculation.zmin": "-15",
+            "bounds.zmax": "12",
+            "calculation.zmax": "12",
+            "solid.0.name": "c_657fdc2b228b14a6aba7:s_c762830741c126f19e44",
+            "solid.0.exists": "-1",
+            "solid.0.material": "Vacuum",
+            "solid.0.volume_mm3": "13824",
+            "solid.0.solid": "-1",
+            "solid.0.hybrid": "0",
+            "solid.1.name": "c_657fdc2b228b14a6aba7:s_442316fb7ee8e64850a4",
+            "solid.1.exists": "-1",
+            "solid.1.material": "Vacuum",
+            "solid.1.volume_mm3": "10857.3442108063",
+            "solid.1.solid": "-1",
+            "solid.1.hybrid": "0",
+            "solid.2.name": "c_657fdc2b228b14a6aba7:s_05e3853e5593cbaefd38",
+            "solid.2.exists": "-1",
+            "solid.2.material": "Vacuum",
+            "solid.2.volume_mm3": "8143.00893851427",
+            "solid.2.solid": "-1",
+            "solid.2.hybrid": "0",
+            "solid.3.name": "c_657fdc2b228b14a6aba7:s_b741e6aa7eec319e517f",
+            "solid.3.exists": "-1",
+            "solid.3.material": "Vacuum",
+            "solid.3.volume_mm3": "10857.3481478284",
+            "solid.3.solid": "-1",
+            "solid.3.hybrid": "0",
+            "solid.4.name": "c_657fdc2b228b14a6aba7:s_6416126ddc079f0331d6",
+            "solid.4.exists": "-1",
+            "solid.4.material": "Vacuum",
+            "solid.4.volume_mm3": "8143.00893851426",
+            "solid.4.solid": "-1",
+            "solid.4.hybrid": "0",
+            "solid.5.name": "c_657fdc2b228b14a6aba7:s_96d8b1db900607f722ac",
+            "solid.5.exists": "-1",
+            "solid.5.material": "Vacuum",
+            "solid.5.volume_mm3": "10857.3363367621",
+            "solid.5.solid": "-1",
+            "solid.5.hybrid": "0",
+            "solid.6.name": "c_657fdc2b228b14a6aba7:s_81e246a4bce9676ec302",
+            "solid.6.exists": "-1",
+            "solid.6.material": "Vacuum",
+            "solid.6.volume_mm3": "8143.00500149216",
+            "solid.6.solid": "-1",
+            "solid.6.hybrid": "0",
+            "solid.7.name": "c_657fdc2b228b14a6aba7:s_0f58b78bc54e0c3e5556",
+            "solid.7.exists": "-1",
+            "solid.7.material": "Vacuum",
+            "solid.7.volume_mm3": "904.77868423386",
+            "solid.7.solid": "-1",
+            "solid.7.hybrid": "0",
+            "end": "GEO1"
+          }
+        },
+        "preserved_expression": "2*R"
+      }
+    },
+    "C2": {
+      "status": "verified",
+      "preexisting_wcs": {
+        "mode": "local",
+        "origin_mm": [
+          17,
+          23,
+          31
+        ],
+        "rotation_w_degrees": 30
+      },
+      "explicit_global": true,
+      "translation": {
+        "status": "verified",
+        "source_sha256": "0a66a9dac907deb973e0100c44a295a62b62522098ed3a448c9dcae5e1f65df1",
+        "closure": {
+          "exit_code": 0,
+          "exit_confirmed": true,
+          "quiet": {
+            "nonce": "f6af17286f99479b9668bb4e21c87ea6",
+            "readback": "not-exposed-by-COM",
+            "setter_returned": true,
+            "requested": true
+          },
+          "window_observation": {
+            "baseline_foreground": {
+              "hwnd": 19276814,
+              "pid": 71700,
+              "visible": true,
+              "minimized": false,
+              "owner": 0,
+              "window_class": "Windows.UI.Core.CoreWindow"
+            },
+            "observation": "WinEvent foreground/show hooks plus 50ms window polling",
+            "owned_foreground_events": 0,
+            "errors": [],
+            "dropped_events": 0,
+            "window_enumeration_gaps": 18,
+            "private_desktop": "CstTools_01513331655a4902848f46e022396925",
+            "desktop_handle_closed": true,
+            "owned_window_events": 182,
+            "minimize_actions": 0
+          },
+          "window_observation_path": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\translated-local-wcs\\constructed\\window-observation.json"
+        },
+        "proof": {
+          "schema_version": 1,
+          "status": "verified",
+          "scope": "root",
+          "source_sha256": "0a66a9dac907deb973e0100c44a295a62b62522098ed3a448c9dcae5e1f65df1",
+          "validation_target": "geometry",
+          "gates": [
+            "saved-reopened",
+            "identity",
+            "settings",
+            "standard-close"
+          ],
+          "diagnostics": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\translated-local-wcs\\constructed\\verification-managed-bf694f1b4eec4c86a17fbad1d8f5c852",
+          "installation": {
+            "executable": "D:\\Program Files (x86)\\CST Studio Suite 2022\\CST DESIGN ENVIRONMENT.exe",
+            "launcher_sha256": "bde34d5ad5b7ec46500ab8d0a1da2eb04b198e27ed06d1d7de3ffe8ec55c397e",
+            "modeler_sha256": "a1cb2ec6316592020e81129fa0687343db2c650d82286c79a22ef4e08310db98",
+            "profile_major": "2022"
+          },
+          "sessions": [
+            {
+              "phase": "saved",
+              "exit_code": 0,
+              "exit_confirmed": true
+            },
+            {
+              "phase": "reopened",
+              "exit_code": 0,
+              "exit_confirmed": true
+            }
+          ],
+          "observations": [
+            {
+              "phase": "saved",
+              "sha256": "17ee0ef1ab91f615f314059f5bc9cca4b72fd8ccb12c46784630c3c2df147559",
+              "native": {
+                "nonce": "ee2f77a1f0514afca52741c98fecb330",
+                "project": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\translated-local-wcs\\constructed\\verification-managed-bf694f1b4eec4c86a17fbad1d8f5c852\\saved\\definition",
+                "build": "Version 2022.5 - Jun 03 2022",
+                "length": "mm",
+                "frequency": "MHz",
+                "end": "G03V1"
+              },
+              "geometry": {
+                "status": "verified",
+                "source": "native-query",
+                "objects": [
+                  {
+                    "object_id": "body",
+                    "native_name": "c_657fdc2b228b14a6aba7:s_230d8358dc8e8890b4c5",
+                    "state": "live",
+                    "exists": true,
+                    "material_id": "Vacuum",
+                    "volume_mm3": 8000.0,
+                    "solid": true,
+                    "hybrid": false,
+                    "volume_check": "analytic"
+                  }
+                ],
+                "bounds_mm": {
+                  "xmin": 20.0,
+                  "xmax": 40.0,
+                  "ymin": -20.0,
+                  "ymax": 0.0,
+                  "zmin": -5.0,
+                  "zmax": 15.0
+                },
+                "calculation_bounds_mm": {
+                  "xmin": 20.0,
+                  "xmax": 40.0,
+                  "ymin": -20.0,
+                  "ymax": 0.0,
+                  "zmin": -5.0,
+                  "zmax": 15.0
+                },
+                "per_solid_bounds": "not-queried; LooseBoundingBox structural-macro restriction",
+                "raw": {
+                  "nonce": "ee2f77a1f0514afca52741c98fecb330",
+                  "project": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\translated-local-wcs\\constructed\\verification-managed-bf694f1b4eec4c86a17fbad1d8f5c852\\saved\\definition",
+                  "count": "1",
+                  "bounds.xmin": "20",
+                  "calculation.xmin": "20",
+                  "bounds.xmax": "40",
+                  "calculation.xmax": "40",
+                  "bounds.ymin": "-20",
+                  "calculation.ymin": "-20",
+                  "bounds.ymax": "0",
+                  "calculation.ymax": "0",
+                  "bounds.zmin": "-5",
+                  "calculation.zmin": "-5",
+                  "bounds.zmax": "15",
+                  "calculation.zmax": "15",
+                  "solid.0.name": "c_657fdc2b228b14a6aba7:s_230d8358dc8e8890b4c5",
+                  "solid.0.exists": "-1",
+                  "solid.0.material": "Vacuum",
+                  "solid.0.volume_mm3": "8000",
+                  "solid.0.solid": "-1",
+                  "solid.0.hybrid": "0",
+                  "end": "GEO1"
+                }
+              }
+            },
+            {
+              "phase": "reopened",
+              "sha256": "58ff23a2bb4ce5118e15859679e3685a49ef766f165aad0a2df5dc3b72921f6f",
+              "native": {
+                "nonce": "316f66496d2e435dba28c132a6ac1060",
+                "project": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\translated-local-wcs\\constructed\\verification-managed-bf694f1b4eec4c86a17fbad1d8f5c852\\reopened\\definition",
+                "build": "Version 2022.5 - Jun 03 2022",
+                "length": "mm",
+                "frequency": "MHz",
+                "end": "G03V1"
+              },
+              "geometry": {
+                "status": "verified",
+                "source": "native-query",
+                "objects": [
+                  {
+                    "object_id": "body",
+                    "native_name": "c_657fdc2b228b14a6aba7:s_230d8358dc8e8890b4c5",
+                    "state": "live",
+                    "exists": true,
+                    "material_id": "Vacuum",
+                    "volume_mm3": 8000.0,
+                    "solid": true,
+                    "hybrid": false,
+                    "volume_check": "analytic"
+                  }
+                ],
+                "bounds_mm": {
+                  "xmin": 20.0,
+                  "xmax": 40.0,
+                  "ymin": -20.0,
+                  "ymax": 0.0,
+                  "zmin": -5.0,
+                  "zmax": 15.0
+                },
+                "calculation_bounds_mm": {
+                  "xmin": 20.0,
+                  "xmax": 40.0,
+                  "ymin": -20.0,
+                  "ymax": 0.0,
+                  "zmin": -5.0,
+                  "zmax": 15.0
+                },
+                "per_solid_bounds": "not-queried; LooseBoundingBox structural-macro restriction",
+                "raw": {
+                  "nonce": "316f66496d2e435dba28c132a6ac1060",
+                  "project": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\translated-local-wcs\\constructed\\verification-managed-bf694f1b4eec4c86a17fbad1d8f5c852\\reopened\\definition",
+                  "count": "1",
+                  "bounds.xmin": "20",
+                  "calculation.xmin": "20",
+                  "bounds.xmax": "40",
+                  "calculation.xmax": "40",
+                  "bounds.ymin": "-20",
+                  "calculation.ymin": "-20",
+                  "bounds.ymax": "0",
+                  "calculation.ymax": "0",
+                  "bounds.zmin": "-5",
+                  "calculation.zmin": "-5",
+                  "bounds.zmax": "15",
+                  "calculation.zmax": "15",
+                  "solid.0.name": "c_657fdc2b228b14a6aba7:s_230d8358dc8e8890b4c5",
+                  "solid.0.exists": "-1",
+                  "solid.0.material": "Vacuum",
+                  "solid.0.volume_mm3": "8000",
+                  "solid.0.solid": "-1",
+                  "solid.0.hybrid": "0",
+                  "end": "GEO1"
+                }
+              }
+            }
+          ]
+        },
+        "workspace": "artifacts\\geo234-native-ebb3e6df\\translated-local-wcs",
+        "spec_sha256": "a4272b7af25805700fc6a160dc2e1ce57ec4782a232d29daf5b922a111f76b15"
+      }
+    },
+    "C3": {
+      "status": "verified",
+      "overlap_cases": [
+        {
+          "operation": "union",
+          "volume_mm3": 10000.0,
+          "record": {
+            "status": "verified",
+            "source_sha256": "ff8ec726bfa5e5ecc83e9ab5b7f3474890c6679bba0f47ae600a7c64737e935a",
+            "closure": {
+              "exit_code": 0,
+              "exit_confirmed": true,
+              "quiet": {
+                "nonce": "0f1397f0f9a8417ba51c2866263cb6f7",
+                "readback": "not-exposed-by-COM",
+                "setter_returned": true,
+                "requested": true
+              },
+              "window_observation": {
+                "baseline_foreground": {
+                  "hwnd": 19276814,
+                  "pid": 71700,
+                  "visible": true,
+                  "minimized": false,
+                  "owner": 0,
+                  "window_class": "Windows.UI.Core.CoreWindow"
+                },
+                "observation": "WinEvent foreground/show hooks plus 50ms window polling",
+                "owned_foreground_events": 0,
+                "errors": [],
+                "dropped_events": 0,
+                "window_enumeration_gaps": 17,
+                "private_desktop": "CstTools_67224ab02dc64621853ace7b1ab3679e",
+                "desktop_handle_closed": true,
+                "owned_window_events": 182,
+                "minimize_actions": 0
+              },
+              "window_observation_path": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\boolean-union\\constructed\\window-observation.json"
+            },
+            "proof": {
+              "schema_version": 1,
+              "status": "verified",
+              "scope": "root",
+              "source_sha256": "ff8ec726bfa5e5ecc83e9ab5b7f3474890c6679bba0f47ae600a7c64737e935a",
+              "validation_target": "geometry",
+              "gates": [
+                "saved-reopened",
+                "identity",
+                "settings",
+                "standard-close"
+              ],
+              "diagnostics": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\boolean-union\\constructed\\verification-managed-9ea6b79657834c9b94644a344ad986ab",
+              "installation": {
+                "executable": "D:\\Program Files (x86)\\CST Studio Suite 2022\\CST DESIGN ENVIRONMENT.exe",
+                "launcher_sha256": "bde34d5ad5b7ec46500ab8d0a1da2eb04b198e27ed06d1d7de3ffe8ec55c397e",
+                "modeler_sha256": "a1cb2ec6316592020e81129fa0687343db2c650d82286c79a22ef4e08310db98",
+                "profile_major": "2022"
+              },
+              "sessions": [
+                {
+                  "phase": "saved",
+                  "exit_code": 0,
+                  "exit_confirmed": true
+                },
+                {
+                  "phase": "reopened",
+                  "exit_code": 0,
+                  "exit_confirmed": true
+                }
+              ],
+              "observations": [
+                {
+                  "phase": "saved",
+                  "sha256": "2b6f088eff4667b6565a6d396ac452eebf21d18ff2142c11ec95fce544622c8a",
+                  "native": {
+                    "nonce": "8d18b168e0784210bbff308f6e436cd0",
+                    "project": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\boolean-union\\constructed\\verification-managed-9ea6b79657834c9b94644a344ad986ab\\saved\\definition",
+                    "build": "Version 2022.5 - Jun 03 2022",
+                    "length": "mm",
+                    "frequency": "MHz",
+                    "end": "G03V1"
+                  },
+                  "geometry": {
+                    "status": "verified",
+                    "source": "native-query",
+                    "objects": [
+                      {
+                        "object_id": "target",
+                        "native_name": "c_657fdc2b228b14a6aba7:s_34a04005bcaf206eec99",
+                        "state": "live",
+                        "exists": true,
+                        "material_id": "Vacuum",
+                        "volume_mm3": 10000.0,
+                        "solid": true,
+                        "hybrid": false,
+                        "volume_check": "positive-only-CSG-not-general-equivalence"
+                      },
+                      {
+                        "object_id": "tool",
+                        "native_name": "c_657fdc2b228b14a6aba7:s_7c9bbe5ec9b3fb774e8f",
+                        "state": "consumed",
+                        "exists": false
+                      }
+                    ],
+                    "bounds_mm": {
+                      "xmin": -10.0,
+                      "xmax": 15.0,
+                      "ymin": -10.0,
+                      "ymax": 10.0,
+                      "zmin": -10.0,
+                      "zmax": 10.0
+                    },
+                    "calculation_bounds_mm": {
+                      "xmin": -10.0,
+                      "xmax": 15.0,
+                      "ymin": -10.0,
+                      "ymax": 10.0,
+                      "zmin": -10.0,
+                      "zmax": 10.0
+                    },
+                    "per_solid_bounds": "not-queried; LooseBoundingBox structural-macro restriction",
+                    "raw": {
+                      "nonce": "8d18b168e0784210bbff308f6e436cd0",
+                      "project": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\boolean-union\\constructed\\verification-managed-9ea6b79657834c9b94644a344ad986ab\\saved\\definition",
+                      "count": "1",
+                      "bounds.xmin": "-10",
+                      "calculation.xmin": "-10",
+                      "bounds.xmax": "15",
+                      "calculation.xmax": "15",
+                      "bounds.ymin": "-10",
+                      "calculation.ymin": "-10",
+                      "bounds.ymax": "10",
+                      "calculation.ymax": "10",
+                      "bounds.zmin": "-10",
+                      "calculation.zmin": "-10",
+                      "bounds.zmax": "10",
+                      "calculation.zmax": "10",
+                      "solid.0.name": "c_657fdc2b228b14a6aba7:s_34a04005bcaf206eec99",
+                      "solid.0.exists": "-1",
+                      "solid.0.material": "Vacuum",
+                      "solid.0.volume_mm3": "10000",
+                      "solid.0.solid": "-1",
+                      "solid.0.hybrid": "0",
+                      "solid.1.name": "c_657fdc2b228b14a6aba7:s_7c9bbe5ec9b3fb774e8f",
+                      "solid.1.exists": "0",
+                      "end": "GEO1"
+                    }
+                  }
+                },
+                {
+                  "phase": "reopened",
+                  "sha256": "f79f4a4d82420c82ec563b3c808df6fc19653d6321c212c55e54e9baff816e6f",
+                  "native": {
+                    "nonce": "399142d13a8a49aeb0f50b255f73140b",
+                    "project": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\boolean-union\\constructed\\verification-managed-9ea6b79657834c9b94644a344ad986ab\\reopened\\definition",
+                    "build": "Version 2022.5 - Jun 03 2022",
+                    "length": "mm",
+                    "frequency": "MHz",
+                    "end": "G03V1"
+                  },
+                  "geometry": {
+                    "status": "verified",
+                    "source": "native-query",
+                    "objects": [
+                      {
+                        "object_id": "target",
+                        "native_name": "c_657fdc2b228b14a6aba7:s_34a04005bcaf206eec99",
+                        "state": "live",
+                        "exists": true,
+                        "material_id": "Vacuum",
+                        "volume_mm3": 10000.0,
+                        "solid": true,
+                        "hybrid": false,
+                        "volume_check": "positive-only-CSG-not-general-equivalence"
+                      },
+                      {
+                        "object_id": "tool",
+                        "native_name": "c_657fdc2b228b14a6aba7:s_7c9bbe5ec9b3fb774e8f",
+                        "state": "consumed",
+                        "exists": false
+                      }
+                    ],
+                    "bounds_mm": {
+                      "xmin": -10.0,
+                      "xmax": 15.0,
+                      "ymin": -10.0,
+                      "ymax": 10.0,
+                      "zmin": -10.0,
+                      "zmax": 10.0
+                    },
+                    "calculation_bounds_mm": {
+                      "xmin": -10.0,
+                      "xmax": 15.0,
+                      "ymin": -10.0,
+                      "ymax": 10.0,
+                      "zmin": -10.0,
+                      "zmax": 10.0
+                    },
+                    "per_solid_bounds": "not-queried; LooseBoundingBox structural-macro restriction",
+                    "raw": {
+                      "nonce": "399142d13a8a49aeb0f50b255f73140b",
+                      "project": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\boolean-union\\constructed\\verification-managed-9ea6b79657834c9b94644a344ad986ab\\reopened\\definition",
+                      "count": "1",
+                      "bounds.xmin": "-10",
+                      "calculation.xmin": "-10",
+                      "bounds.xmax": "15",
+                      "calculation.xmax": "15",
+                      "bounds.ymin": "-10",
+                      "calculation.ymin": "-10",
+                      "bounds.ymax": "10",
+                      "calculation.ymax": "10",
+                      "bounds.zmin": "-10",
+                      "calculation.zmin": "-10",
+                      "bounds.zmax": "10",
+                      "calculation.zmax": "10",
+                      "solid.0.name": "c_657fdc2b228b14a6aba7:s_34a04005bcaf206eec99",
+                      "solid.0.exists": "-1",
+                      "solid.0.material": "Vacuum",
+                      "solid.0.volume_mm3": "10000",
+                      "solid.0.solid": "-1",
+                      "solid.0.hybrid": "0",
+                      "solid.1.name": "c_657fdc2b228b14a6aba7:s_7c9bbe5ec9b3fb774e8f",
+                      "solid.1.exists": "0",
+                      "end": "GEO1"
+                    }
+                  }
+                }
+              ]
+            },
+            "workspace": "artifacts\\geo234-native-ebb3e6df\\boolean-union",
+            "spec_sha256": "f2552f1a12acde8d10d370dfd18af3120d3e74106272989adf5598fc07625156"
+          }
+        },
+        {
+          "operation": "difference",
+          "volume_mm3": 2000.0,
+          "record": {
+            "status": "verified",
+            "source_sha256": "fa0e05f74df51fa8db39793ebd921f7dccb11fd43499ab23d26ba9d224747dd8",
+            "closure": {
+              "exit_code": 0,
+              "exit_confirmed": true,
+              "quiet": {
+                "nonce": "be3a6c8c308e4a66a8a063a113c4d6e6",
+                "readback": "not-exposed-by-COM",
+                "setter_returned": true,
+                "requested": true
+              },
+              "window_observation": {
+                "baseline_foreground": {
+                  "hwnd": 19276814,
+                  "pid": 71700,
+                  "visible": true,
+                  "minimized": false,
+                  "owner": 0,
+                  "window_class": "Windows.UI.Core.CoreWindow"
+                },
+                "observation": "WinEvent foreground/show hooks plus 50ms window polling",
+                "owned_foreground_events": 0,
+                "errors": [],
+                "dropped_events": 0,
+                "window_enumeration_gaps": 17,
+                "private_desktop": "CstTools_67a0ac132a494274b41c3ba395da1180",
+                "desktop_handle_closed": true,
+                "owned_window_events": 184,
+                "minimize_actions": 0
+              },
+              "window_observation_path": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\boolean-difference\\constructed\\window-observation.json"
+            },
+            "proof": {
+              "schema_version": 1,
+              "status": "verified",
+              "scope": "root",
+              "source_sha256": "fa0e05f74df51fa8db39793ebd921f7dccb11fd43499ab23d26ba9d224747dd8",
+              "validation_target": "geometry",
+              "gates": [
+                "saved-reopened",
+                "identity",
+                "settings",
+                "standard-close"
+              ],
+              "diagnostics": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\boolean-difference\\constructed\\verification-managed-2c49a4c4b518410cb108835ca4e1762e",
+              "installation": {
+                "executable": "D:\\Program Files (x86)\\CST Studio Suite 2022\\CST DESIGN ENVIRONMENT.exe",
+                "launcher_sha256": "bde34d5ad5b7ec46500ab8d0a1da2eb04b198e27ed06d1d7de3ffe8ec55c397e",
+                "modeler_sha256": "a1cb2ec6316592020e81129fa0687343db2c650d82286c79a22ef4e08310db98",
+                "profile_major": "2022"
+              },
+              "sessions": [
+                {
+                  "phase": "saved",
+                  "exit_code": 0,
+                  "exit_confirmed": true
+                },
+                {
+                  "phase": "reopened",
+                  "exit_code": 0,
+                  "exit_confirmed": true
+                }
+              ],
+              "observations": [
+                {
+                  "phase": "saved",
+                  "sha256": "52c26bdc262d998bd50514384e1dc5ba7d551323533617f0adec84f1920ac6e6",
+                  "native": {
+                    "nonce": "23f9800f81a84bba9dc80541b4a940ea",
+                    "project": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\boolean-difference\\constructed\\verification-managed-2c49a4c4b518410cb108835ca4e1762e\\saved\\definition",
+                    "build": "Version 2022.5 - Jun 03 2022",
+                    "length": "mm",
+                    "frequency": "MHz",
+                    "end": "G03V1"
+                  },
+                  "geometry": {
+                    "status": "verified",
+                    "source": "native-query",
+                    "objects": [
+                      {
+                        "object_id": "target",
+                        "native_name": "c_657fdc2b228b14a6aba7:s_34a04005bcaf206eec99",
+                        "state": "live",
+                        "exists": true,
+                        "material_id": "Vacuum",
+                        "volume_mm3": 2000.0,
+                        "solid": true,
+                        "hybrid": false,
+                        "volume_check": "positive-only-CSG-not-general-equivalence"
+                      },
+                      {
+                        "object_id": "tool",
+                        "native_name": "c_657fdc2b228b14a6aba7:s_7c9bbe5ec9b3fb774e8f",
+                        "state": "consumed",
+                        "exists": false
+                      }
+                    ],
+                    "bounds_mm": {
+                      "xmin": -10.0,
+                      "xmax": -5.0,
+                      "ymin": -10.0,
+                      "ymax": 10.0,
+                      "zmin": -10.0,
+                      "zmax": 10.0
+                    },
+                    "calculation_bounds_mm": {
+                      "xmin": -10.0,
+                      "xmax": -5.0,
+                      "ymin": -10.0,
+                      "ymax": 10.0,
+                      "zmin": -10.0,
+                      "zmax": 10.0
+                    },
+                    "per_solid_bounds": "not-queried; LooseBoundingBox structural-macro restriction",
+                    "raw": {
+                      "nonce": "23f9800f81a84bba9dc80541b4a940ea",
+                      "project": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\boolean-difference\\constructed\\verification-managed-2c49a4c4b518410cb108835ca4e1762e\\saved\\definition",
+                      "count": "1",
+                      "bounds.xmin": "-10",
+                      "calculation.xmin": "-10",
+                      "bounds.xmax": "-5",
+                      "calculation.xmax": "-5",
+                      "bounds.ymin": "-10",
+                      "calculation.ymin": "-10",
+                      "bounds.ymax": "10",
+                      "calculation.ymax": "10",
+                      "bounds.zmin": "-10",
+                      "calculation.zmin": "-10",
+                      "bounds.zmax": "10",
+                      "calculation.zmax": "10",
+                      "solid.0.name": "c_657fdc2b228b14a6aba7:s_34a04005bcaf206eec99",
+                      "solid.0.exists": "-1",
+                      "solid.0.material": "Vacuum",
+                      "solid.0.volume_mm3": "2000",
+                      "solid.0.solid": "-1",
+                      "solid.0.hybrid": "0",
+                      "solid.1.name": "c_657fdc2b228b14a6aba7:s_7c9bbe5ec9b3fb774e8f",
+                      "solid.1.exists": "0",
+                      "end": "GEO1"
+                    }
+                  }
+                },
+                {
+                  "phase": "reopened",
+                  "sha256": "ef0e67dbd9ef5608bd9f53b1100c5caf5983f246184654b692547cde2a92759e",
+                  "native": {
+                    "nonce": "2f2c8796f51d4f6fb2484c6ccec4c1d5",
+                    "project": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\boolean-difference\\constructed\\verification-managed-2c49a4c4b518410cb108835ca4e1762e\\reopened\\definition",
+                    "build": "Version 2022.5 - Jun 03 2022",
+                    "length": "mm",
+                    "frequency": "MHz",
+                    "end": "G03V1"
+                  },
+                  "geometry": {
+                    "status": "verified",
+                    "source": "native-query",
+                    "objects": [
+                      {
+                        "object_id": "target",
+                        "native_name": "c_657fdc2b228b14a6aba7:s_34a04005bcaf206eec99",
+                        "state": "live",
+                        "exists": true,
+                        "material_id": "Vacuum",
+                        "volume_mm3": 2000.0,
+                        "solid": true,
+                        "hybrid": false,
+                        "volume_check": "positive-only-CSG-not-general-equivalence"
+                      },
+                      {
+                        "object_id": "tool",
+                        "native_name": "c_657fdc2b228b14a6aba7:s_7c9bbe5ec9b3fb774e8f",
+                        "state": "consumed",
+                        "exists": false
+                      }
+                    ],
+                    "bounds_mm": {
+                      "xmin": -10.0,
+                      "xmax": -5.0,
+                      "ymin": -10.0,
+                      "ymax": 10.0,
+                      "zmin": -10.0,
+                      "zmax": 10.0
+                    },
+                    "calculation_bounds_mm": {
+                      "xmin": -10.0,
+                      "xmax": -5.0,
+                      "ymin": -10.0,
+                      "ymax": 10.0,
+                      "zmin": -10.0,
+                      "zmax": 10.0
+                    },
+                    "per_solid_bounds": "not-queried; LooseBoundingBox structural-macro restriction",
+                    "raw": {
+                      "nonce": "2f2c8796f51d4f6fb2484c6ccec4c1d5",
+                      "project": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\boolean-difference\\constructed\\verification-managed-2c49a4c4b518410cb108835ca4e1762e\\reopened\\definition",
+                      "count": "1",
+                      "bounds.xmin": "-10",
+                      "calculation.xmin": "-10",
+                      "bounds.xmax": "-5",
+                      "calculation.xmax": "-5",
+                      "bounds.ymin": "-10",
+                      "calculation.ymin": "-10",
+                      "bounds.ymax": "10",
+                      "calculation.ymax": "10",
+                      "bounds.zmin": "-10",
+                      "calculation.zmin": "-10",
+                      "bounds.zmax": "10",
+                      "calculation.zmax": "10",
+                      "solid.0.name": "c_657fdc2b228b14a6aba7:s_34a04005bcaf206eec99",
+                      "solid.0.exists": "-1",
+                      "solid.0.material": "Vacuum",
+                      "solid.0.volume_mm3": "2000",
+                      "solid.0.solid": "-1",
+                      "solid.0.hybrid": "0",
+                      "solid.1.name": "c_657fdc2b228b14a6aba7:s_7c9bbe5ec9b3fb774e8f",
+                      "solid.1.exists": "0",
+                      "end": "GEO1"
+                    }
+                  }
+                }
+              ]
+            },
+            "workspace": "artifacts\\geo234-native-ebb3e6df\\boolean-difference",
+            "spec_sha256": "b1810ec1f207e7373fe014df33db0c5110da9f359efaf332e705ba3207c945a7"
+          }
+        },
+        {
+          "operation": "intersection",
+          "volume_mm3": 6000.0,
+          "record": {
+            "status": "verified",
+            "source_sha256": "af07f77410e6ad02e06564bde319da03c957341ea45eeb364c5471b21fbd8f2b",
+            "closure": {
+              "exit_code": 0,
+              "exit_confirmed": true,
+              "quiet": {
+                "nonce": "61c95f0c12dc4a84ae12d32bca83c324",
+                "readback": "not-exposed-by-COM",
+                "setter_returned": true,
+                "requested": true
+              },
+              "window_observation": {
+                "baseline_foreground": {
+                  "hwnd": 19276814,
+                  "pid": 71700,
+                  "visible": true,
+                  "minimized": false,
+                  "owner": 0,
+                  "window_class": "Windows.UI.Core.CoreWindow"
+                },
+                "observation": "WinEvent foreground/show hooks plus 50ms window polling",
+                "owned_foreground_events": 0,
+                "errors": [],
+                "dropped_events": 0,
+                "window_enumeration_gaps": 18,
+                "private_desktop": "CstTools_f2a804c5420e4763b11386941173cf1f",
+                "desktop_handle_closed": true,
+                "owned_window_events": 182,
+                "minimize_actions": 0
+              },
+              "window_observation_path": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\boolean-intersection\\constructed\\window-observation.json"
+            },
+            "proof": {
+              "schema_version": 1,
+              "status": "verified",
+              "scope": "root",
+              "source_sha256": "af07f77410e6ad02e06564bde319da03c957341ea45eeb364c5471b21fbd8f2b",
+              "validation_target": "geometry",
+              "gates": [
+                "saved-reopened",
+                "identity",
+                "settings",
+                "standard-close"
+              ],
+              "diagnostics": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\boolean-intersection\\constructed\\verification-managed-e41bb979db3e462bb36503a92904f9f0",
+              "installation": {
+                "executable": "D:\\Program Files (x86)\\CST Studio Suite 2022\\CST DESIGN ENVIRONMENT.exe",
+                "launcher_sha256": "bde34d5ad5b7ec46500ab8d0a1da2eb04b198e27ed06d1d7de3ffe8ec55c397e",
+                "modeler_sha256": "a1cb2ec6316592020e81129fa0687343db2c650d82286c79a22ef4e08310db98",
+                "profile_major": "2022"
+              },
+              "sessions": [
+                {
+                  "phase": "saved",
+                  "exit_code": 0,
+                  "exit_confirmed": true
+                },
+                {
+                  "phase": "reopened",
+                  "exit_code": 0,
+                  "exit_confirmed": true
+                }
+              ],
+              "observations": [
+                {
+                  "phase": "saved",
+                  "sha256": "31cf21f774853306dd9b106620490b5713b935ab344baba21271ce8ddfd7d94d",
+                  "native": {
+                    "nonce": "0c7c3ed84c8544c1909e9f2cba810ba9",
+                    "project": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\boolean-intersection\\constructed\\verification-managed-e41bb979db3e462bb36503a92904f9f0\\saved\\definition",
+                    "build": "Version 2022.5 - Jun 03 2022",
+                    "length": "mm",
+                    "frequency": "MHz",
+                    "end": "G03V1"
+                  },
+                  "geometry": {
+                    "status": "verified",
+                    "source": "native-query",
+                    "objects": [
+                      {
+                        "object_id": "target",
+                        "native_name": "c_657fdc2b228b14a6aba7:s_34a04005bcaf206eec99",
+                        "state": "live",
+                        "exists": true,
+                        "material_id": "Vacuum",
+                        "volume_mm3": 6000.0,
+                        "solid": true,
+                        "hybrid": false,
+                        "volume_check": "positive-only-CSG-not-general-equivalence"
+                      },
+                      {
+                        "object_id": "tool",
+                        "native_name": "c_657fdc2b228b14a6aba7:s_7c9bbe5ec9b3fb774e8f",
+                        "state": "consumed",
+                        "exists": false
+                      }
+                    ],
+                    "bounds_mm": {
+                      "xmin": -5.0,
+                      "xmax": 10.0,
+                      "ymin": -10.0,
+                      "ymax": 10.0,
+                      "zmin": -10.0,
+                      "zmax": 10.0
+                    },
+                    "calculation_bounds_mm": {
+                      "xmin": -5.0,
+                      "xmax": 10.0,
+                      "ymin": -10.0,
+                      "ymax": 10.0,
+                      "zmin": -10.0,
+                      "zmax": 10.0
+                    },
+                    "per_solid_bounds": "not-queried; LooseBoundingBox structural-macro restriction",
+                    "raw": {
+                      "nonce": "0c7c3ed84c8544c1909e9f2cba810ba9",
+                      "project": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\boolean-intersection\\constructed\\verification-managed-e41bb979db3e462bb36503a92904f9f0\\saved\\definition",
+                      "count": "1",
+                      "bounds.xmin": "-5",
+                      "calculation.xmin": "-5",
+                      "bounds.xmax": "10",
+                      "calculation.xmax": "10",
+                      "bounds.ymin": "-10",
+                      "calculation.ymin": "-10",
+                      "bounds.ymax": "10",
+                      "calculation.ymax": "10",
+                      "bounds.zmin": "-10",
+                      "calculation.zmin": "-10",
+                      "bounds.zmax": "10",
+                      "calculation.zmax": "10",
+                      "solid.0.name": "c_657fdc2b228b14a6aba7:s_34a04005bcaf206eec99",
+                      "solid.0.exists": "-1",
+                      "solid.0.material": "Vacuum",
+                      "solid.0.volume_mm3": "6000",
+                      "solid.0.solid": "-1",
+                      "solid.0.hybrid": "0",
+                      "solid.1.name": "c_657fdc2b228b14a6aba7:s_7c9bbe5ec9b3fb774e8f",
+                      "solid.1.exists": "0",
+                      "end": "GEO1"
+                    }
+                  }
+                },
+                {
+                  "phase": "reopened",
+                  "sha256": "b7e056e5846a67ca97a03b46836df43fd8fbb9613621ff12101291fddfd45e82",
+                  "native": {
+                    "nonce": "21e884efa9484d5c88e4c10d33913d21",
+                    "project": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\boolean-intersection\\constructed\\verification-managed-e41bb979db3e462bb36503a92904f9f0\\reopened\\definition",
+                    "build": "Version 2022.5 - Jun 03 2022",
+                    "length": "mm",
+                    "frequency": "MHz",
+                    "end": "G03V1"
+                  },
+                  "geometry": {
+                    "status": "verified",
+                    "source": "native-query",
+                    "objects": [
+                      {
+                        "object_id": "target",
+                        "native_name": "c_657fdc2b228b14a6aba7:s_34a04005bcaf206eec99",
+                        "state": "live",
+                        "exists": true,
+                        "material_id": "Vacuum",
+                        "volume_mm3": 6000.0,
+                        "solid": true,
+                        "hybrid": false,
+                        "volume_check": "positive-only-CSG-not-general-equivalence"
+                      },
+                      {
+                        "object_id": "tool",
+                        "native_name": "c_657fdc2b228b14a6aba7:s_7c9bbe5ec9b3fb774e8f",
+                        "state": "consumed",
+                        "exists": false
+                      }
+                    ],
+                    "bounds_mm": {
+                      "xmin": -5.0,
+                      "xmax": 10.0,
+                      "ymin": -10.0,
+                      "ymax": 10.0,
+                      "zmin": -10.0,
+                      "zmax": 10.0
+                    },
+                    "calculation_bounds_mm": {
+                      "xmin": -5.0,
+                      "xmax": 10.0,
+                      "ymin": -10.0,
+                      "ymax": 10.0,
+                      "zmin": -10.0,
+                      "zmax": 10.0
+                    },
+                    "per_solid_bounds": "not-queried; LooseBoundingBox structural-macro restriction",
+                    "raw": {
+                      "nonce": "21e884efa9484d5c88e4c10d33913d21",
+                      "project": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\boolean-intersection\\constructed\\verification-managed-e41bb979db3e462bb36503a92904f9f0\\reopened\\definition",
+                      "count": "1",
+                      "bounds.xmin": "-5",
+                      "calculation.xmin": "-5",
+                      "bounds.xmax": "10",
+                      "calculation.xmax": "10",
+                      "bounds.ymin": "-10",
+                      "calculation.ymin": "-10",
+                      "bounds.ymax": "10",
+                      "calculation.ymax": "10",
+                      "bounds.zmin": "-10",
+                      "calculation.zmin": "-10",
+                      "bounds.zmax": "10",
+                      "calculation.zmax": "10",
+                      "solid.0.name": "c_657fdc2b228b14a6aba7:s_34a04005bcaf206eec99",
+                      "solid.0.exists": "-1",
+                      "solid.0.material": "Vacuum",
+                      "solid.0.volume_mm3": "6000",
+                      "solid.0.solid": "-1",
+                      "solid.0.hybrid": "0",
+                      "solid.1.name": "c_657fdc2b228b14a6aba7:s_7c9bbe5ec9b3fb774e8f",
+                      "solid.1.exists": "0",
+                      "end": "GEO1"
+                    }
+                  }
+                }
+              ]
+            },
+            "workspace": "artifacts\\geo234-native-ebb3e6df\\boolean-intersection",
+            "spec_sha256": "08a7dc524482a500869ceb3d8dd335d48ef84c0c96ab8bcdf019eaa863aaf182"
+          }
+        }
+      ],
+      "limits": "Empty/disconnected/tangent outputs are not certified as a general CAD equivalence; positive-solid/readback gates still apply.",
+      "edge_cases": [
+        {
+          "case": "disjoint-union",
+          "outcome": "verified-positive-solid",
+          "volume_mm3": 16000.0,
+          "record": {
+            "status": "verified",
+            "source_sha256": "e9fff0d6647aeb9a11b66d61dc00e66cccb83f73b766b6aa6e71aee81547fd21",
+            "closure": {
+              "exit_code": 0,
+              "exit_confirmed": true,
+              "quiet": {
+                "nonce": "257324d486d6432ebc5c7b731163bf77",
+                "readback": "not-exposed-by-COM",
+                "setter_returned": true,
+                "requested": true
+              },
+              "window_observation": {
+                "baseline_foreground": {
+                  "hwnd": 19276814,
+                  "pid": 71700,
+                  "visible": true,
+                  "minimized": false,
+                  "owner": 0,
+                  "window_class": "Windows.UI.Core.CoreWindow"
+                },
+                "observation": "WinEvent foreground/show hooks plus 50ms window polling",
+                "owned_foreground_events": 0,
+                "errors": [],
+                "dropped_events": 0,
+                "window_enumeration_gaps": 18,
+                "private_desktop": "CstTools_8325e05a7ed4460f946963ec06459860",
+                "desktop_handle_closed": true,
+                "owned_window_events": 183,
+                "minimize_actions": 0
+              },
+              "window_observation_path": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\edge-disjoint-union\\constructed\\window-observation.json"
+            },
+            "proof": {
+              "schema_version": 1,
+              "status": "verified",
+              "scope": "root",
+              "source_sha256": "e9fff0d6647aeb9a11b66d61dc00e66cccb83f73b766b6aa6e71aee81547fd21",
+              "validation_target": "geometry",
+              "gates": [
+                "saved-reopened",
+                "identity",
+                "settings",
+                "standard-close"
+              ],
+              "diagnostics": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\edge-disjoint-union\\constructed\\verification-managed-d1d6c9e8fbe04a3ab302a34380b79ef2",
+              "installation": {
+                "executable": "D:\\Program Files (x86)\\CST Studio Suite 2022\\CST DESIGN ENVIRONMENT.exe",
+                "launcher_sha256": "bde34d5ad5b7ec46500ab8d0a1da2eb04b198e27ed06d1d7de3ffe8ec55c397e",
+                "modeler_sha256": "a1cb2ec6316592020e81129fa0687343db2c650d82286c79a22ef4e08310db98",
+                "profile_major": "2022"
+              },
+              "sessions": [
+                {
+                  "phase": "saved",
+                  "exit_code": 0,
+                  "exit_confirmed": true
+                },
+                {
+                  "phase": "reopened",
+                  "exit_code": 0,
+                  "exit_confirmed": true
+                }
+              ],
+              "observations": [
+                {
+                  "phase": "saved",
+                  "sha256": "1146e06003c201c4a510ca3a840eb7c44f2ee6ddeedfc22be37cbc51e6d4bbe7",
+                  "native": {
+                    "nonce": "947e53f82f364b4580a90dc5697d1111",
+                    "project": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\edge-disjoint-union\\constructed\\verification-managed-d1d6c9e8fbe04a3ab302a34380b79ef2\\saved\\definition",
+                    "build": "Version 2022.5 - Jun 03 2022",
+                    "length": "mm",
+                    "frequency": "MHz",
+                    "end": "G03V1"
+                  },
+                  "geometry": {
+                    "status": "verified",
+                    "source": "native-query",
+                    "objects": [
+                      {
+                        "object_id": "target",
+                        "native_name": "c_657fdc2b228b14a6aba7:s_34a04005bcaf206eec99",
+                        "state": "live",
+                        "exists": true,
+                        "material_id": "Vacuum",
+                        "volume_mm3": 16000.0,
+                        "solid": true,
+                        "hybrid": false,
+                        "volume_check": "positive-only-CSG-not-general-equivalence"
+                      },
+                      {
+                        "object_id": "tool",
+                        "native_name": "c_657fdc2b228b14a6aba7:s_7c9bbe5ec9b3fb774e8f",
+                        "state": "consumed",
+                        "exists": false
+                      }
+                    ],
+                    "bounds_mm": {
+                      "xmin": -10.0,
+                      "xmax": 50.0,
+                      "ymin": -10.0,
+                      "ymax": 10.0,
+                      "zmin": -10.0,
+                      "zmax": 10.0
+                    },
+                    "calculation_bounds_mm": {
+                      "xmin": -10.0,
+                      "xmax": 50.0,
+                      "ymin": -10.0,
+                      "ymax": 10.0,
+                      "zmin": -10.0,
+                      "zmax": 10.0
+                    },
+                    "per_solid_bounds": "not-queried; LooseBoundingBox structural-macro restriction",
+                    "raw": {
+                      "nonce": "947e53f82f364b4580a90dc5697d1111",
+                      "project": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\edge-disjoint-union\\constructed\\verification-managed-d1d6c9e8fbe04a3ab302a34380b79ef2\\saved\\definition",
+                      "count": "1",
+                      "bounds.xmin": "-10",
+                      "calculation.xmin": "-10",
+                      "bounds.xmax": "50",
+                      "calculation.xmax": "50",
+                      "bounds.ymin": "-10",
+                      "calculation.ymin": "-10",
+                      "bounds.ymax": "10",
+                      "calculation.ymax": "10",
+                      "bounds.zmin": "-10",
+                      "calculation.zmin": "-10",
+                      "bounds.zmax": "10",
+                      "calculation.zmax": "10",
+                      "solid.0.name": "c_657fdc2b228b14a6aba7:s_34a04005bcaf206eec99",
+                      "solid.0.exists": "-1",
+                      "solid.0.material": "Vacuum",
+                      "solid.0.volume_mm3": "16000",
+                      "solid.0.solid": "-1",
+                      "solid.0.hybrid": "0",
+                      "solid.1.name": "c_657fdc2b228b14a6aba7:s_7c9bbe5ec9b3fb774e8f",
+                      "solid.1.exists": "0",
+                      "end": "GEO1"
+                    }
+                  }
+                },
+                {
+                  "phase": "reopened",
+                  "sha256": "5f6f2f005b0a9c5f7f361ec128d2e8c685e3304240a64e089e1e915e21e33f71",
+                  "native": {
+                    "nonce": "6a5af340b8c04862bd854377f2faa9c5",
+                    "project": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\edge-disjoint-union\\constructed\\verification-managed-d1d6c9e8fbe04a3ab302a34380b79ef2\\reopened\\definition",
+                    "build": "Version 2022.5 - Jun 03 2022",
+                    "length": "mm",
+                    "frequency": "MHz",
+                    "end": "G03V1"
+                  },
+                  "geometry": {
+                    "status": "verified",
+                    "source": "native-query",
+                    "objects": [
+                      {
+                        "object_id": "target",
+                        "native_name": "c_657fdc2b228b14a6aba7:s_34a04005bcaf206eec99",
+                        "state": "live",
+                        "exists": true,
+                        "material_id": "Vacuum",
+                        "volume_mm3": 16000.0,
+                        "solid": true,
+                        "hybrid": false,
+                        "volume_check": "positive-only-CSG-not-general-equivalence"
+                      },
+                      {
+                        "object_id": "tool",
+                        "native_name": "c_657fdc2b228b14a6aba7:s_7c9bbe5ec9b3fb774e8f",
+                        "state": "consumed",
+                        "exists": false
+                      }
+                    ],
+                    "bounds_mm": {
+                      "xmin": -10.0,
+                      "xmax": 50.0,
+                      "ymin": -10.0,
+                      "ymax": 10.0,
+                      "zmin": -10.0,
+                      "zmax": 10.0
+                    },
+                    "calculation_bounds_mm": {
+                      "xmin": -10.0,
+                      "xmax": 50.0,
+                      "ymin": -10.0,
+                      "ymax": 10.0,
+                      "zmin": -10.0,
+                      "zmax": 10.0
+                    },
+                    "per_solid_bounds": "not-queried; LooseBoundingBox structural-macro restriction",
+                    "raw": {
+                      "nonce": "6a5af340b8c04862bd854377f2faa9c5",
+                      "project": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\edge-disjoint-union\\constructed\\verification-managed-d1d6c9e8fbe04a3ab302a34380b79ef2\\reopened\\definition",
+                      "count": "1",
+                      "bounds.xmin": "-10",
+                      "calculation.xmin": "-10",
+                      "bounds.xmax": "50",
+                      "calculation.xmax": "50",
+                      "bounds.ymin": "-10",
+                      "calculation.ymin": "-10",
+                      "bounds.ymax": "10",
+                      "calculation.ymax": "10",
+                      "bounds.zmin": "-10",
+                      "calculation.zmin": "-10",
+                      "bounds.zmax": "10",
+                      "calculation.zmax": "10",
+                      "solid.0.name": "c_657fdc2b228b14a6aba7:s_34a04005bcaf206eec99",
+                      "solid.0.exists": "-1",
+                      "solid.0.material": "Vacuum",
+                      "solid.0.volume_mm3": "16000",
+                      "solid.0.solid": "-1",
+                      "solid.0.hybrid": "0",
+                      "solid.1.name": "c_657fdc2b228b14a6aba7:s_7c9bbe5ec9b3fb774e8f",
+                      "solid.1.exists": "0",
+                      "end": "GEO1"
+                    }
+                  }
+                }
+              ]
+            },
+            "workspace": "artifacts\\geo234-native-ebb3e6df\\edge-disjoint-union",
+            "spec_sha256": "c09334c882336b4c26eb4356912e986924a0e86d2c80725a114160ec82fee3e5"
+          }
+        },
+        {
+          "case": "tangent-union",
+          "outcome": "verified-positive-solid",
+          "volume_mm3": 16000.0,
+          "record": {
+            "status": "verified",
+            "source_sha256": "325c07515de95f670c23d6e2d2d16b8847e851d32fff37ce29bf456e2ddfa6aa",
+            "closure": {
+              "exit_code": 0,
+              "exit_confirmed": true,
+              "quiet": {
+                "nonce": "1729c09e7edb47f1bdd1263f489c384a",
+                "readback": "not-exposed-by-COM",
+                "setter_returned": true,
+                "requested": true
+              },
+              "window_observation": {
+                "baseline_foreground": {
+                  "hwnd": 19276814,
+                  "pid": 71700,
+                  "visible": true,
+                  "minimized": false,
+                  "owner": 0,
+                  "window_class": "Windows.UI.Core.CoreWindow"
+                },
+                "observation": "WinEvent foreground/show hooks plus 50ms window polling",
+                "owned_foreground_events": 0,
+                "errors": [],
+                "dropped_events": 0,
+                "window_enumeration_gaps": 18,
+                "private_desktop": "CstTools_4254db90ee874dc09ade3404d18530fa",
+                "desktop_handle_closed": true,
+                "owned_window_events": 183,
+                "minimize_actions": 0
+              },
+              "window_observation_path": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\edge-tangent-union\\constructed\\window-observation.json"
+            },
+            "proof": {
+              "schema_version": 1,
+              "status": "verified",
+              "scope": "root",
+              "source_sha256": "325c07515de95f670c23d6e2d2d16b8847e851d32fff37ce29bf456e2ddfa6aa",
+              "validation_target": "geometry",
+              "gates": [
+                "saved-reopened",
+                "identity",
+                "settings",
+                "standard-close"
+              ],
+              "diagnostics": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\edge-tangent-union\\constructed\\verification-managed-1b5006328d744e19bb65e40780bd02ca",
+              "installation": {
+                "executable": "D:\\Program Files (x86)\\CST Studio Suite 2022\\CST DESIGN ENVIRONMENT.exe",
+                "launcher_sha256": "bde34d5ad5b7ec46500ab8d0a1da2eb04b198e27ed06d1d7de3ffe8ec55c397e",
+                "modeler_sha256": "a1cb2ec6316592020e81129fa0687343db2c650d82286c79a22ef4e08310db98",
+                "profile_major": "2022"
+              },
+              "sessions": [
+                {
+                  "phase": "saved",
+                  "exit_code": 0,
+                  "exit_confirmed": true
+                },
+                {
+                  "phase": "reopened",
+                  "exit_code": 0,
+                  "exit_confirmed": true
+                }
+              ],
+              "observations": [
+                {
+                  "phase": "saved",
+                  "sha256": "abb10a86e4212e8b8eb1ff8996fb34677d73626e823305eabfa0a4fead4dbe68",
+                  "native": {
+                    "nonce": "c9ed44f95f4f4bbba5ce17b82cc6fe04",
+                    "project": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\edge-tangent-union\\constructed\\verification-managed-1b5006328d744e19bb65e40780bd02ca\\saved\\definition",
+                    "build": "Version 2022.5 - Jun 03 2022",
+                    "length": "mm",
+                    "frequency": "MHz",
+                    "end": "G03V1"
+                  },
+                  "geometry": {
+                    "status": "verified",
+                    "source": "native-query",
+                    "objects": [
+                      {
+                        "object_id": "target",
+                        "native_name": "c_657fdc2b228b14a6aba7:s_34a04005bcaf206eec99",
+                        "state": "live",
+                        "exists": true,
+                        "material_id": "Vacuum",
+                        "volume_mm3": 16000.0,
+                        "solid": true,
+                        "hybrid": false,
+                        "volume_check": "positive-only-CSG-not-general-equivalence"
+                      },
+                      {
+                        "object_id": "tool",
+                        "native_name": "c_657fdc2b228b14a6aba7:s_7c9bbe5ec9b3fb774e8f",
+                        "state": "consumed",
+                        "exists": false
+                      }
+                    ],
+                    "bounds_mm": {
+                      "xmin": -10.0,
+                      "xmax": 30.0,
+                      "ymin": -10.0,
+                      "ymax": 10.0,
+                      "zmin": -10.0,
+                      "zmax": 10.0
+                    },
+                    "calculation_bounds_mm": {
+                      "xmin": -10.0,
+                      "xmax": 30.0,
+                      "ymin": -10.0,
+                      "ymax": 10.0,
+                      "zmin": -10.0,
+                      "zmax": 10.0
+                    },
+                    "per_solid_bounds": "not-queried; LooseBoundingBox structural-macro restriction",
+                    "raw": {
+                      "nonce": "c9ed44f95f4f4bbba5ce17b82cc6fe04",
+                      "project": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\edge-tangent-union\\constructed\\verification-managed-1b5006328d744e19bb65e40780bd02ca\\saved\\definition",
+                      "count": "1",
+                      "bounds.xmin": "-10",
+                      "calculation.xmin": "-10",
+                      "bounds.xmax": "30",
+                      "calculation.xmax": "30",
+                      "bounds.ymin": "-10",
+                      "calculation.ymin": "-10",
+                      "bounds.ymax": "10",
+                      "calculation.ymax": "10",
+                      "bounds.zmin": "-10",
+                      "calculation.zmin": "-10",
+                      "bounds.zmax": "10",
+                      "calculation.zmax": "10",
+                      "solid.0.name": "c_657fdc2b228b14a6aba7:s_34a04005bcaf206eec99",
+                      "solid.0.exists": "-1",
+                      "solid.0.material": "Vacuum",
+                      "solid.0.volume_mm3": "16000",
+                      "solid.0.solid": "-1",
+                      "solid.0.hybrid": "0",
+                      "solid.1.name": "c_657fdc2b228b14a6aba7:s_7c9bbe5ec9b3fb774e8f",
+                      "solid.1.exists": "0",
+                      "end": "GEO1"
+                    }
+                  }
+                },
+                {
+                  "phase": "reopened",
+                  "sha256": "a4552e2b2054d96ebeb93c87d492b4ecb05929b64853b9891feae80514a945a2",
+                  "native": {
+                    "nonce": "7732a8f9cf9e417d8156da87b5b7132c",
+                    "project": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\edge-tangent-union\\constructed\\verification-managed-1b5006328d744e19bb65e40780bd02ca\\reopened\\definition",
+                    "build": "Version 2022.5 - Jun 03 2022",
+                    "length": "mm",
+                    "frequency": "MHz",
+                    "end": "G03V1"
+                  },
+                  "geometry": {
+                    "status": "verified",
+                    "source": "native-query",
+                    "objects": [
+                      {
+                        "object_id": "target",
+                        "native_name": "c_657fdc2b228b14a6aba7:s_34a04005bcaf206eec99",
+                        "state": "live",
+                        "exists": true,
+                        "material_id": "Vacuum",
+                        "volume_mm3": 16000.0,
+                        "solid": true,
+                        "hybrid": false,
+                        "volume_check": "positive-only-CSG-not-general-equivalence"
+                      },
+                      {
+                        "object_id": "tool",
+                        "native_name": "c_657fdc2b228b14a6aba7:s_7c9bbe5ec9b3fb774e8f",
+                        "state": "consumed",
+                        "exists": false
+                      }
+                    ],
+                    "bounds_mm": {
+                      "xmin": -10.0,
+                      "xmax": 30.0,
+                      "ymin": -10.0,
+                      "ymax": 10.0,
+                      "zmin": -10.0,
+                      "zmax": 10.0
+                    },
+                    "calculation_bounds_mm": {
+                      "xmin": -10.0,
+                      "xmax": 30.0,
+                      "ymin": -10.0,
+                      "ymax": 10.0,
+                      "zmin": -10.0,
+                      "zmax": 10.0
+                    },
+                    "per_solid_bounds": "not-queried; LooseBoundingBox structural-macro restriction",
+                    "raw": {
+                      "nonce": "7732a8f9cf9e417d8156da87b5b7132c",
+                      "project": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\edge-tangent-union\\constructed\\verification-managed-1b5006328d744e19bb65e40780bd02ca\\reopened\\definition",
+                      "count": "1",
+                      "bounds.xmin": "-10",
+                      "calculation.xmin": "-10",
+                      "bounds.xmax": "30",
+                      "calculation.xmax": "30",
+                      "bounds.ymin": "-10",
+                      "calculation.ymin": "-10",
+                      "bounds.ymax": "10",
+                      "calculation.ymax": "10",
+                      "bounds.zmin": "-10",
+                      "calculation.zmin": "-10",
+                      "bounds.zmax": "10",
+                      "calculation.zmax": "10",
+                      "solid.0.name": "c_657fdc2b228b14a6aba7:s_34a04005bcaf206eec99",
+                      "solid.0.exists": "-1",
+                      "solid.0.material": "Vacuum",
+                      "solid.0.volume_mm3": "16000",
+                      "solid.0.solid": "-1",
+                      "solid.0.hybrid": "0",
+                      "solid.1.name": "c_657fdc2b228b14a6aba7:s_7c9bbe5ec9b3fb774e8f",
+                      "solid.1.exists": "0",
+                      "end": "GEO1"
+                    }
+                  }
+                }
+              ]
+            },
+            "workspace": "artifacts\\geo234-native-ebb3e6df\\edge-tangent-union",
+            "spec_sha256": "7751a7749df5ed93b79f4efd6aaaf505ed33c20321eedd2a9b6471619d470d55"
+          }
+        },
+        {
+          "case": "disjoint-intersection",
+          "outcome": "rejected-before-publication",
+          "error": "G03 requires completion and owned standard batch exit",
+          "standard_closed": true
+        },
+        {
+          "case": "tangent-intersection",
+          "outcome": "rejected-before-publication",
+          "error": "G03 requires completion and owned standard batch exit",
+          "standard_closed": true
+        },
+        {
+          "case": "complete-subtraction",
+          "outcome": "rejected-before-publication",
+          "error": "G03 requires completion and owned standard batch exit",
+          "standard_closed": true
+        }
+      ]
+    },
+    "C4": {
+      "status": "verified",
+      "edited": {
+        "status": "verified",
+        "source_sha256": "ed0bdc41c9c67e1c0ae4b8c629460b5fd574a2431940523e57c7b6891123f077",
+        "closure": {
+          "exit_code": 0,
+          "exit_confirmed": true,
+          "quiet": {
+            "nonce": "8f7ab8e79d0240249f7d2192f3b052a7",
+            "readback": "not-exposed-by-COM",
+            "setter_returned": true,
+            "requested": true
+          },
+          "window_observation": {
+            "baseline_foreground": {
+              "hwnd": 19276814,
+              "pid": 71700,
+              "visible": true,
+              "minimized": false,
+              "owner": 0,
+              "window_class": "Windows.UI.Core.CoreWindow"
+            },
+            "observation": "WinEvent foreground/show hooks plus 50ms window polling",
+            "owned_foreground_events": 0,
+            "errors": [],
+            "dropped_events": 0,
+            "window_enumeration_gaps": 17,
+            "private_desktop": "CstTools_5e8b5b763a424084a6d1ee518362db8f",
+            "desktop_handle_closed": true,
+            "owned_window_events": 181,
+            "minimize_actions": 0
+          },
+          "window_observation_path": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\edited-declaration\\constructed\\window-observation.json"
+        },
+        "proof": {
+          "schema_version": 1,
+          "status": "verified",
+          "scope": "root",
+          "source_sha256": "ed0bdc41c9c67e1c0ae4b8c629460b5fd574a2431940523e57c7b6891123f077",
+          "validation_target": "geometry",
+          "gates": [
+            "saved-reopened",
+            "identity",
+            "settings",
+            "standard-close"
+          ],
+          "diagnostics": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\edited-declaration\\constructed\\verification-managed-40b9ed9eaa7f4d9c97035f77e44b2751",
+          "installation": {
+            "executable": "D:\\Program Files (x86)\\CST Studio Suite 2022\\CST DESIGN ENVIRONMENT.exe",
+            "launcher_sha256": "bde34d5ad5b7ec46500ab8d0a1da2eb04b198e27ed06d1d7de3ffe8ec55c397e",
+            "modeler_sha256": "a1cb2ec6316592020e81129fa0687343db2c650d82286c79a22ef4e08310db98",
+            "profile_major": "2022"
+          },
+          "sessions": [
+            {
+              "phase": "saved",
+              "exit_code": 0,
+              "exit_confirmed": true
+            },
+            {
+              "phase": "reopened",
+              "exit_code": 0,
+              "exit_confirmed": true
+            }
+          ],
+          "observations": [
+            {
+              "phase": "saved",
+              "sha256": "d39774cf6449ef01745b32a6f9c77b9407b370f65a28544d89709d3041b98c33",
+              "native": {
+                "nonce": "dd4085bef016455884225138beeebc07",
+                "project": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\edited-declaration\\constructed\\verification-managed-40b9ed9eaa7f4d9c97035f77e44b2751\\saved\\definition",
+                "build": "Version 2022.5 - Jun 03 2022",
+                "length": "mm",
+                "frequency": "MHz",
+                "end": "G03V1"
+              },
+              "geometry": {
+                "status": "verified",
+                "source": "native-query",
+                "objects": [
+                  {
+                    "object_id": "body",
+                    "native_name": "c_657fdc2b228b14a6aba7:s_230d8358dc8e8890b4c5",
+                    "state": "live",
+                    "exists": true,
+                    "material_id": "Vacuum",
+                    "volume_mm3": 16000.0,
+                    "solid": true,
+                    "hybrid": false,
+                    "volume_check": "analytic"
+                  }
+                ],
+                "bounds_mm": {
+                  "xmin": -20.0,
+                  "xmax": 20.0,
+                  "ymin": -10.0,
+                  "ymax": 10.0,
+                  "zmin": -10.0,
+                  "zmax": 10.0
+                },
+                "calculation_bounds_mm": {
+                  "xmin": -20.0,
+                  "xmax": 20.0,
+                  "ymin": -10.0,
+                  "ymax": 10.0,
+                  "zmin": -10.0,
+                  "zmax": 10.0
+                },
+                "per_solid_bounds": "not-queried; LooseBoundingBox structural-macro restriction",
+                "raw": {
+                  "nonce": "dd4085bef016455884225138beeebc07",
+                  "project": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\edited-declaration\\constructed\\verification-managed-40b9ed9eaa7f4d9c97035f77e44b2751\\saved\\definition",
+                  "count": "1",
+                  "bounds.xmin": "-20",
+                  "calculation.xmin": "-20",
+                  "bounds.xmax": "20",
+                  "calculation.xmax": "20",
+                  "bounds.ymin": "-10",
+                  "calculation.ymin": "-10",
+                  "bounds.ymax": "10",
+                  "calculation.ymax": "10",
+                  "bounds.zmin": "-10",
+                  "calculation.zmin": "-10",
+                  "bounds.zmax": "10",
+                  "calculation.zmax": "10",
+                  "solid.0.name": "c_657fdc2b228b14a6aba7:s_230d8358dc8e8890b4c5",
+                  "solid.0.exists": "-1",
+                  "solid.0.material": "Vacuum",
+                  "solid.0.volume_mm3": "16000",
+                  "solid.0.solid": "-1",
+                  "solid.0.hybrid": "0",
+                  "end": "GEO1"
+                }
+              }
+            },
+            {
+              "phase": "reopened",
+              "sha256": "10b2d021243cbe179f0d8fc8c30199cfa489b91a8534cb9fa9eda218a9045fb1",
+              "native": {
+                "nonce": "adb88e6edd2144feb87107fd07f85864",
+                "project": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\edited-declaration\\constructed\\verification-managed-40b9ed9eaa7f4d9c97035f77e44b2751\\reopened\\definition",
+                "build": "Version 2022.5 - Jun 03 2022",
+                "length": "mm",
+                "frequency": "MHz",
+                "end": "G03V1"
+              },
+              "geometry": {
+                "status": "verified",
+                "source": "native-query",
+                "objects": [
+                  {
+                    "object_id": "body",
+                    "native_name": "c_657fdc2b228b14a6aba7:s_230d8358dc8e8890b4c5",
+                    "state": "live",
+                    "exists": true,
+                    "material_id": "Vacuum",
+                    "volume_mm3": 16000.0,
+                    "solid": true,
+                    "hybrid": false,
+                    "volume_check": "analytic"
+                  }
+                ],
+                "bounds_mm": {
+                  "xmin": -20.0,
+                  "xmax": 20.0,
+                  "ymin": -10.0,
+                  "ymax": 10.0,
+                  "zmin": -10.0,
+                  "zmax": 10.0
+                },
+                "calculation_bounds_mm": {
+                  "xmin": -20.0,
+                  "xmax": 20.0,
+                  "ymin": -10.0,
+                  "ymax": 10.0,
+                  "zmin": -10.0,
+                  "zmax": 10.0
+                },
+                "per_solid_bounds": "not-queried; LooseBoundingBox structural-macro restriction",
+                "raw": {
+                  "nonce": "adb88e6edd2144feb87107fd07f85864",
+                  "project": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\edited-declaration\\constructed\\verification-managed-40b9ed9eaa7f4d9c97035f77e44b2751\\reopened\\definition",
+                  "count": "1",
+                  "bounds.xmin": "-20",
+                  "calculation.xmin": "-20",
+                  "bounds.xmax": "20",
+                  "calculation.xmax": "20",
+                  "bounds.ymin": "-10",
+                  "calculation.ymin": "-10",
+                  "bounds.ymax": "10",
+                  "calculation.ymax": "10",
+                  "bounds.zmin": "-10",
+                  "calculation.zmin": "-10",
+                  "bounds.zmax": "10",
+                  "calculation.zmax": "10",
+                  "solid.0.name": "c_657fdc2b228b14a6aba7:s_230d8358dc8e8890b4c5",
+                  "solid.0.exists": "-1",
+                  "solid.0.material": "Vacuum",
+                  "solid.0.volume_mm3": "16000",
+                  "solid.0.solid": "-1",
+                  "solid.0.hybrid": "0",
+                  "end": "GEO1"
+                }
+              }
+            }
+          ]
+        },
+        "workspace": "artifacts\\geo234-native-ebb3e6df\\edited-declaration",
+        "spec_sha256": "0b065842f5f72ee4e8acce014deb0a6ce4c4e930c8b41bb2b91c398304be4a97"
+      },
+      "old_sha256": "ee215ed3756f53f190595b2d34f95eec21dd4044547db56e6e3dadd1ae0505ac",
+      "same_caption_append": "rejected offline; never used for edit"
+    },
+    "C5": {
+      "status": "verified",
+      "selection_sets": {
+        "volume": {
+          "op": "define_selection_set",
+          "entity_kind": "solid",
+          "members": [
+            "body"
+          ]
+        }
+      },
+      "parameter_rebuild": {
+        "status": "verified",
+        "closure": {
+          "exit_code": 0,
+          "exit_confirmed": true
+        },
+        "geometry": {
+          "status": "verified",
+          "source": "native-query",
+          "objects": [
+            {
+              "object_id": "body",
+              "native_name": "c_657fdc2b228b14a6aba7:s_230d8358dc8e8890b4c5",
+              "state": "live",
+              "exists": true,
+              "material_id": "Vacuum",
+              "volume_mm3": 13824.0,
+              "solid": true,
+              "hybrid": false,
+              "volume_check": "analytic"
+            }
+          ],
+          "bounds_mm": {
+            "xmin": -12.0,
+            "xmax": 12.0,
+            "ymin": -12.0,
+            "ymax": 12.0,
+            "zmin": -12.0,
+            "zmax": 12.0
+          },
+          "calculation_bounds_mm": {
+            "xmin": -12.0,
+            "xmax": 12.0,
+            "ymin": -12.0,
+            "ymax": 12.0,
+            "zmin": -12.0,
+            "zmax": 12.0
+          },
+          "per_solid_bounds": "not-queried; LooseBoundingBox structural-macro restriction",
+          "raw": {
+            "nonce": "35c21074f42c482dbd318b4787fbe924",
+            "project": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\parameter-rebuild\\definition",
+            "count": "1",
+            "bounds.xmin": "-12",
+            "calculation.xmin": "-12",
+            "bounds.xmax": "12",
+            "calculation.xmax": "12",
+            "bounds.ymin": "-12",
+            "calculation.ymin": "-12",
+            "bounds.ymax": "12",
+            "calculation.ymax": "12",
+            "bounds.zmin": "-12",
+            "calculation.zmin": "-12",
+            "bounds.zmax": "12",
+            "calculation.zmax": "12",
+            "solid.0.name": "c_657fdc2b228b14a6aba7:s_230d8358dc8e8890b4c5",
+            "solid.0.exists": "-1",
+            "solid.0.material": "Vacuum",
+            "solid.0.volume_mm3": "13824",
+            "solid.0.solid": "-1",
+            "solid.0.hybrid": "0",
+            "end": "GEO1"
+          }
+        },
+        "preserved_expression": "2*R"
+      },
+      "removal_consumption": "shared declaration/preflight fault suite; no native Group export"
+    },
+    "C6": {
+      "status": "verified",
+      "legal_queries": "post-history saved/reopened Model.run observers; existence/material/count/body type/volume/whole-structure and calculation box",
+      "per_solid_loose_bounds": "unsupported; never called in structural macro",
+      "volume_units": "mm^3, checked against analytic primitives",
+      "enumeration": "production uses total count and exact names; no index-base assumption or public enumeration API"
+    },
+    "C7": {
+      "status": "verified",
+      "runtime_failure": {
+        "status": "verified",
+        "fault": "explicit runtime Err.Raise, not a natural CST/solver failure",
+        "closure": {
+          "exit_code": 0,
+          "exit_confirmed": true,
+          "quiet": {
+            "nonce": "cb36898562574b8585df3ce48fd77e23",
+            "readback": "not-exposed-by-COM",
+            "setter_returned": true,
+            "requested": true
+          },
+          "window_observation": {
+            "baseline_foreground": {
+              "hwnd": 19276814,
+              "pid": 71700,
+              "visible": true,
+              "minimized": false,
+              "owner": 0,
+              "window_class": "Windows.UI.Core.CoreWindow"
+            },
+            "observation": "WinEvent foreground/show hooks plus 50ms window polling",
+            "owned_foreground_events": 0,
+            "errors": [],
+            "dropped_events": 0,
+            "window_enumeration_gaps": 17,
+            "private_desktop": "CstTools_0e8ff28ef2ba4d66a47fe040334eb8ec",
+            "desktop_handle_closed": true,
+            "owned_window_events": 182,
+            "minimize_actions": 0
+          },
+          "window_observation_path": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\second-step-failure\\window-observation.json"
+        },
+        "context": {
+          "phase": "history-apply",
+          "block_index": 4,
+          "last_applied": 3,
+          "caption": "CST Tools GEO f_b472755226b0519e1b326fab6a3aae6a"
+        },
+        "reason": "SETTING_UNVERIFIED: definition edit/standard exit not confirmed; phase={'phase': 'history-apply', 'block_index': 4, 'last_applied': 3, 'caption': 'CST Tools GEO f_b472755226b0519e1b326fab6a3aae6a'}; native=-2147218544 injected second feature failure source=controlled GEO probe\n; diagnostics=D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\second-step-failure",
+        "published": false
+      },
+      "stage_stop": {
+        "status": "verified",
+        "fault": "controlled stop",
+        "closure": {
+          "exit_code": 0,
+          "exit_confirmed": true,
+          "quiet": {
+            "nonce": "f52e4b83dca8425bbade0d97d20249df",
+            "readback": "not-exposed-by-COM",
+            "setter_returned": true,
+            "requested": true
+          },
+          "window_observation": {
+            "baseline_foreground": {
+              "hwnd": 19276814,
+              "pid": 71700,
+              "visible": true,
+              "minimized": false,
+              "owner": 0,
+              "window_class": "Windows.UI.Core.CoreWindow"
+            },
+            "observation": "WinEvent foreground/show hooks plus 50ms window polling",
+            "owned_foreground_events": 0,
+            "errors": [],
+            "dropped_events": 0,
+            "window_enumeration_gaps": 18,
+            "private_desktop": "CstTools_3920acf7fd65450584c0e79aec72d4b6",
+            "desktop_handle_closed": true,
+            "owned_window_events": 182,
+            "minimize_actions": 0
+          },
+          "window_observation_path": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\stop-between-blocks\\window-observation.json"
+        },
+        "context": {
+          "phase": "history-check",
+          "block_index": 4,
+          "last_applied": 3,
+          "caption": "CST Tools GEO f_b472755226b0519e1b326fab6a3aae6a"
+        },
+        "reason": "SETTING_UNVERIFIED: definition edit/standard exit not confirmed; phase={'phase': 'history-check', 'block_index': 4, 'last_applied': 3, 'caption': 'CST Tools GEO f_b472755226b0519e1b326fab6a3aae6a'}; native=-2147218508 stop requested source=definition\n; diagnostics=D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\stop-between-blocks",
+        "published": false
+      },
+      "transaction_matrix": "offline shared production tests cover response gaps, unknown exit and no replay; explicit runtime injection is not a natural solver failure"
+    },
+    "GEO-4": {
+      "status": "verified",
+      "evidence": "artifacts\\geo234-native-2b0bb022\\acceptance.json",
+      "evidence_sha256": "ac9b9a1e301b99a837c961b2ec303168c82a7a1114073d529a675be9669d726f",
+      "simulation": {
+        "status": "verified",
+        "definition": {
+          "schema_version": 2,
+          "project_id": "geo-acceptance-a44220dd3b144ff2883885c267eb16d2",
+          "definition_revision": "7c564871be1be42c120480b25e16646eaaabc502cfc947dcacc15cafb01f2027",
+          "document_id": "geo-pillbox",
+          "source_sha256": "d5566e9b1cdd328522b79199a02415e5a3f74149d530f862beef66d098b8e985",
+          "installation_ref": "local",
+          "config": {
+            "method": "Default",
+            "mesh": "Tet",
+            "target_enabled": true,
+            "target_value": "500",
+            "adaptation_enabled": false,
+            "requested_modes": 1
+          },
+          "axis": "z",
+          "postprocess": [
+            {
+              "metric_id": "frequency",
+              "method_id": "Frequency",
+              "settings": {
+                "mode": {
+                  "selection": "one",
+                  "index": 1
+                }
+              }
+            },
+            {
+              "metric_id": "rq",
+              "method_id": "R_over_Q",
+              "settings": {
+                "mode": {
+                  "selection": "one",
+                  "index": 1
+                },
+                "integration_line": {
+                  "axis": "z",
+                  "offset_mm": [
+                    0,
+                    0,
+                    0
+                  ],
+                  "beta": 1,
+                  "range": "full"
+                }
+              }
+            }
+          ],
+          "geometry_spec": {
+            "parameters": {
+              "R": {
+                "expression": "100",
+                "description": "radius",
+                "quantity": "length"
+              },
+              "H": {
+                "expression": "2*R",
+                "description": "height expression",
+                "quantity": "length"
+              }
+            },
+            "components": [
+              "vacuum"
+            ],
+            "geometry": {
+              "profile": "geometry-v1",
+              "features": [
+                {
+                  "feature_id": "f_62742f4ee8d46f1a56aeaa87bdc5011b",
+                  "op": "create_cylinder",
+                  "object_id": "pillbox",
+                  "component_id": "vacuum",
+                  "material_id": "Vacuum",
+                  "axis": "z",
+                  "transverse_center_mm": [
+                    "0",
+                    "0"
+                  ],
+                  "axial_range_mm": [
+                    "-H/2",
+                    "H/2"
+                  ],
+                  "outer_radius_mm": "R",
+                  "inner_radius_mm": "0"
+                }
+              ],
+              "identities": {
+                "pillbox": "f_62742f4ee8d46f1a56aeaa87bdc5011b"
+              }
+            },
+            "selection_sets": {},
+            "background": {
+              "op": "set_background",
+              "material": "PEC",
+              "padding_mm": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            "boundaries": {
+              "op": "set_boundaries",
+              "faces": [
+                "electric",
+                "electric",
+                "electric",
+                "electric",
+                "electric",
+                "electric"
+              ],
+              "symmetry": [
+                "none",
+                "none",
+                "none"
+              ]
+            },
+            "simulation": {
+              "solver": "eigenmode",
+              "method": "default",
+              "mesh": {
+                "type": "tet",
+                "cells_per_wavelength": 2,
+                "adaptive": false
+              },
+              "frequency_range_mhz": {
+                "min": 500,
+                "max": 2000
+              },
+              "frequency_lower_target_mhz": 500,
+              "requested_modes": 1,
+              "losses": "postprocess_only"
+            },
+            "postprocess": [
+              {
+                "metric_id": "frequency",
+                "method_id": "Frequency",
+                "settings": {
+                  "mode": {
+                    "selection": "one",
+                    "index": 1
+                  }
+                }
+              },
+              {
+                "metric_id": "rq",
+                "method_id": "R_over_Q",
+                "settings": {
+                  "mode": {
+                    "selection": "one",
+                    "index": 1
+                  },
+                  "integration_line": {
+                    "axis": "z",
+                    "offset_mm": [
+                      0,
+                      0,
+                      0
+                    ],
+                    "beta": 1,
+                    "range": "full"
+                  }
+                }
+              }
+            ]
+          },
+          "verification": {
+            "schema_version": 1,
+            "status": "verified",
+            "scope": "root",
+            "source_sha256": "d5566e9b1cdd328522b79199a02415e5a3f74149d530f862beef66d098b8e985",
+            "validation_target": "simulation",
+            "gates": [
+              "saved-reopened",
+              "identity",
+              "settings",
+              "standard-close"
+            ],
+            "diagnostics": "D:\\work\\cst_tools\\artifacts\\geo234-native-2b0bb022\\project\\control\\definitions\\geo-pillbox\\7c564871be1be42c120480b25e16646eaaabc502cfc947dcacc15cafb01f2027\\verification-managed-a47141f773cd4f45afc3d8f4ee7ff82f",
+            "installation": {
+              "executable": "D:\\Program Files (x86)\\CST Studio Suite 2022\\CST DESIGN ENVIRONMENT.exe",
+              "launcher_sha256": "bde34d5ad5b7ec46500ab8d0a1da2eb04b198e27ed06d1d7de3ffe8ec55c397e",
+              "modeler_sha256": "a1cb2ec6316592020e81129fa0687343db2c650d82286c79a22ef4e08310db98",
+              "profile_major": "2022"
+            },
+            "sessions": [
+              {
+                "phase": "saved",
+                "exit_code": 0,
+                "exit_confirmed": true
+              },
+              {
+                "phase": "reopened",
+                "exit_code": 0,
+                "exit_confirmed": true
+              }
+            ],
+            "observations": [
+              {
+                "phase": "saved",
+                "sha256": "114206f02ee0abda221535296e43a6ce948013be87bdaa9eb1a3e4939de086c2",
+                "native": {
+                  "nonce": "8f1a38779dc2478eacb65a8d729118ca",
+                  "project": "D:\\work\\cst_tools\\artifacts\\geo234-native-2b0bb022\\project\\control\\definitions\\geo-pillbox\\7c564871be1be42c120480b25e16646eaaabc502cfc947dcacc15cafb01f2027\\verification-managed-a47141f773cd4f45afc3d8f4ee7ff82f\\saved\\definition",
+                  "build": "Version 2022.5 - Jun 03 2022",
+                  "solver": "HF Eigenmode",
+                  "length": "mm",
+                  "frequency": "MHz",
+                  "mesh": "Tetrahedral",
+                  "fmin": "500",
+                  "fmax": "2000",
+                  "end": "G03V1"
+                },
+                "geometry": {
+                  "status": "verified",
+                  "source": "native-query",
+                  "objects": [
+                    {
+                      "object_id": "pillbox",
+                      "native_name": "c_657fdc2b228b14a6aba7:s_fa97a25728381a0554c9",
+                      "state": "live",
+                      "exists": true,
+                      "material_id": "Vacuum",
+                      "volume_mm3": 6283187.58554886,
+                      "solid": true,
+                      "hybrid": false,
+                      "volume_check": "analytic"
+                    }
+                  ],
+                  "bounds_mm": {
+                    "xmin": -100.0,
+                    "xmax": 100.0,
+                    "ymin": -100.0,
+                    "ymax": 100.0,
+                    "zmin": -100.0,
+                    "zmax": 100.0
+                  },
+                  "calculation_bounds_mm": {
+                    "xmin": -100.0,
+                    "xmax": 100.0,
+                    "ymin": -100.0,
+                    "ymax": 100.0,
+                    "zmin": -100.0,
+                    "zmax": 100.0
+                  },
+                  "per_solid_bounds": "not-queried; LooseBoundingBox structural-macro restriction",
+                  "raw": {
+                    "nonce": "8f1a38779dc2478eacb65a8d729118ca",
+                    "project": "D:\\work\\cst_tools\\artifacts\\geo234-native-2b0bb022\\project\\control\\definitions\\geo-pillbox\\7c564871be1be42c120480b25e16646eaaabc502cfc947dcacc15cafb01f2027\\verification-managed-a47141f773cd4f45afc3d8f4ee7ff82f\\saved\\definition",
+                    "count": "1",
+                    "bounds.xmin": "-100",
+                    "calculation.xmin": "-100",
+                    "bounds.xmax": "100",
+                    "calculation.xmax": "100",
+                    "bounds.ymin": "-100",
+                    "calculation.ymin": "-100",
+                    "bounds.ymax": "100",
+                    "calculation.ymax": "100",
+                    "bounds.zmin": "-100",
+                    "calculation.zmin": "-100",
+                    "bounds.zmax": "100",
+                    "calculation.zmax": "100",
+                    "solid.0.name": "c_657fdc2b228b14a6aba7:s_fa97a25728381a0554c9",
+                    "solid.0.exists": "-1",
+                    "solid.0.material": "Vacuum",
+                    "solid.0.volume_mm3": "6283187.58554886",
+                    "solid.0.solid": "-1",
+                    "solid.0.hybrid": "0",
+                    "end": "GEO1"
+                  }
+                }
+              },
+              {
+                "phase": "reopened",
+                "sha256": "b93c0cc60a9d89f1fef2262852d78bc98de66e13bd29841cd0e60461d8f327c8",
+                "native": {
+                  "nonce": "980fd87af56147e9bd11a04f7971ccf2",
+                  "project": "D:\\work\\cst_tools\\artifacts\\geo234-native-2b0bb022\\project\\control\\definitions\\geo-pillbox\\7c564871be1be42c120480b25e16646eaaabc502cfc947dcacc15cafb01f2027\\verification-managed-a47141f773cd4f45afc3d8f4ee7ff82f\\reopened\\definition",
+                  "build": "Version 2022.5 - Jun 03 2022",
+                  "solver": "HF Eigenmode",
+                  "length": "mm",
+                  "frequency": "MHz",
+                  "mesh": "Tetrahedral",
+                  "fmin": "500",
+                  "fmax": "2000",
+                  "end": "G03V1"
+                },
+                "geometry": {
+                  "status": "verified",
+                  "source": "native-query",
+                  "objects": [
+                    {
+                      "object_id": "pillbox",
+                      "native_name": "c_657fdc2b228b14a6aba7:s_fa97a25728381a0554c9",
+                      "state": "live",
+                      "exists": true,
+                      "material_id": "Vacuum",
+                      "volume_mm3": 6283187.58554886,
+                      "solid": true,
+                      "hybrid": false,
+                      "volume_check": "analytic"
+                    }
+                  ],
+                  "bounds_mm": {
+                    "xmin": -100.0,
+                    "xmax": 100.0,
+                    "ymin": -100.0,
+                    "ymax": 100.0,
+                    "zmin": -100.0,
+                    "zmax": 100.0
+                  },
+                  "calculation_bounds_mm": {
+                    "xmin": -100.0,
+                    "xmax": 100.0,
+                    "ymin": -100.0,
+                    "ymax": 100.0,
+                    "zmin": -100.0,
+                    "zmax": 100.0
+                  },
+                  "per_solid_bounds": "not-queried; LooseBoundingBox structural-macro restriction",
+                  "raw": {
+                    "nonce": "980fd87af56147e9bd11a04f7971ccf2",
+                    "project": "D:\\work\\cst_tools\\artifacts\\geo234-native-2b0bb022\\project\\control\\definitions\\geo-pillbox\\7c564871be1be42c120480b25e16646eaaabc502cfc947dcacc15cafb01f2027\\verification-managed-a47141f773cd4f45afc3d8f4ee7ff82f\\reopened\\definition",
+                    "count": "1",
+                    "bounds.xmin": "-100",
+                    "calculation.xmin": "-100",
+                    "bounds.xmax": "100",
+                    "calculation.xmax": "100",
+                    "bounds.ymin": "-100",
+                    "calculation.ymin": "-100",
+                    "bounds.ymax": "100",
+                    "calculation.ymax": "100",
+                    "bounds.zmin": "-100",
+                    "calculation.zmin": "-100",
+                    "bounds.zmax": "100",
+                    "calculation.zmax": "100",
+                    "solid.0.name": "c_657fdc2b228b14a6aba7:s_fa97a25728381a0554c9",
+                    "solid.0.exists": "-1",
+                    "solid.0.material": "Vacuum",
+                    "solid.0.volume_mm3": "6283187.58554886",
+                    "solid.0.solid": "-1",
+                    "solid.0.hybrid": "0",
+                    "end": "GEO1"
+                  }
+                }
+              }
+            ]
+          },
+          "ready": true
+        },
+        "result": {
+          "schema_version": 2,
+          "run_id": "geo-solve",
+          "definition_revision": "7c564871be1be42c120480b25e16646eaaabc502cfc947dcacc15cafb01f2027",
+          "task_id": "ca7196fd-cb2a-4918-ae86-7b7d2d5e223c",
+          "status": "success",
+          "frequency_mhz": 1147.42737641147,
+          "rq_ohm": 58.1026729651487,
+          "snapshot": "D:\\work\\cst_tools\\artifacts\\geo234-native-2b0bb022\\project\\result\\simulation\\geo-solve\\worker_single\\single-simulation__f_1147.427376MHz__ca7196fd-cb2a-4918-ae86-7b7d2d5e223c\\single-simulation__f_1147.427376MHz.cst",
+          "snapshot_sha256": "caa7ca23d7b60f1f52bea8bda0e5d0e0c9af3ed576681696290ebafd656fab02",
+          "capture": {
+            "schema_version": 1,
+            "task_id": "ca7196fd-cb2a-4918-ae86-7b7d2d5e223c",
+            "nonce": "6702d91f42a04b0fa2eff8804e847671",
+            "binding": {
+              "project_id": "geo-acceptance-a44220dd3b144ff2883885c267eb16d2",
+              "attempt_id": "ca7196fd-cb2a-4918-ae86-7b7d2d5e223c",
+              "definition_revision": "7c564871be1be42c120480b25e16646eaaabc502cfc947dcacc15cafb01f2027",
+              "database_sha256": "a25a2aefbae1d1ed74a3e8d86477cbdc4797583abce262aef888357f8c0c560f",
+              "cst_build": "2022.5 Release from 2022-06-03 (change 981760)",
+              "scope": "root"
+            },
+            "frame_hashes": {
+              "pre": "64edc3a203ac95a43d5491bc2a8df25870dcafb9a1b964df51163baf51019bd0",
+              "started": "5fb39c3ec907fb294e6165c5f491678a473943e572dff2ceff71772b997e0e17",
+              "post": "2400f5c78345ee62d0e55fb9dd1d0776bdd577aed1f9cd3c0040a9870f80b45d"
+            },
+            "status": "execution-snapshot-match",
+            "reasons": [],
+            "result_success": true,
+            "database_verified": true,
+            "exit_confirmed": true,
+            "solver_return": 1,
+            "calculated_modes": 1,
+            "process_exit_code": 0,
+            "batch_exit_zero": true,
+            "snapshot_sha256": "b01bcde3fd6cda765d054aeff6ee10150e5a7faa7867edafeb76893245a0cd62",
+            "publish_ready": false
+          },
+          "received_sha256": "a5aeee013afd848a9f2641d2b790121cda0f771f290b79033c539080e81eb929",
+          "mode_index": 1,
+          "session_id": "71e8460f-534e-49e1-8afd-58d5deae9ba8",
+          "postprocess_definition": {
+            "schema_version": 1,
+            "mode_index": 1,
+            "source_sha256": "d5566e9b1cdd328522b79199a02415e5a3f74149d530f862beef66d098b8e985",
+            "requested_postprocess": [
+              {
+                "metric_id": "frequency",
+                "method_id": "Frequency",
+                "settings": {
+                  "mode": {
+                    "selection": "one",
+                    "index": 1
+                  }
+                }
+              },
+              {
+                "metric_id": "rq",
+                "method_id": "R_over_Q",
+                "settings": {
+                  "mode": {
+                    "selection": "one",
+                    "index": 1
+                  },
+                  "integration_line": {
+                    "axis": "z",
+                    "offset_mm": [
+                      0,
+                      0,
+                      0
+                    ],
+                    "beta": 1,
+                    "range": "full"
+                  }
+                }
+              }
+            ],
+            "frequency": {
+              "method": "Frequency",
+              "native_call": "GetModeFrequencyInHz",
+              "unit": "MHz",
+              "scale_from_hz": 1e-06
+            },
+            "r_over_q": {
+              "method": "R_over_Q",
+              "implementation": "EigenResult_Complex",
+              "unit": "ohm",
+              "integration_line": {
+                "axis": "z",
+                "offset_mm": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "endpoints_mm": [
+                  [
+                    0.0,
+                    0.0,
+                    -100.0
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    100.0
+                  ]
+                ],
+                "beta": 1.0,
+                "range": "full"
+              },
+              "voltage": "complex line integral with transit phase",
+              "energy": "QFactor.GetTotalEnergy",
+              "formula": "abs(V)^2/(omega*W)",
+              "algorithm": {
+                "path": "rq-algorithm.vb",
+                "sha256": "3c9fdf812a7b53f550bf9c2077b4af858db13048a92d19b3e58941fef40cd71d"
+              }
+            },
+            "generated_macro": {
+              "path": "execution-worker.bas",
+              "sha256": "9ebdb0e36103f8562f8b1ae9d804b75e95a72ed0b98da3f61610c2af2ca5b0c1"
+            },
+            "generated_macro_evidence": "archived"
+          },
+          "postprocess_provenance_sha256": "8203da39871c9e2d04d5571a774b87b6a4730469028079bbff7ed453d290ffec",
+          "execution_active": false,
+          "session_safety": "confirmed-closed",
+          "metrics": [
+            {
+              "metric_id": "frequency",
+              "method_id": "Frequency",
+              "value": 1147.42737641147,
+              "unit": "MHz",
+              "status": "success"
+            },
+            {
+              "metric_id": "rq",
+              "method_id": "R_over_Q",
+              "value": 58.1026729651487,
+              "unit": "ohm",
+              "status": "success"
+            }
+          ],
+          "result_revision": "5bb72321a1b6c341eb159c745eff66c27ab091b58188a49da00cf5497266467c"
+        },
+        "analytic_frequency_mhz": 1147.4252783521006,
+        "frequency_tolerance": 0.05,
+        "session_safety": "confirmed-closed"
+      },
+      "axis_variants": [
+        {
+          "axis": "x",
+          "closure": {
+            "exit_code": 0,
+            "exit_confirmed": true,
+            "quiet": {
+              "nonce": "d71d670cbe6e4009906cb22230597636",
+              "readback": "not-exposed-by-COM",
+              "setter_returned": true,
+              "requested": true
+            },
+            "window_observation": {
+              "baseline_foreground": {
+                "hwnd": 19276814,
+                "pid": 71700,
+                "visible": true,
+                "minimized": false,
+                "owner": 0,
+                "window_class": "Windows.UI.Core.CoreWindow"
+              },
+              "observation": "WinEvent foreground/show hooks plus 50ms window polling",
+              "owned_foreground_events": 0,
+              "errors": [],
+              "dropped_events": 0,
+              "window_enumeration_gaps": 17,
+              "private_desktop": "CstTools_a4149eed1bfe42cba7fb6cff7b3c8613",
+              "desktop_handle_closed": true,
+              "owned_window_events": 183,
+              "minimize_actions": 0
+            },
+            "window_observation_path": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\simulation-x\\constructed\\window-observation.json"
+          },
+          "simulation": {
+            "status": "verified",
+            "definition": {
+              "schema_version": 2,
+              "project_id": "geo-acceptance-0d6d2b238544422da3173406ae9c95f7",
+              "definition_revision": "0830bf9dfadd96b07f3743cbabdea279a564e875025e4e8eb22ba3962568f2a0",
+              "document_id": "geo-pillbox",
+              "source_sha256": "e9846cc771252b92574419ccc08d27ba2eae7105698c5bf9facb608f3895dd09",
+              "installation_ref": "local",
+              "config": {
+                "method": "Default",
+                "mesh": "Tet",
+                "target_enabled": true,
+                "target_value": "500",
+                "adaptation_enabled": false,
+                "requested_modes": 1
+              },
+              "axis": "x",
+              "postprocess": [
+                {
+                  "metric_id": "frequency",
+                  "method_id": "Frequency",
+                  "settings": {
+                    "mode": {
+                      "selection": "one",
+                      "index": 1
+                    }
+                  }
+                },
+                {
+                  "metric_id": "rq",
+                  "method_id": "R_over_Q",
+                  "settings": {
+                    "mode": {
+                      "selection": "one",
+                      "index": 1
+                    },
+                    "integration_line": {
+                      "axis": "x",
+                      "offset_mm": [
+                        0,
+                        0,
+                        0
+                      ],
+                      "beta": 1,
+                      "range": "full"
+                    }
+                  }
+                }
+              ],
+              "geometry_spec": {
+                "parameters": {
+                  "R": {
+                    "expression": "100",
+                    "description": "radius",
+                    "quantity": "length"
+                  },
+                  "H": {
+                    "expression": "2*R",
+                    "description": "height expression",
+                    "quantity": "length"
+                  }
+                },
+                "components": [
+                  "vacuum"
+                ],
+                "geometry": {
+                  "profile": "geometry-v1",
+                  "features": [
+                    {
+                      "feature_id": "f_62742f4ee8d46f1a56aeaa87bdc5011b",
+                      "op": "create_cylinder",
+                      "object_id": "pillbox",
+                      "component_id": "vacuum",
+                      "material_id": "Vacuum",
+                      "axis": "x",
+                      "transverse_center_mm": [
+                        "0",
+                        "0"
+                      ],
+                      "axial_range_mm": [
+                        "-H/2",
+                        "H/2"
+                      ],
+                      "outer_radius_mm": "R",
+                      "inner_radius_mm": "0"
+                    }
+                  ],
+                  "identities": {
+                    "pillbox": "f_62742f4ee8d46f1a56aeaa87bdc5011b"
+                  }
+                },
+                "selection_sets": {},
+                "background": {
+                  "op": "set_background",
+                  "material": "PEC",
+                  "padding_mm": [
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0
+                  ]
+                },
+                "boundaries": {
+                  "op": "set_boundaries",
+                  "faces": [
+                    "electric",
+                    "electric",
+                    "electric",
+                    "electric",
+                    "electric",
+                    "electric"
+                  ],
+                  "symmetry": [
+                    "none",
+                    "none",
+                    "none"
+                  ]
+                },
+                "simulation": {
+                  "solver": "eigenmode",
+                  "method": "default",
+                  "mesh": {
+                    "type": "tet",
+                    "cells_per_wavelength": 2,
+                    "adaptive": false
+                  },
+                  "frequency_range_mhz": {
+                    "min": 500,
+                    "max": 2000
+                  },
+                  "frequency_lower_target_mhz": 500,
+                  "requested_modes": 1,
+                  "losses": "postprocess_only"
+                },
+                "postprocess": [
+                  {
+                    "metric_id": "frequency",
+                    "method_id": "Frequency",
+                    "settings": {
+                      "mode": {
+                        "selection": "one",
+                        "index": 1
+                      }
+                    }
+                  },
+                  {
+                    "metric_id": "rq",
+                    "method_id": "R_over_Q",
+                    "settings": {
+                      "mode": {
+                        "selection": "one",
+                        "index": 1
+                      },
+                      "integration_line": {
+                        "axis": "x",
+                        "offset_mm": [
+                          0,
+                          0,
+                          0
+                        ],
+                        "beta": 1,
+                        "range": "full"
+                      }
+                    }
+                  }
+                ]
+              },
+              "verification": {
+                "schema_version": 1,
+                "status": "verified",
+                "scope": "root",
+                "source_sha256": "e9846cc771252b92574419ccc08d27ba2eae7105698c5bf9facb608f3895dd09",
+                "validation_target": "simulation",
+                "gates": [
+                  "saved-reopened",
+                  "identity",
+                  "settings",
+                  "standard-close"
+                ],
+                "diagnostics": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\simulation-x\\project\\control\\definitions\\geo-pillbox\\0830bf9dfadd96b07f3743cbabdea279a564e875025e4e8eb22ba3962568f2a0\\verification-managed-254df0e2aed64641a9df9928d8589e92",
+                "installation": {
+                  "executable": "D:\\Program Files (x86)\\CST Studio Suite 2022\\CST DESIGN ENVIRONMENT.exe",
+                  "launcher_sha256": "bde34d5ad5b7ec46500ab8d0a1da2eb04b198e27ed06d1d7de3ffe8ec55c397e",
+                  "modeler_sha256": "a1cb2ec6316592020e81129fa0687343db2c650d82286c79a22ef4e08310db98",
+                  "profile_major": "2022"
+                },
+                "sessions": [
+                  {
+                    "phase": "saved",
+                    "exit_code": 0,
+                    "exit_confirmed": true
+                  },
+                  {
+                    "phase": "reopened",
+                    "exit_code": 0,
+                    "exit_confirmed": true
+                  }
+                ],
+                "observations": [
+                  {
+                    "phase": "saved",
+                    "sha256": "15b2ee7bfd17e0059967abaf5ed68afaa4aa47f1d2b6d6643e1e690b0ce13813",
+                    "native": {
+                      "nonce": "5990b9022d2d466cadf1bb847dd4b964",
+                      "project": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\simulation-x\\project\\control\\definitions\\geo-pillbox\\0830bf9dfadd96b07f3743cbabdea279a564e875025e4e8eb22ba3962568f2a0\\verification-managed-254df0e2aed64641a9df9928d8589e92\\saved\\definition",
+                      "build": "Version 2022.5 - Jun 03 2022",
+                      "solver": "HF Eigenmode",
+                      "length": "mm",
+                      "frequency": "MHz",
+                      "mesh": "Tetrahedral",
+                      "fmin": "500",
+                      "fmax": "2000",
+                      "end": "G03V1"
+                    },
+                    "geometry": {
+                      "status": "verified",
+                      "source": "native-query",
+                      "objects": [
+                        {
+                          "object_id": "pillbox",
+                          "native_name": "c_657fdc2b228b14a6aba7:s_fa97a25728381a0554c9",
+                          "state": "live",
+                          "exists": true,
+                          "material_id": "Vacuum",
+                          "volume_mm3": 6283185.30717959,
+                          "solid": true,
+                          "hybrid": false,
+                          "volume_check": "analytic"
+                        }
+                      ],
+                      "bounds_mm": {
+                        "xmin": -100.0,
+                        "xmax": 100.0,
+                        "ymin": -100.0,
+                        "ymax": 100.0,
+                        "zmin": -100.0,
+                        "zmax": 100.0
+                      },
+                      "calculation_bounds_mm": {
+                        "xmin": -100.0,
+                        "xmax": 100.0,
+                        "ymin": -100.0,
+                        "ymax": 100.0,
+                        "zmin": -100.0,
+                        "zmax": 100.0
+                      },
+                      "per_solid_bounds": "not-queried; LooseBoundingBox structural-macro restriction",
+                      "raw": {
+                        "nonce": "5990b9022d2d466cadf1bb847dd4b964",
+                        "project": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\simulation-x\\project\\control\\definitions\\geo-pillbox\\0830bf9dfadd96b07f3743cbabdea279a564e875025e4e8eb22ba3962568f2a0\\verification-managed-254df0e2aed64641a9df9928d8589e92\\saved\\definition",
+                        "count": "1",
+                        "bounds.xmin": "-100",
+                        "calculation.xmin": "-100",
+                        "bounds.xmax": "100",
+                        "calculation.xmax": "100",
+                        "bounds.ymin": "-100",
+                        "calculation.ymin": "-100",
+                        "bounds.ymax": "100",
+                        "calculation.ymax": "100",
+                        "bounds.zmin": "-100",
+                        "calculation.zmin": "-100",
+                        "bounds.zmax": "100",
+                        "calculation.zmax": "100",
+                        "solid.0.name": "c_657fdc2b228b14a6aba7:s_fa97a25728381a0554c9",
+                        "solid.0.exists": "-1",
+                        "solid.0.material": "Vacuum",
+                        "solid.0.volume_mm3": "6283185.30717959",
+                        "solid.0.solid": "-1",
+                        "solid.0.hybrid": "0",
+                        "end": "GEO1"
+                      }
+                    }
+                  },
+                  {
+                    "phase": "reopened",
+                    "sha256": "5b7352ae885266794d3f326d17299ae92e6657a3c49bdb224e9ddb492fe2df33",
+                    "native": {
+                      "nonce": "b679bd9f4cdf493bbecae06201fe254a",
+                      "project": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\simulation-x\\project\\control\\definitions\\geo-pillbox\\0830bf9dfadd96b07f3743cbabdea279a564e875025e4e8eb22ba3962568f2a0\\verification-managed-254df0e2aed64641a9df9928d8589e92\\reopened\\definition",
+                      "build": "Version 2022.5 - Jun 03 2022",
+                      "solver": "HF Eigenmode",
+                      "length": "mm",
+                      "frequency": "MHz",
+                      "mesh": "Tetrahedral",
+                      "fmin": "500",
+                      "fmax": "2000",
+                      "end": "G03V1"
+                    },
+                    "geometry": {
+                      "status": "verified",
+                      "source": "native-query",
+                      "objects": [
+                        {
+                          "object_id": "pillbox",
+                          "native_name": "c_657fdc2b228b14a6aba7:s_fa97a25728381a0554c9",
+                          "state": "live",
+                          "exists": true,
+                          "material_id": "Vacuum",
+                          "volume_mm3": 6283185.30717959,
+                          "solid": true,
+                          "hybrid": false,
+                          "volume_check": "analytic"
+                        }
+                      ],
+                      "bounds_mm": {
+                        "xmin": -100.0,
+                        "xmax": 100.0,
+                        "ymin": -100.0,
+                        "ymax": 100.0,
+                        "zmin": -100.0,
+                        "zmax": 100.0
+                      },
+                      "calculation_bounds_mm": {
+                        "xmin": -100.0,
+                        "xmax": 100.0,
+                        "ymin": -100.0,
+                        "ymax": 100.0,
+                        "zmin": -100.0,
+                        "zmax": 100.0
+                      },
+                      "per_solid_bounds": "not-queried; LooseBoundingBox structural-macro restriction",
+                      "raw": {
+                        "nonce": "b679bd9f4cdf493bbecae06201fe254a",
+                        "project": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\simulation-x\\project\\control\\definitions\\geo-pillbox\\0830bf9dfadd96b07f3743cbabdea279a564e875025e4e8eb22ba3962568f2a0\\verification-managed-254df0e2aed64641a9df9928d8589e92\\reopened\\definition",
+                        "count": "1",
+                        "bounds.xmin": "-100",
+                        "calculation.xmin": "-100",
+                        "bounds.xmax": "100",
+                        "calculation.xmax": "100",
+                        "bounds.ymin": "-100",
+                        "calculation.ymin": "-100",
+                        "bounds.ymax": "100",
+                        "calculation.ymax": "100",
+                        "bounds.zmin": "-100",
+                        "calculation.zmin": "-100",
+                        "bounds.zmax": "100",
+                        "calculation.zmax": "100",
+                        "solid.0.name": "c_657fdc2b228b14a6aba7:s_fa97a25728381a0554c9",
+                        "solid.0.exists": "-1",
+                        "solid.0.material": "Vacuum",
+                        "solid.0.volume_mm3": "6283185.30717959",
+                        "solid.0.solid": "-1",
+                        "solid.0.hybrid": "0",
+                        "end": "GEO1"
+                      }
+                    }
+                  }
+                ]
+              },
+              "ready": true
+            },
+            "result": {
+              "schema_version": 2,
+              "run_id": "geo-solve",
+              "definition_revision": "0830bf9dfadd96b07f3743cbabdea279a564e875025e4e8eb22ba3962568f2a0",
+              "task_id": "973ecf2f-6a75-4c86-9b4e-4870e390bfb8",
+              "status": "success",
+              "frequency_mhz": 1147.42796431385,
+              "rq_ohm": 58.0234672945232,
+              "snapshot": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\simulation-x\\project\\result\\simulation\\geo-solve\\worker_single\\single-simulation__f_1147.427964MHz__973ecf2f-6a75-4c86-9b4e-4870e390bfb8\\single-simulation__f_1147.427964MHz.cst",
+              "snapshot_sha256": "aa764ae7d1f971eaa6530efbb84fd1cb0a2104107f5f6ccddd6cfeaaddfa3987",
+              "capture": {
+                "schema_version": 1,
+                "task_id": "973ecf2f-6a75-4c86-9b4e-4870e390bfb8",
+                "nonce": "c55a9d51c3434aa7b7829992acd94cb6",
+                "binding": {
+                  "project_id": "geo-acceptance-0d6d2b238544422da3173406ae9c95f7",
+                  "attempt_id": "973ecf2f-6a75-4c86-9b4e-4870e390bfb8",
+                  "definition_revision": "0830bf9dfadd96b07f3743cbabdea279a564e875025e4e8eb22ba3962568f2a0",
+                  "database_sha256": "adc8a9ddd1d40eaafd5c31afe4bf8b7f6d26be5109ec7b4c0af1c6687c7c0f7f",
+                  "cst_build": "2022.5 Release from 2022-06-03 (change 981760)",
+                  "scope": "root"
+                },
+                "frame_hashes": {
+                  "pre": "c07d85ddb327b3448e82480ca87104458da10efc2137a343af9534926e702a2d",
+                  "started": "558e37ff851e7023ac61a84d30cb0dcd0f3ef9d0d470c4dbe11875d90e40d762",
+                  "post": "b5dc3f94d51d4930a538c2e7cb3fb4b82eed8af8e13826a983ce3503d83f3ba1"
+                },
+                "status": "execution-snapshot-match",
+                "reasons": [],
+                "result_success": true,
+                "database_verified": true,
+                "exit_confirmed": true,
+                "solver_return": 1,
+                "calculated_modes": 1,
+                "process_exit_code": 0,
+                "batch_exit_zero": true,
+                "snapshot_sha256": "3f9d5efd7a3d68b535b6002797084a9b0e1140d460d88d325cb3682f1d55fa51",
+                "publish_ready": false
+              },
+              "received_sha256": "b86384a89991e412f5ec8328c015b4ebe383e673143b16c57862634ec402228f",
+              "mode_index": 1,
+              "session_id": "879c1295-9988-4046-b269-20189990b84c",
+              "postprocess_definition": {
+                "schema_version": 1,
+                "mode_index": 1,
+                "source_sha256": "e9846cc771252b92574419ccc08d27ba2eae7105698c5bf9facb608f3895dd09",
+                "requested_postprocess": [
+                  {
+                    "metric_id": "frequency",
+                    "method_id": "Frequency",
+                    "settings": {
+                      "mode": {
+                        "selection": "one",
+                        "index": 1
+                      }
+                    }
+                  },
+                  {
+                    "metric_id": "rq",
+                    "method_id": "R_over_Q",
+                    "settings": {
+                      "mode": {
+                        "selection": "one",
+                        "index": 1
+                      },
+                      "integration_line": {
+                        "axis": "x",
+                        "offset_mm": [
+                          0,
+                          0,
+                          0
+                        ],
+                        "beta": 1,
+                        "range": "full"
+                      }
+                    }
+                  }
+                ],
+                "frequency": {
+                  "method": "Frequency",
+                  "native_call": "GetModeFrequencyInHz",
+                  "unit": "MHz",
+                  "scale_from_hz": 1e-06
+                },
+                "r_over_q": {
+                  "method": "R_over_Q",
+                  "implementation": "EigenResult_Complex",
+                  "unit": "ohm",
+                  "integration_line": {
+                    "axis": "x",
+                    "offset_mm": [
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "endpoints_mm": [
+                      [
+                        -100.0,
+                        0.0,
+                        0.0
+                      ],
+                      [
+                        100.0,
+                        0.0,
+                        0.0
+                      ]
+                    ],
+                    "beta": 1.0,
+                    "range": "full"
+                  },
+                  "voltage": "complex line integral with transit phase",
+                  "energy": "QFactor.GetTotalEnergy",
+                  "formula": "abs(V)^2/(omega*W)",
+                  "algorithm": {
+                    "path": "rq-algorithm.vb",
+                    "sha256": "3c9fdf812a7b53f550bf9c2077b4af858db13048a92d19b3e58941fef40cd71d"
+                  }
+                },
+                "generated_macro": {
+                  "path": "execution-worker.bas",
+                  "sha256": "08c260bbeb16e489cd8f8e8eb650f21c706e190da8c5c6e0e74751003b13ebe2"
+                },
+                "generated_macro_evidence": "archived"
+              },
+              "postprocess_provenance_sha256": "cb811aa88a59395d32cb6b0559f0b991e3987d904b12d66cb3309ab2d7f66d1f",
+              "execution_active": false,
+              "session_safety": "confirmed-closed",
+              "metrics": [
+                {
+                  "metric_id": "frequency",
+                  "method_id": "Frequency",
+                  "value": 1147.42796431385,
+                  "unit": "MHz",
+                  "status": "success"
+                },
+                {
+                  "metric_id": "rq",
+                  "method_id": "R_over_Q",
+                  "value": 58.0234672945232,
+                  "unit": "ohm",
+                  "status": "success"
+                }
+              ],
+              "result_revision": "d99a12d2f04a5c99b6c568a59095ab5ea330be6624a053eb236e39788adce9fd"
+            },
+            "analytic_frequency_mhz": 1147.4252783521006,
+            "frequency_tolerance": 0.05,
+            "solver_start_calls": 1,
+            "solver_trace_files": [
+              "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\simulation-x\\project\\control\\runs\\geo-solve\\workers\\single\\879c1295-9988-4046-b269-20189990b84c\\lifecycle.log"
+            ],
+            "session_safety": "confirmed-closed"
+          }
+        },
+        {
+          "axis": "y",
+          "closure": {
+            "exit_code": 0,
+            "exit_confirmed": true,
+            "quiet": {
+              "nonce": "639700bb63e4448a9896498fa6ddba62",
+              "readback": "not-exposed-by-COM",
+              "setter_returned": true,
+              "requested": true
+            },
+            "window_observation": {
+              "baseline_foreground": {
+                "hwnd": 19276814,
+                "pid": 71700,
+                "visible": true,
+                "minimized": false,
+                "owner": 0,
+                "window_class": "Windows.UI.Core.CoreWindow"
+              },
+              "observation": "WinEvent foreground/show hooks plus 50ms window polling",
+              "owned_foreground_events": 0,
+              "errors": [],
+              "dropped_events": 0,
+              "window_enumeration_gaps": 17,
+              "private_desktop": "CstTools_b784b41ee31041b18bbf1a68d434c7b8",
+              "desktop_handle_closed": true,
+              "owned_window_events": 182,
+              "minimize_actions": 0
+            },
+            "window_observation_path": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\simulation-y\\constructed\\window-observation.json"
+          },
+          "simulation": {
+            "status": "verified",
+            "definition": {
+              "schema_version": 2,
+              "project_id": "geo-acceptance-90be10b7bb1745feb3dfdbb4dd7a2953",
+              "definition_revision": "a3ee2ff95a76abb09ac416827fa56045c50dae76ced91c3479cb5d1a48dfdff6",
+              "document_id": "geo-pillbox",
+              "source_sha256": "d17dcbad1f4747262b9c37e803e2e7b1ce41ce90a240021d96143129b6fdfc1c",
+              "installation_ref": "local",
+              "config": {
+                "method": "Default",
+                "mesh": "Tet",
+                "target_enabled": true,
+                "target_value": "500",
+                "adaptation_enabled": false,
+                "requested_modes": 1
+              },
+              "axis": "y",
+              "postprocess": [
+                {
+                  "metric_id": "frequency",
+                  "method_id": "Frequency",
+                  "settings": {
+                    "mode": {
+                      "selection": "one",
+                      "index": 1
+                    }
+                  }
+                },
+                {
+                  "metric_id": "rq",
+                  "method_id": "R_over_Q",
+                  "settings": {
+                    "mode": {
+                      "selection": "one",
+                      "index": 1
+                    },
+                    "integration_line": {
+                      "axis": "y",
+                      "offset_mm": [
+                        0,
+                        0,
+                        0
+                      ],
+                      "beta": 1,
+                      "range": "full"
+                    }
+                  }
+                }
+              ],
+              "geometry_spec": {
+                "parameters": {
+                  "R": {
+                    "expression": "100",
+                    "description": "radius",
+                    "quantity": "length"
+                  },
+                  "H": {
+                    "expression": "2*R",
+                    "description": "height expression",
+                    "quantity": "length"
+                  }
+                },
+                "components": [
+                  "vacuum"
+                ],
+                "geometry": {
+                  "profile": "geometry-v1",
+                  "features": [
+                    {
+                      "feature_id": "f_62742f4ee8d46f1a56aeaa87bdc5011b",
+                      "op": "create_cylinder",
+                      "object_id": "pillbox",
+                      "component_id": "vacuum",
+                      "material_id": "Vacuum",
+                      "axis": "y",
+                      "transverse_center_mm": [
+                        "0",
+                        "0"
+                      ],
+                      "axial_range_mm": [
+                        "-H/2",
+                        "H/2"
+                      ],
+                      "outer_radius_mm": "R",
+                      "inner_radius_mm": "0"
+                    }
+                  ],
+                  "identities": {
+                    "pillbox": "f_62742f4ee8d46f1a56aeaa87bdc5011b"
+                  }
+                },
+                "selection_sets": {},
+                "background": {
+                  "op": "set_background",
+                  "material": "PEC",
+                  "padding_mm": [
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0
+                  ]
+                },
+                "boundaries": {
+                  "op": "set_boundaries",
+                  "faces": [
+                    "electric",
+                    "electric",
+                    "electric",
+                    "electric",
+                    "electric",
+                    "electric"
+                  ],
+                  "symmetry": [
+                    "none",
+                    "none",
+                    "none"
+                  ]
+                },
+                "simulation": {
+                  "solver": "eigenmode",
+                  "method": "default",
+                  "mesh": {
+                    "type": "tet",
+                    "cells_per_wavelength": 2,
+                    "adaptive": false
+                  },
+                  "frequency_range_mhz": {
+                    "min": 500,
+                    "max": 2000
+                  },
+                  "frequency_lower_target_mhz": 500,
+                  "requested_modes": 1,
+                  "losses": "postprocess_only"
+                },
+                "postprocess": [
+                  {
+                    "metric_id": "frequency",
+                    "method_id": "Frequency",
+                    "settings": {
+                      "mode": {
+                        "selection": "one",
+                        "index": 1
+                      }
+                    }
+                  },
+                  {
+                    "metric_id": "rq",
+                    "method_id": "R_over_Q",
+                    "settings": {
+                      "mode": {
+                        "selection": "one",
+                        "index": 1
+                      },
+                      "integration_line": {
+                        "axis": "y",
+                        "offset_mm": [
+                          0,
+                          0,
+                          0
+                        ],
+                        "beta": 1,
+                        "range": "full"
+                      }
+                    }
+                  }
+                ]
+              },
+              "verification": {
+                "schema_version": 1,
+                "status": "verified",
+                "scope": "root",
+                "source_sha256": "d17dcbad1f4747262b9c37e803e2e7b1ce41ce90a240021d96143129b6fdfc1c",
+                "validation_target": "simulation",
+                "gates": [
+                  "saved-reopened",
+                  "identity",
+                  "settings",
+                  "standard-close"
+                ],
+                "diagnostics": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\simulation-y\\project\\control\\definitions\\geo-pillbox\\a3ee2ff95a76abb09ac416827fa56045c50dae76ced91c3479cb5d1a48dfdff6\\verification-managed-b1e4e0c4f2414b5f87a05409a7d1f5e3",
+                "installation": {
+                  "executable": "D:\\Program Files (x86)\\CST Studio Suite 2022\\CST DESIGN ENVIRONMENT.exe",
+                  "launcher_sha256": "bde34d5ad5b7ec46500ab8d0a1da2eb04b198e27ed06d1d7de3ffe8ec55c397e",
+                  "modeler_sha256": "a1cb2ec6316592020e81129fa0687343db2c650d82286c79a22ef4e08310db98",
+                  "profile_major": "2022"
+                },
+                "sessions": [
+                  {
+                    "phase": "saved",
+                    "exit_code": 0,
+                    "exit_confirmed": true
+                  },
+                  {
+                    "phase": "reopened",
+                    "exit_code": 0,
+                    "exit_confirmed": true
+                  }
+                ],
+                "observations": [
+                  {
+                    "phase": "saved",
+                    "sha256": "b3d4ce2d12387c5f201ae9ad5cbeafb52241eb231bd8eaa4a659da6a3437c51d",
+                    "native": {
+                      "nonce": "7d8b86a3fcbe410ca784296ece30cfd7",
+                      "project": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\simulation-y\\project\\control\\definitions\\geo-pillbox\\a3ee2ff95a76abb09ac416827fa56045c50dae76ced91c3479cb5d1a48dfdff6\\verification-managed-b1e4e0c4f2414b5f87a05409a7d1f5e3\\saved\\definition",
+                      "build": "Version 2022.5 - Jun 03 2022",
+                      "solver": "HF Eigenmode",
+                      "length": "mm",
+                      "frequency": "MHz",
+                      "mesh": "Tetrahedral",
+                      "fmin": "500",
+                      "fmax": "2000",
+                      "end": "G03V1"
+                    },
+                    "geometry": {
+                      "status": "verified",
+                      "source": "native-query",
+                      "objects": [
+                        {
+                          "object_id": "pillbox",
+                          "native_name": "c_657fdc2b228b14a6aba7:s_fa97a25728381a0554c9",
+                          "state": "live",
+                          "exists": true,
+                          "material_id": "Vacuum",
+                          "volume_mm3": 6283185.30717959,
+                          "solid": true,
+                          "hybrid": false,
+                          "volume_check": "analytic"
+                        }
+                      ],
+                      "bounds_mm": {
+                        "xmin": -100.0,
+                        "xmax": 100.0,
+                        "ymin": -100.0,
+                        "ymax": 100.0,
+                        "zmin": -100.0,
+                        "zmax": 100.0
+                      },
+                      "calculation_bounds_mm": {
+                        "xmin": -100.0,
+                        "xmax": 100.0,
+                        "ymin": -100.0,
+                        "ymax": 100.0,
+                        "zmin": -100.0,
+                        "zmax": 100.0
+                      },
+                      "per_solid_bounds": "not-queried; LooseBoundingBox structural-macro restriction",
+                      "raw": {
+                        "nonce": "7d8b86a3fcbe410ca784296ece30cfd7",
+                        "project": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\simulation-y\\project\\control\\definitions\\geo-pillbox\\a3ee2ff95a76abb09ac416827fa56045c50dae76ced91c3479cb5d1a48dfdff6\\verification-managed-b1e4e0c4f2414b5f87a05409a7d1f5e3\\saved\\definition",
+                        "count": "1",
+                        "bounds.xmin": "-100",
+                        "calculation.xmin": "-100",
+                        "bounds.xmax": "100",
+                        "calculation.xmax": "100",
+                        "bounds.ymin": "-100",
+                        "calculation.ymin": "-100",
+                        "bounds.ymax": "100",
+                        "calculation.ymax": "100",
+                        "bounds.zmin": "-100",
+                        "calculation.zmin": "-100",
+                        "bounds.zmax": "100",
+                        "calculation.zmax": "100",
+                        "solid.0.name": "c_657fdc2b228b14a6aba7:s_fa97a25728381a0554c9",
+                        "solid.0.exists": "-1",
+                        "solid.0.material": "Vacuum",
+                        "solid.0.volume_mm3": "6283185.30717959",
+                        "solid.0.solid": "-1",
+                        "solid.0.hybrid": "0",
+                        "end": "GEO1"
+                      }
+                    }
+                  },
+                  {
+                    "phase": "reopened",
+                    "sha256": "44c51b0f69bb675e233b724ff38c51f0f386eb2f75819b9ae96918f2ca23ede0",
+                    "native": {
+                      "nonce": "41e2d4cba1514d21a4d57ce549a20157",
+                      "project": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\simulation-y\\project\\control\\definitions\\geo-pillbox\\a3ee2ff95a76abb09ac416827fa56045c50dae76ced91c3479cb5d1a48dfdff6\\verification-managed-b1e4e0c4f2414b5f87a05409a7d1f5e3\\reopened\\definition",
+                      "build": "Version 2022.5 - Jun 03 2022",
+                      "solver": "HF Eigenmode",
+                      "length": "mm",
+                      "frequency": "MHz",
+                      "mesh": "Tetrahedral",
+                      "fmin": "500",
+                      "fmax": "2000",
+                      "end": "G03V1"
+                    },
+                    "geometry": {
+                      "status": "verified",
+                      "source": "native-query",
+                      "objects": [
+                        {
+                          "object_id": "pillbox",
+                          "native_name": "c_657fdc2b228b14a6aba7:s_fa97a25728381a0554c9",
+                          "state": "live",
+                          "exists": true,
+                          "material_id": "Vacuum",
+                          "volume_mm3": 6283185.30717959,
+                          "solid": true,
+                          "hybrid": false,
+                          "volume_check": "analytic"
+                        }
+                      ],
+                      "bounds_mm": {
+                        "xmin": -100.0,
+                        "xmax": 100.0,
+                        "ymin": -100.0,
+                        "ymax": 100.0,
+                        "zmin": -100.0,
+                        "zmax": 100.0
+                      },
+                      "calculation_bounds_mm": {
+                        "xmin": -100.0,
+                        "xmax": 100.0,
+                        "ymin": -100.0,
+                        "ymax": 100.0,
+                        "zmin": -100.0,
+                        "zmax": 100.0
+                      },
+                      "per_solid_bounds": "not-queried; LooseBoundingBox structural-macro restriction",
+                      "raw": {
+                        "nonce": "41e2d4cba1514d21a4d57ce549a20157",
+                        "project": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\simulation-y\\project\\control\\definitions\\geo-pillbox\\a3ee2ff95a76abb09ac416827fa56045c50dae76ced91c3479cb5d1a48dfdff6\\verification-managed-b1e4e0c4f2414b5f87a05409a7d1f5e3\\reopened\\definition",
+                        "count": "1",
+                        "bounds.xmin": "-100",
+                        "calculation.xmin": "-100",
+                        "bounds.xmax": "100",
+                        "calculation.xmax": "100",
+                        "bounds.ymin": "-100",
+                        "calculation.ymin": "-100",
+                        "bounds.ymax": "100",
+                        "calculation.ymax": "100",
+                        "bounds.zmin": "-100",
+                        "calculation.zmin": "-100",
+                        "bounds.zmax": "100",
+                        "calculation.zmax": "100",
+                        "solid.0.name": "c_657fdc2b228b14a6aba7:s_fa97a25728381a0554c9",
+                        "solid.0.exists": "-1",
+                        "solid.0.material": "Vacuum",
+                        "solid.0.volume_mm3": "6283185.30717959",
+                        "solid.0.solid": "-1",
+                        "solid.0.hybrid": "0",
+                        "end": "GEO1"
+                      }
+                    }
+                  }
+                ]
+              },
+              "ready": true
+            },
+            "result": {
+              "schema_version": 2,
+              "run_id": "geo-solve",
+              "definition_revision": "a3ee2ff95a76abb09ac416827fa56045c50dae76ced91c3479cb5d1a48dfdff6",
+              "task_id": "9ac4b8b3-63e5-4f7b-96de-5701ede0b536",
+              "status": "success",
+              "frequency_mhz": 1147.42746788338,
+              "rq_ohm": 57.9725643515358,
+              "snapshot": "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\simulation-y\\project\\result\\simulation\\geo-solve\\worker_single\\single-simulation__f_1147.427468MHz__9ac4b8b3-63e5-4f7b-96de-5701ede0b536\\single-simulation__f_1147.427468MHz.cst",
+              "snapshot_sha256": "dc98f7486d20c6a9642db560dddc30b900c93f07b5e2fc2e2f3431493993e497",
+              "capture": {
+                "schema_version": 1,
+                "task_id": "9ac4b8b3-63e5-4f7b-96de-5701ede0b536",
+                "nonce": "c72a5a522f674ab4bd58a93ee1c7ebe4",
+                "binding": {
+                  "project_id": "geo-acceptance-90be10b7bb1745feb3dfdbb4dd7a2953",
+                  "attempt_id": "9ac4b8b3-63e5-4f7b-96de-5701ede0b536",
+                  "definition_revision": "a3ee2ff95a76abb09ac416827fa56045c50dae76ced91c3479cb5d1a48dfdff6",
+                  "database_sha256": "9ee52354ce34c01b3d2f1f24ffcef26ae263a68c5622da723cbf36351a21976f",
+                  "cst_build": "2022.5 Release from 2022-06-03 (change 981760)",
+                  "scope": "root"
+                },
+                "frame_hashes": {
+                  "pre": "7d551883e57eb4d87a3155835def0b8e58195aa563f25ac6604c01948c76a03d",
+                  "started": "47dfd6d27643a94e0f966222e5b94ddc0320235d218e1a66fdbbb22d552b81b2",
+                  "post": "17e1d71a22196840a0a92027ef4bac7c999ba1da78f4b11412f3546e13edccdd"
+                },
+                "status": "execution-snapshot-match",
+                "reasons": [],
+                "result_success": true,
+                "database_verified": true,
+                "exit_confirmed": true,
+                "solver_return": 1,
+                "calculated_modes": 1,
+                "process_exit_code": 0,
+                "batch_exit_zero": true,
+                "snapshot_sha256": "a382e199ef90754d62fa4b9d543e2c51bdbfe63c8738c77a5baadeb5a8861c5f",
+                "publish_ready": false
+              },
+              "received_sha256": "b2f9595e7af1d92f5b1371f00e43cf7ef9d995929a391e5cd2595c5a9e4eac64",
+              "mode_index": 1,
+              "session_id": "1cdcc4bd-4204-454b-bbce-73043a455f7d",
+              "postprocess_definition": {
+                "schema_version": 1,
+                "mode_index": 1,
+                "source_sha256": "d17dcbad1f4747262b9c37e803e2e7b1ce41ce90a240021d96143129b6fdfc1c",
+                "requested_postprocess": [
+                  {
+                    "metric_id": "frequency",
+                    "method_id": "Frequency",
+                    "settings": {
+                      "mode": {
+                        "selection": "one",
+                        "index": 1
+                      }
+                    }
+                  },
+                  {
+                    "metric_id": "rq",
+                    "method_id": "R_over_Q",
+                    "settings": {
+                      "mode": {
+                        "selection": "one",
+                        "index": 1
+                      },
+                      "integration_line": {
+                        "axis": "y",
+                        "offset_mm": [
+                          0,
+                          0,
+                          0
+                        ],
+                        "beta": 1,
+                        "range": "full"
+                      }
+                    }
+                  }
+                ],
+                "frequency": {
+                  "method": "Frequency",
+                  "native_call": "GetModeFrequencyInHz",
+                  "unit": "MHz",
+                  "scale_from_hz": 1e-06
+                },
+                "r_over_q": {
+                  "method": "R_over_Q",
+                  "implementation": "EigenResult_Complex",
+                  "unit": "ohm",
+                  "integration_line": {
+                    "axis": "y",
+                    "offset_mm": [
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "endpoints_mm": [
+                      [
+                        0.0,
+                        -100.0,
+                        0.0
+                      ],
+                      [
+                        0.0,
+                        100.0,
+                        0.0
+                      ]
+                    ],
+                    "beta": 1.0,
+                    "range": "full"
+                  },
+                  "voltage": "complex line integral with transit phase",
+                  "energy": "QFactor.GetTotalEnergy",
+                  "formula": "abs(V)^2/(omega*W)",
+                  "algorithm": {
+                    "path": "rq-algorithm.vb",
+                    "sha256": "3c9fdf812a7b53f550bf9c2077b4af858db13048a92d19b3e58941fef40cd71d"
+                  }
+                },
+                "generated_macro": {
+                  "path": "execution-worker.bas",
+                  "sha256": "1f1e2148ea0930aa005d0976a07309b605cbc6e5c9b2a6efea21381b6b818ef6"
+                },
+                "generated_macro_evidence": "archived"
+              },
+              "postprocess_provenance_sha256": "94262d7b1b12d9f653dda8578a99369f0ae5eaacc077de7d496e0553b8a5ac4b",
+              "execution_active": false,
+              "session_safety": "confirmed-closed",
+              "metrics": [
+                {
+                  "metric_id": "frequency",
+                  "method_id": "Frequency",
+                  "value": 1147.42746788338,
+                  "unit": "MHz",
+                  "status": "success"
+                },
+                {
+                  "metric_id": "rq",
+                  "method_id": "R_over_Q",
+                  "value": 57.9725643515358,
+                  "unit": "ohm",
+                  "status": "success"
+                }
+              ],
+              "result_revision": "b20bac9634be3a1e289348f91eff5f1c6b6e6659368687139bd76bc79ca88de1"
+            },
+            "analytic_frequency_mhz": 1147.4252783521006,
+            "frequency_tolerance": 0.05,
+            "solver_start_calls": 1,
+            "solver_trace_files": [
+              "D:\\work\\cst_tools\\artifacts\\geo234-native-ebb3e6df\\simulation-y\\project\\control\\runs\\geo-solve\\workers\\single\\1cdcc4bd-4204-454b-bbce-73043a455f7d\\lifecycle.log"
+            ],
+            "session_safety": "confirmed-closed"
+          }
+        }
+      ],
+      "xyz_operator_relative_tolerance": 0.05
+    }
+  },
+  "scope": "CST2022 owned generated geometry; bounded native observations",
+  "tool_sha256": "d03d7f7d87049e838b20c4efb0996d0568b7a9cd72a90d82e600bc454b7b0b75",
+  "artifact_root": "artifacts\\geo234-native-ebb3e6df"
+}

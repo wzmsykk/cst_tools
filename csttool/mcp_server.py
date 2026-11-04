@@ -199,23 +199,28 @@ def create_server(project,*,adapter=None):
 
     @server.tool()
     def apply_model_changes(control_handle:str,document_id:str,expected_document_revision:str,
-                            changes:list[dict[str,object]],request_id:str,invalidate_results:bool=False) -> dict[str,object]:
+                            changes:list[dict[str,object]],request_id:str,invalidate_results:bool=False,
+                            geometry_profile:Literal['geometry-v1']|None=None) -> dict[str,object]:
         """Commit a typed immutable draft. No CST opens; saved results remain immutable."""
-        return invoke(application.edit_model,control_handle,'apply_model_changes',dict(document_id=document_id,
-            expected_document_revision=expected_document_revision,changes=changes,invalidate_results=invalidate_results),request_id)
+        arguments=dict(document_id=document_id,expected_document_revision=expected_document_revision,
+                       changes=changes,invalidate_results=invalidate_results)
+        if geometry_profile is not None:arguments['geometry_profile']=geometry_profile
+        return invoke(application.edit_model,control_handle,'apply_model_changes',arguments,request_id)
 
     @server.tool()
     def configure_simulation(control_handle:str,document_id:str,expected_document_revision:str,
                              simulation:dict[str,object],postprocess:list[dict[str,object]],request_id:str) -> dict[str,object]:
-        """Configure the A1 Tet/Default single-mode draft and required Frequency/RQ."""
+        """Configure supported A1/GEO Tet/Default single-mode Frequency/RQ settings."""
         return invoke(application.edit_model,control_handle,'configure_simulation',dict(document_id=document_id,
             expected_document_revision=expected_document_revision,simulation=simulation,postprocess=postprocess),request_id)
 
     @server.tool()
-    def save_project(control_handle:str,document_id:str,expected_document_revision:str,request_id:str,verify_reopen:bool=True) -> dict[str,object]:
+    def save_project(control_handle:str,document_id:str,expected_document_revision:str,request_id:str,verify_reopen:bool=True,
+                     validation_target:Literal['geometry','simulation']|None=None) -> dict[str,object]:
         """Build a copy and verify saved/reopened settings through G03. Never solves."""
-        return invoke(application.edit_model,control_handle,'save_project',dict(document_id=document_id,
-            expected_document_revision=expected_document_revision,verify_reopen=verify_reopen),request_id)
+        arguments=dict(document_id=document_id,expected_document_revision=expected_document_revision,verify_reopen=verify_reopen)
+        if validation_target is not None:arguments['validation_target']=validation_target
+        return invoke(application.edit_model,control_handle,'save_project',arguments,request_id)
 
     @server.tool()
     def close_project(control_handle:str,document_id:str,expected_document_revision:str,

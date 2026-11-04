@@ -10,16 +10,25 @@ import psutil
 from .configuration import read_json, write_json_atomic
 
 
+def definition_status_paths(catalog):
+    """All owned definition phases, including nested GEO candidate verification."""
+    catalog=Path(catalog).resolve()
+    for path in sorted(catalog.rglob('session-status.json')):
+        if not path.resolve().is_relative_to(catalog):raise ValueError('definition session escapes catalog')
+        yield path
+
+
 def definition_session_facts(project):
     catalog=(Path(project).resolve()/'control/definitions')
     sessions=[]
-    for path in sorted(catalog.glob('*/*/verification-*/*/session-status.json')):
+    for path in definition_status_paths(catalog):
         directory=path.parent.resolve()
         if not directory.is_relative_to(catalog.resolve()):
             raise ValueError('definition session escapes catalog')
         state='unknown';reason='缺少归属进程记录';report={}
         try:
             report=read_json(path)
+            if not isinstance(report,dict):raise ValueError('definition status must be an object')
             owned=report.get('owned')
             # Earlier G03 producers persisted exit codes in the verification
             # journal, not the per-phase status. Read that existing proof only.
@@ -27,6 +36,9 @@ def definition_session_facts(project):
                 proof_path=directory.parent/'verification.json'
                 if proof_path.exists():
                     proof=read_json(proof_path)
+                    if not isinstance(proof,dict):raise ValueError('definition proof must be an object')
+                    if not isinstance(proof.get('sessions'),list) or any(not isinstance(s,dict) for s in proof['sessions']):
+                        raise ValueError('definition proof sessions must be objects')
                     matches=[s for s in proof.get('sessions',[]) if s.get('phase')==directory.name]
                     if len(matches)==1 and matches[0].get('exit_confirmed') is True:
                         report={**report,'exit_code':matches[0].get('exit_code')}
@@ -49,10 +61,11 @@ def definition_session_facts(project):
                 related=list(task_project_processes(directory/'definition.cst'))
                 if related:
                     state='running';reason='已核实副本路径的验证进程仍在运行'
-            standard=state=='exited' and report.get('exit_confirmed') is True and report.get('exit_code')==0
+            standard=state=='exited' and report.get('exit_confirmed') is True and type(report.get('exit_code')) is int and report['exit_code']==0
             reconciled=report.get('disposition')=='abandoned-dead'
             pending=state!='exited' or (not standard and not reconciled)
         except (OSError,ValueError,KeyError,TypeError,psutil.Error) as error:
+            report=report if isinstance(report,dict) else {}
             state='unknown';standard=False;pending=True;reason=str(error)
         bootstrap=directory.parent.name=='verification-bootstrap'
         sessions.append(dict(kind='project-bootstrap' if bootstrap else 'definition-verification',worker_id='G02' if bootstrap else 'G03',session_id=directory.parent.name+'/'+directory.name,

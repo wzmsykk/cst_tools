@@ -1,0 +1,202 @@
+{
+  "date": "2026-11-04",
+  "baseline": "f755505",
+  "status": "GEO-2-4-supported-profile-accepted",
+  "sources": {
+    "csttool/definition_editing.py": "83586960c9b655a5f1cda78e37dc8987107f014f3d08bdf90083c3ef667b5aaa",
+    "csttool/winwrap_emitter.py": "506e8bdeba2edee8a3c97a7d52eeded7c47ef237668b90bb123157f71bf81942",
+    "csttool/winwrap_checks.py": "1054eecf4dbcdbb041f7426b8512713c11a4c92b46007907a3e8150916cbd570",
+    "csttool/settings_projection.py": "f02801de6eb09457c9b319fabab5e87e000ca6393febd4f36b4a94b7c103ea2c",
+    "csttool/vb_codec.py": "5f824f464cb93927434005b5868b8dc960c284fcd155d06fad163ee393bd5407",
+    "csttool/native_definition_builder.py": "dd9e7fb22fddf50c1111b56b7b147134e68a44234e6092d9eb525d47bfd173d9",
+    "data/first_stage_contract.schema.json": "79eb070c7cac6b073b570465cb860a81894b4512781b6b63cfdf09c44417eca8",
+    "csttool/geometry_contract.py": "9e7b835b4d151ee6e9e4cf903637ed5544a063306dc39c4e7183972ee28ce8a0",
+    "csttool/geometry_codegen.py": "433c1dd7786ae79502f159590b19ca86aed8c646f45ce039a1fc3023037a89aa",
+    "csttool/history_program.py": "7338692954aca3c438dfb3952a0cc47ade3e2a83c395d1084bf8903b1c37ec73",
+    "csttool/managed_history.py": "98e6dc0d46d02ff50cb2a86c3a6433e6f9a2ab442a4783d5ae9bf160d22ee5be",
+    "csttool/definition_geometry.py": "0f84c36aeafd53929b9281f5cdef37021f4436d7d68e14911f3f31a2a44ca6ef",
+    "csttool/definition_verifier.py": "4e14e23a0a29038ab46afc7c97789f5ee4981395dc5eaa0b4910a01363845f46",
+    "csttool/application_service.py": "c104d13fd168baba4850ef4bd7db8221fc55042361a4ca15e015689b023eb02a",
+    "csttool/result_provenance.py": "d1ca07a637f049a08b753b024b035eaa09cfd1f64ec79cc4243d2316fa34fa3e",
+    "csttool/definition_sessions.py": "b166f4ddb778110b8dd5c5b47f9297c0a294fed5b6b9702906a74812d794fa76"
+  },
+  "native": {
+    "evidence": "knowledge-base/geometry-calibration-20261104.json",
+    "artifact_root": "artifacts\\geo234-native-ebb3e6df",
+    "cases": {
+      "C1": "verified",
+      "C2": "verified",
+      "C3": "verified",
+      "C4": "verified",
+      "C5": "verified",
+      "C6": "verified",
+      "C7": "verified",
+      "GEO-4": "verified"
+    },
+    "xyz": [
+      {
+        "axis": "z",
+        "metrics": [
+          {
+            "metric_id": "frequency",
+            "method_id": "Frequency",
+            "value": 1147.42737641147,
+            "unit": "MHz",
+            "status": "success"
+          },
+          {
+            "metric_id": "rq",
+            "method_id": "R_over_Q",
+            "value": 58.1026729651487,
+            "unit": "ohm",
+            "status": "success"
+          }
+        ]
+      },
+      {
+        "axis": "x",
+        "metrics": [
+          {
+            "metric_id": "frequency",
+            "method_id": "Frequency",
+            "value": 1147.42796431385,
+            "unit": "MHz",
+            "status": "success"
+          },
+          {
+            "metric_id": "rq",
+            "method_id": "R_over_Q",
+            "value": 58.0234672945232,
+            "unit": "ohm",
+            "status": "success"
+          }
+        ]
+      },
+      {
+        "axis": "y",
+        "metrics": [
+          {
+            "metric_id": "frequency",
+            "method_id": "Frequency",
+            "value": 1147.42746788338,
+            "unit": "MHz",
+            "status": "success"
+          },
+          {
+            "metric_id": "rq",
+            "method_id": "R_over_Q",
+            "value": 57.9725643515358,
+            "unit": "ohm",
+            "status": "success"
+          }
+        ]
+      }
+    ],
+    "solver_starts": "one actual Start per axis; evidence and lifecycle paths retained in calibration",
+    "standard_close": "owned construction and saved/reopened phases verified; solver session_safety confirmed-closed; no kill",
+    "failures": "Err.Raise is deliberately injected; not a spontaneous solver exception. Degenerate Boolean input may exit 0 without Model.run marker; rejected, internal cause unverified."
+  },
+  "public_sdk": {
+    "artifact_root": "artifacts/typed-public-9852d15f",
+    "receipt_sha256": "ec8bcc3e03cc7c868a17abbf89e93503a81321c6072743b808dd62f4054be2f3",
+    "real_cst": true,
+    "desktop_host": false,
+    "geometry_profile": "geometry-v1",
+    "geometry_save_then_simulation": true,
+    "metrics": [
+      {
+        "metric_id": "frequency",
+        "method_id": "Frequency",
+        "value": 1147.42692991921,
+        "unit": "MHz",
+        "status": "success"
+      },
+      {
+        "metric_id": "rq",
+        "method_id": "R_over_Q",
+        "value": 223.541439593232,
+        "unit": "ohm",
+        "status": "success"
+      }
+    ],
+    "solver_trace_files": [
+      "D:\\work\\cst_tools\\artifacts\\typed-public-9852d15f\\control\\runs\\3d08352fd91e43f9a5cfa135da6afc36\\workers\\single\\1337fb9a-a10b-4bd6-8bff-efd050f9449e\\lifecycle.log"
+    ],
+    "runner_exit_confirmed": true,
+    "exports": {
+      "request_id": "5e35d2feebd34033b1cdc2d8918d5c96",
+      "accepted": true,
+      "instance_id": "cce7a7285ab0451dbb59f2cf657f2948",
+      "run_id": "3d08352fd91e43f9a5cfa135da6afc36",
+      "result_revision": "a0b8b8a9a3480c586c9cb14fca884f3df062866e5161619e4390daf3afc55859",
+      "artifacts": [
+        {
+          "path": "result\\exports\\3d08352fd91e43f9a5cfa135da6afc36\\a0b8b8a9a3480c586c9cb14fca884f3df062866e5161619e4390daf3afc55859\\results.csv",
+          "relative_to": "project",
+          "sha256": "ce347c6a357d28d7908acb793ea04731a49356a1e1652840ba8aec794adfc1dd",
+          "size_bytes": 565,
+          "format": "csv"
+        },
+        {
+          "path": "result\\exports\\3d08352fd91e43f9a5cfa135da6afc36\\a0b8b8a9a3480c586c9cb14fca884f3df062866e5161619e4390daf3afc55859\\results.json",
+          "relative_to": "project",
+          "sha256": "4b4626efd25e155ecfceda4e0a1769a1bcaad49c22b2c230f542ecc7f9158c8e",
+          "size_bytes": 4573,
+          "format": "json"
+        }
+      ]
+    },
+    "parameter_expressions": {
+      "R": "100",
+      "L": "R"
+    }
+  },
+  "fixes": [
+    "Native Model.mod strict managed captions/order/body and parameter expressions/descriptions readback",
+    "Do not fabricate cylinder geometry to reuse settings validation; combine actual GEO and actual SIM projection",
+    "Model.run geometry-only probes must not query absent solver settings",
+    "Recursive owned session discovery covers nested GEO verifier phases; malformed evidence remains unknown",
+    "Verifier local guard is candidate.parent; owner service guards catalog under project lock",
+    "Keep project lock throughout geometry verification and show geometry-verify progress",
+    "Native stage cancellation marker preserves standard close wait rather than abandoning owned process"
+  ],
+  "limitations": [
+    "CST2022 bounded profile, PEC background/vacuum, Default/Tet fixed Version1 density, nmodes=1, electric faces, Frequency/RQ beta1 full central line",
+    "Selection sets are logical solid metadata, not native Groups or face/edge topology",
+    "General CSG observation does not prove connectedness or exact CAD equivalence; no per-solid LooseBoundingBox or index enumeration",
+    "Modern SDK fresh process accepted, not refreshed Codex desktop conversation acceptance",
+    "No mesh convergence or physical mode identity proof",
+    "A1 license update rejected by auto approval because separate authorization; data/winwrap-a1-calibration.json unchanged and stale"
+  ],
+  "cleanup": {
+    "status": "completed: inventoried native binaries and archived finished pytest directories removed",
+    "native_regenerable_files": 2424,
+    "native_bytes_removed": 280459818,
+    "raw_models_and_fields_available": false,
+    "retained": "knowledge-base light reports; native macros/logs/spec/parameter/hash files; pytest light evidence ZIPs and JUnit XML under artifacts",
+    "artifact_paths_guaranteed_in_git": false,
+    "recreate_raw_data": "rerun explicitly authorized controlled calibration; do not claim deleted source models remain accessible"
+  },
+  "offline_acceptance": {
+    "functional_and_registry_sdk_package": {
+      "passed": 514,
+      "junit": "artifacts/geo234-final-tests.xml"
+    },
+    "gui_runner": {
+      "passed": 89,
+      "junit": "artifacts/geo234-runner-verified-tests.xml"
+    },
+    "distinct_total": 603,
+    "repeated_runs_not_added": true,
+    "test_corrections": "venv process-tree identity and physical exit; explicit claim rejection keeps transport known; cancel_start durable transfer preserves recovery state",
+    "final_registry_package_repeat": {
+      "passed": 63,
+      "junit": "artifacts/geo234-final-docs.xml",
+      "overlaps_previous_514": true
+    },
+    "final_metadata_repeat": {
+      "passed": 16,
+      "overlaps_previous_suites": true
+    }
+  }
+}
