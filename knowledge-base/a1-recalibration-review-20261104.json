@@ -1,0 +1,664 @@
+{
+  "date": "2026-11-04",
+  "runtime_baseline": "54b8715",
+  "status": "native-accepted",
+  "authorization": "explicit user permission for A1 serial non-solving copies and publication after all gates pass",
+  "current_gate": "knowledge-base/winwrap-w23-20261104.json",
+  "current_gate_file_sha256": "50048924c65d39626ce7526a2ac69ccde3e234f05a3944e86a7183a1a0be5a71",
+  "generator_source_count": 16,
+  "runtime_sources_unchanged": true,
+  "geo_gate_separate_and_current": true,
+  "solver_start_calls": 0,
+  "final_native_sessions": 12,
+  "earlier_debug_sessions": 2,
+  "total_native_sessions": 14,
+  "sessions": [
+    {
+      "path": "artifacts\\winwrap-w23-8dc3c3a9\\compile\\session-status.json",
+      "exit_code": 0,
+      "exit_confirmed": true,
+      "owned": [
+        {
+          "pid": 73020,
+          "create_time": 1793800091.852662
+        },
+        {
+          "pid": 69656,
+          "create_time": 1793800091.8716202
+        },
+        {
+          "pid": 46532,
+          "create_time": 1793800092.30612
+        },
+        {
+          "pid": 66996,
+          "create_time": 1793800092.4835422
+        },
+        {
+          "pid": 47116,
+          "create_time": 1793800094.5929732
+        },
+        {
+          "pid": 16352,
+          "create_time": 1793800095.4446137
+        },
+        {
+          "pid": 35000,
+          "create_time": 1793800096.9079692
+        },
+        {
+          "pid": 25400,
+          "create_time": 1793800098.7308137
+        },
+        {
+          "pid": 77248,
+          "create_time": 1793800098.9835184
+        },
+        {
+          "pid": 53764,
+          "create_time": 1793800099.8028765
+        }
+      ]
+    },
+    {
+      "path": "artifacts\\winwrap-w23-8dc3c3a9\\project\\control\\definitions\\fault-syntax\\attempt\\verification-edit\\saved\\session-status.json",
+      "exit_code": 0,
+      "exit_confirmed": true,
+      "owned": [
+        {
+          "pid": 78348,
+          "create_time": 1793800110.610144
+        },
+        {
+          "pid": 4528,
+          "create_time": 1793800110.628797
+        },
+        {
+          "pid": 76108,
+          "create_time": 1793800111.1017056
+        },
+        {
+          "pid": 31844,
+          "create_time": 1793800111.2873669
+        },
+        {
+          "pid": 46268,
+          "create_time": 1793800113.3348768
+        },
+        {
+          "pid": 36276,
+          "create_time": 1793800114.1799092
+        },
+        {
+          "pid": 58664,
+          "create_time": 1793800115.5378268
+        },
+        {
+          "pid": 28892,
+          "create_time": 1793800116.816008
+        },
+        {
+          "pid": 75796,
+          "create_time": 1793800117.1127355
+        },
+        {
+          "pid": 38740,
+          "create_time": 1793800117.6552348
+        }
+      ]
+    },
+    {
+      "path": "artifacts\\winwrap-w23-b1132d36\\compile\\session-status.json",
+      "exit_code": 0,
+      "exit_confirmed": true,
+      "owned": [
+        {
+          "pid": 31392,
+          "create_time": 1793800285.8255231
+        },
+        {
+          "pid": 62808,
+          "create_time": 1793800285.8466885
+        },
+        {
+          "pid": 77488,
+          "create_time": 1793800286.301112
+        },
+        {
+          "pid": 75340,
+          "create_time": 1793800286.4748108
+        },
+        {
+          "pid": 80664,
+          "create_time": 1793800288.5634234
+        },
+        {
+          "pid": 74728,
+          "create_time": 1793800289.379634
+        },
+        {
+          "pid": 15672,
+          "create_time": 1793800290.744678
+        },
+        {
+          "pid": 75596,
+          "create_time": 1793800291.775258
+        },
+        {
+          "pid": 19748,
+          "create_time": 1793800292.047942
+        },
+        {
+          "pid": 57312,
+          "create_time": 1793800292.5025167
+        }
+      ]
+    },
+    {
+      "path": "artifacts\\winwrap-w23-b1132d36\\project\\control\\definitions\\fault-partial\\attempt\\verification-edit\\saved\\session-status.json",
+      "exit_code": 0,
+      "exit_confirmed": true,
+      "owned": [
+        {
+          "pid": 67152,
+          "create_time": 1793800318.613575
+        },
+        {
+          "pid": 76920,
+          "create_time": 1793800318.6290865
+        },
+        {
+          "pid": 45588,
+          "create_time": 1793800319.1214988
+        },
+        {
+          "pid": 23704,
+          "create_time": 1793800319.282079
+        },
+        {
+          "pid": 41132,
+          "create_time": 1793800321.1963112
+        },
+        {
+          "pid": 36344,
+          "create_time": 1793800322.0230303
+        },
+        {
+          "pid": 80016,
+          "create_time": 1793800323.4623017
+        },
+        {
+          "pid": 81744,
+          "create_time": 1793800324.4969323
+        },
+        {
+          "pid": 45336,
+          "create_time": 1793800324.7228656
+        },
+        {
+          "pid": 41116,
+          "create_time": 1793800325.283523
+        }
+      ]
+    },
+    {
+      "path": "artifacts\\winwrap-w23-b1132d36\\project\\control\\definitions\\fault-syntax\\attempt\\verification-edit\\saved\\session-status.json",
+      "exit_code": 0,
+      "exit_confirmed": true,
+      "owned": [
+        {
+          "pid": 77376,
+          "create_time": 1793800300.4344893
+        },
+        {
+          "pid": 43068,
+          "create_time": 1793800300.4527972
+        },
+        {
+          "pid": 32320,
+          "create_time": 1793800300.91371
+        },
+        {
+          "pid": 46728,
+          "create_time": 1793800301.075016
+        },
+        {
+          "pid": 42208,
+          "create_time": 1793800303.1122108
+        },
+        {
+          "pid": 77176,
+          "create_time": 1793800303.9403703
+        },
+        {
+          "pid": 78464,
+          "create_time": 1793800305.3947735
+        },
+        {
+          "pid": 80836,
+          "create_time": 1793800306.5030296
+        },
+        {
+          "pid": 74876,
+          "create_time": 1793800306.685274
+        },
+        {
+          "pid": 45968,
+          "create_time": 1793800307.1020772
+        }
+      ]
+    },
+    {
+      "path": "artifacts\\winwrap-w23-b1132d36\\project\\x\\candidate\\session-status.json",
+      "exit_code": 0,
+      "exit_confirmed": true,
+      "owned": [
+        {
+          "pid": 41708,
+          "create_time": 1793800337.1649623
+        },
+        {
+          "pid": 41480,
+          "create_time": 1793800337.1875355
+        },
+        {
+          "pid": 54256,
+          "create_time": 1793800337.6663852
+        },
+        {
+          "pid": 61416,
+          "create_time": 1793800337.8316753
+        },
+        {
+          "pid": 30100,
+          "create_time": 1793800339.86749
+        },
+        {
+          "pid": 12284,
+          "create_time": 1793800340.6959226
+        },
+        {
+          "pid": 52952,
+          "create_time": 1793800341.9246812
+        },
+        {
+          "pid": 75932,
+          "create_time": 1793800343.025164
+        },
+        {
+          "pid": 14560,
+          "create_time": 1793800343.2404883
+        },
+        {
+          "pid": 80692,
+          "create_time": 1793800343.6548991
+        }
+      ]
+    },
+    {
+      "path": "artifacts\\winwrap-w23-b1132d36\\project\\x\\candidate\\verification-5a27945a01fd45a0ae82a3ab2e0c9fa9\\reopened\\session-status.json",
+      "exit_code": 0,
+      "exit_confirmed": true,
+      "owned": [
+        {
+          "pid": 61052,
+          "create_time": 1793800370.4703724
+        },
+        {
+          "pid": 71124,
+          "create_time": 1793800370.500841
+        },
+        {
+          "pid": 80068,
+          "create_time": 1793800372.473871
+        },
+        {
+          "pid": 65756,
+          "create_time": 1793800373.3507457
+        },
+        {
+          "pid": 81712,
+          "create_time": 1793800374.7464201
+        },
+        {
+          "pid": 25296,
+          "create_time": 1793800375.669847
+        },
+        {
+          "pid": 30696,
+          "create_time": 1793800375.7702365
+        },
+        {
+          "pid": 80436,
+          "create_time": 1793800376.2100508
+        }
+      ]
+    },
+    {
+      "path": "artifacts\\winwrap-w23-b1132d36\\project\\x\\candidate\\verification-5a27945a01fd45a0ae82a3ab2e0c9fa9\\saved\\session-status.json",
+      "exit_code": 0,
+      "exit_confirmed": true,
+      "owned": [
+        {
+          "pid": 8544,
+          "create_time": 1793800355.6557956
+        },
+        {
+          "pid": 33872,
+          "create_time": 1793800355.693987
+        },
+        {
+          "pid": 76428,
+          "create_time": 1793800357.693287
+        },
+        {
+          "pid": 80148,
+          "create_time": 1793800358.5993507
+        },
+        {
+          "pid": 81476,
+          "create_time": 1793800359.9612267
+        },
+        {
+          "pid": 31000,
+          "create_time": 1793800361.0046444
+        },
+        {
+          "pid": 25636,
+          "create_time": 1793800361.1237447
+        },
+        {
+          "pid": 44028,
+          "create_time": 1793800361.7071395
+        }
+      ]
+    },
+    {
+      "path": "artifacts\\winwrap-w23-b1132d36\\project\\y\\candidate\\session-status.json",
+      "exit_code": 0,
+      "exit_confirmed": true,
+      "owned": [
+        {
+          "pid": 76968,
+          "create_time": 1793800384.8279247
+        },
+        {
+          "pid": 27504,
+          "create_time": 1793800384.8505003
+        },
+        {
+          "pid": 37048,
+          "create_time": 1793800385.2904775
+        },
+        {
+          "pid": 60764,
+          "create_time": 1793800385.4418645
+        },
+        {
+          "pid": 48516,
+          "create_time": 1793800387.4521809
+        },
+        {
+          "pid": 37740,
+          "create_time": 1793800388.2806785
+        },
+        {
+          "pid": 80096,
+          "create_time": 1793800389.711959
+        },
+        {
+          "pid": 74176,
+          "create_time": 1793800390.861421
+        },
+        {
+          "pid": 39152,
+          "create_time": 1793800391.0535374
+        },
+        {
+          "pid": 30308,
+          "create_time": 1793800391.4649286
+        }
+      ]
+    },
+    {
+      "path": "artifacts\\winwrap-w23-b1132d36\\project\\y\\candidate\\verification-06d3bfac754b463d8351345a394bd7e4\\reopened\\session-status.json",
+      "exit_code": 0,
+      "exit_confirmed": true,
+      "owned": [
+        {
+          "pid": 28756,
+          "create_time": 1793800418.189802
+        },
+        {
+          "pid": 32964,
+          "create_time": 1793800418.2199056
+        },
+        {
+          "pid": 71660,
+          "create_time": 1793800420.230822
+        },
+        {
+          "pid": 32300,
+          "create_time": 1793800421.1204689
+        },
+        {
+          "pid": 76620,
+          "create_time": 1793800421.2170467
+        },
+        {
+          "pid": 5148,
+          "create_time": 1793800422.7557468
+        },
+        {
+          "pid": 65068,
+          "create_time": 1793800423.9871933
+        },
+        {
+          "pid": 1680,
+          "create_time": 1793800424.097512
+        },
+        {
+          "pid": 16664,
+          "create_time": 1793800424.6335087
+        }
+      ]
+    },
+    {
+      "path": "artifacts\\winwrap-w23-b1132d36\\project\\y\\candidate\\verification-06d3bfac754b463d8351345a394bd7e4\\saved\\session-status.json",
+      "exit_code": 0,
+      "exit_confirmed": true,
+      "owned": [
+        {
+          "pid": 63752,
+          "create_time": 1793800403.3131332
+        },
+        {
+          "pid": 78260,
+          "create_time": 1793800403.3458495
+        },
+        {
+          "pid": 81604,
+          "create_time": 1793800405.4248571
+        },
+        {
+          "pid": 71684,
+          "create_time": 1793800406.2526665
+        },
+        {
+          "pid": 70364,
+          "create_time": 1793800407.8768492
+        },
+        {
+          "pid": 69320,
+          "create_time": 1793800409.1523836
+        },
+        {
+          "pid": 75732,
+          "create_time": 1793800409.255788
+        },
+        {
+          "pid": 38308,
+          "create_time": 1793800409.712803
+        }
+      ]
+    },
+    {
+      "path": "artifacts\\winwrap-w23-b1132d36\\project\\z\\candidate\\session-status.json",
+      "exit_code": 0,
+      "exit_confirmed": true,
+      "owned": [
+        {
+          "pid": 41212,
+          "create_time": 1793800434.3010588
+        },
+        {
+          "pid": 78152,
+          "create_time": 1793800434.316492
+        },
+        {
+          "pid": 28660,
+          "create_time": 1793800434.776308
+        },
+        {
+          "pid": 61288,
+          "create_time": 1793800434.938507
+        },
+        {
+          "pid": 80340,
+          "create_time": 1793800436.9150295
+        },
+        {
+          "pid": 50596,
+          "create_time": 1793800437.69744
+        },
+        {
+          "pid": 30716,
+          "create_time": 1793800439.0819082
+        },
+        {
+          "pid": 31064,
+          "create_time": 1793800440.133593
+        },
+        {
+          "pid": 44824,
+          "create_time": 1793800440.3940637
+        },
+        {
+          "pid": 30168,
+          "create_time": 1793800441.0854611
+        }
+      ]
+    },
+    {
+      "path": "artifacts\\winwrap-w23-b1132d36\\project\\z\\candidate\\verification-8708f5f3c5b041a8b2cafdc870a40818\\reopened\\session-status.json",
+      "exit_code": 0,
+      "exit_confirmed": true,
+      "owned": [
+        {
+          "pid": 44252,
+          "create_time": 1793800468.7020435
+        },
+        {
+          "pid": 18888,
+          "create_time": 1793800468.746448
+        },
+        {
+          "pid": 45588,
+          "create_time": 1793800471.099228
+        },
+        {
+          "pid": 78228,
+          "create_time": 1793800471.9192176
+        },
+        {
+          "pid": 44680,
+          "create_time": 1793800473.3697395
+        },
+        {
+          "pid": 9376,
+          "create_time": 1793800474.4058783
+        },
+        {
+          "pid": 58948,
+          "create_time": 1793800474.5111563
+        },
+        {
+          "pid": 25512,
+          "create_time": 1793800474.9650052
+        }
+      ]
+    },
+    {
+      "path": "artifacts\\winwrap-w23-b1132d36\\project\\z\\candidate\\verification-8708f5f3c5b041a8b2cafdc870a40818\\saved\\session-status.json",
+      "exit_code": 0,
+      "exit_confirmed": true,
+      "owned": [
+        {
+          "pid": 27552,
+          "create_time": 1793800452.766822
+        },
+        {
+          "pid": 41116,
+          "create_time": 1793800452.8066852
+        },
+        {
+          "pid": 52268,
+          "create_time": 1793800454.9629948
+        },
+        {
+          "pid": 65408,
+          "create_time": 1793800456.3228304
+        },
+        {
+          "pid": 80688,
+          "create_time": 1793800458.0771372
+        },
+        {
+          "pid": 75036,
+          "create_time": 1793800459.273096
+        },
+        {
+          "pid": 12516,
+          "create_time": 1793800459.3861666
+        },
+        {
+          "pid": 58524,
+          "create_time": 1793800459.908666
+        }
+      ]
+    }
+  ],
+  "owned_identities_still_running": [],
+  "tool_sha256": "2fc969557b8a26f042d4c71a632caa9784034e6310eb6dd1b000a3ba8e3f2dfe",
+  "changes": [
+    "Replace obsolete caption absence with exact managed pre-geometry prefix",
+    "Strict integer zero standard exit",
+    "Preserve production original-source unresolved diagnostic; separately bind trusted injection to macro/body hash and block",
+    "Verify actual saved A1 atomic program and parameter descriptions before G03"
+  ],
+  "earlier_failure": "First compile+syntax sessions closed; tool AttributeError after correct CST rejection because production origin was unresolved after deliberate source injection; no gate published",
+  "offline_preflight": {
+    "passed": 61,
+    "scope": [
+      "winwrap_gate_probe",
+      "geometry_execution_macro"
+    ],
+    "junit": "artifacts/a1-preflight-corrected.xml",
+    "overlaps_first_57": true
+  },
+  "cleanup": {
+    "status": "completed: inventoried native binary data removed; ended pytest light evidence archived, verified and temporary directories deleted",
+    "native_raw_files_removed": 116,
+    "native_raw_bytes_removed": 11910164,
+    "retained": "lightweight CST/DB, macros/logs/parameter/source-map/probe source hashes, JUnit, native JSON evidence and test evidence ZIP",
+    "raw_mesh_image_available": false,
+    "artifacts_guaranteed_in_git": false
+  },
+  "limits": "Sub-only CST2022 A1; no real solver failure, full language or all host acceptance",
+  "offline_final": {
+    "passed": 242,
+    "junit": "artifacts/a1-final-regression.xml",
+    "scope": "W3 checks/probes/publication faults, atomic programs, definition lifecycle, GEO gate adapters, registry/docs and real source-package parity",
+    "overlaps_preflight_61": true
+  }
+}

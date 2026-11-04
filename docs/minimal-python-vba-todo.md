@@ -37,7 +37,7 @@
 - [x] GEO-3：既有MCP签名/HTTP/公共事务、GUI Runner适配及CLI转发接入，几何目标实际保存重开后才geometry_saved；未提交意图不自动重放。具体范围见[GEO-2–4生产实现与验收](geometry-production-implementation.md)。
 - [x] GEO-4：受限PEC背景/真空、Default/Tet Version1固定密度、nmodes=1、六面electric及Frequency/RQ闭环；XYZ小网格各一次真实求解，沿原Managed/RunStore采用和导出链。不是多材料/其它求解器或完整CAD承诺。
 - [x] 2026-11-04 GEO新签名在指定Codex桌面实际对话验收：公开正常链通过，保存/提交/导出重试同一身份、实际一次Start及正常退出；见[桌面记录](codex-desktop-geometry-20261104.md)。不勾选完整故障矩阵。
-- [ ] A1独立原生重校准：源码变化使旧许可失效，本次更新许可被自动审批拒绝；未改写A1记录，不影响有独立证据的GEO路径。
+- [x] 用户明确授权后完成[A1重校准](a1-recalibration-20261104.md)：最终12串行无求解会话通过、源码许可及知识库已更新；前期2排查会话另记。A1/GEO许可独立且当前均有效，非完整求解失败矩阵。
 
 
 - [ ] 后续独立阶段：面/边命名规则、零/一/多匹配及拓扑失效校准；不以COMSOL选择tag或CST旧编号保证稳定，不阻塞实体集合首版。

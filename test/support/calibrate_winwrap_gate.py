@@ -21,8 +21,9 @@ from csttool.definition_editing import render_history,render_edit_macro,build_ca
 from csttool.definition_verifier import NativeDefinitionVerifier
 from csttool.native_definition_builder import run_new_definition
 from csttool.saved_project_source import read_saved_source
-from csttool.winwrap_checks import (PROFILE,generator_fingerprint,check_module,execution_definition_map)
+from csttool.winwrap_checks import (PROFILE,generator_fingerprint,check_module,execution_definition_map,map_native_error)
 from csttool.history_program import partition
+from csttool.managed_history import extract_program,verify_saved_program,_canonical
 from csttool.winwrap_emitter import assign_string,Variable,String
 from csttool.application_service import ServiceError
 from test.support.calibrate_cst_macrocheck import cases,render,evaluate
@@ -54,8 +55,39 @@ def compile_cases(directory):
 
 
 def require_closed(closure):
-    if closure.get('exit_confirmed') is not True or closure.get('exit_code')!=0:
+    if (closure.get('exit_confirmed') is not True or type(closure.get('exit_code')) is not int
+            or closure['exit_code']!=0):
         raise RuntimeError('owned standard closure not confirmed; stop this serial probe')
+
+
+def verify_rejected_prefix(source,spec):
+    """The invalid geometry block and every later block must remain unapplied."""
+    program=partition(spec)
+    index=next(i for i,b in enumerate(program) if b['caption']=='CST Tools A1 geometry-cylinder')
+    actual=extract_program(source);expected=program[:index]
+    if (len(actual)!=len(expected) or any(a['caption']!=b['caption'] or
+            _canonical(a['history'])!=_canonical(b['history']) for a,b in zip(actual,expected))):
+        raise RuntimeError('syntax rejection did not preserve exactly the pre-geometry saved prefix')
+    return [b['caption'] for b in actual]
+
+
+def injected_syntax_diagnostic(directory):
+    """Bind deliberate probe changes, without rewriting the production diagnostic."""
+    production=read_json(directory/'native-diagnostic.json')
+    mapping=read_json(directory/'source-map.json');index=production.get('block_index')
+    blocks=mapping['block_hashes']
+    if (type(index) is not int or not 0<=index<len(blocks)
+            or blocks[index]['caption']!='CST Tools A1 geometry-cylinder'
+            or hashlib.sha256((directory/'probe.bas').read_text(encoding='ascii').encode('ascii')).hexdigest()!=mapping['hashes']['final_outer']
+            or hashlib.sha256((directory/'history.vb').read_text(encoding='ascii').encode('ascii')).hexdigest()!=blocks[index]['history_sha256']):
+        raise RuntimeError('injected source artifacts differ from recorded source map')
+    diagnostic=map_native_error((directory/'history-syntax-error.txt').read_text(),mapping,block_index=index)
+    if (diagnostic.get('origin') or {}).get('input_field')!='cylinder.axial_range':
+        raise RuntimeError('native history error not mapped to injected input')
+    diagnostic['provenance']='trusted-calibration-injection; production original-source diagnostic preserved'
+    diagnostic['production_mapping_status']=production.get('mapping_status')
+    write_json_atomic(directory/'injected-native-diagnostic.json',diagnostic)
+    return diagnostic
 
 
 def write_bundle(directory,spec,history,macro,program=None):
@@ -111,12 +143,9 @@ def negative(root,executable,kind):
     directory=catalog/parent['document_id']/'attempt'/'verification-edit'/'saved'
     if (directory/'completed.txt').exists():raise RuntimeError('failure published completion')
     if kind=='syntax':
-        diagnostic=read_json(directory/'native-diagnostic.json')
-        if diagnostic.get('origin',{}).get('input_field')!='cylinder.axial_range':
-            raise RuntimeError('native history error not mapped to input')
+        diagnostic=injected_syntax_diagnostic(directory)
         source=read_saved_source(directory/'definition.cst',scope='root')
-        saved=source.text('Model/3D/Model.mod') or ''
-        if 'CST Tools A1 typed definition' in saved:raise RuntimeError('syntax-rejected history was executed')
+        diagnostic['saved_prefix']=verify_rejected_prefix(source,spec)
     else:
         if not (directory/'partial-step.txt').exists():raise RuntimeError('partial history stage not reached')
         diagnostic=None
@@ -158,6 +187,7 @@ def main():
             if (directory/'failed.txt').exists() or (directory/'completed.txt').read_text().strip()!=nonce:
                 raise RuntimeError('positive generated candidate failed')
             source=read_saved_source(directory/'definition.cst',scope='root')
+            verify_saved_program(source,spec)
             parameters=source.json('Model/Parameters.json')['parameters']
             if {r['name']:(r['expr'],r.get('descr')) for r in parameters}!={k:(v['expression'],v['description']) for k,v in spec['parameters'].items()}:
                 raise RuntimeError('parameter expressions/descriptions changed')

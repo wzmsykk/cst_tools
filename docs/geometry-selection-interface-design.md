@@ -1,6 +1,6 @@
 # 通用几何与选择集接口设计
 
-更新：2026-11-04。GEO-1–4当前实现与验收统一见[GEO-2–4生产实现与验收](geometry-production-implementation.md)；本文保留官方语义、设计取舍与分阶段证据。§8–14是同日较早离线阶段的带日期记录，其中“尚未/禁止/待实现”不再定义当前API；§15原则已由history_program/managed_history落实。当前MCP14工具签名已接入，GEO独立许可已实际校准，A1旧许可仍失效。
+更新：2026-11-04。GEO-1–4当前实现与验收统一见[GEO-2–4生产实现与验收](geometry-production-implementation.md)；本文保留官方语义、设计取舍与分阶段证据。§8–14是同日较早离线阶段的带日期记录，其中“尚未/禁止/待实现”不再定义当前API；§15原则已由history_program/managed_history落实。当前MCP14工具签名已接入，GEO独立许可已实际校准，A1独立许可后来已按明确授权完成[A1重校准](a1-recalibration-20261104.md)。
 
 ## 1. 目标和最小范围
 
@@ -592,4 +592,4 @@ syntax错误另保留原三行history-syntax-error.txt；Python仅在阶段回�
 |O7 失败与发布|块失败后停止；无部分发布/同名追加替换/隐式回滚；保持独立完成和退出核验|
 |O8 跨入口和范围|A1/GEO共用检查/源图，未知用户历史不被压缩；HOM复用路径不因设计文档被擅自改写|
 
-O1–O8离线、C1–C7及GEO-4独立原生矩阵已通过；具体范围及剩余边界见[GEO-2–4生产实现与验收](geometry-production-implementation.md)。A1更新许可本批未获自动审批，旧记录保留失效状态。
+O1–O8离线、C1–C7及GEO-4独立原生矩阵已通过；具体范围及剩余边界见[GEO-2–4生产实现与验收](geometry-production-implementation.md)。GEO原批次A1更新未获审批；后续明确授权后已完成[A1重校准](a1-recalibration-20261104.md)，历史拒绝不改写。

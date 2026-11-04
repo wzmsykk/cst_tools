@@ -3791,6 +3791,15 @@
           "symbols": [
             "verify_saved_program"
           ]
+        },
+        {
+          "path": "test/support/calibrate_winwrap_gate.py",
+          "label": "A1校准前缀及可信注入诊断",
+          "symbols": [
+            "verify_rejected_prefix",
+            "injected_syntax_diagnostic",
+            "require_closed"
+          ]
         }
       ],
       "tests": [
@@ -3879,9 +3888,17 @@
         {
           "path": "docs/geometry-production-implementation.md",
           "label": "共用生产实现与GEO独立边界"
+        },
+        {
+          "path": "docs/a1-recalibration-20261104.md",
+          "label": "当前A1独立原生重校准"
+        },
+        {
+          "path": "knowledge-base/a1-recalibration-review-20261104.json",
+          "label": "本批工具诊断/退出/回归边界"
         }
       ],
-      "provenance": "2026-11-04现行A1/GEO共用原子历史宏、检查及源图，事务/原生验证/关闭分层；GEO独立原生许可通过，A1旧stamp失效未更新。旧W23 12会话只认证旧批次。"
+      "provenance": "2026-11-04运行源码54b8715原样；共用A1/GEO原子历史及事务，独立GEO已通过。A1按新明确授权完成无求解23样本、错误/部分失败、XYZ两阶段G03，最终12会话标准关闭，前期2会话不混入最终覆盖；可信注入诊断和生产原始unresolved映射分别保留，许可只在整批通过后更新。"
     },
     {
       "id": "F127",
@@ -4595,35 +4612,35 @@
       "provenance": "D3人工确认维护职责；不授予运行验收。",
       "review": {
         "date": "2026-11-04",
-        "baseline": "b11ecab",
+        "baseline": "54b8715",
         "status": "operational-and-applicability-reviewed",
-        "scope": "桌面实际工具调用与受限GEO保存/求解/幂等/退出证据；现行状态和旧SDK批次分层。",
+        "scope": "A1当前独立许可、原子历史/错误前缀、可信测试注入与生产原诊断分离、12最终和2排查会话边界；GEO记录独立。",
         "checked_sources": [
           {
-            "path": "knowledge-base/mcp-codex-geometry-20261104.json"
+            "path": "test/support/calibrate_winwrap_gate.py"
           },
           {
-            "path": "csttool/mcp_server.py"
-          },
-          {
-            "path": "csttool/definition_editing.py"
+            "path": "test/winwrap_gate_probe_test.py"
           },
           {
             "path": "csttool/managed_history.py"
           },
           {
-            "path": "csttool/definition_verifier.py"
+            "path": "csttool/winwrap_checks.py"
           },
           {
-            "path": "csttool/definition_sessions.py"
+            "path": "data/winwrap-a1-calibration.json"
           },
           {
-            "path": "csttool/runner_client.py"
+            "path": "knowledge-base/winwrap-w23-20261104.json"
+          },
+          {
+            "path": "knowledge-base/a1-recalibration-review-20261104.json"
           }
         ],
         "finding_ids": [],
-        "limitations": "初始连接就绪超时根因未定；沙箱进程枚举遗漏不证明不存在；不是全故障/网格收敛/复杂CAD或全部CST服务退出。",
-        "content_sha256_at_review": "9842c75bfee523e99036e0eb53c06eee4f748ed3e1962f7aa20366e3e660fdbc"
+        "limitations": "不是完整语言、自然setter/求解异常或任意模型证明；原始artifacts可能清理；旧阶段记录保留当时范围。",
+        "content_sha256_at_review": "5291700fb5a15f34e4e3bbda67860948b4362d705dc5584b67d4b7b6590768bf"
       }
     },
     {
@@ -6294,35 +6311,35 @@
       "provenance": "D3人工确认维护职责；不授予运行验收。",
       "review": {
         "date": "2026-11-04",
-        "baseline": "b11ecab",
+        "baseline": "54b8715",
         "status": "operational-and-applicability-reviewed",
-        "scope": "桌面实际工具调用与受限GEO保存/求解/幂等/退出证据；现行状态和旧SDK批次分层。",
+        "scope": "A1当前独立许可、原子历史/错误前缀、可信测试注入与生产原诊断分离、12最终和2排查会话边界；GEO记录独立。",
         "checked_sources": [
           {
-            "path": "knowledge-base/mcp-codex-geometry-20261104.json"
+            "path": "test/support/calibrate_winwrap_gate.py"
           },
           {
-            "path": "csttool/mcp_server.py"
-          },
-          {
-            "path": "csttool/definition_editing.py"
+            "path": "test/winwrap_gate_probe_test.py"
           },
           {
             "path": "csttool/managed_history.py"
           },
           {
-            "path": "csttool/definition_verifier.py"
+            "path": "csttool/winwrap_checks.py"
           },
           {
-            "path": "csttool/definition_sessions.py"
+            "path": "data/winwrap-a1-calibration.json"
           },
           {
-            "path": "csttool/runner_client.py"
+            "path": "knowledge-base/winwrap-w23-20261104.json"
+          },
+          {
+            "path": "knowledge-base/a1-recalibration-review-20261104.json"
           }
         ],
         "finding_ids": [],
-        "limitations": "初始连接就绪超时根因未定；沙箱进程枚举遗漏不证明不存在；不是全故障/网格收敛/复杂CAD或全部CST服务退出。",
-        "content_sha256_at_review": "7aaeb07737ab0c3b5da471c57db77729973f6888663b02338a582246f5cf082b"
+        "limitations": "不是完整语言、自然setter/求解异常或任意模型证明；原始artifacts可能清理；旧阶段记录保留当时范围。",
+        "content_sha256_at_review": "f2446e97871def163f95c638efb9f42bf75a4f58d9790d5cf78e0db5e645b5d9"
       }
     },
     {
@@ -7369,35 +7386,35 @@
       "provenance": "D3人工确认维护职责；不授予运行验收。",
       "review": {
         "date": "2026-11-04",
-        "baseline": "b11ecab",
+        "baseline": "54b8715",
         "status": "operational-and-applicability-reviewed",
-        "scope": "桌面实际工具调用与受限GEO保存/求解/幂等/退出证据；现行状态和旧SDK批次分层。",
+        "scope": "A1当前独立许可、原子历史/错误前缀、可信测试注入与生产原诊断分离、12最终和2排查会话边界；GEO记录独立。",
         "checked_sources": [
           {
-            "path": "knowledge-base/mcp-codex-geometry-20261104.json"
+            "path": "test/support/calibrate_winwrap_gate.py"
           },
           {
-            "path": "csttool/mcp_server.py"
-          },
-          {
-            "path": "csttool/definition_editing.py"
+            "path": "test/winwrap_gate_probe_test.py"
           },
           {
             "path": "csttool/managed_history.py"
           },
           {
-            "path": "csttool/definition_verifier.py"
+            "path": "csttool/winwrap_checks.py"
           },
           {
-            "path": "csttool/definition_sessions.py"
+            "path": "data/winwrap-a1-calibration.json"
           },
           {
-            "path": "csttool/runner_client.py"
+            "path": "knowledge-base/winwrap-w23-20261104.json"
+          },
+          {
+            "path": "knowledge-base/a1-recalibration-review-20261104.json"
           }
         ],
         "finding_ids": [],
-        "limitations": "初始连接就绪超时根因未定；沙箱进程枚举遗漏不证明不存在；不是全故障/网格收敛/复杂CAD或全部CST服务退出。",
-        "content_sha256_at_review": "99ceef16a4a844fa334ed8d171b8de88c7d26ae1fe228e31d29ff4b440615bf5"
+        "limitations": "不是完整语言、自然setter/求解异常或任意模型证明；原始artifacts可能清理；旧阶段记录保留当时范围。",
+        "content_sha256_at_review": "61bb5c3f6194fcc227ce9489523c4d9255c626a4a74c1908579eea0613936673"
       }
     },
     {
@@ -8270,41 +8287,35 @@
       "provenance": "2026-11-03人工适用性/历史堆叠复审；具体检查层级见review，不将分类当逐条事实证明。",
       "review": {
         "date": "2026-11-04",
-        "baseline": "f755505",
+        "baseline": "54b8715",
         "status": "operational-and-applicability-reviewed",
-        "scope": "GEO-2–4当前profile、实际保存/原生观察、公开签名、许可分离及失败/取消/恢复；早期离线章节明确为历史快照。",
+        "scope": "A1当前独立许可、原子历史/错误前缀、可信测试注入与生产原诊断分离、12最终和2排查会话边界；GEO记录独立。",
         "checked_sources": [
           {
-            "path": "csttool/history_program.py"
+            "path": "test/support/calibrate_winwrap_gate.py"
+          },
+          {
+            "path": "test/winwrap_gate_probe_test.py"
           },
           {
             "path": "csttool/managed_history.py"
           },
           {
-            "path": "csttool/definition_editing.py"
+            "path": "csttool/winwrap_checks.py"
           },
           {
-            "path": "csttool/definition_geometry.py"
+            "path": "data/winwrap-a1-calibration.json"
           },
           {
-            "path": "csttool/definition_verifier.py"
+            "path": "knowledge-base/winwrap-w23-20261104.json"
           },
           {
-            "path": "csttool/definition_sessions.py"
-          },
-          {
-            "path": "csttool/application_service.py"
-          },
-          {
-            "path": "test/geometry_publication_test.py"
-          },
-          {
-            "path": "knowledge-base/geometry-calibration-20261104.json"
+            "path": "knowledge-base/a1-recalibration-review-20261104.json"
           }
         ],
         "finding_ids": [],
-        "limitations": "不追认旧测试为当前代码验收；不是任意CAD/多材料/模式身份/网格收敛或桌面新签名对话验收；A1旧许可保留失效。",
-        "content_sha256_at_review": "f0eded40bd96248dcbd3aa7192ebda548a6d85c2cea35f9ef421bdd3ff5d823b"
+        "limitations": "不是完整语言、自然setter/求解异常或任意模型证明；原始artifacts可能清理；旧阶段记录保留当时范围。",
+        "content_sha256_at_review": "32887a47cb0db7d5d0c25d058c719efae1caaf7900ccad6bce170526aa32057e"
       }
     },
     {
@@ -8607,41 +8618,35 @@
       "provenance": "2026-11-03 W23最终受控无求解XYZ/G03与失败拒绝；源码版本及知识库原生摘要绑定。",
       "review": {
         "date": "2026-11-04",
-        "baseline": "f755505",
+        "baseline": "54b8715",
         "status": "operational-and-applicability-reviewed",
-        "scope": "GEO-2–4当前profile、实际保存/原生观察、公开签名、许可分离及失败/取消/恢复；早期离线章节明确为历史快照。",
+        "scope": "A1当前独立许可、原子历史/错误前缀、可信测试注入与生产原诊断分离、12最终和2排查会话边界；GEO记录独立。",
         "checked_sources": [
           {
-            "path": "csttool/history_program.py"
+            "path": "test/support/calibrate_winwrap_gate.py"
+          },
+          {
+            "path": "test/winwrap_gate_probe_test.py"
           },
           {
             "path": "csttool/managed_history.py"
           },
           {
-            "path": "csttool/definition_editing.py"
+            "path": "csttool/winwrap_checks.py"
           },
           {
-            "path": "csttool/definition_geometry.py"
+            "path": "data/winwrap-a1-calibration.json"
           },
           {
-            "path": "csttool/definition_verifier.py"
+            "path": "knowledge-base/winwrap-w23-20261104.json"
           },
           {
-            "path": "csttool/definition_sessions.py"
-          },
-          {
-            "path": "csttool/application_service.py"
-          },
-          {
-            "path": "test/geometry_publication_test.py"
-          },
-          {
-            "path": "knowledge-base/geometry-calibration-20261104.json"
+            "path": "knowledge-base/a1-recalibration-review-20261104.json"
           }
         ],
         "finding_ids": [],
-        "limitations": "不追认旧测试为当前代码验收；不是任意CAD/多材料/模式身份/网格收敛或桌面新签名对话验收；A1旧许可保留失效。",
-        "content_sha256_at_review": "d209bdb376f161e8f63623de681c82898a08228af64dd79989166e9dfe98eeae"
+        "limitations": "不是完整语言、自然setter/求解异常或任意模型证明；原始artifacts可能清理；旧阶段记录保留当时范围。",
+        "content_sha256_at_review": "ea3586170e38abfc914d349baafaf17bce75289e6493f46a61184a16d9825eb2"
       }
     },
     {
@@ -9589,41 +9594,35 @@
       "provenance": "GEO-0官方帮助核对与GEO-1声明契约离线实现；完整原生接口仍为设计目标。",
       "review": {
         "date": "2026-11-04",
-        "baseline": "f755505",
+        "baseline": "54b8715",
         "status": "operational-and-applicability-reviewed",
-        "scope": "GEO-2–4当前profile、实际保存/原生观察、公开签名、许可分离及失败/取消/恢复；早期离线章节明确为历史快照。",
+        "scope": "A1当前独立许可、原子历史/错误前缀、可信测试注入与生产原诊断分离、12最终和2排查会话边界；GEO记录独立。",
         "checked_sources": [
           {
-            "path": "csttool/history_program.py"
+            "path": "test/support/calibrate_winwrap_gate.py"
+          },
+          {
+            "path": "test/winwrap_gate_probe_test.py"
           },
           {
             "path": "csttool/managed_history.py"
           },
           {
-            "path": "csttool/definition_editing.py"
+            "path": "csttool/winwrap_checks.py"
           },
           {
-            "path": "csttool/definition_geometry.py"
+            "path": "data/winwrap-a1-calibration.json"
           },
           {
-            "path": "csttool/definition_verifier.py"
+            "path": "knowledge-base/winwrap-w23-20261104.json"
           },
           {
-            "path": "csttool/definition_sessions.py"
-          },
-          {
-            "path": "csttool/application_service.py"
-          },
-          {
-            "path": "test/geometry_publication_test.py"
-          },
-          {
-            "path": "knowledge-base/geometry-calibration-20261104.json"
+            "path": "knowledge-base/a1-recalibration-review-20261104.json"
           }
         ],
         "finding_ids": [],
-        "limitations": "不追认旧测试为当前代码验收；不是任意CAD/多材料/模式身份/网格收敛或桌面新签名对话验收；A1旧许可保留失效。",
-        "content_sha256_at_review": "52ecebe1626542a3cd5da8315fb91c1ba59f87230d2a31aceb54524dfb29ead9"
+        "limitations": "不是完整语言、自然setter/求解异常或任意模型证明；原始artifacts可能清理；旧阶段记录保留当时范围。",
+        "content_sha256_at_review": "daab2cd0d34b193aafa3d3cee21db5c7fd7bf7958fb706b422190a07c0098cc0"
       }
     },
     {
@@ -9633,35 +9632,35 @@
       "provenance": "2026-11-04 GEO-2–4当前实现及独立验收。",
       "review": {
         "date": "2026-11-04",
-        "baseline": "b11ecab",
+        "baseline": "54b8715",
         "status": "operational-and-applicability-reviewed",
-        "scope": "桌面实际工具调用与受限GEO保存/求解/幂等/退出证据；现行状态和旧SDK批次分层。",
+        "scope": "A1当前独立许可、原子历史/错误前缀、可信测试注入与生产原诊断分离、12最终和2排查会话边界；GEO记录独立。",
         "checked_sources": [
           {
-            "path": "knowledge-base/mcp-codex-geometry-20261104.json"
+            "path": "test/support/calibrate_winwrap_gate.py"
           },
           {
-            "path": "csttool/mcp_server.py"
-          },
-          {
-            "path": "csttool/definition_editing.py"
+            "path": "test/winwrap_gate_probe_test.py"
           },
           {
             "path": "csttool/managed_history.py"
           },
           {
-            "path": "csttool/definition_verifier.py"
+            "path": "csttool/winwrap_checks.py"
           },
           {
-            "path": "csttool/definition_sessions.py"
+            "path": "data/winwrap-a1-calibration.json"
           },
           {
-            "path": "csttool/runner_client.py"
+            "path": "knowledge-base/winwrap-w23-20261104.json"
+          },
+          {
+            "path": "knowledge-base/a1-recalibration-review-20261104.json"
           }
         ],
         "finding_ids": [],
-        "limitations": "初始连接就绪超时根因未定；沙箱进程枚举遗漏不证明不存在；不是全故障/网格收敛/复杂CAD或全部CST服务退出。",
-        "content_sha256_at_review": "6dc9b6fe338ff03d9d746d946cd6d8d8f0bc722c30800c978bec33186be6c1c1"
+        "limitations": "不是完整语言、自然setter/求解异常或任意模型证明；原始artifacts可能清理；旧阶段记录保留当时范围。",
+        "content_sha256_at_review": "54c304fcf2bfd39ee6aa478c958d4eef66d59166a70fb8c5571f5421821fb3a0"
       }
     },
     {
@@ -9700,6 +9699,44 @@
         "finding_ids": [],
         "limitations": "初始连接就绪超时根因未定；沙箱进程枚举遗漏不证明不存在；不是全故障/网格收敛/复杂CAD或全部CST服务退出。",
         "content_sha256_at_review": "797bb96c72db1acf9854987780fd203eafdb5d04276fe4b2a91e85980cc5fc37"
+      }
+    },
+    {
+      "path": "docs/a1-recalibration-20261104.md",
+      "role": "dated-implementation-or-acceptance",
+      "authority": "dated-evidence-only",
+      "provenance": "2026-11-04明确授权下当前A1原子历史无求解重校准；首轮工具故障与最终整批分别留证。",
+      "review": {
+        "date": "2026-11-04",
+        "baseline": "54b8715",
+        "status": "operational-and-applicability-reviewed",
+        "scope": "A1当前独立许可、原子历史/错误前缀、可信测试注入与生产原诊断分离、12最终和2排查会话边界；GEO记录独立。",
+        "checked_sources": [
+          {
+            "path": "test/support/calibrate_winwrap_gate.py"
+          },
+          {
+            "path": "test/winwrap_gate_probe_test.py"
+          },
+          {
+            "path": "csttool/managed_history.py"
+          },
+          {
+            "path": "csttool/winwrap_checks.py"
+          },
+          {
+            "path": "data/winwrap-a1-calibration.json"
+          },
+          {
+            "path": "knowledge-base/winwrap-w23-20261104.json"
+          },
+          {
+            "path": "knowledge-base/a1-recalibration-review-20261104.json"
+          }
+        ],
+        "finding_ids": [],
+        "limitations": "不是完整语言、自然setter/求解异常或任意模型证明；原始artifacts可能清理；旧阶段记录保留当时范围。",
+        "content_sha256_at_review": "1abcdcab69d47c74cceb1b8b90bd22f3db6c39fca227a332ba3c9b277018f72b"
       }
     }
   ],
@@ -11058,8 +11095,8 @@
         "--run-cst"
       ],
       "review_status": "manually-reviewed-owned-copy-no-solver",
-      "unknown": "部分属性故障为明确注入，不冒充自然CST setter失败；不是完整语言/全部弹窗/初始化证明。",
-      "evidence": "2026-11-03静态复核main/negative：exclusive_probe→持有对象构造→既有G03；require_closed阻断后续未确认退出，源码前后hash不变才允许写门禁。；GEO-2离线扩展后复审：该工具仍是A1原生校准，SOURCES扩展不证明GEO；本批未调用工具或刷新凭据。；本批静态复审两处generated_profile调用与partial阶段注入新锚点，显式断言唯一；CLI参数/串行关闭/校准权限不变，未运行原生工具。"
+      "unknown": "注入故障不是自然setter/求解异常；源图及许可不是安全签名；GEO许可独立；本条登记不授权任意运行。",
+      "evidence": "2026-11-04人工复审main/negative/verify_rejected_prefix/injected_syntax_diagnostic：生产原始诊断保留；可信注入诊断需匹配实际probe宏、被拒绝块body哈希及块身份；正例核对实际managed历史；关闭要求整数0。用户明确授权无求解重校准及通过后更新A1许可。"
     },
     {
       "path": "test/support/validate_public_faults.py",
@@ -11824,14 +11861,26 @@
         {
           "path": "csttool/definition_editing.py",
           "symbol": "build_candidate"
+        },
+        {
+          "path": "test/support/calibrate_winwrap_gate.py",
+          "symbol": "verify_rejected_prefix"
+        },
+        {
+          "path": "test/support/calibrate_winwrap_gate.py",
+          "symbol": "injected_syntax_diagnostic"
+        },
+        {
+          "path": "csttool/managed_history.py",
+          "symbol": "verify_saved_program"
         }
       ],
       "type": "owned-calibration-chain",
-      "trigger": "显式--run-cst；编译样本→语法失败→注入步骤失败→XYZ/G03，全部通过且源码未变才可--publish-gate。",
+      "trigger": "显式--run-cst启动串行拥有副本；--publish-gate仅在整批通过后更新A1许可及固定知识库证据。",
       "lifecycle": "独占串行副本；无Solver.Start；失败候选不发布，未知退出阻断下一个会话。",
       "cleanup": "既有持有对象及批执行正常退出；不强杀；原始大副本验收完成再清理，保留宏/哈希/证据。",
-      "evidence": "2026-11-04 GEO-2–4逐调用人工复审：离线宏/故障注入适配新分块；本批未运行A1许可发布。 代码hash仅作复审定位，原生证据另见独立校准。",
-      "unknown": "不是自然求解失败、任意CST setter或全部生命周期故障证明。",
+      "evidence": "2026-11-04逐调用复审：23编译样本、正例实际分块历史/参数和两阶段G03、负例原生拒绝前缀、注入源图和生产原诊断分开，当前61项离线检查通过。全部原生证据与标准退出齐备后才写A1许可，源码变化中止；未修改SOURCES运行文件。",
+      "unknown": "不是完整语言/所有宏或求解异常证明；当前原生矩阵状态见对应知识库记录。",
       "consumers": []
     },
     {
@@ -12442,7 +12491,7 @@
     "csttool/winwrap_emitter.py": "506e8bdeba2edee8a3c97a7d52eeded7c47ef237668b90bb123157f71bf81942",
     "test/support/calibrate_winwrap_calls.py": "8ca3d86870b070d8e9f1c47213d372aba2e74fff49fbc918bd101e213901614d",
     "csttool/winwrap_checks.py": "bec2a914b930072d574edd5552c44e00910f3abe3e289b4f769e425349f4b40e",
-    "test/support/calibrate_winwrap_gate.py": "32782e665b35a50c3dd7a482462ce63122d7fb4658af90d891c212c78df87987",
+    "test/support/calibrate_winwrap_gate.py": "2fc969557b8a26f042d4c71a632caa9784034e6310eb6dd1b000a3ba8e3f2dfe",
     "test/support/validate_public_faults.py": "e41535452da7e5e6049d0311ccba5fcbd87841945d18798a25361e4b4c2d8fce",
     "csttool/batch_desktop.py": "90976bb2b871a014e3c509343ab551dc5f6bb60b339c7f5e98ca818d310a6d91",
     "test/support/validate_hom_recovery_native.py": "c7f981034cb6453209e580bdc1cb96ded4914140a1fdf0c90ff8283d489adb1d",

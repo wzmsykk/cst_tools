@@ -8,7 +8,7 @@ GEO仍使用有序features、逻辑实体集合、不可变revision、直接父�
 
 设置按规范属性唯一归属；history_program拆Units/WCS/组件/feature及受支持SIM职责，A1也使用同一分块控制模板。声明变更生成新候选，不能追加同caption冒充替换。managed_history核对实际Model.mod及表达式，保存/重开观察使用整体计算域和实体事实；一般CSG不宣称精确CAD等价。参数/身份/原生资源责任及失败/取消详见生产实施页。
 
-A1仍独立校准，省略validation_target默认simulation；旧A1 stamp失效且本批未更新，不借GEO许可放行。
+A1省略validation_target默认simulation；当前独立许可已由[A1重校准](a1-recalibration-20261104.md)重新验明，仍不借GEO许可放行。原生许可源版本变化后继续拒绝，不自动刷新。
 
 
 ## 调用顺序

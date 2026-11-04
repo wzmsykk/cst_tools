@@ -188,14 +188,15 @@
   "current_plan": {
     "updated": "2026-11-04",
     "status": "GEO-1-4 implemented and independently accepted in supported profile",
-    "next": "Optional refreshed Codex desktop GEO signature dialogue acceptance; independent future face/edge and material/solver expansion; A1 recalibration needs separate authorization",
+    "next": "Cold-start readiness diagnosis and independently scoped future face/edge/material/solver expansion; A1 current independent calibration accepted on 2026-11-04",
     "order": [
       "GEO-1/1.1 declaration and edit",
       "GEO-2 O1-O8 and managed saved history/C1-C7",
       "GEO-3 shared adapters/public SDK",
       "GEO-4 real XYZ/Managed/RunStore result chain"
     ],
-    "evidence": "knowledge-base/geometry-production-20261104.json"
+    "evidence": "knowledge-base/geometry-production-20261104.json",
+    "a1_followup": "knowledge-base/a1-recalibration-review-20261104.json"
   },
   "history_edit_implementation": {
     "date": "2026-11-04",
