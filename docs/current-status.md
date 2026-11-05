@@ -1,6 +1,8 @@
 # CST Tools 当前状态
 
-更新：2026-11-05；本页只保留现行结论。源码基线cd5a820（本批Runner启动修正另见下文）；受限A1与桌面正常闭环、串行故障驱动、生产Runner崩溃恢复及HOM恢复驱动已有各自证据；完整协议/数值模式身份和Start=0/自身异常矩阵仍逐项验收。逐批原文及旧待办见[复审前快照](archive/20261103-semantic-review/current-status.md)和[更早归档](archive/20261102-progress-consolidation/README.md)。
+更新：2026-11-06；本页只保留现行结论。源码基线4738f62（本批MCP边界修正见收口记录）；受限A1与桌面正常闭环、串行故障驱动、生产Runner崩溃恢复及HOM恢复驱动已有各自证据；完整协议/数值模式身份和Start=0/自身异常矩阵仍逐项验收。逐批原文及旧待办见[复审前快照](archive/20261103-semantic-review/current-status.md)和[更早归档](archive/20261102-progress-consolidation/README.md)。
+
+首阶段MCP已按受限本机范围收口，正常桌面/原生证据与协议边界分别列于[MCP收口与使用](mcp-first-stage-closeout.md)。本批修正未知工具错误分层及非法后台输出，未启动CST；完整扩展/故障矩阵仍保持未全验。
 
 ## 已实现与实际证据
 

@@ -17,7 +17,7 @@ META = {'io.modelcontextprotocol/protocolVersion':'2026-07-28',
 def wire(tmp_path,request):
     errors = (tmp_path/'stderr.log').open('wb')
     command=[sys.executable, '-m', 'csttool.mcp_server', '--project', str(tmp_path)]
-    if getattr(request,'param',False):
+    if getattr(request,'param',False) is True:
         script=tmp_path/'slow_peer.py'
         script.write_text('import sys,time\nfrom pathlib import Path\n'
             +f'sys.path.insert(0,{str(Path(__file__).parents[1])!r})\n'
@@ -28,26 +28,45 @@ def wire(tmp_path,request):
             +'  (root/"entered").touch()\n  time.sleep(1.5)\n  return {"state":"IDLE"}\n'
             +'create_server(root,adapter=Peer()).run(transport="stdio")\n',encoding='utf-8')
         command=[sys.executable,str(script)]
+    if getattr(request,'param',False)=='output':
+        script=tmp_path/'output_peer.py'
+        script.write_text('import sys\nfrom pathlib import Path\n'
+            +f'sys.path.insert(0,{str(Path(__file__).parents[1])!r})\n'
+            +'from csttool.mcp_server import create_server\n'
+            +'class Peer:\n count=0\n def get_status(self):\n'
+            +'  self.count+=1\n  return {"value":float("nan")} if self.count==1 else {"state":"中文\\n结果"}\n'
+            +'create_server(Path.cwd(),adapter=Peer()).run(transport="stdio")\n',encoding='utf-8')
+        command=[sys.executable,str(script)]
     child = subprocess.Popen(command,
         stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=errors, cwd=Path(__file__).parents[1])
     rows = queue.Queue()
+    def reject_nonfinite(value):
+        raise ValueError("nonfinite JSON output: "+value)
     def reader():
-        for line in child.stdout: rows.put(json.loads(line))
+        for line in child.stdout:
+            try:
+                rows.put(json.loads(line,parse_constant=reject_nonfinite))
+            except Exception as error:
+                rows.put(error)
+    def receive(timeout=10):
+        value=rows.get(timeout=timeout)
+        if isinstance(value,Exception):raise value
+        return value
     thread=threading.Thread(target=reader,daemon=True);thread.start()
     def call(method, *, params=None, identity=1):
         message={'jsonrpc':'2.0','id':identity,'method':method,'params':{'_meta':META,**(params or {})}}
         child.stdin.write((json.dumps(message,ensure_ascii=False)+'\n').encode('utf-8'));child.stdin.flush()
-        return rows.get(timeout=10)
+        return receive()
     def notify(method, params):
         child.stdin.write((json.dumps({'jsonrpc':'2.0','method':method,'params':params})+'\n').encode('utf-8'))
         child.stdin.flush()
     call.notify = notify
     def raw(value):
         child.stdin.write((value+'\n').encode('utf-8'));child.stdin.flush()
-        return rows.get(timeout=10)
+        return receive()
     call.raw = raw
     call.send_raw=lambda value:(child.stdin.write((value+'\n').encode('utf-8')),child.stdin.flush())
-    call.receive=rows.get
+    call.receive=receive
     call.directory=tmp_path
     try: yield call
     finally:
@@ -138,3 +157,20 @@ def test_active_cancel_sends_no_late_response_and_next_request_survives(wire):
     time.sleep(2)
     with pytest.raises(queue.Empty):wire.receive(timeout=.2)
     assert (wire.directory/'calls.txt').read_text().splitlines()==['call']
+
+
+def test_unknown_tool_is_a_protocol_error_and_next_request_survives(wire):
+    result=wire('tools/call',params={'name':'unknown_tool','arguments':{}})
+    assert result['error']['code']==-32602
+    assert 'result' not in result
+    assert len(wire('tools/list',identity=2)['result']['tools'])==14
+
+
+@pytest.mark.parametrize('wire',['output'],indirect=True)
+def test_invalid_output_is_rejected_and_valid_unicode_survives_on_wire(wire):
+    result=wire('tools/call',params={'name':'get_project_status','arguments':{}})['result']
+    assert result['isError'] is True
+    assert 'INVALID_OUTPUT' in str(result['content'])
+    good=wire('tools/call',params={'name':'get_project_status','arguments':{}},identity=2)['result']
+    assert good['structuredContent']=={'state':'中文\n结果'}
+    assert not good.get('isError',False)

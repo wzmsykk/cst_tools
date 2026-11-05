@@ -1,6 +1,6 @@
 # 公共链故障矩阵与协议覆盖
 
-更新：2026-11-03。覆盖G03/G04/G08及N01–N25的登记入口。桌面正常链见[实际记录](codex-desktop-acceptance-20261103.md)；本批新增故障均为离线注入，没有启动真实CST。故障注入的FakeWorker不证明CST会自然发生同一错误。
+更新：2026-11-06。历史测试日期保留；首阶段受限闭环见[MCP收口](mcp-first-stage-closeout.md)。覆盖G03/G04/G08及N01–N25的登记入口。桌面正常链见[实际记录](codex-desktop-acceptance-20261103.md)；本批新增故障均为离线注入，没有启动真实CST。故障注入的FakeWorker不证明CST会自然发生同一错误。
 
 ## 执行链矩阵
 
@@ -25,18 +25,18 @@
 
 |编号|已有/本批证据|仍未覆盖或首版范围|
 |---|---|---|
-|N01|SDK正常请求/重试业务ID路径|非法JSON、nullID、重复在途RPC ID、通知回复完整矩阵|
-|N02|modern SDK与旧模式拒绝测试|缺version/capabilities及交错能力完整矩阵|
-|N03|真实stdio自动发现|原始wire无需初始化的全部发现错误路径|
+|N01|mcp_wire_fault_test：非法JSON/数组/null或bool ID/错误jsonrpc、重复在途ID零二次派发、取消通知无回复|其它ID/通知与交错竞态组合未穷尽|
+|N02|现代SDK、旧/未知版本拒绝、每请求缺version或capabilities的wire测试|交错能力与全部非法类型组合|
+|N03|原始stdio无需initialize发现、后续调用及不支持方法拒绝|全部发现错误路径未穷尽|
 |N04|SDK成功/输入错误均核对complete|所有结果与错误分支|
-|N05|stdio发现/EOF；内存SDK中文、反斜线、换行往返|中文wire逐字节、启动/异常stdout污染专项|
+|N05|stdio发现/EOF、严格JSON响应解析；SDK及wire中文/换行返回、非法输出后服务继续|全部启动/异常stdout污染专项|
 |N06|stdio EOF；独立Runner与假GUI客户端死亡测试|实际CST计算时宿主进程死亡组合|
 |N07|14工具排序；错误前后目录稳定|不同服务授权配置矩阵|
 |N08|目录private、ttl=0|全部可缓存响应的规范矩阵|
 |N09|未知字段、错误类型和脚本注入零业务派发|复杂Schema预算/网络ref全矩阵|
-|N10|结构化正常值/中文往返；服务非有限值拒绝|所有输出Schema/错误DTO完整性|
-|N11|错误输入/无效句柄与后续正常调用|所有协议错误码与工具错误分层|
-|N12|独立任务不因客户端退出取消的假任务证据|协议取消前后竞态、无后续进度/响应|
+|N10|SDK拒绝NaN/Infinity/bytes/非对象；wire拒绝非有限输出后正常中文返回|所有逐字段输出Schema/错误DTO完整性未保证|
+|N11|未知工具-32602且零业务派发；已知工具输入错误isError；错误后后续正常调用|全部协议错误码与业务拒绝组合|
+|N12|活动请求取消不发迟回复、后续请求可用；取消不转成Runner stop|全部取消前后竞态及真实求解组合|
 |N13|首版读取业务status，不将CST局部进度等同协议progress|token生命周期专项|
 |N14|首版有界14工具目录|不透明游标、空cursor及更新竞态|
 |N15|句柄重启失效、租约与Runner唯一性测试|全部跨实例/交错主体矩阵|
@@ -48,15 +48,17 @@
 |N21|非首版|MCP Streamable HTTP未实现；Runner内部HTTP不能算作它|
 |N22|stdio依赖OS/配置边界|HTTP OAuth未实现|
 |N23|不声明Tasks扩展，Runner run_id仍为业务ID|协议Tasks未实现|
-|N24|响应丢失/幂等、租约、重启、重复恢复无重算的服务/Runner测试|真实发布边界控制器退出已验；实际求解中生产Runner退出及协议取消组合未验|
+|N24|响应丢失/幂等、租约、重启、重复恢复无重算的服务/Runner测试|真实发布边界控制器退出已验；11-04生产Runner求解中退出已验；与协议取消组合未验|
 |N25|本批ACK/关闭/采集缺口拒绝、采用补写与桌面正常实测|15个受支持真实场景已验；未覆盖Start=0/Start异常、HOM前沿组合与全部真实故障|
 
 ## API修正与剩余验收
 
 首次`reconcile_simulation`修复结果发布缺口后，现在同后续查询一样返回带`result_revision`的公共DTO；不改已持久结果格式，也不增加重算/自动重试。源数据不齐仍拒绝。测试定位见[新增故障测试](../test/public_failure_matrix_test.py)、[SDK测试](../test/mcp_sdk_test.py)。
 
-现已接入[串行真实注入驱动](public-fault-injection.md)，将ACK闸点与公共控制器退出分层验收；只按对应实际报告升级覆盖，求解中生产Runner进程退出仍未由发布边界测试证明。本轮15例真实注入通过、22个原生会话标准关闭，详见[驱动验收](public-fault-injection.md)。完整N01–N25仍为部分覆盖，不能因本表登记完整而宣称符合。轻量报告写入知识库；artifacts临时模型可清理且不保证随Git迁移。
+现已接入[串行真实注入驱动](public-fault-injection.md)，将ACK闸点与公共控制器退出分层验收；只按对应实际报告升级覆盖，发布边界测试不证明求解中Runner退出；后者已有11-04独立副本证据，见[五项实施](execution-hardening-five-steps.md)。本轮15例真实注入通过、22个原生会话标准关闭，详见[驱动验收](public-fault-injection.md)。完整N01–N25仍为部分覆盖，不能因本表登记完整而宣称符合。轻量报告写入知识库；artifacts临时模型可清理且不保证随Git迁移。
 
 ## 离线批次执行结果
 
 新增19项服务故障测试；相关服务/G03/ACK/Runner/采集组合123项通过（83.40s），专用MCP运行环境8项SDK测试通过（3.65s）。集合各自报告，不当作全仓测试。见[轻量记录](../knowledge-base/public-fault-matrix-20261103.json)；该离线批次未运行真实CST；后续真实证据由串行驱动记录。
+
+2026-11-06 MCP收口回归：32项SDK/原始stdio/适配测试通过；本批未运行CST。旧123项/8项及后续原生数字保持各自日期和范围，不相加。

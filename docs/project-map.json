@@ -3624,6 +3624,14 @@
         {
           "path": "docs/execution-hardening-five-steps.md",
           "label": "后续五项与隔离/协议边界"
+        },
+        {
+          "path": "docs/mcp-first-stage-closeout.md",
+          "label": "首阶段当前范围、使用及错误边界"
+        },
+        {
+          "path": "knowledge-base/mcp-first-stage-closeout-20261106.json",
+          "label": "本批离线验收记录"
         }
       ],
       "provenance": "Migrated from maintained feature-index at c083c58; no new semantic or runtime acceptance."
@@ -4647,36 +4655,36 @@
       "authority": "current-navigation",
       "provenance": "D3人工确认维护职责；不授予运行验收。",
       "review": {
-        "date": "2026-11-05",
-        "baseline": "cd5a820",
+        "date": "2026-11-06",
+        "baseline": "4738f62 plus MCP closeout worktree",
         "status": "operational-and-applicability-reviewed",
-        "scope": "冷启动预算、两类启动异常、里程碑/迟就绪、协作锁及实际所有权；失败包启动证据与运行身份分离。",
+        "scope": "首阶段当前结论、历史设计时点与扩展故障边界；未逐句重新认证第三方规范或旧数值",
         "checked_sources": [
           {
-            "path": "csttool/runner_client.py"
+            "path": "csttool/mcp_server.py"
           },
           {
-            "path": "csttool/runner.py"
+            "path": "csttool/mcp_stdio.py"
           },
           {
-            "path": "csttool/runner_ownership.py"
+            "path": "test/mcp_sdk_test.py"
           },
           {
-            "path": "csttool/diagnostic_bundle.py"
+            "path": "test/mcp_wire_fault_test.py"
           },
           {
-            "path": "test/runner_startup_test.py"
+            "path": "docs/codex-desktop-geometry-20261104.md"
           },
           {
-            "path": "test/diagnostic_bundle_test.py"
+            "path": "docs/execution-hardening-five-steps.md"
           },
           {
-            "path": "knowledge-base/runner-startup-readiness-20261105.json"
+            "path": "knowledge-base/mcp-first-stage-closeout-20261106.json"
           }
         ],
         "finding_ids": [],
-        "limitations": "原现场首次超时未唯一归因；OS创建/磁盘不硬实时；未启动CST、不宣称已加载GUI/MCP热更新；启动或锁释放不是原生关闭/结果证明。",
-        "content_sha256_at_review": "1edafb7c7b251aa6be0dde3af2f0c4ce66d06429c401c0fb14291a9fa24ca082"
+        "limitations": "本批无真实CST/桌面重载；完整N01–N25与扩展功能未完成",
+        "content_sha256_at_review": "2bb76a85b148acebadddcd5ccb0a4d5ae2abb55632ca053be0cad37fee208ae2"
       }
     },
     {
@@ -5732,16 +5740,36 @@
       "authority": "dated-source-context-not-current-API",
       "provenance": "2026-11-03人工适用性/历史堆叠复审；具体检查层级见review，不将分类当逐条事实证明。",
       "review": {
-        "date": "2026-11-03",
-        "baseline": "2705935",
-        "status": "design-scope-reviewed",
-        "scope": "旧语义与现行执行的适用性、历史记录堆叠及操作/证据边界",
-        "checked_sources": [],
-        "finding_ids": [
-          "S15"
+        "date": "2026-11-06",
+        "baseline": "4738f62 plus MCP closeout worktree",
+        "status": "operational-and-applicability-reviewed",
+        "scope": "首阶段当前结论、历史设计时点与扩展故障边界；未逐句重新认证第三方规范或旧数值",
+        "checked_sources": [
+          {
+            "path": "csttool/mcp_server.py"
+          },
+          {
+            "path": "csttool/mcp_stdio.py"
+          },
+          {
+            "path": "test/mcp_sdk_test.py"
+          },
+          {
+            "path": "test/mcp_wire_fault_test.py"
+          },
+          {
+            "path": "docs/codex-desktop-geometry-20261104.md"
+          },
+          {
+            "path": "docs/execution-hardening-five-steps.md"
+          },
+          {
+            "path": "knowledge-base/mcp-first-stage-closeout-20261106.json"
+          }
         ],
-        "limitations": "核对作用范围与现行接口分离；原方案、伪代码、外部来源及公式示例不认证为当前生产行为，未重新逐源联网验证。",
-        "content_sha256_at_review": "1aeb393afee442432b8dc35262e007327ad282184d70a3ff86c2198f9700c611"
+        "finding_ids": [],
+        "limitations": "本批无真实CST/桌面重载；完整N01–N25与扩展功能未完成",
+        "content_sha256_at_review": "228b2303b795b2a0c0c18ce37d9f52197afdf14335ba7bd276a0454642811971"
       }
     },
     {
@@ -6346,36 +6374,36 @@
       "authority": "current-progress",
       "provenance": "D3人工确认维护职责；不授予运行验收。",
       "review": {
-        "date": "2026-11-05",
-        "baseline": "cd5a820",
+        "date": "2026-11-06",
+        "baseline": "4738f62 plus MCP closeout worktree",
         "status": "operational-and-applicability-reviewed",
-        "scope": "冷启动预算、两类启动异常、里程碑/迟就绪、协作锁及实际所有权；失败包启动证据与运行身份分离。",
+        "scope": "首阶段当前结论、历史设计时点与扩展故障边界；未逐句重新认证第三方规范或旧数值",
         "checked_sources": [
           {
-            "path": "csttool/runner_client.py"
+            "path": "csttool/mcp_server.py"
           },
           {
-            "path": "csttool/runner.py"
+            "path": "csttool/mcp_stdio.py"
           },
           {
-            "path": "csttool/runner_ownership.py"
+            "path": "test/mcp_sdk_test.py"
           },
           {
-            "path": "csttool/diagnostic_bundle.py"
+            "path": "test/mcp_wire_fault_test.py"
           },
           {
-            "path": "test/runner_startup_test.py"
+            "path": "docs/codex-desktop-geometry-20261104.md"
           },
           {
-            "path": "test/diagnostic_bundle_test.py"
+            "path": "docs/execution-hardening-five-steps.md"
           },
           {
-            "path": "knowledge-base/runner-startup-readiness-20261105.json"
+            "path": "knowledge-base/mcp-first-stage-closeout-20261106.json"
           }
         ],
         "finding_ids": [],
-        "limitations": "原现场首次超时未唯一归因；OS创建/磁盘不硬实时；未启动CST、不宣称已加载GUI/MCP热更新；启动或锁释放不是原生关闭/结果证明。",
-        "content_sha256_at_review": "6f711f87bf4d8e0144c5de7eeb55450f9dc6fecddaf196fabb84426d5f879d74"
+        "limitations": "本批无真实CST/桌面重载；完整N01–N25与扩展功能未完成",
+        "content_sha256_at_review": "117d1bdaa66c970a5e9f75215416f28b28df990ccf98291a3f2e152d933b992a"
       }
     },
     {
@@ -6607,39 +6635,36 @@
       "authority": "current-defined-scope-only",
       "provenance": "2026-11-03人工适用性/历史堆叠复审；具体检查层级见review，不将分类当逐条事实证明。",
       "review": {
-        "date": "2026-11-03",
-        "baseline": "2705935",
+        "date": "2026-11-06",
+        "baseline": "4738f62 plus MCP closeout worktree",
         "status": "operational-and-applicability-reviewed",
-        "scope": "逐门禁对照源码已接入子集及原日期证据；指定桌面/实时工具发现/故障矩阵不升级为已验。；同日桌面正常链以新增验收记录为证，全故障矩阵未完成；复审本批公共故障矩阵和首次恢复DTO修正；同日15个真实受支持场景及剩余Start/Runner边界已核对",
+        "scope": "首阶段当前结论、历史设计时点与扩展故障边界；未逐句重新认证第三方规范或旧数值",
         "checked_sources": [
           {
             "path": "csttool/mcp_server.py"
           },
           {
-            "path": "csttool/application_service.py"
+            "path": "csttool/mcp_stdio.py"
           },
           {
-            "path": "csttool/definition_sessions.py"
+            "path": "test/mcp_sdk_test.py"
           },
           {
-            "path": "knowledge-base/mcp-typed-public-acceptance-20261103.json"
+            "path": "test/mcp_wire_fault_test.py"
           },
           {
-            "path": "knowledge-base/mcp-codex-desktop-20261103.json"
+            "path": "docs/codex-desktop-geometry-20261104.md"
           },
           {
-            "path": "knowledge-base/public-fault-matrix-20261103.json"
+            "path": "docs/execution-hardening-five-steps.md"
           },
           {
-            "path": "knowledge-base/public-native-faults-20261103.json"
+            "path": "knowledge-base/mcp-first-stage-closeout-20261106.json"
           }
         ],
-        "finding_ids": [
-          "S01",
-          "S10"
-        ],
-        "limitations": "本批逐条静态核对所列源码/保存证据；历史实测及原厂/第三方规范不重新运行或外部认证，不等于完整CST/桌面/物理验收。",
-        "content_sha256_at_review": "df656ed65183b876c8f1b895b1994ee3122073e56c603e23f936afe5f5e9abf9"
+        "finding_ids": [],
+        "limitations": "本批无真实CST/桌面重载；完整N01–N25与扩展功能未完成",
+        "content_sha256_at_review": "86825f562d36523d106917653754dd15feb6a1de6fb42e1aee87453470e5bec6"
       }
     },
     {
@@ -7297,16 +7322,36 @@
       "authority": "dated-source-context-not-current-API",
       "provenance": "2026-11-03人工适用性/历史堆叠复审；具体检查层级见review，不将分类当逐条事实证明。",
       "review": {
-        "date": "2026-11-03",
-        "baseline": "2705935",
-        "status": "design-scope-reviewed",
-        "scope": "旧语义与现行执行的适用性、历史记录堆叠及操作/证据边界",
-        "checked_sources": [],
-        "finding_ids": [
-          "S15"
+        "date": "2026-11-06",
+        "baseline": "4738f62 plus MCP closeout worktree",
+        "status": "operational-and-applicability-reviewed",
+        "scope": "首阶段当前结论、历史设计时点与扩展故障边界；未逐句重新认证第三方规范或旧数值",
+        "checked_sources": [
+          {
+            "path": "csttool/mcp_server.py"
+          },
+          {
+            "path": "csttool/mcp_stdio.py"
+          },
+          {
+            "path": "test/mcp_sdk_test.py"
+          },
+          {
+            "path": "test/mcp_wire_fault_test.py"
+          },
+          {
+            "path": "docs/codex-desktop-geometry-20261104.md"
+          },
+          {
+            "path": "docs/execution-hardening-five-steps.md"
+          },
+          {
+            "path": "knowledge-base/mcp-first-stage-closeout-20261106.json"
+          }
         ],
-        "limitations": "核对作用范围与现行接口分离；原方案、伪代码、外部来源及公式示例不认证为当前生产行为，未重新逐源联网验证。",
-        "content_sha256_at_review": "af1280c3411a0034eee59795ba00c60d16931f1fcfec406ce3fdb3d5f62d3174"
+        "finding_ids": [],
+        "limitations": "本批无真实CST/桌面重载；完整N01–N25与扩展功能未完成",
+        "content_sha256_at_review": "3365aa63624e8e1b700c5f285765fd1b03fb59f5387f639ccf1459f4aaa1ad6e"
       }
     },
     {
@@ -7353,20 +7398,36 @@
       "authority": "dated-source-context-not-current-API",
       "provenance": "2026-11-03人工适用性/历史堆叠复审；具体检查层级见review，不将分类当逐条事实证明。",
       "review": {
-        "date": "2026-11-03",
-        "baseline": "2705935",
-        "status": "design-scope-reviewed",
-        "scope": "旧语义与现行执行的适用性、历史记录堆叠及操作/证据边界；复审本批公共故障矩阵和首次恢复DTO修正",
+        "date": "2026-11-06",
+        "baseline": "4738f62 plus MCP closeout worktree",
+        "status": "operational-and-applicability-reviewed",
+        "scope": "首阶段当前结论、历史设计时点与扩展故障边界；未逐句重新认证第三方规范或旧数值",
         "checked_sources": [
           {
-            "path": "knowledge-base/public-fault-matrix-20261103.json"
+            "path": "csttool/mcp_server.py"
+          },
+          {
+            "path": "csttool/mcp_stdio.py"
+          },
+          {
+            "path": "test/mcp_sdk_test.py"
+          },
+          {
+            "path": "test/mcp_wire_fault_test.py"
+          },
+          {
+            "path": "docs/codex-desktop-geometry-20261104.md"
+          },
+          {
+            "path": "docs/execution-hardening-five-steps.md"
+          },
+          {
+            "path": "knowledge-base/mcp-first-stage-closeout-20261106.json"
           }
         ],
-        "finding_ids": [
-          "S15"
-        ],
-        "limitations": "核对作用范围与现行接口分离；原方案、伪代码、外部来源及公式示例不认证为当前生产行为，未重新逐源联网验证。",
-        "content_sha256_at_review": "bc283c14c6a06f1fc6c2ee58aae8c87211aa335549f18266e42487ca03312342"
+        "finding_ids": [],
+        "limitations": "本批无真实CST/桌面重载；完整N01–N25与扩展功能未完成",
+        "content_sha256_at_review": "ca59b8c232206db9e888cb432ac1bde99412a94155dd90649d45e72f0bb3e31c"
       }
     },
     {
@@ -7440,36 +7501,36 @@
       "authority": "current-worklist",
       "provenance": "D3人工确认维护职责；不授予运行验收。",
       "review": {
-        "date": "2026-11-05",
-        "baseline": "cd5a820",
+        "date": "2026-11-06",
+        "baseline": "4738f62 plus MCP closeout worktree",
         "status": "operational-and-applicability-reviewed",
-        "scope": "冷启动预算、两类启动异常、里程碑/迟就绪、协作锁及实际所有权；失败包启动证据与运行身份分离。",
+        "scope": "首阶段当前结论、历史设计时点与扩展故障边界；未逐句重新认证第三方规范或旧数值",
         "checked_sources": [
           {
-            "path": "csttool/runner_client.py"
+            "path": "csttool/mcp_server.py"
           },
           {
-            "path": "csttool/runner.py"
+            "path": "csttool/mcp_stdio.py"
           },
           {
-            "path": "csttool/runner_ownership.py"
+            "path": "test/mcp_sdk_test.py"
           },
           {
-            "path": "csttool/diagnostic_bundle.py"
+            "path": "test/mcp_wire_fault_test.py"
           },
           {
-            "path": "test/runner_startup_test.py"
+            "path": "docs/codex-desktop-geometry-20261104.md"
           },
           {
-            "path": "test/diagnostic_bundle_test.py"
+            "path": "docs/execution-hardening-five-steps.md"
           },
           {
-            "path": "knowledge-base/runner-startup-readiness-20261105.json"
+            "path": "knowledge-base/mcp-first-stage-closeout-20261106.json"
           }
         ],
         "finding_ids": [],
-        "limitations": "原现场首次超时未唯一归因；OS创建/磁盘不硬实时；未启动CST、不宣称已加载GUI/MCP热更新；启动或锁释放不是原生关闭/结果证明。",
-        "content_sha256_at_review": "fe90fe1754427afc2a43d876021a02f04b5e1ce7b463b62095c51b2df7ca0e8c"
+        "limitations": "本批无真实CST/桌面重载；完整N01–N25与扩展功能未完成",
+        "content_sha256_at_review": "0b31c5f14f5fd5bfd09063c7b5d0dd396ce72857e1986f9a5d00b759507eef19"
       }
     },
     {
@@ -9475,30 +9536,36 @@
       "authority": "current-defined-scope-only",
       "provenance": "57ccb32后公共故障矩阵与对应测试",
       "review": {
-        "date": "2026-11-03",
-        "baseline": "57ccb32",
+        "date": "2026-11-06",
+        "baseline": "4738f62 plus MCP closeout worktree",
         "status": "operational-and-applicability-reviewed",
-        "scope": "G03/G04/G08故障测试及N01–N25分项覆盖，不整体认证；复审原生采集移至模式可用之后及原始求解错误优先保留；同日15个真实受支持场景及剩余Start/Runner边界已核对",
+        "scope": "首阶段当前结论、历史设计时点与扩展故障边界；未逐句重新认证第三方规范或旧数值",
         "checked_sources": [
           {
-            "path": "csttool/application_service.py"
+            "path": "csttool/mcp_server.py"
           },
           {
-            "path": "test/public_failure_matrix_test.py"
+            "path": "csttool/mcp_stdio.py"
           },
           {
             "path": "test/mcp_sdk_test.py"
           },
           {
-            "path": "knowledge-base/public-fault-matrix-20261103.json"
+            "path": "test/mcp_wire_fault_test.py"
           },
           {
-            "path": "knowledge-base/public-native-faults-20261103.json"
+            "path": "docs/codex-desktop-geometry-20261104.md"
+          },
+          {
+            "path": "docs/execution-hardening-five-steps.md"
+          },
+          {
+            "path": "knowledge-base/mcp-first-stage-closeout-20261106.json"
           }
         ],
         "finding_ids": [],
-        "limitations": "离线注入/假任务子进程不等于真实CST失败和所有协议矩阵",
-        "content_sha256_at_review": "e7cf71537ae3ab202f559869659ce84e5e50c63149a4d0bd7d15e1c58d02dc3e"
+        "limitations": "本批无真实CST/桌面重载；完整N01–N25与扩展功能未完成",
+        "content_sha256_at_review": "90273de56f0cafa88f2efd558e25bdecb3b7f65fa610096cea970228ae954241"
       }
     },
     {
@@ -9831,6 +9898,44 @@
         "limitations": "原现场首次超时未唯一归因；OS创建/磁盘不硬实时；未启动CST、不宣称已加载GUI/MCP热更新；启动或锁释放不是原生关闭/结果证明。",
         "content_sha256_at_review": "ce8eaa5b22757fd3141bd5a9796b850d6c0b41b82f04a2964d9c3a879dbc7dc6"
       }
+    },
+    {
+      "path": "docs/mcp-first-stage-closeout.md",
+      "role": "api-contract",
+      "authority": "current-defined-scope-only",
+      "provenance": "First-stage bounded closeout, not universal protocol/native certification",
+      "review": {
+        "date": "2026-11-06",
+        "baseline": "4738f62 plus MCP closeout worktree",
+        "status": "operational-and-applicability-reviewed",
+        "scope": "首阶段当前结论、历史设计时点与扩展故障边界；未逐句重新认证第三方规范或旧数值",
+        "checked_sources": [
+          {
+            "path": "csttool/mcp_server.py"
+          },
+          {
+            "path": "csttool/mcp_stdio.py"
+          },
+          {
+            "path": "test/mcp_sdk_test.py"
+          },
+          {
+            "path": "test/mcp_wire_fault_test.py"
+          },
+          {
+            "path": "docs/codex-desktop-geometry-20261104.md"
+          },
+          {
+            "path": "docs/execution-hardening-five-steps.md"
+          },
+          {
+            "path": "knowledge-base/mcp-first-stage-closeout-20261106.json"
+          }
+        ],
+        "finding_ids": [],
+        "limitations": "本批无真实CST/桌面重载；完整N01–N25与扩展功能未完成",
+        "content_sha256_at_review": "6cde5ed61a4accdcb9f94f4550212f30e65ad7dd4f5461f97c6b0110be0ed154"
+      }
     }
   ],
   "tools": [
@@ -9952,7 +10057,7 @@
       ],
       "review_status": "source-reviewed-specific-boundary",
       "unknown": "动态/委托参数、外部工具及传递副作用不由AST或本条登记证明安全。",
-      "evidence": "2026-11-03静态检查；已读create_server/main/adapter；SDK可选，不注册额外求解队列。"
+      "evidence": "2026-11-06复审main仍仅--project；create_server仍14工具、8并发限额、未知工具协议拒绝及非法输出检查；EOF不停止Runner。未改命令参数/原生生命周期。"
     },
     {
       "path": "csttool/nsgaii_TM020.py",
@@ -11507,8 +11612,8 @@
       "trigger": "server.tool装饰器注册公开工具；闭包invoke限流并转换错误。",
       "lifecycle": "MCP stdio进程；SDK在create_server内加载，adapter可注入。",
       "cleanup": "invoke finally释放信号量；EOF关闭适配器不停止独立任务。",
-      "evidence": "2026-11-04 GEO-2–4逐调用人工复审：14工具签名新增显式geometry_profile/validation_target并实际转发；SDK分发测试和公开真实链分层。 代码hash仅作复审定位，原生证据另见独立校准。",
-      "unknown": "SDK动态调用/宿主发现与版本协商不由本记录证明；注入adapter可替换。",
+      "evidence": "2026-11-06人工复审create_server严格输入/未知工具分发、invoke输出检查与finally释放、现代stdio信封和取消责任；14工具签名及Runner调用不变。SDK/原始线路/适配32项通过，不代表原生或全部协议符合。",
+      "unknown": "官方SDK固定版本及当前工具子集；完整取消/并发竞态、所有错误DTO及其它传输未全验。",
       "consumers": []
     },
     {
@@ -12086,8 +12191,8 @@
       "trigger": "StrictServer.run_stdio_async；仅现代stdio，每个请求校验信封后仍交官方SDK分发。",
       "lifecycle": "单连接异步输入/输出与SDK线程调用；在途ID按响应/取消清理；取消不转换为CST stop。",
       "cleanup": "EOF关闭适配进程资源，不停止独立Runner；不启用HTTP/OAuth/Tasks。",
-      "evidence": "2026-11-04 GEO-2–4逐调用人工复审：复核同一Runner/adapter或注入边界及未更改的清理责任；GEO新增目标不是另一后端。 代码hash仅作复审定位，原生证据另见独立校准。",
-      "unknown": "SDK私有lowlevel入口依赖固定版本；非stdio客户端和未测试扩展不能外推符合。"
+      "evidence": "2026-11-06人工复审create_server严格输入/未知工具分发、invoke输出检查与finally释放、现代stdio信封和取消责任；14工具签名及Runner调用不变。SDK/原始线路/适配32项通过，不代表原生或全部协议符合。",
+      "unknown": "官方SDK固定版本及当前工具子集；完整取消/并发竞态、所有错误DTO及其它传输未全验。"
     },
     {
       "id": "R025",
@@ -12532,7 +12637,7 @@
     "csttool/logging_config.py": "b664595865c6530dbb448aded381fe96b436a2138cde424e5648d9e6a416ec37",
     "csttool/managed_cstworker.py": "53177e919554544d5a4f157a0a3126ac92b61c1cc3af0cfa24213aa51242fde6",
     "csttool/managed_session_recovery.py": "1a84a69e85a43457039af1059a15cb25ac8553849896ae0b787f369fafb3e999",
-    "csttool/mcp_server.py": "86f3eca54884bce79b8ec86f47b106edd820ed07e54dfde76bd553bec7faac60",
+    "csttool/mcp_server.py": "c5094c6f3a8bf468fe57ca72fedb88a4af28853df9ce61786001d2641a78b7ef",
     "csttool/native_definition_builder.py": "7becaf1525d62d9d332ad4b46ec864d925a2db60991131f14f8c38860db4a872",
     "csttool/native_execution_capture.py": "6bcd6e1519cc41794e151e872d2f6077b08d9566f854e63fbe810305ae609a25",
     "csttool/physical_domain.py": "e8fdb99ef1a65a829f9ca525f9c049a73e6b6fc5cb69bb98a552ee6908f2113a",

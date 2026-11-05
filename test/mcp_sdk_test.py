@@ -97,3 +97,30 @@ def test_modern_unicode_payload_and_error_do_not_poison_next_call(tmp_path):
             assert [t.name for t in before.tools] == [t.name for t in after.tools]
             assert after.ttl_ms == 0 and after.cache_scope == 'private'
     asyncio.run(run())
+
+
+def test_unknown_tool_is_protocol_error_without_business_dispatch(tmp_path):
+    async def run():
+        from mcp.shared.exceptions import MCPError
+        FakeClient.calls=[]
+        server=create_server(tmp_path,adapter=MCPApplicationAdapter(tmp_path,client_factory=FakeClient))
+        async with Client(server,mode='2026-07-28') as client:
+            with pytest.raises(MCPError) as caught:await client.call_tool('not_a_cst_tool',{})
+            assert caught.value.error.code==-32602
+            assert FakeClient.calls==[]
+            assert (await client.call_tool('get_project_status',{})).structured_content=={'state':'IDLE'}
+    asyncio.run(run())
+
+
+@pytest.mark.parametrize('bad',[{'value':float('nan')},{'nested':[float('inf')]},{'value':b'not-json'},['not-an-object']])
+def test_invalid_backend_output_is_rejected_before_sdk_can_coerce_it(tmp_path,bad):
+    class Peer:
+        def get_status(self):return bad
+    async def run():
+        server=create_server(tmp_path,adapter=Peer())
+        async with Client(server,mode='2026-07-28') as client:
+            result=await client.call_tool('get_project_status',{})
+            assert result.is_error and 'INVALID_OUTPUT' in result.content[0].text
+            assert not result.structured_content
+            assert len((await client.list_tools()).tools)==14
+    asyncio.run(run())

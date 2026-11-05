@@ -1,6 +1,6 @@
 # 现行计划与TODO
 
-更新：2026-11-05。以[当前状态](current-status.md)确认实现和证据；本页只列当前工作。所有旧未决条目保存在[复审前完整快照](archive/20261103-semantic-review/minimal-python-vba-todo.md)及[较早归档](archive/20261102-progress-consolidation/minimal-python-vba-todo.md)，不因归档标为完成。
+更新：2026-11-06。以[当前状态](current-status.md)确认实现和证据；本页只列当前工作。所有旧未决条目保存在[复审前完整快照](archive/20261103-semantic-review/minimal-python-vba-todo.md)及[较早归档](archive/20261102-progress-consolidation/minimal-python-vba-todo.md)，不因归档标为完成。
 
 ## 已完成的基础
 
@@ -10,6 +10,11 @@
 - [x] W0静态和核心宿主无求解语法校准；ANTLR离线PoC、NoUI未初始化边界留档。
 - [x] 公共空工程/类型化构造的归属后quiet、非活动桌面与窗口观察首批验收。
 - [x] D1–D4功能映射/查询/登记/源码包边界，2026-11-03组合60项通过。
+
+## 首阶段MCP收口
+
+- [x] 受限本机14工具的契约、使用/身份、错误与恢复边界收口；已有正常桌面链不再列待验，未启用扩展不混入本阶段必需项。见[收口记录](mcp-first-stage-closeout.md)。
+- [x] 未知工具协议错误、后台非法输出拒绝及错误后中文stdio回归；本批32项通过，未启动CST。完整故障矩阵、其它宿主/建模能力仍见后续独立项。
 
 ## 近期工作顺序
 

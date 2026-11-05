@@ -4,6 +4,7 @@ Only implemented operations are advertised. No Qt, worker or CST object belongs
 in this process. EOF closes the adapter, not an independent run.
 """
 import argparse
+import json
 from pathlib import Path
 import re
 import secrets
@@ -109,16 +110,19 @@ def create_server(project,*,adapter=None):
 
         async def call_tool(self,name,arguments,context=None):
             from jsonschema import Draft202012Validator
+            from mcp.shared.exceptions import MCPError
+            from mcp.server.mcpserver.exceptions import ToolError
             for tool in await self.list_tools():
                 if tool.name==name:
                     error=next(Draft202012Validator(tool.input_schema).iter_errors(arguments),None)
                     if error is not None:
-                        raise ValueError('INVALID_ARGUMENT: tool input does not match schema')
+                        raise ToolError('INVALID_ARGUMENT: tool input does not match schema')
                     break
+            else:
+                raise MCPError(-32602,'Unknown tool: '+name)
             try:
                 return await super().call_tool(name,arguments,context)
             except ValueError as error:
-                from mcp.server.mcpserver.exceptions import ToolError
                 raise ToolError(str(error)) from None
 
     async def modern_only(context,call_next):
@@ -144,7 +148,15 @@ def create_server(project,*,adapter=None):
         from mcp.server.mcpserver.exceptions import ToolError
         from .runner_client import RunnerRejected
         if not inflight.acquire(blocking=False):raise ToolError('RATE_LIMITED: adapter request capacity exceeded')
-        try:return function(*args,**kwargs)
+        try:
+            result=function(*args,**kwargs)
+            try:
+                if not isinstance(result,dict):raise TypeError('output must be an object')
+                json.dumps(result,allow_nan=False)
+            except (TypeError,ValueError,OverflowError,RecursionError):
+                raise ToolError('INVALID_OUTPUT: backend result must be a finite JSON object; inspect Runner diagnostics') from None
+            return result
+        except ToolError:raise
         except (ValueError,RunnerRejected) as error:
             raise ToolError(str(error)) from None
         except (OSError,RuntimeError) as error:

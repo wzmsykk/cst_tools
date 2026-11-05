@@ -1,0 +1,43 @@
+{
+  "date": "2026-11-06",
+  "baseline": "4738f62 plus MCP closeout worktree",
+  "scope": "first-stage tools-only stdio boundary; no CST or desktop reload in this batch",
+  "reproduced_before_fix": {
+    "tests": 5,
+    "failures": 5
+  },
+  "sdk_wire_adapter": {
+    "passed": 32,
+    "seconds": 23.83
+  },
+  "fixes": [
+    "unknown tool returns JSON-RPC -32602 without dispatch",
+    "reject non-object/non-JSON/nonfinite backend output before SDK coercion",
+    "strict wire output parsing and continued Unicode response after rejection"
+  ],
+  "native_evidence": "Existing 2026-11-03/04 evidence remains dated; no new native acceptance",
+  "remaining": [
+    "native Start=0 and Start exception",
+    "full N01-N25 combinations",
+    "extended CAD/materials/solvers and other hosts"
+  ],
+  "related_regression": {
+    "passed": 89,
+    "failed": 1,
+    "seconds": 87.31,
+    "failure": "source snapshot and source_fingerprints sampled across an in-flight code cleanup; gate correctly refused"
+  },
+  "final_package_and_registry": {
+    "passed": 10,
+    "seconds": 48.66,
+    "includes_rerun_of_previous_failed_package": true,
+    "overlaps_related_regression": true
+  },
+  "source_gates": "A1, GEO geometry and GEO simulation valid without native launch",
+  "cleanup": "All seven completed mcp-closeout pytest basetemp directories removed after bounded workspace path checks; XML and this lightweight report retained. Temporary source ZIP/extraction must be regenerated.",
+  "final_document_registry": {
+    "passed": 8,
+    "seconds": 20.07,
+    "overlaps_related_regression": true
+  }
+}

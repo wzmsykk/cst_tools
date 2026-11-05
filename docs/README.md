@@ -12,8 +12,9 @@
 |公共单次API/G03、恢复/错误行为|[公共服务](single-simulation-service.md)|
 |2026-11-02真实CST组合验收|[G03/G04记录](single-simulation-g04-acceptance.md)|
 |设置定义/执行事实分层|[验证器](cst-settings-verifier-design.md)、[B2投影](settings-history-projection.md)、[B3快照](execution-snapshot-verification.md)、[原生采集](native-execution-capture.md)|
+|MCP首阶段当前使用、范围及证据|[收口与使用](mcp-first-stage-closeout.md)、[现行门禁](g01-g08-progress.md)|
 |MCP目标与冻结设计，非全部已实现|[G01–G08](mcp-first-stage-conversational-gate.md)、[首阶段契约](mcp-first-stage-interface-contract.md)、[统一接口](unified-interface-contract.md)、[静态框架](mcp-framework-static-design.md)|
-|通用几何与实体选择集，GEO-1/1.1声明编辑与GEO-2离线历史已接、原生待校准|[GEO设计、作用域与历史边界](geometry-selection-interface-design.md)|
+|通用几何与实体选择集，受限GEO-2–4原生及桌面已验|[GEO设计、作用域与历史边界](geometry-selection-interface-design.md)|
 |既有生产运行协议与恢复|[Python/VBA协议](minimal-python-vba-protocol.md)、[恢复退出实现](recovery-exit-audit-implementation.md)|
 |整理前状态、旧计划、原始验收数字|[归档索引](archive/20261102-progress-consolidation/README.md)|
 
